@@ -209,8 +209,9 @@ public class WebAPIClient {
 //        requestURL = requestURL.replace(" ", "%20");
 
         String encodedPostData = "";
+        String tempData = "\"" + postData + "\"";
         try {
-            String tempData = "\"" + postData + "\"";
+
             encodedPostData = URLEncoder.encode(tempData, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -241,7 +242,7 @@ public class WebAPIClient {
             OutputStream os = httpURLConnection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
-            writer.write(encodedPostData);
+            writer.write(tempData);
 
             writer.flush();
             writer.close();

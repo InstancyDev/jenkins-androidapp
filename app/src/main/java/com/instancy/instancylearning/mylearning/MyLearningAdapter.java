@@ -35,7 +35,6 @@ import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
-import com.instancy.instancylearning.globalpackage.SynchData;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.DownloadInterface;

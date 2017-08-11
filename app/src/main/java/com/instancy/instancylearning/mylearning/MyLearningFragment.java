@@ -652,9 +652,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();
-
         final String finalDownloadedFilePath = downloadDestFolderPath + "/" + extensionStr;
-
         final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
         final String finalDownloadDestFolderPath = downloadDestFolderPath;
         DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
@@ -674,12 +672,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             zipfile.delete();
                         }
                         myLearningAdapter.notifyDataSetChanged();
-
                         if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
                             callMetaDataService(learningModel);
                         }
                     }
-
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d(TAG, "onDownloadFailed: " + +errorCode);
@@ -691,9 +687,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
                         if (v != null) {
                             updateStatus(position, progress);
-
                         }
-
                     }
 
                 });
@@ -726,13 +720,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             }
         }
-
-
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult first:");
         Log.d(TAG, "onActivityResult first:");
 
         super.onActivityResult(requestCode, resultCode, data);

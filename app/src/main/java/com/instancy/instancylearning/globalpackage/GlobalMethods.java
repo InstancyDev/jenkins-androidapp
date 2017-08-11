@@ -650,7 +650,8 @@ public class GlobalMethods {
             if (downloadInterface != null) {
                 downloadInterface.deletedTheContent(1);
                 Toast.makeText(v.getContext(), "successfully deleted", Toast.LENGTH_SHORT).show();
-
+                databaseH = new DatabaseHandler(v.getContext());
+                databaseH.ejectRecordsinCmi(myLearningModel);
             }
         } else {
 

@@ -15,7 +15,6 @@ import com.instancy.instancylearning.utils.Utilities;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,11 +65,12 @@ public class SynchData {
                     + "</SCOID>");
             if (tempCmi.get_status().equals("") || tempCmi.get_status() == null
                     || tempCmi.get_status().equals("null")) {
-                sb.append("<CoreLessonStatus></CoreLessonStatus>");
+                sb.append("<CoreLessonStatus>incomplete</CoreLessonStatus>");
 
             } else {
-                sb.append("<CoreLessonStatus>" + tempCmi.get_status()
-                        + "</CoreLessonStatus>");
+//                sb.append("<CoreLessonStatus>" + tempCmi.get_status()
+//                        + "</CoreLessonStatus>");
+                sb.append("<CoreLessonStatus>incomplete</CoreLessonStatus> ");
             }
 
             if (tempCmi.get_location().equals("")
@@ -306,9 +306,9 @@ public class SynchData {
                     sb.append("<SCOID>"
                             + String.valueOf(tempResponse.get_scoId())
                             + "</SCOID>");
-                    sb.append("<QuestionId>"
+                    sb.append("<QuestionID>"
                             + String.valueOf(tempResponse.get_questionid())
-                            + "</QuestionId>");
+                            + "</QuestionID>");
                     sb.append("<AssessmentAttempt>"
                             + String.valueOf(tempResponse
                             .get_assessmentattempt())
@@ -390,20 +390,14 @@ public class SynchData {
             Log.d("MobileUpdateOfflineTracked", sb.toString());
 
 
-//            try {
             String requestURL = appUserModel.getWebAPIUrl()
                     + "/MobileLMS/MobileUpdateOfflineTrackedData"
                     + "?_studId=" + String.valueOf(tempCmi.get_userId())
                     + "&_scoId=" + String.valueOf(tempCmi.get_scoId())
                     + "&_siteURL=" + tempCmi.get_sitrurl()
                     + "&_siteID=" + tempCmi.get_siteId();
-            HttpURLConnection urlConnection = null;
             InputStream inputStream = null;
-
-
             inputStream = webAPIClient.synchronousPostMethod(requestURL, appUserModel.getAuthHeaders(), sb.toString());
-
-
             if (inputStream != null) {
 
                 String result = Utilities.convertStreamToString(inputStream);

@@ -2034,6 +2034,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("progress")) {
 
                     myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
+                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        ejectRecordsinCmi(myLearningModel);
+                    }
                 }
 
 //            injectIntoRowWise(myLearningModel);
@@ -4021,7 +4024,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     + quesAry[9]);
                 }
             } else {
-                studentresponse.set_result("");
+
                 studentresponse.set_attachfilename("");
                 studentresponse.set_attachfileid("");
                 studentresponse.set_attachedfilepath("");
@@ -4611,7 +4614,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.NoOfAttempts, C.score, D.objecttypeid, C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.contentid, C.CourseMode, C.scoreMin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl FROM "
                 + TBL_CMI
-                + " C left join "
+                + " C inner join "
                 + TBL_DOWNLOADDATA
                 + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate='false'";
         Cursor cursor = db.rawQuery(selQuery, null);
