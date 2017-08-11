@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:background="#4d4d4d">
+
+    <ImageView
+        android:id="@+id/subMenuIcon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:id="@+id/subMenuText"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/subMenuIcon"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:text="Menu Item"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/subMenuExpIcon"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_launcher"
+        android:visibility="gone" />
+</RelativeLayout>

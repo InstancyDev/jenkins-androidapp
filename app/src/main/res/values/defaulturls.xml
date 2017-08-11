@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- <string name="app_default_url">http://demo.instancyplatform.com/</string>
+   <string name="app_default_webapi_url">http://webapi.instancyplatform.com/api/</string> -->
+
+    <!--
+    <string name="app_default_url">http://247cle.instancy.com/</string>
+    <string name="app_default_webapi_url">http://Citnwebapi.instancyplatform.com/api/</string>
+    -->
+    <!--
+    <string name="app_default_url">http://247cle.instancy.net/</string>
+    <string name="app_default_webapi_url">http://247clewebapi.instancy.net/api/</string>
+    -->
+    <!--  <string name="app_default_url">http://qacle.instancy.net/</string>
+        <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
+
+    <string name="app_default_url">http://test.instancy.net/</string>
+    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+
+    <!--<string name="app_default_url">http://staging.enlightus.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+
+    <!--<string name="app_default_url">http://learnonlinelifeskills.instancy.net/</string>-->
+    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
+    <!--     <string name="app_default_url">http://mobile.instancy.net/</string>
+        <string name="app_default_webapi_url">http://mobiwebapi.instancy.net/api/</string> -->
+
+    <!--    <string name="app_default_url">http://development.instancy.net/</string>
+        <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>  -->
+
+    <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
+
+    <!--     <string name="app_default_url">http://montessoritraining.instancy.net/</string>
+        <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>  -->
+
+    <!--        <string name="app_default_url">http://croplife.instancy.net/</string>
+        <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>   -->
+
+    <!--<string name="app_default_url">http://mci-institute-newui.instancy.net/</string>-->
+    <!--<string name="app_default_webapi_url">http://mcinewwapi.instancy.net/api/</string>-->
+
+    <!--<string name="app_default_url">http://qatoshiba.instancy.net/</string>-->
+    <!--<string name="app_default_webapi_url">http://Toshiwebapi.instancy.net/api/</string>-->
+
+    <!--<string name="app_default_url">http://toshiba.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://Toshiwebapi.instancy.net/api/</string>-->
+
+    <!--<string name="app_default_url">http://qa-newui.instancy.net/</string>-->
+    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
+
+</resources>

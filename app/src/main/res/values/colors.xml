@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#8dc73f</color>
+    <color name="colorPrimaryDark">#36454f</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorGray">#D3D3D3</color>
+    <color name="colorWhite">#ffff</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorDefault">#8dc73f</color>
+    <color name="colorRed">#EA4941</color>
+    <color name="colorFaceBookSilver">#f7f7f7</color>
+
+    <color name="colorStatusCompleted">#4ad963</color>
+    <color name="colorStatusNotStarted">#fe2c53</color>
+    <color name="colorStatusInProgress">#ff9503</color>
+    <color name="colorSiteName">#34aadc</color>
+    <color name="colorStatusOther">#5750da</color>
+
+    <color name="colorDefaultBackGround">#5DB100</color>
+
+
+</resources>

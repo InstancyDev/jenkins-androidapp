@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.instancy.instancylearning">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:name=".globalpackage.AppController"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:node="replace">
+        <activity
+            android:name=".mainactivities.Splash_activity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar">
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Branding screen -->
+        <activity
+            android:name=".mainactivities.Branding_activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <!-- Login screen -->
+        <activity
+            android:name=".mainactivities.Login_activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustNothing"></activity>
+
+        <!-- forgot screen -->
+        <activity
+            android:name=".mainactivities.ForgotPasswordActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!-- social screen -->
+        <activity
+            android:name=".mainactivities.SocialWebLoginsActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!-- sign screen -->
+        <activity
+            android:name=".mainactivities.SignUp_Activity"
+            android:screenOrientation="portrait"></activity>
+
+        <!-- Settings screen -->
+        <activity
+            android:name=".mainactivities.Settings_activity"
+            android:screenOrientation="portrait"></activity>
+
+        <!-- NativeSettings screen -->
+        <activity
+            android:name=".mainactivities.NativeSettings"
+            android:screenOrientation="portrait"></activity>
+
+        <!-- sidemenu screen -->
+        <activity
+            android:name=".sidemenumodule.SideMenu"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <!-- MylearningDetail screen -->
+        <activity
+            android:name=".mylearning.MyLearningDetail_Activity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--aDVANCED WEBVIEW -->
+        <activity
+            android:name=".mainactivities.AdvancedWebCourseLaunch"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".mainactivities.WebLaunchView"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".mainactivities.WebView_Activity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".mainactivities.PdfViewer_Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <activity
+            android:name=".mylearning.TrackList_Activity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".mylearning.Reports_Activity"
+            android:screenOrientation="portrait"></activity>
+
+
+    </application>
+
+</manifest>

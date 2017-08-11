@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TrackedData>
+
+        <CMI>
+
+            <ID>2</ID>
+
+            <UserID>1</UserID>
+
+            <SCOID>183</SCOID>
+
+            <CoreLessonStatus>In Progress</CoreLessonStatus>
+
+            <CoreLessonLocation>2</CoreLessonLocation>
+
+            <SuspendData>#pgvs_start#1;2;#pgvs_end#</SuspendData>
+
+            <Score>0</Score>
+
+            <ObjectTypeId>9</ObjectTypeId>
+
+            <DateCompleted />
+
+            <SequenceNumber>0</SequenceNumber>
+
+            <NoOfAttempts>0</NoOfAttempts>
+
+            <TrackScoID>0</TrackScoID>
+
+            <TrackContentID>0</TrackContentID>
+
+            <TrackObjectTypeID>9</TrackObjectTypeID>
+
+            <OrgUnitID>374</OrgUnitID>
+
+            <AttemptsLeft />
+
+            <CoreLessonMode />
+
+            <ScoreMin />
+
+            <ScoreMax />
+
+            <RandomQuestionNos />
+
+            <TextResponses />
+
+            <PooledQuestionNos />
+        </CMI>
+
+        <LearnerSession>
+
+            <SessionID>964</SessionID>
+
+            <UserID>1</UserID>
+
+            <SCOID>183</SCOID>
+
+            <AttemptNumber>1</AttemptNumber>
+
+            <SessionDateTime>2017-08-10T15:42:31</SessionDateTime>
+
+            <TimeSpent>00:00:14.96</TimeSpent>
+        </LearnerSession>
+
+        <StudentResponse>
+
+            <UserID>1</UserID>
+
+            <SCOID>183</SCOID>
+
+            <QuestionId>1</QuestionId>
+
+            <AssessmentAttempt>1</AssessmentAttempt>
+
+            <QuestionAttempt>1</QuestionAttempt>
+
+            <AttemptDate>2017-08-10T15:42:45.957</AttemptDate>
+
+            <Response>1</Response>
+
+            <Result>correct</Result>
+
+            <OptionalNotes />
+
+            <AttachFileName />
+
+            <AttachFileId />
+
+            <CapturedVidFileName />
+
+            <CapturedVidId />
+
+            <CapturedImgFileName />
+
+            <CapturedImgId />
+        </StudentResponse>
+    </TrackedData>
+</LinearLayout>

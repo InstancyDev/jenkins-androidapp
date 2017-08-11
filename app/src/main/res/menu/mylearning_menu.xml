@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/mylearning_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:orderInCategory="100"
+        android:title="search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+    <item
+        android:id="@+id/mylearning_filter"
+        android:icon="@drawable/ic_filter_list_black_24dp"
+        android:orderInCategory="100"
+        android:title="filter"
+        app:showAsAction="ifRoom|withText" />
+
+    <!--<item-->
+    <!--android:id="@+id/action_search"-->
+    <!--android:actionViewClass="android.widget.SearchView"-->
+    <!--android:icon="@drawable/ic_search_black_24dp"-->
+    <!--android:title="Search"-->
+    <!--app:showAsAction="always" />-->
+
+</menu>

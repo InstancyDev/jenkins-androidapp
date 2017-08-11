@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="pref_screen">
+    <PreferenceCategory
+        android:key="cat_url"
+        android:layout="@layout/pref_heading_layout"
+        android:selectable="true"
+        android:shouldDisableView="true"
+        android:title="@string/pref_chk_label_reset_url">
+        <!--<view-->
+        <!--android:defaultValue="false"-->
+        <!--android:key="reseturl"-->
+        <!--android:shouldDisableView="true"-->
+        <!--android:title="@string/pref_chk_label_reset_url" />-->
+        <EditTextPreference
+            android:defaultValue="@string/app_default_url"
+            android:key="url"
+            android:layout="@layout/pref_edit_style"
+            android:negativeButtonText="@string/alert_btntext_Cancel"
+            android:positiveButtonText="@string/alert_btntext_Save"
+            android:shouldDisableView="true"
+            android:title="@string/pref_edit_label_change_url" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="cat_notif"
+        android:shouldDisableView="true"
+        android:title="@string/pref_head_notifications">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="target_reminder"
+            android:shouldDisableView="true"
+            android:title="@string/pref_txt_label_target_reminder" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="assignment"
+            android:shouldDisableView="true"
+            android:title="@string/pref_txt_label_assignment" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="new_content"
+            android:shouldDisableView="true"
+            android:title="@string/pref_txt_label_new_content" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="unassignment"
+            android:shouldDisableView="true"
+            android:title="@string/pref_txt_label_unassignment" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="cat_down"
+        android:shouldDisableView="true"
+        android:title="@string/pref_head_download">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="down_auto"
+            android:shouldDisableView="true"
+            android:title="@string/pref_txt_label_auto" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="down_mobile"
+            android:shouldDisableView="true"
+            android:title="@string/pref_txt_label_mobile" />
+    </PreferenceCategory>
+    <!--<PreferenceCategory-->
+    <!--android:key="cat_updates"-->
+    <!--android:layout="@layout/pref_heading_layout"-->
+    <!--android:shouldDisableView="true"-->
+    <!--android:title="@string/pref_head_updates" >-->
+    <!--<Preference-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:ellipsize="marquee"-->
+    <!--android:key="check_updates"-->
+    <!--android:shouldDisableView="true"-->
+    <!--android:textSize="14dp"-->
+    <!--android:title="@string/pref_txt_label_check_updates" />-->
+    <!--</PreferenceCategory>-->
+</PreferenceScreen>
