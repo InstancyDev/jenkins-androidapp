@@ -733,6 +733,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
+        Log.d(TAG, "onActivityResult first:");
+
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK) {
 
