@@ -514,8 +514,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onResume() {
         super.onResume();
 //        synchData.SyncData();
-        cmiSynchTask = new CmiSynchTask(context);
-        cmiSynchTask.execute();
+//        cmiSynchTask = new CmiSynchTask(context);
+//        cmiSynchTask.execute();
     }
 
     public HashMap<String, String> generateConditionsHashmap(String conditions) {

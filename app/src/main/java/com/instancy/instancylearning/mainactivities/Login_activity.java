@@ -260,7 +260,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 break;
             case 4:
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, ApiConstants.linkedInUrl);
-                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Linkedin");
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Linkedin");//9963014569
                 startActivity(intentSocial);
                 break;
             case 5:
@@ -413,7 +413,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void hideOrShowBtns() {
 
-        btnSignup.setVisibility(View.INVISIBLE);
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
@@ -445,6 +444,15 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             linearLayoutOr.setVisibility(View.VISIBLE);
             lineView2.setVisibility(View.VISIBLE);
             lineView1.setVisibility(View.VISIBLE);
+        }
+
+        if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
+
+            btnSignup.setVisibility(View.VISIBLE);
+
+        } else {
+            btnSignup.setVisibility(View.INVISIBLE);
+
         }
     }
 

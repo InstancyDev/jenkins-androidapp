@@ -70,7 +70,7 @@ public class SynchData {
             } else {
 //                sb.append("<CoreLessonStatus>" + tempCmi.get_status()
 //                        + "</CoreLessonStatus>");
-                sb.append("<CoreLessonStatus>incomplete</CoreLessonStatus> ");
+                sb.append("<CoreLessonStatus>incomplete</CoreLessonStatus>");
             }
 
             if (tempCmi.get_location().equals("")

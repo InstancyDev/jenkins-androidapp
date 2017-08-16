@@ -760,6 +760,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                 uiSettingsModel.setNativeAppType(nativeSettingsObj.get("keyvalue").getAsString());
 
+                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationAllowed"))) {
+
+                                uiSettingsModel.setSelfRegistrationAllowed(nativeSettingsObj.get("keyvalue").getAsString());
                             }
 
                         }
@@ -4612,7 +4615,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<CMIModel> getAllCmiDetails() {
         List<CMIModel> cmiList = new ArrayList<CMIModel>();
         SQLiteDatabase db = this.getWritableDatabase();
-        String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.NoOfAttempts, C.score, D.objecttypeid, C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.contentid, C.CourseMode, C.scoreMin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl FROM "
+        String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.noofattempts, C.score, D.objecttypeid, C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.contentid, C.coursemode, C.scoremin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl FROM "
                 + TBL_CMI
                 + " C inner join "
                 + TBL_DOWNLOADDATA
@@ -4665,7 +4668,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return cmiList;
     }
-
 
     public void insertCmiIsUpdate(MyLearningModel learningModel) {
 
