@@ -108,7 +108,11 @@
             android:name=".mylearning.Reports_Activity"
             android:screenOrientation="portrait"></activity>
 
-
+        <receiver android:name=".helper.NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -676,6 +676,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             callMetaDataService(learningModel);
                         }
                     }
+
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d(TAG, "onDownloadFailed: " + +errorCode);

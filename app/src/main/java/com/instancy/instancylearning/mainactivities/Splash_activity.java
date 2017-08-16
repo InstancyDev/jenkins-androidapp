@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -184,8 +185,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
                 if (!appUserModel.getUserIDValue().equalsIgnoreCase("-1")) {
 
-//                    Intent intent = new Intent(this, SideMenu.class);
-//                    startActivity(intent);
                     Intent i = new Intent(context, Branding_activity.class);
                     startActivity(i);
 
@@ -292,9 +291,14 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     @Override
     public void postExecuteIn(String results) {
 
+        if (isNetworkConnectionAvailable(context, -1)) {
+
+            CmiSynchTask cmiSynchTask = new CmiSynchTask(context);
+            cmiSynchTask.execute();
+        }
         progressStatus = 100;
         progressBar.setProgress(progressStatus);
-        imageBrandLogo.clearAnimation();
+//        imageBrandLogo.clearAnimation();
         final ArrayList<String> imagesArray = new ArrayList<String>();
         String splashImagesPath = getExternalFilesDir(null) + "/Mydownloads/"
                 + "SplashImages" + "";

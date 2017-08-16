@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -3157,6 +3158,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 cmiModel.set_scoremin(jsonCMiColumnObj.get("scoremin").toString());
 
+
             }
 
             // scoremax
@@ -3168,7 +3170,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // startdate
             if (jsonCMiColumnObj.has("startdate")) {
 
-                cmiModel.set_startdate(jsonCMiColumnObj.get("startdate").toString());
+
+                String s = jsonCMiColumnObj.getString("startdate").toUpperCase();
+                String dateStr = s.substring(0, 19);
+                SimpleDateFormat curFormater = new SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss");
+                java.util.Date dateObj = null;
+                try {
+                    dateObj = curFormater.parse(dateStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                SimpleDateFormat postFormater = new SimpleDateFormat(
+                        "yyyy-MM-dd hh:mm:ss");
+                String strCreatedDate1 = postFormater
+                        .format(dateObj);
+                cmiModel.set_startdate(strCreatedDate1);
 
             }
             // datecompleted
@@ -3955,7 +3972,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             studentresponse.set_result(quesAry[3]);
             studentresponse.set_assessmentattempt(assessmentAttempt);
             String formattedDate = GetCurrentDateTime();
-//            studentresponse.set_attemptdate(formattedDate);
+            studentresponse.set_attemptdate(formattedDate);
 
             if (learningModel.getObjecttypeId().equalsIgnoreCase("8")) {
                 studentresponse.set_questionid(Integer
@@ -4619,7 +4636,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_CMI
                 + " C inner join "
                 + TBL_DOWNLOADDATA
-                + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate='false'";
+                + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate = 'false'";
         Cursor cursor = db.rawQuery(selQuery, null);
         if (cursor.moveToFirst()) {
             do {
@@ -4677,25 +4694,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             strExeQuery = "UPDATE " + TBL_CMI + " SET isupdate= 'false'" + " WHERE siteid ='" + learningModel.getSiteID() + "' AND userid ='" + learningModel.getUserID() + "' AND scoid='" + learningModel.getScoId() + "'";
 
-            Cursor cursor = null;
-            cursor = db.rawQuery(strExeQuery, null);
+            db.execSQL(strExeQuery);
 
         } catch (SQLiteException ex) {
             ex.printStackTrace();
         }
 
     }
-
     public void insertCMiIsViewd(CMIModel learningModel) {
 
         String strExeQuery = "";
         SQLiteDatabase db = this.getWritableDatabase();
         try {
 
-            strExeQuery = "UPDATE " + TBL_CMI + " SET isupdate= 'true'" + " WHERE siteid ='" + learningModel.get_siteId() + "' AND userid ='" + learningModel.get_userId() + "' AND scoid='" + learningModel.get_scoId() + "'";
+            strExeQuery = "UPDATE " + TBL_CMI + " SET isupdate = 'true'" + " WHERE siteid ='" + learningModel.get_siteId() + "' AND userid ='" + learningModel.get_userId() + "' AND scoid='" + learningModel.get_scoId() + "'";
 
-            Cursor cursor = null;
-            cursor = db.rawQuery(strExeQuery, null);
+            db.execSQL(strExeQuery);
 
         } catch (SQLiteException ex) {
             ex.printStackTrace();

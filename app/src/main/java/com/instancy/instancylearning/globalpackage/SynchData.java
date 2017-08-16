@@ -113,6 +113,9 @@ public class SynchData {
                     sb.append("<DateCompleted></DateCompleted>");
 
                 } else {
+//                    Calendar c = Calendar.getInstance();
+//                    SimpleDateFormat nowtime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssss");
+//                    String presentDate = nowtime.format(c.getTime());
                     sb.append("<DateCompleted>" + tempCmi.get_datecompleted()
                             + "</DateCompleted>");
                 }
@@ -139,7 +142,6 @@ public class SynchData {
             sb.append("<TrackContentID></TrackContentID>");
             sb.append("<TrackObjectTypeID></TrackObjectTypeID>");
             sb.append("<OrgUnitID>" + tempCmi.get_siteId() + "</OrgUnitID>");
-
 
             try {
                 if (tempCmi.get_attemptsleft().equals("")
@@ -387,7 +389,7 @@ public class SynchData {
             }
             sb.append("</TrackedData>");
 
-            Log.d("MobileUpdateOfflineTracked", sb.toString());
+//            Log.d("MobileUpdateOfflineTracked", sb.toString());
 
 
             String requestURL = appUserModel.getWebAPIUrl()
@@ -401,16 +403,15 @@ public class SynchData {
             if (inputStream != null) {
 
                 String result = Utilities.convertStreamToString(inputStream);
-
+                dbh.insertCMiIsViewd(tempCmi);
                 Log.d("TAG", "SyncData: " + result);
             }
 //            dbh.finishSynch(tempCmi);
-            dbh.insertCMiIsViewd(tempCmi);
 //            dbh.sendOfflineUserPagenotes();
         }
 
         // if (errorMessage.equals("")) {
-        // // dbh.FinishSynch();
+//          dbh.finishSynch();
         // }
     }
 
