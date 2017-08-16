@@ -93,7 +93,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        callWebMethods();
 
     }
 
@@ -251,6 +250,8 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     boolean storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
                     if (storageAccepted && cameraAccepted) {
 //                        Toast.makeText(Splash_activity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                        callWebMethods();
+
 
                     } else {
 

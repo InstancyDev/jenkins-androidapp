@@ -4701,6 +4701,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
+
     public void insertCMiIsViewd(CMIModel learningModel) {
 
         String strExeQuery = "";

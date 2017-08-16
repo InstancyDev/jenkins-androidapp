@@ -42,6 +42,7 @@ import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
+import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -101,6 +102,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     WebAPIClient webAPIClient;
     //    SynchData synchData;
     CmiSynchTask cmiSynchTask;
+    UiSettingsModel uiSettingsModel;
 
     public MyLearningFragment() {
     }
@@ -114,6 +116,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         db = new DatabaseHandler(context);
         initVolleyCallback();
         cmiSynchTask = new CmiSynchTask(context);
+        uiSettingsModel = UiSettingsModel.getInstance();
+
 //        synchData = new SynchData(context);
         vollyService = new VollyService(resultCallback, context);
         preferencesManager = PreferencesManager.getInstance();
@@ -322,6 +326,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_search = menu.findItem(R.id.mylearning_search);
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
+
+
         item_filter.setVisible(false);
         if (item_search != null) {
             item_search.setIcon(R.drawable.ic_search_black_24dp);
@@ -332,8 +338,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.DKGRAY);
-            txtSearch.setTextColor(getResources().getColor(R.color.colorGray));
+            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -514,8 +520,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onResume() {
         super.onResume();
 //        synchData.SyncData();
-//        cmiSynchTask = new CmiSynchTask(context);
-//        cmiSynchTask.execute();
+//onactivity
     }
 
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
@@ -740,7 +745,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-
                         getStatusFromServer(myLearningModel);
 
                     } else {
@@ -759,6 +763,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         }
 
                     }
+                } else {
+                    cmiSynchTask = new CmiSynchTask(context);
+                    cmiSynchTask.execute();
                 }
             }
         }

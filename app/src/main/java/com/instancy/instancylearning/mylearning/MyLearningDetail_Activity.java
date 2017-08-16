@@ -356,13 +356,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusCompleted)));
             progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-            displayStatus = courseStatus + " " + myLearningModel.getProgress();
+            displayStatus = courseStatus + " (" + myLearningModel.getProgress();
         } else if (courseStatus.equalsIgnoreCase("Not Started")) {
 
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusNotStarted)));
             progressBar.setProgress(0);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
-            displayStatus = courseStatus + "  0";
+            displayStatus = courseStatus + "  (0";
 
         } else {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
@@ -370,7 +370,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
             displayStatus = courseStatus + " " + myLearningModel.getProgress();
         }
-        txtCourseStatus.setText(displayStatus + "%");
+        txtCourseStatus.setText(displayStatus + "%)");
     }
 
     void initVolleyCallback() {

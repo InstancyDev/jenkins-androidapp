@@ -315,20 +315,15 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     @Override
                     public void onResponse(JSONObject response) {
                         svProgressHUD.dismiss();
-
                         Log.d("Response: ", " " + response.has("faileduserlogin"));
-
                         if (response.has("faileduserlogin")) {
-
                             SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
                             alertText.setVisibility(View.VISIBLE);
-
 
                         } else if (response.has("successfulluserlogin")) {
                             alertText.setVisibility(View.GONE);
                             try {
                                 JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
-
                                 if (loginResponseAry.length() != 0) {
 
                                     JSONObject jsonobj = loginResponseAry.getJSONObject(0);
@@ -339,10 +334,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.KEY_USERNAME);
                                     preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                                     preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
-
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     startActivity(intentSideMenu);
-
                                 }
 
                             } catch (JSONException e) {
@@ -373,7 +366,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
-
 
     void getMyCatalogData() {
         File tepfile = new File(getExternalFilesDir(null)

@@ -29,6 +29,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.menufragments.Catalog_fragment;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
@@ -173,12 +174,15 @@ public class SideMenu extends AppCompatActivity {
                     int logoutPos = sideMenusModel.size() - 1;
                     String filterCOndition = sideMenusModel.get(groupPosition).getConditions();
                     if (logoutPos == groupPosition) {
+                        Intent intent = new Intent(SideMenu.this, Login_activity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         finish();
                         preferencesManager.setStringValue("", StaticValues.KEY_USERID);
-
-                    }
-                    if (lastClicked != groupPosition) {
-                        selectItem(groupPosition);
+                    } else {
+                        if (lastClicked != groupPosition) {
+                            selectItem(groupPosition);
+                        }
                     }
                     drawer.closeDrawer(Gravity.LEFT);
                     lastClicked = groupPosition;
@@ -273,6 +277,7 @@ public class SideMenu extends AppCompatActivity {
         toggle.onConfigurationChanged(newConfig);
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

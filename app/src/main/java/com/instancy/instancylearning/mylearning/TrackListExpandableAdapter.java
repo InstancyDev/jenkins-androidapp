@@ -221,14 +221,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusCompleted)));
                 holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = trackChildList.getStatus() + " " + trackChildList.getProgress();
+                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
             } else if (trackChildList.getStatus().equalsIgnoreCase("Not Started")) {
 
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusNotStarted)));
                 holder.progressBar.setProgress(0);
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = trackChildList.getStatus() + "  0";
+                courseStatus = trackChildList.getStatus() + "  (0";
 
             }
 //            else if (trackChildList.getStatus().toLowerCase().contains("passed") || trackChildList.getStatus().toLowerCase().contains("failed")) {
@@ -247,7 +247,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 courseStatus = trackChildList.getStatus() + " " + trackChildList.getProgress();
 
             }
-            holder.txtCourseStatus.setText(courseStatus + "%");
+            holder.txtCourseStatus.setText(courseStatus + "%)");
         }
 
         String imgUrl = trackChildList.getImageData();

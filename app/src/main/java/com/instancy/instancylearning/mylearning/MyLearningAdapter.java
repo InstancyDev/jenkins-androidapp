@@ -205,24 +205,24 @@ public class MyLearningAdapter extends BaseAdapter {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
                 holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = myLearningModel.get(position).getStatus() + " " + myLearningModel.get(position).getProgress();
+                courseStatus = myLearningModel.get(position).getStatus() + " (" + myLearningModel.get(position).getProgress();
             } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Not Started")) {
 
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
                 holder.progressBar.setProgress(0);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = myLearningModel.get(position).getStatus() + "  0";
+                courseStatus = myLearningModel.get(position).getStatus() + "  (0";
 
             } else {
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
                 holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = myLearningModel.get(position).getStatus() + " " + myLearningModel.get(position).getProgress();
+                courseStatus = myLearningModel.get(position).getStatus() + "(" + myLearningModel.get(position).getProgress();
 
             }
-            holder.txtCourseStatus.setText(courseStatus + "%");
+            holder.txtCourseStatus.setText(courseStatus + "%)");
         }
 
         String imgUrl = myLearningModel.get(position).getImageData();
