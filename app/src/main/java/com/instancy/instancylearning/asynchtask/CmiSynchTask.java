@@ -13,15 +13,13 @@ import com.instancy.instancylearning.synchtasks.WebAPIClient;
 public class CmiSynchTask extends AsyncTask<String, Integer, Void> {
 
 
-    WebAPIClient webAPIClient;
+
     Context context;
     SynchData synchData;
 
     public CmiSynchTask(Context context) {
         this.context = context;
-        webAPIClient = new WebAPIClient(context);
         synchData = new SynchData(context);
-
     }
 
     @Override
@@ -32,7 +30,7 @@ public class CmiSynchTask extends AsyncTask<String, Integer, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-        synchData.SyncData();
+//        synchData.SyncData();
         return null;
     }
 

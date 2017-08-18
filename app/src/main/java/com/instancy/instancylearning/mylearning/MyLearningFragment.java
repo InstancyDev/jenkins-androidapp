@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,7 +29,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
@@ -37,6 +42,7 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
+import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -60,6 +66,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -100,7 +107,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     String filterContentType = "", consolidationType = "all", sortBy = "";
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
-    //    SynchData synchData;
     CmiSynchTask cmiSynchTask;
     UiSettingsModel uiSettingsModel;
 
@@ -327,7 +333,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
 
-
         item_filter.setVisible(false);
         if (item_search != null) {
             item_search.setIcon(R.drawable.ic_search_black_24dp);
@@ -335,7 +340,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
-
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
@@ -677,9 +681,24 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             zipfile.delete();
                         }
                         myLearningAdapter.notifyDataSetChanged();
-                        if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
-                            callMetaDataService(learningModel);
+
+                        if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                                callMobileGetContentTrackedData(learningModel);
+                                callMobileGetMobileContentMetaData(learningModel);
+                            } else {
+                                callMobileGetMobileContentMetaData(learningModel);
+
+                            }
+
+                        } else {
+                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                                callMobileGetContentTrackedData(learningModel);
+
+                            }
+
                         }
+
                     }
 
                     @Override
@@ -700,12 +719,53 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         int downloadId = downloadManager.add(downloadRequest);
     }
 
-    public void callMetaDataService(MyLearningModel learningModel) {
+    public void callMobileGetContentTrackedData(MyLearningModel learningModel) {
         String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
 
         vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
 
     }
+
+    public void callMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
+
+        String paramsString = "SiteURL=" + learningModel.getSiteURL()
+                + "&ContentID=" + learningModel.getContentID()
+                + "&userid=" + learningModel.getUserID()
+                + "&DelivoryMode=" + "1";
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                if (response != null) {
+                    try {
+                        db.insertTrackObjects(response, learningModel);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjReq);
+
+    }
+
 
     private void updateStatus(int index, int Status) {
         // Update ProgressBar
@@ -733,7 +793,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         Log.d(TAG, "onActivityResult first:");
 
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK) {
+        if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
 
             if (data != null) {
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");

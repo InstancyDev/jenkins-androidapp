@@ -24,6 +24,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.interfaces.LRSJavaScriptInterface;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -40,6 +41,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     private AdvancedWebView adWebView;
     MyLearningModel myLearningModel;
     String TAG = AdvancedWebCourseLaunch.class.getSimpleName();
+    String prevStatus = "";
+    DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,7 +50,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         setContentView(R.layout.advancedweb_courselaunch);
         adWebView = (AdvancedWebView) findViewById(R.id.advanced_coursewbview);
 //        adWebView.setListener(this, this);
-
+        databaseHandler = new DatabaseHandler(this);
         Bundle bundle = getIntent().getExtras();
         String courseUrl;
         String courseName = "";
@@ -119,6 +122,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                intent.putExtra("myLearningDetalData", myLearningModel);
                                                setResult(RESULT_OK, intent);
                                                view.stopLoading();
+                                               databaseHandler.saveCourseClose(url, myLearningModel);
                                                finish();
                                            }
                                            return false;

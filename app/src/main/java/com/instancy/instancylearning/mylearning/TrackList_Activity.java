@@ -24,6 +24,8 @@ import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.asynchtask.CmiSynchTask;
+import com.instancy.instancylearning.asynchtask.DownloadXmlAsynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
@@ -41,11 +43,19 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import butterknife.Bind;
 
@@ -78,6 +88,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     WebAPIClient webAPIClient;
     @Bind(R.id.lable_catalog)
     TextView frqagmentName;
+    CmiSynchTask cmiSynchTask;
+    DownloadXmlAsynchTask downloadXmlAsynchTask;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,6 +126,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshMyLearning(false);
+//            downloadXmlAsynchTask = new DownloadXmlAsynchTask(context, isTraxkList, myLearningModel, appUserModel.getSiteURL());
+//            downloadXmlAsynchTask.execute();  commented for work flow rules
         } else {
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             injectFromDbtoModel();
@@ -497,6 +511,10 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         }
 
                     }
+                } else {
+
+                    cmiSynchTask = new CmiSynchTask(context);
+                    cmiSynchTask.execute();
                 }
             }
         }
@@ -562,4 +580,199 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         };
     }
 
+    private void executeWorkFlowRules(final String workflowtype) {
+        try {
+            // String tlcontentid = dbh
+            // .getObjectString("SELECT contentid FROM DOWNLOADDATA WHERE userid ='"
+            // + bundleUserId
+            // + "' AND scoid='" + bundleScoId
+            // + "' AND siteid='" + bundleSiteId + "'");
+
+            File fXmlFile = null;
+            fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/"
+                    + myLearningModel.getSiteID() + "/" + myLearningModel.getContentID() + "/content.xml");
+            if (fXmlFile != null && fXmlFile.exists()) {
+                DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+                        .newInstance();
+                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                Document doc = dBuilder.parse(fXmlFile);
+
+                // optional, but recommended
+                // read this -
+                // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+                doc.getDocumentElement().normalize();
+
+                NodeList workflowList = doc.getElementsByTagName("Workflow");
+                int workflowCount = workflowList.getLength();
+
+                ArrayList<Map<String, String>> actionsMap = null;
+                ArrayList<Map<String, String>> conditionsMap = null;
+                ArrayList<Map<String, String>> stepsMap = null;
+
+                stepsMap = new ArrayList<Map<String, String>>();
+                actionsMap = new ArrayList<Map<String, String>>();
+                conditionsMap = new ArrayList<Map<String, String>>();
+
+                for (int wfItem = 0; wfItem < workflowCount; wfItem++) {
+
+                    Node workflowNode = workflowList.item(wfItem);
+
+                    if (workflowNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                        Element workflowElement = (Element) workflowNode;
+                        if (workflowElement.getAttribute("trigger").toString()
+                                .equals(workflowtype)) {
+
+                            NodeList stepList = workflowElement
+                                    .getElementsByTagName("Step");
+
+                            int stepsCount = stepList.getLength();
+                            for (int stepItem = 0; stepItem < stepsCount; stepItem++) {
+
+                                Node stepNode = stepList.item(stepItem);
+
+                                if (stepNode.getNodeType() == Node.ELEMENT_NODE) {
+                                    Element stepElement = (Element) stepNode;
+
+                                    Map<String, String> stepmap = new HashMap<String, String>();
+                                    String stepId = stepElement
+                                            .getAttribute("id");
+                                    stepmap.put("stepid", stepId);
+                                    stepmap.put("timedelay", stepElement
+                                            .getAttribute("timedelay"));
+                                    stepmap.put("ruleid", workflowElement
+                                            .getAttribute("ruleid"));
+
+                                    stepsMap.add(stepmap);
+                                    NodeList conditionList = stepElement
+                                            .getElementsByTagName("Condition");
+                                    NodeList actionList = stepElement
+                                            .getElementsByTagName("Action");
+
+                                    int conditionsCount = conditionList
+                                            .getLength();
+                                    int actionCount = actionList.getLength();
+
+                                    for (int conditionItem = 0; conditionItem < conditionsCount; conditionItem++) {
+
+                                        Node conditionNode = conditionList
+                                                .item(conditionItem);
+
+                                        if (stepNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                                            Element conditionElement = (Element) conditionNode;
+                                            Map<String, String> conditionmap = new HashMap<String, String>();
+                                            conditionmap
+                                                    .put("conditionid",
+                                                            conditionElement
+                                                                    .getAttribute("conditionid"));
+                                            String conditionType = conditionElement
+                                                    .getAttribute("type");
+                                            conditionmap.put("conditiontype",
+                                                    conditionType);
+                                            conditionmap
+                                                    .put("conditionitemid",
+                                                            conditionElement
+                                                                    .getAttribute("itemid"));
+                                            conditionmap
+                                                    .put("conditionoperator",
+                                                            conditionElement
+                                                                    .getAttribute("operator"));
+                                            conditionmap
+                                                    .put("conditioncoperator",
+                                                            conditionElement
+                                                                    .getAttribute("coperator"));
+                                            String conditionResult = conditionElement
+                                                    .getAttribute("result");
+                                            if (conditionType.equals("status")) {
+
+                                                switch (conditionResult
+                                                        .toLowerCase()) {
+                                                    case "not attempted":
+                                                        conditionResult = "not started";
+                                                        break;
+                                                    case "incomplete":
+                                                    case "in progress":
+                                                        conditionResult = "in progress";
+                                                        break;
+                                                    case "passed":
+                                                        conditionResult = "completed (passed)";
+                                                        break;
+                                                    case "failed":
+                                                        conditionResult = "completed (failed)";
+                                                        break;
+                                                    case "completed":
+                                                        conditionResult = "completed";
+                                                        break;
+                                                    case "grade":
+                                                        conditionResult = "pending review";
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+                                            }
+
+                                            conditionmap.put("conditionresult",
+                                                    conditionResult);
+                                            conditionmap.put("conditionstepid",
+                                                    stepId);
+                                            conditionsMap.add(conditionmap);
+
+                                        }
+                                    }
+                                    // conditionsDic.put(stepId, conditionsMap);
+
+                                    for (int actionItem = 0; actionItem < actionCount; actionItem++) {
+
+                                        Node actionNode = actionList
+                                                .item(actionItem);
+
+                                        if (stepNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                                            Element actionElement = (Element) actionNode;
+                                            Map<String, String> actionmap = new HashMap<String, String>();
+                                            actionmap
+                                                    .put("actionid",
+                                                            actionElement
+                                                                    .getAttribute("actionid"));
+                                            actionmap
+                                                    .put("actiontype",
+                                                            actionElement
+                                                                    .getAttribute("type"));
+                                            actionmap
+                                                    .put("actionitemid",
+                                                            actionElement
+                                                                    .getAttribute("itemid"));
+                                            actionmap
+                                                    .put("actionstatus",
+                                                            actionElement
+                                                                    .getAttribute("status"));
+                                            actionmap.put("actionstepid",
+                                                    stepId);
+                                            actionsMap.add(actionmap);
+
+
+                                        }
+                                    }
+                                    // actionsDic.put(stepId, actionsMap);
+                                }
+                            }
+                            wfItem = workflowCount;
+                        }
+                    }
+
+                }
+
+            } else {
+
+            }
+        } catch (Exception e) {
+            Log.e("executeWorkFlowRules", "executeWorkFlowRules");
+            e.printStackTrace();
+
+        }
+    }
+
 }
+

@@ -27,6 +27,7 @@ import com.instancy.instancylearning.mylearning.TrackList_Activity;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.List;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
@@ -52,6 +53,8 @@ public class GlobalMethods {
             databaseH = new DatabaseHandler(context);
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+
+   // LRS need to be implemented
 
                 databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
 //
@@ -79,7 +82,7 @@ public class GlobalMethods {
 
             }
 
-            offlinePath = offlinePath.replaceAll(" ", "%20");
+             offlinePath = offlinePath.replaceAll(" ", "%20");
 
 //
 //            MimeTypeMap myMime = MimeTypeMap.getSingleton();

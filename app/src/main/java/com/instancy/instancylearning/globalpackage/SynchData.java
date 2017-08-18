@@ -47,16 +47,15 @@ public class SynchData {
 
     public void SyncData() {
         String bundlevalue1 = null;
-        String cmsiteid = null;
-        String cmiscoid = null;
-        List<String> scoList = new ArrayList<String>();
-        String errorMessage = "";
-        List<CMIModel> cmiList = dbh.getAllCmiDetails();
-
+        List<CMIModel> cmiList = new ArrayList<CMIModel>();
+        List<CMIModel> cmiMylearningList = dbh.getAllCmiDetails(dbh.TBL_DOWNLOADDATA);
+        cmiList.addAll(cmiMylearningList);
+        List<CMIModel> cmitrackList = dbh.getAllCmiDetails(dbh.TBL_TRACKLISTDATA);
+        cmiList.addAll(cmitrackList);
+        List<CMIModel> cmiEventRelated = dbh.getAllCmiDetails(dbh.TBL_RELATEDCONTENTDATA);
+        cmiList.addAll(cmiEventRelated);
         for (CMIModel tempCmi : cmiList) {
             bundlevalue1 = String.valueOf(tempCmi.get_userId());
-            cmsiteid = String.valueOf(tempCmi.get_siteId());
-            cmiscoid = String.valueOf(tempCmi.get_scoId());
             StringBuilder sb = new StringBuilder();
             sb.append("<TrackedData><CMI>");
             sb.append("<ID>" + String.valueOf(tempCmi.get_Id()) + "</ID>");
@@ -65,12 +64,11 @@ public class SynchData {
                     + "</SCOID>");
             if (tempCmi.get_status().equals("") || tempCmi.get_status() == null
                     || tempCmi.get_status().equals("null")) {
-                sb.append("<CoreLessonStatus>incomplete</CoreLessonStatus>");
+                sb.append("<CoreLessonStatus></CoreLessonStatus>");
 
             } else {
-//                sb.append("<CoreLessonStatus>" + tempCmi.get_status()
-//                        + "</CoreLessonStatus>");
-                sb.append("<CoreLessonStatus>incomplete</CoreLessonStatus>");
+                sb.append("<CoreLessonStatus>" + tempCmi.get_status()
+                        + "</CoreLessonStatus>");
             }
 
             if (tempCmi.get_location().equals("")
@@ -390,7 +388,6 @@ public class SynchData {
             sb.append("</TrackedData>");
 
 //            Log.d("MobileUpdateOfflineTracked", sb.toString());
-
 
             String requestURL = appUserModel.getWebAPIUrl()
                     + "/MobileLMS/MobileUpdateOfflineTrackedData"

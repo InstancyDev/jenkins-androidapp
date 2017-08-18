@@ -284,12 +284,14 @@ public class SideMenu extends AppCompatActivity {
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         if (fragments != null) {
             for (Fragment fragment : fragments) {
-
-                if (data != null) {
-                    fragment.onActivityResult(requestCode, resultCode, data);
+                if (fragment != null) {
+                    if (data != null) {
+                        fragment.onActivityResult(requestCode, resultCode, data);
+                    }
                 }
             }
         }
-
     }
+
+
 }

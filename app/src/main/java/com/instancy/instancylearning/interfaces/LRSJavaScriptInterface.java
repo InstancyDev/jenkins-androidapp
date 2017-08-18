@@ -48,8 +48,23 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public String SaveLocationWithLocation(String location) {
         Log.d("SaveLocat", location);
-        String status = databaseHandler.UpdatetScormCMI(_learningModel, "location", location);
+        String status = databaseHandler.saveResponseCMI(_learningModel, "location", location);
 
+        return location;
+    }
+
+    @JavascriptInterface
+    public String SaveQuestionDataWithQuestionDataSeqID(String quesData, String seqID) {
+        Log.d("SaveQuesWD", quesData);
+        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
+        return status;
+    }
+
+    @JavascriptInterface
+    public String SaveLocationWithLocationSeqID(String location, String seqID) {
+        Log.d("SaveLocationWith", location);
+        String status = "";
+        databaseHandler.updateCMiRecordForTemplateView(_learningModel, seqID, location);
         return location;
     }
 

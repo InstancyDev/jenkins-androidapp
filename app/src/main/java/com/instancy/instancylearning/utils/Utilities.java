@@ -730,7 +730,7 @@ public class Utilities {
             for (int i = 0; i < conditionsArray.length; i++) {
                 String[] filterArray = conditionsArray[i].split("=");
 
-                System.out.println(" forvalue " + filterArray);
+//                System.out.println(" forvalue " + filterArray);
 
                 if(filterArray.length>1)
                     map.put(filterArray[0], filterArray[1]);
