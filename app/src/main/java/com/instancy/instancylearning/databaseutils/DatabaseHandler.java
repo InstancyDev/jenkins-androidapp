@@ -4480,10 +4480,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String replaceString = displayName.replaceAll(" ", "%20");
 
+
         query = "?nativeappURL=true&cid=" + mylearningModel.getScoId() + "&stid=" + mylearningModel.getUserID() + "&lloc=" + locationValue + "&lstatus=" + lStatusValue + "&susdata=" + susData + "&tbookmark=" + seqNumnber + "&LtSusdata=" + suspendDataValue + "&LtQuesData=" + question + "&LtStatus=" + statusValue + "&sname=" + replaceString;
 
         query = query.replaceAll("null", "");
-        return query;
+
+        String replaceStr = query.replace(" ", "%20");
+        return replaceStr;
     }
 
     private String GetCurrentDateTime() {
@@ -4563,7 +4566,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         try {
 
 
-            String strExeQuery = "SELECT count(ID) AS attemptscount from = " + TBL_USERSESSION + " WHERE scoid="
+            String strExeQuery = "SELECT count(sessionid) AS attemptscount from  " + TBL_USERSESSION + " WHERE scoid="
                     + scoID + " AND siteid=" + learningModel.getSiteID()
                     + " AND userid=" + learningModel.getUserID();
             Cursor cursor = null;
@@ -5668,7 +5671,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String subURL[] = url.split("\\?");
 
-        String score = learningModel.getScore(), lStatus, ltStatus, lLoc, susData = "", seqID, siteIDValue, userIDValue, siteURL;
+        String score = learningModel.getScore(), lStatus = "", ltStatus = "", lLoc = "", susData = "", scoid = "", seqID = "", siteIDValue = "", userIDValue = "", siteURL = "", timeSpent = "";
         String sqlTimeSpent = "";
         String sqlNoOfAttempts = "";
         String sqlPreviousState = "";
@@ -5688,7 +5691,75 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     responMap = generateHashMap(conditionsArray);
                     Log.d("Type", "Called On saveCourseClose" + responMap.keySet());
                     Log.d("Type", "Called On saveCourseClose" + responMap.values());
-                    susData = responMap.get("susdata");
+
+//                    ioscourseclose=true&cid=338&seqid=1&stid=1&lloc=2&lstatus=incomplete&susdata=#pgvs_start#1;2;#pgvs_end#&timespent=00:00:06.88&quesdata=&ltstatus=incomplete
+                    if (responMap.containsKey("susdata")) {
+
+                        susData = responMap.get("susdata");
+
+                    } else {
+
+                        susData = "";
+
+                    }
+                    if (responMap.containsKey("cid")) {
+
+                        scoid = responMap.get("cid");
+                    } else {
+                        scoid = "";
+
+                    }
+                    if (responMap.containsKey("seqid")) {
+
+                        seqID = responMap.get("seqid");
+                    } else {
+                        seqID = "";
+
+                    }
+                    if (responMap.containsKey("lloc")) {
+
+                        lLoc = responMap.get("lloc");
+                    } else {
+                        lLoc = "";
+
+                    }
+                    if (responMap.containsKey("lstatus")) {
+                        lStatus = responMap.get("lstatus");
+
+                    } else {
+                        lStatus = "";
+
+                    }
+                    if (responMap.containsKey("timespent")) {
+
+                        timeSpent = responMap.get("timespent");
+                    } else {
+                        timeSpent = "";
+
+                    }
+                    if (responMap.containsKey("ltstatus")) {
+
+                        ltStatus = responMap.get("ltstatus");
+                    } else {
+                        ltStatus = "";
+
+                    }
+                    if (responMap.containsKey("score")) {
+
+                        score = responMap.get("score");
+                    } else {
+                        score = "";
+
+                    }
+                    if (responMap.containsKey("stid")) {
+
+                        userIDValue = responMap.get("stid");
+                    } else {
+                        userIDValue = "";
+
+                    }
+
+
                 }
             }
             SQLiteDatabase db = this.getWritableDatabase();
@@ -5741,19 +5812,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         CMIModel cmiModel = new CMIModel();
         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-            cmiModel.set_location(learningModel.getLocationName());
-            cmiModel.set_status(learningModel.getStatus());
+            cmiModel.set_location(lLoc);
+            cmiModel.set_status(lStatus);
             cmiModel.set_datecompleted(dateCompleted);
             cmiModel.set_timespent(totalSessionTimeSpent);
-            cmiModel.set_suspenddata(susData.replaceAll(
-                    "CourseDiscussionsPage.aspx?ContentID", ""));
+            cmiModel.set_suspenddata(susData);
 
         } else {
             cmiModel.set_suspenddata("");
-            cmiModel.set_status(learningModel.getStatus());
+            cmiModel.set_status(lStatus);
             cmiModel.set_timespent(totalSessionTimeSpent);
             cmiModel.set_datecompleted(dateCompleted);
-            cmiModel.set_seqNum("" + learningModel.getSequenceNumber());
+            cmiModel.set_seqNum("" + seqID);
         }
 
         if (!score.equalsIgnoreCase("")) {
@@ -5763,9 +5833,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cmiModel.set_siteId(learningModel.getSiteID());
-        cmiModel.set_userId(Integer.parseInt(learningModel.getUserID()));
+        cmiModel.set_userId(Integer.parseInt(userIDValue));
         cmiModel.set_isupdate(learningModel.getSiteID());
-        cmiModel.set_scoId(Integer.parseInt(learningModel.getScoId()));
+        cmiModel.set_scoId(Integer.parseInt(scoid));
         cmiModel.set_objecttypeid(learningModel.getObjecttypeId());
         cmiModel.set_sitrurl(learningModel.getSiteURL());
         cmiModel.set_noofattempts(Integer.parseInt(totalNoOfAttempts));
@@ -5786,23 +5856,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         int status = -1;
         Cursor isUpdated = null;
-//        try {
-//
-//            String strUpdate = "UPDATE " + TBL_CMI + " SET status = '"
-//                    + cmiModel.get_status() + "', progress = '" + progress
-//                    + "' WHERE siteid ='"
-//                    + myLearningModel.getSiteID() + "'"
-//                    + " AND " + " scoid=" + "'"
-//                    + myLearningModel.getScoId() + "'" + " AND "
-//                    + " userid=" + "'"
-//                    + myLearningModel.getUserID() + "'";
-//            Log.d(TAG, "updateContentStatus: " + strUpdate);
-//            db.execSQL(strUpdate);
-//            status = 1;
-//        } catch (Exception e) {
-//            status = -1;
-//            Log.e("updateContentStatus", e.toString());
-//        }
+        try {
+
+            String strUpdate = "UPDATE " + TBL_CMI + " SET status = '"
+                    + cmiModel.get_status()
+                    + "' WHERE siteid ='"
+                    + cmiModel.get_siteId() + "'"
+                    + " AND " + " scoid=" + "'"
+                    + cmiModel.get_scoId() + "'" + " AND "
+                    + " userid=" + "'"
+                    + cmiModel.get_userId() + "'";
+            Log.d(TAG, "updateContentStatus: " + strUpdate);
+            db.execSQL(strUpdate);
+            status = 1;
+        } catch (Exception e) {
+            status = -1;
+            Log.e("updateContentStatus", e.toString());
+        }
         db.close();
 
     }
@@ -5823,6 +5893,129 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return prevStatus;
+    }
+
+    void updateTrackListItemBlockname(MyLearningModel cmiNew) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strExeQuery = "";
+        strExeQuery = "UPDATE " + TBL_TRACKLISTDATA + " SET BlockName='"
+                + cmiNew.getBlockName() + "' WHERE siteid='"
+                + cmiNew.getSiteID() + "' AND userid='" + cmiNew.getUserID()
+                + "' AND parentid='" + cmiNew.getParentID() + "'";
+        try {
+            db.execSQL(strExeQuery);
+        } catch (SQLException e) {
+            Log.e("updateTrac: ", strExeQuery);
+        }
+        db.close();
+    }
+
+
+    public int updateTrackListItemstatus(String scoId, String siteId,
+                                         String userId, String updatedStatus) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        int status = -1;
+        Cursor isUpdated = null;
+        try {
+            String strUpdate = "UPDATE " + TBL_TRACKLISTDATA
+                    + " SET status = '" + updatedStatus + "' WHERE siteid ='"
+                    + siteId + "'" + " AND " + " scoid=" + "'" + scoId + "'"
+                    + " AND " + " userid=" + "'" + userId + "'";
+            db.execSQL(strUpdate);
+            status = 1;
+        } catch (Exception e) {
+            status = -1;
+            Log.e("updateContentStatus", e.toString());
+        }
+
+        db.close();
+
+        return status;
+
+    }
+
+    public int updateTrackListItemstatusInCMI(String scoId, String siteId,
+                                              String userId, String updatedStatus) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        int status = -1;
+        try {
+            String strUpdate = "UPDATE " + TBL_CMI + " SET status = '"
+                    + updatedStatus + "' WHERE siteid ='" + siteId + "'"
+                    + " AND " + " scoid=" + "'" + scoId + "'" + " AND "
+                    + " userid=" + "'" + userId + "'";
+            db.execSQL(strUpdate);
+            status = 1;
+        } catch (Exception e) {
+            status = -1;
+            Log.e("updateContentStatus", e.toString());
+        }
+
+        db.close();
+
+        return status;
+
+    }
+
+    /**
+     * To update the time delay for Track
+     *
+     * @param cmiNew
+     * @author Venu
+     */
+    public void updateTrackTimedelay(MyLearningModel cmiNew) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strExeQuery = "";
+        strExeQuery = "UPDATE " + TBL_TRACKLISTDATA + " SET timedelay='"
+                + cmiNew.getTimeDelay() + "' WHERE siteid='"
+                + cmiNew.getSiteID() + "' AND userid='" + cmiNew.getUserID()
+                + "' AND scoid='" + cmiNew.getScoId() + "'";
+
+        try {
+            db.execSQL(strExeQuery);
+        } catch (SQLException e) {
+            Log.d("timedelayTRACKLISTDATA", e.getMessage());
+        }
+        db.close();
+    }
+
+    /**
+     * To get the time delay of a track object or track
+     *
+     * @param userId
+     * @param tackScoId
+     * @param sitrId
+     * @return
+     */
+    public String getTrackTimedelay(String userId, String tackScoId,
+                                    String sitrId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strExeQuery = "";
+        Cursor cursor = null;
+        String timeDelay = "0";
+        strExeQuery = "SELECT timedelay FROM " + TBL_TRACKLISTDATA
+                + " WHERE userid='" + userId + "' AND scoid='" + tackScoId
+                + "' AND siteid='" + sitrId + "'";
+        try {
+            cursor = db.rawQuery(strExeQuery, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                if (cursor.moveToFirst()) {
+                    timeDelay = cursor.getString(cursor
+                            .getColumnIndex("timedelay"));
+                    if (!isValidString(timeDelay)) {
+                        timeDelay = "0";
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            Log.d("getTrackTimedelay", e.getMessage());
+        }
+        db.close();
+        return timeDelay;
     }
 
 }

@@ -339,8 +339,6 @@ public class MyLearningAdapter extends BaseAdapter {
         }
         notifyDataSetChanged();
     }
-
-
     class ViewHolder {
         public int getPosition;
         public MyLearningModel myLearningDetalData;

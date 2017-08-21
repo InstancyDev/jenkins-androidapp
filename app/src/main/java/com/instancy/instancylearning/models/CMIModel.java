@@ -29,6 +29,17 @@ public class CMIModel implements Serializable {
     private String _pooledqusseq = "";
     private String _textResponses = "";
 
+    public String getShowStatus() {
+        return showStatus;
+    }
+
+    public void setShowStatus(String showStatus) {
+        this.showStatus = showStatus;
+    }
+
+    private String showStatus = "";
+
+
     public int get_Id() {
         return _Id;
     }

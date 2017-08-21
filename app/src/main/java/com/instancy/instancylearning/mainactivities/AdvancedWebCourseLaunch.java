@@ -63,7 +63,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //            }
             adWebView.loadUrl(courseUrl);
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
-            Log.d(TAG, "onCreate: in web launch " + courseUrl);
+            Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
 
             courseName = myLearningModel.getCourseName();
         }
@@ -125,7 +125,11 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                databaseHandler.saveCourseClose(url, myLearningModel);
                                                finish();
                                            }
-                                           return false;
+                                           else if (url.contains("iosobjectclose=true")) {
+
+                                               databaseHandler.saveCourseClose(url, myLearningModel);
+                                           }
+                                           return true;
 
                                        }
 
@@ -142,7 +146,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                view.stopLoading();
                                                finish();
                                            }
-                                           return false;
+                                           return true;
                                        }
 
                                        @Override

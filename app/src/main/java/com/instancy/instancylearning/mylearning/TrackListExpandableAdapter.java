@@ -250,6 +250,20 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
 
+        if (trackChildList.getShowStatus().equalsIgnoreCase("disabled")) {
+
+            holder.btnDownload.setEnabled(false);
+            childView.setBackgroundColor(Color.RED);
+            holder.btnContextMenu.setEnabled(false);
+            holder.imgThumb.setEnabled(false);
+        } else {
+
+            childView.setBackgroundColor(Color.WHITE);
+            holder.btnDownload.setEnabled(true);
+            holder.btnContextMenu.setEnabled(true);
+            holder.imgThumb.setEnabled(true);
+        }
+
         String imgUrl = trackChildList.getImageData();
         Glide.with(childView.getContext()).load(imgUrl)
                 .thumbnail(0.5f)

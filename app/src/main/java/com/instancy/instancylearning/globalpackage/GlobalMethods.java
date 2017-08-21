@@ -82,40 +82,27 @@ public class GlobalMethods {
 
             }
 
-             offlinePath = offlinePath.replaceAll(" ", "%20");
+             String  offlinePathEncode = offlinePath.replaceAll(" ", "%20");
 
-//
-//            MimeTypeMap myMime = MimeTypeMap.getSingleton();
-//            Intent newIntent = new Intent(Intent.ACTION_VIEW);
-//            String mimeType = myMime.getMimeTypeFromExtension(fileExt(getFile()).substring(1));
-//            newIntent.setDataAndType(Uri.fromFile(getFile()), mimeType);
-//            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            try {
-//                context.startActivity(newIntent);
-//            } catch (ActivityNotFoundException e) {
-//                Toast.makeText(context, "No handler for this type of file.", Toast.LENGTH_LONG).show();
-//            }
-
-
-            if (offlinePath.endsWith(".pdf")) {
+            if (offlinePathEncode.endsWith(".pdf")) {
                 Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
-                pdfIntent.putExtra("PDF_URL", offlinePath);
+                pdfIntent.putExtra("PDF_URL", offlinePathEncode);
                 pdfIntent.putExtra("ISONLINE", "NO");
                 pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
                 context.startActivity(pdfIntent);
 
-            } else if (offlinePath.toLowerCase().contains(".ppt")
-                    || offlinePath.toLowerCase().contains(".pptx")) {
+            } else if (offlinePathEncode.toLowerCase().contains(".ppt")
+                    || offlinePathEncode.toLowerCase().contains(".pptx")) {
 
-                offlinePath = offlinePath.replace("file://", "");
+                offlinePathEncode = offlinePathEncode.replace("file://", "");
 
                 try {
 
-                    offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    offlinePathEncode = URLDecoder.decode(offlinePath, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                File file = new File(offlinePath);
+                File file = new File(offlinePathEncode);
                 Intent intent2 = new Intent();
                 intent2.setAction(android.content.Intent.ACTION_VIEW);
                 intent2.setDataAndType(
@@ -135,17 +122,17 @@ public class GlobalMethods {
                 }
 
 
-            } else if (offlinePath.toLowerCase().contains(".doc")
-                    || offlinePath.toLowerCase().contains(".docx")) {
+            } else if (offlinePathEncode.toLowerCase().contains(".doc")
+                    || offlinePathEncode.toLowerCase().contains(".docx")) {
 
-                offlinePath = offlinePath.replace("file://", "");
+                offlinePathEncode = offlinePathEncode.replace("file://", "");
                 try {
 
-                    offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    offlinePathEncode = URLDecoder.decode(offlinePath, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                File file = new File(offlinePath);
+                File file = new File(offlinePathEncode);
                 Intent intent3 = new Intent();
                 intent3.setAction(android.content.Intent.ACTION_VIEW);
                 intent3.setDataAndType(
@@ -163,17 +150,17 @@ public class GlobalMethods {
                     toast.show();
                 }
 
-            } else if (offlinePath.toLowerCase().contains(".xlsx")
-                    || offlinePath.toLowerCase().contains(".xls")) {
-                offlinePath = offlinePath.replace("file://", "");
+            } else if (offlinePathEncode.toLowerCase().contains(".xlsx")
+                    || offlinePathEncode.toLowerCase().contains(".xls")) {
+                offlinePathEncode = offlinePathEncode.replace("file://", "");
 
                 try {
 
-                    offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    offlinePathEncode = URLDecoder.decode(offlinePathEncode, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                File file = new File(offlinePath);
+                File file = new File(offlinePathEncode);
                 Intent intent4 = new Intent();
                 intent4.setAction(android.content.Intent.ACTION_VIEW);
                 intent4.setDataAndType(
@@ -191,14 +178,14 @@ public class GlobalMethods {
                     toast.show();
 
                 }
-            } else if (offlinePath.toLowerCase().contains(".mpp")) {
-                offlinePath = offlinePath.replace("file://", "");
+            } else if (offlinePathEncode.toLowerCase().contains(".mpp")) {
+                offlinePathEncode = offlinePathEncode.replace("file://", "");
                 try {
-                    offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    offlinePathEncode = URLDecoder.decode(offlinePathEncode, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                File file = new File(offlinePath);
+                File file = new File(offlinePathEncode);
                 Intent intent4 = new Intent();
                 intent4.setAction(android.content.Intent.ACTION_VIEW);
                 intent4.setDataAndType(
@@ -219,16 +206,16 @@ public class GlobalMethods {
                 }
 
 
-            } else if (offlinePath.toLowerCase().contains(".visio")
-                    || offlinePath.toLowerCase().contains(".vsd")) {
-                offlinePath = offlinePath.replace("file://", "");
+            } else if (offlinePathEncode.toLowerCase().contains(".visio")
+                    || offlinePathEncode.toLowerCase().contains(".vsd")) {
+                offlinePathEncode = offlinePathEncode.replace("file://", "");
 
                 try {
-                    offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    offlinePathEncode = URLDecoder.decode(offlinePathEncode, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                File file = new File(offlinePath);
+                File file = new File(offlinePathEncode);
                 Intent intent4 = new Intent();
                 intent4.setAction(android.content.Intent.ACTION_VIEW);
                 intent4.setDataAndType(
@@ -248,15 +235,15 @@ public class GlobalMethods {
 
                 }
 
-            } else if (offlinePath.toLowerCase().contains(".txt")) {
+            } else if (offlinePathEncode.toLowerCase().contains(".txt")) {
 
                 try {
 
-                    offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    offlinePathEncode = URLDecoder.decode(offlinePathEncode, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-                File file = new File(offlinePath);
+                File file = new File(offlinePathEncode);
                 Intent intent4 = new Intent();
                 intent4.setAction(android.content.Intent.ACTION_VIEW);
                 intent4.setDataAndType(Uri.fromFile(file), "text/plain");
@@ -274,7 +261,7 @@ public class GlobalMethods {
             } else {
                 databaseH.insertCmiIsUpdate(myLearningModel);
                 Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-                iWeb.putExtra("COURSE_URL", offlinePath);
+                iWeb.putExtra("COURSE_URL", offlinePathEncode);
                 iWeb.putExtra("myLearningDetalData", myLearningModel);
                 ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
 
@@ -507,26 +494,6 @@ public class GlobalMethods {
 
         }
     }
-
-
-//    public  void viewOfflineMode(MyLearningModel mylearningModel, Context context) {
-//
-//        boolean isTrackList = false;
-//        Toast.makeText(context, "This is ofline view", Toast.LENGTH_SHORT).show();
-//        String numberOfAttempts = "";
-//        String strObjectTypeID = "";
-//        String strStatus = "";
-//
-//        if (isTrackList) {
-//
-//
-//        } else {
-//            SQLiteDatabase db = context.getWritableDatabase();
-//            String queryStr = "SELECT D.courseattempts,D.objecttypeid,case when C.Status is NOT NULL then C.status else D.status end as ObjStatus FROM DOWNLOADDATA D left outer join CMI C On C.UserId=D.UserId and C.scoid =D.scoid and C.siteid=D.siteid WHERE D.SITEID =" + mylearningModel.getSiteID() + " AND D.SCOID = " + mylearningModel.getScoId() + " AND D.USERID = " + mylearningModel.getUserID();
-//
-//
-//        }
-//    }
 
     public static void relatedContentView(MyLearningModel myLearningModel, Context context) {
         Integer relatedCount = Integer.parseInt(myLearningModel.getRelatedContentCount());

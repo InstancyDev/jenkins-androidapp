@@ -2,11 +2,11 @@ package com.instancy.instancylearning.mylearning;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -22,23 +22,20 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.DownloadXmlAsynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.interfaces.XmlDownloadListner;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
-import com.thin.downloadmanager.DownloadRequest;
-import com.thin.downloadmanager.DownloadStatusListenerV1;
-import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +46,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,14 +61,16 @@ import butterknife.Bind;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
  * http://www.mysamplecode.com/2012/11/android-expandablelistview-search.html
  */
 
-public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, ExpandableListView.OnChildClickListener {
+public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, ExpandableListView.OnChildClickListener, XmlDownloadListner {
     //eclipse line 8351
     ExpandableListView trackList;
     TrackListExpandableAdapter trackListExpandableAdapter;
@@ -90,6 +92,9 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     TextView frqagmentName;
     CmiSynchTask cmiSynchTask;
     DownloadXmlAsynchTask downloadXmlAsynchTask;
+    List<MyLearningModel> trackListModelList;
+    Boolean iscondition = true;
+    String workFlowType;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,6 +109,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         blockNames = new ArrayList<String>();
         db = new DatabaseHandler(this);
         webAPIClient = new WebAPIClient(this);
+        workFlowType = "onlaunch";
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
@@ -115,6 +121,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         trackList.setOnChildClickListener(this);
         // setting list adapter
         trackList.setAdapter(trackListExpandableAdapter);
+        trackListModelList = new ArrayList<MyLearningModel>();
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -126,8 +133,9 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshMyLearning(false);
-//            downloadXmlAsynchTask = new DownloadXmlAsynchTask(context, isTraxkList, myLearningModel, appUserModel.getSiteURL());
-//            downloadXmlAsynchTask.execute();  commented for work flow rules
+            downloadXmlAsynchTask = new DownloadXmlAsynchTask(context, isTraxkList, myLearningModel, appUserModel.getSiteURL());
+            downloadXmlAsynchTask.xmlDownloadListner = this;
+            downloadXmlAsynchTask.execute();
         } else {
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             injectFromDbtoModel();
@@ -209,7 +217,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     }
 
     public void injectFromDbtoModel() {
-        List<MyLearningModel> trackListModelList = new ArrayList<MyLearningModel>();
+        trackListModelList = new ArrayList<MyLearningModel>();
         blockNames.clear();
 
         if (isTraxkList) {
@@ -318,169 +326,6 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         return false;
     }
 
-    public void downloadTheCourse(MyLearningModel learningModel, View view, int position, int groupPosition) {
-
-        String[] startPage = null;
-
-        String localizationFolder = "";
-
-        if (learningModel.getStartPage().contains("/")) {
-            startPage = learningModel.getStartPage().split("/");
-            localizationFolder = "/" + startPage[0];
-        } else {
-            localizationFolder = "";
-        }
-        String downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
-        String downloadSourcePath = null;
-
-        boolean success = (new File(downloadDestFolderPath)).mkdirs();
-
-        switch (learningModel.getObjecttypeId()) {
-            case "52":
-                downloadSourcePath = learningModel.getSiteURL() + "/content/sitefiles/"
-                        + learningModel.getSiteID() + "/usercertificates/" + learningModel.getSiteID() + "/"
-                        + learningModel.getContentID() + ".pdf";
-                break;
-            case "11":
-            case "14":
-                downloadSourcePath = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getStartPage();
-                break;
-            case "8":
-            case "9":
-            case "10":
-                //downloadfiles
-
-
-//                downloadSourcePath = learningModel.getSiteURL() + "content/sitefiles/"
-//                        + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
-//
-//                int statusCode = webAPIClient.checkFileFoundOrNot(downloadSourcePath);
-//
-//                if (statusCode != 200) {
-//                    downloadSourcePath = learningModel.getSiteURL() + "content/downloadfiles/"
-//                            + "/" + learningModel.getContentID() + ".zip";
-//
-//                } else {
-                downloadSourcePath = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
-//                }
-
-                break;
-            default:
-                downloadSourcePath = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID()
-                        + ".zip";
-                break;
-        }
-        downloadThin(downloadSourcePath, downloadDestFolderPath, learningModel, position, groupPosition, view);
-    }
-
-    public void downloadThin(String downloadStruri, final String downloadPath, final MyLearningModel learningModel, final int position, final int groupPosition, final View view) {
-
-        downloadStruri = downloadStruri.replace(" ", "%20");
-        ThinDownloadManager downloadManager = new ThinDownloadManager();
-        Uri downloadUri = Uri.parse(downloadStruri);
-        String extensionStr = "";
-        switch (learningModel.getObjecttypeId()) {
-            case "52":
-            case "11":
-            case "14":
-
-                String[] startPage = null;
-                if (learningModel.getStartPage().contains("/")) {
-                    startPage = learningModel.getStartPage().split("/");
-                    extensionStr = startPage[1];
-                } else {
-                    extensionStr = learningModel.getStartPage();
-                }
-                break;
-            case "8":
-            case "9":
-            case "10":
-                extensionStr = learningModel.getContentID() + ".zip";
-                break;
-            default:
-                extensionStr = learningModel.getContentID() + ".zip";
-                break;
-        }
-
-        final String finalDownloadedFilePath = downloadPath + "/" + extensionStr;
-
-        final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
-        DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
-                .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
-                .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
-                .setStatusListener(new DownloadStatusListenerV1() {
-                    @Override
-                    public void onDownloadComplete(DownloadRequest downloadRequest) {
-                        Log.d(TAG, "onDownloadComplete: ");
-
-                        if (finalDownloadedFilePath.contains(".zip")) {
-                            String zipFile = finalDownloadedFilePath;
-                            String unzipLocation = downloadPath;
-                            UnZip d = new UnZip(zipFile,
-                                    unzipLocation);
-                            File zipfile = new File(zipFile);
-                            zipfile.delete();
-                        }
-                        trackListExpandableAdapter.notifyDataSetChanged();
-
-                        if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
-                            callMetaDataService(learningModel);
-                        }
-                    }
-
-                    @Override
-                    public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
-                        Log.d(TAG, "onDownloadFailed: " + +errorCode);
-                        Toast.makeText(TrackList_Activity.this, "Download failed", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
-
-                        updateStatus(position, progress, view);
-                    }
-                });
-        int downloadId = downloadManager.add(downloadRequest);
-    }
-
-    public void callMetaDataService(MyLearningModel learningModel) {
-        String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
-
-        vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
-
-    }
-
-    private void updateStatus(int index, int Status, View view) {
-        // Update ProgressBar
-        // Update Text to ColStatus
-
-        int firstPosition = trackList.getFirstVisiblePosition() - trackList.getHeaderViewsCount(); // This is the same as child #0
-        int wantedChild = index + firstPosition;
-// Say, first visible position is 8, you want position 10, wantedChild will now be 2
-// So that means your view is child #2 in the ViewGroup:
-
-// Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
-        View wantedView = trackList.getChildAt(index);
-
-        View v = trackList.getChildAt(index - trackList.getFirstVisiblePosition());
-        TextView txtBtnDownload = (TextView) wantedView.findViewById(R.id.btntxt_download);
-        CircleProgressBar circleProgressBar = (CircleProgressBar) wantedView.findViewById(R.id.circle_progress_track);
-        circleProgressBar.setVisibility(View.VISIBLE);
-        txtBtnDownload.setVisibility(View.GONE);
-        circleProgressBar.setProgress(Status);
-        // Enabled Button View
-        if (Status >= 100) {
-            txtBtnDownload.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-            txtBtnDownload.setVisibility(View.VISIBLE);
-            circleProgressBar.setVisibility(View.GONE);
-            txtBtnDownload.setEnabled(false);
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
@@ -580,38 +425,38 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         };
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
     private void executeWorkFlowRules(final String workflowtype) {
         try {
-            // String tlcontentid = dbh
-            // .getObjectString("SELECT contentid FROM DOWNLOADDATA WHERE userid ='"
-            // + bundleUserId
-            // + "' AND scoid='" + bundleScoId
-            // + "' AND siteid='" + bundleSiteId + "'");
 
-            File fXmlFile = null;
-            fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/"
-                    + myLearningModel.getSiteID() + "/" + myLearningModel.getContentID() + "/content.xml");
-            if (fXmlFile != null && fXmlFile.exists()) {
+            File fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml");
+
+            String fileXmls = getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml";
+            if (fXmlFile.exists()) {
+
+
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory
                         .newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
                 Document doc = dBuilder.parse(fXmlFile);
 
-                // optional, but recommended
-                // read this -
-                // http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
                 doc.getDocumentElement().normalize();
-
                 NodeList workflowList = doc.getElementsByTagName("Workflow");
                 int workflowCount = workflowList.getLength();
 
-                ArrayList<Map<String, String>> actionsMap = null;
-                ArrayList<Map<String, String>> conditionsMap = null;
-                ArrayList<Map<String, String>> stepsMap = null;
 
-                stepsMap = new ArrayList<Map<String, String>>();
-                actionsMap = new ArrayList<Map<String, String>>();
-                conditionsMap = new ArrayList<Map<String, String>>();
+                ArrayList<Map<String, String>> actionsMap = new ArrayList<Map<String, String>>();
+
+                ArrayList<Map<String, String>> conditionsMap = new ArrayList<Map<String, String>>();
+
+                ArrayList<Map<String, String>> stepsMap = new ArrayList<Map<String, String>>();
+
 
                 for (int wfItem = 0; wfItem < workflowCount; wfItem++) {
 
@@ -620,7 +465,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                     if (workflowNode.getNodeType() == Node.ELEMENT_NODE) {
 
                         Element workflowElement = (Element) workflowNode;
-                        if (workflowElement.getAttribute("trigger").toString()
+
+                        if (workflowElement.getAttribute("trigger")
                                 .equals(workflowtype)) {
 
                             NodeList stepList = workflowElement
@@ -707,7 +553,6 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                                     case "grade":
                                                         conditionResult = "pending review";
                                                         break;
-
                                                     default:
                                                         break;
                                                 }
@@ -761,18 +606,864 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                             wfItem = workflowCount;
                         }
                     }
+                }
+                // here
 
+//                Log.d(TAG, "executeWorkFlowRules: actionsMap " + actionsMap);
+//                Log.d(TAG, "executeWorkFlowRules  conditionsMap: " + conditionsMap);
+//                Log.d(TAG, "executeWorkFlowRules: stepsMap " + stepsMap);
+
+
+//
+
+                int totalStepsCount = stepsMap.size();
+                for (int stepIndex = 0; stepIndex < totalStepsCount; stepIndex++) {
+                    Map<String, String> stemap = stepsMap.get(stepIndex);
+                    int totalConditionsCount = conditionsMap.size();
+
+                    // int coursesCount = coursenames.size();
+                    int coursesCount = trackListModelList.size();
+                    for (int con = 0; con < totalConditionsCount; con++) {
+                        Map<String, String> conmap = conditionsMap.get(con);
+                        if (conmap.get("conditionstepid").equals(
+                                stemap.get("stepid"))) {
+                            if (conmap.get("conditiontype").equals("score")) {
+                                float workFlowScore = Float.parseFloat(conmap
+                                        .get("conditionresult"));
+                                if (conmap.get("conditioncoperator").equals("")) {
+                                    for (int it = 0; it < coursesCount; it++) {
+                                        MyLearningModel tlItem = trackListModelList
+                                                .get(it);
+                                        if (isValidString(tlItem.getScore())) {
+                                            float itemScore = Float
+                                                    .parseFloat(tlItem
+                                                            .getScore());
+                                            if (conmap.get("conditionitemid")
+                                                    .equals(tlItem
+                                                            .getContentID())) {
+                                                switch (conmap
+                                                        .get("conditionoperator")) {
+                                                    case ">=":
+                                                        try {
+                                                            if (itemScore >= workFlowScore) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator >=",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    case "<=":
+                                                        try {
+                                                            if (itemScore <= workFlowScore) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator <=",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    case "==":
+                                                        try {
+                                                            if (itemScore == workFlowScore) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator ==",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    case "!=":
+                                                        try {
+                                                            if (itemScore != workFlowScore) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator !=",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    for (int it = 0; it < coursesCount; it++) {
+                                        MyLearningModel tlItem = trackListModelList
+                                                .get(it);
+                                        Boolean tempbool = null;
+                                        if (isValidString(tlItem.getScore())) {
+                                            float itemScore = Float
+                                                    .parseFloat(tlItem
+                                                            .getScore());
+                                            if (conmap.get("conditionitemid")
+                                                    .equals(tlItem
+                                                            .getContentID())) {
+                                                switch (conmap
+                                                        .get("conditionoperator")) {
+                                                    case ">=":
+                                                        try {
+                                                            if (itemScore >= workFlowScore) {
+                                                                tempbool = true;
+                                                            } else {
+                                                                tempbool = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator >=",
+                                                                    e.getMessage());
+                                                            tempbool = false;
+                                                        }
+                                                        break;
+                                                    case "<=":
+                                                        try {
+                                                            if (itemScore <= workFlowScore) {
+                                                                tempbool = true;
+                                                            } else {
+                                                                tempbool = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator <=",
+                                                                    e.getMessage());
+                                                            tempbool = false;
+                                                        }
+                                                        break;
+                                                    case "==":
+                                                        try {
+                                                            if (itemScore == workFlowScore) {
+                                                                tempbool = true;
+                                                            } else {
+                                                                tempbool = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator ==",
+                                                                    e.getMessage());
+                                                            tempbool = false;
+                                                        }
+                                                        break;
+                                                    case "!=":
+                                                        try {
+                                                            if (itemScore != workFlowScore) {
+                                                                iscondition = true;
+                                                                tempbool = true;
+                                                            } else {
+                                                                tempbool = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator !=",
+                                                                    e.getMessage());
+                                                            tempbool = false;
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+
+                                                switch (conmap
+                                                        .get("conditioncoperator")) {
+                                                    case "or":
+                                                        if (tempbool || iscondition) {
+                                                            iscondition = true;
+                                                            it = coursesCount;
+                                                        } else {
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    case "and":
+                                                        if (tempbool && iscondition) {
+                                                            iscondition = true;
+                                                            it = coursesCount;
+                                                        } else {
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            } else if (conmap.get("conditiontype").equals(
+                                    "status")) {
+                                if (conmap.get("conditionstepid").equals(
+                                        stemap.get("stepid"))) {
+                                    if (conmap.get("conditioncoperator")
+                                            .equals("")) {
+                                        for (int it = 0; it < coursesCount; it++) {
+                                            MyLearningModel tlItem = trackListModelList
+                                                    .get(it);
+
+                                            if (conmap.get("conditionitemid")
+                                                    .equals(tlItem
+                                                            .getContentID())) {
+                                                switch (conmap
+                                                        .get("conditionoperator")) {
+                                                    case "==":
+                                                        try {
+                                                            if ((tlItem.getStatus()
+                                                                    .toLowerCase())
+                                                                    .contains(conmap
+                                                                            .get("conditionresult")
+                                                                            .toLowerCase())) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator ==",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                        }
+                                                        break;
+                                                    case "!=":
+                                                        try {
+                                                            if (!(tlItem
+                                                                    .getStatus()
+                                                                    .toLowerCase())
+                                                                    .contains(conmap
+                                                                            .get("conditionresult")
+                                                                            .toLowerCase())) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator !=",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+                                                it = coursesCount;
+                                            }
+                                        }
+                                    } else {
+                                        for (int it = 0; it < coursesCount; it++) {
+                                            MyLearningModel tlItem = trackListModelList
+                                                    .get(it);
+                                            Boolean tempbool = null;
+                                            if (conmap.get("conditionitemid")
+                                                    .equals(tlItem
+                                                            .getContentID())) {
+                                                switch (conmap
+                                                        .get("conditionoperator")) {
+                                                    case "==":
+                                                        try {
+                                                            if ((tlItem.getStatus()
+                                                                    .toLowerCase())
+                                                                    .contains(conmap
+                                                                            .get("conditionresult")
+                                                                            .toLowerCase())) {
+                                                                tempbool = true;
+
+                                                            } else {
+                                                                tempbool = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator ==",
+                                                                    e.getMessage());
+                                                            tempbool = false;
+                                                        }
+                                                        break;
+                                                    case "!=":
+                                                        try {
+                                                            if (!(tlItem
+                                                                    .getStatus()
+                                                                    .toLowerCase())
+                                                                    .contains(conmap
+                                                                            .get("conditionresult")
+                                                                            .toLowerCase())) {
+                                                                tempbool = true;
+
+                                                            } else {
+                                                                tempbool = false;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("conditionoperator !=",
+                                                                    e.getMessage());
+                                                            tempbool = false;
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+
+                                                switch (conmap
+                                                        .get("conditioncoperator")) {
+                                                    case "or":
+                                                        if (tempbool || iscondition) {
+                                                            iscondition = true;
+                                                        } else {
+                                                            iscondition = false;
+                                                        }
+                                                        break;
+                                                    case "and":
+                                                        if (tempbool && iscondition) {
+                                                            iscondition = true;
+                                                        } else {
+                                                            iscondition = false;
+                                                        }
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                }
+
+                                                it = coursesCount;
+
+                                            }
+                                        }
+                                    }
+                                }
+                            } else if (conmap.get("conditiontype").equals(
+                                    "timeelapsed")) {
+                                if (isValidString(myLearningModel.getDateAssigned())) {
+                                    float workFlowTimeElapsed = Float
+                                            .parseFloat(conmap
+                                                    .get("conditionresult"));
+                                    if (conmap.get("conditioncoperator")
+                                            .equals("")) {
+                                        for (int it = 0; it < coursesCount; it++) {
+                                            MyLearningModel tlItem = trackListModelList
+                                                    .get(it);
+                                            // //TODO calculate the TimeDiff
+                                            // between DateAssigned and current
+                                            // time as itemTimeElapsed
+
+                                            SimpleDateFormat curFormat = new SimpleDateFormat(
+                                                    "yyyy-MM-dd'T'HH:mm:ss");
+                                            Date assignedDate = curFormat
+                                                    .parse(myLearningModel.getDateAssigned());
+                                            Calendar cal = Calendar
+                                                    .getInstance();
+
+                                            long currentTimeMillis = cal
+                                                    .getTimeInMillis();
+                                            long assignedTimeMillis = assignedDate
+                                                    .getTime();
+
+                                            long timeDiffMillis = currentTimeMillis
+                                                    - assignedTimeMillis;
+
+                                            float itemTimeElapsed = (float) (timeDiffMillis / 3600000);
+
+                                            if (conmap.get("conditionitemid")
+                                                    .equals(tlItem
+                                                            .getContentID())) {
+                                                switch (conmap
+                                                        .get("conditionoperator")) {
+                                                    case ">=":
+                                                        try {
+                                                            if (itemTimeElapsed >= workFlowTimeElapsed) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("time cierator >=", e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    case "<=":
+                                                        try {
+                                                            if (itemTimeElapsed <= workFlowTimeElapsed) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("timeerator <=",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    case "==":
+                                                        try {
+                                                            if (itemTimeElapsed == workFlowTimeElapsed) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                        } catch (Exception e) {
+                                                            Log.e("timeerator ==",
+                                                                    e.getMessage());
+                                                            iscondition = false;
+                                                            it = coursesCount;
+                                                        }
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        for (int it = 0; it < coursesCount; it++) {
+                                            MyLearningModel tlItem = trackListModelList
+                                                    .get(it);
+                                            Boolean tempbool = null;
+                                            if (isValidString(tlItem.getScore())) {
+                                                float itemScore = Float
+                                                        .parseFloat(tlItem
+                                                                .getScore());
+                                                if (conmap
+                                                        .get("conditionitemid")
+                                                        .equals(tlItem
+                                                                .getContentID())) {
+                                                    switch (conmap
+                                                            .get("conditionoperator")) {
+                                                        case ">=":
+                                                            try {
+                                                                if (itemScore >= workFlowTimeElapsed) {
+                                                                    tempbool = true;
+                                                                } else {
+                                                                    tempbool = false;
+                                                                }
+                                                            } catch (Exception e) {
+                                                                Log.e("conditionoperator >=",
+                                                                        e.getMessage());
+                                                                tempbool = false;
+                                                            }
+                                                            break;
+                                                        case "<=":
+                                                            try {
+                                                                if (itemScore <= workFlowTimeElapsed) {
+                                                                    tempbool = true;
+                                                                } else {
+                                                                    tempbool = false;
+                                                                }
+                                                            } catch (Exception e) {
+                                                                Log.e("conditionoperator <=",
+                                                                        e.getMessage());
+                                                                tempbool = false;
+                                                            }
+                                                            break;
+                                                        case "==":
+                                                            try {
+                                                                if (itemScore == workFlowTimeElapsed) {
+                                                                    tempbool = true;
+                                                                } else {
+                                                                    tempbool = false;
+                                                                }
+                                                            } catch (Exception e) {
+                                                                Log.e("conditionoperator ==",
+                                                                        e.getMessage());
+                                                                tempbool = false;
+                                                            }
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+
+                                                    switch (conmap
+                                                            .get("conditioncoperator")) {
+                                                        case "or":
+                                                            if (tempbool
+                                                                    || iscondition) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                            break;
+                                                        case "and":
+                                                            if (tempbool
+                                                                    && iscondition) {
+                                                                iscondition = true;
+                                                                it = coursesCount;
+                                                            } else {
+                                                                iscondition = false;
+                                                                it = coursesCount;
+                                                            }
+                                                            break;
+
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    iscondition = false;
+                                }
+
+                            }
+                        }
+                    }
+
+                    if (iscondition) {
+                        int totalActionsCount = actionsMap.size();
+                        for (int act = 0; act < totalActionsCount; act++) {
+                            Map<String, String> actmap = actionsMap.get(act);
+                            if (actmap.get("actionstepid").equals(
+                                    stemap.get("stepid"))) {
+                                long currentTimeMillis = System
+                                        .currentTimeMillis();
+                                if (actmap.get("actionitemid").equals("all")) {
+                                    for (int it = 0; it < coursesCount; it++) {
+                                        MyLearningModel tlItem = trackListModelList
+                                                .get(it);
+                                        if (tlItem.getStatus().toLowerCase()
+                                                .equals("not started")) {
+                                            String showStatus = "";
+                                            switch (actmap.get("actiontype")) {
+                                                case "disabled":
+
+                                                    showStatus = "disabled";
+                                                    trackListModelList.get(it)
+                                                            .setShowStatus(
+                                                                    "disabled");
+                                                    break;
+                                                case "show":
+                                                    showStatus = "show";
+                                                    trackListModelList.get(it)
+                                                            .setShowStatus("show");
+                                                    break;
+                                                case "hide":
+                                                    showStatus = "hide";
+                                                    trackListModelList.get(it)
+                                                            .setShowStatus("hide");
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+
+                                            MyLearningModel cmiDetails = new MyLearningModel();
+                                            cmiDetails.setSiteID(tlItem
+                                                    .getSiteID());
+                                            cmiDetails.setUserID(tlItem
+                                                    .getUserID());
+                                            cmiDetails.setScoId(tlItem
+                                                    .getScoId());
+                                            cmiDetails
+                                                    .setShowStatus(showStatus);
+                                            db.updateTrackListItemShowstatus(cmiDetails);
+
+                                            if (isValidString(stemap
+                                                    .get("timedelay"))) {
+                                                long lngLastTime = 0;
+
+                                                String strLastTime = db
+                                                        .getTrackTimedelay(
+                                                                tlItem.getUserID(),
+                                                                tlItem.getScoId(),
+                                                                tlItem.getSiteID());
+
+                                                try {
+                                                    lngLastTime = Long
+                                                            .parseLong(strLastTime);
+                                                    cmiDetails = new MyLearningModel();
+                                                    if (lngLastTime == 0) {
+                                                        lngLastTime = currentTimeMillis
+                                                                * (Long.parseLong(stemap
+                                                                .get("timedelay")) * 3600000);
+                                                    }
+
+                                                } catch (Exception se) {
+                                                    lngLastTime = currentTimeMillis
+                                                            + (Long.parseLong(stemap
+                                                            .get("timedelay")) * 3600000);
+                                                }
+                                                cmiDetails.setTimeDelay(String
+                                                        .valueOf(lngLastTime));
+                                                db.updateTrackTimedelay(cmiDetails);
+                                                cmiDetails = new MyLearningModel();
+                                                if (currentTimeMillis >= lngLastTime) {
+                                                    cmiDetails
+                                                            .setShowStatus("show");
+                                                    trackListModelList.get(it)
+                                                            .setShowStatus(
+                                                                    "show");
+                                                } else {
+                                                    cmiDetails
+                                                            .setShowStatus("disabled");
+                                                    trackListModelList
+                                                            .get(it)
+                                                            .setShowStatus(
+                                                                    "disabled-"
+                                                                            + lngLastTime);
+                                                }
+                                                db.updateTrackListItemShowstatus(cmiDetails);
+                                            }
+                                        }
+                                    }
+                                } else if (actmap.get("actionitemid").equals(
+                                        "track")) {
+                                    CMIModel cmiDetails = new CMIModel();
+                                    cmiDetails.set_siteId(myLearningModel.getSiteID());
+                                    cmiDetails.set_userId(Integer
+                                            .parseInt(myLearningModel.getUserID()));
+                                    cmiDetails
+                                            .set_startdate(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+                                    cmiDetails
+                                            .set_datecompleted(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+                                    cmiDetails.set_scoId(Integer
+                                            .parseInt(myLearningModel.getScoId()));
+                                    cmiDetails.set_isupdate("false");
+                                    cmiDetails.set_status("completed");
+                                    cmiDetails.set_seqNum("0");
+                                    cmiDetails.set_objecttypeid("10");
+                                    cmiDetails.set_timespent("");
+                                    cmiDetails.set_sitrurl(myLearningModel.getSiteURL());
+                                    db.insertCMI(cmiDetails, true);
+                                    // TODO Here need to execute
+                                    // ContentCompletionWorkflowRules
+
+                                    for (int it = 0; it < coursesCount; it++) {
+                                        MyLearningModel tlItem = trackListModelList
+                                                .get(it);
+                                        if (actmap.get("actionitemid").equals(
+                                                tlItem.getContentID())) {
+                                            switch (actmap.get("actiontype")) {
+                                                case "setscore":
+                                                    if (actmap.get("scoretype")
+                                                            .equals("weighted")) {
+
+                                                    } else {
+
+                                                    }
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }
+
+                                } else if (actmap.get("actionitemid").equals(
+                                        "next")) {
+
+                                } else {
+                                    for (int it = 0; it < coursesCount; it++) {
+                                        MyLearningModel tlItem = trackListModelList
+                                                .get(it);
+                                        if (actmap.get("actionitemid").equals(
+                                                tlItem.getContentID())) {
+
+                                            if (tlItem.getStatus()
+                                                    .toLowerCase()
+                                                    .equals("not started")) {
+                                                String showStatus = "";
+                                                switch (actmap
+                                                        .get("actiontype")) {
+                                                    case "disabled":
+                                                        showStatus = "disabled";
+                                                        trackListModelList.get(it)
+                                                                .setShowStatus(
+                                                                        "disabled");
+                                                        break;
+                                                    case "show":
+                                                        showStatus = "show";
+                                                        trackListModelList.get(it)
+                                                                .setShowStatus(
+                                                                        "show");
+                                                        break;
+                                                    case "hide":
+                                                        showStatus = "hide";
+                                                        trackListModelList.get(it)
+                                                                .setShowStatus(
+                                                                        "hide");
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+
+                                                MyLearningModel _cmiDetails = new MyLearningModel();
+                                                _cmiDetails.setSiteID(tlItem
+                                                        .getSiteID());
+                                                _cmiDetails.setUserID(tlItem
+                                                        .getUserID());
+                                                _cmiDetails.setScoId(tlItem
+                                                        .getScoId());
+                                                _cmiDetails
+                                                        .setShowStatus(showStatus);
+
+                                                db.updateTrackListItemShowstatus(_cmiDetails);
+
+                                                if (isValidString(stemap
+                                                        .get("timedelay"))) {
+                                                    long lngLastTime = 0;
+
+                                                    String strLastTime = db
+                                                            .getTrackTimedelay(
+                                                                    tlItem.getUserID(),
+                                                                    tlItem.getScoId(),
+                                                                    tlItem.getSiteID());
+                                                    try {
+                                                        lngLastTime = Long
+                                                                .parseLong(strLastTime);
+                                                        if (lngLastTime == 0) {
+                                                            lngLastTime = currentTimeMillis
+                                                                    + (Long.parseLong(stemap
+                                                                    .get("timedelay")) * 3600000);
+                                                        }
+
+                                                    } catch (SQLiteException se) {
+                                                        lngLastTime = currentTimeMillis
+                                                                + (Long.parseLong(stemap
+                                                                .get("timedelay")) * 3600000);
+
+                                                    }
+                                                    _cmiDetails = new MyLearningModel();
+                                                    _cmiDetails
+                                                            .setSiteID(tlItem
+                                                                    .getSiteID());
+                                                    _cmiDetails
+                                                            .setUserID(tlItem
+                                                                    .getUserID());
+                                                    _cmiDetails
+                                                            .setScoId(tlItem
+                                                                    .getScoId());
+                                                    _cmiDetails
+                                                            .setTimeDelay(String
+                                                                    .valueOf(lngLastTime));
+                                                    db.updateTrackTimedelay(_cmiDetails);
+                                                    _cmiDetails = new MyLearningModel();
+                                                    _cmiDetails
+                                                            .setSiteID(tlItem
+                                                                    .getSiteID());
+                                                    _cmiDetails
+                                                            .setUserID(tlItem
+                                                                    .getUserID());
+                                                    _cmiDetails
+                                                            .setScoId(tlItem
+                                                                    .getScoId());
+                                                    if (currentTimeMillis >= lngLastTime) {
+                                                        _cmiDetails
+                                                                .setShowStatus("show");
+                                                        trackListModelList.get(it)
+                                                                .setShowStatus(
+                                                                        "show");
+                                                    } else {
+                                                        _cmiDetails
+                                                                .setShowStatus("disabled");
+                                                        trackListModelList
+                                                                .get(it)
+                                                                .setShowStatus(
+                                                                        "disabled-"
+                                                                                + lngLastTime);
+                                                    }
+                                                    db.updateTrackListItemShowstatus(_cmiDetails);
+                                                }
+
+                                            }
+                                            it = coursesCount;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (workFlowType.equals("onexit")) {
+                    workFlowType = "";
+                    if (isNetworkConnectionAvailable(context, -1)
+                            ) {
+
+//                        SyncData();
+                    } else {
+                        finish();
+                    }
+                } else if (workFlowType.equals("onlaunch")) {
+
+                    workFlowType = "onitemChange";
+                    executeWorkFlowRules(workFlowType);
+
+                } else {
+//                    List<TrackListItem> tempTrackListItems = new ArrayList<TrackListItem>();
+//                    tempTrackListItems = trackListItems;
+//                    trackListItems = new ArrayList<TrackListItem>();
+//                    int itemsCount = tempTrackListItems.size();
+//                    for (int it = 0; it < itemsCount; it++) {
+//                        TrackListItem tempTLItem = tempTrackListItems.get(it);
+//                        if (!tempTLItem.getShowstatus().equals("hide")) {
+//                            trackListItems.add(tempTLItem);
+//                        }
+//                    }
+
+                    workFlowType = "";
+                    trackList.deferNotifyDataSetChanged();
                 }
 
             } else {
-
+                defaultActionOnNoWorkflowRules();
             }
         } catch (Exception e) {
             Log.e("executeWorkFlowRules", "executeWorkFlowRules");
             e.printStackTrace();
+        }
+    }
+
+    private void defaultActionOnNoWorkflowRules() {
+        if (workFlowType.equals("onexit")) {
+            workFlowType = "";
+            if (isNetworkConnectionAvailable(context, -1)) {
+
+//                SyncData();
+            } else {
+                finish();
+            }
+
+        } else {
+            workFlowType = "";
+
 
         }
     }
 
+    @Override
+    public void completedXmlFileDownload() {
+
+        executeWorkFlowRules("onlaunch");
+
+    }
 }
 

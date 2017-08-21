@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.instancy.instancylearning.interfaces.XmlDownloadListner;
 import com.instancy.instancylearning.models.MyLearningModel;
 
 import java.io.BufferedInputStream;
@@ -27,6 +28,7 @@ public class DownloadXmlAsynchTask extends AsyncTask<String, Integer, Void> {
     boolean isTraxkListView;
     MyLearningModel learningModel;
     String siteUrl;
+   public   XmlDownloadListner xmlDownloadListner;
 
     public DownloadXmlAsynchTask(Context context, boolean isTraxkListView, MyLearningModel learningModel, String siteUrl) {
         this.context = context;
@@ -101,7 +103,7 @@ public class DownloadXmlAsynchTask extends AsyncTask<String, Integer, Void> {
             output.close();
             output = null;
         } catch (Exception e) {
-            Log.e("workflowXMLLocalPath copyFile", e.getMessage());
+            Log.e("workflowXMLcopyFile", e.getMessage());
         }
 
         return null;
@@ -116,6 +118,6 @@ public class DownloadXmlAsynchTask extends AsyncTask<String, Integer, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-
+        xmlDownloadListner.completedXmlFileDownload();
     }
 }
