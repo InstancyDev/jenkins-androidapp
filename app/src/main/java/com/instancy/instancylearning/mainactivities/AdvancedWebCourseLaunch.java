@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.mainactivities;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -9,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -17,8 +17,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -107,9 +105,22 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        adWebView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
+
+
+        adWebView.getSettings().setLoadsImagesAutomatically(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+        }
         // Add Class in js
 
-        adWebView.addJavascriptInterface(new LRSJavaScriptInterface(this, myLearningModel), "MobileJSInterface");
+//        final LRSJavaScriptInterface lrsInterface = new LRSJavaScriptInterface(this, myLearningModel);
+
+        adWebView.addJavascriptInterface(new LRSJavaScriptInterface(this, myLearningModel, this), "MobileJSInterface");
+
 
         adWebView.setWebViewClient(new WebViewClient() {
                                        @Override
@@ -124,30 +135,68 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                view.stopLoading();
                                                databaseHandler.saveCourseClose(url, myLearningModel);
                                                finish();
+                                               return true;
                                            }
-                                           else if (url.contains("iosobjectclose=true")) {
+                                           if (url.contains("iosobjectclose=true")) {
 
                                                databaseHandler.saveCourseClose(url, myLearningModel);
+                                               return true;
                                            }
-                                           return true;
-
-                                       }
-
-                                       @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                                       @Override
-                                       public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                                           String urlReq = request.getUrl().toString();
-                                           Log.d(TAG, "shouldOverrideUrlLoading: newmwthod " + urlReq);
-                                           urlReq = urlReq.toLowerCase();
-                                           if (urlReq.contains("ioscourseclose") || urlReq.contains("/logoff") || urlReq.contains("home.html")) {
-                                               Intent intent = getIntent();
-                                               intent.putExtra("myLearningDetalData", myLearningModel);
-                                               setResult(RESULT_OK, intent);
+                                           if ((url.contains("exittracklistview") || url.contains("/all")
+                                                   || url.contains("/pending") || url.contains("/my learning")
+                                                   || url.contains("/my%20learning")
+                                                   || url.contains("/logoff")
+                                                   || url.contains("/home")
+                                                   || url.contains("/sign%20in")
+                                                   || url.contains("/sign in"))
+                                                   && !url.contains("/fromnative/true")) {
                                                view.stopLoading();
                                                finish();
+
                                            }
-                                           return true;
+
+                                           if ((url.contains("events/tabs/")
+                                                   || url.contains("catalogresources%20content")
+                                                   || url.contains("catalogresources content")
+                                                   || url.contains("discussion%20forums")
+                                                   || url.contains("discussion forums")
+                                                   || url.contains("ask%20a%20question")
+                                                   || url.contains("ask a question")
+                                                   || url.contains("topics/forumid/")
+                                                   || url.contains("/tab%20list%20view/")
+                                                   || url.contains("/tab list view/")
+                                                   || url.contains("user questions list")
+                                                   || url.contains("user%20questions%20list"))
+                                                   && !url.contains("/fromnative/true")) {
+
+                                               view.loadUrl(url + "/fromnative/true");
+                                               return false;
+                                           }
+
+                                           return false;
+
                                        }
+
+//                                       @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//                                       @Override
+//                                       public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+//                                           String urlReq = request.getUrl().toString();
+//                                           Log.d(TAG, "shouldOverrideUrlLoading: newmwthod " + urlReq);
+//                                           urlReq = urlReq.toLowerCase();
+//                                           if (urlReq.contains("ioscourseclose") || urlReq.contains("/logoff") || urlReq.contains("home.html")) {
+//                                               Intent intent = getIntent();
+//                                               intent.putExtra("myLearningDetalData", myLearningModel);
+//                                               setResult(RESULT_OK, intent);
+//                                               view.stopLoading();
+//                                               finish();
+//                                               return false;
+//                                           } else if (urlReq.contains("iosobjectclose=true")) {
+//
+//                                               databaseHandler.saveCourseClose(urlReq, myLearningModel);
+//                                               return true;
+//                                           }
+//                                           return false;
+//                                       }
 
                                        @Override
                                        public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -161,14 +210,13 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                        }
 
                                        @Override
-                                       public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                                           super.onReceivedError(view, request, error);
+                                       public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                                           super.onReceivedError(view, errorCode, description, failingUrl);
 
                                        }
 
                                    }
         );
-
 
         adWebView.setWebChromeClient(new WebChromeClient() {
             @Override

@@ -275,7 +275,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + "(RESPONSEID INTEGER PRIMARY KEY AUTOINCREMENT,trackscoid INTEGER,scoid INTEGER,sequencenumber INTEGER,siteid INTEGER,userid INTEGER,objecttypeid INTEGER,name TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
@@ -1720,7 +1720,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel myLearningModel = new MyLearningModel();
             ContentValues contentValues = null;
@@ -2311,7 +2311,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel trackLearningModel = new MyLearningModel();
             ContentValues contentValues = null;
@@ -2350,6 +2350,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonMyLearningColumnObj.has("showstatus")) {
 
                 trackLearningModel.setShowStatus(jsonMyLearningColumnObj.get("showstatus").toString());
+            } else {
+
+                trackLearningModel.setShowStatus("show");
+
             }
             //timedelay
             if (jsonMyLearningColumnObj.has("timedelay")) {
@@ -2891,6 +2895,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("courseattempts")));
                     trackListModel.setEventContentid(cursor.getString(cursor
                             .getColumnIndex("eventcontentid")));
+
 
                     trackListModel.setMediatypeId(cursor.getString(cursor
                             .getColumnIndex("mediatypeid")));
@@ -5691,8 +5696,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     responMap = generateHashMap(conditionsArray);
                     Log.d("Type", "Called On saveCourseClose" + responMap.keySet());
                     Log.d("Type", "Called On saveCourseClose" + responMap.values());
-
 //                    ioscourseclose=true&cid=338&seqid=1&stid=1&lloc=2&lstatus=incomplete&susdata=#pgvs_start#1;2;#pgvs_end#&timespent=00:00:06.88&quesdata=&ltstatus=incomplete
+
                     if (responMap.containsKey("susdata")) {
 
                         susData = responMap.get("susdata");
@@ -5706,14 +5711,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         scoid = responMap.get("cid");
                     } else {
-                        scoid = "";
+                        scoid = "0";
 
                     }
                     if (responMap.containsKey("seqid")) {
 
                         seqID = responMap.get("seqid");
                     } else {
-                        seqID = "";
+                        seqID = "0";
 
                     }
                     if (responMap.containsKey("lloc")) {
@@ -5755,7 +5760,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         userIDValue = responMap.get("stid");
                     } else {
-                        userIDValue = "";
+                        userIDValue = "0";
 
                     }
 
@@ -5833,12 +5838,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         cmiModel.set_siteId(learningModel.getSiteID());
-        cmiModel.set_userId(Integer.parseInt(userIDValue));
-        cmiModel.set_isupdate(learningModel.getSiteID());
-        cmiModel.set_scoId(Integer.parseInt(scoid));
-        cmiModel.set_objecttypeid(learningModel.getObjecttypeId());
-        cmiModel.set_sitrurl(learningModel.getSiteURL());
-        cmiModel.set_noofattempts(Integer.parseInt(totalNoOfAttempts));
+        try {
+            cmiModel.set_userId(Integer.parseInt(userIDValue));
+            cmiModel.set_isupdate(learningModel.getSiteID());
+            cmiModel.set_scoId(Integer.parseInt(scoid));
+            cmiModel.set_objecttypeid(learningModel.getObjecttypeId());
+            cmiModel.set_sitrurl(learningModel.getSiteURL());
+            cmiModel.set_noofattempts(Integer.parseInt(totalNoOfAttempts));
+        } catch (NumberFormatException e) {
+
+            e.printStackTrace();
+        }
 
 
         if (isSqlDataPresent.equalsIgnoreCase("true")) {

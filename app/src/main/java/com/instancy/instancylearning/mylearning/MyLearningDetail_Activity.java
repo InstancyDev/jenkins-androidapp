@@ -109,7 +109,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     @Bind(R.id.txt_site_name)
     TextView txtSiteName;
 
-
     @Bind(R.id.view_btn_txt)
     TextView txtBtnView;
 

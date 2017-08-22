@@ -88,12 +88,7 @@
 //        webView.getSettings().setJavaScriptEnabled(true);
 //        webView.getSettings().setDomStorageEnabled(true);
 //        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-//        webView.getSettings().setLoadsImagesAutomatically(true);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
-//                WebView.setWebContentsDebuggingEnabled(true);
-//            }
-//        }
+
 //        webView.setWebChromeClient(new WebChromeClient() {
 //                                       @Override
 //                                       public void onProgressChanged(WebView view, int newProgress) {

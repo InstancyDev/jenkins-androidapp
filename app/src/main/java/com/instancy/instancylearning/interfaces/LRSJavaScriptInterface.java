@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.interfaces;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -17,11 +18,13 @@ public class LRSJavaScriptInterface {
     String launchURL;
     MyLearningModel _learningModel;
     DatabaseHandler databaseHandler;
+    Activity activity;
 
-    public LRSJavaScriptInterface(Context c, MyLearningModel learningModel) {
+    public LRSJavaScriptInterface(Context c, MyLearningModel learningModel, Activity activity) {
         mContext = c;
         _learningModel = learningModel;
         databaseHandler = new DatabaseHandler(c);
+        this.activity = activity;
     }
 
     @JavascriptInterface
@@ -42,6 +45,7 @@ public class LRSJavaScriptInterface {
     public String SaveQuestionDataWithQuestionData(String quesData) {
         Log.d("SaveQuesWD", quesData);
         String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
+        activity.finish();
         return status;
     }
 
@@ -66,6 +70,21 @@ public class LRSJavaScriptInterface {
         String status = "";
         databaseHandler.updateCMiRecordForTemplateView(_learningModel, seqID, location);
         return location;
+    }
+
+    // Course close
+
+    @JavascriptInterface
+    public void OnLineCourseClose() {
+
+        activity.finish();
+
+    }
+
+    @JavascriptInterface
+    public void LMSTrackInitialize(String value, String tracksqno) {
+
+
     }
 
 }

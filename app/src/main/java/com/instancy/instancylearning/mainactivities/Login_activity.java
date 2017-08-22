@@ -335,6 +335,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                                     preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intentSideMenu);
                                 }
 

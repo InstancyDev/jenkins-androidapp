@@ -253,7 +253,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         if (trackChildList.getShowStatus().equalsIgnoreCase("disabled")) {
 
             holder.btnDownload.setEnabled(false);
-            childView.setBackgroundColor(Color.RED);
+            childView.setBackgroundColor(childView.getResources().getColor(R.color.colorGray));
             holder.btnContextMenu.setEnabled(false);
             holder.imgThumb.setEnabled(false);
         } else {
@@ -280,6 +280,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    public void refresh() {
+        notifyDataSetChanged();
+    }
 
     class ViewHolder {
         public int getChildPosition;

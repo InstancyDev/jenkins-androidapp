@@ -182,18 +182,33 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             } else {
 
-                if (!appUserModel.getUserIDValue().equalsIgnoreCase("-1")) {
 
-                    Intent i = new Intent(context, Branding_activity.class);
-                    startActivity(i);
+                String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
+
+                if (userID != null && !userID.equalsIgnoreCase("")) {
+
+                    Intent intent = new Intent(this, SideMenu.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
 
                 } else {
-
-                    Intent i = new Intent(context, Branding_activity.class);
-                    startActivity(i);
+                    Intent intent = new Intent(this, Login_activity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
 
                 }
 
+//                if (!appUserModel.getUserIDValue().equalsIgnoreCase("-1")) {
+//
+//                    Intent i = new Intent(context, Branding_activity.class);
+//                    startActivity(i);
+//
+//                } else {
+//
+//                    Intent i = new Intent(context, Branding_activity.class);
+//                    startActivity(i);
+//
+//                }
 
             }
         }

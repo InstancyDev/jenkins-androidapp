@@ -36,6 +36,8 @@ import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -94,7 +96,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     DownloadXmlAsynchTask downloadXmlAsynchTask;
     List<MyLearningModel> trackListModelList;
     Boolean iscondition = true;
-    String workFlowType;
+    String workFlowType, strlaunch;
+    PreferencesManager preferencesManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,6 +113,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         db = new DatabaseHandler(this);
         webAPIClient = new WebAPIClient(this);
         workFlowType = "onlaunch";
+        strlaunch = "0";
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
@@ -122,6 +126,10 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         // setting list adapter
         trackList.setAdapter(trackListExpandableAdapter);
         trackListModelList = new ArrayList<MyLearningModel>();
+        preferencesManager = PreferencesManager.getInstance();
+        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -218,7 +226,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
     public void injectFromDbtoModel() {
         trackListModelList = new ArrayList<MyLearningModel>();
-        blockNames.clear();
+        blockNames = new ArrayList<String>();
 
         if (isTraxkList) {
 
@@ -429,17 +437,26 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     @Override
     protected void onResume() {
         super.onResume();
-
+        try {
+            if (strlaunch.equals("0")) {
+                strlaunch = "1";
+            } else if (strlaunch.equals("1")) {
+                workFlowType = "onitemChange";
+                executeWorkFlowRules(workFlowType);
+            }
+        } catch (Exception ex) {
+            Log.d("Onresume", ex.getMessage());
+        }
     }
 
     private void executeWorkFlowRules(final String workflowtype) {
+
         try {
 
             File fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml");
 
-            String fileXmls = getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml";
+//            String fileXmls = getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml";
             if (fXmlFile.exists()) {
-
 
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory
                         .newInstance();
@@ -964,7 +981,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                         for (int it = 0; it < coursesCount; it++) {
                                             MyLearningModel tlItem = trackListModelList
                                                     .get(it);
-                                            // //TODO calculate the TimeDiff
+                                            // // calculate the TimeDiff
                                             // between DateAssigned and current
                                             // time as itemTimeElapsed
 
@@ -1403,34 +1420,34 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                     }
                 }
 
-                if (workFlowType.equals("onexit")) {
-                    workFlowType = "";
-                    if (isNetworkConnectionAvailable(context, -1)
-                            ) {
-
-//                        SyncData();
-                    } else {
-                        finish();
-                    }
-                } else if (workFlowType.equals("onlaunch")) {
+//                if (workFlowType.equals("onexit")) {
+//                    workFlowType = "";
+//                    if (isNetworkConnectionAvailable(context, -1)
+//                            ) {
+//
+////                        SyncData();
+//                    } else {
+//                        finish();
+//                    }
+//                } else
+                if (workFlowType.equals("onlaunch")) {
 
                     workFlowType = "onitemChange";
-                    executeWorkFlowRules(workFlowType);
+//                    executeWorkFlowRules(workFlowType);
 
                 } else {
-//                    List<TrackListItem> tempTrackListItems = new ArrayList<TrackListItem>();
-//                    tempTrackListItems = trackListItems;
-//                    trackListItems = new ArrayList<TrackListItem>();
-//                    int itemsCount = tempTrackListItems.size();
-//                    for (int it = 0; it < itemsCount; it++) {
-//                        TrackListItem tempTLItem = tempTrackListItems.get(it);
-//                        if (!tempTLItem.getShowstatus().equals("hide")) {
-//                            trackListItems.add(tempTLItem);
-//                        }
-//                    }
-
+                    List<MyLearningModel> tempTrackListItems = new ArrayList<MyLearningModel>();
+                    tempTrackListItems = trackListModelList;
+                    trackListModelList = new ArrayList<MyLearningModel>();
+                    int itemsCount = tempTrackListItems.size();
+                    for (int it = 0; it < itemsCount; it++) {
+                        MyLearningModel tempTLItem = tempTrackListItems.get(it);
+                        if (!tempTLItem.getShowStatus().equals("hide")) {
+                            trackListModelList.add(tempTLItem);
+                        }
+                    }
                     workFlowType = "";
-                    trackList.deferNotifyDataSetChanged();
+                    trackListExpandableAdapter.refresh();
                 }
 
             } else {
@@ -1439,24 +1456,26 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         } catch (Exception e) {
             Log.e("executeWorkFlowRules", "executeWorkFlowRules");
             e.printStackTrace();
+            defaultActionOnNoWorkflowRules();
         }
+        trackListExpandableAdapter.refresh();
     }
 
     private void defaultActionOnNoWorkflowRules() {
-        if (workFlowType.equals("onexit")) {
-            workFlowType = "";
-            if (isNetworkConnectionAvailable(context, -1)) {
+//        if (workFlowType.equals("onexit")) {
+//            workFlowType = "";
+//            if (isNetworkConnectionAvailable(context, -1)) {
+//
+////                SyncData();
+//            } else {
+//                finish();
+//            }
+//
+//        } else {
+        workFlowType = "";
+        trackListExpandableAdapter.refresh();
 
-//                SyncData();
-            } else {
-                finish();
-            }
-
-        } else {
-            workFlowType = "";
-
-
-        }
+//        }
     }
 
     @Override

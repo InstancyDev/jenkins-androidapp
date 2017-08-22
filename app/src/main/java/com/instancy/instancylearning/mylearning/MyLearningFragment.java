@@ -209,7 +209,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             e.printStackTrace();
                         }
                     } else {
-
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 }
                 if (requestType.equalsIgnoreCase("UPDATESTATUS")) {
@@ -220,6 +220,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             resultListner.statusUpdateFromServer(true, response);
 
                     } else {
+
 
                     }
                 }
@@ -244,13 +245,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             public void notifyError(String requestType, VolleyError error) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
 
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
-
+                swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
 
