@@ -83,7 +83,6 @@ public class VolleySingleton {
 
     public static void stringRequests(final String defaultSiteUrl, final StringResultListner<String> listeners) {
 
-
         StringRequest req = new StringRequest(defaultSiteUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -94,11 +93,11 @@ public class VolleySingleton {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.e("Error: ", error.getMessage());
+                listeners.getError(error.getMessage());
             }
+
         });
 
-//      add the request object to the queue to be executed
-//     AppController.getInstance().addToRequestQueue(req);
         requestQueue.add(req);
 
     }

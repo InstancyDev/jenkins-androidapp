@@ -4,14 +4,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.instancy.instancylearning.globalpackage.SynchData;
-import com.instancy.instancylearning.synchtasks.WebAPIClient;
 
 /**
  * Created by Upendranath on 5/22/2017.
  */
 
 public class CmiSynchTask extends AsyncTask<String, Integer, Void> {
-
 
 
     Context context;
@@ -30,7 +28,7 @@ public class CmiSynchTask extends AsyncTask<String, Integer, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-//        synchData.SyncData();
+        synchData.SyncData();
         return null;
     }
 

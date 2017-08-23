@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.NativeSettingsAdapter;
@@ -29,6 +30,7 @@ import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.instancy.instancylearning.utils.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +38,9 @@ import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+import static android.webkit.URLUtil.isValidUrl;
 import static com.instancy.instancylearning.utils.Utilities.formatURL;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 5/29/2017.
@@ -50,6 +54,7 @@ public class NativeSettings extends AppCompatActivity {
     HashMap<String, List<String>> expandableListDetail;
     PreferencesManager preferencesManager;
     Boolean isLogin;
+    private SVProgressHUD svProgressHUD;
     final Context context = this;
     String TAG = NativeSettings.class.getSimpleName();
 
@@ -57,6 +62,7 @@ public class NativeSettings extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
+        svProgressHUD = new SVProgressHUD(this);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
 
@@ -64,7 +70,7 @@ public class NativeSettings extends AppCompatActivity {
         }
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
-        preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+//        preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
 
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
@@ -152,7 +158,7 @@ public class NativeSettings extends AppCompatActivity {
 
         final EditText userInput = (EditText) promptsView
                 .findViewById(R.id.reseturledit);
-
+        userInput.setText(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)
@@ -162,22 +168,24 @@ public class NativeSettings extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 // get user input and set it to result
                                 // edit text
-//                            result.setText(userInput.getText());
                                 String newUrl = userInput.getText().toString().trim();
                                 newUrl = formatURL(newUrl);
 
-                                Toast.makeText(context, "" + newUrl, Toast.LENGTH_SHORT).show();
-
-                                VolleySingleton.stringRequests(newUrl + "/PublicModules/SiteAPIDetails.aspx", new StringResultListner<String>() {
-                                    @Override
-                                    public void getResult(String result) {
-                                        if (!result.isEmpty()) {
-                                            //do what you need with the result...
-                                            LogUtils.d(TAG, "" + result);
-                                        }
+                                if (isValidUrl(newUrl)) {
+                                    if (isNetworkConnectionAvailable(context, -1)) {
+                                        resetUrlWebCall(newUrl);
+                                    } else {
+                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                                     }
-                                });
+
+                                } else {
+                                    Toast.makeText(context, "Invalid Url " + newUrl, Toast.LENGTH_SHORT).show();
+
+                                }
+
                             }
+
+
                         })
                 .setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
@@ -193,6 +201,55 @@ public class NativeSettings extends AppCompatActivity {
         alertDialog.show();
 
     }
+
+    public void resetUrlWebCall(String newUrl) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        VolleySingleton.stringRequests(newUrl + "/PublicModules/SiteAPIDetails.aspx", new StringResultListner<String>() {
+            @Override
+            public void getResult(String result) {
+                if (!result.isEmpty()) {
+                    //do what you need with the result...
+
+                    String webApiUrl = getSiteAPIDetails(result);
+
+                    LogUtils.d(TAG, "Result web api" + webApiUrl);
+
+                    svProgressHUD.dismiss();
+                }
+            }
+
+            @Override
+            public void getError(String error) {
+                LogUtils.e(TAG, "Result error " + error);
+                Toast.makeText(context, "Invalid Request ", Toast.LENGTH_SHORT).show();
+                svProgressHUD.dismiss();
+            }
+        });
+    }
+
+    public String getSiteAPIDetails(String result) {
+
+        String strAPIURL = "";
+
+        if (result.indexOf("<!DOCTYPE html>") > -1) {
+            strAPIURL = result.split("<!DOCTYPE html>")[0]
+                    .toString().trim();
+
+            if (!Utilities.isValidString(strAPIURL)) {
+                strAPIURL = "";
+            } else {
+
+                Log.d("webapiurl", strAPIURL);
+                preferencesManager.setStringValue(strAPIURL, StaticValues.KEY_WEBAPIURL);
+
+            }
+        }
+
+        return strAPIURL;
+    }
+
 
     @Override
     public void onBackPressed() {

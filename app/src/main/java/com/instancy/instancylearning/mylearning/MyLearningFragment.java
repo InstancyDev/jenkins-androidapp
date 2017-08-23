@@ -76,6 +76,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 
 /**
@@ -466,14 +467,22 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
         switch (view.getId()) {
             case R.id.btntxt_download:
-                downloadTheCourse(myLearningModelsList.get(position), view, position);
+                if (isNetworkConnectionAvailable(context, -1)) {
+                    downloadTheCourse(myLearningModelsList.get(position), view, position);
+                } else {
+                    showToast(context, "No Internet");
+                }
                 break;
             case R.id.imagethumb:
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext());
                 break;
+            default:
+                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext());
         }
+
     }
 
     @Override
@@ -487,7 +496,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
+    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow,
+                             final boolean isShow) {
         final View myView = getActivity().findViewById(viewID);
         int width = myView.getWidth();
         if (posFromRight > 0)

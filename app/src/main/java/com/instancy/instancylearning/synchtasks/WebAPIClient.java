@@ -49,7 +49,6 @@ public class WebAPIClient {
         inputStream = null;
         httpURLConnection = null;
 
-
         try {
             URL url = new URL(requestURL);
 

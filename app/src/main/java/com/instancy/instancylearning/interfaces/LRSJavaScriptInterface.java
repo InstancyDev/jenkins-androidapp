@@ -2,11 +2,14 @@ package com.instancy.instancylearning.interfaces;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.models.MyLearningModel;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Upendranath on 8/8/2017 Working on InstancyLearning.
@@ -45,7 +48,6 @@ public class LRSJavaScriptInterface {
     public String SaveQuestionDataWithQuestionData(String quesData) {
         Log.d("SaveQuesWD", quesData);
         String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
-        activity.finish();
         return status;
     }
 
@@ -77,6 +79,9 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public void OnLineCourseClose() {
 
+        Intent intent = activity.getIntent();
+        intent.putExtra("myLearningDetalData", _learningModel);
+        activity.setResult(RESULT_OK, intent);
         activity.finish();
 
     }
@@ -84,6 +89,34 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public void LMSTrackInitialize(String value, String tracksqno) {
 
+        Log.d("SaveLocationWith", value);
+    }
+
+
+    //Track Template view javascriptmethods
+    @JavascriptInterface
+    public String LMSGetTrackWorkflowResultsWithTrackID(String trackId) {
+
+        Log.d("LMSGetTracWithTrackID", trackId);
+
+        return trackId;
+
+    }
+
+    @JavascriptInterface
+    public String LMSGetTrackAllItemsResultWithTrackID(String trackId) {
+
+        Log.d("LMSGetTrackAllItemsckID", trackId);
+
+        return trackId;
+    }
+
+    @JavascriptInterface
+    public String UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String cid, String state, String str, String cRuleId, String cStepId) {
+
+        Log.d("SaveLocationWith", trackID);
+
+        return cStepId;
 
     }
 

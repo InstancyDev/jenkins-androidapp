@@ -494,14 +494,12 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.id_settings:
-//                Intent intentSettings = new Intent(this, NativeSettings.class);
-//                intentSettings.putExtra(StaticValues.KEY_ISLOGIN, false);
-//                startActivity(intentSettings);
+                Intent intentSettings = new Intent(this, NativeSettings.class);
+                intentSettings.putExtra(StaticValues.KEY_ISLOGIN, false);
+                startActivity(intentSettings);
                 return true;
         }
         return false;
     }
-
-
 }
 

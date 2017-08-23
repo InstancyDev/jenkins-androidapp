@@ -339,6 +339,7 @@ public class MyLearningAdapter extends BaseAdapter {
         }
         notifyDataSetChanged();
     }
+
     class ViewHolder {
         public int getPosition;
         public MyLearningModel myLearningDetalData;
@@ -422,7 +423,6 @@ public class MyLearningAdapter extends BaseAdapter {
 
         }
     }
-
 
     private void deleteMetaDataFromDB(MyLearningModel learningModel) {
 

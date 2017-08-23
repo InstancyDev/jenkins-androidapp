@@ -59,6 +59,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.showToast;
+
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
  */
@@ -244,7 +247,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
                 holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = trackChildList.getStatus() + " " + trackChildList.getProgress();
+                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");
@@ -256,8 +259,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             childView.setBackgroundColor(childView.getResources().getColor(R.color.colorGray));
             holder.btnContextMenu.setEnabled(false);
             holder.imgThumb.setEnabled(false);
+        } else if (trackChildList.getShowStatus().equalsIgnoreCase("hide")) {
+            childView.setVisibility(View.GONE);
         } else {
-
             childView.setBackgroundColor(Color.WHITE);
             holder.btnDownload.setEnabled(true);
             holder.btnContextMenu.setEnabled(true);
@@ -351,14 +355,15 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 GlobalMethods.contextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface);
 
             } else if (view.getId() == R.id.imagethumb) {
-
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData,
-                        view.getContext());
+                GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData,view.getContext());
             } else {
-
 //                ((ExpandableListView) parent).performItemClick(view, getChildPosition, getGroupPosition);
-
-                downloadTheCourse(myLearningDetalData, view, getChildPosition);
+                if (isNetworkConnectionAvailable(_context, -1)) {
+                    btnDownload.setTextColor(view.getResources().getColor(R.color.colorStatusInProgress));
+                    downloadTheCourse(myLearningDetalData, view, getChildPosition);
+                } else {
+                    showToast(_context, "No Internet");
+                }
             }
         }
     }
@@ -492,8 +497,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                             File zipfile = new File(zipFile);
                             zipfile.delete();
                         }
+
                         if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
                             callMetaDataService(learningModel);
+
                         }
                         notifyDataSetChanged();
                     }

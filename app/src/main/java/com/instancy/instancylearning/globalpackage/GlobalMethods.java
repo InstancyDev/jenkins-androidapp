@@ -268,6 +268,8 @@ public class GlobalMethods {
             }
         } else {
 
+
+
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
                 Intent intentDetail = new Intent(context, TrackList_Activity.class);
                 intentDetail.putExtra("myLearningDetalData", myLearningModel);

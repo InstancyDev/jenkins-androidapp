@@ -7,7 +7,6 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.interfaces.SiteConfigInterface;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
-import com.instancy.instancylearning.utils.StaticValues;
 
 /**
  * Created by Upendranath on 5/22/2017.

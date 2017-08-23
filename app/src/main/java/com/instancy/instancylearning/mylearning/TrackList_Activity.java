@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +25,6 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.DownloadXmlAsynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
@@ -72,7 +70,7 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
  * http://www.mysamplecode.com/2012/11/android-expandablelistview-search.html
  */
 
-public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, ExpandableListView.OnChildClickListener, XmlDownloadListner {
+public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, XmlDownloadListner {
     //eclipse line 8351
     ExpandableListView trackList;
     TrackListExpandableAdapter trackListExpandableAdapter;
@@ -122,7 +120,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
         trackListExpandableAdapter = new TrackListExpandableAdapter(this, blockNames, trackListHashMap);
-        trackList.setOnChildClickListener(this);
+//        trackList.setOnChildClickListener(this);
         // setting list adapter
         trackList.setAdapter(trackListExpandableAdapter);
         trackListModelList = new ArrayList<MyLearningModel>();
@@ -141,13 +139,19 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshMyLearning(false);
-            downloadXmlAsynchTask = new DownloadXmlAsynchTask(context, isTraxkList, myLearningModel, appUserModel.getSiteURL());
-            downloadXmlAsynchTask.xmlDownloadListner = this;
-            downloadXmlAsynchTask.execute();
+            executeXmlWorkFlowFile();
         } else {
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-            injectFromDbtoModel();
+//            injectFromDbtoModel();
+            executeXmlWorkFlowFile();
         }
+    }
+
+    public void executeXmlWorkFlowFile() {
+
+        downloadXmlAsynchTask = new DownloadXmlAsynchTask(context, isTraxkList, myLearningModel, appUserModel.getSiteURL());
+        downloadXmlAsynchTask.xmlDownloadListner = this;
+        downloadXmlAsynchTask.execute();
     }
 
     public void refreshMyLearning(Boolean isRefreshed) {
@@ -176,11 +180,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         try {
                             if (isTraxkList) {
                                 db.injectTracklistData(true, response, myLearningModel);
-                                injectFromDbtoModel();
+//                                injectFromDbtoModel();
                             } else {
                                 Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
                                 db.injectTracklistData(false, response, myLearningModel);
-                                injectFromDbtoModel();
+//                                injectFromDbtoModel();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -315,24 +319,24 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
     }
 
-    @Override
-    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-//        Toast.makeText(this, "selected click in main activity", Toast.LENGTH_SHORT).show();
-
-        switch (v.getId()) {
-//            case R.id.btntxt_download:
-//                downloadTheCourse(trackListHashMap.get(blockNames.get(groupPosition)).get(childPosition), v, childPosition, groupPosition);
+//    @Override
+//    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 //
+//        Toast.makeText(this, "selected click in main activity", Toast.LENGTH_SHORT).show();
+//
+//        switch (v.getId()) {
+////            case R.id.btntxt_download:
+////                downloadTheCourse(trackListHashMap.get(blockNames.get(groupPosition)).get(childPosition), v, childPosition, groupPosition);
+////
+////                break;
+//            case R.id.imagethumb:
+//                GlobalMethods.launchCourseViewFromGlobalClass(trackListHashMap.get(blockNames.get(groupPosition)).get(childPosition),
+//                        v.getContext());
 //                break;
-            case R.id.imagethumb:
-                GlobalMethods.launchCourseViewFromGlobalClass(trackListHashMap.get(blockNames.get(groupPosition)).get(childPosition),
-                        v.getContext());
-                break;
-        }
-
-        return false;
-    }
+//        }
+//
+//        return false;
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -356,7 +360,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                             i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
                             if (i == 1) {
                                 Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-                                injectFromDbtoModel();
+//                                injectFromDbtoModel();
                             } else {
                                 Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                             }
@@ -374,7 +378,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
             Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
-            injectFromDbtoModel();
+//            injectFromDbtoModel();
         }
     }
 
@@ -415,7 +419,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         i = db.updateContentStatusInTrackList(myLearningModel, status, progress);
                         if (i == 1) {
 
-                            injectFromDbtoModel();
+//                            injectFromDbtoModel();
                             Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 
                         } else {
@@ -610,6 +614,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                                     .put("actionstatus",
                                                             actionElement
                                                                     .getAttribute("status"));
+
+
                                             actionmap.put("actionstepid",
                                                     stepId);
                                             actionsMap.add(actionmap);
@@ -1447,7 +1453,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         }
                     }
                     workFlowType = "";
-                    trackListExpandableAdapter.refresh();
+//                    trackListExpandableAdapter.refresh();
+                    injectFromDbtoModel();
                 }
 
             } else {
@@ -1458,7 +1465,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             e.printStackTrace();
             defaultActionOnNoWorkflowRules();
         }
-        trackListExpandableAdapter.refresh();
+//        trackListExpandableAdapter.refresh();
+        injectFromDbtoModel();
     }
 
     private void defaultActionOnNoWorkflowRules() {
@@ -1473,7 +1481,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 //
 //        } else {
         workFlowType = "";
-        trackListExpandableAdapter.refresh();
+        injectFromDbtoModel();
 
 //        }
     }
