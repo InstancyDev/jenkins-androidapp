@@ -5,12 +5,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +30,7 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -335,11 +341,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_search = menu.findItem(R.id.mylearning_search);
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
+        int color = Color.parseColor(uiSettingsModel.getDefaultTextColor());
 
         item_filter.setVisible(false);
         if (item_search != null) {
-            item_search.setIcon(R.drawable.ic_search_black_24dp);
-            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
+            Drawable myIcon = getResources().getDrawable( R.drawable.ic_search_black_24dp );
+            item_search.setIcon(setTintDrawable(myIcon, color));
+//            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
@@ -347,6 +355,19 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+
+//            final PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+//
+//
+//            for (int i = 0; i < toolbar.getChildCount(); i++) {
+//
+//                final View v = toolbar.getChildAt(i);
+//
+//                if (v instanceof ImageButton) {
+//                    ((ImageButton) v).setColorFilter(colorFilter);
+//                }
+//            }
+
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -375,6 +396,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
             item_filter.setTitle("Filter");
         }
+    }
+
+
+    public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
+        drawable.clearColorFilter();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        drawable.invalidateSelf();
+        Drawable wrapDrawable = DrawableCompat.wrap(drawable).mutate();
+        DrawableCompat.setTint(wrapDrawable, color);
+        return wrapDrawable;
     }
 
     public void setSearchtollbar() {

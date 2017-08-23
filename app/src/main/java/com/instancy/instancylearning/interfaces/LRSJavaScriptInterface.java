@@ -90,6 +90,7 @@ public class LRSJavaScriptInterface {
     public void LMSTrackInitialize(String value, String tracksqno) {
 
         Log.d("SaveLocationWith", value);
+        Log.d("SaveLocationWith", value);
     }
 
 
