@@ -2292,7 +2292,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void injectTracklistData(Boolean isTrackList, JSONObject jsonObject, MyLearningModel parentModel) throws JSONException {
-        SQLiteDatabase db = this.getWritableDatabase();
 
         JSONArray jsonTableBlocks = null;
         JSONArray jsonTableAry = null;
@@ -2680,13 +2679,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     injectIntoEventRelatedContentTable(trackLearningModel);
                 }
             }
-            db.close();
         }
     }
 
     public void insertTrackObjects(JSONObject jsonResponse, MyLearningModel myLearningModel) throws JSONException {
         JSONArray jsonTrackObjects = null;
+        JSONArray jsonTrackList = null;
         jsonTrackObjects = jsonResponse.getJSONArray("table3");
+        jsonTrackList = jsonResponse.getJSONArray("table5");
+
         if (jsonTrackObjects.length() > 0) {
             ejectRecordsinTrackObjDb(myLearningModel);
 
@@ -2723,7 +2724,375 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 injectIntoTrackObjectsTable(trackObjectsModel);
             }
         }
+
+        if (jsonTrackList.length() > 0) {
+            ejectRecordsinTracklistTable(myLearningModel.getSiteID(), myLearningModel.getTrackScoid(), myLearningModel.getUserID(), true);
+            for (int i = 0; i < jsonTrackList.length(); i++) {
+                JSONObject jsonMyLearningColumnObj = jsonTrackList.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+                MyLearningModel trackLearningModel = new MyLearningModel();
+                ContentValues contentValues = null;
+
+                // trackscoid
+                trackLearningModel.setTrackScoid(myLearningModel.getScoId());
+
+                // userid
+                trackLearningModel.setUserID(myLearningModel.getUserID());
+
+                // username
+                trackLearningModel.setUserName(myLearningModel.getUserName());
+
+                // password
+                trackLearningModel.setPassword(myLearningModel.getPassword());
+
+                //sitename
+
+                trackLearningModel.setSiteName(myLearningModel.getSiteName());
+                // siteurl
+
+                trackLearningModel.setSiteURL(myLearningModel.getSiteURL());
+
+                // siteid
+
+                trackLearningModel.setSiteID(myLearningModel.getSiteID());
+
+                // parentid
+                if (jsonMyLearningColumnObj.has("parentid")) {
+
+                    trackLearningModel.setParentID(jsonMyLearningColumnObj.get("parentid").toString());
+
+                }
+
+                //showstatus
+                if (jsonMyLearningColumnObj.has("showstatus")) {
+
+                    trackLearningModel.setShowStatus(jsonMyLearningColumnObj.get("showstatus").toString());
+                } else {
+
+                    trackLearningModel.setShowStatus("show");
+
+                }
+                //timedelay
+                if (jsonMyLearningColumnObj.has("timedelay")) {
+
+                    trackLearningModel.setShowStatus(jsonMyLearningColumnObj.get("timedelay").toString());
+                }
+                //isdiscussion
+                if (jsonMyLearningColumnObj.has("isdiscussion")) {
+
+                    trackLearningModel.setIsDiscussion(jsonMyLearningColumnObj.get("isdiscussion").toString());
+                }
+
+                //eventcontendid
+                if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                    trackLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+                }
+
+                //eventid
+                if (jsonMyLearningColumnObj.has("eventid")) {
+
+                    trackLearningModel.setEventID(jsonMyLearningColumnObj.get("eventid").toString());
+                }
+
+                //sequencenumber
+                if (jsonMyLearningColumnObj.has("sequencenumber")) {
+
+                    Integer parseInteger = Integer.parseInt(jsonMyLearningColumnObj.get("sequencenumber").toString());
+                    trackLearningModel.setSequenceNumber(parseInteger);
+                }
+                // mediatypeid
+                if (jsonMyLearningColumnObj.has("mediatypeid")) {
+
+                    trackLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+                }
+                // relatedcontentcount
+                if (jsonMyLearningColumnObj.has("relatedcontentcount")) {
+                    trackLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedcontentcount").toString());
+                }
+
+//            //sitename
+//            if (jsonMyLearningColumnObj.has("sitename")) {
+//
+//                trackLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
+//            }
+//            // siteurl
+//            if (jsonMyLearningColumnObj.has("siteurl")) {
+//
+//                trackLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
+//
+//            }
+//            // siteid
+//            if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+//
+//                trackLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+//
+//            }
+
+                // coursename
+                if (jsonMyLearningColumnObj.has("name")) {
+
+                    trackLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
+
+                }
+                // shortdes
+                if (jsonMyLearningColumnObj.has("shortdescription")) {
+
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
+
+                    trackLearningModel.setShortDes(result.toString());
+
+                }
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    trackLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+                }
+                // contentID
+                if (jsonMyLearningColumnObj.has("contentid")) {
+
+                    trackLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
+
+                }
+                // createddate
+                if (jsonMyLearningColumnObj.has("createddate")) {
+
+                    trackLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+
+                }
+                // displayName
+                trackLearningModel.setDisplayName(appUserModel.getDisplayName());
+                // objectID
+//            if (jsonMyLearningColumnObj.has("objectid")) {
+//
+//                trackLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
+//
+//            }
+                // thumbnailimagepath
+                if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+
+                    String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
+
+                    if (isValidString(imageurl)) {
+
+                        trackLearningModel.setThumbnailImagePath(imageurl);
+                        String imagePathSet = trackLearningModel.getSiteURL() + "/content/sitefiles/Images/" + trackLearningModel.getContentID() + "/" + imageurl;
+                        trackLearningModel.setImageData(imagePathSet);
+
+                    } else {
+                        if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
+                            String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
+                            if (isValidString(imageurlContentType)) {
+                                String imagePathSet = trackLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
+                                trackLearningModel.setImageData(imagePathSet);
+
+                            }
+                        }
+
+                    }
+
+                    if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
+                        String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
+                        String startPage = jsonMyLearningColumnObj.get("startpage").toString();
+                        String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                        String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
+                                + "/Mydownloads/Contentdownloads" + "/" + contentid;
+
+                        String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
+
+                        trackLearningModel.setOfflinepath(finalDownloadedFilePath);
+                    }
+
+                    // relatedcontentcount
+                    if (jsonMyLearningColumnObj.has("relatedconentcount")) {
+
+                        trackLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
+
+                    }
+                    // isDownloaded
+                    if (jsonMyLearningColumnObj.has("isdownloaded")) {
+
+                        trackLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
+
+                    }
+                    // courseattempts
+                    if (jsonMyLearningColumnObj.has("courseattempts")) {
+
+                        trackLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
+
+                    }
+                    // objecttypeid
+                    if (jsonMyLearningColumnObj.has("objecttypeid")) {
+
+                        trackLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
+
+                    }
+                    // scoid
+                    if (jsonMyLearningColumnObj.has("scoid")) {
+
+                        trackLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
+
+                    }
+                    // startpage
+                    if (jsonMyLearningColumnObj.has("startpage")) {
+
+                        trackLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
+
+                    }
+                    // status
+                    if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                        trackLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                    }
+
+                    // longdes
+                    if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                        Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+
+                        trackLearningModel.setLongDes(result.toString());
+
+                    }
+                    // typeofevent
+                    if (jsonMyLearningColumnObj.has("typeofevent")) {
+
+                        int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+
+                        trackLearningModel.setTypeofevent(typeoFEvent);
+                    }
+
+                    // medianame
+                    if (jsonMyLearningColumnObj.has("medianame")) {
+                        String medianame = "";
+
+                        if (!trackLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                            if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
+                                medianame = "Assessment(Test)";
+
+                            } else {
+                                medianame = jsonMyLearningColumnObj.get("medianame").toString();
+                            }
+                        } else {
+                            if (trackLearningModel.getTypeofevent() == 2) {
+                                medianame = "Event (Online)";
+
+
+                            } else if (trackLearningModel.getTypeofevent() == 1) {
+                                medianame = "Event (Face to Face)";
+
+                            }
+                        }
+
+                        trackLearningModel.setMediaName(medianame);
+
+                    }
+
+                    // eventstarttime
+                    if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                        trackLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+
+                    }
+                    // eventendtime
+                    if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+
+                        trackLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+
+                    }
+
+                    // mediatypeid
+                    if (jsonMyLearningColumnObj.has("mediatypeid")) {
+
+                        trackLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+
+                    }
+                    // eventcontentid
+                    if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                        trackLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+
+                    }
+                    // eventAddedToCalender
+                    trackLearningModel.setEventAddedToCalender(false);
+
+//            if (jsonMyLearningColumnObj.has("startdate")) {
+//
+//                String checkfalseOrTrue = jsonMyLearningColumnObj.get("startdate").toString();
+//                if (checkfalseOrTrue.equalsIgnoreCase("false")) {
+//                    myLearningModel.setEventAddedToCalender(false);
+//                } else {
+//                    myLearningModel.setEventAddedToCalender(true);
+//                }
+//            }
+                    // isExpiry
+//            if (jsonMyLearningColumnObj.has("startdate")) {
+//
+//                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
+//
+//            }
+                    // locationname
+                    if (jsonMyLearningColumnObj.has("locationname")) {
+
+                        trackLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+
+                    }
+                    // timezone
+                    if (jsonMyLearningColumnObj.has("timezone")) {
+
+                        trackLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
+
+                    }
+                    // participanturl
+                    if (jsonMyLearningColumnObj.has("participanturl")) {
+
+                        trackLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
+
+                    }
+
+                    // isListView
+                    if (jsonMyLearningColumnObj.has("bit5")) {
+
+                        trackLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
+
+                    }
+
+                    // joinurl
+                    if (jsonMyLearningColumnObj.has("joinurl")) {
+
+                        trackLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+
+                    }
+
+                    // presenter
+                    if (jsonMyLearningColumnObj.has("presenter")) {
+
+                        trackLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+                    }
+
+                    //sitename
+                    if (jsonMyLearningColumnObj.has("progress")) {
+
+                        trackLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
+                    }
+
+
+                    trackLearningModel.setBlockName("");
+
+                }
+
+                injectIntoTrackTable(trackLearningModel);
+            }
+
+        }
+
+
     }
+
 
     public void injectIntoTrackObjectsTable(TrackObjectsModel trackObjModel) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -4622,7 +4991,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-
     public String SaveQuestionDataWithQuestionDataMethod(MyLearningModel learningModel, String questionData) {
 
         String uploadfilepath = dbctx.getExternalFilesDir(null) + "/Mydownloads/";
@@ -6028,6 +6396,129 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return timeDelay;
     }
 
+
+    public String getTrackTemplateWorkflowResults(String trackID, MyLearningModel learningModel) {
+        String returnStr = "";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selQuery = "SELECT trackscoid, userid, showstatus, ruleid, stepid, contentid, wmessage FROM " + TBL_TRACKLISTDATA + " WHERE trackscoid = '" + trackID + "' AND userid = '" + learningModel.getUserID() + "' AND siteid = '" + learningModel.getSiteID() + "'";
+        Cursor cursor = db.rawQuery(selQuery, null);
+
+        JSONArray jsonArray = new JSONArray();
+        if (cursor.moveToFirst()) {
+
+            while (cursor.moveToNext()) {
+
+                String ruleID = (cursor.getString(cursor.getColumnIndex("ruleid")));
+
+                if (ruleID.equalsIgnoreCase("0")) {
+
+                    break;
+                }
+
+                JSONObject trackObj = new JSONObject();
+                try {
+
+                    trackObj.put("userid", (cursor.getString(cursor.getColumnIndex("userid"))));
+                    trackObj.put("trackid", (cursor.getString(cursor.getColumnIndex("trackscoid"))));
+                    trackObj.put("trackobjectid", (cursor.getString(cursor.getColumnIndex("contentid"))));
+                    trackObj.put("result", (cursor.getString(cursor.getColumnIndex("showstatus"))));
+                    trackObj.put("wmessage", (cursor.getString(cursor.getColumnIndex("wmessage"))));
+                    trackObj.put("ruleid", ruleID);
+                    trackObj.put("stepid", (cursor.getString(cursor.getColumnIndex("stepid"))));
+                    jsonArray.put(trackObj);
+
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        cursor.close();
+        db.close();
+
+        if (jsonArray.length() == 0) {
+
+            returnStr = "";
+        } else returnStr = jsonArray.toString();
+
+        return returnStr;
+    }
+
+
+    public String getTrackTemplateAllItemsResult(String trackID, MyLearningModel learningModel) {
+        String returnStr = "";
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selQuery = "SELECT TL.contentid, CASE WHEN C.status is NOT NULL OR NOT C.status = '' THEN C.status ELSE TL.status END AS objStatus, C.score FROM " + TBL_TRACKLISTDATA + " TL LEFT OUTER JOIN " + TBL_CMI + " C ON TL.userid = C.userid AND TL.scoid = C.scoid AND TL.siteid = C.siteid WHERE TL.trackscoid = '" + trackID + "' AND TL.userid = '" + learningModel.getUserID() + "' AND TL.siteid = '" + learningModel.getSiteID() + "'";
+        JSONArray jsonArray = new JSONArray();
+        try {
+
+            Cursor cursor = db.rawQuery(selQuery, null);
+
+            if (cursor.moveToFirst()) {
+
+                while (cursor.moveToNext()) {
+
+                    String ruleID = (cursor.getString(cursor.getColumnIndex("ruleid")));
+
+                    if (ruleID.equalsIgnoreCase("0")) {
+
+                        break;
+                    }
+
+                    JSONObject trackObj = new JSONObject();
+                    try {
+
+
+                        String score = (cursor.getString(cursor.getColumnIndex("contentid")));
+
+                        if (score.equalsIgnoreCase("")) {
+
+                            score = "0";
+                        }
+
+                        trackObj.put("contentid", (cursor.getString(cursor.getColumnIndex("contentid"))));
+                        trackObj.put("status", (cursor.getString(cursor.getColumnIndex("status"))));
+                        trackObj.put("score", score);
+
+                        jsonArray.put(trackObj);
+
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+        if (jsonArray.length() == 0) {
+            returnStr = "";
+        } else returnStr = jsonArray.toString();
+
+        return returnStr;
+    }
+
+    public void updateWorkFlowRulesInDBForTrackTemplate(String trackID, String trackItemID, String trackItemState, String wmessage, String ruleID, String stepID, String siteID, String userID) {
+
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            String sqlQuery = "UPDATE " + TBL_TRACKLISTDATA + " SET showstatus = '" + trackItemState + "' , ruleid = '" + ruleID + "' , stepid = '" + stepID + "' wmessage = '" + wmessage + "' WHERE trackscoid = '" + trackID + "'  AND contentid = '" + trackItemID + "'  AND siteid =' " + siteID + "'  AND userid =  '" + userID + "'";
+
+            db.execSQL(sqlQuery);
+
+        } catch (SQLException ex)
+
+        {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
+    }
+
 }
+
 
 

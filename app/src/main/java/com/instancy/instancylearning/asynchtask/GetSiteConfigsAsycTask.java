@@ -37,27 +37,33 @@ public class GetSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> {
         int i = 10;
         publishProgress(i);
         String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0]);
-        i = i + 10;
-        publishProgress(i);
-        webAPIClient.getAPIAuthDetails(params[0], tempWebApiUrl);
-        i = i + 10;
-        publishProgress(i);
-        db.getSiteSettingsServer(tempWebApiUrl, params[0]);
-        i = i + 10;
-        publishProgress(i);
-        db.getNativeMenusFromServer(tempWebApiUrl, params[0]);
-        i = i + 10;
-        publishProgress(i);
-        db.getSiteTinCanDetails(tempWebApiUrl, params[0]);
-        i = i + 10;
-        publishProgress(i);
-        db.downloadSplashImages(params[0]);
-        i = i + 10;
-        publishProgress(i);
-        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        uiSettingsModel = db.getAppSettingsFromLocal(params[0], "374");
-        i = i + 10;
-        publishProgress(i);
+
+        if (tempWebApiUrl.length() != 0) {
+            i = i + 10;
+            publishProgress(i);
+            webAPIClient.getAPIAuthDetails(params[0], tempWebApiUrl);
+            i = i + 10;
+            publishProgress(i);
+            db.getSiteSettingsServer(tempWebApiUrl, params[0]);
+            i = i + 10;
+            publishProgress(i);
+            db.getNativeMenusFromServer(tempWebApiUrl, params[0]);
+            i = i + 10;
+            publishProgress(i);
+            db.getSiteTinCanDetails(tempWebApiUrl, params[0]);
+            i = i + 10;
+            publishProgress(i);
+            db.downloadSplashImages(params[0]);
+            i = i + 10;
+            publishProgress(i);
+            UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+            uiSettingsModel = db.getAppSettingsFromLocal(params[0], "374");
+            i = i + 10;
+            publishProgress(i);
+        } else {
+
+
+        }
         return null;
     }
 

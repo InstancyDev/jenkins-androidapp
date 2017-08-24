@@ -346,7 +346,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable( R.drawable.ic_search_black_24dp );
-            item_search.setIcon(setTintDrawable(myIcon, color));
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getDefaultTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
@@ -848,7 +848,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-                        getStatusFromServer(myLearningModel);
+                        if (isNetworkConnectionAvailable(getContext(), -1)) {
+                            getStatusFromServer(myLearningModel);
+
+                        }
 
                     } else {
 

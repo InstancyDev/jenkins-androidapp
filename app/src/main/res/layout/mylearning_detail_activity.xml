@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/transparent"
     android:padding="1dp">
 
@@ -178,6 +178,7 @@
                             android:textSize="12sp" />
 
                         <View
+                            android:id="@+id/consolidateline"
                             android:layout_width="1dp"
                             android:layout_height="12dp"
                             android:background="@color/colorGray"
@@ -208,18 +209,18 @@
                     android:padding="4dp">
 
                     <!--<TextView-->
-                        <!--android:id="@+id/btntxt_download_detail"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="30dp"-->
-                        <!--android:layout_alignParentBottom="true"-->
-                        <!--android:layout_alignParentRight="true"-->
-                        <!--android:background="@android:color/transparent"-->
-                        <!--android:clickable="true"-->
-                        <!--android:gravity="center"-->
-                        <!--android:text="@string/fa_icon_cloud_download"-->
-                        <!--android:textColor="@color/text_color"-->
-                        <!--android:textSize="30sp"-->
-                        <!--android:visibility="invisible" />-->
+                    <!--android:id="@+id/btntxt_download_detail"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:layout_alignParentBottom="true"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:background="@android:color/transparent"-->
+                    <!--android:clickable="true"-->
+                    <!--android:gravity="center"-->
+                    <!--android:text="@string/fa_icon_cloud_download"-->
+                    <!--android:textColor="@color/text_color"-->
+                    <!--android:textSize="30sp"-->
+                    <!--android:visibility="invisible" />-->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -272,9 +273,9 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_weight="1"
 
-            android:layout_weight="1">
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/view_fa_icon"
@@ -293,12 +294,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
                 android:layout_centerVertical="true"
-                android:textAlignment="textStart"
-
                 android:layout_toRightOf="@id/view_fa_icon"
+
                 android:gravity="center_vertical"
                 android:minHeight="?android:attr/listPreferredItemHeightSmall"
                 android:text="View"
+                android:textAlignment="textStart"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp" />
@@ -312,8 +313,8 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/report_fa_icon"
@@ -329,14 +330,14 @@
             <TextView
                 android:id="@+id/report_btn_txt"
                 android:layout_width="wrap_content"
-                android:textAlignment="textStart"
-
                 android:layout_height="44dp"
+
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/report_fa_icon"
                 android:gravity="center_vertical"
                 android:minHeight="?android:attr/listPreferredItemHeightSmall"
                 android:text="Report"
+                android:textAlignment="textStart"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp" />

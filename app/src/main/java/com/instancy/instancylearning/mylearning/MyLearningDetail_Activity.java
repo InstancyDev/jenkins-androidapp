@@ -125,6 +125,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     @Bind(R.id.circle_progress)
     CircleProgressBar circleProgressBar;
 
+    @Nullable
+    @Bind(R.id.consolidateline)
+    View consolidateLine;
+
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
     MyLearningModel myLearningModel;
@@ -174,6 +178,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             LinearLayout linearLayout = (LinearLayout) findViewById(R.id.bottom_button_layout);
 
             linearLayout.setBackground(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+
+
+            if (myLearningModel.getSiteName().equalsIgnoreCase("")) {
+                consolidateLine.setVisibility(View.GONE);
+
+            } else {
+                consolidateLine.setVisibility(View.VISIBLE);
+            }
 
 //            txtBtnReport.setBackground(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 //            txtBtnView.setBackground(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -367,7 +379,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
             progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            displayStatus = courseStatus + " " + myLearningModel.getProgress();
+            displayStatus = courseStatus + " (" + myLearningModel.getProgress();
         }
         txtCourseStatus.setText(displayStatus + "%)");
     }

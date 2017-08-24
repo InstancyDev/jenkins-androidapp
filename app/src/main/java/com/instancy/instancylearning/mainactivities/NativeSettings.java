@@ -3,6 +3,7 @@ package com.instancy.instancylearning.mainactivities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -112,9 +113,19 @@ public class NativeSettings extends AppCompatActivity {
                             .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
-                                    preferencesManager.setStringValue(StaticValues.KEY_SITEURL, getString(R.string.app_default_url));
+                                    if (isNetworkConnectionAvailable(context, -1)) {
+                                        preferencesManager.setStringValue(getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+                                        Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+                                        intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intentBranding);
+                                        Toast.makeText(context, "Default url set " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                                    }
+
+
                                     sDialog.dismissWithAnimation();
-                                    Toast.makeText(context, "Default url set", Toast.LENGTH_LONG).show();
+
                                 }
                             }).setCancelText("Cancel").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
@@ -202,7 +213,7 @@ public class NativeSettings extends AppCompatActivity {
 
     }
 
-    public void resetUrlWebCall(String newUrl) {
+    public void resetUrlWebCall(final String newUrl) {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
@@ -214,7 +225,23 @@ public class NativeSettings extends AppCompatActivity {
 
                     String webApiUrl = getSiteAPIDetails(result);
 
-                    LogUtils.d(TAG, "Result web api" + webApiUrl);
+                    LogUtils.d(TAG, "Result web api " + webApiUrl);
+
+                    if (isValidUrl(webApiUrl)) {
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            preferencesManager.setStringValue(newUrl, StaticValues.KEY_SITEURL);
+                            Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+                            intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intentBranding);
+
+                        } else {
+                            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        Toast.makeText(context, "Invalid Url " + webApiUrl, Toast.LENGTH_SHORT).show();
+
+                    }
 
                     svProgressHUD.dismiss();
                 }

@@ -98,9 +98,9 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public String LMSGetTrackWorkflowResultsWithTrackID(String trackId) {
 
-        Log.d("LMSGetTracWithTrackID", trackId);
-
-        return trackId;
+        String returnTrack = databaseHandler.getTrackTemplateWorkflowResults(trackId, _learningModel);
+        Log.d("LMSGetTracWithTrackID ", returnTrack);
+        return returnTrack;
 
     }
 
@@ -108,15 +108,15 @@ public class LRSJavaScriptInterface {
     public String LMSGetTrackAllItemsResultWithTrackID(String trackId) {
 
         Log.d("LMSGetTrackAllItemsckID", trackId);
-
-        return trackId;
+        String returnTrack = databaseHandler.getTrackTemplateAllItemsResult(trackId, _learningModel);
+        return returnTrack;
     }
 
     @JavascriptInterface
-    public String UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String cid, String state, String str, String cRuleId, String cStepId) {
+    public String UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String trackItemId, String trackIstate, String wMessage, String ruleId, String cStepId) {
 
         Log.d("SaveLocationWith", trackID);
-
+        databaseHandler.updateWorkFlowRulesInDBForTrackTemplate(trackID, trackItemId, trackIstate, wMessage, ruleId, cStepId, _learningModel.getSiteID(), _learningModel.getUserID());
         return cStepId;
 
     }

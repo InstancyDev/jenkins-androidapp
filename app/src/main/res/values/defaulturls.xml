@@ -14,8 +14,11 @@
     <!--  <string name="app_default_url">http://qacle.instancy.net/</string>
         <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
-    <string name="app_default_url">http://test.instancy.net/</string>
+    <string name="app_default_url">http://mobilelocal.instancysoft.com/</string>
     <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+
+    <!--<string name="app_default_url">http://mobile.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://staging.enlightus.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
