@@ -14,7 +14,7 @@
     <item
         android:id="@+id/ctx_detail"
         android:orderInCategory="100"
-        android:title="Detail" />
+        android:title="Details" />
 
     <item
         android:id="@+id/ctx_join"

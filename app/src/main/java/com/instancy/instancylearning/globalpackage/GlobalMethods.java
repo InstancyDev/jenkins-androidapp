@@ -566,14 +566,15 @@ public class GlobalMethods {
 
         } else {
             menu.getItem(2).setVisible(true);
-            menu.getItem(5).setVisible(true);
+//            menu.getItem(5).setVisible(true);
+            menu.getItem(5).setVisible(false);
             menu.getItem(1).setVisible(true);
         }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("detail")) {
+                if (item.getTitle().toString().equalsIgnoreCase("details")) {
                     Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
 //                    v.getContext().startActivity(intentDetail);
@@ -593,12 +594,12 @@ public class GlobalMethods {
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Related Content")) {
                     relatedContentView(myLearningDetalData, v.getContext());
-                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
 
                 }
 

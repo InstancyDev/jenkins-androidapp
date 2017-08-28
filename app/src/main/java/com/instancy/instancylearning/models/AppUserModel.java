@@ -28,7 +28,7 @@ public class AppUserModel {
     }
 
     public String getDisplayName() {
-        return displayName.isEmpty() ? "Playground" : displayName;
+        return displayName.isEmpty() ? "" : displayName;
     }
 
     public void setDisplayName(String displayName) {

@@ -10,6 +10,16 @@ public class UiSettingsModel {
     private String menuTextColor = "";
     private String defaultTextColor = "";
 
+    public String getAppLoginBGColor() {
+        return appLoginBGColor;
+    }
+
+    public void setAppLoginBGColor(String appLoginBGColor) {
+        this.appLoginBGColor = appLoginBGColor;
+    }
+
+    private String appLoginBGColor = "";
+
     public String getAppTextColor() {
         return appTextColor.isEmpty() ? "" : appTextColor;
     }
@@ -204,7 +214,7 @@ public class UiSettingsModel {
     }
 
     public String getMenuHeaderTextColor() {
-        return menuHeaderTextColor;
+        return menuHeaderTextColor.isEmpty() ? "#FFFFFF" : menuHeaderTextColor;
     }
 
     public void setMenuHeaderTextColor(String menuHeaderTextColor) {

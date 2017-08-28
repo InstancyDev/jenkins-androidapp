@@ -90,7 +90,7 @@ public class LRSJavaScriptInterface {
     public void LMSTrackInitialize(String value, String tracksqno) {
 
         Log.d("SaveLocationWith", value);
-        Log.d("SaveLocationWith", value);
+
     }
 
 
@@ -103,7 +103,6 @@ public class LRSJavaScriptInterface {
         return returnTrack;
 
     }
-
     @JavascriptInterface
     public String LMSGetTrackAllItemsResultWithTrackID(String trackId) {
 
@@ -111,7 +110,6 @@ public class LRSJavaScriptInterface {
         String returnTrack = databaseHandler.getTrackTemplateAllItemsResult(trackId, _learningModel);
         return returnTrack;
     }
-
     @JavascriptInterface
     public String UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String trackItemId, String trackIstate, String wMessage, String ruleId, String cStepId) {
 
@@ -120,5 +118,4 @@ public class LRSJavaScriptInterface {
         return cStepId;
 
     }
-
 }

@@ -163,6 +163,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
 
+        txtBtnReport.setVisibility(View.GONE);
+
         if (myLearningModel != null) {
             txtTitle.setText(myLearningModel.getCourseName());
             txtCourseName.setText(myLearningModel.getMediaName());
@@ -255,7 +257,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
         }
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Detail</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Details</font>"));
 //        getSupportActionBar().setCustomView(R.layout.drawermenu_item);
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -453,7 +455,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         }
     }
 
-    @OnClick({R.id.view_btn_txt, R.id.report_btn_txt, R.id.btntxt_download_detail})
+    @OnClick({R.id.view_btn_txt, R.id.report_btn_txt, R.id.btntxt_download_detail, R.id.viewLayout})
     public void actionsforDetail(View view) {
         switch (view.getId()) {
             case R.id.view_btn_txt:
@@ -467,6 +469,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
 //                }
 
+                break;
+
+            case R.id.viewLayout:
+                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
                 break;
             case R.id.report_btn_txt:
                 Toast.makeText(this, "here selected", Toast.LENGTH_SHORT).show();

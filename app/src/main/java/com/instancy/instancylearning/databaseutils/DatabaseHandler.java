@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.Spanned;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -241,7 +240,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, defaultTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, headerTextColor TEXT, headerBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, viewButtonColor TEXT, viewButtonTextColor TEXT, detailButtonColor TEXT, detailButtonTextColor TEXT, reportButtonColor TEXT, reportButtonTextColor TEXT, setCompleteButtonColor TEXT, setCompleteTextColor TEXT, appHeaderColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, defaultTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, headerTextColor TEXT, headerBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, viewButtonColor TEXT, viewButtonTextColor TEXT, detailButtonColor TEXT, detailButtonTextColor TEXT, reportButtonColor TEXT, reportButtonTextColor TEXT, setCompleteButtonColor TEXT, setCompleteTextColor TEXT, appHeaderColor TEXT,appLoginBGColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_NATIVEMENUS
@@ -721,8 +720,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
+                            } else if (uisettingsJsonOjb
+                                    .get("csseditingpalceholdername")
+                                    .getAsString()
+                                    .equals("#NativeLogin_Page_Background#")) {
+                                uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+                                        "csseditingpalceholdervalue")
+                                        .getAsString()
+                                        .substring(0, 7));
                             }
-
                         }
 
                     }
@@ -831,7 +837,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
         try {
             String strExeQuery = "";
-            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor, menuTextColor, defaultTextColor, menuBGColor , selectedMenuTextColor, selectedMenuBGColor, headerTextColor, headerBGColor, listBGColor, listBorderColor, menuHeaderBGColor, menuHeaderTextColor, menuBGAlternativeColor, menuBGSelectTextColor, viewButtonColor, viewButtonTextColor, detailButtonColor, detailButtonTextColor, reportButtonColor, reportButtonTextColor, setCompleteButtonColor, setCompleteTextColor, appHeaderColor, selfRegistrationAllowed, contentDownloadType, courseAppContent, enableNativeCatlog, enablePushNotification, nativeAppType , autodownloadsizelimit, catalogContentDownloadType , fileUploadButtonColor, firstTarget, secondTarget, thirdTarget, contentAssignment, newContentAvailable, contentUnassigned, firstEvent, isFacebook, isLinkedin , isGoogle , isTwitter, siteID, siteURL)"
+            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor, menuTextColor, defaultTextColor, menuBGColor , selectedMenuTextColor, selectedMenuBGColor, headerTextColor, headerBGColor, listBGColor, listBorderColor, menuHeaderBGColor, menuHeaderTextColor, menuBGAlternativeColor, menuBGSelectTextColor, viewButtonColor, viewButtonTextColor, detailButtonColor, detailButtonTextColor, reportButtonColor, reportButtonTextColor, setCompleteButtonColor, setCompleteTextColor, appHeaderColor, appLoginBGColor, selfRegistrationAllowed, contentDownloadType, courseAppContent, enableNativeCatlog, enablePushNotification, nativeAppType , autodownloadsizelimit, catalogContentDownloadType , fileUploadButtonColor, firstTarget, secondTarget, thirdTarget, contentAssignment, newContentAvailable, contentUnassigned, firstEvent, isFacebook, isLinkedin , isGoogle , isTwitter, siteID, siteURL)"
                     + " VALUES ('"
                     + uiSettingsModel.getAppTextColor()
                     + "','"
@@ -880,6 +886,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + uiSettingsModel.getSetCompleteTextColor()
                     + "','"
                     + uiSettingsModel.getAppHeaderColor()
+                    + "','"
+                    + uiSettingsModel.getAppLoginBGColor()
                     + "','"
                     + uiSettingsModel.getSelfRegistrationAllowed()
                     + "','"
@@ -2313,7 +2321,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel trackLearningModel = new MyLearningModel();
-            ContentValues contentValues = null;
+
 
             // trackscoid
             trackLearningModel.setTrackScoid(parentModel.getScoId());
@@ -2888,10 +2896,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             if (isValidString(imageurlContentType)) {
                                 String imagePathSet = trackLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
                                 trackLearningModel.setImageData(imagePathSet);
-
                             }
                         }
-
                     }
 
                     if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
@@ -2910,7 +2916,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     if (jsonMyLearningColumnObj.has("relatedconentcount")) {
 
                         trackLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
-
                     }
                     // isDownloaded
                     if (jsonMyLearningColumnObj.has("isdownloaded")) {
@@ -3499,7 +3504,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                               String updatedStatus, String progress) {
         SQLiteDatabase db = this.getWritableDatabase();
         int status = -1;
-        Cursor isUpdated = null;
+
         try {
 
             String strUpdate = "UPDATE " + TBL_TRACKLISTDATA + " SET status = '"
@@ -4056,7 +4061,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String offlinePath = "";
         boolean isTrackList = false;
-        Toast.makeText(context, "This is ofline view", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "This is ofline view", Toast.LENGTH_SHORT).show();
         String numberOfAttempts = "";
         String strObjectTypeID = "";
         String strStatus = "";
@@ -4929,7 +4934,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     scoID = cursor.getString(cursor.getColumnIndex("scoid"));
-
 
                 } while (cursor.moveToNext());
             }
@@ -6207,6 +6211,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         cmiModel.set_siteId(learningModel.getSiteID());
         try {
+
+            if (userIDValue.length() == 0) {
+
+                userIDValue = learningModel.getUserID();
+            }
+
+            if (scoid.length() == 0) {
+
+                scoid = learningModel.getScoId();
+            }
+
+
             cmiModel.set_userId(Integer.parseInt(userIDValue));
             cmiModel.set_isupdate(learningModel.getSiteID());
             cmiModel.set_scoId(Integer.parseInt(scoid));

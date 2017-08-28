@@ -152,8 +152,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             blockNameTxt.setText(_blockNames.get(groupPosition));
 
             if (_blockNames.get(groupPosition).equalsIgnoreCase("")) {
-                groupView.setVisibility(View.INVISIBLE);
+                groupView.setVisibility(View.GONE);
+                blockNameTxt.setVisibility(View.GONE);
             }
+
         }
         return groupView;
     }
@@ -355,7 +357,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 GlobalMethods.contextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface);
 
             } else if (view.getId() == R.id.imagethumb) {
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData,view.getContext());
+                GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());
             } else {
 //                ((ExpandableListView) parent).performItemClick(view, getChildPosition, getGroupPosition);
                 if (isNetworkConnectionAvailable(_context, -1)) {
@@ -509,7 +511,6 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d("TAG", "onDownloadFailed: " + +errorCode);
                         Toast.makeText(_context, "Download failed " + errorMessage, Toast.LENGTH_SHORT).show();
-
 
                     }
 

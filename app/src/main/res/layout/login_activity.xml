@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:id="@+id/login_layout"
     android:background="@color/colorDefaultBackGround">
 
         <TextView
@@ -179,7 +180,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:gravity="center"
-                    android:text="@string/label_newuser"
+                    android:text="@string/btn_txt_signup"
                     android:textAlignment="textEnd"
                     android:textAllCaps="false"
                     android:textColor="@color/colorWhite"

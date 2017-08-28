@@ -139,11 +139,13 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshMyLearning(false);
-            executeXmlWorkFlowFile();
+//            executeXmlWorkFlowFile();
         } else {
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
 //            injectFromDbtoModel();
-            executeXmlWorkFlowFile();
+//            executeXmlWorkFlowFile();
+            workFlowType = "onlaunch";
+            executeWorkFlowRules(workFlowType);
         }
     }
 
@@ -180,11 +182,13 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         try {
                             if (isTraxkList) {
                                 db.injectTracklistData(true, response, myLearningModel);
-//                                injectFromDbtoModel();
+                                injectFromDbtoModel();
+                                executeXmlWorkFlowFile();
                             } else {
-                                Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
                                 db.injectTracklistData(false, response, myLearningModel);
-//                                injectFromDbtoModel();
+                                injectFromDbtoModel();
+                                executeXmlWorkFlowFile();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -245,9 +249,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         if (trackListModelList != null) {
             Log.d(TAG, "dataLoaded: " + trackListModelList.size());
 //            trackListModel.refreshList(myLearningModelsList);
-
             trackListHashMap = prepareHashMap(trackListModelList, blockNames);
-
             trackListExpandableAdapter.refreshList(blockNames, trackListHashMap);
             if (blockNames != null && blockNames.size() > 0) {
                 for (int i = 0; i < blockNames.size(); i++)
@@ -359,10 +361,10 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                             int i = -1;
                             i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
                             if (i == 1) {
-                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-//                                injectFromDbtoModel();
+                                injectFromDbtoModel();
+//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                             }
 
                         }
@@ -377,8 +379,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
-            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
-//            injectFromDbtoModel();
+//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -404,6 +405,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 int i = -1;
                 Log.d(TAG, "statusUpdateFromServer JSONObject :" + result);
                 JSONArray jsonArray = null;
+
                 try {
                     if (result.has("contentstatus")) {
                         jsonArray = result.getJSONArray("contentstatus");
@@ -418,13 +420,12 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         }
                         i = db.updateContentStatusInTrackList(myLearningModel, status, progress);
                         if (i == 1) {
-
-//                            injectFromDbtoModel();
-                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+                            injectFromDbtoModel();
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 
                         } else {
 
-                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -432,19 +433,19 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                     e.printStackTrace();
                 }
 
-
             }
         };
     }
-
 
     @Override
     protected void onResume() {
         super.onResume();
         try {
+
             if (strlaunch.equals("0")) {
                 strlaunch = "1";
             } else if (strlaunch.equals("1")) {
+                injectFromDbtoModel();
                 workFlowType = "onitemChange";
                 executeWorkFlowRules(workFlowType);
             }
@@ -471,13 +472,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 NodeList workflowList = doc.getElementsByTagName("Workflow");
                 int workflowCount = workflowList.getLength();
 
-
                 ArrayList<Map<String, String>> actionsMap = new ArrayList<Map<String, String>>();
 
                 ArrayList<Map<String, String>> conditionsMap = new ArrayList<Map<String, String>>();
 
                 ArrayList<Map<String, String>> stepsMap = new ArrayList<Map<String, String>>();
-
 
                 for (int wfItem = 0; wfItem < workflowCount; wfItem++) {
 
@@ -632,9 +631,9 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 }
                 // here
 
-//                Log.d(TAG, "executeWorkFlowRules: actionsMap " + actionsMap);
-//                Log.d(TAG, "executeWorkFlowRules  conditionsMap: " + conditionsMap);
-//                Log.d(TAG, "executeWorkFlowRules: stepsMap " + stepsMap);
+                Log.d(TAG, "executeWorkFlowRules: actionsMap " + actionsMap);
+                Log.d(TAG, "executeWorkFlowRules  conditionsMap: " + conditionsMap);
+                Log.d(TAG, "executeWorkFlowRules: stepsMap " + stepsMap);
 
 
 //
@@ -1300,8 +1299,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                         }
                                     }
 
-                                } else if (actmap.get("actionitemid").equals(
-                                        "next")) {
+                                } else if (actmap.get("actionitemid").equals("next")) {
 
                                 } else {
                                     for (int it = 0; it < coursesCount; it++) {
@@ -1439,7 +1437,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 if (workFlowType.equals("onlaunch")) {
 
                     workFlowType = "onitemChange";
-//                    executeWorkFlowRules(workFlowType);
+                    executeWorkFlowRules(workFlowType);
 
                 } else {
                     List<MyLearningModel> tempTrackListItems = new ArrayList<MyLearningModel>();
@@ -1453,7 +1451,6 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         }
                     }
                     workFlowType = "";
-//                    trackListExpandableAdapter.refresh();
                     injectFromDbtoModel();
                 }
 
@@ -1465,8 +1462,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             e.printStackTrace();
             defaultActionOnNoWorkflowRules();
         }
-//        trackListExpandableAdapter.refresh();
-        injectFromDbtoModel();
+//        injectFromDbtoModel();
     }
 
     private void defaultActionOnNoWorkflowRules() {

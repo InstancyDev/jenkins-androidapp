@@ -401,7 +401,7 @@ public class SynchData {
 
                 String result = Utilities.convertStreamToString(inputStream);
                 dbh.insertCMiIsViewd(tempCmi);
-                Log.d("TAG", "SyncData: " + result);
+//                Log.d("TAG", "SyncData: " + result);
             }
 //            dbh.finishSynch(tempCmi);
 //            dbh.sendOfflineUserPagenotes();

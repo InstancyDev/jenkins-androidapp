@@ -14,8 +14,8 @@
     <!--  <string name="app_default_url">http://qacle.instancy.net/</string>
         <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
-    <string name="app_default_url">http://mobilelocal.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://mobile.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
@@ -34,11 +34,11 @@
     <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
-    <!--     <string name="app_default_url">http://montessoritraining.instancy.net/</string>
+    <!-- <string name="app_default_url">http://montessoritraining.instancy.net/</string>
         <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>  -->
 
-    <!--        <string name="app_default_url">http://croplife.instancy.net/</string>
-        <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>   -->
+        <string name="app_default_url">http://croplife.instancy.net/</string>
+        <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>
 
     <!--<string name="app_default_url">http://mci-institute-newui.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">http://mcinewwapi.instancy.net/api/</string>-->

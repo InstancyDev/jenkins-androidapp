@@ -3,7 +3,9 @@ package com.instancy.instancylearning.mainactivities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -127,8 +129,18 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
-        appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
+
+        View someView = findViewById(R.id.login_layout);
+
+        // Find the root view
+        View root = someView.getRootView();
+
+        // Set the color
+
+        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+        appUserModel = AppUserModel.getInstance();
+
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         VolleySingleton.getInstance(this);
@@ -163,6 +175,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         FontManager.markAsIconContainer(findViewById(R.id.btntxt_linkedin), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.txt_pass), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.txt_user), iconFont);
+
+
 
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -317,7 +331,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                         svProgressHUD.dismiss();
                         Log.d("Response: ", " " + response.has("faileduserlogin"));
                         if (response.has("faileduserlogin")) {
-                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
+//                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
                             alertText.setVisibility(View.VISIBLE);
 
                         } else if (response.has("successfulluserlogin")) {
@@ -447,6 +461,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             btnSignup.setVisibility(View.INVISIBLE);
 
         }
+
+        btnForgot.setVisibility(View.INVISIBLE);
+
     }
 
     @Override

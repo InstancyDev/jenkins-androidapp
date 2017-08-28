@@ -41,6 +41,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     String TAG = AdvancedWebCourseLaunch.class.getSimpleName();
     String prevStatus = "";
     DatabaseHandler databaseHandler;
+    boolean isOffline = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +65,13 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
 
             courseName = myLearningModel.getCourseName();
+
+            if (courseUrl.startsWith("file:///")) {
+                isOffline = true;
+
+            } else {
+                isOffline = false;
+            }
         }
 
 
@@ -105,7 +113,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         adWebView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
 
 
@@ -170,11 +177,16 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                    && !url.contains("/fromnative/true")) {
 
                                                view.loadUrl(url + "/fromnative/true");
-                                               return false;
+                                               return true;
+
+                                           } else {
+
+                                               if (isOffline) {
+                                                   return true;
+                                               } else {
+                                                   return false;
+                                               }
                                            }
-
-                                           return false;
-
                                        }
 
 //                                       @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

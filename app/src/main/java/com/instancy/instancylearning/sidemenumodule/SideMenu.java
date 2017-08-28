@@ -135,7 +135,6 @@ public class SideMenu extends AppCompatActivity {
         toggle.getDrawerArrowDrawable().setColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
         toggle.syncState();
 
-
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.drawerheaderview);
         rl.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
@@ -153,7 +152,10 @@ public class SideMenu extends AppCompatActivity {
                 .into(profileImage);
 
         txtUsername.setText(appUserModel.getUserName());
-        txtAddress.setText(appUserModel.getDisplayName());
+
+
+
+        txtAddress.setText(appUserModel.getDisplayName().isEmpty()? getResources().getString(R.string.app_name):appUserModel.getDisplayName());
 
         sideMenusModel = db.getNativeMainMenusData();
 
@@ -170,9 +172,9 @@ public class SideMenu extends AppCompatActivity {
             navDrawerExpandableView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
                     int logoutPos = sideMenusModel.size() - 1;
-                    String filterCOndition = sideMenusModel.get(groupPosition).getConditions();
+                    String filterCondition = sideMenusModel.get(groupPosition).getConditions();
                     if (logoutPos == groupPosition) {
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -228,7 +228,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     } else {
 
-
                     }
                 }
 //                if (requestType.equalsIgnoreCase("MLADP")) {
@@ -339,22 +338,20 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.mylearning_menu, menu);
         item_search = menu.findItem(R.id.mylearning_search);
-        item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
-        int color = Color.parseColor(uiSettingsModel.getDefaultTextColor());
 
         item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable( R.drawable.ic_search_black_24dp );
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getDefaultTextColor())));
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
 //            final PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 //
@@ -397,7 +394,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             item_filter.setTitle("Filter");
         }
     }
-
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();
@@ -860,11 +856,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
 
                             if (i == 1) {
-                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
                                 injectFromDbtoModel();
                             } else {
 
-                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -957,11 +953,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         if (i == 1) {
 
                             injectFromDbtoModel();
-                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 
                         } else {
 
-                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
 
                     }
