@@ -13,7 +13,19 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class SweetAlert {
 
-    SVProgressHUD mSVProgressHUD;
+    private static SVProgressHUD mSVProgressHUD;
+
+
+    public static void showSvProgressAlert(SVProgressHUD svprogressHud) {
+        svprogressHud.show();
+    }
+
+
+    public static void dismisSvProgressAlert(SVProgressHUD svprogressHud) {
+
+        svprogressHud.dismiss();
+    }
+
 
     public static void sweetErrorAlert(Context context, String titleTxt, String contentTxt) {
         new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)

@@ -387,7 +387,7 @@ public class SynchData {
             }
             sb.append("</TrackedData>");
 
-//            Log.d("MobileUpdateOfflineTracked", sb.toString());
+            Log.d("SynchUpdateOffline", sb.toString());
 
             String requestURL = appUserModel.getWebAPIUrl()
                     + "/MobileLMS/MobileUpdateOfflineTrackedData"
@@ -401,7 +401,7 @@ public class SynchData {
 
                 String result = Utilities.convertStreamToString(inputStream);
                 dbh.insertCMiIsViewd(tempCmi);
-//                Log.d("TAG", "SyncData: " + result);
+                Log.d("TAG", "SyncData: " + result);
             }
 //            dbh.finishSynch(tempCmi);
 //            dbh.sendOfflineUserPagenotes();

@@ -103,13 +103,14 @@
     </RelativeLayout>
 
     <ImageView
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/bottom_logo"
         android:layout_width="match_parent"
         android:layout_height="75dp"
         android:background="@color/colorGray"
         android:padding="3dp"
-        android:scaleType="fitStart"
-        android:src="@drawable/bottomplaygroundlogo" />
+        android:layout_gravity="center"
+        android:scaleType="centerInside"
+        android:src="@drawable/playground" />
 </LinearLayout>
 

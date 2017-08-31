@@ -117,16 +117,18 @@ public class SideMenu extends AppCompatActivity {
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
         ButterKnife.bind(this);
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         uiSettingsModel = UiSettingsModel.getInstance();
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>My Learning</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderTextColor() + "'>My Learning</font>"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.back_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.settings_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.notification_font), iconFont);
+
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -152,7 +154,6 @@ public class SideMenu extends AppCompatActivity {
                 .into(profileImage);
 
         txtUsername.setText(appUserModel.getUserName());
-
 
 
         txtAddress.setText(appUserModel.getDisplayName().isEmpty()? getResources().getString(R.string.app_name):appUserModel.getDisplayName());

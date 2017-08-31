@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.mylearning;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -9,15 +10,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v7.app.NotificationCompat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,8 +85,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     WebAPIClient webAPIClient;
     VollyService vollyService;
     IResult resultCallback = null;
+    ExpandableListView expandableListView;
+    boolean isDownloading = false;
 
-    public TrackListExpandableAdapter(Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList) {
+    public TrackListExpandableAdapter(Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView) {
         this._context = context;
         this._blockNames = blockNames;
         this._trackList = trackList;
@@ -92,6 +98,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         webAPIClient = new WebAPIClient(_context);
         vollyService = new VollyService(resultCallback, _context);
         db = new DatabaseHandler(context);
+        this.expandableListView = expandableListView;
     }
 
     public void refreshList(List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList) {
@@ -155,7 +162,6 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 groupView.setVisibility(View.GONE);
                 blockNameTxt.setVisibility(View.GONE);
             }
-
         }
         return groupView;
     }
@@ -170,17 +176,18 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             inflater = (LayoutInflater) _context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         childView = inflater.inflate(R.layout.tracklistchilditem, parent, false);
+
         holder = new ViewHolder(childView);
         holder.parent = parent;
-
+        holder.relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.getChildPosition = childPosition;
         holder.getGroupPosition = groupPosition;
         holder.myLearningDetalData = trackChildList;
 
-        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         holder.txtTitle.setText(trackChildList.getCourseName());
         holder.txtCourseName.setText(trackChildList.getMediaName());
@@ -223,10 +230,25 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
             String courseStatus = "";
             if (trackChildList.getStatus().equalsIgnoreCase("Completed") || trackChildList.getStatus().toLowerCase().contains("passed") || trackChildList.getStatus().toLowerCase().contains("failed")) {
+                String progressPercent = "100";
+                String statusValue = trackChildList.getStatus();
+                if (trackChildList.getStatus().equalsIgnoreCase("Completed")) {
+                    statusValue = "Completed";
+
+                } else if (trackChildList.getStatus().equalsIgnoreCase("failed")) {
+
+                    statusValue = "Completed(failed)";
+                } else if (trackChildList.getStatus().equalsIgnoreCase("passed")) {
+
+                    statusValue = "Completed(passed)";
+
+                }
+
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
+                holder.progressBar.setProgress(Integer.parseInt(progressPercent));
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
+//                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
+                courseStatus = statusValue + " (" + progressPercent;
             } else if (trackChildList.getStatus().equalsIgnoreCase("Not Started")) {
 
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
@@ -235,21 +257,18 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
                 courseStatus = trackChildList.getStatus() + "  (0";
 
-            }
-//            else if (trackChildList.getStatus().toLowerCase().contains("passed") || trackChildList.getStatus().toLowerCase().contains("failed")) {
-//
-//                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusCompleted)));
-//                holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
-//                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
-//                courseStatus = trackChildList.getStatus() + " " + trackChildList.getProgress();
-//
-//            }
-            else {
+            } else {
+                String statusValue = "In Progress";
+
+                if (trackChildList.getStatus().toLowerCase().equalsIgnoreCase("incomplete") || trackChildList.getStatus().equalsIgnoreCase("") || trackChildList.getStatus().toLowerCase().equalsIgnoreCase("in complete")) {
+                    statusValue = "In Progress";
+                }
+
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
                 holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
+                courseStatus = statusValue + " (" + trackChildList.getProgress();
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");
@@ -299,6 +318,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         @Nullable
         @Bind(R.id.txt_title_name)
         TextView txtTitle;
+
+        @Nullable
+        @Bind(R.id.relative_layout)
+        RelativeLayout relativeLayout;
 
         @Nullable
         @Bind(R.id.txtShortDesc)
@@ -361,8 +384,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             } else {
 //                ((ExpandableListView) parent).performItemClick(view, getChildPosition, getGroupPosition);
                 if (isNetworkConnectionAvailable(_context, -1)) {
-                    btnDownload.setTextColor(view.getResources().getColor(R.color.colorStatusInProgress));
-                    downloadTheCourse(myLearningDetalData, view, getChildPosition);
+                    if (!isDownloading) {
+                        downloadTheCourse(myLearningDetalData, view, getChildPosition, getGroupPosition);
+                        btnDownload.setTextColor(view.getResources().getColor(R.color.colorStatusInProgress));
+                        showToast(_context, "Download Started");
+
+                    } else {
+                        showToast(_context, "Download in progress");
+                    }
                 } else {
                     showToast(_context, "No Internet");
                 }
@@ -370,7 +399,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
+    public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position, final int Gposition) {
 
         String[] startPage = null;
 
@@ -431,17 +460,17 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     if (statusCode != 200) {
                         downloadSourcePath[0] = learningModel.getSiteURL() + "content/downloadfiles/"
                                 + learningModel.getContentID() + ".zip";
-                        downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view);
+                        downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view, Gposition);
 
                     } else {
                         downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
                                 + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
-                        downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view);
+                        downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view, Gposition);
 
                     }
                 } else {
 
-                    downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view);
+                    downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view, Gposition);
                 }
 //                int statusCode = vollyService.checkResponseCode(downloadSourcePath[0]);
 
@@ -451,7 +480,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void downloadThin(String downloadStruri, final String downloadPath, final MyLearningModel learningModel, final int position, final View view) {
+    public void downloadThin(String downloadStruri, final String downloadPath, final MyLearningModel learningModel, final int position, final View view, final int gposition) {
 
         downloadStruri = downloadStruri.replace(" ", "%20");
         ThinDownloadManager downloadManager = new ThinDownloadManager();
@@ -482,6 +511,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
         final String finalDownloadedFilePath = downloadPath + "/" + extensionStr;
 
+        final int id = 1;
+        final NotificationManager mNotifyManager =
+                (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(_context);
+        mBuilder.setContentTitle("" + learningModel.getCourseName())
+                .setContentText("" + learningModel.getAuthor())
+                .setSmallIcon(R.mipmap.ic_launcher);
+
         final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
         DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
                 .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
@@ -490,7 +527,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     @Override
                     public void onDownloadComplete(DownloadRequest downloadRequest) {
                         Log.d("TAG", "onDownloadComplete: ");
-
+                        isDownloading = false;
                         if (finalDownloadedFilePath.contains(".zip")) {
                             String zipFile = finalDownloadedFilePath;
                             String unzipLocation = downloadPath;
@@ -505,19 +542,32 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
                         }
                         notifyDataSetChanged();
+                        mBuilder.setContentText("Download completed")
+                                // Removes the progress bar
+                                .setProgress(0, 0, false);
+                        mNotifyManager.notify(id, mBuilder.build());
                     }
 
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d("TAG", "onDownloadFailed: " + +errorCode);
                         Toast.makeText(_context, "Download failed " + errorMessage, Toast.LENGTH_SHORT).show();
-
+                        isDownloading = false;
                     }
 
                     @Override
                     public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
 
-                        updateStatus(position, progress, view);
+                        isDownloading = true;
+//                        if (view != null) {
+//                            updateStatus(position, progress, view, gposition);
+//                        }
+
+
+                        mBuilder.setProgress(100, progress, false);
+
+                        // Displays the progress bar for the first time.
+                        mNotifyManager.notify(id, mBuilder.build());
 
                     }
 
@@ -561,35 +611,33 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     }
 
 
-    private void updateStatus(int index, int Status, View view) {
-        // Update ProgressBar
-        // Update Text to ColStatus
-//
-//
-//// Say, first visible position is 8, you want position 10, wantedChild will now be 2
-//// So that means your view is child #2 in the ViewGroup:
-//
-//// Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
-//        int firstPosition = _trackList.getFirstVisiblePosition() - _trackList.getHeaderViewsCount(); // This is the same as child #0
-//        int wantedChild = index + firstPosition;
-//// Say, first visible position is 8, you want position 10, wantedChild will now be 2
-//// So that means your view is child #2 in the ViewGroup:
-//
-//// Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
-//        View wantedView = view.findViewWithTag("view");
-//
-//        TextView txtBtnDownload = (TextView) wantedView.findViewById(R.id.btntxt_download);
-//        CircleProgressBar circleProgressBar = (CircleProgressBar) wantedView.findViewById(R.id.circle_progress_track);
-//        circleProgressBar.setVisibility(View.VISIBLE);
-//        txtBtnDownload.setVisibility(View.GONE);
-//        circleProgressBar.setProgress(Status);
-//        // Enabled Button View
-//        if (Status >= 100) {
-//            txtBtnDownload.setTextColor(view.getResources().getColor(R.color.colorStatusCompleted));
-//            txtBtnDownload.setVisibility(View.VISIBLE);
-//            circleProgressBar.setVisibility(View.GONE);
-//            txtBtnDownload.setEnabled(false);
-//        }
+    private void updateStatus(int index, int Status, View view, int Gposition) {
+
+// Could also check if wantedPosition is between listView.getFirstVisiblePosition() and listView.getLastVisiblePosition() instead.
+
+//        int positions = expandableListView.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
+        int firstPosition = expandableListView.getFirstVisiblePosition() - expandableListView.getFlatListPosition(index); // This is the same as child #0
+        int wantedChild = index - expandableListView.getFlatListPosition(firstPosition);
+// Say, first visible position is 8, you want position 10, wantedChild will now be 2
+// So that means your view is child #2 in the ViewGroup:
+
+        View wantedView = expandableListView.getChildAt(wantedChild + 1);
+
+        if (wantedView != null) {
+
+            TextView txtBtnDownload = (TextView) wantedView.findViewById(R.id.btntxt_download);
+            CircleProgressBar circleProgressBar = (CircleProgressBar) wantedView.findViewById(R.id.circle_progress_track);
+            circleProgressBar.setVisibility(View.VISIBLE);
+            txtBtnDownload.setVisibility(View.GONE);
+            circleProgressBar.setProgress(Status);
+            // Enabled Button View
+            if (Status >= 100) {
+                txtBtnDownload.setTextColor(view.getResources().getColor(R.color.colorStatusCompleted));
+                txtBtnDownload.setVisibility(View.VISIBLE);
+                circleProgressBar.setVisibility(View.GONE);
+                txtBtnDownload.setEnabled(false);
+            }
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Instancy Learning</string>
+    <string name="app_name">Croplife Online Dealer Training</string>
     <string name="label_signin">Sign In</string>
     <string name="label_login">Login In</string>
     <string name="label_settings">Settings</string>
@@ -14,7 +14,6 @@
     <string name="label_forgot">Forgot Password?</string>
     <string name="alert_headtext_no_sliding_images">Some Error Occurred During Splash Screen Loading</string>
     <string name="login_failed_contact_admin">Login failed.\nContact site admin.</string>
-
 
     <string name="no_data">No Data</string>
 

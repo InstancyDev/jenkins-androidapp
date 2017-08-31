@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -42,6 +43,31 @@ public class SignUp_Activity extends AppCompatActivity {
         preferencesManager = PreferencesManager.getInstance();
         svProgressHUD = new SVProgressHUD(this);
         webView = (WebView) findViewById(R.id.webview);
+
+        WebSettings webSettings = this.webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+//        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        webSettings.getUseWideViewPort();
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setSaveFormData(true);
+        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        webView.setScrollbarFadingEnabled(false);
+        webSettings.setAllowFileAccessFromFileURLs(true);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+
+
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Sign up</font>"));
@@ -107,6 +133,7 @@ public class SignUp_Activity extends AppCompatActivity {
                     Intent signinIntent = new Intent(SignUp_Activity.this, Login_activity.class);
                     startActivity(signinIntent);
                 }
+                svProgressHUD.dismiss();
             }
 
             @Override

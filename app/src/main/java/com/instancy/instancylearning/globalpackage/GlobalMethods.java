@@ -27,11 +27,12 @@ import com.instancy.instancylearning.mylearning.TrackList_Activity;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.List;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.replace;
+import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 /**
  * Created by Upendranath on 7/7/2017 Working on InstancyLearning.
@@ -54,7 +55,7 @@ public class GlobalMethods {
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-   // LRS need to be implemented
+                // LRS need to be implemented
 
                 databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
 //
@@ -82,7 +83,7 @@ public class GlobalMethods {
 
             }
 
-             String  offlinePathEncode = offlinePath.replaceAll(" ", "%20");
+            String offlinePathEncode = offlinePath.replaceAll(" ", "%20");
 
             if (offlinePathEncode.endsWith(".pdf")) {
                 Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
@@ -269,7 +270,6 @@ public class GlobalMethods {
         } else {
 
 
-
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
                 Intent intentDetail = new Intent(context, TrackList_Activity.class);
                 intentDetail.putExtra("myLearningDetalData", myLearningModel);
@@ -277,223 +277,226 @@ public class GlobalMethods {
                 ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
 //                context.startActivity(intentDetail);
             } else {
-                String urlForView = "";
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/SiteFiles/"
-                            + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
-                {
-                    urlForView = myLearningModel.getSiteURL() + "/Content/Sitefiles/" + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage();
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+                if (isNetworkConnectionAvailable(context, -1)) {
+                    String urlForView = "";
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/SiteFiles/"
+                                + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
+                    {
+                        urlForView = myLearningModel.getSiteURL() + "/Content/Sitefiles/" + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage();
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
-                    urlForView = myLearningModel.getStartPage();
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
+                        urlForView = myLearningModel.getStartPage();
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
 
-                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/SiteFiles/"
-                            + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "& trackinguserid=" + myLearningModel.getUserID();
+                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/SiteFiles/"
+                                + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "& trackinguserid=" + myLearningModel.getUserID();
 
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
-
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
 
 
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
 
 
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+
+
+                    } else {
+
+                    }
+                    String encodedStr = replace(urlForView);
+                    Log.d("DBG", "launchCourseView: " + encodedStr);
+                    if (encodedStr.endsWith(".pdf")) {
+                        Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+                        pdfIntent.putExtra("PDF_URL", encodedStr);
+                        pdfIntent.putExtra("ISONLINE", "YES");
+                        pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
+                        context.startActivity(pdfIntent);
+                    } else if (encodedStr.toLowerCase().contains(".ppt")
+                            || encodedStr.toLowerCase().contains(".pptx")) {
+
+                        encodedStr = encodedStr.replace("file://", "");
+
+                        try {
+
+                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(encodedStr);
+                        Intent intent2 = new Intent();
+                        intent2.setAction(android.content.Intent.ACTION_VIEW);
+                        intent2.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/mspowerpoint,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation");
+                        try {
+                            context.startActivity(intent2);
+
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_pp),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+                    } else if (encodedStr.toLowerCase().contains(".doc")
+                            || encodedStr.toLowerCase().contains(".docx")) {
+
+                        encodedStr = encodedStr.replace("file://", "");
+                        try {
+
+                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(encodedStr);
+                        Intent intent3 = new Intent();
+                        intent3.setAction(android.content.Intent.ACTION_VIEW);
+                        intent3.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+                        try {
+                            context.startActivity(intent3);
+
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_word),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+
+                    } else if (offlinePath.toLowerCase().contains(".xlsx")
+                            || offlinePath.toLowerCase().contains(".xls")) {
+                        offlinePath = offlinePath.replace("file://", "");
+
+                        try {
+
+                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(offlinePath);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                        try {
+                            context.startActivity(intent4);
+
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_excel),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+                    } else if (offlinePath.toLowerCase().contains(".mpp")) {
+                        offlinePath = offlinePath.replace("file://", "");
+                        try {
+                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(offlinePath);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
+
+                        try {
+                            context.startActivity(intent4);
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_mpp),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+                    } else if (offlinePath.toLowerCase().contains(".visio")
+                            || offlinePath.toLowerCase().contains(".vsd")) {
+                        offlinePath = offlinePath.replace("file://", "");
+
+                        try {
+                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(offlinePath);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
+
+                        try {
+                            context.startActivity(intent4);
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_mpp),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+
+                        }
+
+                    } else if (offlinePath.toLowerCase().contains(".txt")) {
+
+                        try {
+
+                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(offlinePath);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(Uri.fromFile(file), "text/plain");
+                        try {
+                            context.startActivity(intent4);
+
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_txt),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+
+                        relatedContentView(myLearningModel, context);
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+
+
+                    } else {
+                        Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                        iWeb.putExtra("COURSE_URL", encodedStr);
+                        iWeb.putExtra("myLearningDetalData", myLearningModel);
+
+                        ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                    }
                 } else {
 
-                }
-                String encodedStr = replace(urlForView);
-                Log.d("DBG", "launchCourseView: " + encodedStr);
-                if (encodedStr.endsWith(".pdf")) {
-                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
-                    pdfIntent.putExtra("PDF_URL", encodedStr);
-                    pdfIntent.putExtra("ISONLINE", "YES");
-                    pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
-                    context.startActivity(pdfIntent);
-                } else if (encodedStr.toLowerCase().contains(".ppt")
-                        || encodedStr.toLowerCase().contains(".pptx")) {
-
-                    encodedStr = encodedStr.replace("file://", "");
-
-                    try {
-
-                        encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(encodedStr);
-                    Intent intent2 = new Intent();
-                    intent2.setAction(android.content.Intent.ACTION_VIEW);
-                    intent2.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/mspowerpoint,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation");
-                    try {
-                        context.startActivity(intent2);
-
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_pp),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-                    }
-
-                } else if (encodedStr.toLowerCase().contains(".doc")
-                        || encodedStr.toLowerCase().contains(".docx")) {
-
-                    encodedStr = encodedStr.replace("file://", "");
-                    try {
-
-                        encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(encodedStr);
-                    Intent intent3 = new Intent();
-                    intent3.setAction(android.content.Intent.ACTION_VIEW);
-                    intent3.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-                    try {
-                        context.startActivity(intent3);
-
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_word),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
-
-                } else if (offlinePath.toLowerCase().contains(".xlsx")
-                        || offlinePath.toLowerCase().contains(".xls")) {
-                    offlinePath = offlinePath.replace("file://", "");
-
-                    try {
-
-                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(offlinePath);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                    try {
-                        context.startActivity(intent4);
-
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_excel),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-                    }
-                } else if (offlinePath.toLowerCase().contains(".mpp")) {
-                    offlinePath = offlinePath.replace("file://", "");
-                    try {
-                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(offlinePath);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
-
-                    try {
-                        context.startActivity(intent4);
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_mpp),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-                    }
-
-                } else if (offlinePath.toLowerCase().contains(".visio")
-                        || offlinePath.toLowerCase().contains(".vsd")) {
-                    offlinePath = offlinePath.replace("file://", "");
-
-                    try {
-                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(offlinePath);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
-
-                    try {
-                        context.startActivity(intent4);
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_mpp),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-
-                    }
-
-                } else if (offlinePath.toLowerCase().contains(".txt")) {
-
-                    try {
-
-                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(offlinePath);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(Uri.fromFile(file), "text/plain");
-                    try {
-                        context.startActivity(intent4);
-
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_txt),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-
-                    relatedContentView(myLearningModel, context);
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
-
-
-                } else {
-                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-                    iWeb.putExtra("COURSE_URL", encodedStr);
-                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-//                context.startActivity(iWeb);
-//                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                    showToast(context, "The content has not been downloaded for offline View. Please download it when you are in online");
                 }
             }
-
         }
     }
 
@@ -503,7 +506,6 @@ public class GlobalMethods {
             Intent intentDetail = new Intent(context, TrackList_Activity.class);
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", false);
-//            context.startActivity(intentDetail);
             ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
         }
     }

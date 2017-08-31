@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -129,6 +130,20 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     @Bind(R.id.consolidateline)
     View consolidateLine;
 
+    @Nullable
+    @Bind(R.id.viewLayout)
+    RelativeLayout bottomViewLayout;
+
+    @Nullable
+    @Bind(R.id.bottom_button_layout)
+    LinearLayout bottomLayout;
+
+
+    @Nullable
+    @Bind(R.id.detail_layout)
+    RelativeLayout relativeLayout;
+
+
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
     MyLearningModel myLearningModel;
@@ -156,13 +171,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(this);
         webAPIClient = new WebAPIClient(this);
         db = new DatabaseHandler(this);
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
-
+        relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         txtBtnReport.setVisibility(View.GONE);
 
         if (myLearningModel != null) {
@@ -172,10 +190,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             txtSiteName.setText(myLearningModel.getSiteName());
             txtLongDisx.setText(myLearningModel.getShortDes());
             // apply colors
-            txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-            txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-            txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-            txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+            txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             LinearLayout linearLayout = (LinearLayout) findViewById(R.id.bottom_button_layout);
 
@@ -195,7 +213,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 //            txtFontView.setBackground(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 //            txtFontReport.setBackground(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
-            txtLongDisx.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+            txtLongDisx.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             ratingValue = 0;
 
             try {
@@ -378,10 +396,22 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             displayStatus = courseStatus + "  (0";
 
         } else {
+
+            String status = "";
+            if (courseStatus.equalsIgnoreCase("incomplete")) {
+                status = "In Progress";
+            } else if (courseStatus.length() == 0) {
+                status = "In Progress";
+
+            } else {
+                status = courseStatus;
+
+            }
+
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
             progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            displayStatus = courseStatus + " (" + myLearningModel.getProgress();
+            displayStatus = status + " (" + myLearningModel.getProgress();
         }
         txtCourseStatus.setText(displayStatus + "%)");
     }
@@ -508,10 +538,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                         int i = -1;
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
                         if (i == 1) {
-                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
                             statusUpdate(getResources().getString(R.string.metadata_status_progress));
                         } else {
-                            Toast.makeText(MyLearningDetail_Activity.this, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MyLearningDetail_Activity.this, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -554,7 +584,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                         i = db.updateContentStatus(myLearningModel, status, progress);
                         if (i == 1) {
 
-                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
 
                             myLearningModel.setStatus(status);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -563,7 +593,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
                         } else {
 
-                            Toast.makeText(MyLearningDetail_Activity.this, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MyLearningDetail_Activity.this, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
 
                     }

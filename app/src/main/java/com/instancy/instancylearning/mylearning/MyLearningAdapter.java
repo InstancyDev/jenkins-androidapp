@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -130,6 +131,8 @@ public class MyLearningAdapter extends BaseAdapter {
         holder = new ViewHolder(vi);
         holder.parent = parent;
         holder.getPosition = position;
+        holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
@@ -155,10 +158,10 @@ public class MyLearningAdapter extends BaseAdapter {
 
         // apply colors
 
-        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
+        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTag(position);
 //        initVolleyCallback(myLearningModel.get(position), position);
 
@@ -217,9 +220,20 @@ public class MyLearningAdapter extends BaseAdapter {
             } else {
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
+                String status = "";
+
+                if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete")) {
+                    status = "In Progress";
+                } else if (myLearningModel.get(position).getStatus().length() == 0) {
+                    status = "In Progress";
+
+                } else {
+                    status = myLearningModel.get(position).getStatus();
+
+                }
                 holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = myLearningModel.get(position).getStatus() + "(" + myLearningModel.get(position).getProgress();
+                courseStatus = status + "(" + myLearningModel.get(position).getProgress();
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");
@@ -228,7 +242,6 @@ public class MyLearningAdapter extends BaseAdapter {
         String imgUrl = myLearningModel.get(position).getImageData();
         Glide.with(vi.getContext()).load(imgUrl)
                 .thumbnail(0.5f)
-                .crossFade()
                 .placeholder(R.drawable.cellimage)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imgThumb);
@@ -348,6 +361,10 @@ public class MyLearningAdapter extends BaseAdapter {
         @Nullable
         @Bind(R.id.txt_title_name)
         TextView txtTitle;
+
+        @Nullable
+        @Bind(R.id.card_view)
+        CardView card_view;
 
         @Nullable
         @Bind(R.id.txtShortDesc)

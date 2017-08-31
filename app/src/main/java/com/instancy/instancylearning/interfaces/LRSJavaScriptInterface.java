@@ -22,12 +22,15 @@ public class LRSJavaScriptInterface {
     MyLearningModel _learningModel;
     DatabaseHandler databaseHandler;
     Activity activity;
+    public hideProgressListner hideProgressListner;
 
-    public LRSJavaScriptInterface(Context c, MyLearningModel learningModel, Activity activity) {
+
+    public LRSJavaScriptInterface(Context c, MyLearningModel learningModel, Activity activity, hideProgressListner hideProgressListner) {
         mContext = c;
         _learningModel = learningModel;
         databaseHandler = new DatabaseHandler(c);
         this.activity = activity;
+        this.hideProgressListner = hideProgressListner;
     }
 
     @JavascriptInterface
@@ -86,13 +89,20 @@ public class LRSJavaScriptInterface {
 
     }
 
+
+    @JavascriptInterface
+    public void hideNativeContentLoader() {
+
+        if (hideProgressListner != null)
+            hideProgressListner.statusUpdateFromServer();
+    }
+
     @JavascriptInterface
     public void LMSTrackInitialize(String value, String tracksqno) {
 
         Log.d("SaveLocationWith", value);
 
     }
-
 
     //Track Template view javascriptmethods
     @JavascriptInterface
@@ -103,6 +113,7 @@ public class LRSJavaScriptInterface {
         return returnTrack;
 
     }
+
     @JavascriptInterface
     public String LMSGetTrackAllItemsResultWithTrackID(String trackId) {
 
@@ -110,6 +121,7 @@ public class LRSJavaScriptInterface {
         String returnTrack = databaseHandler.getTrackTemplateAllItemsResult(trackId, _learningModel);
         return returnTrack;
     }
+
     @JavascriptInterface
     public String UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String trackItemId, String trackIstate, String wMessage, String ruleId, String cStepId) {
 

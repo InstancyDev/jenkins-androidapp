@@ -238,9 +238,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, defaultTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, headerTextColor TEXT, headerBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, viewButtonColor TEXT, viewButtonTextColor TEXT, detailButtonColor TEXT, detailButtonTextColor TEXT, reportButtonColor TEXT, reportButtonTextColor TEXT, setCompleteButtonColor TEXT, setCompleteTextColor TEXT, appHeaderColor TEXT,appLoginBGColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_NATIVEMENUS
@@ -356,9 +355,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // +
         // "(contentid TEXT,topicid TEXT,forumid TEXT,name TEXT,createddate TEXT,latestreplyby TEXT,noofreplies TEXT,noofviews TEXT,siteid INTEGER,PRIMARY KEY(siteid,forumid,topicid,contentid))");
 
+//        db.execSQL("CREATE TABLE IF NOT EXISTS "
+//                + TBL_OFFLINEUSERS
+//                + "(userid TEXT, username TEXT, password TEXT, siteid TEXT, siteurl TEXT, PRIMARY KEY(username, password, siteurl))");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_OFFLINEUSERS
-                + "(userid TEXT, username TEXT, password TEXT, siteid TEXT, siteurl TEXT, PRIMARY KEY(username, password, siteurl))");
+                + "(userid TEXT, orgunitid TEXT, userstatus TEXT, displayname TEXT, siteid TEXT, username TEXT, password TEXT, siteurl TEXT )");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_ALLUSERSINFO
                 + "(picture TEXT,userid TEXT,displayname TEXT,email TEXT,profileimagepath TEXT, siteid TEXT, PRIMARY KEY(userid, siteid))");
@@ -534,10 +538,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         for (int i = 0; i < jsonTableOne.size(); i++) {
                             JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
 
-                            if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                            if (uisettingsJsonOjb
+                                    .get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#HEADER_TEXT_COLOR#")) {
-                                uiSettingsModel.setHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
+                                    .equals("#APP_BACKGROUNDCOLOR#")) {
+                                uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+                                        "csseditingpalceholdervalue")
+                                        .getAsString()
+                                        .substring(0, 7));
+                            } else if (uisettingsJsonOjb
+                                    .get("csseditingpalceholdername")
+                                    .getAsString()
+                                    .equals("#App_backgrndText#")) {
+                                uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+                                        "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
                             } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
@@ -547,32 +561,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
-                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#LIST_BORDER_COLOR#")) {
-                                uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#LIST_BG_COLOR#")) {
-                                uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString().equalsIgnoreCase("#TEXT_COLOR#")) {
-                                uiSettingsModel.setDefaultTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
                             } else if (uisettingsJsonOjb
                                     .get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#MENU_TEXT_COLOR#")) {
-                                uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+                                    .equals("#NativeApp_Header_Text#")) {
+                                uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
@@ -587,8 +580,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             } else if (uisettingsJsonOjb
                                     .get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#MENU_SL_TEXT_COLOR#")) {
-                                uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+                                    .equals("#MENU_TEXT_COLOR#")) {
+                                uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
@@ -598,6 +591,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     .equals("#MENU_SL_BG_COLOR#")) {
                                 uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
+                                        .getAsString()
+                                        .substring(0, 7));
+                            } else if (uisettingsJsonOjb
+                                    .get("csseditingpalceholdername")
+                                    .getAsString()
+                                    .equals("#MENU_SL_TEXT_COLOR#")) {
+                                uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+                                        "csseditingpalceholdervalue")
+                                        .getAsString()
+                                        .substring(0, 7));
+                            } else if (uisettingsJsonOjb
+                                    .get("csseditingpalceholdername")
+                                    .getAsString()
+                                    .equals("#HEADER_BG_COLOR#")) {
+                                uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
+                                        "csseditingpalceholdervalue")
+                                        .getAsString()
+                                        .substring(0, 7));
+                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                                    .getAsString()
+                                    .equals("#HEADER_TEXT_COLOR#")) {
+                                uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
                             } else if (uisettingsJsonOjb
@@ -635,88 +650,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             } else if (uisettingsJsonOjb
                                     .get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#VIEW_BUTTON_COLOR#")) {
-                                uiSettingsModel.setViewButtonColor(uisettingsJsonOjb.get(
+                                    .equals("#Button_Background_Color#")) {
+                                uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
                             } else if (uisettingsJsonOjb
                                     .get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#VIEW_BUTTON_TEXTCOLOR#")) {
-                                uiSettingsModel.setViewButtonTextColor(uisettingsJsonOjb.get(
+                                    .equals("#Button_Text_Color#")) {
+                                uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
                             } else if (uisettingsJsonOjb
                                     .get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#DETAILS_BUTTON_COLOR#")) {
-                                uiSettingsModel.setDetailButtonColor(uisettingsJsonOjb.get(
+                                    .equals("#FileUplad_BUTTON#")) {
+                                uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
+                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#DETAILS_BUTTON_TEXTCOLOR#")) {
-                                uiSettingsModel.setDetailButtonTextColor(uisettingsJsonOjb.get(
+                                    .equals("#LIST_BG_COLOR#")) {
+                                uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
+                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                     .getAsString()
-                                    .equals("#REPORTS_BUTTON_COLOR#")) {
-                                uiSettingsModel.setReportButtonColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#REPORTS_BUTTON_TEXTCOLOR#")) {
-                                uiSettingsModel.setReportButtonTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#SETCOMPLETE_BUTTON_COLOR#")) {
-                                uiSettingsModel.setSetCompleteButtonColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#SETCOMPLETE_BUTTON_TEXTCOLOR#")) {
-                                uiSettingsModel.setSetCompleteTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#HEADER_BG_COLOR#")) {
-                                uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#APP_TEXTCOLOR#")) {
-                                uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
-                                        .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#APP_BACKGROUNDCOLOR#")) {
-                                uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+                                    .equals("#LIST_BORDER_COLOR#")) {
+                                uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
@@ -728,7 +693,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                         "csseditingpalceholdervalue")
                                         .getAsString()
                                         .substring(0, 7));
+                            } else if (uisettingsJsonOjb
+                                    .get("csseditingpalceholdername")
+                                    .getAsString()
+                                    .equals("#NativeAppLogin_Page_Text#")) {
+                                uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+                                        "csseditingpalceholdervalue")
+                                        .getAsString()
+                                        .substring(0, 7));
                             }
+
                         }
 
                     }
@@ -774,6 +748,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationAllowed"))) {
 
                                 uiSettingsModel.setSelfRegistrationAllowed(nativeSettingsObj.get("keyvalue").getAsString());
+                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
+
+                                uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
+                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
+
+                                uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
+                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationDisplayName"))) {
+
+                                uiSettingsModel.setSignUpName(nativeSettingsObj.get("keyvalue").getAsString());
+                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeAppLoginSetting"))) {
+
+                                uiSettingsModel.setEnableAppLogin(nativeSettingsObj.get("keyvalue").getAsString());
+                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
+
+                                String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
+                                if (appLogo.length() == 0) {
+                                    String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
+                                    uiSettingsModel.setEnableAppLogin(appLogos);
+                                }
                             }
 
                         }
@@ -837,25 +830,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
         try {
             String strExeQuery = "";
-            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor, menuTextColor, defaultTextColor, menuBGColor , selectedMenuTextColor, selectedMenuBGColor, headerTextColor, headerBGColor, listBGColor, listBorderColor, menuHeaderBGColor, menuHeaderTextColor, menuBGAlternativeColor, menuBGSelectTextColor, viewButtonColor, viewButtonTextColor, detailButtonColor, detailButtonTextColor, reportButtonColor, reportButtonTextColor, setCompleteButtonColor, setCompleteTextColor, appHeaderColor, appLoginBGColor, selfRegistrationAllowed, contentDownloadType, courseAppContent, enableNativeCatlog, enablePushNotification, nativeAppType , autodownloadsizelimit, catalogContentDownloadType , fileUploadButtonColor, firstTarget, secondTarget, thirdTarget, contentAssignment, newContentAvailable, contentUnassigned, firstEvent, isFacebook, isLinkedin , isGoogle , isTwitter, siteID, siteURL)"
+            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL )"
                     + " VALUES ('"
                     + uiSettingsModel.getAppTextColor()
                     + "','"
-                    + uiSettingsModel.getAppHeaderColor()
+                    + uiSettingsModel.getAppBGColor()
                     + "','"
                     + uiSettingsModel.getMenuTextColor()
-                    + "','"
-                    + uiSettingsModel.getDefaultTextColor()
                     + "','"
                     + uiSettingsModel.getMenuBGColor()
                     + "','"
                     + uiSettingsModel.getSelectedMenuTextColor()
                     + "','"
                     + uiSettingsModel.getSelectedMenuBGColor()
-                    + "','"
-                    + uiSettingsModel.getHeaderTextColor()
-                    + "','"
-                    + uiSettingsModel.getHeaderBGColor()
                     + "','"
                     + uiSettingsModel.getListBGColor()
                     + "','"
@@ -869,25 +856,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + "','"
                     + uiSettingsModel.getSelectedMenuTextColor()
                     + "','"
-                    + uiSettingsModel.getViewButtonColor()
+                    + uiSettingsModel.getAppButtonBgColor()
                     + "','"
-                    + uiSettingsModel.getViewButtonTextColor()
+                    + uiSettingsModel.getAppButtonTextColor()
                     + "','"
-                    + uiSettingsModel.getDetailButtonColor()
-                    + "','"
-                    + uiSettingsModel.getDetailButtonTextColor()
-                    + "','"
-                    + uiSettingsModel.getReportButtonColor()
-                    + "','"
-                    + uiSettingsModel.getReportButtonTextColor()
-                    + "','"
-                    + uiSettingsModel.getSetCompleteButtonColor()
-                    + "','"
-                    + uiSettingsModel.getSetCompleteTextColor()
+                    + uiSettingsModel.getAppHeaderTextColor()
                     + "','"
                     + uiSettingsModel.getAppHeaderColor()
                     + "','"
                     + uiSettingsModel.getAppLoginBGColor()
+                    + "','"
+                    + uiSettingsModel.getAppLoginTextolor()
                     + "','"
                     + uiSettingsModel.getSelfRegistrationAllowed()
                     + "','"
@@ -918,6 +897,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + uiSettingsModel.getNewContentAvailable()
                     + "','"
                     + uiSettingsModel.getContentUnassigned()
+                    + "','"
+                    + uiSettingsModel.getEnableAppLogin()
+                    + "','"
+                    + uiSettingsModel.getNativeAppLoginLogo()
+                    + "','"
+                    + uiSettingsModel.getEnableBranding()
+                    + "','"
+                    + uiSettingsModel.getSignUpName()
                     + "','"
                     + uiSettingsModel.getFirstEvent()
                     + "','"
@@ -953,8 +940,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             uiSettingsModel.setMenuTextColor(cursor.getString(cursor
                     .getColumnIndex("menuTextColor")));
 
-            uiSettingsModel.setDefaultTextColor(cursor.getString(cursor
-                    .getColumnIndex("defaultTextColor")));
+            uiSettingsModel.setAppTextColor(cursor.getString(cursor
+                    .getColumnIndex("appTextColor")));
 
             uiSettingsModel.setMenuBGColor(cursor.getString(cursor
                     .getColumnIndex("menuBGColor")));
@@ -965,11 +952,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             uiSettingsModel.setSelectedMenuBGColor(cursor.getString(cursor
                     .getColumnIndex("selectedMenuBGColor")));
 
-            uiSettingsModel.setHeaderTextColor(cursor.getString(cursor
-                    .getColumnIndex("headerTextColor")));
-
-            uiSettingsModel.setHeaderBGColor(cursor.getString(cursor
-                    .getColumnIndex("headerBGColor")));
+            uiSettingsModel.setAppHeaderTextColor(cursor.getString(cursor
+                    .getColumnIndex("appHeaderTextColor")));
 
             uiSettingsModel.setListBorderColor(cursor.getString(cursor
                     .getColumnIndex("listBorderColor")));
@@ -989,33 +973,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             uiSettingsModel.setMenuBGSelectTextColor(cursor.getString(cursor
                     .getColumnIndex("menuBGSelectTextColor")));
 
-            uiSettingsModel.setViewButtonColor(cursor.getString(cursor
-                    .getColumnIndex("viewButtonColor")));
-
-            uiSettingsModel.setViewButtonTextColor(cursor.getString(cursor
-                    .getColumnIndex("viewButtonColor")));
-
-            uiSettingsModel.setDetailButtonColor(cursor.getString(cursor
-                    .getColumnIndex("detailButtonColor")));
-
-            uiSettingsModel.setDetailButtonTextColor(cursor.getString(cursor
-                    .getColumnIndex("detailButtonTextColor")));
-
-
-            uiSettingsModel.setReportButtonColor(cursor.getString(cursor
-                    .getColumnIndex("reportButtonColor")));
-
-            uiSettingsModel.setReportButtonTextColor(cursor.getString(cursor
-                    .getColumnIndex("reportButtonTextColor")));
-
-
-            uiSettingsModel.setSetCompleteButtonColor(cursor.getString(cursor
-                    .getColumnIndex("setCompleteButtonColor")));
-
-            uiSettingsModel.setSetCompleteTextColor(cursor.getString(cursor
-                    .getColumnIndex("setCompleteTextColor")));
-
-
             uiSettingsModel.setAppHeaderColor(cursor.getString(cursor
                     .getColumnIndex("appHeaderColor")));
 
@@ -1030,7 +987,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setEnableNativeCatlog(cursor.getString(cursor
                     .getColumnIndex("enableNativeCatlog")));
-
 
             uiSettingsModel.setEnablePushNotification(cursor.getString(cursor
                     .getColumnIndex("enablePushNotification")));
@@ -3209,6 +3165,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + "' AND D.siteid ='"
                 + parentModel.getSiteID() + "' ORDER BY blockname";
 
+        Log.d(TAG, "fetchTrackListModel strSelQuery : " + strSelQuery);
+
         try {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
@@ -3258,7 +3216,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     trackListModel.setParticipantUrl(cursor.getString(cursor
                             .getColumnIndex("participanturl")));
                     trackListModel.setStatus(cursor.getString(cursor
-                            .getColumnIndex("status")));
+                            .getColumnIndex("objStatus")));
                     trackListModel.setPassword(cursor.getString(cursor
                             .getColumnIndex("password")));
                     trackListModel.setDisplayName(cursor.getString(cursor
@@ -3291,10 +3249,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     trackListModel.setTimeZone(cursor.getString(cursor
                             .getColumnIndex("timezone")));
 
-
                     trackListModel.setTrackScoid(cursor.getString(cursor
                             .getColumnIndex("trackscoid")));
-
 
                     trackListModel.setIsDiscussion(cursor.getString(cursor
                             .getColumnIndex("isdiscussion")));
@@ -3476,7 +3432,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public int updateContentStatus(MyLearningModel myLearningModel, String updatedStatus, String progress) {
         SQLiteDatabase db = this.getWritableDatabase();
         int status = -1;
-        Cursor isUpdated = null;
+
         try {
 
             String strUpdate = "UPDATE " + TBL_DOWNLOADDATA + " SET status = '"
@@ -3521,6 +3477,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             status = -1;
             Log.e("updateContentStatus", e.toString());
         }
+
+        try {
+
+            if (updatedStatus.toLowerCase().contains("failed")) {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET status = 'failed'"
+                        + " WHERE siteid ='"
+                        + myLearningModel.getSiteID() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + myLearningModel.getScoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + myLearningModel.getUserID() + "'";
+                db.execSQL(strUpdate);
+
+            } else if (updatedStatus.toLowerCase().contains("passed")) {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET status = 'passed'"
+                        + " WHERE siteid ='"
+                        + myLearningModel.getSiteID() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + myLearningModel.getScoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + myLearningModel.getUserID() + "'";
+                db.execSQL(strUpdate);
+
+            } else if (updatedStatus.toLowerCase().contains("completed")) {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET status = 'completed'"
+                        + " WHERE siteid ='"
+                        + myLearningModel.getSiteID() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + myLearningModel.getScoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + myLearningModel.getUserID() + "'";
+                db.execSQL(strUpdate);
+
+            }
+
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+
         db.close();
 
         return status;
@@ -3529,7 +3525,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     public void injectCMIDataInto(JSONObject jsonObjectCMI, MyLearningModel learningModel) throws JSONException {
-
 
         JSONArray jsonCMiAry = jsonObjectCMI.getJSONArray("cmi");
         JSONArray jsonStudentAry = jsonObjectCMI.getJSONArray("studentresponse");
@@ -4317,73 +4312,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             query = "?nativeappURL=true&cid=" + mylearningModel.getScoId() + "&stid=" + mylearningModel.getUserID() + "&lloc=" + locationValue + "&lstatus=" + statusValue + "&susdata=" + suspendDataValue + "&quesdata=" + question + "&sname=" + mylearningModel.getUserName();
         }
 //      not required for now
-//      boolean isSessionExists = false;
-//        int numberOfAttemptsInt = 0;
-////            var timeSpent = "00:00:00"
-//        String sqlQuery = "SELECT count(ID) as attemptscount FROM" + TBL_USERSESSION + " WHERE siteid = " + mylearningModel.getSiteID() + " AND scoid = " + mylearningModel.getScoId() + " AND userid = " + mylearningModel.getUserID();
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        Cursor cursor = null;
-//        cursor = db.rawQuery(sqlQuery, null);
-//        try {
-//
-//            if (cursor != null && cursor.moveToFirst()) {
-//                do {
-//
-//                    isSessionExists = true;
-//                    String counts = cursor.getString(cursor.getColumnIndex("attemptscount"));
-//                    numberOfAttemptsInt = Integer.parseInt(counts);
-//                    numberOfAttemptsInt = numberOfAttemptsInt + 1;
-//
-//                } while (cursor.moveToNext());
-//            }
-//        } catch (SQLiteException ex) {
-//
-//
-//        }
-//
-//        {
-//
-//            LearnerSessionModel learnersessionTb = new LearnerSessionModel();
-//            if (mylearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-////                let tupleValues = self.getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(scoidValue, sequenceNumber:
-//                sequenceNumberValue, siteID:siteIDValue, userID:userIDValue)
-//                let objectScoidValue = tupleValues.scoid
-//                let latestAttemptNo = self.getlatestAtempt(objectScoidValue, userid:
-//                userIDValue, siteid:siteIDValue)
-//                learnersessionTb.setScoID(mylearningModel.getScoId());
-//                userSessionModel.attemptNumber = String(latestAttemptNo + 1)
-//            } else {
-//                userSessionModel.scoID = scoidValue
-//                userSessionModel.attemptNumber = String(numberOfAttemptsInt)
-//            }
-//            userSessionModel.siteID = siteIDValue
-//            userSessionModel.userID = userIDValue
-//            userSessionModel.sessionDateTime = Singleton.sharedInstance.getCurrentDate()
-//            insertUsersessionData(userSessionModel);
-//        }
-//
-//        if (isSessionExists) {
-//
-//            learnersessionTb.setSiteID(mylearningModel.getSiteID());
-//            learnersessionTb.setUserID(mylearningModel.getUserID());
-//            learnersessionTb.setScoID(mylearningModel.getScoId());
-//            learnersessionTb.setAttemptNumber("" + numberOfAttemptsInt + 1);
-//            learnersessionTb.setSessionDateTime(GetCurrentDateTime());
-//            insertUserSession(learnersessionTb);
-//
-//            if (mylearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-//                int tempTrackObjScoId = GetTrackObjectScoid(mylearningModel);
-//                int objLastAttempt = getLatestAttempt(tempTrackObjScoId,
-//                        Integer.parseInt(userid), Integer.parseInt(siteId));
-//                LearnerSessionModel objSession = new UserSessionDetails();
-//                objSession.set_siteId(siteId);
-//                objSession.set_userId(Integer.parseInt(userid));
-//                objSession.set_scoId(tempTrackObjScoId);
-//                objSession.set_attemptnumber(objLastAttempt + 1);
-//                objSession.se(getCurrentDateTime());
-//                dbh.insertUserSession(objSession);
-//            }
-//        }
+        boolean isSessionExists = false;
+        int numberOfAttemptsInt = 0;
+//            var timeSpent = "00:00:00"
+        String sqlQuery = "SELECT count(sessionid) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + mylearningModel.getSiteID() + " AND scoid = " + mylearningModel.getScoId() + " AND userid = " + mylearningModel.getUserID();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = null;
+        cursor = db.rawQuery(sqlQuery, null);
+        try {
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+
+                    isSessionExists = true;
+                    String counts = cursor.getString(cursor.getColumnIndex("attemptscount"));
+                    numberOfAttemptsInt = Integer.parseInt(counts);
+                    numberOfAttemptsInt = numberOfAttemptsInt + 1;
+
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException ex) {
+
+
+        }
+
+        if (isSessionExists) {
+            LearnerSessionModel learnersessionTb = new LearnerSessionModel();
+            if (mylearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                String[] tupleValues = getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(mylearningModel, sequenceNumberValue);
+                String objectScoidValue = tupleValues[0];
+
+
+                int latestAttemptNo = getLatestAttempt(objectScoidValue,
+                        mylearningModel.getUserID(), mylearningModel.getSiteID());
+
+                learnersessionTb.setScoID(objectScoidValue);
+
+                learnersessionTb.setAttemptNumber("" + latestAttemptNo);
+            } else {
+                learnersessionTb.setScoID(mylearningModel.getScoId());
+                learnersessionTb.setAttemptNumber("" + numberOfAttemptsInt);
+            }
+
+            learnersessionTb.setSiteID(mylearningModel.getSiteID());
+            learnersessionTb.setUserID(mylearningModel.getUserID());
+            learnersessionTb.setSessionDateTime(GetCurrentDateTime());
+
+            insertUserSession(learnersessionTb);
+        }
+
 
         query = query.replaceAll("#", "%23");
 
@@ -4393,6 +4370,65 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Log.d(TAG, "generateOfflinePathForCourseView: " + requestString);
 
         return requestString;
+    }
+
+    public int getLatestAttempt(String scoId, String userId, String siteID) {
+
+        String sqlQuery = "SELECT count(ID) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + siteID + " AND scoid = " + scoId + " AND userid = " + userId;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = null;
+        cursor = db.rawQuery(sqlQuery, null);
+
+        int numberOfAttemptsInt = 0;
+        try {
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+
+                    String counts = cursor.getString(cursor.getColumnIndex("attemptscount"));
+                    numberOfAttemptsInt = Integer.parseInt(counts);
+
+
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException ex) {
+
+
+        }
+
+        return numberOfAttemptsInt + 1;
+    }
+
+
+    public String[] getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(MyLearningModel learningModel, String seqNumber) {
+
+        String[] strAry = new String[2];
+
+        String sqlQuery = "SELECT scoid, objecttypeid FROM " + TBL_TRACKOBJECTS + " WHERE siteid = " + learningModel.getSiteID() + " AND trackscoid = " + learningModel.getScoId() + "AND sequencenumber = " + seqNumber + " AND userid = " + learningModel.getUserID();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = null;
+        cursor = db.rawQuery(sqlQuery, null);
+
+        try {
+
+            if (cursor != null && cursor.moveToFirst()) {
+                while (cursor.moveToNext()) {
+
+                    String scoID = cursor.getString(cursor.getColumnIndex("scoid"));
+                    String objectTypeID = cursor.getString(cursor.getColumnIndex("objecttypeid"));
+
+                    strAry[0] = scoID;
+                    strAry[1] = objectTypeID;
+
+                }
+
+
+            }
+        } catch (SQLiteException ex) {
+
+
+        }
+        return strAry;
     }
 
 
@@ -5162,7 +5198,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         assesmentNumber = Integer.parseInt(cursor.getString(0));
 
-                        Log.d("TAG", "HEre assesmentNumber " + assesmentNumber);
+                        Log.d("TAG", "Here assesmentNumber " + assesmentNumber);
 
                     }
 
@@ -5366,12 +5402,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                }
 //            }
 
+//            if (cmiNew.getStatus().equalsIgnoreCase("Not Started")) {
+//
+//                strExeQuery = "INSERT INTO "
+//                        + TBL_CMI
+//                        + "(siteid,scoid,userid,location,status,isupdate)"
+//                        + " VALUES (" + cmiNew.getSiteID() + ","
+//                        + cmiNew.getScoId() + "," + cmiNew.getUserID()
+//                        + "," + getvalue + ","
+//                        + "'In Progress" + "','false')";
+//                db.execSQL(strExeQuery);
+//            } else {
             strExeQuery = "UPDATE CMI SET " + getname + "='" + getvalue + "'"
                     + ", isupdate= 'false'" + " WHERE scoid="
                     + cmiNew.getScoId() + " AND siteid=" + cmiNew.getSiteID()
                     + " AND userid=" + cmiNew.getUserID();
 
             db.execSQL(strExeQuery);
+
+//            }
 
             db.close();
 
@@ -5488,7 +5537,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
         String strExeQuery = "";
-
+        String timeSpent = "00:00:00";
         try {
             strExeQuery = "SELECT * FROM " + TBL_USERSESSION + " WHERE scoid="
                     + sessionDetails.getScoID() + " AND userid="
@@ -5496,20 +5545,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + sessionDetails.getAttemptNumber() + " AND siteid="
                     + sessionDetails.getSiteID();
             cursor = db.rawQuery(strExeQuery, null);
+
+//            while (cursor.moveToNext()) {
+//
+//                timeSpent = (cursor.getString(cursor
+//                        .getColumnIndex("timespent")));
+//            }
+
             if (cursor != null && cursor.getCount() > 0) {
-                try {
-                    strExeQuery = "UPDATE " + TBL_USERSESSION
-                            + " SET timespent='"
-                            + sessionDetails.getTimeSpent() + "' WHERE scoid="
-                            + sessionDetails.getScoID() + " AND siteid="
-                            + sessionDetails.getSiteID() + " AND userid="
-                            + sessionDetails.getUserID()
-                            + " AND attemptnumber="
-                            + sessionDetails.getAttemptNumber();
-                    db.execSQL(strExeQuery);
-                } catch (Exception e) {
-                    Log.d("InsertUserSession", e.getMessage());
-                }
+//                try {
+//                    strExeQuery = "UPDATE " + TBL_USERSESSION
+//                            + " SET timespent='"
+//                            + timeSpent + "' WHERE scoid="
+//                            + sessionDetails.getScoID() + " AND siteid="
+//                            + sessionDetails.getSiteID() + " AND userid="
+//                            + sessionDetails.getUserID()
+//                            + " AND attemptnumber="
+//                            + sessionDetails.getAttemptNumber();
+//                    db.execSQL(strExeQuery);
+//                } catch (Exception e) {
+//                Log.d("InsertUserSession", e.getMessage());
+//                }
             } else {
                 try {
                     strExeQuery = "INSERT INTO "
@@ -5519,7 +5575,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             + sessionDetails.getScoID() + ","
                             + sessionDetails.getUserID() + ","
                             + sessionDetails.getAttemptNumber() + ",'"
-                            + sessionDetails.getSessionDateTime() + "',0)";
+                            + sessionDetails.getSessionDateTime() + "','00:00:00')";
                     db.execSQL(strExeQuery);
                 } catch (Exception e) {
                     Log.d("InsertUserSession", e.getMessage());
@@ -6189,27 +6245,39 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         CMIModel cmiModel = new CMIModel();
         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-            cmiModel.set_location(lLoc);
+
             cmiModel.set_status(lStatus);
             cmiModel.set_datecompleted(dateCompleted);
-            cmiModel.set_timespent(totalSessionTimeSpent);
-            cmiModel.set_suspenddata(susData);
+            cmiModel.set_score("0");
+            cmiModel.set_suspenddata("");
+            cmiModel.set_location("");
 
         } else {
-            cmiModel.set_suspenddata("");
+            cmiModel.set_suspenddata(susData);
             cmiModel.set_status(lStatus);
-            cmiModel.set_timespent(totalSessionTimeSpent);
+            cmiModel.set_location(lLoc);
             cmiModel.set_datecompleted(dateCompleted);
+
+            if (!score.equalsIgnoreCase("")) {
+                cmiModel.set_score(sqlScore);
+            } else {
+                cmiModel.set_score(score);
+            }
+        }
+
+
+        if (seqID.equalsIgnoreCase("")) {
+
+            seqID = "0";
+        } else {
+
             cmiModel.set_seqNum("" + seqID);
         }
 
-        if (!score.equalsIgnoreCase("")) {
-            cmiModel.set_score(sqlScore);
-        } else {
-            cmiModel.set_score(score);
-        }
 
-        cmiModel.set_siteId(learningModel.getSiteID());
+        cmiModel.set_timespent(totalSessionTimeSpent);
+
+
         try {
 
             if (userIDValue.length() == 0) {
@@ -6221,10 +6289,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 scoid = learningModel.getScoId();
             }
+            cmiModel.set_timespent(totalSessionTimeSpent);
 
-
+            cmiModel.set_siteId(learningModel.getSiteID());
             cmiModel.set_userId(Integer.parseInt(userIDValue));
-            cmiModel.set_isupdate(learningModel.getSiteID());
+            cmiModel.set_isupdate("false");
             cmiModel.set_scoId(Integer.parseInt(scoid));
             cmiModel.set_objecttypeid(learningModel.getObjecttypeId());
             cmiModel.set_sitrurl(learningModel.getSiteURL());
@@ -6248,32 +6317,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void updateCMIDataOnCourseClose(CMIModel cmiModel) {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        int status = -1;
-        Cursor isUpdated = null;
-        try {
 
-            String strUpdate = "UPDATE " + TBL_CMI + " SET status = '"
-                    + cmiModel.get_status()
-                    + "' WHERE siteid ='"
-                    + cmiModel.get_siteId() + "'"
-                    + " AND " + " scoid=" + "'"
-                    + cmiModel.get_scoId() + "'" + " AND "
-                    + " userid=" + "'"
-                    + cmiModel.get_userId() + "'";
-            Log.d(TAG, "updateContentStatus: " + strUpdate);
-            db.execSQL(strUpdate);
-            status = 1;
-        } catch (Exception e) {
-            status = -1;
-            Log.e("updateContentStatus", e.toString());
+        if (cmiModel.get_datecompleted().equalsIgnoreCase("")) {
+
+            try {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET location = " + cmiModel.get_location() + ",status = '"
+                        + cmiModel.get_status() + "',suspenddata='" + cmiModel.get_suspenddata() + "',isupdate='" + cmiModel.get_isupdate() + "',score='" + cmiModel.get_score() + "',noofattempts='" + cmiModel.get_noofattempts() + "',sequenceNumber='" + cmiModel.get_seqNum() + "',timespent='" + cmiModel.get_timespent()
+                        + "' WHERE siteid ='"
+                        + cmiModel.get_siteId() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + cmiModel.get_scoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + cmiModel.get_userId() + "'";
+                db.execSQL(strUpdate);
+            } catch (SQLiteException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+
+            try {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET location = " + cmiModel.get_location() + ",status = '"
+                        + cmiModel.get_status() + "', suspenddata = '" + cmiModel.get_suspenddata() + "', isupdate= '" + cmiModel.get_isupdate() + "', dateCompleted= '" + cmiModel.get_datecompleted() + "', score= '" + cmiModel.get_score() + "',noofattempts='" + cmiModel.get_noofattempts() + "', sequenceNumber='" + cmiModel.get_seqNum() + "',timespent='" + cmiModel.get_timespent()
+                        + "' WHERE siteid ='"
+                        + cmiModel.get_siteId() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + cmiModel.get_scoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + cmiModel.get_userId() + "'";
+                db.execSQL(strUpdate);
+            } catch (SQLiteException ex) {
+                ex.printStackTrace();
+            }
         }
-        db.close();
-
     }
 
-    public void insertDataIntoCMI(CMIModel cmiModel, String isupdate) {
-
-    }
 
     public String GetPreviousStatus(MyLearningModel learningModel) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -6534,6 +6611,105 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public void insertUserCredentialsForOfflineLogin(JSONObject jsonObject) throws JSONException {
+        boolean isUserExists = false;
+        String queryStr = "";
+
+
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            queryStr = "SELECT userid FROM " + TBL_OFFLINEUSERS + " WHERE siteid = " + jsonObject.get("siteid") +
+                    "  AND siteurl = '" + jsonObject.get("siteurl") + "' AND username = '" + jsonObject.get("username") + "' AND password = '" + jsonObject.get("password") + "'";
+
+            Cursor cursor = db.rawQuery(queryStr, null);
+
+            if (cursor != null) {
+
+                while (cursor.moveToNext()) {
+
+                    isUserExists = true;
+                }
+            }
+        } catch (SQLiteException ex) {
+
+            ex.printStackTrace();
+        }
+
+        if (isUserExists) {
+
+            try {
+                SQLiteDatabase db = this.getWritableDatabase();
+                queryStr = "UPDATE " + TBL_OFFLINEUSERS + " SET userid = " + jsonObject.get("userid") + " , siteid = " + jsonObject.get("siteid") + ", userstatus ='" + jsonObject.get("userstatus") + "', displayname = '" + jsonObject.get("displayname") + "', orgunitid = " + jsonObject.get("orgunitid") + ", username = '" + jsonObject.get("username") + "', password = '" + jsonObject.get("password") + "', siteurl = '" + jsonObject.get("siteurl") + "' WHERE siteid = " + jsonObject.get("siteid") + "  AND siteurl = '" + jsonObject.get("siteurl") + "' AND username = '" + jsonObject.get("username") + "'";
+
+                db.execSQL(queryStr);
+
+            } catch (SQLiteException ex) {
+
+                ex.printStackTrace();
+            }
+        } else {
+            try {
+                SQLiteDatabase db = this.getWritableDatabase();
+
+                queryStr = "INSERT INTO " + TBL_OFFLINEUSERS + "( userid, siteid, userstatus, displayname, orgunitid, username, password, siteurl)" + " VALUES ("
+                        + jsonObject.get("userid")
+                        + ","
+                        + jsonObject.get("siteid")
+                        + ",'"
+                        + jsonObject.get("userstatus")
+                        + "','"
+                        + jsonObject.get("displayname")
+                        + "','"
+                        + jsonObject.get("orgunitid")
+                        + "','"
+                        + jsonObject.get("username")
+                        + "','"
+                        + jsonObject.get("password")
+                        + "','"
+                        + jsonObject.get("siteurl")
+                        + "')";
+
+                db.execSQL(queryStr);
+            } catch (SQLiteException ex) {
+
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public JSONObject checkOfflineUserCredintials(JSONObject jsonObject) throws JSONException {
+        JSONObject jsonCred = new JSONObject();
+
+        String sqlQuery = "SELECT * FROM " + TBL_OFFLINEUSERS + " WHERE siteid = " + jsonObject.get("siteid") + "  AND siteurl = '" + jsonObject.get("siteurl") + "' AND username = '" + jsonObject.get("username") + "' AND password = '" + jsonObject.get("password") + "'";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+
+            Cursor cursor = db.rawQuery(sqlQuery, null);
+
+            if (cursor != null) {
+
+                while (cursor.moveToNext()) {
+
+                    jsonCred.put("userid", (cursor.getString(cursor.getColumnIndex("userid"))));
+                    jsonCred.put("siteid", (cursor.getString(cursor.getColumnIndex("siteid"))));
+                    jsonCred.put("userstatus", (cursor.getString(cursor.getColumnIndex("userstatus"))));
+                    jsonCred.put("displayname", (cursor.getString(cursor.getColumnIndex("displayname"))));
+                    jsonCred.put("orgunitid", (cursor.getString(cursor.getColumnIndex("orgunitid"))));
+                    jsonCred.put("username", (cursor.getString(cursor.getColumnIndex("username"))));
+                    jsonCred.put("password", (cursor.getString(cursor.getColumnIndex("password"))));
+                    jsonCred.put("siteurl", (cursor.getString(cursor.getColumnIndex("siteurl"))));
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+        return jsonCred;
+    }
 }
 
 

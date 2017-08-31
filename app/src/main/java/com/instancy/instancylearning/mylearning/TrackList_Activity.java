@@ -16,6 +16,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,12 +97,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     Boolean iscondition = true;
     String workFlowType, strlaunch;
     PreferencesManager preferencesManager;
+    LinearLayout linearLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tracklist_activity);
+        linearLayout = (LinearLayout) findViewById(R.id.layout_linear_detail);
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+
+        linearLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         trackList = (ExpandableListView) findViewById(R.id.trackexpandablelist);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipetracklist);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -109,6 +114,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         appUserModel = AppUserModel.getInstance();
         blockNames = new ArrayList<String>();
         db = new DatabaseHandler(this);
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         webAPIClient = new WebAPIClient(this);
         workFlowType = "onlaunch";
         strlaunch = "0";
@@ -119,7 +125,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, blockNames, trackListHashMap);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, blockNames, trackListHashMap,trackList);
 //        trackList.setOnChildClickListener(this);
         // setting list adapter
         trackList.setAdapter(trackListExpandableAdapter);
@@ -372,14 +378,27 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                     }
                 } else {
 
+                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        int i = -1;
+                        i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
+                        if (i == 1) {
+
+//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+                        } else {
+//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
                     cmiSynchTask = new CmiSynchTask(context);
                     cmiSynchTask.execute();
+                    injectFromDbtoModel();
                 }
             }
         }
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
 //            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
+            injectFromDbtoModel();
         }
     }
 

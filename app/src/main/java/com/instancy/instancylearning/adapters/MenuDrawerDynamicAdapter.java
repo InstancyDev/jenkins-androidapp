@@ -158,7 +158,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         TextView txtTitle = (TextView) pView.findViewById(R.id.menuText);
         ImageView expIcon = (ImageView) pView.findViewById(R.id.expIcon);
         TextView fontIcon = (TextView) pView.findViewById(R.id.fontawasomeIcon);
-        fontIcon.setTextColor(pView.getResources().getColor(R.color.colorPrimaryDark));
+        fontIcon.setTextColor(pView.getResources().getColor(R.color.colorBlack));
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);
 
         switch (mainMenu.getContextMenuId()) {
@@ -202,14 +202,14 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             if (isExpanded) {
                 Drawable exp = ctx.getResources().getDrawable(
                         R.drawable.ic_launcher);
-                exp.setColorFilter(Color.parseColor(uiSettingsModel.getMenuTextColor()),
+                exp.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()),
                         PorterDuff.Mode.SRC_ATOP);
 
                 expIcon.setImageDrawable(exp);
             } else {
                 Drawable exp = ctx.getResources().getDrawable(
                         R.drawable.ic_launcher);
-                exp.setColorFilter(Color.parseColor(uiSettingsModel.getMenuTextColor()),
+                exp.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()),
                         PorterDuff.Mode.SRC_ATOP);
 
                 expIcon.setImageDrawable(exp);

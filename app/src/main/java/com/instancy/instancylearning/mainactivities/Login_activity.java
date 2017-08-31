@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -28,6 +30,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
@@ -123,23 +126,17 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     String autoSignInUserName = "";
     String autoSignInPassword = "";
     boolean isAutoSignIn = false;
-
+    DatabaseHandler db;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
         uiSettingsModel = UiSettingsModel.getInstance();
+        db = new DatabaseHandler(this);
 
-        View someView = findViewById(R.id.login_layout);
-
-        // Find the root view
-        View root = someView.getRootView();
-
-        // Set the color
-
-        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
         appUserModel = AppUserModel.getInstance();
+
 
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
@@ -164,7 +161,46 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        btnLogin.setBackgroundResource(R.drawable.round_corners);
 //        GradientDrawable drawable = (GradientDrawable) btnLogin.getBackground();
 //        drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-//        btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+
+        imgPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        editPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        editUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        editPassword.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        editUserName.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        View someView = findViewById(R.id.login_layout);
+
+        // Find the root view
+        View root = someView.getRootView();
+
+        // Set the color
+
+//        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+
+        Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
+        drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
+
+        Drawable drawableUser = editUserName.getBackground(); // get current EditText drawable
+        drawableUser.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP);
+
+        if (Build.VERSION.SDK_INT > 16) {
+            editPassword.setBackground(drawablePass); // set the new drawable to EditText
+            editUserName.setBackground(drawableUser); // set the new drawable to EditText
+
+        } else {
+            editPassword.setBackgroundDrawable(drawablePass); // use setBackgroundDrawable because setBackground r
+            editUserName.setBackgroundDrawable(drawableUser); // use setBackgroundDrawable because setBackground requ
+        }
 
         appUserModel = AppUserModel.getInstance();
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
@@ -175,8 +211,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         FontManager.markAsIconContainer(findViewById(R.id.btntxt_linkedin), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.txt_pass), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.txt_user), iconFont);
-
-
 
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -200,7 +234,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     public void socialLoginBtns(View view) {
         switch (view.getId()) {
             case R.id.id_loginbtn:
-                loginMethod();
+                try {
+                    loginMethod();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.btntxt_google:
                 if (isNetworkConnectionAvailable(this, -1)) {
@@ -291,7 +329,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     }
 
-    public void loginMethod() {
+    public void loginMethod() throws JSONException {
 
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
@@ -308,8 +346,40 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 loginVollyWebCall(userName, passWord);
             } else {
 
-                SweetAlert.sweetAlertNoNet(Login_activity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("username", userName);
+                    jsonObject.put("password", passWord);
+                    jsonObject.put("siteid", "374");
+                    jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                JSONObject jsonReturn = null;
+                try {
+                    jsonReturn = db.checkOfflineUserCredintials(jsonObject);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (jsonReturn != null) {
+
+                    preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
+                    preferencesManager.setStringValue(passWord, StaticValues.KEY_USERPASSWORD);
+                    preferencesManager.setStringValue(jsonReturn.get("userid").toString(), StaticValues.KEY_USERID);
+                    preferencesManager.setStringValue(jsonReturn.get("username").toString(), StaticValues.KEY_USERNAME);
+                    preferencesManager.setStringValue(jsonReturn.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
+                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intentSideMenu);
+
+                } else {
+
+                    SweetAlert.sweetAlertNoNet(Login_activity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
+                }
             }
 
         }
@@ -339,8 +409,20 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                             try {
                                 JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
                                 if (loginResponseAry.length() != 0) {
-
                                     JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                                    JSONObject jsonObject = new JSONObject();
+                                    jsonObject.put("userid", jsonobj.get("userid").toString());
+                                    jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
+                                    jsonObject.put("userstatus", jsonobj.get("userstatus"));
+                                    jsonObject.put("displayname", jsonobj.get("username"));
+                                    jsonObject.put("siteid", jsonobj.get("siteid"));
+                                    jsonObject.put("username", userName);
+                                    jsonObject.put("password", password);
+                                    jsonObject.put("siteurl", appUserModel.getSiteURL());
+
+                                    db.insertUserCredentialsForOfflineLogin(jsonObject);
+
                                     Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
                                     preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
                                     preferencesManager.setStringValue(password, StaticValues.KEY_USERPASSWORD);
@@ -473,7 +555,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             editUserName.setText(autoSignInUserName);
             editPassword.setText(autoSignInPassword);
             isAutoSignIn = false;
-            loginMethod();
+            try {
+                loginMethod();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 

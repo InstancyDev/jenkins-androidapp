@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -30,7 +29,6 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -342,7 +340,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         item_filter.setVisible(false);
         if (item_search != null) {
-            Drawable myIcon = getResources().getDrawable( R.drawable.ic_search_black_24dp );
+            Drawable myIcon = getResources().getDrawable(R.drawable.ic_search_black_24dp);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
@@ -805,7 +803,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     }
 
-
     private void updateStatus(int index, int Status) {
         // Update ProgressBar
         // Update Text to ColStatus
@@ -872,11 +869,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
 
                         if (i == 1) {
-                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-                            myLearningAdapter.notifyDataSetChanged();
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+//                            myLearningAdapter.notifyDataSetChanged();
+                            injectFromDbtoModel();
                         } else {
 
-                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     }
 
