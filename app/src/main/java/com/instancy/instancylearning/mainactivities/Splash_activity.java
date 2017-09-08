@@ -56,7 +56,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     DatabaseHandler db;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    AppController appController;
     WebAPIClient webAPIClient;
     GetSiteConfigsAsycTask getSiteConfigsAsycTask;
     private static final String TAG = Splash_activity.class.getSimpleName();
@@ -69,6 +68,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     private int progressStatus = 0;
     AppUserModel appUserModel;
     PreferencesManager preferencesManager;
+    AppController appController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +83,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         uiSettingsModel = UiSettingsModel.getInstance();
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
+        appController=AppController.getInstance();
         String siteUrl = preferencesManager.getStringValue(StaticValues.KEY_SITEURL);
 
         if (siteUrl.length() == 0) {
@@ -187,7 +188,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                 String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
                 if (userID != null && !userID.equalsIgnoreCase("")) {
-
+                    appController.setAlreadyViewd(true);
                     Intent intent = new Intent(this, SideMenu.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

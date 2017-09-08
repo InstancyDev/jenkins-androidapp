@@ -21,7 +21,6 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -87,7 +86,6 @@ public class SideMenu extends AppCompatActivity {
 
     AppUserModel appUserModel;
 
-    String filtedConditions = "";
 
     MenuDrawerDynamicAdapter menuDynamicAdapter;
     PreferencesManager preferencesManager;
@@ -141,7 +139,7 @@ public class SideMenu extends AppCompatActivity {
         rl.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
         ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
-        imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+//        imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
         // navdrawer Top layout initilization
 
@@ -155,8 +153,7 @@ public class SideMenu extends AppCompatActivity {
 
         txtUsername.setText(appUserModel.getUserName());
 
-
-        txtAddress.setText(appUserModel.getDisplayName().isEmpty()? getResources().getString(R.string.app_name):appUserModel.getDisplayName());
+        txtAddress.setText(appUserModel.getDisplayName().isEmpty() ? getResources().getString(R.string.app_name) : appUserModel.getDisplayName());
 
         sideMenusModel = db.getNativeMainMenusData();
 
@@ -166,7 +163,7 @@ public class SideMenu extends AppCompatActivity {
 
             if (savedInstanceState == null) {
                 // on first time to display view for first navigation item based on the number
-                selectItem(0); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(1,0); // 2 is your fragment's number for "CollectionFragment"
                 lastClicked = 0;
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
@@ -184,7 +181,12 @@ public class SideMenu extends AppCompatActivity {
                         preferencesManager.setStringValue("", StaticValues.KEY_USERID);
                     } else {
                         if (lastClicked != groupPosition) {
-                            selectItem(groupPosition);
+                            try {
+                                selectItem(Integer.parseInt(sideMenusModel.get(groupPosition).getContextMenuId()),groupPosition);
+                            } catch (NumberFormatException numEx) {
+                                numEx.printStackTrace();
+                                selectItem(1,groupPosition);
+                            }
                         }
                     }
                     drawer.closeDrawer(Gravity.LEFT);
@@ -195,16 +197,17 @@ public class SideMenu extends AppCompatActivity {
         }
     }
 
-    private void selectItem(int position) {
+
+    private void selectItem(int menuid, int position) {
 
         Fragment fragment = null;
 
-        switch (position) {
-            case 0:
+        switch (menuid) {
+            case 1:
                 fragment = new MyLearningFragment();
                 break;
-            case 1:
-                fragment = new Catalog_fragment();
+            case 2:
+                fragment = new com.instancy.instancylearning.catalog.Catalog_fragment();
                 break;
             case 3:
                 fragment = new Catalog_fragment();
@@ -220,7 +223,7 @@ public class SideMenu extends AppCompatActivity {
             Bundle bundle = new Bundle();
 
             // send model from her to fragment
-            bundle.putString(CONTEXT_TITLE, sideMenusModel.get(position).getDisplayName());
+//            bundle.putString(CONTEXT_TITLE, sideMenusModel.get(position).getDisplayName());
             bundle.putSerializable("sidemenumodel", sideMenusModel.get(position));
             fragment.setArguments(bundle);
 

@@ -70,7 +70,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Sign up</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -95,7 +95,7 @@ public class SignUp_Activity extends AppCompatActivity {
                 } else if (url.toLowerCase().contains("autosignupnativeapp.aspx")) {
                     if (url.contains("?")) {
                         Toast.makeText(SignUp_Activity.this, "Sign up success..!!", Toast.LENGTH_SHORT).show();
-                        String query = url.toLowerCase().substring(url.lastIndexOf("?") + 1);
+                        String query = url.substring(url.lastIndexOf("?") + 1);
                         String userCredentials[] = query.split("&");
                         String userName = userCredentials[0].substring(userCredentials[0].lastIndexOf("=") + 1);
                         String password = userCredentials[1].substring(userCredentials[1].lastIndexOf("=") + 1);

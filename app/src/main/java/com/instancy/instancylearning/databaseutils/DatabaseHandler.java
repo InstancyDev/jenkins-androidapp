@@ -255,7 +255,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,viewtype TEXT,eventid TEXT,price TEXT,islistview TEXT,mediatypeid TEXT,isuseraddedcontent TEXT,status TEXT,ratingid TEXT,publisheddate TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, componentid TEXT, presenter TEXT, isaddedtomylearning INTEGER, relatedcontentcount INTEGER, joinurl TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,siteurl TEXT,sitename TEXT,userid TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,viewtype TEXT,price TEXT,islistview TEXT,mediatypeid TEXT,status TEXT,ratingid TEXT,publisheddate TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, componentid TEXT, isaddedtomylearning INTEGER, relatedcontentcount INTEGER, joinurl TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERSESSION
                 + "(sessionid INTEGER PRIMARY KEY AUTOINCREMENT,userid INTEGER,scoid INTEGER,siteid INTEGR,attemptnumber INTEGER,sessiondatetime DATETIME,timespent TEXT)");
@@ -277,7 +277,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
@@ -1714,11 +1714,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
             // coursename
+
+
             if (jsonMyLearningColumnObj.has("name")) {
 
                 myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
 
             }
+
             // shortdes
             if (jsonMyLearningColumnObj.has("shortdescription")) {
 
@@ -1728,12 +1731,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 myLearningModel.setShortDes(result.toString());
 
             }
-            // author
-            if (jsonMyLearningColumnObj.has("author")) {
 
-                myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+            String authorName = "";
+            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
+                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
 
             }
+
+            if (authorName.length() != 0) {
+                myLearningModel.setAuthor(authorName);
+            } else {
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+                }
+            }
+
+
             // contentID
             if (jsonMyLearningColumnObj.has("contentid")) {
 
@@ -2223,6 +2239,527 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return myLearningModelList;
     }
 
+
+    public void injectCatalogData(JSONObject jsonObject) throws JSONException {
+
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_CATALOGDATA);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            MyLearningModel myLearningModel = new MyLearningModel();
+
+
+            //sitename
+            if (jsonMyLearningColumnObj.has("sitename")) {
+
+                myLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
+            }
+            // siteurl
+            if (jsonMyLearningColumnObj.has("siteurl")) {
+
+                myLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("siteid").toString());
+
+            }
+            // userid
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                myLearningModel.setUserID(jsonMyLearningColumnObj.get("userid").toString());
+
+            }
+            // coursename
+
+
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
+
+            }
+
+            // shortdes
+            if (jsonMyLearningColumnObj.has("shortdescription")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
+
+                myLearningModel.setShortDes(result.toString());
+
+            }
+
+            String authorName = "";
+            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
+                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
+
+            }
+
+            if (authorName.length() != 0) {
+                myLearningModel.setAuthor(authorName);
+            } else {
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+                }
+            }
+
+
+            // contentID
+            if (jsonMyLearningColumnObj.has("contentid")) {
+
+                myLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
+
+            }
+            // createddate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+
+            }
+            // displayName
+
+            myLearningModel.setDisplayName(appUserModel.getDisplayName());
+            // durationEndDate
+            if (jsonMyLearningColumnObj.has("durationenddate")) {
+
+                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
+
+            }
+            // objectID
+            if (jsonMyLearningColumnObj.has("objectid")) {
+
+                myLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
+
+            }
+            // thumbnailimagepath
+            if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+
+                String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
+
+
+                if (isValidString(imageurl)) {
+
+                    myLearningModel.setThumbnailImagePath(imageurl);
+                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    myLearningModel.setImageData(imagePathSet);
+
+
+                } else {
+                    if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
+                        String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
+                        if (isValidString(imageurlContentType)) {
+                            String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
+                            myLearningModel.setImageData(imagePathSet);
+
+                        }
+                    }
+
+
+                }
+//                // imagedata
+//                if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+//
+//
+//                } else {
+//
+//                }
+                // relatedcontentcount
+                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
+
+                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
+
+                }
+                // isDownloaded
+                if (jsonMyLearningColumnObj.has("isdownloaded")) {
+
+                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
+
+                }
+                // courseattempts
+                if (jsonMyLearningColumnObj.has("courseattempts")) {
+
+                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
+
+                }
+                // objecttypeid
+                if (jsonMyLearningColumnObj.has("objecttypeid")) {
+
+                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
+
+                }
+                // scoid
+                if (jsonMyLearningColumnObj.has("scoid")) {
+
+                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
+
+                }
+                // startpage
+                if (jsonMyLearningColumnObj.has("startpage")) {
+
+                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
+
+                }
+                // status
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+                // userName
+                myLearningModel.setUserName(appUserModel.getUserName());
+                // longdes
+                if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+
+                    myLearningModel.setShortDes(result.toString());
+                    myLearningModel.setLongDes(result.toString());
+
+                }
+                // typeofevent
+                if (jsonMyLearningColumnObj.has("typeofevent")) {
+
+                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+
+                    myLearningModel.setTypeofevent(typeoFEvent);
+
+                }
+
+                // medianame
+                if (jsonMyLearningColumnObj.has("medianame")) {
+                    String medianame = "";
+
+                    if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                        if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
+                            medianame = "Assessment(Test)";
+
+                        } else {
+                            medianame = jsonMyLearningColumnObj.get("medianame").toString();
+                        }
+                    } else {
+                        if (myLearningModel.getTypeofevent() == 2) {
+                            medianame = "Event (Online)";
+
+
+                        } else if (myLearningModel.getTypeofevent() == 1) {
+                            medianame = "Event (Face to Face)";
+
+                        }
+                    }
+
+                    myLearningModel.setMediaName(medianame);
+
+                }       // ratingid
+                if (jsonMyLearningColumnObj.has("ratingid")) {
+
+                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
+
+                }
+                // publishedDate
+                if (jsonMyLearningColumnObj.has("publisheddate")) {
+
+                    myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
+
+                }
+                // eventstarttime
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+
+                }
+                // eventendtime
+                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+
+                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+
+                }
+
+                // mediatypeid
+                if (jsonMyLearningColumnObj.has("mediatypeid")) {
+
+                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+
+                }
+                // dateassigned
+                if (jsonMyLearningColumnObj.has("dateassigned")) {
+
+                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+
+                }
+                // keywords
+                if (jsonMyLearningColumnObj.has("seokeywords")) {
+
+                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
+
+                }
+                // eventcontentid
+                if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+
+                }
+                // eventAddedToCalender
+                myLearningModel.setEventAddedToCalender(false);
+
+
+                // isExpiry
+                myLearningModel.setIsExpiry("false");
+
+                // locationname
+                if (jsonMyLearningColumnObj.has("locationname")) {
+
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+
+                }
+                // timezone
+                if (jsonMyLearningColumnObj.has("timezone")) {
+
+                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
+
+                }
+                // participanturl
+                if (jsonMyLearningColumnObj.has("participanturl")) {
+
+                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
+
+                }
+                // password
+
+                myLearningModel.setPassword(appUserModel.getPassword());
+
+                // isListView
+                if (jsonMyLearningColumnObj.has("bit5")) {
+
+                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
+
+                }
+
+                // joinurl
+                if (jsonMyLearningColumnObj.has("joinurl")) {
+
+                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+
+                }
+
+                // offlinepath
+                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
+                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
+                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
+                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                    String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
+                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+
+                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
+
+                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
+                }
+//
+
+
+                // wresult
+                if (jsonMyLearningColumnObj.has("wresult")) {
+
+                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
+
+                }
+                // wmessage
+                if (jsonMyLearningColumnObj.has("wmessage")) {
+
+                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
+
+                }
+
+                // presenter
+                if (jsonMyLearningColumnObj.has("presenter")) {
+
+                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+                }
+
+                //sitename
+                if (jsonMyLearningColumnObj.has("price")) {
+
+                    myLearningModel.setPrice(jsonMyLearningColumnObj.get("price").toString());
+
+                }
+
+                //googleproductid
+                if (jsonMyLearningColumnObj.has("googleproductid")) {
+
+                    myLearningModel.setGoogleProductID(jsonMyLearningColumnObj.get("googleproductid").toString());
+
+                }
+
+                //googleproductid
+                if (jsonMyLearningColumnObj.has("componentid")) {
+
+                    myLearningModel.setComponentId(jsonMyLearningColumnObj.get("componentid").toString());
+
+                }
+
+                injectCatalogDataIntoTable(myLearningModel);
+            }
+
+        }
+
+    }
+
+    public void injectCatalogDataIntoTable(MyLearningModel myLearningModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("siteid", myLearningModel.getSiteID());
+            contentValues.put("scoid", myLearningModel.getScoId());
+            contentValues.put("siteurl", myLearningModel.getSiteURL());
+            contentValues.put("sitename", myLearningModel.getSiteName());
+            contentValues.put("userid", myLearningModel.getUserID());
+            contentValues.put("contentid", myLearningModel.getContentID());
+            contentValues.put("coursename", myLearningModel.getCourseName());
+            contentValues.put("author", myLearningModel.getAuthor());
+            contentValues.put("shortdes", myLearningModel.getShortDes());
+            contentValues.put("longdes", myLearningModel.getLongDes());
+            contentValues.put("imagedata", myLearningModel.getImageData());
+            contentValues.put("medianame", myLearningModel.getMediaName());
+            contentValues.put("createddate", myLearningModel.getCreatedDate());
+            contentValues.put("startpage", myLearningModel.getStartPage());
+            contentValues.put("objecttypeid", myLearningModel.getObjecttypeId());
+            contentValues.put("locationname", myLearningModel.getLocationName());
+            contentValues.put("timezone", myLearningModel.getTimeZone());
+            contentValues.put("participanturl", myLearningModel.getParticipantUrl());
+            contentValues.put("islistview", myLearningModel.getIsListView());
+            contentValues.put("relatedcontentcount", myLearningModel.getRelatedContentCount());
+            contentValues.put("ratingid", myLearningModel.getRatingId());
+            contentValues.put("publisheddate", myLearningModel.getPublishedDate());
+            contentValues.put("mediatypeid", myLearningModel.getMediatypeId());
+            contentValues.put("keywords", myLearningModel.getKeywords());
+            contentValues.put("courselaunchpath", myLearningModel.getOfflinepath());
+            contentValues.put("joinurl", myLearningModel.getJoinurl());
+
+            contentValues.put("viewtype", myLearningModel.getCreatedDate());
+
+            contentValues.put("price", myLearningModel.getCreatedDate());
+
+            contentValues.put("googleproductid", myLearningModel.getGoogleProductID());
+
+            contentValues.put("componentid", myLearningModel.getComponentId());
+
+            db.insert(TBL_CATALOGDATA, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+
+    }
+
+
+    public List<MyLearningModel> fetchCatalogModel() {
+        List<MyLearningModel> myLearningModelList = null;
+        MyLearningModel myLearningModel = new MyLearningModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE componentid = 1  ORDER BY publisheddate DESC";
+
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                myLearningModelList = new ArrayList<MyLearningModel>();
+                do {
+                    myLearningModel = new MyLearningModel();
+                    myLearningModel.setUserID(cursor.getString(cursor
+                            .getColumnIndex("userid")));
+                    myLearningModel.setSiteID(cursor.getString(cursor
+                            .getColumnIndex("siteid")));
+                    myLearningModel.setSiteURL(cursor.getString(cursor
+                            .getColumnIndex("siteurl")));
+                    myLearningModel.setSiteName(cursor.getString(cursor
+                            .getColumnIndex("sitename")));
+                    myLearningModel.setContentID(cursor.getString(cursor
+                            .getColumnIndex("contentid")));
+                    myLearningModel.setCourseName(cursor.getString(cursor
+                            .getColumnIndex("coursename")));
+                    myLearningModel.setAuthor(cursor.getString(cursor
+                            .getColumnIndex("author")));
+                    myLearningModel.setShortDes(cursor.getString(cursor
+                            .getColumnIndex("shortdes")));
+                    myLearningModel.setLongDes(cursor.getString(cursor
+                            .getColumnIndex("longdes")));
+                    myLearningModel.setImageData(cursor.getString(cursor
+                            .getColumnIndex("imagedata")));
+                    myLearningModel.setMediaName(cursor.getString(cursor
+                            .getColumnIndex("medianame")));
+                    myLearningModel.setCreatedDate(cursor.getString(cursor
+                            .getColumnIndex("createddate")));
+                    myLearningModel.setStartPage(cursor.getString(cursor
+                            .getColumnIndex("startpage")));
+                    myLearningModel.setObjecttypeId(cursor.getString(cursor
+                            .getColumnIndex("objecttypeid")));
+                    myLearningModel.setLocationName(cursor.getString(cursor
+                            .getColumnIndex("locationname")));
+                    myLearningModel.setScoId(cursor.getString(cursor
+                            .getColumnIndex("scoid")));
+                    myLearningModel.setParticipantUrl(cursor.getString(cursor
+                            .getColumnIndex("participanturl")));
+//                    myLearningModel.setDisplayName(cursor.getString(cursor
+//                            .getColumnIndex("displayname")));
+                    myLearningModel.setIsListView(cursor.getString(cursor
+                            .getColumnIndex("islistview")));
+//                    myLearningModel.setIsDownloaded(cursor.getString(cursor
+//                            .getColumnIndex("isdownloaded")));
+//                    myLearningModel.setCourseAttempts(cursor.getString(cursor
+//                            .getColumnIndex("courseattempts")));
+                    myLearningModel.setRelatedContentCount(cursor.getString(cursor
+                            .getColumnIndex("relatedcontentcount")));
+                    myLearningModel.setRatingId(cursor.getString(cursor
+                            .getColumnIndex("ratingid")));
+                    myLearningModel.setPublishedDate(cursor.getString(cursor
+                            .getColumnIndex("publisheddate")));
+                    myLearningModel.setMediatypeId(cursor.getString(cursor
+                            .getColumnIndex("mediatypeid")));
+                    myLearningModel.setKeywords(cursor.getString(cursor
+                            .getColumnIndex("keywords")));
+                    myLearningModel.setOfflinepath(cursor.getString(cursor
+                            .getColumnIndex("courselaunchpath")));
+                    myLearningModel.setEventAddedToCalender(false);
+//                    myLearningModel.setEventAddedToCalender(cursor.getb(cursor
+//                            .getColumnIndex("eventaddedtocalender")));
+                    myLearningModel.setJoinurl(cursor.getString(cursor
+                            .getColumnIndex("joinurl")));
+
+                    myLearningModelList.add(myLearningModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return myLearningModelList;
+    }
+
     /*
     *
     *
@@ -2390,12 +2927,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 trackLearningModel.setShortDes(result.toString());
 
             }
-            // author
-            if (jsonMyLearningColumnObj.has("author")) {
 
-                trackLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+            String authorName = "";
+            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
+                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
 
             }
+
+            if (authorName.length() != 0) {
+                trackLearningModel.setAuthor(authorName);
+            } else {
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    authorName = jsonMyLearningColumnObj.getString("author");
+
+                    String authorReplace = authorName.replaceAll(" ", "");
+
+                    trackLearningModel.setAuthor(authorReplace);
+
+                }
+            }
+//
+//
+//            // author
+//            if (jsonMyLearningColumnObj.has("author")) {
+//
+//                trackLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+//
+//            }
             // contentID
             if (jsonMyLearningColumnObj.has("contentid")) {
 
@@ -3408,7 +3969,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("eventcontentid", "false");
             contentValues.put("mediatypeid", trackListModel.getMediatypeId());
             contentValues.put("downloadurl", trackListModel.getDownloadURL());
-//            contentValues.put("progress", trackListModel.getProgress());
+            contentValues.put("progress", trackListModel.getProgress());
             contentValues.put("presenter", trackListModel.getPresenter());
             contentValues.put("joinurl", trackListModel.getJoinurl());
             contentValues.put("blockname", trackListModel.getBlockName());

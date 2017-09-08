@@ -17,6 +17,7 @@ public class SweetAlert {
 
 
     public static void showSvProgressAlert(SVProgressHUD svprogressHud) {
+//        svprogressHud.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.None);
         svprogressHud.show();
     }
 

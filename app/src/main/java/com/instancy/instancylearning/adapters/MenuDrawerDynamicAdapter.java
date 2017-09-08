@@ -217,7 +217,13 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         } else {
             expIcon.setVisibility(View.GONE);
         }
-
+//        if (parentPosition % 2 == 0) {
+//            pView.setBackgroundColor(Color
+//                    .parseColor("#5DB100"));
+//        } else {
+//            pView.setBackgroundColor(Color
+//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//        }
         return pView;
     }
 

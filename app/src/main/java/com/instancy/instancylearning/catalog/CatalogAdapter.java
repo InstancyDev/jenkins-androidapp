@@ -1,8 +1,7 @@
-package com.instancy.instancylearning.mylearning;
+package com.instancy.instancylearning.catalog;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -18,7 +17,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +30,6 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
-import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -67,7 +64,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
  */
 
-public class MyLearningAdapter extends BaseAdapter {
+public class CatalogAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
@@ -78,13 +75,13 @@ public class MyLearningAdapter extends BaseAdapter {
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
     PreferencesManager preferencesManager;
-    private String TAG = MyLearningAdapter.class.getSimpleName();
+    private String TAG = CatalogAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
     AppController appcontroller;
 
 
-    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel) {
+    public CatalogAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel) {
         this.activity = activity;
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
@@ -132,7 +129,7 @@ public class MyLearningAdapter extends BaseAdapter {
         View vi = convertView;
         if (convertView == null)
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        vi = inflater.inflate(R.layout.mylearning_cell, null);
+        vi = inflater.inflate(R.layout.catalog_cell, null);
         holder = new ViewHolder(vi);
         holder.parent = parent;
         holder.getPosition = position;
@@ -178,8 +175,6 @@ public class MyLearningAdapter extends BaseAdapter {
 
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
-            holder.progressBar.setVisibility(View.GONE);
-            holder.txtCourseStatus.setVisibility(View.GONE);
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
@@ -189,6 +184,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
             } else {
                 holder.btnDownload.setVisibility(View.VISIBLE);
+                holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
 
 //              File extStore = Environment.getExternalStorageDirectory();
@@ -201,193 +197,111 @@ public class MyLearningAdapter extends BaseAdapter {
                 } else {
                     holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
                     holder.btnDownload.setEnabled(true);
-
+                    holder.btnDownload.setVisibility(View.GONE);
 
                 }
             }
 
-            holder.progressBar.setVisibility(View.VISIBLE);
-            holder.txtCourseStatus.setVisibility(View.VISIBLE);
-            String courseStatus = "";
+            String imgUrl = myLearningModel.get(position).getImageData();
+            Glide.with(vi.getContext()).load(imgUrl)
+                    .thumbnail(0.5f)
+                    .placeholder(R.drawable.cellimage)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(holder.imgThumb);
+            final float oldRating = ratingValue;
+            holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
-            if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed"))) {
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = myLearningModel.get(position).getStatus() + " (" + myLearningModel.get(position).getProgress();
-            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Not Started")) {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    // TODO Auto-generated method stub
 
-//                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
-                holder.progressBar.setProgress(0);
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = myLearningModel.get(position).getStatus() + "  (0";
+                    if (fromUser) {
+                        int ratingInt = Math.round(rating);
+                        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+                        String paramsString = appUserModel.getWebAPIUrl() +
+                                ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
+                                "&ContentID=" + myLearningModel.get(position).getContentID()
+                                + "&Title=" +
+                                "&Description=From%20Android%20Native%20App" +
+                                "&RatingID=" + ratingInt;
+                        if (isNetworkConnectionAvailable(activity, -1)) {
+                            try {
 
-            } else {
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
-                String status = "";
-
-                if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete")) {
-                    status = "In Progress";
-                } else if (myLearningModel.get(position).getStatus().length() == 0) {
-                    status = "In Progress";
-
-                } else {
-                    status = myLearningModel.get(position).getStatus();
-
-                }
-                holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = status + "(" + myLearningModel.get(position).getProgress();
-
-            }
-            holder.txtCourseStatus.setText(courseStatus + "%)");
-        }
-        String imgUrl = myLearningModel.get(position).getImageData();
-        Glide.with(vi.getContext()).load(imgUrl)
-                .thumbnail(0.5f)
-                .placeholder(R.drawable.cellimage)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.imgThumb);
-        final float oldRating = ratingValue;
-        holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                // TODO Auto-generated method stub
-
-                if (fromUser) {
-                    int ratingInt = Math.round(rating);
-                    svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-                    String paramsString = appUserModel.getWebAPIUrl() +
-                            ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
-                            "&ContentID=" + myLearningModel.get(position).getContentID()
-                            + "&Title=" +
-                            "&Description=From%20Android%20Native%20App" +
-                            "&RatingID=" + ratingInt;
-                    if (isNetworkConnectionAvailable(activity, -1)) {
-                        try {
-
-                            Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
-                            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    try {
-                                        Log.d("logr  response =", "response " + response.get("table1"));
-                                        JSONArray jsonArray = response.getJSONArray("table1");
-                                        String status = jsonArray.getJSONObject(0).get("status").toString();
-                                        String rating = jsonArray.getJSONObject(0).get("rating").toString();
-                                        if (status.contains("Success")) {
-                                            db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
-                                            Toast.makeText(
-                                                    activity,
-                                                    activity.getString(R.string.rating_update_success),
-                                                    Toast.LENGTH_SHORT)
-                                                    .show();
-                                            myLearningModel.get(position).setRatingId(rating);
+                                Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
+                                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        try {
+                                            Log.d("logr  response =", "response " + response.get("table1"));
+                                            JSONArray jsonArray = response.getJSONArray("table1");
+                                            String status = jsonArray.getJSONObject(0).get("status").toString();
+                                            String rating = jsonArray.getJSONObject(0).get("rating").toString();
+                                            if (status.contains("Success")) {
+                                                db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
+                                                Toast.makeText(
+                                                        activity,
+                                                        activity.getString(R.string.rating_update_success),
+                                                        Toast.LENGTH_SHORT)
+                                                        .show();
+                                                myLearningModel.get(position).setRatingId(rating);
 //                                        notifyDataSetChanged();
-                                        } else {
-                                            Toast.makeText(
-                                                    activity,
-                                                    activity.getString(R.string.rating_update_fail),
-                                                    Toast.LENGTH_SHORT)
-                                                    .show();
+                                            } else {
+                                                Toast.makeText(
+                                                        activity,
+                                                        activity.getString(R.string.rating_update_fail),
+                                                        Toast.LENGTH_SHORT)
+                                                        .show();
+                                                holder.ratingBar.setRating(oldRating);
+                                            }
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
                                             holder.ratingBar.setRating(oldRating);
                                         }
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                        holder.ratingBar.setRating(oldRating);
+                                        svProgressHUD.dismiss();
                                     }
-                                    svProgressHUD.dismiss();
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    holder.ratingBar.setRating(oldRating);
-                                    svProgressHUD.dismiss();
-                                    Toast.makeText(
-                                            activity,
-                                            activity.getString(R.string.rating_update_fail),
-                                            Toast.LENGTH_SHORT)
-                                            .show();
-                                }
-                            }) {
-                                @Override
-                                public Map<String, String> getHeaders() throws AuthFailureError {
-                                    final Map<String, String> headers = new HashMap<>();
-                                    String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                                    return headers;
-                                }
-                            };
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        holder.ratingBar.setRating(oldRating);
+                                        svProgressHUD.dismiss();
+                                        Toast.makeText(
+                                                activity,
+                                                activity.getString(R.string.rating_update_fail),
+                                                Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                }) {
+                                    @Override
+                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                        final Map<String, String> headers = new HashMap<>();
+                                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                                        return headers;
+                                    }
+                                };
 //                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
 //                                0,
 //                                -1,
 //                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                            VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
+                                VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
 
-                        } catch (Exception e) {
+                            } catch (Exception e) {
 
-                            e.printStackTrace();
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
                         }
-
-                    } else {
-                        Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-        });
+            });
 
-        // do something for phones running an SDK before lollipop
+            // do something for phones running an SDK before lollipop
 
-// uncomment for crop life
-//        if (position == 0 && !appcontroller.isAlreadyViewd()) {
-//
-//            ViewTooltip
-//                    .on(holder.btnDownload)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                }
-//            })
-//                    .text("Click to download the content").clickToHide(true)
-//                    .show();
-//
-//            ViewTooltip
-//                    .on(holder.btnContextMenu)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
-//                    .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                }
-//            })
-//                    .show();
-//
-//            ViewTooltip
-//                    .on(holder.imgThumb)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM)
-//                    .clickToHide(true)
-//                    .animation(new ViewTooltip.FadeTooltipAnimation(500))
-//                    .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                }
-//            })
-//                    .show();
-//
-//        }
 
+        }
 
         return vi;
     }
@@ -437,13 +351,6 @@ public class MyLearningAdapter extends BaseAdapter {
         @Bind(R.id.rat_adapt_ratingbar)
         RatingBar ratingBar;
 
-        @Nullable
-        @Bind(R.id.txt_course_progress)
-        TextView txtCourseStatus;
-
-        @Nullable
-        @Bind(R.id.course_progress_bar)
-        ProgressBar progressBar;
 
         @Nullable
         @Bind(R.id.txt_author)

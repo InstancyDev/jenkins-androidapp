@@ -89,7 +89,6 @@ public class LRSJavaScriptInterface {
 
     }
 
-
     @JavascriptInterface
     public void hideNativeContentLoader() {
 

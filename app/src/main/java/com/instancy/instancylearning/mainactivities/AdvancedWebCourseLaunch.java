@@ -67,8 +67,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //            } catch (UnsupportedEncodingException e) {
 //                e.printStackTrace();
 //            }
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-            showSvProgressAlert(svProgressHUD);
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            showSvProgressAlert(svProgressHUD);
             adWebView.loadUrl(courseUrl);
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
@@ -285,10 +285,10 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        return;
-    }
+//    @Override
+//    public void onBackPressed() {
+//        return;
+//    }
 
     @Override
     protected void onPause() {

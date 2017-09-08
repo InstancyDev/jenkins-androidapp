@@ -12,6 +12,26 @@ import com.android.volley.RequestQueue;
 public class AppController extends Application {
 
 
+    public boolean isAlreadyViewd() {
+        return isAlreadyViewd;
+    }
+
+    public void setAlreadyViewd(boolean alreadyViewd) {
+        isAlreadyViewd = alreadyViewd;
+    }
+
+    public boolean isAlreadyViewdTrack() {
+        return isAlreadyViewdTrack;
+    }
+
+    public void setAlreadyViewdTrack(boolean alreadyViewdTrack) {
+        isAlreadyViewdTrack = alreadyViewdTrack;
+    }
+
+    public  boolean isAlreadyViewdTrack;
+
+
+    private boolean isAlreadyViewd=false;
 
     private String webApiUrl;
 

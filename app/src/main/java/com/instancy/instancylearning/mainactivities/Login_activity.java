@@ -31,6 +31,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
@@ -127,17 +128,19 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     String autoSignInPassword = "";
     boolean isAutoSignIn = false;
     DatabaseHandler db;
+    AppController appController;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
-        uiSettingsModel = UiSettingsModel.getInstance();
         db = new DatabaseHandler(this);
-
         appUserModel = AppUserModel.getInstance();
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
+        uiSettingsModel = UiSettingsModel.getInstance();
 
+        appController = AppController.getInstance();
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         VolleySingleton.getInstance(this);
@@ -178,10 +181,12 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        View someView = findViewById(R.id.login_layout);
+
+//       uncomment for backgroundcolor purpose
+//        View someView = findViewById(R.id.login_layout);
 
         // Find the root view
-        View root = someView.getRootView();
+//        View root = someView.getRootView();
 
         // Set the color
 
@@ -220,13 +225,12 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         editUserName.setText(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
         editPassword.setText(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
 
+//        editUserName.setText("admin@Instancy.com");
+//        editPassword.setText("abc");
 
-        editUserName.setText("admin@Instancy.com");
-        editPassword.setText("abc");
-
-        LogUtils.d("DBG", "KEY_WEBAPIURL " + appUserModel.getWebAPIUrl());
-        LogUtils.d("KEY_SITEURL :" + appUserModel.getSiteURL());
-        LogUtils.d("Authorization: " + appUserModel.getAuthHeaders());
+//        LogUtils.d("DBG", "KEY_WEBAPIURL " + appUserModel.getWebAPIUrl());
+//        LogUtils.d("KEY_SITEURL :" + appUserModel.getSiteURL());
+//        LogUtils.d("Authorization: " + appUserModel.getAuthHeaders());
         getMyCatalogData();
     }
 
@@ -342,6 +346,36 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             if (isNetworkConnectionAvailable(this, -1)) {
 
+
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("username", userName);
+                    jsonObject.put("password", passWord);
+                    jsonObject.put("siteid", "374");
+                    jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                JSONObject jsonReturn = null;
+                try {
+                    jsonReturn = db.checkOfflineUserCredintials(jsonObject);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (jsonReturn.length() != 0) {
+
+                    appController.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+
+                } else {
+                    preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
+                    appController.setAlreadyViewd(false);
+                }
+
                 svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
                 loginVollyWebCall(userName, passWord);
             } else {
@@ -365,19 +399,23 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     e.printStackTrace();
                 }
 
-                if (jsonReturn != null) {
+                if (jsonReturn.length() != 0) {
 
+                    appController.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
                     preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
                     preferencesManager.setStringValue(passWord, StaticValues.KEY_USERPASSWORD);
                     preferencesManager.setStringValue(jsonReturn.get("userid").toString(), StaticValues.KEY_USERID);
-                    preferencesManager.setStringValue(jsonReturn.get("username").toString(), StaticValues.KEY_USERNAME);
+                    preferencesManager.setStringValue(jsonReturn.get("displayname").toString(), StaticValues.KEY_USERNAME);
                     preferencesManager.setStringValue(jsonReturn.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intentSideMenu);
 
-                } else {
 
+                } else {
+                    appController.setAlreadyViewd(false);
+                    preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
                     SweetAlert.sweetAlertNoNet(Login_activity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
                 }
             }

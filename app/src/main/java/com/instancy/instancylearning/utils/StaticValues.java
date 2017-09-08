@@ -57,6 +57,8 @@ public class StaticValues {
     public static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
 
 
+    public static final String KEY_HIDE_ANNOTATION = "KEY_HIDE_ANNOTATION";
+
     public static final String CONTEXT_TITLE = "COONTEXT_TITLE";
     /**
      * To get the FontAwsome font .ttf asset path

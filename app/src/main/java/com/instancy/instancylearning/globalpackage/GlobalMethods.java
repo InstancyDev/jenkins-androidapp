@@ -19,6 +19,8 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.mainactivities.AdvancedWebCourseLaunch;
 import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
+import com.instancy.instancylearning.models.CMIModel;
+import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
@@ -30,6 +32,7 @@ import java.net.URLDecoder;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.replace;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
@@ -552,7 +555,11 @@ public class GlobalMethods {
                 menu.getItem(1).setVisible(true);
             }
             if (!myLearningDetalData.getStatus().contains("completed")) {
+
                 menu.getItem(7).setVisible(true);
+
+            } else {
+                menu.getItem(7).setVisible(false);
 
             }
 
@@ -610,6 +617,12 @@ public class GlobalMethods {
 
                 }
 
+                if (item.getTitle().toString().equalsIgnoreCase("Set Complete")) {
+
+                    Log.d("GLB", "onMenuItemClick: Set Complete ");
+
+                }
+
                 return true;
             }
         });
@@ -633,5 +646,222 @@ public class GlobalMethods {
         }
     }
 
+//    public static void setCourseCompleted(int position, String objectId,
+//                                          String scoId, String siteId, String userid, String isdownload,
+//                                          String siteurl, String wresult, String wmessage, String expirydate,
+//                                          String contentID, MyLearningModel learningModel, Context context) {
+//        CMIModel cmiDetails = new CMIModel();
+//        cmiDetails.set_siteId(siteId);
+//        cmiDetails.set_userId(Integer.parseInt(userid));
+//        cmiDetails.set_startdate(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+//        cmiDetails.set_datecompleted(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+//        cmiDetails.set_scoId(Integer.parseInt(scoId));
+//        cmiDetails.set_isupdate("false");
+//        cmiDetails.set_status(context.getString(R.string.metadata_status_completed));
+//        cmiDetails.set_seqNum("0");
+//        cmiDetails.set_timespent("");
+//        cmiDetails.set_objecttypeid(objectId);
+//        cmiDetails.set_sitrurl(siteurl);
+//        int objlastAttempt = databaseH.getLatestAttempt(learningModel);
+//        LearnerSessionModel nsessionDetails = new LearnerSessionModel();
+//        nsessionDetails.setSiteID(siteId);
+//        nsessionDetails.setUserID(userid);
+//        nsessionDetails.setScoID(scoId);
+//        nsessionDetails.setAttemptNumber("" + objlastAttempt + 1);
+//        nsessionDetails.setSessionDateTime(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+//        if (isdownload.equals("1")) {
+//            if (wresult.contains("disabled")) {
+//                if (expirydate.equals("")) {
+////                    ShowAlert.alertOK(context, R.string.alert,
+////                            wmessage, R.string.alert_btntext_OK, false);
+//                }
+//            } else {
+//                databaseH.insertCMI(cmiDetails, true);
+//                databaseH.insertUserSession(nsessionDetails);
+//
+//                Log.d("HERE", "loadMyLearningData 1");
+//
+////                loadMyLearningData(root);
+//                Log.d("SetComplete click", "Status updated to DB");
+//                Toast.makeText(context,
+//                       context.getString(R.string.status_update_success),
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            if (isNetworkConnectionAvailable(context, -1)) {
+//                String paramsString = "ContentID=" + contentID + "&UserID="
+//                        + userid + "&ScoId=" + scoId;
+//                paramsString = paramsString.replace(" ", "%20");
+//                HttpResponse res = wap.callWebAPIMethod(strAPIURL, "MobileLMS",
+//                        "MobileSetStatusCompleted", authentication,
+//                        paramsString);
+//                HttpEntity entity = res.getEntity();
+//                try {
+//                    if (entity != null) {
+//                        InputStream instream = entity.getContent();
+//                        String result = convertStreamToString(instream);
+//                        instream.close();
+//                        if (result.toLowerCase().contains("completed")) {
+//                            databaseH.insertCMI(cmiDetails, true);
+//                            databaseH.insertUserSession(nsessionDetails);
+//                            Log.d("HERE", "loadMyLearningData 2");
+//
+////                            loadMyLearningData(root);
+////                            getListView().setSelection(position);
+//                            Log.d("SetComplete click", "Status updated to DB");
+//                            Toast.makeText(context,context.
+//                                    getString(R.string.status_update_success),
+//                                    Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(context,context.
+//                                    getString(R.string.status_update_fail),
+//                                    Toast.LENGTH_SHORT).show();
+//                        }
+//                    } else {
+//                        Toast.makeText(context,context.
+//                                getString(R.string.status_update_fail),
+//                                Toast.LENGTH_SHORT).show();
+//                    }
+//                } catch (IllegalStateException | IOException e) {
+//                    e.printStackTrace();
+//                    Log.d("SetComplete click", "WebAPI Response error");
+//                }
+//            } else {
+//                databaseH.insertCMI(cmiDetails, true);
+//                databaseH.insertUserSession(nsessionDetails);
+//                Log.d("HERE", "loadMyLearningData 3");
+//
+////                loadMyLearningData(root);
+//                Log.d("SetComplete click", "Status updated to DB");
+//                Toast.makeText(context,context.
+//                        getString(R.string.status_update_success),
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 
+
+//   / this one will work
+//    public static void setCOmpleteMethods(Context context, MyLearningModel learningModel) {
+//
+//        CMIModel cmiDetails = new CMIModel();
+//        cmiDetails.set_siteId(learningModel.getSiteID());
+//        cmiDetails.set_userId(Integer.parseInt(learningModel.getUserID()));
+//        cmiDetails
+//                .set_startdate(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+//        cmiDetails
+//                .set_datecompleted(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+//        cmiDetails.set_scoId(Integer.parseInt(learningModel.getScoId()));
+//        cmiDetails.set_isupdate("false");
+//        cmiDetails.set_status("Completed");
+//        cmiDetails.set_seqNum("0");
+//        cmiDetails.set_timespent("");
+//        cmiDetails.set_objecttypeid(learningModel.getObjectId());
+//        cmiDetails.set_sitrurl(learningModel.getSiteURL());
+//
+//        int objlastAttempt = databaseH.getLatestAttempt(
+//                Integer.parseInt(learningModel.getScoId()),
+//                Integer.parseInt(learningModel.getUserID()),
+//                Integer.parseInt(learningModel.getSiteID()));
+//        LearnerSessionModel nsessionDetails = new LearnerSessionModel();
+//        nsessionDetails.setSiteID(learningModel.getSiteID());
+//        nsessionDetails.setUserID(Integer
+//                .parseInt(learningModel.getUserID()));
+//        nsessionDetails.setScoID(Integer.parseInt(learningModel.getScoId()));
+//        nsessionDetails.setAttemptNumber(""+objlastAttempt + 1);
+//        nsessionDetails
+//                .setSessionDateTime(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+//
+//        if (learningModel.getIsDownloaded().equals("true")) {
+//            if (learningModel.getWresult().contains("disabled")) {
+//                if (learningModel.getContentExpire().equals("")) {
+////                    ShowAlert.alertOK(DownloadList.this,
+////                            R.string.alert, resultwmessage,
+////                            R.string.alert_btntext_OK, false);
+//                }
+//            } else {
+//                databaseH.insertCMI(cmiDetails, true);
+//                databaseH.insertUserSession(nsessionDetails);
+////                loadMyLearningData(root);
+////                getListView().setSelection(position);
+//                Log.d("SetComplete click",
+//                        "Status updated to DB");
+////                Toast.makeText(
+////                        DownloadList.this,
+////                        getString(R.string.status_update_success),
+////                        Toast.LENGTH_SHORT).show();
+//            }
+//        } else {
+//            if (isNetworkConnectionAvailable(context, -1)) {
+//
+//                String paramsString = "ContentID="
+//                        + learningModel.getContentID() + "&UserID=" + learningModel.getUserID()
+//                        + "&ScoId=" + learningModel.getScoId();
+//
+//                paramsString = paramsString.replace(" ", "%20");
+//
+//                HttpResponse res = wap.callWebAPIMethod(
+//                        strAPIURL, "MobileLMS",
+//                        "MobileSetStatusCompleted",
+//                        authentication, paramsString);
+//                HttpEntity entity = res.getEntity();
+//                try {
+//                    if (entity != null) {
+//                        InputStream instream = entity
+//                                .getContent();
+//                        String result = convertStreamToString(instream);
+//                        instream.close();
+//                        if (result.toLowerCase().contains(
+//                                "completed")) {
+//                            databaseH.insertCMI(cmiDetails, true);
+//                            databaseH.insertUserSession(nsessionDetails);
+//                            Log.d("HERE",
+//                                    "loadMyLearningData 8");
+//
+//                            loadMyLearningData(root);
+//                            getListView()
+//                                    .setSelection(position);
+//                            Log.d("SetComplete click",
+//                                    "Status updated to DB");
+//                            Toast.makeText(
+//                                    DownloadList.this,
+//                                    getString(R.string.status_update_success),
+//                                    Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(
+//                                    DownloadList.this,
+//                                    getString(R.string.status_update_fail),
+//                                    Toast.LENGTH_SHORT).show();
+//                        }
+//                    } else {
+//                        Toast.makeText(
+//                                DownloadList.this,
+//                                getString(R.string.status_update_fail),
+//                                Toast.LENGTH_SHORT).show();
+//                    }
+//                } catch (IllegalStateException | IOException e) {
+//                    e.printStackTrace();
+//                    Log.d("SetComplete click",
+//                            "WebAPI Response error");
+//                }
+//
+//            } else {
+//                //jhkhjkhj
+//                databaseH.insertCMI(cmiDetails, true);
+//                databaseH.insertUserSession(nsessionDetails);
+//                Log.d("HERE", "loadMyLearningData 9");
+//
+//                loadMyLearningData(root);
+//                getListView().setSelection(position);
+//                Log.d("SetComplete click",
+//                        "Status updated to DB");
+//                Toast.makeText(
+//                        DownloadList.this,
+//                        getString(R.string.status_update_success),
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//
+//
+//    }
 }

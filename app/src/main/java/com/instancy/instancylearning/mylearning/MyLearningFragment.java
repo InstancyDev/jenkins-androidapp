@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,6 +45,7 @@ import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
@@ -114,6 +117,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     WebAPIClient webAPIClient;
     CmiSynchTask cmiSynchTask;
     UiSettingsModel uiSettingsModel;
+    AppController appcontroller;
 
     public MyLearningFragment() {
     }
@@ -128,10 +132,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         initVolleyCallback();
         cmiSynchTask = new CmiSynchTask(context);
         uiSettingsModel = UiSettingsModel.getInstance();
-
-//        synchData = new SynchData(context);
-        vollyService = new VollyService(resultCallback, context);
+        appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
+        String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
+//        synchData = new SynchData(context);
+        if (isViewed.equalsIgnoreCase("true")) {
+            appcontroller.setAlreadyViewd(true);
+        } else {
+
+            appcontroller.setAlreadyViewd(false);
+        }
+        vollyService = new VollyService(resultCallback, context);
+
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -310,6 +322,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         toolbar = ((SideMenu) getActivity()).toolbar;
 //        setSearchtollbar();
 
+        toolbar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+        toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
+//        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contextTitle + "</font>"));
+
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshMyLearning(false);
         } else {
@@ -337,10 +353,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         inflater.inflate(R.menu.mylearning_menu, menu);
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
+        MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+
 
         item_filter.setVisible(false);
         if (item_search != null) {
-            Drawable myIcon = getResources().getDrawable(R.drawable.ic_search_black_24dp);
+            Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
@@ -391,6 +409,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
             item_filter.setTitle("Filter");
         }
+
+        if (itemInfo != null) {
+            Drawable myIcon = getResources().getDrawable(R.drawable.help);
+            itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+        }
     }
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
@@ -417,22 +440,23 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             });
 
-        } else
-            Log.d("toolbar", "setSearchtollbar: NULL");
+        }
+
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        int id = item.getItemId();
-        if (id == R.id.mylearning_search) {
+        switch (item.getItemId()) {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                circleReveal(R.id.toolbar, 1, true, true);
-            else
-                toolbar.setVisibility(View.VISIBLE);
-            item_search.expandActionView();
+            case R.id.mylearning_search:
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    circleReveal(R.id.toolbar, 1, true, true);
+                else
+                    toolbar.setVisibility(View.VISIBLE);
+                item_search.expandActionView();
 
 //            MenuItemCompat.setOnActionExpandListener(item_search, new MenuItemCompat.OnActionExpandListener() {
 //                @Override
@@ -452,8 +476,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                }
 //            });
 
-            return true;
+                break;
+            case R.id.mylearning_info_help:
+                Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
+                appcontroller.setAlreadyViewd(false);
+                preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
+                myLearningAdapter.notifyDataSetChanged();
+                break;
+
         }
+
         return super.onOptionsItemSelected(item);
     }
 

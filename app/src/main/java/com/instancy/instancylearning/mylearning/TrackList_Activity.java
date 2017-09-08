@@ -8,12 +8,15 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -26,6 +29,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.DownloadXmlAsynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
@@ -98,23 +102,33 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     String workFlowType, strlaunch;
     PreferencesManager preferencesManager;
     LinearLayout linearLayout;
+    AppController appController;
+    UiSettingsModel uiSettingsModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tracklist_activity);
         linearLayout = (LinearLayout) findViewById(R.id.layout_linear_detail);
-        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+        preferencesManager = PreferencesManager.getInstance();
+        appUserModel = AppUserModel.getInstance();
+        db = new DatabaseHandler(this);
+        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
+        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
 
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         linearLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         trackList = (ExpandableListView) findViewById(R.id.trackexpandablelist);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipetracklist);
         swipeRefreshLayout.setOnRefreshListener(this);
         svProgressHUD = new SVProgressHUD(context);
-        appUserModel = AppUserModel.getInstance();
+
         blockNames = new ArrayList<String>();
-        db = new DatabaseHandler(this);
-        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+
         webAPIClient = new WebAPIClient(this);
         workFlowType = "onlaunch";
         strlaunch = "0";
@@ -125,10 +139,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, blockNames, trackListHashMap,trackList);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, trackList);
 //        trackList.setOnChildClickListener(this);
         // setting list adapter
         trackList.setAdapter(trackListExpandableAdapter);
+        appController = AppController.getInstance();
         trackListModelList = new ArrayList<MyLearningModel>();
         preferencesManager = PreferencesManager.getInstance();
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
@@ -300,6 +315,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tracklistmenu, menu);
+        MenuItem itemInfo = menu.findItem(R.id.tracklist_help);
+        Drawable myIcon = getResources().getDrawable(R.drawable.help);
+        itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+        return true;
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -312,7 +337,22 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+            case R.id.tracklist_help:
+                Log.d("DEBUG", "");
+                appController.setAlreadyViewdTrack(false);
+                trackListExpandableAdapter.notifyDataSetChanged();
+                break;
         }
+        return true;
+    }
+
+    public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
+        drawable.clearColorFilter();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        drawable.invalidateSelf();
+        Drawable wrapDrawable = DrawableCompat.wrap(drawable).mutate();
+        DrawableCompat.setTint(wrapDrawable, color);
+        return wrapDrawable;
     }
 
     @Override
@@ -441,7 +481,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         if (i == 1) {
                             injectFromDbtoModel();
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-
+                            workFlowType = "onitemChange";
+                            executeWorkFlowRules(workFlowType);
                         } else {
 
 //                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
@@ -656,7 +697,6 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
 
 //
-
                 int totalStepsCount = stepsMap.size();
                 for (int stepIndex = 0; stepIndex < totalStepsCount; stepIndex++) {
                     Map<String, String> stemap = stepsMap.get(stepIndex);
@@ -1009,8 +1049,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                             // between DateAssigned and current
                                             // time as itemTimeElapsed
 
-                                            SimpleDateFormat curFormat = new SimpleDateFormat(
-                                                    "yyyy-MM-dd'T'HH:mm:ss");
+                                            SimpleDateFormat curFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                                             Date assignedDate = curFormat
                                                     .parse(myLearningModel.getDateAssigned());
                                             Calendar cal = Calendar

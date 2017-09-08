@@ -74,6 +74,38 @@ public class MyLearningModel implements Serializable {
     String trackScoid = "";
     String showStatus = "";
 
+    String googleProductID = "";
+
+    public String getComponentId() {
+        return componentId;
+    }
+
+    public void setComponentId(String componentId) {
+        this.componentId = componentId;
+    }
+
+    String componentId = "";
+
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    String price = "";
+
+    public String getGoogleProductID() {
+        return googleProductID;
+    }
+
+    public void setGoogleProductID(String googleProductID) {
+        this.googleProductID = googleProductID;
+    }
+
+
     public String getEventID() {
         return isValidString(eventID) ? eventID : "";
     }
@@ -429,7 +461,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public Boolean getEventAddedToCalender() {
-        return eventAddedToCalender!=null?eventAddedToCalender:false;
+        return eventAddedToCalender != null ? eventAddedToCalender : false;
     }
 
     public void setEventAddedToCalender(Boolean eventAddedToCalender) {

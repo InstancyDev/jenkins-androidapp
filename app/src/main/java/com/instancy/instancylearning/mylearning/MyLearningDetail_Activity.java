@@ -36,8 +36,10 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
@@ -156,6 +158,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
     boolean isFileExist = false;
+    AppController appController;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -174,6 +177,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
+        appController = AppController.getInstance();
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
@@ -182,7 +186,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         txtBtnReport.setVisibility(View.GONE);
-
         if (myLearningModel != null) {
             txtTitle.setText(myLearningModel.getCourseName());
             txtCourseName.setText(myLearningModel.getMediaName());
@@ -252,6 +255,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                         btnDownload.setTextColor(getResources().getColor(R.color.colorBlack));
                         btnDownload.setEnabled(true);
                         isFileExist = false;
+                        if (!appController.isAlreadyViewd()) {
+                            ViewTooltip
+                                    .on(btnDownload)
+                                    .autoHide(true, 5000)
+                                    .corner(30)
+                                    .position(ViewTooltip.Position.LEFT)
+                                    .text("Click to download the content").clickToHide(true)
+                                    .show();
+                        }
+
                     }
 
                     btnDownload.setVisibility(View.VISIBLE);
@@ -261,8 +274,17 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                 txtCourseStatus.setVisibility(View.VISIBLE);
 
             }
-
             String imgUrl = myLearningModel.getImageData();
+
+//            ViewTooltip
+//                    .on(imgThumb)
+//                    .autoHide(true, 5000)
+//                    .corner(30)
+//                    .position(ViewTooltip.Position.BOTTOM)
+//                    .text("Click on image to view")
+//                    .show();
+
+
             Glide.with(this).load(imgUrl)
                     .thumbnail(0.5f)
                     .crossFade()
@@ -384,36 +406,51 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
         String displayStatus = "";
         if (courseStatus.equalsIgnoreCase("Completed") || (courseStatus.toLowerCase().contains("passed") || courseStatus.toLowerCase().contains("failed"))) {
-            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusCompleted)));
-            progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
-            txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-            displayStatus = courseStatus + " (" + myLearningModel.getProgress();
-        } else if (courseStatus.equalsIgnoreCase("Not Started")) {
 
+
+            String progressPercent = "100";
+            String statusValue = myLearningModel.getStatus();
+            if (myLearningModel.getStatus().equalsIgnoreCase("Completed")) {
+                statusValue = "Completed";
+
+            } else if (myLearningModel.getStatus().equalsIgnoreCase("failed")) {
+
+                statusValue = "Completed(failed)";
+            } else if (myLearningModel.getStatus().equalsIgnoreCase("passed")) {
+
+                statusValue = "Completed(passed)";
+
+            }
+
+            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusCompleted)));
+            progressBar.setProgress(Integer.parseInt(progressPercent));
+            txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
+//                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
+            courseStatus = statusValue + " (" + progressPercent;
+
+        } else if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+
+//                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusNotStarted)));
             progressBar.setProgress(0);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
-            displayStatus = courseStatus + "  (0";
+            courseStatus = myLearningModel.getStatus() + "  (0";
 
         } else {
+            String statusValue = "In Progress";
 
-            String status = "";
-            if (courseStatus.equalsIgnoreCase("incomplete")) {
-                status = "In Progress";
-            } else if (courseStatus.length() == 0) {
-                status = "In Progress";
-
-            } else {
-                status = courseStatus;
-
+            if (myLearningModel.getStatus().toLowerCase().equalsIgnoreCase("incomplete") || myLearningModel.getStatus().equalsIgnoreCase("") || myLearningModel.getStatus().toLowerCase().equalsIgnoreCase("in complete")) {
+                statusValue = "In Progress";
             }
+
 
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
             progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            displayStatus = status + " (" + myLearningModel.getProgress();
+            courseStatus = statusValue + " (" + myLearningModel.getProgress();
+
         }
-        txtCourseStatus.setText(displayStatus + "%)");
+        txtCourseStatus.setText(courseStatus + "%)");
     }
 
     void initVolleyCallback() {
