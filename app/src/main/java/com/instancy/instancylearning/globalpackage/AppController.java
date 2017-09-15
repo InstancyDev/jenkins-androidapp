@@ -1,6 +1,6 @@
 package com.instancy.instancylearning.globalpackage;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 
@@ -9,7 +9,7 @@ import com.android.volley.RequestQueue;
  * http://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/
  */
 
-public class AppController extends Application {
+public class AppController extends MultiDexApplication {
 
 
     public boolean isAlreadyViewd() {
@@ -28,10 +28,10 @@ public class AppController extends Application {
         isAlreadyViewdTrack = alreadyViewdTrack;
     }
 
-    public  boolean isAlreadyViewdTrack;
+    public boolean isAlreadyViewdTrack;
 
 
-    private boolean isAlreadyViewd=false;
+    private boolean isAlreadyViewd = false;
 
     private String webApiUrl;
 

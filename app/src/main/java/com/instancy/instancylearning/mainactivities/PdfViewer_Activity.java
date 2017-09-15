@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.mainactivities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -18,6 +19,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.ScrollBar;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -39,7 +41,7 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
     String isOnline;
     Integer pageNumber = 0;
     Uri uri;
-
+    MyLearningModel myLearningModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +60,7 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
             coursePdf = bundle.getString("PDF_URL");
             courseName = bundle.getString("PDF_FILENAME");
             isOnline = bundle.getString("ISONLINE");
+            myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
         }
 
         pdfView = (PDFView) findViewById(R.id.pdfView);
@@ -144,7 +147,9 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
     @Override
     public void onBackPressed() {
 
-
+        Intent intent = getIntent();
+        intent.putExtra("myLearningDetalData", myLearningModel);
+        setResult(RESULT_OK, intent);
         finish();
         super.onBackPressed();
     }
@@ -154,6 +159,9 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
+                Intent intent = getIntent();
+                intent.putExtra("myLearningDetalData", myLearningModel);
+                setResult(RESULT_OK, intent);
                 finish();
                 return true;
             default:

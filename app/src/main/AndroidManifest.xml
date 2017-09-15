@@ -130,15 +130,15 @@
         <activity
             android:name=".mainactivities.PdfViewer_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
 
         <activity
             android:name=".mylearning.TrackList_Activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <activity
             android:name=".mylearning.Reports_Activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <receiver android:name=".helper.NetworkChangeReceiver">
             <intent-filter>

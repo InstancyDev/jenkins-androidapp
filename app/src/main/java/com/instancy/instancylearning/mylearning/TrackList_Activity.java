@@ -18,6 +18,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -77,7 +78,7 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, XmlDownloadListner {
     //eclipse line 8351
-    ExpandableListView trackList;
+    ExpandableListView expandableListView;
     TrackListExpandableAdapter trackListExpandableAdapter;
     final Context context = this;
     SVProgressHUD svProgressHUD;
@@ -112,6 +113,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         linearLayout = (LinearLayout) findViewById(R.id.layout_linear_detail);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
+        appController = AppController.getInstance();
         db = new DatabaseHandler(this);
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
@@ -122,7 +124,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         linearLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        trackList = (ExpandableListView) findViewById(R.id.trackexpandablelist);
+        expandableListView = (ExpandableListView) findViewById(R.id.trackexpandablelist);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipetracklist);
         swipeRefreshLayout.setOnRefreshListener(this);
         svProgressHUD = new SVProgressHUD(context);
@@ -139,13 +141,25 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, trackList);
-//        trackList.setOnChildClickListener(this);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView);
+//        expandableListView.setOnChildClickListener(this);
         // setting list adapter
-        trackList.setAdapter(trackListExpandableAdapter);
-        appController = AppController.getInstance();
+        expandableListView.setAdapter(trackListExpandableAdapter);
+
+        expandableListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                appController.setAlreadyViewdTrack(true);
+                preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+            }
+        });
         trackListModelList = new ArrayList<MyLearningModel>();
-        preferencesManager = PreferencesManager.getInstance();
+
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
@@ -274,7 +288,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             trackListExpandableAdapter.refreshList(blockNames, trackListHashMap);
             if (blockNames != null && blockNames.size() > 0) {
                 for (int i = 0; i < blockNames.size(); i++)
-                    trackList.expandGroup(i);
+                    expandableListView.expandGroup(i);
             }
         }
     }
@@ -320,8 +334,8 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         MenuItem itemInfo = menu.findItem(R.id.tracklist_help);
         Drawable myIcon = getResources().getDrawable(R.drawable.help);
         itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+        itemInfo.setVisible(false);
         return true;
-
     }
 
     @Override
@@ -340,6 +354,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             case R.id.tracklist_help:
                 Log.d("DEBUG", "");
                 appController.setAlreadyViewdTrack(false);
+                preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
                 trackListExpandableAdapter.notifyDataSetChanged();
                 break;
         }
@@ -358,7 +373,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
-//            refreshMyLearning(true);
+//            refreshCatalog(true);
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);

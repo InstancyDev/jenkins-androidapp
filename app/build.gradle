@@ -7,10 +7,11 @@ android {
         applicationId "com.instancy.croplifeindia"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 8
-        versionName "1.4"
+        versionCode 9
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -48,16 +49,11 @@ dependencies {
     compile 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
     compile 'com.github.barteksc:android-pdf-viewer:1.6.0'
     compile 'com.anjlab.android.iab.v3:library:1.0.+'
-
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
-
-
     compile 'com.dinuscxj:circleprogressbar:1.1.1'
-
     compile 'com.mani:ThinDownloadManager:1.2.5'
-
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
-
     compile 'com.github.florent37:viewtooltip:1.0.8'
+    compile 'com.android.support:multidex:1.0.1'
 }

@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.mainactivities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -23,6 +24,8 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import im.delight.android.webview.AdvancedWebView;
+
 import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_PASSWORD;
 import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_USERNAME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -32,42 +35,33 @@ public class SignUp_Activity extends AppCompatActivity {
 
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
-    WebView webView;
+    //    WebView webView;
+    private AdvancedWebView webView;
     private SVProgressHUD svProgressHUD;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signup);
+        setContentView(R.layout.activity_advance_signup);
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         svProgressHUD = new SVProgressHUD(this);
-        webView = (WebView) findViewById(R.id.webview);
-
+        webView = (AdvancedWebView) findViewById(R.id.advanced_signupview);
+        context = this;
         WebSettings webSettings = this.webView.getSettings();
+        clearWebViewAbsolutely(webView);
         webSettings.setJavaScriptEnabled(true);
+        context.deleteDatabase("webviewCache.db");
 //        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(true);
-        webSettings.setAllowFileAccess(true);
-        webSettings.setAppCacheEnabled(true);
-        webSettings.setDomStorageEnabled(true);
         webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
-        webSettings.getUseWideViewPort();
-        webSettings.setDatabaseEnabled(true);
-        webSettings.setSaveFormData(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         webView.setScrollbarFadingEnabled(false);
-        webSettings.setAllowFileAccessFromFileURLs(true);
-        webSettings.setAllowUniversalAccessFromFileURLs(true);
         webSettings.setSupportZoom(true);
-        webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
-        webSettings.setMediaPlaybackRequiresUserGesture(false);
-
-
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
@@ -133,6 +127,7 @@ public class SignUp_Activity extends AppCompatActivity {
                     Intent signinIntent = new Intent(SignUp_Activity.this, Login_activity.class);
                     startActivity(signinIntent);
                 }
+
                 svProgressHUD.dismiss();
             }
 
@@ -161,10 +156,26 @@ public class SignUp_Activity extends AppCompatActivity {
 
     }
 
+    //    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//    }
+    public static void clearWebViewAbsolutely(WebView webView) {
+        webView.clearCache(true);
+        webView.clearHistory();
+        webView.clearView();
+        webView.clearSslPreferences();
+        webView.clearDisappearingChildren();
+        webView.clearFocus();
+        webView.clearFormData();
+        webView.clearMatches();
+    }
+
     @Override
     public void onBackPressed() {
 
-
+        clearWebViewAbsolutely(webView);
         finish();
         super.onBackPressed();
     }

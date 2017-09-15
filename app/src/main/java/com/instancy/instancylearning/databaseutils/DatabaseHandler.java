@@ -19,6 +19,7 @@ import com.google.gson.JsonParser;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.UnZip;
+import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
@@ -54,8 +55,11 @@ import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 import static com.instancy.instancylearning.utils.StaticValues.DATABASE_NAME;
 import static com.instancy.instancylearning.utils.StaticValues.DATABASE_VERSION;
+import static com.instancy.instancylearning.utils.Utilities.convertStreamToString;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
@@ -216,6 +220,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public static final String TBL_APP_SETTINGS = "APPSETTINGS";
 
+    public static final String TBL_TINCAN = "TINCAN";
+
     private Context dbctx;
     private WebAPIClient wap;
     private SharedPreferences sharedPreferences;
@@ -223,6 +229,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private AppController appController;
     private PreferencesManager preferencesManager;
     AppUserModel appUserModel;
+
+    SetCompleteListner listner;
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -233,6 +241,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         appUserModel = AppUserModel.getInstance();
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
+        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+        appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
     }
 
     @Override
@@ -250,12 +265,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_DOWNLOADDATA
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT)");
 
-
         //used upto here
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,siteurl TEXT,sitename TEXT,userid TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,viewtype TEXT,price TEXT,islistview TEXT,mediatypeid TEXT,status TEXT,ratingid TEXT,publisheddate TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, componentid TEXT, isaddedtomylearning INTEGER, relatedcontentcount INTEGER, joinurl TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERSESSION
                 + "(sessionid INTEGER PRIMARY KEY AUTOINCREMENT,userid INTEGER,scoid INTEGER,siteid INTEGR,attemptnumber INTEGER,sessiondatetime DATETIME,timespent TEXT)");
@@ -267,10 +282,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + "(RESPONSEID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,scoid INTEGER,userid INTEGER,questionid INTEGER,quesname TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CMI
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,scoid INTEGER,userid INTEGER,location TEXT,status TEXT,suspenddata TEXT,isupdate TEXT,siteurl TEXT,datecompleted DATETIME,noofattempts INTEGER,score TEXT,sequencenumber INTEGER,startdate DATETIME,timespent TEXT,coursemode TEXT,scoremin TEXT,scoremax TEXT,submittime TEXT,randomquesseq TEXT,pooledquesseq TEXT,textResponses TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,scoid INTEGER,userid INTEGER,location TEXT,status TEXT,suspenddata TEXT,isupdate TEXT,siteurl TEXT,datecompleted DATETIME,noofattempts INTEGER,score TEXT,sequencenumber INTEGER,startdate DATETIME,timespent TEXT,coursemode TEXT,scoremin TEXT,scoremax TEXT,submittime TEXT,randomquesseq TEXT,pooledquesseq TEXT,textResponses TEXT, objecttypeid TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKOBJECTS
                 + "(RESPONSEID INTEGER PRIMARY KEY AUTOINCREMENT,trackscoid INTEGER,scoid INTEGER,sequencenumber INTEGER,siteid INTEGER,userid INTEGER,objecttypeid INTEGER,name TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_TINCAN
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, istincan TEXT, lrsendpoint TEXT, lrsauthorization TEXT, lrsauthorizationpassword TEXT, enabletincansupportforco TEXT, enabletincansupportforao TEXT, enabletincansupportforlt TEXT, base64lrsAuthKey TEXT, siteid TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT)");
@@ -500,7 +520,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (inputStream != null) {
 
-            String result = Utilities.convertStreamToString(inputStream);
+            String result = convertStreamToString(inputStream);
             JsonParser jsonParser = new JsonParser();
             JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
             UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
@@ -518,14 +538,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             siteid = siteSettingJsonObj.get("siteid").getAsString();
                             String strsitename = siteSettingJsonObj.get("name").getAsString();
                             String platformurl = siteSettingJsonObj.get("siteurl").getAsString();
-                            preferencesManager.setStringValue(StaticValues.KEY_SITEID, siteid);
-                            preferencesManager.setStringValue(StaticValues.KEY_SITENAME, strsitename);
-                            preferencesManager.setStringValue(StaticValues.KEY_PLATFORMURL, platformurl);
+                            preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
+                            preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
+                            preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
 //                            prefEditor = sharedPreferences.edit();
 //                            prefEditor.putString(StaticValues.KEY_SITEID, siteid);
 //                            prefEditor.putString(StaticValues.KEY_SITENAME, strsitename);
 //                            prefEditor.putString(StaticValues.KEY_PLATFORMURL, platformurl);
-                            appUserModel.setSiteIDValue(siteUrl);
+                            appUserModel.setSiteIDValue(siteid);
                             appUserModel.setSiteName(strsitename);
 //                            prefEditor.commit();
                         }
@@ -1054,7 +1074,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         appController.setSiteId(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         if (inputStream != null) {
 
-            String result = Utilities.convertStreamToString(inputStream);
+            String result = convertStreamToString(inputStream);
             JsonParser jsonParser = new JsonParser();
             JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
 
@@ -1590,18 +1610,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         InputStream inputStream = wap.callWebAPIMethod(webAPiUrl, "MobileLMS",
                 "MobileTinCanConfigurations", appController.getAuthentication(), paramsString);
 
-//        if (inputStream != null) {
-//
-//            String result = Utilities.convertStreamToString(inputStream);
-//            JsonParser jsonParser = new JsonParser();
-//            JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
-//
-//            Log.d(TAG, "getSiteTinCanDetails: " + result);
-//
-//        }
+        if (inputStream != null) {
+
+            String result = Utilities.convertStreamToString(inputStream);
+
+            result = result.replaceAll("\"", "");
+
+            String replaceStr = result.replaceAll("\'", "\"");
+            String siteID = preferencesManager.getStringValue(StaticValues.KEY_SITEID);
+            ;
+            try {
+                JSONObject jsonObj = new JSONObject(replaceStr);
+                Log.d(TAG, "getSiteTinCanDetails: " + jsonObj);
+                injectTinCanConfigurationValues(jsonObj, siteID);
+            } catch (JSONException e) {
+
+                e.printStackTrace();
+
+            }
+        }
 
     }
-
 
     // Method for branding screen images
 
@@ -2044,7 +2073,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
 //            injectIntoRowWise(myLearningModel);
-                injectMyLearningIntoTable(myLearningModel);
+                injectMyLearningIntoTable(myLearningModel, false);
             }
 
             db.close();
@@ -2052,7 +2081,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public void injectMyLearningIntoTable(MyLearningModel myLearningModel) {
+    public void injectMyLearningIntoTable(MyLearningModel myLearningModel, boolean subscibed) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
         try {
@@ -2106,6 +2135,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("typeofevent", myLearningModel.getTypeofevent());
             contentValues.put("progress", myLearningModel.getProgress());
 
+            if (subscibed) {
+
+                db.delete(TBL_DOWNLOADDATA, "siteid='" + myLearningModel.getSiteID()
+                        + "' AND userid='" + myLearningModel.getUserID() + "' AND scoid='"
+                        + myLearningModel.getScoId() + "'", null);
+            }
+
+
             db.insert(TBL_DOWNLOADDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -2122,9 +2159,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        String strSelQuery = "SELECT * FROM " + TBL_DOWNLOADDATA;
 ////                + " ORDER BY ";
 
-
         String strSelQuery = "SELECT DISTINCT D.*, CASE WHEN C.status is NOT NULL OR NOT C.status = '' then C.status ELSE D.status END as objStatus FROM " + TBL_DOWNLOADDATA + " D LEFT OUTER JOIN " + TBL_CMI + " C ON D.userid = C.userid AND D.scoid = C.scoid AND D.siteid = C.siteid ORDER BY D.dateassigned DESC";
 
+        Log.d(TAG, "fetchMylearningModel: " + strSelQuery);
         try {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
@@ -2266,9 +2303,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
             // siteid
-            if (jsonMyLearningColumnObj.has("siteid")) {
+            if (jsonMyLearningColumnObj.has("orgunitid")) {
 
-                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("siteid").toString());
+                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("orgunitid").toString());
 
             }
             // userid
@@ -2326,9 +2363,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
 
             }
-            // displayName
+            // displayNam
 
-            myLearningModel.setDisplayName(appUserModel.getDisplayName());
+
             // durationEndDate
             if (jsonMyLearningColumnObj.has("durationenddate")) {
 
@@ -2415,8 +2452,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                 }
-                // userName
-                myLearningModel.setUserName(appUserModel.getUserName());
+
                 // longdes
                 if (jsonMyLearningColumnObj.has("longdescription")) {
 
@@ -2533,8 +2569,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
 
                 }
+                // display
+                myLearningModel.setDisplayName(appUserModel.getDisplayName());
+                // userName
+                myLearningModel.setUserName(appUserModel.getUserName());
                 // password
-
                 myLearningModel.setPassword(appUserModel.getPassword());
 
                 // isListView
@@ -2564,7 +2603,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setOfflinepath(finalDownloadedFilePath);
                 }
 //
-
 
                 // wresult
                 if (jsonMyLearningColumnObj.has("wresult")) {
@@ -2600,13 +2638,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
 
-                //googleproductid
+                //componentid
                 if (jsonMyLearningColumnObj.has("componentid")) {
 
                     myLearningModel.setComponentId(jsonMyLearningColumnObj.get("componentid").toString());
 
                 }
 
+                //currency
+                if (jsonMyLearningColumnObj.has("currency")) {
+
+                    myLearningModel.setCurrency(jsonMyLearningColumnObj.get("currency").toString());
+
+                }
+
+                //viewtype
+                if (jsonMyLearningColumnObj.has("viewtype")) {
+
+                    myLearningModel.setViewType(jsonMyLearningColumnObj.get("viewtype").toString());
+
+                }
+                //isaddedtomylearning
+                if (jsonMyLearningColumnObj.has("isaddedtomylearning")) {
+
+                    myLearningModel.setAddedToMylearning(Integer.parseInt(jsonMyLearningColumnObj.get("isaddedtomylearning").toString()));
+
+                }
                 injectCatalogDataIntoTable(myLearningModel);
             }
 
@@ -2622,9 +2679,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues = new ContentValues();
 
             contentValues.put("siteid", myLearningModel.getSiteID());
-            contentValues.put("scoid", myLearningModel.getScoId());
             contentValues.put("siteurl", myLearningModel.getSiteURL());
             contentValues.put("sitename", myLearningModel.getSiteName());
+            contentValues.put("displayname", myLearningModel.getDisplayName());
+            contentValues.put("username", myLearningModel.getUserName());
+            contentValues.put("password", myLearningModel.getPassword());
             contentValues.put("userid", myLearningModel.getUserID());
             contentValues.put("contentid", myLearningModel.getContentID());
             contentValues.put("coursename", myLearningModel.getCourseName());
@@ -2638,23 +2697,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("objecttypeid", myLearningModel.getObjecttypeId());
             contentValues.put("locationname", myLearningModel.getLocationName());
             contentValues.put("timezone", myLearningModel.getTimeZone());
+            contentValues.put("scoid", myLearningModel.getScoId());
             contentValues.put("participanturl", myLearningModel.getParticipantUrl());
+            contentValues.put("viewtype", myLearningModel.getViewType());
+            contentValues.put("price", myLearningModel.getPrice());
             contentValues.put("islistview", myLearningModel.getIsListView());
-            contentValues.put("relatedcontentcount", myLearningModel.getRelatedContentCount());
             contentValues.put("ratingid", myLearningModel.getRatingId());
             contentValues.put("publisheddate", myLearningModel.getPublishedDate());
             contentValues.put("mediatypeid", myLearningModel.getMediatypeId());
             contentValues.put("keywords", myLearningModel.getKeywords());
-            contentValues.put("courselaunchpath", myLearningModel.getOfflinepath());
-            contentValues.put("joinurl", myLearningModel.getJoinurl());
-
-            contentValues.put("viewtype", myLearningModel.getCreatedDate());
-
-            contentValues.put("price", myLearningModel.getCreatedDate());
-
             contentValues.put("googleproductid", myLearningModel.getGoogleProductID());
-
-            contentValues.put("componentid", myLearningModel.getComponentId());
+            contentValues.put("currency", myLearningModel.getCurrency());
+            contentValues.put("itemtype", myLearningModel.getItemType());
+            contentValues.put("categorycompid", myLearningModel.getComponentId());
+            contentValues.put("downloadurl", myLearningModel.getDownloadURL());
+            contentValues.put("offlinepath", myLearningModel.getOfflinepath());
+            contentValues.put("isaddedtomylearning", myLearningModel.getAddedToMylearning());
 
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -2662,18 +2720,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             exception.printStackTrace();
         }
 
-
     }
 
 
-    public List<MyLearningModel> fetchCatalogModel() {
+    public List<MyLearningModel> fetchCatalogModel(String componentID) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE componentid = 1  ORDER BY publisheddate DESC";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate DESC";
 
-
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
@@ -2682,65 +2739,109 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 myLearningModelList = new ArrayList<MyLearningModel>();
                 do {
                     myLearningModel = new MyLearningModel();
-                    myLearningModel.setUserID(cursor.getString(cursor
-                            .getColumnIndex("userid")));
+
                     myLearningModel.setSiteID(cursor.getString(cursor
                             .getColumnIndex("siteid")));
+
+
                     myLearningModel.setSiteURL(cursor.getString(cursor
                             .getColumnIndex("siteurl")));
+
                     myLearningModel.setSiteName(cursor.getString(cursor
                             .getColumnIndex("sitename")));
+
+                    myLearningModel.setDisplayName(cursor.getString(cursor
+                            .getColumnIndex("displayname")));
+
+                    myLearningModel.setUserName(cursor.getString(cursor
+                            .getColumnIndex("username")));
+
+                    myLearningModel.setPassword(cursor.getString(cursor
+                            .getColumnIndex("password")));
+
+                    myLearningModel.setUserID(cursor.getString(cursor
+                            .getColumnIndex("userid")));
+
                     myLearningModel.setContentID(cursor.getString(cursor
                             .getColumnIndex("contentid")));
+
                     myLearningModel.setCourseName(cursor.getString(cursor
                             .getColumnIndex("coursename")));
+
                     myLearningModel.setAuthor(cursor.getString(cursor
                             .getColumnIndex("author")));
+
                     myLearningModel.setShortDes(cursor.getString(cursor
                             .getColumnIndex("shortdes")));
+
                     myLearningModel.setLongDes(cursor.getString(cursor
                             .getColumnIndex("longdes")));
+
                     myLearningModel.setImageData(cursor.getString(cursor
                             .getColumnIndex("imagedata")));
+
                     myLearningModel.setMediaName(cursor.getString(cursor
                             .getColumnIndex("medianame")));
+
                     myLearningModel.setCreatedDate(cursor.getString(cursor
                             .getColumnIndex("createddate")));
+
                     myLearningModel.setStartPage(cursor.getString(cursor
                             .getColumnIndex("startpage")));
+
                     myLearningModel.setObjecttypeId(cursor.getString(cursor
                             .getColumnIndex("objecttypeid")));
+
                     myLearningModel.setLocationName(cursor.getString(cursor
                             .getColumnIndex("locationname")));
+
+                    myLearningModel.setTimeZone(cursor.getString(cursor
+                            .getColumnIndex("timezone")));
+
                     myLearningModel.setScoId(cursor.getString(cursor
                             .getColumnIndex("scoid")));
+
                     myLearningModel.setParticipantUrl(cursor.getString(cursor
                             .getColumnIndex("participanturl")));
-//                    myLearningModel.setDisplayName(cursor.getString(cursor
-//                            .getColumnIndex("displayname")));
+
+                    myLearningModel.setViewType(cursor.getString(cursor
+                            .getColumnIndex("viewtype")));
+
                     myLearningModel.setIsListView(cursor.getString(cursor
                             .getColumnIndex("islistview")));
-//                    myLearningModel.setIsDownloaded(cursor.getString(cursor
-//                            .getColumnIndex("isdownloaded")));
-//                    myLearningModel.setCourseAttempts(cursor.getString(cursor
-//                            .getColumnIndex("courseattempts")));
-                    myLearningModel.setRelatedContentCount(cursor.getString(cursor
-                            .getColumnIndex("relatedcontentcount")));
+                    myLearningModel.setPrice(cursor.getString(cursor
+                            .getColumnIndex("price")));
+
                     myLearningModel.setRatingId(cursor.getString(cursor
                             .getColumnIndex("ratingid")));
+
                     myLearningModel.setPublishedDate(cursor.getString(cursor
                             .getColumnIndex("publisheddate")));
+
                     myLearningModel.setMediatypeId(cursor.getString(cursor
                             .getColumnIndex("mediatypeid")));
+
                     myLearningModel.setKeywords(cursor.getString(cursor
                             .getColumnIndex("keywords")));
+
+                    myLearningModel.setGoogleProductID(cursor.getString(cursor
+                            .getColumnIndex("googleproductid")));
+                    myLearningModel.setCurrency(cursor.getString(cursor
+                            .getColumnIndex("currency")));
+                    myLearningModel.setItemType(cursor.getString(cursor
+                            .getColumnIndex("itemtype")));
+                    myLearningModel.setComponentId(cursor.getString(cursor
+                            .getColumnIndex("categorycompid")));
+
+                    myLearningModel.setDownloadURL(cursor.getString(cursor
+                            .getColumnIndex("downloadurl")));
                     myLearningModel.setOfflinepath(cursor.getString(cursor
-                            .getColumnIndex("courselaunchpath")));
+                            .getColumnIndex("offlinepath")));
+
+                    myLearningModel.setAddedToMylearning(cursor.getInt(cursor
+                            .getColumnIndex("isaddedtomylearning")));
+
                     myLearningModel.setEventAddedToCalender(false);
-//                    myLearningModel.setEventAddedToCalender(cursor.getb(cursor
-//                            .getColumnIndex("eventaddedtocalender")));
-                    myLearningModel.setJoinurl(cursor.getString(cursor
-                            .getColumnIndex("joinurl")));
 
                     myLearningModelList.add(myLearningModel);
                 } while (cursor.moveToNext());
@@ -2748,6 +2849,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
             db.close();
         } catch (Exception e) {
+            e.printStackTrace();
             if (db.isOpen()) {
                 db.close();
             }
@@ -4935,7 +5037,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public int getLatestAttempt(String scoId, String userId, String siteID) {
 
-        String sqlQuery = "SELECT count(ID) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + siteID + " AND scoid = " + scoId + " AND userid = " + userId;
+        String sqlQuery = "SELECT count(sessionid) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + siteID + " AND scoid = " + scoId + " AND userid = " + userId;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.rawQuery(sqlQuery, null);
@@ -5495,8 +5597,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public void updateTrackContentAttemptsInTrackListData(MyLearningModel myLearningModel,
-                                                          int numberofAtmInt) {
+    public void updateTrackContentAttemptsInTrackListData(MyLearningModel myLearningModel, int numberofAtmInt) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
@@ -6522,9 +6623,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 + cmiNew.get_suspenddata() + "',isupdate='"
                                 + cmiNew.get_isupdate() + "',score='"
                                 + cmiNew.get_score() + "',noofattempts="
-                                + cmiNew.get_noofattempts() + ",objecttypeid="
+                                + cmiNew.get_noofattempts() + ",objecttypeid='"
                                 + cmiNew.get_objecttypeid()
-                                + ",sequencenumber=" + cmiNew.get_seqNum()
+                                + "',sequencenumber=" + cmiNew.get_seqNum()
                                 + ",timespent='" + cmiNew.get_timespent()
                                 + "',coursemode='" + cmiNew.get_coursemode()
                                 + "',scoremin='" + cmiNew.get_scoremin()
@@ -6541,9 +6642,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 + cmiNew.get_suspenddata() + "',isupdate='"
                                 + cmiNew.get_isupdate() + "',score='"
                                 + cmiNew.get_score() + "',noofattempts="
-                                + cmiNew.get_noofattempts() + ",objecttypeid="
+                                + cmiNew.get_noofattempts() + ",objecttypeid='"
                                 + cmiNew.get_objecttypeid()
-                                + ",sequencenumber=" + cmiNew.get_seqNum()
+                                + "',sequencenumber=" + cmiNew.get_seqNum()
                                 + ",timespent='" + cmiNew.get_timespent()
                                 + "',coursemode='" + cmiNew.get_coursemode()
                                 + "',scoremin='" + cmiNew.get_scoremin()
@@ -6571,8 +6672,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             + cmiNew.get_scoId() + "," + cmiNew.get_userId()
                             + ",'" + cmiNew.get_location() + "','"
                             + cmiNew.get_status() + "','"
-                            + cmiNew.get_suspenddata() + "',"
-                            + cmiNew.get_objecttypeid() + ",'"
+                            + cmiNew.get_suspenddata() + "','"
+                            + cmiNew.get_objecttypeid() + "','"
                             + cmiNew.get_datecompleted() + "',"
                             + cmiNew.get_noofattempts() + ",'"
                             + cmiNew.get_score() + "','" + cmiNew.get_seqNum()
@@ -6873,7 +6974,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
-
 
     public void updateCMIDataOnCourseClose(CMIModel cmiModel) {
 
@@ -7270,6 +7370,647 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return jsonCred;
+    }
+
+    public void setCompleteMethods(Context context, MyLearningModel learningModel) {
+
+        CMIModel cmiDetails = new CMIModel();
+        cmiDetails.set_siteId(learningModel.getSiteID());
+        cmiDetails.set_userId(Integer.parseInt(learningModel.getUserID()));
+        cmiDetails
+                .set_startdate(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+        cmiDetails
+                .set_datecompleted(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+        cmiDetails.set_scoId(Integer.parseInt(learningModel.getScoId()));
+        cmiDetails.set_isupdate("false");
+        cmiDetails.set_status("Completed");
+        cmiDetails.set_seqNum("0");
+        cmiDetails.set_timespent("");
+        cmiDetails.set_objecttypeid(learningModel.getObjectId());
+        cmiDetails.set_sitrurl(learningModel.getSiteURL());
+        int objlastAttempt = getLatestAttempt(learningModel.getScoId(), learningModel.getUserID(),
+                learningModel.getSiteID());
+        LearnerSessionModel nsessionDetails = new LearnerSessionModel();
+        nsessionDetails.setSiteID(learningModel.getSiteID());
+        nsessionDetails.setUserID(learningModel.getUserID());
+        nsessionDetails.setScoID(learningModel.getScoId());
+        nsessionDetails.setAttemptNumber("" + objlastAttempt + 1);
+        nsessionDetails
+                .setSessionDateTime(getCurrentDateTime("yyyy-MM-dd HH:mm:ss"));
+
+        if (learningModel.getIsDownloaded().equals("true")) {
+            if (learningModel.getWresult().contains("disabled")) {
+                if (learningModel.getContentExpire().equals("")) {
+//                    ShowAlert.alertOK(DownloadList.this,
+//                            R.string.alert, resultwmessage,
+//                            R.string.alert_btntext_OK, false);
+                }
+            } else {
+                insertCMI(cmiDetails, true);
+                insertUserSession(nsessionDetails);
+//                loadMyLearningData(root);
+//                getListView().setSelection(position);
+                Log.d("SetComplete click",
+                        "Status updated to DB");
+//                Toast.makeText(
+//                        DownloadList.this,
+//                        getString(R.string.status_update_success),
+//                        Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (isNetworkConnectionAvailable(context, -1)) {
+
+                String paramsString = "ContentID="
+                        + learningModel.getContentID() + "&UserID=" + learningModel.getUserID()
+                        + "&ScoId=" + learningModel.getScoId();
+
+                paramsString = paramsString.replace(" ", "%20");
+
+                appController.setWebApiUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+
+                InputStream inputStream = wap.callWebAPIMethod(appController.getWebApiUrl(), "MobileLMS",
+                        "MobileSetStatusCompleted", appController.getAuthentication(), paramsString);
+
+                try {
+                    if (inputStream != null) {
+
+                        String result = convertStreamToString(inputStream);
+                        inputStream.close();
+                        if (result.toLowerCase().contains(
+                                "completed")) {
+                            insertCMI(cmiDetails, true);
+                            insertUserSession(nsessionDetails);
+                            Log.d("HERE",
+                                    "loadMyLearningData 8");
+
+//                loadMyLearningData(root); uncomment here
+
+                            Log.d("SetComplete click",
+                                    "Status updated to DB");
+//                            Toast.makeText(
+//                                    context, context.
+//                                            getString(R.string.status_update_success),
+//                                    Toast.LENGTH_SHORT).show();
+                        } else {
+//                            Toast.makeText(
+//                                    context, context.getString(R.string.status_update_fail),
+//                                    Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+//                        Toast.makeText(
+//                                context, context.
+//                                        getString(R.string.status_update_fail),
+//                                Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IllegalStateException | IOException e) {
+                    e.printStackTrace();
+                    Log.d("SetComplete click",
+                            "WebAPI Response error");
+                }
+
+            } else {
+                //jhkhjkhj
+                insertCMI(cmiDetails, true);
+                insertUserSession(nsessionDetails);
+                Log.d("HERE", "loadMyLearningData 9");
+
+//                loadMyLearningData(root); uncomment here
+
+                Log.d("SetComplete click",
+                        "Status updated to DB");
+//                Toast.makeText(context,
+//                        context.getString(R.string.status_update_success),
+//                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+    }
+
+
+    public void injectTinCanConfigurationValues(JSONObject jsonObj, String siteID) throws JSONException {
+
+        String authKey = jsonObj.getString("lrsauthorization");
+        String authPassword = jsonObj.getString("lrsauthorizationpassword");
+
+        String base64lrsAuthKey = authKey + ":" + authPassword;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.execSQL("DELETE FROM " + TBL_TINCAN + " WHERE siteid = " + siteID);
+
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+            contentValues.put("istincan", jsonObj.get("istincan").toString());
+            contentValues.put("lrsendpoint", jsonObj.get("lrsendpoint").toString());
+            contentValues.put("lrsauthorization", authKey);
+            contentValues.put("lrsauthorizationpassword", authPassword);
+            contentValues.put("enabletincansupportforco", jsonObj.get("enabletincansupportforco").toString());
+            contentValues.put("enabletincansupportforao", jsonObj.get("enabletincansupportforao").toString());
+            contentValues.put("enabletincansupportforlt", jsonObj.get("enabletincansupportforlt").toString());
+            contentValues.put("base64lrsAuthKey", base64lrsAuthKey);
+            contentValues.put("siteid", siteID);
+
+            db.insert(TBL_TINCAN, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
+    public JSONObject gettTinCanConfigurationValues(String siteID) throws JSONException {
+
+
+        JSONObject jsonObject = new JSONObject();
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "select * from TINCAN where siteid = " + siteID;
+
+        Cursor cursor = db.rawQuery(query, null);
+        try {
+
+            if (cursor != null) {
+
+                while (cursor.moveToFirst()) {
+                    jsonObject.put("istincan", cursor.getString(cursor.getColumnIndex("istincan")));
+                    jsonObject.put("lrsendpoint", cursor.getString(cursor.getColumnIndex("lrsendpoint")));
+                    jsonObject.put("lrsauthorization", cursor.getString(cursor.getColumnIndex("lrsauthorization")));
+                    jsonObject.put("lrsauthorizationpassword", cursor.getString(cursor.getColumnIndex("lrsauthorizationpassword")));
+                    jsonObject.put("enabletincansupportforco", cursor.getString(cursor.getColumnIndex("enabletincansupportforco")));
+                    jsonObject.put("enabletincansupportforao", cursor.getString(cursor.getColumnIndex("enabletincansupportforao")));
+                    jsonObject.put("enabletincansupportforlt", cursor.getString(cursor.getColumnIndex("enabletincansupportforlt")));
+                    jsonObject.put("base64lrsAuthKey", cursor.getString(cursor.getColumnIndex("base64lrsAuthKey")));
+                    jsonObject.put("siteid", cursor.getString(cursor.getColumnIndex("siteid")));
+                    break;
+                }
+
+            }
+            cursor.close();
+            db.close();
+
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+        return jsonObject;
+    }
+
+    public boolean isSubscribedContent(MyLearningModel learningModel) {
+        boolean isSubscribedContent = false;
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strSelQuery = "SELECT contentid FROM " + TBL_DOWNLOADDATA
+                    + " WHERE userid ='" + learningModel.getUserID() + "' AND contentid ='"
+                    + learningModel.getContentID() + "' AND siteid ='" + learningModel.getSiteID() + "'";
+            Cursor cursor = db.rawQuery(strSelQuery, null);
+            if (cursor.getCount() > 0) {
+                isSubscribedContent = true;
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("isContentSubscribed", e.getMessage());
+
+        }
+        return isSubscribedContent;
+    }
+
+    public boolean saveNewlySubscribedContentMetadata(JSONObject jsonObject) throws JSONException {
+
+        boolean isInserted = false;
+        Log.d("saveNewlySubscribed DB", " " + jsonObject);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            MyLearningModel myLearningModel = new MyLearningModel();
+            ContentValues contentValues = null;
+
+
+            //sitename
+            if (jsonMyLearningColumnObj.has("sitename")) {
+
+                myLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
+            }
+            // siteurl
+            if (jsonMyLearningColumnObj.has("siteurl")) {
+
+                myLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("siteid").toString());
+
+            }
+            // userid
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                myLearningModel.setUserID(jsonMyLearningColumnObj.get("userid").toString());
+
+            }
+            // coursename
+
+
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
+
+            }
+
+            // shortdes
+            if (jsonMyLearningColumnObj.has("shortdescription")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
+
+                myLearningModel.setShortDes(result.toString());
+
+            }
+
+            String authorName = "";
+            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
+                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
+
+            }
+
+            if (authorName.length() != 0) {
+                myLearningModel.setAuthor(authorName);
+            } else {
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+                }
+            }
+
+
+            // contentID
+            if (jsonMyLearningColumnObj.has("contentid")) {
+
+                myLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
+
+            }
+            // createddate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+
+            }
+            // displayName
+
+            myLearningModel.setDisplayName(appUserModel.getDisplayName());
+            // durationEndDate
+            if (jsonMyLearningColumnObj.has("durationenddate")) {
+
+                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
+
+            }
+            // objectID
+            if (jsonMyLearningColumnObj.has("objectid")) {
+
+                myLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
+
+            }
+            // thumbnailimagepath
+            if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+
+                String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
+
+
+                if (isValidString(imageurl)) {
+
+                    myLearningModel.setThumbnailImagePath(imageurl);
+                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    myLearningModel.setImageData(imagePathSet);
+
+
+                } else {
+                    if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
+                        String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
+                        if (isValidString(imageurlContentType)) {
+                            String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
+                            myLearningModel.setImageData(imagePathSet);
+
+                        }
+                    }
+
+
+                }
+//                // imagedata
+//                if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+//
+//
+//                } else {
+//
+//                }
+                // relatedcontentcount
+                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
+
+                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
+
+                }
+                // isDownloaded
+                if (jsonMyLearningColumnObj.has("isdownloaded")) {
+
+                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
+
+                }
+                // courseattempts
+                if (jsonMyLearningColumnObj.has("courseattempts")) {
+
+                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
+
+                }
+                // objecttypeid
+                if (jsonMyLearningColumnObj.has("objecttypeid")) {
+
+                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
+
+                }
+                // scoid
+                if (jsonMyLearningColumnObj.has("scoid")) {
+
+                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
+
+                }
+                // startpage
+                if (jsonMyLearningColumnObj.has("startpage")) {
+
+                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
+
+                }
+                // status
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+                // userName
+                myLearningModel.setUserName(appUserModel.getUserName());
+                // longdes
+                if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+
+                    myLearningModel.setShortDes(result.toString());
+                    myLearningModel.setLongDes(result.toString());
+
+                }
+                // typeofevent
+                if (jsonMyLearningColumnObj.has("typeofevent")) {
+
+                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+
+                    myLearningModel.setTypeofevent(typeoFEvent);
+
+                }
+
+                // medianame
+                if (jsonMyLearningColumnObj.has("medianame")) {
+                    String medianame = "";
+
+                    if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                        if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
+                            medianame = "Assessment(Test)";
+
+                        } else {
+                            medianame = jsonMyLearningColumnObj.get("medianame").toString();
+                        }
+                    } else {
+                        if (myLearningModel.getTypeofevent() == 2) {
+                            medianame = "Event (Online)";
+
+
+                        } else if (myLearningModel.getTypeofevent() == 1) {
+                            medianame = "Event (Face to Face)";
+
+                        }
+                    }
+
+                    myLearningModel.setMediaName(medianame);
+
+                }       // ratingid
+                if (jsonMyLearningColumnObj.has("ratingid")) {
+
+                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
+
+                }
+                // publishedDate
+                if (jsonMyLearningColumnObj.has("publisheddate")) {
+
+                    myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
+
+                }
+                // eventstarttime
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+
+                }
+                // eventendtime
+                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+
+                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+
+                }
+
+                // mediatypeid
+                if (jsonMyLearningColumnObj.has("mediatypeid")) {
+
+                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+
+                }
+                // dateassigned
+                if (jsonMyLearningColumnObj.has("dateassigned")) {
+
+                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+
+                }
+                // keywords
+                if (jsonMyLearningColumnObj.has("seokeywords")) {
+
+                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
+
+                }
+                // eventcontentid
+                if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+
+                }
+                // eventAddedToCalender
+                myLearningModel.setEventAddedToCalender(false);
+
+//            if (jsonMyLearningColumnObj.has("startdate")) {
+//
+//                String checkfalseOrTrue = jsonMyLearningColumnObj.get("startdate").toString();
+//                if (checkfalseOrTrue.equalsIgnoreCase("false")) {
+//                    myLearningModel.setEventAddedToCalender(false);
+//                } else {
+//                    myLearningModel.setEventAddedToCalender(true);
+//                }
+//            }
+                // isExpiry
+                myLearningModel.setIsExpiry("false");
+//            if (jsonMyLearningColumnObj.has("startdate")) {
+//
+//                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
+//
+//            }
+                // locationname
+                if (jsonMyLearningColumnObj.has("locationname")) {
+
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+
+                }
+                // timezone
+                if (jsonMyLearningColumnObj.has("timezone")) {
+
+                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
+
+                }
+                // participanturl
+                if (jsonMyLearningColumnObj.has("participanturl")) {
+
+                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
+
+                }
+                // password
+
+                myLearningModel.setPassword(appUserModel.getPassword());
+
+                // isListView
+                if (jsonMyLearningColumnObj.has("bit5")) {
+
+                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
+
+                }
+
+                // joinurl
+                if (jsonMyLearningColumnObj.has("joinurl")) {
+
+                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+
+                }
+
+                // offlinepath
+                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
+                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
+                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
+                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                    String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
+                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+
+                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
+
+                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
+                }
+//
+
+
+                // wresult
+                if (jsonMyLearningColumnObj.has("wresult")) {
+
+                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
+
+                }
+                // wmessage
+                if (jsonMyLearningColumnObj.has("wmessage")) {
+
+                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
+
+                }
+
+                // presenter
+                if (jsonMyLearningColumnObj.has("presenter")) {
+
+                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+                }
+
+                //sitename
+                if (jsonMyLearningColumnObj.has("progress")) {
+
+                    myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
+                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        ejectRecordsinCmi(myLearningModel);
+                    }
+                }
+
+                getTrackScoIdsAndDeleteCMI(myLearningModel);
+
+                injectMyLearningIntoTable(myLearningModel, true);
+            }
+
+            db.close();
+        }
+
+        return false;
+    }
+
+    public void getTrackScoIdsAndDeleteCMI(MyLearningModel learningModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selQuery = "SELECT ScoId,objecttypeid FROM TRACKOBJECTS WHERE userid="
+                + learningModel.getUserID()
+                + " AND trackscoid="
+                + learningModel.getScoId()
+                + " AND siteid=" + learningModel.getSiteID();
+        String whereCLause = "";
+        Cursor cursorTrackObjects = db.rawQuery(selQuery,
+                null);
+        if (cursorTrackObjects != null
+                & cursorTrackObjects.getCount() > 0) {
+            if (cursorTrackObjects.moveToFirst()) {
+                do {
+                    whereCLause = "WHERE userid ='"
+                            + learningModel.getUserID()
+                            + "' AND scoid='"
+                            + cursorTrackObjects
+                            .getString(0)
+                            + "' AND siteid='" + learningModel.getSiteID()
+                            + "'";
+
+                    String strDelete = "DELETE FROM CMI " + whereCLause;
+
+                    db.execSQL(strDelete);
+                    String strDeleteUser = "DELETE FROM USERSESSION " + whereCLause;
+
+                    db.execSQL(strDeleteUser);
+
+
+                    if (cursorTrackObjects.getString(1)
+                            .equals("9")
+                            || cursorTrackObjects
+                            .getString(1).equals(
+                                    "8")) {
+//						deleteRecords(TBL_STUDENTRESPONSES,
+//								whereCLause);
+                        String strDeleteUserRes = "DELETE FROM STUDENTRESPONSES " + whereCLause;
+
+                        db.execSQL(strDeleteUserRes);
+                    }
+
+                } while (cursorTrackObjects.moveToNext());
+            }
+        }
+//		cursorTrackObjects.close();
     }
 }
 

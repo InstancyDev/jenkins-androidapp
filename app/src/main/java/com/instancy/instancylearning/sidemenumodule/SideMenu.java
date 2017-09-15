@@ -144,8 +144,7 @@ public class SideMenu extends AppCompatActivity {
         // navdrawer Top layout initilization
 
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
-
-        Glide.with(this).load(profileIma).placeholder(getResources().getDrawable(R.drawable.user_placeholder))
+        Glide.with(this).load(profileIma)
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)

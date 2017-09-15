@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -120,6 +121,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     AppController appcontroller;
 
     public MyLearningFragment() {
+
     }
 
     @Override
@@ -135,15 +137,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
-//        synchData = new SynchData(context);
         if (isViewed.equalsIgnoreCase("true")) {
             appcontroller.setAlreadyViewd(true);
         } else {
-
             appcontroller.setAlreadyViewd(false);
         }
         vollyService = new VollyService(resultCallback, context);
-
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -295,6 +294,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     public void injectFromDbtoModel() {
 //          myLearningModelsList.clear();
+
         myLearningModelsList = db.fetchMylearningModel();
         if (myLearningModelsList != null) {
 //            Log.d(TAG, "dataLoaded: " + myLearningModelsList.size());
@@ -319,6 +319,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+        myLearninglistView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                appcontroller.setAlreadyViewd(true);
+                preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+            }
+        });
         toolbar = ((SideMenu) getActivity()).toolbar;
 //        setSearchtollbar();
 
@@ -329,7 +341,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshMyLearning(false);
         } else {
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             injectFromDbtoModel();
         }
 
@@ -354,8 +366,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
-
-
+        itemInfo.setVisible(false);
         item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -441,9 +452,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             });
 
         }
-
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -457,25 +466,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 else
                     toolbar.setVisibility(View.VISIBLE);
                 item_search.expandActionView();
-
-//            MenuItemCompat.setOnActionExpandListener(item_search, new MenuItemCompat.OnActionExpandListener() {
-//                @Override
-//                public boolean onMenuItemActionCollapse(MenuItem item) {
-//                    // Do something when collapsed
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                        circleReveal(R.id.toolbar, 1, true, false);
-//                    } else
-//                        toolbar.setVisibility(View.GONE);
-//                    return true;
-//                }
-//
-//                @Override
-//                public boolean onMenuItemActionExpand(MenuItem item) {
-//                    // Do something when expanded
-//                    return true;
-//                }
-//            });
-
                 break;
             case R.id.mylearning_info_help:
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
@@ -865,7 +855,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             if (data != null) {
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
-                Log.d(TAG, "onActivityResult if getCourseName :" + myLearningModel.getCourseName());
 
                 File myFile = new File(myLearningModel.getOfflinepath());
 
@@ -877,9 +866,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             getStatusFromServer(myLearningModel);
 
                         }
-
                     } else {
-
                         if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                             int i = -1;
                             i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
@@ -909,12 +896,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     }
-
-                    cmiSynchTask = new CmiSynchTask(context);
-                    cmiSynchTask.execute();
+//                    cmiSynchTask = new CmiSynchTask(context);
+//                    cmiSynchTask.execute();
                 }
+                cmiSynchTask = new CmiSynchTask(context);
+                cmiSynchTask.execute();
             }
-
+//            cmiSynchTask = new CmiSynchTask(context);
+//            cmiSynchTask.execute();
         }
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
@@ -995,11 +984,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-
             }
         };
     }
-
 
 }

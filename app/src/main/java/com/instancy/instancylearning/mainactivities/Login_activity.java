@@ -28,7 +28,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -351,7 +350,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 try {
                     jsonObject.put("username", userName);
                     jsonObject.put("password", passWord);
-                    jsonObject.put("siteid", "374");
+                    jsonObject.put("siteid", preferencesManager.getStringValue(StaticValues.KEY_SITEID));
                     jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
 
                 } catch (JSONException e) {
@@ -366,15 +365,15 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     e.printStackTrace();
                 }
 
-                if (jsonReturn.length() != 0) {
-
-                    appController.setAlreadyViewd(true);
-                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-
-                } else {
-                    preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
-                    appController.setAlreadyViewd(false);
-                }
+//                if (jsonReturn.length() != 0) {
+//
+//                    appController.setAlreadyViewd(true);
+//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+//
+//                } else {
+//                    preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
+//                    appController.setAlreadyViewd(false);
+//                }
 
                 svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
                 loginVollyWebCall(userName, passWord);
@@ -408,10 +407,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     preferencesManager.setStringValue(jsonReturn.get("userid").toString(), StaticValues.KEY_USERID);
                     preferencesManager.setStringValue(jsonReturn.get("displayname").toString(), StaticValues.KEY_USERNAME);
                     preferencesManager.setStringValue(jsonReturn.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
+
                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intentSideMenu);
-
 
                 } else {
                     appController.setAlreadyViewd(false);
@@ -425,12 +424,13 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void loginVollyWebCall(final String userName, final String password) {
 
-
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + userName + "&Password=" + password + "&MobileSiteURL="
                 + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
 
-        LogUtils.d("here  " + urlStr);
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
                 new Response.Listener<JSONObject>() {
@@ -493,7 +493,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             public Map<String, String> getHeaders() throws AuthFailureError {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
                 return headers;
             }

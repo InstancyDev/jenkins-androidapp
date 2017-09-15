@@ -31,8 +31,6 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 
 import im.delight.android.webview.AdvancedWebView;
 
-import static com.instancy.instancylearning.utils.SweetAlert.showSvProgressAlert;
-
 /**
  * Created by Upendranath on 6/29/2017 Working on InstancyLearning.
  * https://github.com/delight-im/Android-AdvancedWebView
@@ -99,7 +97,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 ex.printStackTrace();
             }
         }
-
 //        closeSvProgress();
         WebSettings webSettings = this.adWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -123,7 +120,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         adWebView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         webSettings.setMediaPlaybackRequiresUserGesture(false);
-
         adWebView.getSettings().setLoadsImagesAutomatically(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
@@ -156,59 +152,57 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
                                            Log.d(TAG, "shouldOverrideUrlLoading: from normal web " + url);
                                            url = url.toLowerCase();
-                                           if (url.contains("ioscourseclose") || url.contains("/logoff") || url.contains("home.html")) {
+
+//                                           if (url.contains("iosobjectclose=true")) {
+//                                               databaseHandler.saveCourseClose(url, myLearningModel);
+//                                               return true;
+//                                           }
+
+                                           if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                                               if (url.contains("iosobjectclose=true")) {
+                                                   databaseHandler.saveCourseClose(url, myLearningModel);
+                                                   return true;
+                                               }
+                                               if (url.contains("blank.html?ioscourseclose=true&cid")) {
+                                                   databaseHandler.saveCourseClose(url, myLearningModel);
+                                                   Intent intent = getIntent();
+                                                   intent.putExtra("myLearningDetalData", myLearningModel);
+                                                   setResult(RESULT_OK, intent);
+                                                   view.stopLoading();
+                                                   finish();
+                                                   return true;
+                                               } else if (url.contains("blank.html?ioscourseclose=true")) {
+                                                   databaseHandler.saveCourseClose(url, myLearningModel);
+                                                   Intent intent = getIntent();
+                                                   intent.putExtra("myLearningDetalData", myLearningModel);
+                                                   setResult(RESULT_OK, intent);
+                                                   view.stopLoading();
+                                                   finish();
+                                                   return true;
+                                               }
+
+                                           } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                                               view.stopLoading();
+                                               finish();
+
+                                           }
+
+                                           if (url.contains("logoff")) {
                                                Intent intent = getIntent();
                                                intent.putExtra("myLearningDetalData", myLearningModel);
                                                setResult(RESULT_OK, intent);
                                                view.stopLoading();
-                                               databaseHandler.saveCourseClose(url, myLearningModel);
-                                               finish();
-                                               return true;
-                                           }
-                                           if (url.contains("iosobjectclose=true")) {
-
-                                               databaseHandler.saveCourseClose(url, myLearningModel);
-                                               return true;
-                                           }
-                                           if ((url.contains("exittracklistview") || url.contains("/all")
-                                                   || url.contains("/pending") || url.contains("/my learning")
-                                                   || url.contains("/my%20learning")
-                                                   || url.contains("/logoff")
-                                                   || url.contains("/home")
-                                                   || url.contains("/sign%20in")
-                                                   || url.contains("/sign in"))
-                                                   && !url.contains("/fromnative/true")) {
-                                               view.stopLoading();
                                                finish();
 
                                            }
 
-                                           if ((url.contains("events/tabs/")
-                                                   || url.contains("catalogresources%20content")
-                                                   || url.contains("catalogresources content")
-                                                   || url.contains("discussion%20forums")
-                                                   || url.contains("discussion forums")
-                                                   || url.contains("ask%20a%20question")
-                                                   || url.contains("ask a question")
-                                                   || url.contains("topics/forumid/")
-                                                   || url.contains("/tab%20list%20view/")
-                                                   || url.contains("/tab list view/")
-                                                   || url.contains("user questions list")
-                                                   || url.contains("user%20questions%20list"))
-                                                   && !url.contains("/fromnative/true")) {
 
-                                               view.loadUrl(url + "/fromnative/true");
+                                           if (isOffline) {
+                                               svProgressHUD.dismiss();
                                                return true;
 
                                            } else {
-                                               if (isOffline) {
-                                                   svProgressHUD.dismiss();
-                                                   return true;
-
-                                               } else {
-                                                   return false;
-                                               }
-
+                                               return false;
                                            }
 
                                        }
@@ -243,13 +237,14 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                        @Override
                                        public void onPageFinished(WebView view, String url) {
                                            super.onPageFinished(view, url);
-                                           if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
-                                               svProgressHUD.dismiss();
-                                           }
-                                           if (isOffline) {
-                                               svProgressHUD.dismiss();
 
+                                           if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("26") || !isOffline) {
+                                               svProgressHUD.dismiss();
+                                           } else {
+
+                                               svProgressHUD.dismiss();
                                            }
+
                                        }
 
                                        @Override
@@ -313,5 +308,4 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 }

@@ -255,15 +255,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                         btnDownload.setTextColor(getResources().getColor(R.color.colorBlack));
                         btnDownload.setEnabled(true);
                         isFileExist = false;
-                        if (!appController.isAlreadyViewd()) {
-                            ViewTooltip
-                                    .on(btnDownload)
-                                    .autoHide(true, 5000)
-                                    .corner(30)
-                                    .position(ViewTooltip.Position.LEFT)
-                                    .text("Click to download the content").clickToHide(true)
-                                    .show();
-                        }
+//                        if (!appController.isAlreadyViewd()) {
+//                            ViewTooltip
+//                                    .on(btnDownload)
+//                                    .autoHide(true, 5000)
+//                                    .corner(30)
+//                                    .position(ViewTooltip.Position.LEFT)
+//                                    .text("Click to download the content").clickToHide(true)
+//                                    .show();
+//                        }
 
                     }
 

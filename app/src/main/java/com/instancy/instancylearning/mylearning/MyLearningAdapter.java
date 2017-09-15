@@ -40,11 +40,13 @@ import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -166,7 +168,9 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.btnDownload.setTag(position);
+        holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+
 //        initVolleyCallback(myLearningModel.get(position), position);
 
         if (myLearningModel.get(position).getShortDes().isEmpty()) {
@@ -202,17 +206,24 @@ public class MyLearningAdapter extends BaseAdapter {
                     holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
                     holder.btnDownload.setEnabled(true);
 
-
                 }
             }
 
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
             String courseStatus = "";
+            int progressPercentage = 0;
+
+            try {
+                progressPercentage = Integer.parseInt(myLearningModel.get(position).getProgress());
+            } catch (NumberFormatException ex) {
+                progressPercentage = 0;
+                ex.printStackTrace();
+            }
 
             if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed"))) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
+                holder.progressBar.setProgress(progressPercentage);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
                 courseStatus = myLearningModel.get(position).getStatus() + " (" + myLearningModel.get(position).getProgress();
             } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Not Started")) {
@@ -237,9 +248,10 @@ public class MyLearningAdapter extends BaseAdapter {
                     status = myLearningModel.get(position).getStatus();
 
                 }
-                holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
+
+                holder.progressBar.setProgress(progressPercentage);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = status + "(" + myLearningModel.get(position).getProgress();
+                courseStatus = status + "(" + progressPercentage;
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");
@@ -343,50 +355,55 @@ public class MyLearningAdapter extends BaseAdapter {
         // do something for phones running an SDK before lollipop
 
 // uncomment for crop life
-//        if (position == 0 && !appcontroller.isAlreadyViewd()) {
-//
-//            ViewTooltip
-//                    .on(holder.btnDownload)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                }
-//            })
-//                    .text("Click to download the content").clickToHide(true)
-//                    .show();
-//
-//            ViewTooltip
-//                    .on(holder.btnContextMenu)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
-//                    .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                }
-//            })
-//                    .show();
-//
-//            ViewTooltip
-//                    .on(holder.imgThumb)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM)
-//                    .clickToHide(true)
-//                    .animation(new ViewTooltip.FadeTooltipAnimation(500))
-//                    .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                }
-//            })
-//                    .show();
-//
-//        }
+
+        String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
+        if (position == 0 && isViewd.equalsIgnoreCase("false")) {
+
+            ViewTooltip
+                    .on(holder.btnDownload)
+                    .autoHide(true, 5000)
+                    .corner(30)
+                    .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
+                @Override
+                public void onHide(View view) {
+                    appcontroller.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                }
+            })
+                    .text("Click to download the content").clickToHide(true)
+                    .show();
+
+            ViewTooltip
+                    .on(holder.btnContextMenu)
+                    .autoHide(true, 5000)
+                    .corner(30)
+                    .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
+                    .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
+                @Override
+                public void onHide(View view) {
+                    appcontroller.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                }
+            })
+                    .show();
+
+            ViewTooltip
+                    .on(holder.imgThumb)
+                    .autoHide(true, 5000)
+                    .corner(30)
+                    .position(ViewTooltip.Position.BOTTOM)
+                    .clickToHide(true)
+                    .animation(new ViewTooltip.FadeTooltipAnimation(500))
+                    .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
+                @Override
+                public void onHide(View view) {
+                    appcontroller.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                }
+            })
+                    .show();
+
+        }
 
 
         return vi;
@@ -413,6 +430,7 @@ public class MyLearningAdapter extends BaseAdapter {
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
         public DownloadInterface downloadInterface;
+        public SetCompleteListner setCompleteListner;
         @Nullable
         @Bind(R.id.txt_title_name)
         TextView txtTitle;
@@ -481,6 +499,15 @@ public class MyLearningAdapter extends BaseAdapter {
                     deleteMetaDataFromDB(myLearningDetalData);
                 }
             };
+
+            setCompleteListner = new SetCompleteListner() {
+                @Override
+                public void completedStatus() {
+                    myLearningDetalData.setStatus("Completed");
+                    myLearningDetalData.setProgress("100");
+                    notifyDataSetChanged();
+                }
+            };
         }
 
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
@@ -488,18 +515,16 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.contextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
             } else {
                 ((ListView) parent).performItemClick(view, getPosition, 0);
             }
-
         }
     }
 
     private void deleteMetaDataFromDB(MyLearningModel learningModel) {
 
     }
-
 
 }
 

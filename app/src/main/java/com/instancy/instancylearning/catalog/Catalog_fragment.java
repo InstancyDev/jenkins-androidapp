@@ -1,60 +1,79 @@
 package com.instancy.instancylearning.catalog;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
-import com.instancy.instancylearning.mainactivities.Settings_activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -62,6 +81,7 @@ import butterknife.ButterKnife;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 
 /**
@@ -69,10 +89,6 @@ import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
  */
 
 public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, SearchView.OnQueryTextListener {
-
-
-//    @Bind(R.id.lable_catalog)
-//    TextView frqagmentName;
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -163,10 +179,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             // No such key
             filterContentType = "";
         }
-        refreshMyLearning(false);
     }
 
-    public void refreshMyLearning(Boolean isRefreshed) {
+    public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
@@ -175,7 +190,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
-
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -207,19 +221,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     }
                 }
-//                if (requestType.equalsIgnoreCase("MLADP")) {
-//
-//                    if (response != null) {
-//                        try {
-//                            db.injectCMIDataInto(response,lear);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    } else {
-//
-//                    }
-//
-//                }
+
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -252,7 +254,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     } else {
 
                     }
-
                 }
 
                 svProgressHUD.dismiss();
@@ -281,26 +282,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         initilizeView();
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshMyLearning(false);
+            refreshCatalog(false);
         } else {
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-//            injectFromDbtoModel(); uncomment after the conten is downloaded
+            injectFromDbtoModel();
         }
 
         return rootView;
     }
 
     public void injectFromDbtoModel() {
-//          myLearningModelsList.clear();
-        catalogModelsList = db.fetchCatalogModel();
+        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId());
         if (catalogModelsList != null) {
-//            Log.d(TAG, "dataLoaded: " + myLearningModelsList.size());
             catalogAdapter.refreshList(catalogModelsList);
-//            myLearninglistView.setVisibility(View.VISIBLE);
         } else {
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
-//            myLearninglistView.setVisibility(View.GONE);
         }
     }
 
@@ -311,7 +307,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
-//        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contextTitle + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -326,6 +321,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+        itemInfo.setVisible(false);
 
         item_filter.setVisible(false);
         if (item_search != null) {
@@ -340,17 +336,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
-//            final PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-//
-//
-//            for (int i = 0; i < toolbar.getChildCount(); i++) {
-//
-//                final View v = toolbar.getChildAt(i);
-//
-//                if (v instanceof ImageButton) {
-//                    ((ImageButton) v).setColorFilter(colorFilter);
-//                }
-//            }
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -361,15 +346,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-//                    if (TextUtils.isEmpty(newText)) {
-//                        myLearningAdapter.filter("");
-//                        myLearninglistView.clearTextFilter();
-//                        injectFromDbtoModel();
-//                    } else {
-
                     catalogAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
-//                    }
+
                     return true;
                 }
             });
@@ -414,24 +393,34 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.catalog_search) {
-            Intent intentSettings = new Intent(getActivity(), Settings_activity.class);
-            intentSettings.putExtra(StaticValues.KEY_ISLOGIN, true);
-            startActivity(intentSettings);
-            return true;
+
+        switch (item.getItemId()) {
+
+            case R.id.mylearning_search:
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    circleReveal(R.id.toolbar, 1, true, true);
+                else
+                    toolbar.setVisibility(View.VISIBLE);
+                item_search.expandActionView();
+                break;
+            case R.id.mylearning_info_help:
+                Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
+                appcontroller.setAlreadyViewd(false);
+                preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
+                catalogAdapter.notifyDataSetChanged();
+                break;
+
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshMyLearning(true);
+            refreshCatalog(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -448,8 +437,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 int conditionCount = conditionsArray.length;
                 if (conditionCount > 0) {
                     responMap = generateHashMap(conditionsArray);
-//                    Log.d("Type", "Called On Type" + responMap.keySet());
-//                    Log.d("Type", "Called On Type" + responMap.values());
+
                 }
             }
         }
@@ -466,8 +454,401 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         return false;
     }
 
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        switch (view.getId()) {
+            case R.id.btntxt_download:
+                if (isNetworkConnectionAvailable(context, -1)) {
+                } else {
+                    showToast(context, "No Internet");
+                }
+                break;
+            case R.id.btn_contextmenu:
+                View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
+                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+                catalogContextMenuMethod(view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
+                break;
+            default:
+
+        }
+
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
+        final View myView = getActivity().findViewById(viewID);
+        int width = myView.getWidth();
+        if (posFromRight > 0)
+            width -= (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material)) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
+        if (containsOverflow)
+            width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
+        int cx = width;
+        int cy = myView.getHeight() / 2;
+
+        Animator anim;
+        if (isShow)
+            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, (float) width);
+        else
+            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, (float) width, 0);
+        anim.setDuration((long) 400);
+        // make the view invisible when the animation is done
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!isShow) {
+                    super.onAnimationEnd(animation);
+                    myView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+        // make the view visible and start the animation
+        if (isShow)
+            myView.setVisibility(View.VISIBLE);
+
+        // start the animation
+        anim.start();
+
+    }
+
+    public void catalogContextMenuMethod(final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
+
+        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.catalog_contextmenu, popup.getMenu());
+        //registering popup with OnMenuItemClickListene
+
+        Menu menu = popup.getMenu();
+
+        menu.getItem(0).setVisible(false);//view
+        menu.getItem(1).setVisible(false);//add
+        menu.getItem(2).setVisible(false);//buy
+        menu.getItem(3).setVisible(false);//detail
+        menu.getItem(4).setVisible(false);//delete
+
+//        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
+
+        if (myLearningDetalData.getAddedToMylearning() == 1) {
+            menu.getItem(0).setVisible(true);
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(false);
+            menu.getItem(3).setVisible(true);
+
+            if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+
+                File myFile = new File(myLearningDetalData.getOfflinepath());
+
+                if (myFile.exists()) {
+
+                    menu.getItem(4).setVisible(true);
+
+                } else {
+
+                    menu.getItem(4).setVisible(false);
+                }
+            }
+
+        } else {
+            if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
+                menu.getItem(0).setVisible(false);
+                menu.getItem(1).setVisible(true);
+                menu.getItem(2).setVisible(false);
+                menu.getItem(3).setVisible(true);
+
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+
+                    File myFile = new File(myLearningDetalData.getOfflinepath());
+
+                    if (myFile.exists()) {
+
+                        menu.getItem(4).setVisible(true);
+
+                    } else {
+
+                        menu.getItem(4).setVisible(false);
+                    }
+                }
+            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
+                menu.getItem(0).setVisible(false);
+                menu.getItem(1).setVisible(true);
+                menu.getItem(3).setVisible(true);
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+
+                    File myFile = new File(myLearningDetalData.getOfflinepath());
+
+                    if (myFile.exists()) {
+
+                        menu.getItem(4).setVisible(true);
+
+                    } else {
+
+                        menu.getItem(4).setVisible(false);
+                    }
+
+                }
+            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
+                menu.getItem(0).setVisible(false);
+                menu.getItem(2).setVisible(true);
+                menu.getItem(3).setVisible(true);
+                menu.getItem(1).setVisible(false);
+            }
+        }
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
+                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+//                    v.getContext().startActivity(intentDetail);
+                    v.getContext().startActivity(intentDetail);
+//                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+//                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+
+                }
+                if (item.getTitle().toString().equalsIgnoreCase("View")) {
+//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
+//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+                }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
+//                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+
+                }
+                if (item.getTitle().toString().equalsIgnoreCase("Add")) {
+
+//                    addToMyLearning(myLearningDetalData);
+                    addToMyLearningCheckUser(myLearningDetalData);
+                }
+                return true;
+            }
+        });
+        popup.show();//showing popup menu
+
+    }
+
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData) {
+
+        if (isNetworkConnectionAvailable(context, -1)) {
+
+            if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
+
+                checkUserLogin(myLearningDetalData);
+            } else {
+
+                addToMyLearning(myLearningDetalData);
+
+            }
+        }
+    }
+
+    public void addToMyLearning(final MyLearningModel myLearningDetalData) {
+
+        if (isNetworkConnectionAvailable(context, -1)) {
+            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
+            if (isSubscribed) {
+                Toast toast = Toast.makeText(
+                        context,
+                        context.getString(R.string.cat_add_already),
+                        Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            } else {
+                String requestURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileAddtoMyCatalog?"
+                        + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
+                        + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
+
+                requestURL = requestURL.replaceAll(" ", "%20");
+                Log.d(TAG, "inside catalog login : " + requestURL);
+
+
+                StringRequest strReq = new StringRequest(Request.Method.GET,
+                        requestURL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "add to mylearning data " + response.toString());
+                        if (response.equalsIgnoreCase("true")) {
+                            getMobileGetMobileContentMetaData(myLearningDetalData);
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    context, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        final Map<String, String> headers = new HashMap<>();
+                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                        return headers;
+                    }
+                };
+                ;
+                VolleySingleton.getInstance(context).addToRequestQueue(strReq);
+
+
+            }
+
+        }
+    }
+
+    public void checkUserLogin(final MyLearningModel learningModel) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
+                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
+                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "inside catalog login : " + urlStr);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObj) {
+                        svProgressHUD.dismiss();
+                        if (jsonObj.has("faileduserlogin")) {
+
+                            JSONArray userloginAry = null;
+                            try {
+                                userloginAry = jsonObj
+                                        .getJSONArray("faileduserlogin");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (userloginAry.length() > 0) {
+
+
+                                String response = null;
+                                try {
+                                    response = userloginAry
+                                            .getJSONObject(0)
+                                            .get("userstatus")
+                                            .toString();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (response.contains("Login Failed")) {
+                                    Toast.makeText(context,
+                                            "Authentication Failed. Contact site admin",
+                                            Toast.LENGTH_LONG)
+                                            .show();
+
+                                }
+                                if (response.contains("Pending Registration")) {
+
+                                    Toast.makeText(context, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
+                                            Toast.LENGTH_LONG)
+                                            .show();
+                                }
+                            }
+                        } else if (jsonObj.has("successfulluserlogin")) {
+
+                            try {
+                                JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                                if (loginResponseAry.length() != 0) {
+                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                                    String userIdresponse = loginResponseAry
+                                            .getJSONObject(0)
+                                            .get("userid").toString();
+                                    if (userIdresponse.length() != 0) {
+
+                                        addToMyLearning(learningModel);
+                                    }
+                                }
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
+                + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
+                + appUserModel.getUserIDValue() + "&DelivoryMode=1";
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "getMobileGetMobileContentMetaData : " + urlStr);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObj) {
+
+                        Log.d(TAG, "getMobileGetMobileContentMetaData response : " + jsonObj);
+                        if (jsonObj.length() != 0) {
+                            boolean isInserted = false;
+                            isInserted= db.saveNewlySubscribedContentMetadata(jsonObj);
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
     }
 }

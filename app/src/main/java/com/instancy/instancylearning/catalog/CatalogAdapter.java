@@ -42,6 +42,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,8 +94,13 @@ public class CatalogAdapter extends BaseAdapter {
         svProgressHUD = new SVProgressHUD(activity);
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
-        appUserModel.getWebAPIUrl();
-          /* setup enter and exit animation */
+        appUserModel = AppUserModel.getInstance();
+        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         appcontroller = AppController.getInstance();
 
     }
@@ -138,7 +144,7 @@ public class CatalogAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor());
+        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor()+" ");
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
@@ -147,7 +153,7 @@ public class CatalogAdapter extends BaseAdapter {
         } else {
             holder.consolidateLine.setVisibility(View.VISIBLE);
         }
-        holder.txtSiteName.setText(myLearningModel.get(position).getSiteName());
+        holder.txtSiteName.setText(" "+myLearningModel.get(position).getSiteName());
         float ratingValue = 0;
         try {
             ratingValue = Float.parseFloat(myLearningModel.get(position).getRatingId());
@@ -376,7 +382,6 @@ public class CatalogAdapter extends BaseAdapter {
         @Bind(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
-
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
@@ -385,29 +390,16 @@ public class CatalogAdapter extends BaseAdapter {
                 @Override
                 public void deletedTheContent(int updateProgress) {
                     notifyDataSetChanged();
-                    deleteMetaDataFromDB(myLearningDetalData);
                 }
             };
         }
-
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
         public void actionsForMenu(View view) {
 
-            if (view.getId() == R.id.btn_contextmenu) {
-
-                GlobalMethods.contextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface);
-            } else {
                 ((ListView) parent).performItemClick(view, getPosition, 0);
-            }
 
         }
     }
-
-    private void deleteMetaDataFromDB(MyLearningModel learningModel) {
-
-    }
-
-
 }
 
 

@@ -83,7 +83,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         uiSettingsModel = UiSettingsModel.getInstance();
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
-        appController=AppController.getInstance();
+        appController = AppController.getInstance();
         String siteUrl = preferencesManager.getStringValue(StaticValues.KEY_SITEURL);
 
         if (siteUrl.length() == 0) {
@@ -189,6 +189,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
                 if (userID != null && !userID.equalsIgnoreCase("")) {
                     appController.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
                     Intent intent = new Intent(this, SideMenu.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

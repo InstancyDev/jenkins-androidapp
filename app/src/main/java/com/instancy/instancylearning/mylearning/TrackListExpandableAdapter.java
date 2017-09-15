@@ -43,10 +43,13 @@ import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -88,7 +91,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     boolean isDownloading = false;
     private Activity activity;
     AppController appController;
-
+    PreferencesManager preferencesManager;
 
     public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView) {
         this._context = context;
@@ -104,7 +107,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         this.expandableListView = expandableListView;
 //        mNotifyManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         appController = AppController.getInstance();
-
+        preferencesManager = PreferencesManager.getInstance();
     }
 
     public void refreshList(List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList) {
@@ -186,6 +189,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         holder = new ViewHolder(childView);
         holder.parent = parent;
 //        holder.relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        childView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.getChildPosition = childPosition;
         holder.getGroupPosition = groupPosition;
         holder.myLearningDetalData = trackChildList;
@@ -279,49 +283,54 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
-//        if (childPosition == 0 && groupPosition == 0 && !appController.isAlreadyViewdTrack()) {
-//            ViewTooltip
-//                    .on(holder.btnDownload)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.LEFT).clickToHide(true)
-//                    .text("Click to download the content").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appController.setAlreadyViewdTrack(true);
-//                }
-//            })
-//                    .show();
-//
-//
-//            ViewTooltip
-//                    .on(holder.btnContextMenu)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.LEFT)
-//                    .text("Click for more options").clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appController.setAlreadyViewdTrack(true);
-//                }
-//            })
-//                    .show();
-//
-//
-//            ViewTooltip
-//                    .on(holder.imgThumb)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM)
-//                    .text("Click on image to view").clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appController.setAlreadyViewdTrack(true);
-//                }
-//            })
-//                    .show();
-//
-//        }
+        String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
+
+        if (childPosition == 0 && isViewd.equalsIgnoreCase("false")) {
+            ViewTooltip
+                    .on(holder.btnDownload)
+                    .autoHide(true, 5000)
+                    .corner(30)
+                    .position(ViewTooltip.Position.LEFT).clickToHide(true)
+                    .text("Click to download the content").onHide(new ViewTooltip.ListenerHide() {
+                @Override
+                public void onHide(View view) {
+                    appController.setAlreadyViewdTrack(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                }
+            })
+                    .show();
+
+
+            ViewTooltip
+                    .on(holder.btnContextMenu)
+                    .autoHide(true, 5000)
+                    .corner(30)
+                    .position(ViewTooltip.Position.LEFT)
+                    .text("Click for more options").clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
+                @Override
+                public void onHide(View view) {
+                    appController.setAlreadyViewdTrack(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                }
+            })
+                    .show();
+
+
+            ViewTooltip
+                    .on(holder.imgThumb)
+                    .autoHide(true, 5000)
+                    .corner(30)
+                    .position(ViewTooltip.Position.BOTTOM)
+                    .text("Click on image to view").clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
+                @Override
+                public void onHide(View view) {
+                    appController.setAlreadyViewdTrack(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                }
+            })
+                    .show();
+
+        }
 
         if (trackChildList.getShowStatus().equalsIgnoreCase("disabled")) {
             holder.btnDownload.setEnabled(false);
@@ -331,7 +340,8 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         } else if (trackChildList.getShowStatus().equalsIgnoreCase("hide")) {
             childView.setVisibility(View.GONE);
         } else {
-            childView.setBackgroundColor(Color.WHITE);
+            childView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+//            childView.setBackgroundColor(Color.WHITE);
             holder.btnDownload.setEnabled(true);
             holder.btnContextMenu.setEnabled(true);
             holder.imgThumb.setEnabled(true);
@@ -368,6 +378,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
         DownloadInterface downloadInterface;
+        SetCompleteListner setCompleteListner;
         @Nullable
         @Bind(R.id.txt_title_name)
         TextView txtTitle;
@@ -423,6 +434,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     notifyDataSetChanged();
                 }
             };
+
+
+            setCompleteListner = new SetCompleteListner() {
+                @Override
+                public void completedStatus() {
+                    notifyDataSetChanged();
+                }
+            };
         }
 
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
@@ -430,7 +449,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.contextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
 
             } else if (view.getId() == R.id.imagethumb) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());

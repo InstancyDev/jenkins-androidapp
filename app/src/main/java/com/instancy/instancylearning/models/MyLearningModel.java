@@ -74,7 +74,57 @@ public class MyLearningModel implements Serializable {
     String trackScoid = "";
     String showStatus = "";
 
+    // Exclusive For Catalog Model start
+
     String googleProductID = "";
+
+    String componentId = "";
+
+    String price = "";
+
+    int addedToMylearning = 0;
+
+    String itemType = "";
+
+    String viewType = "";
+
+    String currency = "";
+
+    public int getAddedToMylearning() {
+
+
+        return addedToMylearning;
+    }
+
+    public void setAddedToMylearning(int addedToMylearning) {
+        this.addedToMylearning = addedToMylearning;
+    }
+
+    public String getItemType() {
+
+        return isValidString(itemType) ? itemType : "";
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+
+    public String getViewType() {
+
+        return isValidString(viewType) ? viewType : "";
+    }
+
+    public void setViewType(String viewType) {
+        this.viewType = viewType;
+    }
+
+    public String getCurrency() {
+        return isValidString(currency) ? currency : "";
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
 
     public String getComponentId() {
         return componentId;
@@ -84,9 +134,6 @@ public class MyLearningModel implements Serializable {
         this.componentId = componentId;
     }
 
-    String componentId = "";
-
-
     public String getPrice() {
         return price;
     }
@@ -95,16 +142,14 @@ public class MyLearningModel implements Serializable {
         this.price = price;
     }
 
-    String price = "";
-
     public String getGoogleProductID() {
-        return googleProductID;
+
+        return isValidString(googleProductID) ? googleProductID : "";
     }
 
     public void setGoogleProductID(String googleProductID) {
         this.googleProductID = googleProductID;
     }
-
 
     public String getEventID() {
         return isValidString(eventID) ? eventID : "";
