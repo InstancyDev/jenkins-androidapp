@@ -21,11 +21,9 @@ import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.mainactivities.AdvancedWebCourseLaunch;
 import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
-import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
-import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
 import com.instancy.instancylearning.mylearning.TrackList_Activity;
@@ -96,25 +94,28 @@ public class GlobalMethods {
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
                 // LRS is implemented completed disabled for some resons
-//                if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
-//                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
+                if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
+
+                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
+                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
+                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
+                    } else {
+                        databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
 //
-//                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
-//
-//                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
-//                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
-//
-//                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
-//                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
-//                    }
-//                }
-////                else {
+                        offlinePath = databaseH.generateOfflinePathForCourseView(myLearningModel, context);
+                    }
+                } else {
 
                     databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
 //
                     offlinePath = databaseH.generateOfflinePathForCourseView(myLearningModel, context);
 
-//                }
+                }
 
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
 
@@ -454,7 +455,7 @@ public class GlobalMethods {
                         urlForView = myLearningModel.getSiteURL() + "/Content/SiteFiles/" + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
                         String cerName = myLearningModel.getContentID() + "_Certificate";
-                        urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getSiteID() + "UserCertificates/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
+                        urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getSiteID() + "/UserCertificates/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
 
@@ -775,6 +776,7 @@ public class GlobalMethods {
 
                 if (item.getTitle().toString().equalsIgnoreCase("details")) {
                     Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+                    intentDetail.putExtra("IFROMCATALOG", false);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
 //                    v.getContext().startActivity(intentDetail);
 //                context.startActivity(iWeb);

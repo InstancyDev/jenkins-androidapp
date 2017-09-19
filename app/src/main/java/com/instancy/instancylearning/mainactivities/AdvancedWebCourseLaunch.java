@@ -128,7 +128,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         }
         // Add Class in js
 
-        LRSJavaScriptInterface lrsInterface = new LRSJavaScriptInterface(this, myLearningModel, this, hideProgressListner);
+        LRSJavaScriptInterface lrsInterface = new LRSJavaScriptInterface(this, myLearningModel, this, hideProgressListner,isOffline);
         lrsInterface.hideProgressListner = new hideProgressListner() {
             @Override
             public void statusUpdateFromServer() {
@@ -164,27 +164,32 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                    return true;
                                                }
                                                if (url.contains("blank.html?ioscourseclose=true&cid")) {
-                                                   databaseHandler.saveCourseClose(url, myLearningModel);
-                                                   Intent intent = getIntent();
-                                                   intent.putExtra("myLearningDetalData", myLearningModel);
-                                                   setResult(RESULT_OK, intent);
-                                                   view.stopLoading();
-                                                   finish();
+                                                   int isCompleted = databaseHandler.saveCourseClose(url, myLearningModel);
+
+                                                   if (isCompleted == 1) {
+                                                       Intent intent = getIntent();
+                                                       intent.putExtra("myLearningDetalData", myLearningModel);
+                                                       setResult(RESULT_OK, intent);
+                                                       view.stopLoading();
+                                                       finish();
+                                                   }
                                                    return true;
                                                } else if (url.contains("blank.html?ioscourseclose=true")) {
-                                                   databaseHandler.saveCourseClose(url, myLearningModel);
-                                                   Intent intent = getIntent();
+                                                   int isCompleted = databaseHandler.saveCourseClose(url, myLearningModel);
+
+                                                   if (isCompleted == 1) {
+
+                                                       Intent intent = getIntent();
                                                    intent.putExtra("myLearningDetalData", myLearningModel);
                                                    setResult(RESULT_OK, intent);
                                                    view.stopLoading();
-                                                   finish();
+                                                   finish();}
                                                    return true;
                                                }
 
                                            } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                                                view.stopLoading();
                                                finish();
-
                                            }
 
                                            if (url.contains("logoff")) {

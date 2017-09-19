@@ -2,7 +2,9 @@ package com.instancy.instancylearning.catalog;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -17,6 +19,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
@@ -50,6 +53,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
@@ -78,7 +82,9 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
@@ -468,14 +474,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             case R.id.btn_contextmenu:
                 View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
+                catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
                 break;
             default:
 
         }
 
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
@@ -513,7 +518,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-    public void catalogContextMenuMethod(final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -601,15 +606,16 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 if (item.getTitle().toString().equalsIgnoreCase("Details")) {
                     Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+                    intentDetail.putExtra("IFROMCATALOG", true);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
 //                    v.getContext().startActivity(intentDetail);
-                    v.getContext().startActivity(intentDetail);
-//                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-//                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+//                    v.getContext().startActivity(intentDetail);
+//                   context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View")) {
-//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
@@ -623,7 +629,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (item.getTitle().toString().equalsIgnoreCase("Add")) {
 
 //                    addToMyLearning(myLearningDetalData);
-                    addToMyLearningCheckUser(myLearningDetalData);
+                    addToMyLearningCheckUser(myLearningDetalData, position);
+                }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
+
+//                  addToMyLearning(myLearningDetalData);
+                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -632,22 +644,22 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData) {
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
 
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
-                checkUserLogin(myLearningDetalData);
+                checkUserLogin(myLearningDetalData, position);
             } else {
 
-                addToMyLearning(myLearningDetalData);
+                addToMyLearning(myLearningDetalData, position);
 
             }
         }
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
             boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -666,14 +678,22 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 requestURL = requestURL.replaceAll(" ", "%20");
                 Log.d(TAG, "inside catalog login : " + requestURL);
 
-
                 StringRequest strReq = new StringRequest(Request.Method.GET,
                         requestURL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
-                            getMobileGetMobileContentMetaData(myLearningDetalData);
+                            catalogModelsList.get(position).setAddedToMylearning(1);
+                            catalogAdapter.notifyDataSetChanged();
+                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
+                            Toast toast = Toast.makeText(
+                                    context,
+                                    context.getString(R.string.cat_add_success),
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
 
                         } else {
                             Toast toast = Toast.makeText(
@@ -710,7 +730,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
-    public void checkUserLogin(final MyLearningModel learningModel) {
+    public void checkUserLogin(final MyLearningModel learningModel, final int position) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
@@ -773,7 +793,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                             .get("userid").toString();
                                     if (userIdresponse.length() != 0) {
 
-                                        addToMyLearning(learningModel);
+                                        addToMyLearning(learningModel, position);
                                     }
                                 }
 
@@ -805,7 +825,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
@@ -821,9 +841,33 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         Log.d(TAG, "getMobileGetMobileContentMetaData response : " + jsonObj);
                         if (jsonObj.length() != 0) {
                             boolean isInserted = false;
-                            isInserted= db.saveNewlySubscribedContentMetadata(jsonObj);
-                        }
+                            try {
+                                isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
+                                if (isInserted) {
+                                    catalogModelsList.get(position).setAddedToMylearning(1);
+                                    catalogAdapter.notifyDataSetChanged();
+//                                    Toast toast = Toast.makeText(
+//                                            context,
+//                                            context.getString(R.string.cat_add_success),
+//                                            Toast.LENGTH_SHORT);
+//                                    toast.setGravity(Gravity.CENTER, 0, 0);
+//                                    toast.show();
 
+                                    final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                    builder.setMessage(context.getString(R.string.cat_add_success))
+                                            .setCancelable(false)
+                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    //do things
+                                                    dialog.dismiss();
+                                                }
+                                            });
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -845,10 +889,18 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == DETAIL_CATALOG_CODE && resultCode == RESULT_OK && data != null) {
+
+            if (data != null) {
+                boolean refresh = data.getBooleanExtra("REFRESH", false);
+                if (refresh) {
+                    injectFromDbtoModel();
+                }
+            }
+        }
     }
 }

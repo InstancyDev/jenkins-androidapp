@@ -2140,6 +2140,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 db.delete(TBL_DOWNLOADDATA, "siteid='" + myLearningModel.getSiteID()
                         + "' AND userid='" + myLearningModel.getUserID() + "' AND scoid='"
                         + myLearningModel.getScoId() + "'", null);
+
+
+//                db.delete(TBL_STUDENTRESPONSES, "siteid='" + myLearningModel.getSiteID()
+//                        + "' AND userid='" + myLearningModel.getUserID() + "' AND scoid='"
+//                        + myLearningModel.getScoId() + "'", null);
+
             }
 
 
@@ -3878,8 +3884,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("scoid")));
                     trackListModel.setParticipantUrl(cursor.getString(cursor
                             .getColumnIndex("participanturl")));
-                    trackListModel.setStatus(cursor.getString(cursor
-                            .getColumnIndex("objStatus")));
+//                    trackListModel.setStatus(cursor.getString(cursor
+//                            .getColumnIndex("objStatus")));
+
+                    String objStatus = cursor.getString(cursor
+                            .getColumnIndex("objStatus"));
+
+                    if (objStatus.toLowerCase().contains("passed")) {
+                        trackListModel.setStatus("Completed (passed)");
+                    } else if (objStatus.toLowerCase().contains("failed")) {
+                        trackListModel.setStatus("Completed (failed)");
+                    } else {
+
+                        trackListModel.setStatus(objStatus);
+                    }
+
+
                     trackListModel.setPassword(cursor.getString(cursor
                             .getColumnIndex("password")));
                     trackListModel.setDisplayName(cursor.getString(cursor
@@ -5067,7 +5087,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String[] strAry = new String[2];
 
-        String sqlQuery = "SELECT scoid, objecttypeid FROM " + TBL_TRACKOBJECTS + " WHERE siteid = " + learningModel.getSiteID() + " AND trackscoid = " + learningModel.getScoId() + "AND sequencenumber = " + seqNumber + " AND userid = " + learningModel.getUserID();
+        String sqlQuery = "SELECT scoid, objecttypeid FROM " + TBL_TRACKOBJECTS + " WHERE siteid = " + learningModel.getSiteID() + " AND trackscoid = " + learningModel.getScoId() + " AND sequencenumber = " + seqNumber + " AND userid = " + learningModel.getUserID();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.rawQuery(sqlQuery, null);
@@ -6762,8 +6782,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public void saveCourseClose(String url, MyLearningModel learningModel) {
+    public int saveCourseClose(String url, MyLearningModel learningModel) {
 
+
+        int completed = -1;
         String subURL[] = url.split("\\?");
 
         String score = learningModel.getScore(), lStatus = "", ltStatus = "", lLoc = "", susData = "", scoid = "", seqID = "", siteIDValue = "", userIDValue = "", siteURL = "", timeSpent = "";
@@ -6784,8 +6806,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 int conditionCount = conditionsArray.length;
                 if (conditionCount > 0) {
                     responMap = generateHashMap(conditionsArray);
-                    Log.d("Type", "Called On saveCourseClose" + responMap.keySet());
-                    Log.d("Type", "Called On saveCourseClose" + responMap.values());
+//                    Log.d("Type", "Called On saveCourseClose" + responMap.keySet());
+//                    Log.d("Type", "Called On saveCourseClose" + responMap.values());
 //                    ioscourseclose=true&cid=338&seqid=1&stid=1&lloc=2&lstatus=incomplete&susdata=#pgvs_start#1;2;#pgvs_end#&timespent=00:00:06.88&quesdata=&ltstatus=incomplete
 
                     if (responMap.containsKey("susdata")) {
@@ -6969,10 +6991,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (isSqlDataPresent.equalsIgnoreCase("true")) {
 
             updateCMIDataOnCourseClose(cmiModel);
+            completed = 1;
         } else {
             injectIntoCMITable(cmiModel, "false");
+            completed = 1;
         }
+        Log.d(TAG, "saveCourseClose: end ");
 
+        return completed;
     }
 
     public void updateCMIDataOnCourseClose(CMIModel cmiModel) {
@@ -7067,6 +7093,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return status;
 
     }
+
+    public void updateCMIstatus(MyLearningModel learningmodel, String updatedStatus) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+        Cursor isUpdated = null;
+        try {
+            String strUpdate = "UPDATE " + TBL_CMI
+                    + " SET status = '" + updatedStatus + "' WHERE siteid ='"
+                    + learningmodel.getSiteID() + "'" + " AND " + " scoid=" + "'" + learningmodel.getScoId() + "'"
+                    + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
+            db.execSQL(strUpdate);
+
+        } catch (Exception e) {
+
+            Log.e("updateContentStatus", e.toString());
+        }
+
+        db.close();
+
+    }
+
 
     public int updateTrackListItemstatusInCMI(String scoId, String siteId,
                                               String userId, String updatedStatus) {
@@ -7712,13 +7761,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
                 }
-//                // imagedata
-//                if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
-//
-//
-//                } else {
-//
-//                }
+
                 // relatedcontentcount
                 if (jsonMyLearningColumnObj.has("relatedconentcount")) {
 
@@ -7956,12 +7999,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 getTrackScoIdsAndDeleteCMI(myLearningModel);
 
                 injectMyLearningIntoTable(myLearningModel, true);
+
+                isInserted = true;
             }
 
             db.close();
         }
 
-        return false;
+        return isInserted;
     }
 
     public void getTrackScoIdsAndDeleteCMI(MyLearningModel learningModel) {
@@ -8011,6 +8056,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
 //		cursorTrackObjects.close();
+    }
+
+    public void updateContenToCatalog(MyLearningModel myLearningModel) {
+        String strUpdateML = "UPDATE " + TBL_CATALOGDATA + " SET isaddedtomylearning=1"
+                + " WHERE siteid ='" + myLearningModel.getSiteID() + "' AND userid ='"
+                + myLearningModel.getUserID() + "' AND scoid='" + myLearningModel.getScoId() + "'";
+        try {
+            executeQuery(strUpdateML);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

@@ -81,6 +81,9 @@ public class StaticValues {
      *
      * @author Venu
      */
+
+    public static final int DETAIL_CATALOG_CODE = 1212;
+
     public static final int COURSE_CLOSE_CODE = 9595;
 
 

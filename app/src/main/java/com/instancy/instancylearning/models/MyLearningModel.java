@@ -305,7 +305,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public String getAuthor() {
-        return author;
+        return isValidString(author) ? author : "";
     }
 
     public void setAuthor(String author) {

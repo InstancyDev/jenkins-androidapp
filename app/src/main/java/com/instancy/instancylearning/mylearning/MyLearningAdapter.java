@@ -212,7 +212,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
             String courseStatus = "";
-            int progressPercentage = 0;
+            int progressPercentage = 1;
 
             try {
                 progressPercentage = Integer.parseInt(myLearningModel.get(position).getProgress());
@@ -221,16 +221,16 @@ public class MyLearningAdapter extends BaseAdapter {
                 ex.printStackTrace();
             }
 
-            if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed"))) {
+            if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed")) || myLearningModel.get(position).getStatus().equalsIgnoreCase("completed")) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(progressPercentage);
+                holder.progressBar.setProgress(100);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = myLearningModel.get(position).getStatus() + " (" + myLearningModel.get(position).getProgress();
+                courseStatus = myLearningModel.get(position).getStatus() + " (" + 100;
             } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Not Started")) {
 
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
-                holder.progressBar.setProgress(0);
+                holder.progressBar.setProgress(1);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 courseStatus = myLearningModel.get(position).getStatus() + "  (0";
 
@@ -249,9 +249,9 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 }
 
-                holder.progressBar.setProgress(progressPercentage);
+                holder.progressBar.setProgress(50);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = status + "(" + progressPercentage;
+                courseStatus = status + "(" + 50;
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");

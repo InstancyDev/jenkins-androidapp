@@ -321,10 +321,20 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
     @Override
     public void onBackPressed() {
+
+        boolean isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+
+        if (isCompleted) {
+
+            db.updateCMIstatus(myLearningModel, "Completed");
+        }
+
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
         finish();
+
+
         super.onBackPressed();
     }
 
@@ -338,16 +348,44 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         return true;
     }
 
+    public boolean onTrackListClose(MyLearningModel learningModel, List<MyLearningModel> trackList) {
+        boolean isTraxkListCompleted = true;
+
+        for (int i = 0; i <= trackList.size(); i++) {
+
+            if (!trackList.get(i).getStatus().toLowerCase().contains("completed") || trackList.get(i).getStatus().toLowerCase().contains("failed") || trackList.get(i).getStatus().toLowerCase().contains("passed")) {
+
+                isTraxkListCompleted = false;
+                break;
+            } else {
+                isTraxkListCompleted = true;
+            }
+        }
+
+        return isTraxkListCompleted;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
                 Log.d("DEBUG", "onOptionsItemSelected: ");
+                boolean isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+
+                if (isCompleted) {
+
+                    db.updateCMIstatus(myLearningModel, "Completed");
+                }
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
                 setResult(RESULT_OK, intent);
                 finish();
+//                boolean isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+
+//                if (isCompleted){
+////                    db.updateContentStatus(myLearningModel);
+//                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -443,10 +481,17 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 //                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     }
+//               remove if not required
+                    injectFromDbtoModel();
+
+                    workFlowType = "onitemChange";
+                    executeWorkFlowRules(workFlowType);
+
+//                    injectFromDbtoModel();
 
                     cmiSynchTask = new CmiSynchTask(context);
                     cmiSynchTask.execute();
-                    injectFromDbtoModel();
+
                 }
             }
         }
@@ -516,7 +561,6 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     protected void onResume() {
         super.onResume();
         try {
-
             if (strlaunch.equals("0")) {
                 strlaunch = "1";
             } else if (strlaunch.equals("1")) {

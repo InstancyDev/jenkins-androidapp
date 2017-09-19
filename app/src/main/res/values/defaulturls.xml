@@ -20,8 +20,8 @@
     <!--<string name="app_default_url">http://mobile.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
-    <!--<string name="app_default_url">https://www.enlightus.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+    <string name="app_default_url">http://staging.enlightus.com/</string>
+    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
 
     <!--<string name="app_default_url">http://learnonlinelifeskills.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
@@ -32,8 +32,8 @@
     <!--<string name="app_default_url">http://development.instancy.net/</string>
         <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>  -->
 
-    <string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>
-    <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>
+    <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
     <!-- <string name="app_default_url">http://montessoritraining.instancy.net/</string>   4166
     <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>  -->

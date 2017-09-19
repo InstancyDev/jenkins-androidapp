@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.mylearning;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -13,10 +14,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,12 +34,13 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
-import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -112,18 +116,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     @Bind(R.id.txt_site_name)
     TextView txtSiteName;
 
-    @Bind(R.id.view_btn_txt)
-    TextView txtBtnView;
-
-    @Bind(R.id.report_btn_txt)
-    TextView txtBtnReport;
-
-    @Bind(R.id.view_fa_icon)
-    TextView txtFontReport;
-
-    @Bind(R.id.report_fa_icon)
-    TextView txtFontView;
-
     @Nullable
     @Bind(R.id.circle_progress)
     CircleProgressBar circleProgressBar;
@@ -133,13 +125,31 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     View consolidateLine;
 
     @Nullable
-    @Bind(R.id.viewLayout)
-    RelativeLayout bottomViewLayout;
-
-    @Nullable
     @Bind(R.id.bottom_button_layout)
     LinearLayout bottomLayout;
 
+    @Nullable
+    @Bind(R.id.viewtypeLayout)
+    RelativeLayout bottomViewLayout;
+
+    @Nullable
+    @Bind(R.id.reportLayout)
+    RelativeLayout bottomReportLayout;
+
+    @Bind(R.id.view_btn_txt)
+    TextView txtBtnView;
+
+    @Bind(R.id.report_btn_txt)
+    TextView txtBtnReport;
+
+    @Bind(R.id.report_fa_icon)
+    TextView txtFontReport;
+
+    @Bind(R.id.view_fa_icon)
+    TextView txtFontView;
+
+    @Bind(R.id.downloadlayout)
+    RelativeLayout downloadlayout;
 
     @Nullable
     @Bind(R.id.detail_layout)
@@ -159,6 +169,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     WebAPIClient webAPIClient;
     boolean isFileExist = false;
     AppController appController;
+    boolean isFromCatalog = false;
+    boolean refreshCatalogContent = false;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -169,7 +181,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+
+            myLearningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
+            isFromCatalog = bundle.getBoolean("IFROMCATALOG");
+        }
+
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(this);
         webAPIClient = new WebAPIClient(this);
@@ -178,14 +197,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
         appController = AppController.getInstance();
-        Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
-        FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
-        FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
-        FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
-        relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        txtBtnReport.setVisibility(View.GONE);
+
+        typeLayout(isFromCatalog, uiSettingsModel);
+
+
         if (myLearningModel != null) {
             txtTitle.setText(myLearningModel.getCourseName());
             txtCourseName.setText(myLearningModel.getMediaName());
@@ -274,6 +289,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                 txtCourseStatus.setVisibility(View.VISIBLE);
 
             }
+
+            if (isFromCatalog) {
+
+                progressBar.setVisibility(View.GONE);
+                txtCourseStatus.setVisibility(View.GONE);
+            }
+
             String imgUrl = myLearningModel.getImageData();
 
 //            ViewTooltip
@@ -343,6 +365,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                                                     Toast.LENGTH_SHORT)
                                                     .show();
                                             myLearningModel.setRatingId(rating);
+                                            refreshCatalogContent = true;
 //                                        notifyDataSetChanged();
                                         } else {
                                             Toast.makeText(
@@ -398,6 +421,47 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    public void typeLayout(boolean isCatalog, UiSettingsModel uiSettingsModel) {
+
+        Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
+        relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        txtBtnReport.setVisibility(View.GONE);
+
+        if (isCatalog) {
+
+            downloadlayout.setVisibility(View.GONE);
+            bottomReportLayout.setVisibility(View.GONE);
+            txtBtnView.setText("Add");
+            FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
+            txtFontView.setText(getResources().getString(R.string.fa_icon_plus));
+
+            if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
+                FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
+                txtFontView.setText(getResources().getString(R.string.fa_icon_cart_plus));
+                txtBtnView.setText("Buy");
+            }
+            if (myLearningModel.getAddedToMylearning() == 1) {
+                txtBtnView.setText("View");
+                txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
+            }
+
+
+        } else {
+
+            FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
+            FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
+            FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
+            txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
+            bottomReportLayout.setVisibility(View.INVISIBLE);
+            txtBtnView.setText("View");
+
+
+        }
 
     }
 
@@ -499,10 +563,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
         Intent intent = getIntent();
-        intent.putExtra("refresh", "refresh");
+        if (isFromCatalog) {
+            intent.putExtra("REFRESH", refreshCatalogContent);
+        } else {
+
+            intent.putExtra("refresh", "refresh");
+
+        }
         setResult(RESULT_OK, intent);
+
         finish();
         super.onBackPressed();
     }
@@ -513,8 +583,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
                 Intent intent = getIntent();
-                intent.putExtra("refresh", "refresh");
+                if (isFromCatalog) {
+                    intent.putExtra("REFRESH", refreshCatalogContent);
+                } else {
+
+                    intent.putExtra("refresh", "refresh");
+
+                }
                 setResult(RESULT_OK, intent);
+
+                finish();
                 finish();
                 return true;
             default:
@@ -522,24 +600,19 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         }
     }
 
-    @OnClick({R.id.view_btn_txt, R.id.report_btn_txt, R.id.btntxt_download_detail, R.id.viewLayout})
+    @OnClick({R.id.view_btn_txt, R.id.report_btn_txt, R.id.btntxt_download_detail, R.id.viewtypeLayout})
     public void actionsforDetail(View view) {
         switch (view.getId()) {
             case R.id.view_btn_txt:
-
-//                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
-//                    Intent intentDetail = new Intent(view.getContext(), TrackList_Activity.class);
-//                    intentDetail.putExtra("myLearningDetalData", myLearningModel);
-//                    view.getContext().startActivity(intentDetail);
-//
-//                } else {
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
-//                }
-
-                break;
-
-            case R.id.viewLayout:
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
+            case R.id.viewtypeLayout:
+                if (txtBtnView.getText().toString().equalsIgnoreCase("View")) {
+                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
+                } else if (txtBtnView.getText().toString().equalsIgnoreCase("Add")) {
+//                    Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show();
+                    addToMyLearningCheckUser(myLearningModel, 1);
+                } else if (txtBtnView.getText().toString().equalsIgnoreCase("Buy")) {
+                    Toast.makeText(this, "Buy button", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.report_btn_txt:
                 Toast.makeText(this, "here selected", Toast.LENGTH_SHORT).show();
@@ -827,6 +900,252 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         }
 
 
+    }
+
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position) {
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+
+            if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
+
+                checkUserLogin(myLearningDetalData, position);
+            } else {
+
+                addToMyLearning(myLearningDetalData, position);
+
+            }
+        }
+    }
+
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
+            if (isSubscribed) {
+                Toast toast = Toast.makeText(
+                        this,
+                        this.getString(R.string.cat_add_already),
+                        Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            } else {
+                String requestURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileAddtoMyCatalog?"
+                        + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
+                        + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
+
+                requestURL = requestURL.replaceAll(" ", "%20");
+                Log.d(TAG, "inside catalog login : " + requestURL);
+
+                StringRequest strReq = new StringRequest(Request.Method.GET,
+                        requestURL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "add to mylearning data " + response.toString());
+                        if (response.equalsIgnoreCase("true")) {
+
+
+                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
+                            myLearningModel.setAddedToMylearning(1);
+                            refreshCatalogContent = true;
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    MyLearningDetail_Activity.this, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        final Map<String, String> headers = new HashMap<>();
+                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                        return headers;
+                    }
+                };
+                ;
+                VolleySingleton.getInstance(this).addToRequestQueue(strReq);
+
+
+            }
+
+        }
+    }
+
+
+    public void checkUserLogin(final MyLearningModel learningModel, final int position) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
+                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
+                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "inside catalog login : " + urlStr);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObj) {
+                        svProgressHUD.dismiss();
+                        if (jsonObj.has("faileduserlogin")) {
+
+                            JSONArray userloginAry = null;
+                            try {
+                                userloginAry = jsonObj
+                                        .getJSONArray("faileduserlogin");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (userloginAry.length() > 0) {
+
+
+                                String response = null;
+                                try {
+                                    response = userloginAry
+                                            .getJSONObject(0)
+                                            .get("userstatus")
+                                            .toString();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (response.contains("Login Failed")) {
+                                    Toast.makeText(MyLearningDetail_Activity.this,
+                                            "Authentication Failed. Contact site admin",
+                                            Toast.LENGTH_LONG)
+                                            .show();
+
+                                }
+                                if (response.contains("Pending Registration")) {
+
+                                    Toast.makeText(MyLearningDetail_Activity.this, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
+                                            Toast.LENGTH_LONG)
+                                            .show();
+                                }
+                            }
+                        } else if (jsonObj.has("successfulluserlogin")) {
+
+                            try {
+                                JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                                if (loginResponseAry.length() != 0) {
+                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                                    String userIdresponse = loginResponseAry
+                                            .getJSONObject(0)
+                                            .get("userid").toString();
+                                    if (userIdresponse.length() != 0) {
+
+                                        addToMyLearning(learningModel, position);
+                                    }
+                                }
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
+                + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
+                + appUserModel.getUserIDValue() + "&DelivoryMode=1";
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "getMobileGetMobileContentMetaData : " + urlStr);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObj) {
+
+                        Log.d(TAG, "getMobileGetMobileContentMetaData response : " + jsonObj);
+                        if (jsonObj.length() != 0) {
+                            boolean isInserted = false;
+                            try {
+                                isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
+                                if (isInserted) {
+                                    myLearningModel.setAddedToMylearning(1);
+                                    db.updateContenToCatalog(myLearningModel);
+                                    txtBtnView.setText("View");
+                                    txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
+                                    refreshCatalogContent = true;
+//                                    Toast toast = Toast.makeText(
+//                                            MyLearningDetail_Activity.this,
+//                                            MyLearningDetail_Activity.this.getString(R.string.cat_add_success),
+//                                            Toast.LENGTH_SHORT);
+//                                    toast.setGravity(Gravity.CENTER, 0, 0);
+//                                    toast.show();
+
+                                    final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
+                                    builder.setMessage(MyLearningDetail_Activity.this.getString(R.string.cat_add_success))
+                                            .setCancelable(false)
+                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    //do things
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
 }

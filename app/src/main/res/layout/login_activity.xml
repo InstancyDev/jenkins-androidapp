@@ -3,8 +3,9 @@
     android:id="@+id/login_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/bg">
-
+    android:background="@color/colorDefault"
+    >
+    <!--android:background="@drawable/bg"-->
     <TextView
         android:id="@+id/id_settings_txt"
         android:layout_width="40dp"

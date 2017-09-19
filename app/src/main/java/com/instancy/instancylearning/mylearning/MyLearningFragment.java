@@ -890,7 +890,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         if (i == 1) {
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 //                            myLearningAdapter.notifyDataSetChanged();
-                            injectFromDbtoModel();
+//                            injectFromDbtoModel();
                         } else {
 
 //                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
@@ -898,6 +898,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     }
 //                    cmiSynchTask = new CmiSynchTask(context);
 //                    cmiSynchTask.execute();
+                    injectFromDbtoModel();
                 }
                 cmiSynchTask = new CmiSynchTask(context);
                 cmiSynchTask.execute();

@@ -23,14 +23,17 @@ public class LRSJavaScriptInterface {
     DatabaseHandler databaseHandler;
     Activity activity;
     public hideProgressListner hideProgressListner;
+    String TAG = LRSJavaScriptInterface.class.getSimpleName();
+    boolean isDownloaded;
 
 
-    public LRSJavaScriptInterface(Context c, MyLearningModel learningModel, Activity activity, hideProgressListner hideProgressListner) {
+    public LRSJavaScriptInterface(Context c, MyLearningModel learningModel, Activity activity, hideProgressListner hideProgressListner, boolean isDownloaded) {
         mContext = c;
         _learningModel = learningModel;
         databaseHandler = new DatabaseHandler(c);
         this.activity = activity;
         this.hideProgressListner = hideProgressListner;
+        this.isDownloaded = isDownloaded;
     }
 
     @JavascriptInterface
@@ -48,33 +51,33 @@ public class LRSJavaScriptInterface {
     }
 
     @JavascriptInterface
-    public String SaveQuestionDataWithQuestionData(String quesData) {
+    public void SaveQuestionDataWithQuestionData(String quesData) {
         Log.d("SaveQuesWD", quesData);
         String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
-        return status;
+//        return status;
     }
 
     @JavascriptInterface
-    public String SaveLocationWithLocation(String location) {
+    public void SaveLocationWithLocation(String location) {
         Log.d("SaveLocat", location);
         String status = databaseHandler.saveResponseCMI(_learningModel, "location", location);
 
-        return location;
+//        return location;
     }
 
     @JavascriptInterface
-    public String SaveQuestionDataWithQuestionDataSeqID(String quesData, String seqID) {
+    public void SaveQuestionDataWithQuestionDataSeqID(String quesData, String seqID) {
         Log.d("SaveQuesWD", quesData);
         String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
-        return status;
+//        return status;
     }
 
     @JavascriptInterface
-    public String SaveLocationWithLocationSeqID(String location, String seqID) {
+    public void SaveLocationWithLocationSeqID(String location, String seqID) {
         Log.d("SaveLocationWith", location);
         String status = "";
         databaseHandler.updateCMiRecordForTemplateView(_learningModel, seqID, location);
-        return location;
+//        return location;
     }
 
     // Course close
@@ -82,10 +85,12 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public void OnLineCourseClose() {
 
-        Intent intent = activity.getIntent();
-        intent.putExtra("myLearningDetalData", _learningModel);
-        activity.setResult(RESULT_OK, intent);
-        activity.finish();
+        if (!isDownloaded) {
+            Intent intent = activity.getIntent();
+            intent.putExtra("myLearningDetalData", _learningModel);
+            activity.setResult(RESULT_OK, intent);
+            activity.finish();
+        }
 
     }
 
@@ -122,11 +127,19 @@ public class LRSJavaScriptInterface {
     }
 
     @JavascriptInterface
-    public String UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String trackItemId, String trackIstate, String wMessage, String ruleId, String cStepId) {
+    public void UpdateTrackWorkflowResultsWithTrackIDTrackItemIDTrackItemStateWmessageRuleIDStepID(String trackID, String trackItemId, String trackIstate, String wMessage, String ruleId, String cStepId) {
 
         Log.d("SaveLocationWith", trackID);
         databaseHandler.updateWorkFlowRulesInDBForTrackTemplate(trackID, trackItemId, trackIstate, wMessage, ruleId, cStepId, _learningModel.getSiteID(), _learningModel.getUserID());
-        return cStepId;
+//        return cStepId;
 
+    }
+
+    @JavascriptInterface
+    public String LMSGetPooledQuestionNos() {
+
+        Log.d(TAG, "LMSGetPooledQuestionNos: ");
+
+        return "";
     }
 }

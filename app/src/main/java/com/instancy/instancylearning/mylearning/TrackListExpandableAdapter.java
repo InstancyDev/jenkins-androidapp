@@ -342,7 +342,13 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         } else {
             childView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 //            childView.setBackgroundColor(Color.WHITE);
-            holder.btnDownload.setEnabled(true);
+            File myFile = new File(trackChildList.getOfflinepath());
+            if (myFile.exists()) {
+                holder.btnDownload.setEnabled(false);
+            } else {
+
+                holder.btnDownload.setEnabled(true);
+            }
             holder.btnContextMenu.setEnabled(true);
             holder.imgThumb.setEnabled(true);
         }
@@ -554,7 +560,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
     public void downloadThin(String downloadStruri, final String downloadPath, final MyLearningModel learningModel, final int position, final View view, final int gposition) {
 
-        downloadStruri = downloadStruri.replace(" ", "%20");
+        downloadStruri = downloadStruri.replaceAll(" ", "%20");
         ThinDownloadManager downloadManager = new ThinDownloadManager();
         Uri downloadUri = Uri.parse(downloadStruri);
         String extensionStr = "";
