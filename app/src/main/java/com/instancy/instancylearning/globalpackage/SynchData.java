@@ -48,11 +48,11 @@ public class SynchData {
     public void SyncData() {
         String bundlevalue1 = null;
         List<CMIModel> cmiList = new ArrayList<CMIModel>();
-        List<CMIModel> cmiMylearningList = dbh.getAllCmiDetails(dbh.TBL_DOWNLOADDATA);
+        List<CMIModel> cmiMylearningList = dbh.getAllCmiDownloadDataDetails();
         cmiList.addAll(cmiMylearningList);
-        List<CMIModel> cmitrackList = dbh.getAllCmiDetails(dbh.TBL_TRACKLISTDATA);
+        List<CMIModel> cmitrackList = dbh.getAllCmiTrackListDetails();
         cmiList.addAll(cmitrackList);
-        List<CMIModel> cmiEventRelated = dbh.getAllCmiDetails(dbh.TBL_RELATEDCONTENTDATA);
+        List<CMIModel> cmiEventRelated = dbh.getAllCmiRelatedContentDetails();
         cmiList.addAll(cmiEventRelated);
         for (CMIModel tempCmi : cmiList) {
             bundlevalue1 = String.valueOf(tempCmi.get_userId());
@@ -91,20 +91,6 @@ public class SynchData {
             }
 
             try {
-                if (tempCmi.get_score().equals("")
-                        || tempCmi.get_score() == null
-                        || tempCmi.get_score().equals("null")) {
-                    sb.append("<Score>0</Score>");
-                } else {
-                    sb.append("<Score>" + tempCmi.get_score() + "</Score>");
-                }
-            } catch (Exception ex) {
-                sb.append("<Score>0</Score>");
-            }
-            sb.append("<ObjectTypeId>" + tempCmi.get_objecttypeid()
-                    + "</ObjectTypeId>");
-
-            try {
                 if (tempCmi.get_datecompleted().equals("")
                         || tempCmi.get_datecompleted() == null
                         || tempCmi.get_datecompleted().equals("null")) {
@@ -120,6 +106,37 @@ public class SynchData {
             } catch (Exception ex) {
                 sb.append("<DateCompleted></DateCompleted>");
             }
+
+            sb.append("<NoOfAttempts>" + tempCmi.get_noofattempts()
+                    + "</NoOfAttempts>");
+
+
+            // need to send data  parentcontentid and parentscoid
+            sb.append("<TrackScoID>"+String.valueOf(tempCmi.get_scoId())+"</TrackScoID>");
+            sb.append("<TrackContentID></TrackContentID>");
+
+
+           // need to send parent obj type id
+            sb.append("<TrackObjectTypeID>"+tempCmi.get_objecttypeid()+"</TrackObjectTypeID>");
+
+
+            sb.append("<OrgUnitID>" + tempCmi.get_siteId() + "</OrgUnitID>");
+
+            try {
+                if (tempCmi.get_score().equals("")
+                        || tempCmi.get_score() == null
+                        || tempCmi.get_score().equals("null")) {
+                    sb.append("<Score>0</Score>");
+                } else {
+                    sb.append("<Score>" + tempCmi.get_score() + "</Score>");
+                }
+            } catch (Exception ex) {
+                sb.append("<Score>0</Score>");
+            }
+            sb.append("<ObjectTypeId>" + tempCmi.get_objecttypeid()
+                    + "</ObjectTypeId>");
+
+
             try {
                 if (tempCmi.get_seqNum().equals("")
                         || tempCmi.get_seqNum() == null
@@ -132,14 +149,6 @@ public class SynchData {
             } catch (Exception ex) {
                 sb.append("<SequenceNumber>0</SequenceNumber>");
             }
-
-            sb.append("<NoOfAttempts>" + tempCmi.get_noofattempts()
-                    + "</NoOfAttempts>");
-
-            sb.append("<TrackScoID></TrackScoID>");
-            sb.append("<TrackContentID></TrackContentID>");
-            sb.append("<TrackObjectTypeID></TrackObjectTypeID>");
-            sb.append("<OrgUnitID>" + tempCmi.get_siteId() + "</OrgUnitID>");
 
             try {
                 if (tempCmi.get_attemptsleft().equals("")

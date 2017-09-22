@@ -143,7 +143,7 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor());
+        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
@@ -187,7 +187,7 @@ public class MyLearningAdapter extends BaseAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688")) {
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
 
@@ -234,7 +234,7 @@ public class MyLearningAdapter extends BaseAdapter {
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 courseStatus = myLearningModel.get(position).getStatus() + "  (0";
 
-            } else {
+            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete") || (myLearningModel.get(position).getStatus().toLowerCase().contains("inprogress")) || (myLearningModel.get(position).getStatus().toLowerCase().contains("in progress"))) {
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
                 String status = "";
@@ -252,6 +252,23 @@ public class MyLearningAdapter extends BaseAdapter {
                 holder.progressBar.setProgress(50);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
                 courseStatus = status + "(" + 50;
+
+            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("pending review") || (myLearningModel.get(position).getStatus().toLowerCase().contains("pendingreview"))) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+                String status = "";
+
+                status = myLearningModel.get(position).getStatus();
+
+                holder.progressBar.setProgress(100);
+                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+                courseStatus = status + "(" + 100;
+            } else {
+
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
+                holder.progressBar.setProgress(0);
+                String status = "";
+                status = myLearningModel.get(position).getStatus();
+                courseStatus = status + "(" + 0;
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");

@@ -218,7 +218,7 @@ public class Utilities {
      */
     public static boolean isValidString(String str) {
         try {
-            if (str == null || str.equals("") || str.equals("null") || str.equals("undefined")) {
+            if (str == null || str.equals("") || str.contains("null") || str.equals("undefined")) {
                 return false;
             } else {
                 return true;

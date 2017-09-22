@@ -327,6 +327,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         if (isCompleted) {
 
             db.updateCMIstatus(myLearningModel, "Completed");
+            myLearningModel.setStatus("Completed");
         }
 
         Intent intent = getIntent();
@@ -376,6 +377,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 if (isCompleted) {
 
                     db.updateCMIstatus(myLearningModel, "Completed");
+                    myLearningModel.setStatus("Completed");
                 }
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
@@ -560,16 +562,19 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     @Override
     protected void onResume() {
         super.onResume();
-        try {
-            if (strlaunch.equals("0")) {
-                strlaunch = "1";
-            } else if (strlaunch.equals("1")) {
-                injectFromDbtoModel();
-                workFlowType = "onitemChange";
-                executeWorkFlowRules(workFlowType);
+        if (isTraxkList) {
+            try {
+
+                if (strlaunch.equals("0")) {
+                    strlaunch = "1";
+                } else if (strlaunch.equals("1")) {
+                    injectFromDbtoModel();
+                    workFlowType = "onitemChange";
+                    executeWorkFlowRules(workFlowType);
+                }
+            } catch (Exception ex) {
+                Log.d("Onresume", ex.getMessage());
             }
-        } catch (Exception ex) {
-            Log.d("Onresume", ex.getMessage());
         }
     }
 

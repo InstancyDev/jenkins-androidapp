@@ -85,10 +85,16 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         preferencesManager = PreferencesManager.getInstance();
         appController = AppController.getInstance();
         String siteUrl = preferencesManager.getStringValue(StaticValues.KEY_SITEURL);
+        String siteID = preferencesManager.getStringValue(StaticValues.KEY_SITEID);
 
         if (siteUrl.length() == 0) {
             preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
 
+
+        }
+        if (siteID.length() == 0) {
+
+            preferencesManager.setStringValue("374", StaticValues.KEY_SITEID);
         }
         webAPIClient = new WebAPIClient(this);
         getSiteConfigsAsycTask = new GetSiteConfigsAsycTask(this);

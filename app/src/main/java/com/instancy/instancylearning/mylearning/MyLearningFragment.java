@@ -870,7 +870,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                             int i = -1;
                             i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
-
                             if (i == 1) {
 //                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
                                 injectFromDbtoModel();

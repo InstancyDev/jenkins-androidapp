@@ -74,6 +74,16 @@ public class MyLearningModel implements Serializable {
     String trackScoid = "";
     String showStatus = "";
 
+    public String getTrackOrRelatedContentID() {
+        return trackOrRelatedContentID;
+    }
+
+    public void setTrackOrRelatedContentID(String trackOrRelatedContentID) {
+        this.trackOrRelatedContentID = trackOrRelatedContentID;
+    }
+
+    String trackOrRelatedContentID = "";
+
     // Exclusive For Catalog Model start
 
     String googleProductID = "";
@@ -229,7 +239,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public String getShowStatus() {
-        return showStatus;
+        return isValidString(showStatus) ? showStatus : "";
     }
 
     public void setShowStatus(String showStatus) {

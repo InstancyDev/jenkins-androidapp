@@ -149,17 +149,17 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/btnewuser"
-                android:layout_width="300dp"
-                android:layout_height="45dp"
-                android:layout_below="@+id/id_loginbtn"
-                android:background="@color/colorDefault"
-                android:gravity="center"
-                android:text="Subscribe Now"
-                android:textAllCaps="false"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp" />
+            <!--<Button-->
+                <!--android:id="@+id/btnewuser"-->
+                <!--android:layout_width="300dp"-->
+                <!--android:layout_height="45dp"-->
+                <!--android:layout_below="@+id/id_loginbtn"-->
+                <!--android:background="@color/colorDefault"-->
+                <!--android:gravity="center"-->
+                <!--android:text="Subscribe Now"-->
+                <!--android:textAllCaps="false"-->
+                <!--android:textColor="@color/colorWhite"-->
+                <!--android:textSize="16sp" />-->
 
 
             <LinearLayout
@@ -186,19 +186,19 @@
                     android:textSize="14sp" />
 
 
-                <!--<Button-->
-                <!--android:id="@+id/btnewuser"-->
-                <!--android:layout_width="100dp"-->
-                <!--android:layout_height="20dp"-->
-                <!--android:layout_gravity="end"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@android:color/transparent"-->
-                <!--android:gravity="center"-->
-                <!--android:text="@string/btn_txt_signup"-->
-                <!--android:textAlignment="textEnd"-->
-                <!--android:textAllCaps="false"-->
-                <!--android:textColor="@color/colorBlack"-->
-                <!--android:textSize="14sp" />-->
+                <Button
+                android:id="@+id/btnewuser"
+                android:layout_width="100dp"
+                android:layout_height="20dp"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:text="@string/btn_txt_signup"
+                android:textAlignment="textEnd"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp" />
 
             </LinearLayout>
 
@@ -251,13 +251,13 @@
         android:id="@+id/rlSocialLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="27dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
 
         <TextView
             android:id="@+id/btntxt_facebook"

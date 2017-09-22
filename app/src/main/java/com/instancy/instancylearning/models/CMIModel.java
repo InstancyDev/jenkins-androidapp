@@ -29,6 +29,45 @@ public class CMIModel implements Serializable {
     private String _pooledqusseq = "";
     private String _textResponses = "";
 
+
+    public String getParentObjTypeId() {
+        return parentObjTypeId;
+    }
+
+    public void setParentObjTypeId(String parentObjTypeId) {
+        this.parentObjTypeId = parentObjTypeId;
+    }
+
+    public String getParentContentId() {
+        return parentContentId;
+    }
+
+    public void setParentContentId(String parentContentId) {
+        this.parentContentId = parentContentId;
+    }
+
+    public String getParentScoId() {
+        return parentScoId;
+    }
+
+    public void setParentScoId(String parentScoId) {
+        this.parentScoId = parentScoId;
+    }
+
+    private String parentObjTypeId = "";
+    private String parentContentId = "";
+    private String parentScoId = "";
+
+    public String get_contentId() {
+        return _contentId;
+    }
+
+    public void set_contentId(String _contentId) {
+        this._contentId = _contentId;
+    }
+
+    private String _contentId = "";
+
     public String getShowStatus() {
         return showStatus;
     }

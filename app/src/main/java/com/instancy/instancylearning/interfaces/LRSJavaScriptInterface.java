@@ -53,7 +53,7 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public void SaveQuestionDataWithQuestionData(String quesData) {
         Log.d("SaveQuesWD", quesData);
-        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
+        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData,"");
 //        return status;
     }
 
@@ -68,7 +68,7 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public void SaveQuestionDataWithQuestionDataSeqID(String quesData, String seqID) {
         Log.d("SaveQuesWD", quesData);
-        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData);
+        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData,seqID);
 //        return status;
     }
 

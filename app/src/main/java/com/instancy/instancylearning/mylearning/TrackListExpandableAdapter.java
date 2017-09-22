@@ -267,20 +267,57 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
                 courseStatus = trackChildList.getStatus() + "  (0";
 
-            } else {
-                String statusValue = "In Progress";
-
-                if (trackChildList.getStatus().toLowerCase().equalsIgnoreCase("incomplete") || trackChildList.getStatus().equalsIgnoreCase("") || trackChildList.getStatus().toLowerCase().equalsIgnoreCase("in complete")) {
-                    statusValue = "In Progress";
-                }
-
+            } else if (trackChildList.getStatus().equalsIgnoreCase("incomplete") || (trackChildList.getStatus().toLowerCase().contains("inprogress")) || (trackChildList.getStatus().toLowerCase().contains("in progress"))) {
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
-                holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
+                String status = "";
+
+                if (trackChildList.getStatus().equalsIgnoreCase("incomplete")) {
+                    status = "In Progress";
+                } else if (trackChildList.getStatus().length() == 0) {
+                    status = "In Progress";
+
+                } else {
+                    status = trackChildList.getStatus();
+
+                }
+
+                holder.progressBar.setProgress(50);
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = statusValue + " (" + trackChildList.getProgress();
+                courseStatus = status + "(" + 50;
+
+            } else if (trackChildList.getStatus().equalsIgnoreCase("pending review") || (trackChildList.getStatus().toLowerCase().contains("pendingreview"))) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
+                String status = "";
+
+                status = trackChildList.getStatus();
+
+                holder.progressBar.setProgress(100);
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
+                courseStatus = status + "(" + 100;
+            } else {
+
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorGray)));
+                holder.progressBar.setProgress(0);
+                String status = "";
+                status = trackChildList.getStatus();
+                courseStatus = status + "(" + 0;
 
             }
+//            else {
+//                String statusValue = "In Progress";
+//
+//                if (trackChildList.getStatus().toLowerCase().equalsIgnoreCase("incomplete") || trackChildList.getStatus().equalsIgnoreCase("") || trackChildList.getStatus().toLowerCase().equalsIgnoreCase("in complete")) {
+//                    statusValue = "In Progress";
+//                }
+//
+//
+//                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
+//                holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
+//                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
+//                courseStatus = statusValue + " (" + trackChildList.getProgress();
+//
+//            }
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
         String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
@@ -441,10 +478,11 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 }
             };
 
-
             setCompleteListner = new SetCompleteListner() {
                 @Override
                 public void completedStatus() {
+                    myLearningDetalData.setStatus("Completed");
+                    myLearningDetalData.setProgress("100");
                     notifyDataSetChanged();
                 }
             };
@@ -465,10 +503,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     if (!isDownloading) {
                         downloadTheCourse(myLearningDetalData, view, getChildPosition, getGroupPosition);
                         btnDownload.setTextColor(view.getResources().getColor(R.color.colorStatusInProgress));
-                        showToast(_context, "Download Started");
+//                        showToast(_context, "Download Started");
 
                     } else {
-                        showToast(_context, "Download in progress");
+//                        showToast(_context, "Download in progress");
                     }
                 } else {
                     showToast(_context, "No Internet");

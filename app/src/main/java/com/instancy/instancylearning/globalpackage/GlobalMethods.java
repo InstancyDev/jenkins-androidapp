@@ -92,7 +92,7 @@ public class GlobalMethods {
             }
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-
+                offlinePath = "file://" + myLearningModel.getOfflinepath();
                 // LRS is implemented completed disabled for some resons
                 if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
@@ -136,7 +136,6 @@ public class GlobalMethods {
                 String cerName = myLearningModel.getContentID() + "_Certificate";
 
                 offlinePath = offlinePath + "/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
-
 
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
@@ -242,7 +241,7 @@ public class GlobalMethods {
 
             } else if (offlinePathEncode.toLowerCase().contains(".xlsx")
                     || offlinePathEncode.toLowerCase().contains(".xls")) {
-                offlinePathEncode = offlinePathEncode.replace("file://", "");
+                offlinePathEncode = offlinePathEncode.replace(" content://", "");
 
                 File file = new File(offlinePathEncode);
                 Intent intent4 = new Intent();
@@ -459,6 +458,10 @@ public class GlobalMethods {
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
 
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("20")) {
+
+                        urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getContentID() + "/glossary_english.html";
 
                     } else {
 

@@ -293,11 +293,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT)");
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
@@ -522,324 +523,328 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String result = convertStreamToString(inputStream);
             JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
-            UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-            String siteid = "";
-            try {
 
-                if (jsonObject.has("table")) {
-                    JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
-                    for (int i = 0; i < jsonTable.size(); i++) {
-                        Log.d(TAG, "siteSettingJsonObj: inDB " + jsonTable);
-                        JsonObject siteSettingJsonObj = jsonTable.get(i).getAsJsonObject();
-                        if (siteSettingJsonObj.has("siteid")) {
+            if (isValidString(result)) {
+
+                JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
+                UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+                String siteid = "";
+                try {
+
+                    if (jsonObject.has("table")) {
+                        JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
+                        for (int i = 0; i < jsonTable.size(); i++) {
+                            Log.d(TAG, "siteSettingJsonObj: inDB " + jsonTable);
+                            JsonObject siteSettingJsonObj = jsonTable.get(i).getAsJsonObject();
+                            if (siteSettingJsonObj.has("siteid")) {
 //                            Log.d(TAG, "siteSettingJsonObj: siteid  " + siteSettingJsonObj.get("siteid"));
 //                            [{"SiteID":374,"Name":"Playground","SiteURL":"http://Test-admin.instancy.net/"}]
-                            siteid = siteSettingJsonObj.get("siteid").getAsString();
-                            String strsitename = siteSettingJsonObj.get("name").getAsString();
-                            String platformurl = siteSettingJsonObj.get("siteurl").getAsString();
-                            preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
-                            preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
-                            preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
+                                siteid = siteSettingJsonObj.get("siteid").getAsString();
+                                String strsitename = siteSettingJsonObj.get("name").getAsString();
+                                String platformurl = siteSettingJsonObj.get("siteurl").getAsString();
+                                preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
+                                preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
+                                preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
 //                            prefEditor = sharedPreferences.edit();
 //                            prefEditor.putString(StaticValues.KEY_SITEID, siteid);
 //                            prefEditor.putString(StaticValues.KEY_SITENAME, strsitename);
 //                            prefEditor.putString(StaticValues.KEY_PLATFORMURL, platformurl);
-                            appUserModel.setSiteIDValue(siteid);
-                            appUserModel.setSiteName(strsitename);
+                                appUserModel.setSiteIDValue(siteid);
+                                appUserModel.setSiteName(strsitename);
 //                            prefEditor.commit();
+                            }
                         }
                     }
-                }
-                if (jsonObject.has("table1")) {
-                    JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
-                    if (jsonTableOne.size() > 0) {
+                    if (jsonObject.has("table1")) {
+                        JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
+                        if (jsonTableOne.size() > 0) {
 
-                        for (int i = 0; i < jsonTableOne.size(); i++) {
-                            JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
+                            for (int i = 0; i < jsonTableOne.size(); i++) {
+                                JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
 
-                            if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#APP_BACKGROUNDCOLOR#")) {
-                                uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#App_backgrndText#")) {
-                                uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#APP_BACKGROUNDCOLOR#")) {
+                                    uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#HEADER_BACKGROUNDCOLOR#")) {
-                                uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#App_backgrndText#")) {
+                                    uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#NativeApp_Header_Text#")) {
-                                uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#HEADER_BACKGROUNDCOLOR#")) {
+                                    uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_BG_COLOR#")) {
-                                uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#NativeApp_Header_Text#")) {
+                                    uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_TEXT_COLOR#")) {
-                                uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_BG_COLOR#")) {
+                                    uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_SL_BG_COLOR#")) {
-                                uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_TEXT_COLOR#")) {
+                                    uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_SL_TEXT_COLOR#")) {
-                                uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_SL_BG_COLOR#")) {
+                                    uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#HEADER_BG_COLOR#")) {
-                                uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_SL_TEXT_COLOR#")) {
+                                    uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#HEADER_TEXT_COLOR#")) {
-                                uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
+                                        .equals("#HEADER_BG_COLOR#")) {
+                                    uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_HEADER_BGCOLOR#")) {
-                                uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#HEADER_TEXT_COLOR#")) {
+                                    uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_HEADER_TEXT_COLOR#")) {
-                                uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_HEADER_BGCOLOR#")) {
+                                    uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_BG_ALTERNATIVECOLOR#")) {
-                                uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_HEADER_TEXT_COLOR#")) {
+                                    uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#MENU_BG_SELECT_TEXTCOLOR#")) {
-                                uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_BG_ALTERNATIVECOLOR#")) {
+                                    uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#Button_Background_Color#")) {
-                                uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#MENU_BG_SELECT_TEXTCOLOR#")) {
+                                    uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#Button_Text_Color#")) {
-                                uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#Button_Background_Color#")) {
+                                    uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#FileUplad_BUTTON#")) {
-                                uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#Button_Text_Color#")) {
+                                    uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#LIST_BG_COLOR#")) {
-                                uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#FileUplad_BUTTON#")) {
+                                    uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#LIST_BORDER_COLOR#")) {
-                                uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#LIST_BG_COLOR#")) {
+                                    uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#NativeLogin_Page_Background#")) {
-                                uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#LIST_BORDER_COLOR#")) {
+                                    uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
-                            } else if (uisettingsJsonOjb
-                                    .get("csseditingpalceholdername")
-                                    .getAsString()
-                                    .equals("#NativeAppLogin_Page_Text#")) {
-                                uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
-                                        "csseditingpalceholdervalue")
+                                        .equals("#NativeLogin_Page_Background#")) {
+                                    uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                } else if (uisettingsJsonOjb
+                                        .get("csseditingpalceholdername")
                                         .getAsString()
-                                        .substring(0, 7));
+                                        .equals("#NativeAppLogin_Page_Text#")) {
+                                    uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+                                            "csseditingpalceholdervalue")
+                                            .getAsString()
+                                            .substring(0, 7));
+                                }
+
                             }
 
                         }
 
                     }
 
-                }
+                    if (jsonObject.has("table2")) {
+                        JsonArray jsonTableTwo = jsonObject.get("table2").getAsJsonArray();
+                        if (jsonTableTwo.size() > 0) {
 
-                if (jsonObject.has("table2")) {
-                    JsonArray jsonTableTwo = jsonObject.get("table2").getAsJsonArray();
-                    if (jsonTableTwo.size() > 0) {
-
-                        for (int i = 0; i < jsonTableTwo.size(); i++) {
-                            JsonObject nativeSettingsObj = jsonTableTwo.get(i).getAsJsonObject();
+                            for (int i = 0; i < jsonTableTwo.size(); i++) {
+                                JsonObject nativeSettingsObj = jsonTableTwo.get(i).getAsJsonObject();
 //                            Log.d(TAG, "uisettingsJsonOjb: "+nativeSettingsObj);
 
-                            if (nativeSettingsObj.get("name").getAsString().equals("autodownloadsizelimit")) {
+                                if (nativeSettingsObj.get("name").getAsString().equals("autodownloadsizelimit")) {
 
-                                uiSettingsModel.setAutodownloadsizelimit(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setAutodownloadsizelimit(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if (nativeSettingsObj.get("name").getAsString().equals("CatalogContentDownloadType")) {
+                                } else if (nativeSettingsObj.get("name").getAsString().equals("CatalogContentDownloadType")) {
 
-                                uiSettingsModel.setCatalogContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setCatalogContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if ((nativeSettingsObj.get("name").getAsString().equals("courseappcontent"))) {
+                                } else if ((nativeSettingsObj.get("name").getAsString().equals("courseappcontent"))) {
 
-                                uiSettingsModel.setCourseAppContent(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setCourseAppContent(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if ((nativeSettingsObj.get("name").getAsString().equals("ContentDownloadType"))) {
+                                } else if ((nativeSettingsObj.get("name").getAsString().equals("ContentDownloadType"))) {
 
-                                uiSettingsModel.setContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if ((nativeSettingsObj.get("name").getAsString().equals("EnableNativeCatlog"))) {
+                                } else if ((nativeSettingsObj.get("name").getAsString().equals("EnableNativeCatlog"))) {
 
-                                uiSettingsModel.setEnableNativeCatlog(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setEnableNativeCatlog(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if ((nativeSettingsObj.get("name").getAsString().equals("EnablePushNotification"))) {
+                                } else if ((nativeSettingsObj.get("name").getAsString().equals("EnablePushNotification"))) {
 
-                                uiSettingsModel.setEnablePushNotification(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setEnablePushNotification(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if ((nativeSettingsObj.get("name").getAsString().equals("nativeapptype"))) {
+                                } else if ((nativeSettingsObj.get("name").getAsString().equals("nativeapptype"))) {
 
-                                uiSettingsModel.setNativeAppType(nativeSettingsObj.get("keyvalue").getAsString());
+                                    uiSettingsModel.setNativeAppType(nativeSettingsObj.get("keyvalue").getAsString());
 
-                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationAllowed"))) {
+                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationAllowed"))) {
 
-                                uiSettingsModel.setSelfRegistrationAllowed(nativeSettingsObj.get("keyvalue").getAsString());
-                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
+                                    uiSettingsModel.setSelfRegistrationAllowed(nativeSettingsObj.get("keyvalue").getAsString());
+                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
 
-                                uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
-                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
+                                    uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
+                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
 
-                                uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
-                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationDisplayName"))) {
+                                    uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
+                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationDisplayName"))) {
 
-                                uiSettingsModel.setSignUpName(nativeSettingsObj.get("keyvalue").getAsString());
-                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeAppLoginSetting"))) {
+                                    uiSettingsModel.setSignUpName(nativeSettingsObj.get("keyvalue").getAsString());
+                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeAppLoginSetting"))) {
 
-                                uiSettingsModel.setEnableAppLogin(nativeSettingsObj.get("keyvalue").getAsString());
-                            } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
+                                    uiSettingsModel.setEnableAppLogin(nativeSettingsObj.get("keyvalue").getAsString());
+                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
 
-                                String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
-                                if (appLogo.length() == 0) {
-                                    String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
-                                    uiSettingsModel.setEnableAppLogin(appLogos);
+                                    String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
+                                    if (appLogo.length() == 0) {
+                                        String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
+                                        uiSettingsModel.setEnableAppLogin(appLogos);
+                                    }
                                 }
-                            }
-
-                        }
-                    }
-
-                }
-
-                if (jsonObject.has("table3")) {
-                    JsonArray jsonTableThree = jsonObject.get("table3").getAsJsonArray();
-                    if (jsonTableThree.size() > 0) {
-
-                        for (int i = 0; i < jsonTableThree.size(); i++) {
-                            JsonObject nativeSettingsObj = jsonTableThree.get(i).getAsJsonObject();
-                            Log.d(TAG, "table three: " + nativeSettingsObj);
-                        }
-                    }
-                }
-
-                if (jsonObject.has("table4")) {
-                    JsonArray jsonTableFour = jsonObject.get("table4").getAsJsonArray();
-                    if (jsonTableFour.size() > 0) {
-
-                        for (int i = 0; i < jsonTableFour.size(); i++) {
-                            JsonObject nativeSettingsObj = jsonTableFour.get(i).getAsJsonObject();
-                            Log.d(TAG, "table three: " + nativeSettingsObj);
-                            if (nativeSettingsObj.get("privilegeid").getAsString().equals("908")) {
-
-                                uiSettingsModel.setIsFaceBook(nativeSettingsObj.get("ismobileprivilege").getAsString());
-
-                            } else if (nativeSettingsObj.get("privilegeid").getAsString().equals("911")) {
-
-                                uiSettingsModel.setIsTwitter(nativeSettingsObj.get("ismobileprivilege").getAsString());
-
-                            } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("909"))) {
-
-                                uiSettingsModel.setIsLinkedIn(nativeSettingsObj.get("ismobileprivilege").getAsString());
-
-                            } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("910"))) {
-
-                                uiSettingsModel.setIsGoogle(nativeSettingsObj.get("ismobileprivilege").getAsString());
 
                             }
+                        }
 
+                    }
 
+                    if (jsonObject.has("table3")) {
+                        JsonArray jsonTableThree = jsonObject.get("table3").getAsJsonArray();
+                        if (jsonTableThree.size() > 0) {
+
+                            for (int i = 0; i < jsonTableThree.size(); i++) {
+                                JsonObject nativeSettingsObj = jsonTableThree.get(i).getAsJsonObject();
+                                Log.d(TAG, "table three: " + nativeSettingsObj);
+                            }
                         }
                     }
+
+                    if (jsonObject.has("table4")) {
+                        JsonArray jsonTableFour = jsonObject.get("table4").getAsJsonArray();
+                        if (jsonTableFour.size() > 0) {
+
+                            for (int i = 0; i < jsonTableFour.size(); i++) {
+                                JsonObject nativeSettingsObj = jsonTableFour.get(i).getAsJsonObject();
+                                Log.d(TAG, "table three: " + nativeSettingsObj);
+                                if (nativeSettingsObj.get("privilegeid").getAsString().equals("908")) {
+
+                                    uiSettingsModel.setIsFaceBook(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                } else if (nativeSettingsObj.get("privilegeid").getAsString().equals("911")) {
+
+                                    uiSettingsModel.setIsTwitter(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("909"))) {
+
+                                    uiSettingsModel.setIsLinkedIn(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("910"))) {
+
+                                    uiSettingsModel.setIsGoogle(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                }
+
+
+                            }
+                        }
+                    }
+
+                    Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());
+
+                    insertIntoAppSettingsTable(uiSettingsModel, siteid, siteUrl);
+                } catch (JsonIOException jsonExce) {
+                    jsonExce.printStackTrace();
                 }
-
-                Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());
-
-                insertIntoAppSettingsTable(uiSettingsModel, siteid, siteUrl);
-            } catch (JsonIOException jsonExce) {
-                jsonExce.printStackTrace();
             }
         }
     }
@@ -1075,257 +1080,259 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (inputStream != null) {
 
             String result = convertStreamToString(inputStream);
-            JsonParser jsonParser = new JsonParser();
-            JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
 
-            try {
-                JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
-                // for deleting records in table for respective table
-                deleteRecordsinTable(appController.getSiteId(), siteUrl, TBL_NATIVEMENUS);
+            if (isValidString(result)) {
+                JsonParser jsonParser = new JsonParser();
+                JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
 
-                for (int i = 0; i < jsonTable.size(); i++) {
+                try {
+                    JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
+                    // for deleting records in table for respective table
+                    deleteRecordsinTable(appController.getSiteId(), siteUrl, TBL_NATIVEMENUS);
 
-                    JsonObject nativeMenuJsonObj = jsonTable.get(i).getAsJsonObject();
-                    NativeMenuModel nativeMenuModel = new NativeMenuModel();
+                    for (int i = 0; i < jsonTable.size(); i++) {
 
-                    Log.d(TAG, "nativeMenuJsonObj: inDB " + nativeMenuJsonObj);
+                        JsonObject nativeMenuJsonObj = jsonTable.get(i).getAsJsonObject();
+                        NativeMenuModel nativeMenuModel = new NativeMenuModel();
 
-                    if (nativeMenuJsonObj.has("menuid")) {
+                        Log.d(TAG, "nativeMenuJsonObj: inDB " + nativeMenuJsonObj);
 
-                        JsonElement el = nativeMenuJsonObj.get("menuid");
+                        if (nativeMenuJsonObj.has("menuid")) {
 
-                        if (el != null && !el.isJsonNull()) {
+                            JsonElement el = nativeMenuJsonObj.get("menuid");
 
-                            nativeMenuModel.setMenuid(nativeMenuJsonObj.get("menuid").getAsString());
-                        } else {
+                            if (el != null && !el.isJsonNull()) {
 
-                            nativeMenuModel.setMenuid("");
+                                nativeMenuModel.setMenuid(nativeMenuJsonObj.get("menuid").getAsString());
+                            } else {
+
+                                nativeMenuModel.setMenuid("");
+                            }
+
+                        }
+                        if (nativeMenuJsonObj.has("displayname")) {
+
+                            JsonElement el = nativeMenuJsonObj.get("displayname");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setDisplayname(nativeMenuJsonObj.get("displayname").getAsString());
+                            } else {
+
+                                nativeMenuModel.setDisplayname("");
+                            }
+
+
+                        }
+                        if (nativeMenuJsonObj.has("displayorder")) {
+
+
+                            JsonElement el = nativeMenuJsonObj.get("displayorder");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setDisplayOrder(nativeMenuJsonObj.get("displayorder").getAsInt());
+                            } else {
+
+                                nativeMenuModel.setDisplayOrder(0);
+                            }
+
+
+                        }
+                        if (nativeMenuJsonObj.has("image")) {
+
+                            JsonElement el = nativeMenuJsonObj.get("image");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setImage(nativeMenuJsonObj.get("image").getAsString());
+                            } else {
+
+                                nativeMenuModel.setImage("");
+                            }
+
+
+                        }
+                        if (nativeMenuJsonObj.has("isofflinemenu")) {
+                            JsonElement el = nativeMenuJsonObj.get("isofflinemenu");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setIsofflineMenu(nativeMenuJsonObj.get("isofflinemenu").getAsString());
+
+                            } else {
+
+                                nativeMenuModel.setIsofflineMenu("");
+                            }
+
+                        }
+                        if (nativeMenuJsonObj.has("isenabled")) {
+
+                            JsonElement el = nativeMenuJsonObj.get("isenabled");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setIsEnabled(nativeMenuJsonObj.get("isenabled").getAsString());
+
+                            } else {
+
+                                nativeMenuModel.setIsEnabled("");
+                            }
+
+                        }
+                        if (nativeMenuJsonObj.has("contexttitle")) {
+
+
+                            JsonElement el = nativeMenuJsonObj.get("contexttitle");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setContextTitle(nativeMenuJsonObj.get("contexttitle").getAsString());
+
+                            } else {
+
+                                nativeMenuModel.setContextTitle("");
+                            }
+
+                        }
+                        if (nativeMenuJsonObj.has("contextmenuid")) {
+
+
+                            JsonElement el = nativeMenuJsonObj.get("contextmenuid");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setContextmenuId(nativeMenuJsonObj.get("contextmenuid").getAsString());
+
+                            } else {
+
+                                nativeMenuModel.setContextmenuId("");
+                            }
+                        }
+                        if (nativeMenuJsonObj.has("repositoryid")) {
+
+
+                            JsonElement el = nativeMenuJsonObj.get("repositoryid");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setRepositoryId(nativeMenuJsonObj.get("repositoryid").getAsString());
+
+
+                            } else {
+
+                                nativeMenuModel.setRepositoryId("");
+                            }
+
+
+                        }
+                        if (nativeMenuJsonObj.has("landingpagetype")) {
+
+
+                            JsonElement el = nativeMenuJsonObj.get("landingpagetype");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setLandingpageType(nativeMenuJsonObj.get("landingpagetype").getAsString());
+
+
+                            } else {
+
+                                nativeMenuModel.setLandingpageType("");
+                            }
+
                         }
 
-                    }
-                    if (nativeMenuJsonObj.has("displayname")) {
+                        if (nativeMenuJsonObj.has("parameterstrings")) {
 
-                        JsonElement el = nativeMenuJsonObj.get("displayname");
 
-                        if (el != null && !el.isJsonNull()) {
+                            JsonElement el = nativeMenuJsonObj.get("parameterstrings");
 
-                            nativeMenuModel.setDisplayname(nativeMenuJsonObj.get("displayname").getAsString());
-                        } else {
+                            if (el != null && !el.isJsonNull()) {
 
-                            nativeMenuModel.setDisplayname("");
+                                nativeMenuModel.setParameterString(nativeMenuJsonObj.get("parameterstrings").getAsString());
+
+
+                            } else {
+
+                                nativeMenuModel.setParameterString("");
+                            }
+
                         }
 
+                        if (nativeMenuJsonObj.has("parentmenuid")) {
 
-                    }
-                    if (nativeMenuJsonObj.has("displayorder")) {
+                            JsonElement el = nativeMenuJsonObj.get("parentmenuid");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setParentMenuId(nativeMenuJsonObj.get("parentmenuid").getAsString());
 
 
-                        JsonElement el = nativeMenuJsonObj.get("displayorder");
+                            } else {
 
-                        if (el != null && !el.isJsonNull()) {
+                                nativeMenuModel.setParentMenuId("");
+                            }
 
-                            nativeMenuModel.setDisplayOrder(nativeMenuJsonObj.get("displayorder").getAsInt());
-                        } else {
-
-                            nativeMenuModel.setDisplayOrder(0);
                         }
+                        if (nativeMenuJsonObj.has("categorystyle")) {
+
+                            JsonElement el = nativeMenuJsonObj.get("categorystyle");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setCategoryStyle(nativeMenuJsonObj.get("categorystyle").getAsString());
 
 
-                    }
-                    if (nativeMenuJsonObj.has("image")) {
+                            } else {
 
-                        JsonElement el = nativeMenuJsonObj.get("image");
+                                nativeMenuModel.setCategoryStyle("");
+                            }
 
-                        if (el != null && !el.isJsonNull()) {
 
-                            nativeMenuModel.setImage(nativeMenuJsonObj.get("image").getAsString());
-                        } else {
-
-                            nativeMenuModel.setImage("");
                         }
+                        if (nativeMenuJsonObj.has("componentid")) {
+
+                            JsonElement el = nativeMenuJsonObj.get("componentid");
+
+                            if (el != null && !el.isJsonNull()) {
+
+                                nativeMenuModel.setComponentId(nativeMenuJsonObj.get("componentid").getAsString());
 
 
-                    }
-                    if (nativeMenuJsonObj.has("isofflinemenu")) {
-                        JsonElement el = nativeMenuJsonObj.get("isofflinemenu");
+                            } else {
 
-                        if (el != null && !el.isJsonNull()) {
+                                nativeMenuModel.setComponentId("");
+                            }
 
-                            nativeMenuModel.setIsofflineMenu(nativeMenuJsonObj.get("isofflinemenu").getAsString());
-
-                        } else {
-
-                            nativeMenuModel.setIsofflineMenu("");
                         }
+                        if (nativeMenuJsonObj.has("conditions")) {
 
-                    }
-                    if (nativeMenuJsonObj.has("isenabled")) {
+                            JsonElement el = nativeMenuJsonObj.get("conditions");
 
-                        JsonElement el = nativeMenuJsonObj.get("isenabled");
+                            if (el != null && !el.isJsonNull()) {
 
-                        if (el != null && !el.isJsonNull()) {
+                                nativeMenuModel.setConditions(nativeMenuJsonObj.get("conditions").getAsString());
 
-                            nativeMenuModel.setIsEnabled(nativeMenuJsonObj.get("isenabled").getAsString());
 
-                        } else {
+                            } else {
 
-                            nativeMenuModel.setIsEnabled("");
+                                nativeMenuModel.setConditions("");
+                            }
+
                         }
-
-                    }
-                    if (nativeMenuJsonObj.has("contexttitle")) {
-
-
-                        JsonElement el = nativeMenuJsonObj.get("contexttitle");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setContextTitle(nativeMenuJsonObj.get("contexttitle").getAsString());
-
-                        } else {
-
-                            nativeMenuModel.setContextTitle("");
-                        }
-
-                    }
-                    if (nativeMenuJsonObj.has("contextmenuid")) {
-
-
-                        JsonElement el = nativeMenuJsonObj.get("contextmenuid");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setContextmenuId(nativeMenuJsonObj.get("contextmenuid").getAsString());
-
-                        } else {
-
-                            nativeMenuModel.setContextmenuId("");
-                        }
-                    }
-                    if (nativeMenuJsonObj.has("repositoryid")) {
-
-
-                        JsonElement el = nativeMenuJsonObj.get("repositoryid");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setRepositoryId(nativeMenuJsonObj.get("repositoryid").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setRepositoryId("");
-                        }
-
-
-                    }
-                    if (nativeMenuJsonObj.has("landingpagetype")) {
-
-
-                        JsonElement el = nativeMenuJsonObj.get("landingpagetype");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setLandingpageType(nativeMenuJsonObj.get("landingpagetype").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setLandingpageType("");
-                        }
-
+                        insertIntoNativeMenusTable(nativeMenuModel, appController.getSiteId(), siteUrl);
                     }
 
-                    if (nativeMenuJsonObj.has("parameterstrings")) {
+                } catch (JsonIOException ex) {
 
-
-                        JsonElement el = nativeMenuJsonObj.get("parameterstrings");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setParameterString(nativeMenuJsonObj.get("parameterstrings").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setParameterString("");
-                        }
-
-                    }
-
-                    if (nativeMenuJsonObj.has("parentmenuid")) {
-
-                        JsonElement el = nativeMenuJsonObj.get("parentmenuid");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setParentMenuId(nativeMenuJsonObj.get("parentmenuid").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setParentMenuId("");
-                        }
-
-                    }
-                    if (nativeMenuJsonObj.has("categorystyle")) {
-
-                        JsonElement el = nativeMenuJsonObj.get("categorystyle");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setCategoryStyle(nativeMenuJsonObj.get("categorystyle").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setCategoryStyle("");
-                        }
-
-
-                    }
-                    if (nativeMenuJsonObj.has("componentid")) {
-
-                        JsonElement el = nativeMenuJsonObj.get("componentid");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setComponentId(nativeMenuJsonObj.get("componentid").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setComponentId("");
-                        }
-
-                    }
-                    if (nativeMenuJsonObj.has("conditions")) {
-
-                        JsonElement el = nativeMenuJsonObj.get("conditions");
-
-                        if (el != null && !el.isJsonNull()) {
-
-                            nativeMenuModel.setConditions(nativeMenuJsonObj.get("conditions").getAsString());
-
-
-                        } else {
-
-                            nativeMenuModel.setConditions("");
-                        }
-
-                    }
-                    insertIntoNativeMenusTable(nativeMenuModel, appController.getSiteId(), siteUrl);
+                    ex.printStackTrace();
                 }
 
-            } catch (JsonIOException ex) {
 
-                ex.printStackTrace();
             }
 
-
         }
-
-
     }
 
     /**
@@ -1352,8 +1359,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
             menuList = new ArrayList<SideMenusModel>();
-            if (cursor != null && cursor.moveToFirst()) {
-                do {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    String contextMenuID = cursor.getString(cursor
+                            .getColumnIndex("contextmenuid"));
+                    //
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+                        break;
+
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -1418,7 +1432,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("issubmenuexists")));
 
                     menuList.add(menu);
-                } while (cursor.moveToNext());
+                }
             }
 
             cursor.close();
@@ -2042,7 +2056,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 //
 
-
                 // wresult
                 if (jsonMyLearningColumnObj.has("wresult")) {
 
@@ -2069,6 +2082,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
                     if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                         ejectRecordsinCmi(myLearningModel);
+
                     }
                 }
 
@@ -2172,9 +2186,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
 
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor != null) {
                 myLearningModelList = new ArrayList<MyLearningModel>();
-                do {
+                while (cursor.moveToNext()) {
                     myLearningModel = new MyLearningModel();
                     myLearningModel.setUserID(cursor.getString(cursor
                             .getColumnIndex("userid")));
@@ -2263,9 +2277,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("typeofevent")));
                     myLearningModel.setProgress(cursor.getString(cursor
                             .getColumnIndex("progress")));
-
                     myLearningModelList.add(myLearningModel);
-                } while (cursor.moveToNext());
+
+                }
             }
             cursor.close();
             db.close();
@@ -3159,7 +3173,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // status
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                    trackLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    String status = jsonMyLearningColumnObj.get("corelessonstatus").toString();
+                    if (!isValidString(status)) {
+                        status = "Not Started";
+                        if (status.equalsIgnoreCase("Not Started")) {
+
+                            // delete usersession
+
+
+                        }
+                    }
+
+
+                    trackLearningModel.setStatus(status);
+
 
                 }
 
@@ -3305,7 +3332,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         trackLearningModel.setBlockName("");
                     }
                 }
-
+                trackLearningModel.setTrackOrRelatedContentID(parentModel.getContentID());
                 if (isTrackList) {
                     injectIntoTrackTable(trackLearningModel);
                 } else {
@@ -3710,8 +3737,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         trackLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
                     }
 
-
                     trackLearningModel.setBlockName("");
+                    trackLearningModel.setTrackOrRelatedContentID(myLearningModel.getContentID());
 
                 }
 
@@ -3798,6 +3825,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("sequencenumber", trackListModel.getSequenceNumber());
             contentValues.put("courseattempts", trackListModel.getCourseAttempts());
             contentValues.put("offlinepath", trackListModel.getOfflinepath());
+            contentValues.put("trackContentId", trackListModel.getTrackOrRelatedContentID());
 
             db.insert(TBL_TRACKLISTDATA, null, contentValues);
 
@@ -3938,6 +3966,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     trackListModel.setIsDiscussion(cursor.getString(cursor
                             .getColumnIndex("isdiscussion")));
 
+                    trackListModel.setShowStatus(cursor.getString(cursor
+                            .getColumnIndex("showstatus")));
 // for tracklis
 
                     if (isTrackListView) {
@@ -3945,8 +3975,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         trackListModel.setParentID(cursor.getString(cursor
                                 .getColumnIndex("parentid")));
 
-                        trackListModel.setShowStatus(cursor.getString(cursor
-                                .getColumnIndex("showstatus")));
 
                         trackListModel.setProgress(cursor.getString(cursor
                                 .getColumnIndex("progress")));
@@ -4103,6 +4131,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("dateassigned", trackListModel.getDateAssigned());
             contentValues.put("keywords", trackListModel.getKeywords());
             contentValues.put("offlinepath", trackListModel.getOfflinepath());
+            contentValues.put("trackContentId", trackListModel.getOfflinepath());
 
             db.insert(TBL_RELATEDCONTENTDATA, null, contentValues);
 
@@ -4681,7 +4710,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-
     public void ejectRecordsinCmi(MyLearningModel learnerModel) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -4691,10 +4719,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     "' AND userid= '" + learnerModel.getUserID() + "'";
             db.execSQL(strDelete);
 
-
         } catch (SQLiteException sqlEx) {
 
             sqlEx.printStackTrace();
+        }
+
+        if (learnerModel.getObjecttypeId().equalsIgnoreCase("10")) {
+
+            try {
+                String strDelete = "DELETE FROM " + TBL_CMI + " WHERE siteid= '" + learnerModel.getSiteID() +
+                        "' AND scoid= '" + learnerModel.getScoId() +
+                        "' AND userid= '" + learnerModel.getUserID() + "'";
+                db.execSQL(strDelete);
+
+            } catch (SQLiteException sqlEx) {
+
+                sqlEx.printStackTrace();
+            }
+
+
         }
 
     }
@@ -4732,7 +4775,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
-
 
     public void preFunctionalityBeforeNonLRSOfflineContentPathCreation(MyLearningModel mylearningModel, Context context) {
 
@@ -4834,7 +4876,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     statusValue = cursor.getString(cursor.getColumnIndex("status"));
                     suspendDataValue = cursor.getString(cursor.getColumnIndex("suspenddata"));
                     sequenceNumberValue = cursor.getString(cursor.getColumnIndex("sequencenumber"));
-                    sequenceNumberValue = "1";
+
+                    if (!isValidString(sequenceNumberValue)) {
+                        sequenceNumberValue = "1";
+                    }
+
 
                 } while (cursor.moveToNext());
             }
@@ -4884,8 +4930,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         cursor = db.rawQuery(sqlQuery, null);
 
 
-                        if (cursor != null && cursor.moveToFirst()) {
-                            do {
+                        if (cursor != null) {
+                            while (cursor.moveToNext()) {
 
                                 if (question.length() != 0) {
                                     question = question + "$";
@@ -4972,7 +5018,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 }
 
 //                                Log.d(TAG, "generateOfflinePathForCourseView: " + question);
-                            } while (cursor.moveToNext());
+                            }
+                            ;
                         }
                     } catch (SQLiteException ex) {
                         ex.printStackTrace();
@@ -4998,7 +5045,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         boolean isSessionExists = false;
         int numberOfAttemptsInt = 0;
 //            var timeSpent = "00:00:00"
-        String sqlQuery = "SELECT count(sessionid) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + mylearningModel.getSiteID() + " AND scoid = " + mylearningModel.getScoId() + " AND userid = " + mylearningModel.getUserID();
+        String sqlQuery = "SELECT count(sessionid) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + mylearningModel.getSiteID() + " AND scoid = '" + mylearningModel.getScoId() + "' AND userid = " + mylearningModel.getUserID();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.rawQuery(sqlQuery, null);
@@ -5022,7 +5069,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (isSessionExists) {
             LearnerSessionModel learnersessionTb = new LearnerSessionModel();
             if (mylearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-                String[] tupleValues = getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(mylearningModel, sequenceNumberValue);
+                String[] tupleValues = getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(mylearningModel.getScoId(), sequenceNumberValue, mylearningModel.getSiteID(), mylearningModel.getUserID());
                 String objectScoidValue = tupleValues[0];
 
 
@@ -5057,7 +5104,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public int getLatestAttempt(String scoId, String userId, String siteID) {
 
-        String sqlQuery = "SELECT count(sessionid) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + siteID + " AND scoid = " + scoId + " AND userid = " + userId;
+        String sqlQuery = "SELECT count(sessionid) as attemptscount FROM " + TBL_USERSESSION + " WHERE siteid = " + siteID + " AND scoid = '" + scoId + "' AND userid = " + userId;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.rawQuery(sqlQuery, null);
@@ -5083,18 +5130,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public String[] getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(MyLearningModel learningModel, String seqNumber) {
+    public String[] getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(String trackScoId, String seqNumber, String siteID, String userID) {
 
         String[] strAry = new String[2];
 
-        String sqlQuery = "SELECT scoid, objecttypeid FROM " + TBL_TRACKOBJECTS + " WHERE siteid = " + learningModel.getSiteID() + " AND trackscoid = " + learningModel.getScoId() + " AND sequencenumber = " + seqNumber + " AND userid = " + learningModel.getUserID();
+        String sqlQuery = "SELECT scoid, objecttypeid FROM " + TBL_TRACKOBJECTS + " WHERE siteid = " + siteID + " AND trackscoid = " + trackScoId + " AND sequencenumber = " + seqNumber + " AND userid = " + userID;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
         cursor = db.rawQuery(sqlQuery, null);
 
         try {
 
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor != null) {
+
+
                 while (cursor.moveToNext()) {
 
                     String scoID = cursor.getString(cursor.getColumnIndex("scoid"));
@@ -5109,6 +5158,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         } catch (SQLiteException ex) {
 
+            ex.printStackTrace();
+            Log.d(TAG, "getTrackObjectTypeIDAndScoidBasedOnSequenceNumber: " + ex);
 
         }
         return strAry;
@@ -5388,7 +5439,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return requestString;
     }
 
-    public String getTrackObjectList(MyLearningModel mylearningModel, String lStatusValue, String susData, String seqNumnber) {
+    public String getTrackObjectList(MyLearningModel mylearningModel, String lStatusValue, String susData, String cmiSeqNumber) {
 
         String query = "";
         String locationValue = "";
@@ -5403,8 +5454,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Cursor cursor = null;
             cursor = db.rawQuery(sqlQuery, null);
 
-            if (cursor.moveToFirst()) {
-                do {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
 
                     String status = "";
                     String suspendData = "";
@@ -5418,7 +5469,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (!statusValue.equalsIgnoreCase("null") && !statusValue.isEmpty()) {
 
-                        statusValue = statusValue + "@" + status;
+                        statusValue = statusValue + "@" + status + "$" + sequenceNo;
                     } else {
 
                         statusValue = status + "$" + sequenceNo;
@@ -5427,7 +5478,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (!suspendDataValue.equalsIgnoreCase("null") && !suspendDataValue.isEmpty()) {
 
-                        suspendDataValue = suspendDataValue + "@" + suspendData;
+                        suspendDataValue = suspendDataValue + "@" + suspendData + "$" + sequenceNo;
                     } else {
 
                         suspendDataValue = suspendData + "$" + sequenceNo;
@@ -5435,13 +5486,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (!locationValue.equalsIgnoreCase("null") && !locationValue.isEmpty()) {
 
-                        locationValue = locationValue + "@" + location;
+                        locationValue = locationValue + "@" + location + "$" + sequenceNo;
+                        ;
                     } else {
 
                         locationValue = location + "$" + sequenceNo;
                     }
 
-                } while (cursor.moveToNext());
+                }
+                ;
             }
         } catch (SQLiteException ex) {
             ex.printStackTrace();
@@ -5454,16 +5507,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Cursor cursor = null;
             cursor = db.rawQuery(sqlQuerys, null);
 
-            if (cursor.moveToFirst()) {
-                do {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
 
                     if (question.length() != 0) {
                         question = question + "$";
                     }
 
-
                     String sqNO = "";
-                    String seqNo = cursor.getString(cursor.getColumnIndex("questionid"));
+                    String seqNo = cursor.getString(cursor.getColumnIndex("sequencenumber"));
 
                     if (!seqNo.equalsIgnoreCase("null") && !seqNo.isEmpty()) {
                         sqNO = seqNo;
@@ -5559,7 +5611,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         question = question + "@";
                     }
 
-                } while (cursor.moveToNext());
+                }
+                ;
 
             }
         } catch (SQLiteException ex)
@@ -5579,7 +5632,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String replaceString = displayName.replaceAll(" ", "%20");
 
 
-        query = "?nativeappURL=true&cid=" + mylearningModel.getScoId() + "&stid=" + mylearningModel.getUserID() + "&lloc=" + locationValue + "&lstatus=" + lStatusValue + "&susdata=" + susData + "&tbookmark=" + seqNumnber + "&LtSusdata=" + suspendDataValue + "&LtQuesData=" + question + "&LtStatus=" + statusValue + "&sname=" + replaceString;
+        query = "?nativeappURL=true&cid=" + mylearningModel.getScoId() + "&stid=" + mylearningModel.getUserID() + "&lloc=" + locationValue + "&lstatus=" + lStatusValue + "&susdata=" + susData + "&tbookmark=" + cmiSeqNumber + "&LtSusdata=" + suspendDataValue + "&LtQuesData=" + question + "&LtStatus=" + statusValue + "&sname=" + replaceString;
 
         query = query.replaceAll("null", "");
 
@@ -5662,8 +5715,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         try {
 
 
-            String strExeQuery = "SELECT count(sessionid) AS attemptscount from  " + TBL_USERSESSION + " WHERE scoid="
-                    + scoID + " AND siteid=" + learningModel.getSiteID()
+            String strExeQuery = "SELECT count(sessionid) AS attemptscount from  " + TBL_USERSESSION + " WHERE scoid='"
+                    + scoID + "' AND siteid=" + learningModel.getSiteID()
                     + " AND userid=" + learningModel.getUserID();
             Cursor cursor = null;
             cursor = db.rawQuery(strExeQuery, null);
@@ -5713,7 +5766,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public String SaveQuestionDataWithQuestionDataMethod(MyLearningModel learningModel, String questionData) {
+    public String SaveQuestionDataWithQuestionDataMethod(MyLearningModel learningModel, String questionData, String seqID) {
 
         String uploadfilepath = dbctx.getExternalFilesDir(null) + "/Mydownloads/";
 
@@ -5723,13 +5776,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String tempStr = questionData.replaceAll("undefined", "");
         String[] quesAry = tempStr.split("@");
+        String scoID = learningModel.getScoId();
 
         int assessmentAttempt = Getassessmentattempt(learningModel, "false");
 
         if (quesAry.length > 3) {
 
+            if (learningModel.getObjecttypeId().equalsIgnoreCase("10") && seqID.length() != 0) {
+
+                String[] objectTypeIDScoid = getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(learningModel.getScoId(), seqID, learningModel.getSiteID(), learningModel.getUserID());
+
+                if (objectTypeIDScoid.length > 1) {
+                    scoID = objectTypeIDScoid[0];
+                }
+            }
+
             StudentResponseModel studentresponse = new StudentResponseModel();
-            studentresponse.set_scoId(Integer.parseInt(learningModel.getScoId()));
+            studentresponse.set_scoId(Integer.parseInt(scoID));
             studentresponse.set_siteId(learningModel.getSiteID());
             studentresponse.set_userId(Integer.parseInt(learningModel.getUserID()));
 
@@ -5831,6 +5894,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return "true";
     }
 
+    public String[] getTrackObjectTypeIDAndScoid(MyLearningModel learningModel, String seqId) {
+
+        String[] objAndScoID = new String[2];
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String scoID = "";
+        String objID = "";
+        try {
+            String sqlQuery = "SELECT scoid, objecttypeid FROM " + TBL_TRACKOBJECTS + " WHERE siteid = " + learningModel.getSiteID() + " AND trackscoid = " + learningModel.getScoId() + " AND userid = " + learningModel.getUserID() + " AND sequencenumber = " + seqId;
+            Cursor cursor = null;
+            cursor = db.rawQuery(sqlQuery, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    scoID = cursor.getString(cursor.getColumnIndex("scoid"));
+                    objID = cursor.getString(cursor.getColumnIndex("scoid"));
+
+                } while (cursor.moveToNext());
+            }
+
+            objAndScoID[0] = objID;
+            objAndScoID[1] = scoID;
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+
+        return objAndScoID;
+    }
 
     public void insertStudentResponses(StudentResponseModel resDetails) {
 
@@ -6007,94 +6100,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = this.getWritableDatabase();
             String strExeQuery = "";
-//            if (getname.equals("timespent")) {
-//                String pretime;
-//                Cursor cursor = null;
-//
-//                strExeQuery = "SELECT timespent,noofattempts,objecttypeid FROM cmi WHERE scoid="
-//                        + cmiNew.getScoId()
-//                        + " AND userid="
-//                        + cmiNew.getUserID()
-//                        + " AND siteid="
-//                        + cmiNew.getSiteID();
-//                cursor = db.rawQuery(strExeQuery, null);
-//
-//                if (cursor != null && cursor.getCount() > 0) {
-//                    if (cursor.moveToFirst()) {
-//
-//                        if (isValidString(cursor.getString(cursor
-//                                .getColumnIndex("timespent")))) {
-//                            pretime = cursor.getString(cursor
-//                                    .getColumnIndex("timespent"));
-//
-//                            if (!isValidString(getvalue)) {
-//
-//                            } else {
-//                                String[] strSplitvalues = pretime.split(":");
-//                                String[] strSplitvalues1 = getvalue.split(":");
-//                                if (strSplitvalues.length == 3
-//                                        && strSplitvalues1.length == 3) {
-//                                    try {
-//                                        int hours1 = (Integer
-//                                                .parseInt(strSplitvalues[0]) + Integer
-//                                                .parseInt(strSplitvalues1[0])) * 3600;
-//                                        int mins1 = (Integer
-//                                                .parseInt(strSplitvalues[1]) + Integer
-//                                                .parseInt(strSplitvalues1[1])) * 60;
-//                                        int secs1 = (int) (Float
-//                                                .parseFloat(strSplitvalues[2]) + Float
-//                                                .parseFloat(strSplitvalues1[2]));
-//                                        int totaltime = hours1 + mins1 + secs1;
-//                                        long longVal = totaltime;
-//                                        int hours = (int) longVal / 3600;
-//                                        int remainder = (int) longVal - hours
-//                                                * 3600;
-//                                        int mins = remainder / 60;
-//                                        remainder = remainder - mins * 60;
-//                                        int secs = remainder;
-//
-//                                        // cmiNew.set_timespent(hours+":"+mins+":"+secs);
-//                                        getvalue = hours + ":" + mins + ":"
-//                                                + secs;
-//                                    } catch (Exception ex) {
-//
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        if (cursor.getString(1).equals("9")
-//                                || cursor.getString(1).equals("8")) {
-//                            if (!isValidString(cmiNew.getScore())) {
-//
-//                            } else {
-//                                int intNoAtt = Integer.parseInt(cursor
-//                                        .getString(1));
-//
-//                                intNoAtt = intNoAtt + 1;
-//                                strExeQuery = "UPDATE CMI SET noofattempts="
-//                                        + intNoAtt + "" + ", isupdate= 'false'"
-//                                        + " WHERE scoid=" + cmiNew.getScoId()
-//                                        + " AND siteid=" + cmiNew.getSiteID()
-//                                        + " AND userid=" + cmiNew.getUserID();
-//
-//                                db.execSQL(strExeQuery);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
 
-//            if (cmiNew.getStatus().equalsIgnoreCase("Not Started")) {
-//
-//                strExeQuery = "INSERT INTO "
-//                        + TBL_CMI
-//                        + "(siteid,scoid,userid,location,status,isupdate)"
-//                        + " VALUES (" + cmiNew.getSiteID() + ","
-//                        + cmiNew.getScoId() + "," + cmiNew.getUserID()
-//                        + "," + getvalue + ","
-//                        + "'In Progress" + "','false')";
-//                db.execSQL(strExeQuery);
-//            } else {
             strExeQuery = "UPDATE CMI SET " + getname + "='" + getvalue + "'"
                     + ", isupdate= 'false'" + " WHERE scoid="
                     + cmiNew.getScoId() + " AND siteid=" + cmiNew.getSiteID()
@@ -6107,7 +6113,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.close();
 
         } catch (Exception e) {
-            Log.d("UpdatetScormCMI", e.getMessage());
+            Log.d("UpdatetCMI", e.getMessage());
         }
 
         return "true";
@@ -6215,6 +6221,59 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return sessionList;
     }
 
+    public void updateUserSessionData(LearnerSessionModel sessionDetails) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = null;
+        String countAttempt = "";
+        int countAttemptsInt = 1;
+        try {
+            String strExeQuery = "SELECT count(sessionid) as countattempt from " + TBL_USERSESSION + " WHERE scoid="
+                    + sessionDetails.getScoID() + " AND userid="
+                    + sessionDetails.getUserID() + " AND siteid="
+                    + sessionDetails.getSiteID();
+            cursor = db.rawQuery(strExeQuery, null);
+
+            while (cursor.moveToNext()) {
+
+                countAttempt = (cursor.getString(cursor
+                        .getColumnIndex("countattempt")));
+            }
+
+            if (!isValidString(countAttempt)) {
+
+                countAttemptsInt = 1;
+            } else {
+
+                try {
+                    countAttemptsInt = Integer.parseInt(countAttempt);
+                } catch (NumberFormatException ex) {
+
+                }
+            }
+
+            if (cursor != null && cursor.getCount() > 0) {
+                try {
+                    strExeQuery = "UPDATE " + TBL_USERSESSION
+                            + " SET timespent='"
+                            + sessionDetails.getTimeSpent() + "' WHERE scoid="
+                            + sessionDetails.getScoID() + " AND siteid="
+                            + sessionDetails.getSiteID() + " AND userid="
+                            + sessionDetails.getUserID()
+                            + " AND attemptnumber="
+                            + countAttemptsInt;
+                    db.execSQL(strExeQuery);
+                } catch (Exception e) {
+                    Log.d("InsertUserSession", e.getMessage());
+                }
+            }
+            cursor.close();
+        } catch (Exception e) {
+            Log.d("InsertUserSession", e.getMessage());
+        }
+
+    }
+
+
     public void insertUserSession(LearnerSessionModel sessionDetails) {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = null;
@@ -6228,26 +6287,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + sessionDetails.getSiteID();
             cursor = db.rawQuery(strExeQuery, null);
 
-//            while (cursor.moveToNext()) {
-//
-//                timeSpent = (cursor.getString(cursor
-//                        .getColumnIndex("timespent")));
-//            }
+            while (cursor.moveToNext()) {
+
+                timeSpent = (cursor.getString(cursor
+                        .getColumnIndex("timespent")));
+            }
 
             if (cursor != null && cursor.getCount() > 0) {
-//                try {
-//                    strExeQuery = "UPDATE " + TBL_USERSESSION
-//                            + " SET timespent='"
-//                            + timeSpent + "' WHERE scoid="
-//                            + sessionDetails.getScoID() + " AND siteid="
-//                            + sessionDetails.getSiteID() + " AND userid="
-//                            + sessionDetails.getUserID()
-//                            + " AND attemptnumber="
-//                            + sessionDetails.getAttemptNumber();
-//                    db.execSQL(strExeQuery);
-//                } catch (Exception e) {
-//                Log.d("InsertUserSession", e.getMessage());
-//                }
+                try {
+                    strExeQuery = "UPDATE " + TBL_USERSESSION
+                            + " SET timespent='"
+                            + timeSpent + "' WHERE scoid="
+                            + sessionDetails.getScoID() + " AND siteid="
+                            + sessionDetails.getSiteID() + " AND userid="
+                            + sessionDetails.getUserID()
+                            + " AND attemptnumber="
+                            + sessionDetails.getAttemptNumber();
+                    db.execSQL(strExeQuery);
+                } catch (Exception e) {
+                    Log.d("InsertUserSession", e.getMessage());
+                }
             } else {
                 try {
                     strExeQuery = "INSERT INTO "
@@ -6267,7 +6326,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.d("InsertUserSession", e.getMessage());
         }
-        db.close();
+
     }
 
     public int getLatestAttempt(MyLearningModel learningModel) {
@@ -6432,7 +6491,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String strExeQuery = "";
         Cursor cursor = null;
         String timeDelay = "0";
-        strExeQuery = "SELECT timedelay FROM " + TBL_TRACKLISTDATA
+        strExeQuery = "SELECT scoid FROM " + TBL_TRACKLISTDATA
                 + " WHERE userid='" + learningModel.getUserID() + "' AND scoid='" + learningModel.getTrackScoid()
                 + "' AND siteid='" + learningModel.getSiteID() + "'";
         try {
@@ -6453,17 +6512,187 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return timeDelay;
     }
 
-    public List<CMIModel> getAllCmiDetails(String TBL_GENERIC) {
+    public List<CMIModel> getAllCmiRelatedContentDetails() {
         List<CMIModel> cmiList = new ArrayList<CMIModel>();
         SQLiteDatabase db = this.getWritableDatabase();
-        String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.noofattempts, C.score, D.objecttypeid, C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.contentid, C.coursemode, C.scoremin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl FROM "
+
+        String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.noofattempts, C.score, D.objecttypeid, C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.contentid, D.trackcontentid, D.trackscoid, C.coursemode, C.scoremin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl,C.pooledquesseq FROM "
                 + TBL_CMI
                 + " C inner join "
-                + TBL_GENERIC
-                + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate = 'false'";
+                + TBL_RELATEDCONTENTDATA
+                + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate = 'false' ORDER BY C.sequencenumber";
+
+
         Cursor cursor = db.rawQuery(selQuery, null);
         if (cursor.moveToFirst()) {
             do {
+
+                String objecttypeId = cursor.getString(cursor
+                        .getColumnIndex("objecttypeid"));
+
+                if (objecttypeId.equalsIgnoreCase("10")) {
+
+                    continue;
+                }
+
+
+                CMIModel cmiDetails = new CMIModel();
+                cmiDetails.set_scoId(Integer.parseInt(cursor.getString(cursor
+                        .getColumnIndex("scoid"))));
+                cmiDetails.set_location(cursor.getString(cursor
+                        .getColumnIndex("location")));
+                cmiDetails.set_status(cursor.getString(cursor
+                        .getColumnIndex("status")));
+                cmiDetails.set_suspenddata(cursor.getString(cursor
+                        .getColumnIndex("suspenddata")));
+                cmiDetails.set_Id(Integer.parseInt(cursor.getString(cursor
+                        .getColumnIndex("ID"))));
+                cmiDetails.set_siteId(cursor.getString(cursor
+                        .getColumnIndex("siteid")));
+                cmiDetails.set_score(cursor.getString(cursor
+                        .getColumnIndex("score")));
+                cmiDetails.set_objecttypeid(cursor.getString(cursor
+                        .getColumnIndex("objecttypeid")));
+                cmiDetails.set_seqNum(cursor.getString(cursor
+                        .getColumnIndex("sequencenumber")));
+                cmiDetails.set_userId(Integer.parseInt(cursor.getString(cursor
+                        .getColumnIndex("userid"))));
+                cmiDetails.set_datecompleted(cursor.getString(cursor
+                        .getColumnIndex("datecompleted")));
+                cmiDetails.set_noofattempts(Integer.parseInt(cursor
+                        .getString(cursor.getColumnIndex("noofattempts"))));
+
+                cmiDetails.set_coursemode(cursor.getString(cursor
+                        .getColumnIndex("coursemode")));
+                cmiDetails.set_qusseq(cursor.getString(cursor
+                        .getColumnIndex("randomquesseq")));
+                cmiDetails.set_sitrurl(cursor.getString(cursor
+                        .getColumnIndex("siteurl")));
+                cmiDetails.set_textResponses(cursor.getString(cursor
+                        .getColumnIndex("textResponses")));
+                cmiDetails.set_pooledqusseq(cursor.getString(cursor
+                        .getColumnIndex("pooledquesseq")));
+
+                cmiDetails.setParentObjTypeId("10");
+                cmiDetails.setParentContentId(cursor.getString(cursor
+                        .getColumnIndex("trackContentId")));
+                cmiDetails.setParentScoId(cursor.getString(cursor
+                        .getColumnIndex("trackscoid")));
+
+                cmiList.add(cmiDetails);
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return cmiList;
+    }
+
+    public List<CMIModel> getAllCmiTrackListDetails() {
+        List<CMIModel> cmiList = new ArrayList<CMIModel>();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.noofattempts, C.score,C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.objecttypeid, D.contentid, D.trackContentId, D.trackscoid, C.coursemode, C.scoremin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl, C.pooledquesseq FROM "
+                + TBL_CMI
+                + " C inner join "
+                + TBL_TRACKLISTDATA
+                + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate = 'false' ORDER BY C.sequencenumber ";
+
+
+        Cursor cursor = db.rawQuery(selQuery, null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+
+                String objecttypeId = cursor.getString(cursor
+                        .getColumnIndex("objecttypeid"));
+
+                if (objecttypeId.equalsIgnoreCase("10")) {
+
+                    continue;
+                }
+
+
+                CMIModel cmiDetails = new CMIModel();
+                cmiDetails.set_scoId(Integer.parseInt(cursor.getString(cursor
+                        .getColumnIndex("scoid"))));
+                cmiDetails.set_location(cursor.getString(cursor
+                        .getColumnIndex("location")));
+                cmiDetails.set_status(cursor.getString(cursor
+                        .getColumnIndex("status")));
+                cmiDetails.set_suspenddata(cursor.getString(cursor
+                        .getColumnIndex("suspenddata")));
+                cmiDetails.set_Id(Integer.parseInt(cursor.getString(cursor
+                        .getColumnIndex("ID"))));
+                cmiDetails.set_siteId(cursor.getString(cursor
+                        .getColumnIndex("siteid")));
+                cmiDetails.set_score(cursor.getString(cursor
+                        .getColumnIndex("score")));
+                cmiDetails.set_objecttypeid(cursor.getString(cursor
+                        .getColumnIndex("objecttypeid")));
+                cmiDetails.set_seqNum(cursor.getString(cursor
+                        .getColumnIndex("sequencenumber")));
+                cmiDetails.set_userId(Integer.parseInt(cursor.getString(cursor
+                        .getColumnIndex("userid"))));
+                cmiDetails.set_datecompleted(cursor.getString(cursor
+                        .getColumnIndex("datecompleted")));
+                cmiDetails.set_noofattempts(Integer.parseInt(cursor
+                        .getString(cursor.getColumnIndex("noofattempts"))));
+//                cmiDetails.set_noofattempts(cursor.getInt(cursor
+//                        .getColumnIndex("attemptnumber")));
+                cmiDetails.set_coursemode(cursor.getString(cursor
+                        .getColumnIndex("coursemode")));
+                cmiDetails.set_qusseq(cursor.getString(cursor
+                        .getColumnIndex("randomquesseq")));
+                cmiDetails.set_sitrurl(cursor.getString(cursor
+                        .getColumnIndex("siteurl")));
+                cmiDetails.set_textResponses(cursor.getString(cursor
+                        .getColumnIndex("textResponses")));
+                cmiDetails.set_pooledqusseq(cursor.getString(cursor
+                        .getColumnIndex("pooledquesseq")));
+
+                cmiDetails.set_contentId(cursor.getString(cursor
+                        .getColumnIndex("contentid")));
+
+                cmiDetails.setParentObjTypeId("10");
+                cmiDetails.setParentContentId(cursor.getString(cursor
+                        .getColumnIndex("trackContentId")));
+                cmiDetails.setParentScoId(cursor.getString(cursor
+                        .getColumnIndex("trackscoid")));
+
+                cmiList.add(cmiDetails);
+
+            }
+        }
+        cursor.close();
+        db.close();
+        return cmiList;
+    }
+
+
+    public List<CMIModel> getAllCmiDownloadDataDetails() {
+        List<CMIModel> cmiList = new ArrayList<CMIModel>();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String selQuery = "SELECT C.location, C.status, C.suspenddata, C.datecompleted, C.noofattempts, C.score, D.objecttypeid, C.sequencenumber, C.scoid, C.userid, C.siteid, D.courseattempts, D.contentid, C.coursemode, C.scoremin, C.scoreMax, C.randomQuesSeq, C.textResponses, C.ID, C.siteurl, C.pooledquesseq FROM "
+                + TBL_CMI
+                + " C inner join "
+                + TBL_DOWNLOADDATA
+                + " D On D.userid = C.userid and D.scoid = C.scoid and D.siteid = C.siteid WHERE C.isupdate = 'false' ORDER BY C.sequencenumber";
+
+
+        Cursor cursor = db.rawQuery(selQuery, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+
+                String objecttypeId = cursor.getString(cursor
+                        .getColumnIndex("objecttypeid"));
+
+                if (objecttypeId.equalsIgnoreCase("10")) {
+
+                    continue;
+                }
+
                 CMIModel cmiDetails = new CMIModel();
                 cmiDetails.set_scoId(Integer.parseInt(cursor.getString(cursor
                         .getColumnIndex("scoid"))));
@@ -6499,11 +6728,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         .getColumnIndex("siteurl")));
                 cmiDetails.set_textResponses(cursor.getString(cursor
                         .getColumnIndex("textResponses")));
-//                cmiDetails.set_pooledqusseq(cursor.getString(cursor
-//                        .getColumnIndex("pooledquesseq")));
+                cmiDetails.set_pooledqusseq(cursor.getString(cursor
+                        .getColumnIndex("pooledquesseq")));
+
+                cmiDetails.set_contentId(cursor.getString(cursor
+                        .getColumnIndex("contentid")));
+
+                cmiDetails.set_coursemode(cursor.getString(cursor
+                        .getColumnIndex("coursemode")));
+
+                cmiDetails.set_scoremin(cursor.getString(cursor
+                        .getColumnIndex("scoremin")));
+
+                cmiDetails.set_scoremax(cursor.getString(cursor
+                        .getColumnIndex("scoremax")));
+
+                cmiDetails.setParentObjTypeId("");
+                cmiDetails.setParentContentId("");
+                cmiDetails.setParentScoId("");
+
+
                 cmiList.add(cmiDetails);
 
-            } while (cursor.moveToNext());
+            }
+
         }
         cursor.close();
         db.close();
@@ -6784,19 +7032,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public int saveCourseClose(String url, MyLearningModel learningModel) {
 
-
         int completed = -1;
         String subURL[] = url.split("\\?");
 
-        String score = learningModel.getScore(), lStatus = "", ltStatus = "", lLoc = "", susData = "", scoid = "", seqID = "", siteIDValue = "", userIDValue = "", siteURL = "", timeSpent = "";
-        String sqlTimeSpent = "";
-        String sqlNoOfAttempts = "";
-        String sqlPreviousState = "";
-        String isSqlDataPresent = "false";
-        String totalSessionTimeSpent = "";
-        String totalNoOfAttempts = "0";
-        String dateCompleted = "";
-        String sqlScore = "0";
+        String score = learningModel.getScore(), lStatus = "", ltStatus = "", lLoc = "", susData = "", scoid = "", seqID = "", userIDValue = "", siteURL = "", timeSpent = "";
+
         if (subURL.length > 1) {
             HashMap<String, String> responMap = null;
             Log.d(TAG, "saveCourseClose: " + subURL[1]);
@@ -6879,43 +7119,97 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
             }
-            SQLiteDatabase db = this.getWritableDatabase();
-            String selQuery = "SELECT location,status,suspenddata,datecompleted,score,noofattempts,timespent FROM CMI WHERE userid="
-                    + learningModel.getUserID() + " AND siteid=" + learningModel.getSiteID() + " AND scoid=" + learningModel.getScoId();
-            Cursor cursor = db.rawQuery(selQuery, null);
-            if (cursor.moveToFirst()) {
-                do {
-                    isSqlDataPresent = "true";
-                    sqlScore = ((cursor.getString(cursor.getColumnIndex("score"))));
-                    sqlNoOfAttempts = ((cursor.getString(cursor.getColumnIndex("noofattempts"))));
-                    sqlPreviousState = (cursor.getString(cursor.getColumnIndex("status")));
-                    sqlTimeSpent = (cursor.getString(cursor.getColumnIndex("timespent")));
-                    dateCompleted = (cursor.getString(cursor.getColumnIndex("datecompleted")));
 
-                } while (cursor.moveToNext());
+            checkCMIObjectClose(learningModel.getObjecttypeId(), scoid, timeSpent, score, lStatus, ltStatus, lLoc, susData, seqID, learningModel.getSiteID(), userIDValue, learningModel.getSiteURL());
+
+
+            // user session
+
+            LearnerSessionModel learnerM = new LearnerSessionModel();
+            learnerM.setTimeSpent(timeSpent.isEmpty() ? "00:00:00" : timeSpent);
+            learnerM.setSiteID(learningModel.getSiteID());
+            learnerM.setUserID(userIDValue);
+            learnerM.setScoID(scoid);
+            updateUserSessionData(learnerM);
+
+            if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                String[] objectTypeIDScoid = getTrackObjectTypeIDAndScoidBasedOnSequenceNumber(scoid, seqID, learningModel.getSiteID(), userIDValue);
+
+                if (objectTypeIDScoid.length > 1) {
+                    String childScoID = objectTypeIDScoid[0];
+                    String childObj = objectTypeIDScoid[1];
+                    checkCMIObjectClose(childObj, childScoID, timeSpent, score, lStatus, ltStatus, lLoc, susData, seqID, learningModel.getSiteID(), userIDValue, learningModel.getSiteURL());
+
+                    LearnerSessionModel learnerC = new LearnerSessionModel();
+                    learnerC.setTimeSpent(timeSpent.isEmpty() ? "00:00:00" : timeSpent);
+                    learnerC.setSiteID(learningModel.getSiteID());
+                    learnerC.setUserID(userIDValue);
+                    learnerC.setScoID(childScoID);
+                    updateUserSessionData(learnerC);
+                }
+
             }
-            cursor.close();
-            db.close();
 
-            if (isSqlDataPresent.equalsIgnoreCase("true")) {
-                if (sqlNoOfAttempts.equalsIgnoreCase("")) {
-                    sqlNoOfAttempts = "0";
-                }
-                if (!score.equalsIgnoreCase("")) {
-                    totalNoOfAttempts = "" + Integer.parseInt(sqlNoOfAttempts) + 1;
-                } else {
-                    totalNoOfAttempts = "" + Integer.parseInt(sqlNoOfAttempts);
-                }
 
-                if (learningModel.getStatus().equalsIgnoreCase("passed") || learningModel.getStatus().equalsIgnoreCase("completed") || learningModel.getStatus().equalsIgnoreCase("failed")) {
+            Log.d(TAG, "saveCourseClose: end ");
 
-                    if (!(sqlPreviousState.toLowerCase().contains("completed") || sqlPreviousState.toLowerCase().contains("failed") || sqlPreviousState.toLowerCase().contains("passed"))) {
-                        dateCompleted = GetCurrentDateTime();
-                    }
-                    dateCompleted = dateCompleted.isEmpty() ? GetCurrentDateTime() : dateCompleted;
 
-                }
+        }
+        return completed;
+    }
+
+    public void checkCMIObjectClose(String objTypeID, String objScoID, String timeSpent, String score, String lStatus, String ltStatus, String lLoc, String susData, String seqID, String siteIDValue, String userIdValue, String siteurl) {
+
+
+        String sqlTimeSpent = "";
+        String sqlNoOfAttempts = "";
+        String sqlPreviousState = "";
+        String isSqlDataPresent = "false";
+        String totalSessionTimeSpent = "";
+        String totalNoOfAttempts = "0";
+        String dateCompleted = "";
+        String sqlScore = "0";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selQuery = "SELECT location,status,suspenddata,datecompleted,score,noofattempts,timespent FROM CMI WHERE userid="
+                + userIdValue + " AND siteid=" + siteIDValue + " AND scoid=" + objScoID;
+        Cursor cursor = db.rawQuery(selQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                isSqlDataPresent = "true";
+                sqlScore = ((cursor.getString(cursor.getColumnIndex("score"))));
+                sqlNoOfAttempts = ((cursor.getString(cursor.getColumnIndex("noofattempts"))));
+                sqlPreviousState = (cursor.getString(cursor.getColumnIndex("status")));
+                sqlTimeSpent = (cursor.getString(cursor.getColumnIndex("timespent")));
+                dateCompleted = (cursor.getString(cursor.getColumnIndex("datecompleted")));
+
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        if (isSqlDataPresent.equalsIgnoreCase("true")) {
+
+            // time spent neeed to be implemented from old project
+
+            if (sqlNoOfAttempts.equalsIgnoreCase("")) {
+                sqlNoOfAttempts = "0";
             }
+            if (!score.equalsIgnoreCase("")) {
+                totalNoOfAttempts = "" + Integer.parseInt(sqlNoOfAttempts) + 1;
+            } else {
+                totalNoOfAttempts = "" + Integer.parseInt(sqlNoOfAttempts);
+            }
+
+            if (lStatus.equalsIgnoreCase("passed") || lStatus.equalsIgnoreCase("completed") || lStatus.equalsIgnoreCase("failed")) {
+
+                if (!(sqlPreviousState.toLowerCase().contains("completed") || sqlPreviousState.toLowerCase().contains("failed") || sqlPreviousState.toLowerCase().contains("passed"))) {
+                    dateCompleted = GetCurrentDateTime();
+                }
+                dateCompleted = dateCompleted.isEmpty() ? GetCurrentDateTime() : dateCompleted;
+
+            }
+
         } else {
 
             if (!score.equalsIgnoreCase("")) {
@@ -6923,21 +7217,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } else {
                 totalNoOfAttempts = "0";
             }
-            if (learningModel.getStatus().equalsIgnoreCase("passed") || learningModel.getStatus().equalsIgnoreCase("completed") || learningModel.getStatus().equalsIgnoreCase("failed")) {
+            if (lStatus.equalsIgnoreCase("passed") || lStatus.equalsIgnoreCase("completed") || lStatus.equalsIgnoreCase("failed")) {
                 dateCompleted = GetCurrentDateTime();
             }
+
+            totalSessionTimeSpent = timeSpent.isEmpty() ? "00:00:00" : timeSpent;
         }
         CMIModel cmiModel = new CMIModel();
-        if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-            cmiModel.set_status(lStatus);
+        if (objTypeID.equalsIgnoreCase("10")) {
+
+            cmiModel.set_status(ltStatus);
             cmiModel.set_datecompleted(dateCompleted);
             cmiModel.set_score("0");
             cmiModel.set_suspenddata("");
             cmiModel.set_location("");
 
         } else {
-            cmiModel.set_suspenddata(susData);
+            cmiModel.set_suspenddata(susData.replaceAll("CourseDiscussionsPage.aspx?ContentID", ""));
             cmiModel.set_status(lStatus);
             cmiModel.set_location(lLoc);
             cmiModel.set_datecompleted(dateCompleted);
@@ -6958,29 +7255,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cmiModel.set_seqNum("" + seqID);
         }
 
-
         cmiModel.set_timespent(totalSessionTimeSpent);
-
 
         try {
 
-            if (userIDValue.length() == 0) {
 
-                userIDValue = learningModel.getUserID();
-            }
-
-            if (scoid.length() == 0) {
-
-                scoid = learningModel.getScoId();
-            }
-            cmiModel.set_timespent(totalSessionTimeSpent);
-
-            cmiModel.set_siteId(learningModel.getSiteID());
-            cmiModel.set_userId(Integer.parseInt(userIDValue));
+            cmiModel.set_siteId(siteIDValue);
+            cmiModel.set_userId(Integer.parseInt(userIdValue));
             cmiModel.set_isupdate("false");
-            cmiModel.set_scoId(Integer.parseInt(scoid));
-            cmiModel.set_objecttypeid(learningModel.getObjecttypeId());
-            cmiModel.set_sitrurl(learningModel.getSiteURL());
+            cmiModel.set_scoId(Integer.parseInt(objScoID));
+            cmiModel.set_objecttypeid(objTypeID);
+            cmiModel.set_sitrurl(siteurl);
             cmiModel.set_noofattempts(Integer.parseInt(totalNoOfAttempts));
         } catch (NumberFormatException e) {
 
@@ -6991,14 +7276,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (isSqlDataPresent.equalsIgnoreCase("true")) {
 
             updateCMIDataOnCourseClose(cmiModel);
-            completed = 1;
         } else {
             injectIntoCMITable(cmiModel, "false");
-            completed = 1;
         }
-        Log.d(TAG, "saveCourseClose: end ");
 
-        return completed;
     }
 
     public void updateCMIDataOnCourseClose(CMIModel cmiModel) {
@@ -7008,7 +7289,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cmiModel.get_datecompleted().equalsIgnoreCase("")) {
 
             try {
-                String strUpdate = "UPDATE " + TBL_CMI + " SET location = " + cmiModel.get_location() + ",status = '"
+                String strUpdate = "UPDATE " + TBL_CMI + " SET location = '" + cmiModel.get_location() + "',status = '"
                         + cmiModel.get_status() + "',suspenddata='" + cmiModel.get_suspenddata() + "',isupdate='" + cmiModel.get_isupdate() + "',score='" + cmiModel.get_score() + "',noofattempts='" + cmiModel.get_noofattempts() + "',sequenceNumber='" + cmiModel.get_seqNum() + "',timespent='" + cmiModel.get_timespent()
                         + "' WHERE siteid ='"
                         + cmiModel.get_siteId() + "'"
@@ -7023,7 +7304,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } else {
 
             try {
-                String strUpdate = "UPDATE " + TBL_CMI + " SET location = " + cmiModel.get_location() + ",status = '"
+                String strUpdate = "UPDATE " + TBL_CMI + " SET location = '" + cmiModel.get_location() + "',status = '"
                         + cmiModel.get_status() + "', suspenddata = '" + cmiModel.get_suspenddata() + "', isupdate= '" + cmiModel.get_isupdate() + "', dateCompleted= '" + cmiModel.get_datecompleted() + "', score= '" + cmiModel.get_score() + "',noofattempts='" + cmiModel.get_noofattempts() + "', sequenceNumber='" + cmiModel.get_seqNum() + "',timespent='" + cmiModel.get_timespent()
                         + "' WHERE siteid ='"
                         + cmiModel.get_siteId() + "'"
@@ -7307,9 +7588,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void updateWorkFlowRulesInDBForTrackTemplate(String trackID, String trackItemID, String trackItemState, String wmessage, String ruleID, String stepID, String siteID, String userID) {
 
+
+        // try database.executeUpdate("UPDATE \(DBTables.TrackListTable.rawValue) SET showstatus = ?, ruleid = ?, stepid = ?, wmessage = ? WHERE trackcontentid = ? AND contentid = ? AND siteid = ? AND userid = ? ", values: ["\(trackItemState)", "\(ruleID)", "\(stepID)", "\(wmessage)", "\(trackID)", "\(trackItemID)", "\(siteID)", "\(userID)"])
+
+
         try {
             SQLiteDatabase db = this.getWritableDatabase();
-            String sqlQuery = "UPDATE " + TBL_TRACKLISTDATA + " SET showstatus = '" + trackItemState + "' , ruleid = '" + ruleID + "' , stepid = '" + stepID + "' wmessage = '" + wmessage + "' WHERE trackscoid = '" + trackID + "'  AND contentid = '" + trackItemID + "'  AND siteid =' " + siteID + "'  AND userid =  '" + userID + "'";
+            String sqlQuery = "UPDATE " + TBL_TRACKLISTDATA + " SET showstatus = '" + trackItemState + "' , ruleid = '" + ruleID + "' , stepid = '" + stepID + "', wmessage = '" + wmessage + "' WHERE trackContentId = '" + trackID + "'  AND contentid = '" + trackItemID + "'  AND siteid =' " + siteID + "'  AND userid =  '" + userID + "'";
 
             db.execSQL(sqlQuery);
 
@@ -7518,7 +7803,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
             } else {
-                //jhkhjkhj
+
                 insertCMI(cmiDetails, true);
                 insertUserSession(nsessionDetails);
                 Log.d("HERE", "loadMyLearningData 9");

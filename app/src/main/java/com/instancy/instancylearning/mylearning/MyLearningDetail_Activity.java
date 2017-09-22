@@ -432,6 +432,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         txtBtnReport.setVisibility(View.GONE);
 
+        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+//            relatedContentView(myLearningModel, context);
+            bottomLayout.setVisibility(View.GONE);
+        }
+
         if (isCatalog) {
 
             downloadlayout.setVisibility(View.GONE);
@@ -460,7 +465,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             bottomReportLayout.setVisibility(View.INVISIBLE);
             txtBtnView.setText("View");
 
-
         }
 
     }
@@ -470,7 +474,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
         String displayStatus = "";
         if (courseStatus.equalsIgnoreCase("Completed") || (courseStatus.toLowerCase().contains("passed") || courseStatus.toLowerCase().contains("failed"))) {
-
 
             String progressPercent = "100";
             String statusValue = myLearningModel.getStatus();
@@ -500,18 +503,34 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
             courseStatus = myLearningModel.getStatus() + "  (0";
 
-        } else {
+        } else if (myLearningModel.getStatus().toLowerCase().contains("incomplete") || (myLearningModel.getStatus().toLowerCase().contains("inprogress")) || (myLearningModel.getStatus().toLowerCase().contains("in progress"))) {
             String statusValue = "In Progress";
 
             if (myLearningModel.getStatus().toLowerCase().equalsIgnoreCase("incomplete") || myLearningModel.getStatus().equalsIgnoreCase("") || myLearningModel.getStatus().toLowerCase().equalsIgnoreCase("in complete")) {
                 statusValue = "In Progress";
             }
 
-
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
             progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
             courseStatus = statusValue + " (" + myLearningModel.getProgress();
+
+        } else if (myLearningModel.getStatus().toLowerCase().contains("pending review") || (myLearningModel.getStatus().toLowerCase().contains("pendingreview"))) {
+            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
+            String status = "";
+
+            status = myLearningModel.getStatus();
+
+            progressBar.setProgress(100);
+            txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+            courseStatus = status + "(" + 100;
+        } else {
+
+            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
+            progressBar.setProgress(0);
+            String status = "";
+            status = myLearningModel.getStatus();
+            courseStatus = status + "(" + 0;
 
         }
         txtCourseStatus.setText(courseStatus + "%)");
