@@ -16,7 +16,9 @@ import com.instancy.instancylearning.utils.Utilities;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Upendranath on 8/10/2017 Working on InstancyLearning.
@@ -48,12 +50,26 @@ public class SynchData {
     public void SyncData() {
         String bundlevalue1 = null;
         List<CMIModel> cmiList = new ArrayList<CMIModel>();
+        Set<CMIModel> hs = new HashSet<>();
+
         List<CMIModel> cmiMylearningList = dbh.getAllCmiDownloadDataDetails();
-        cmiList.addAll(cmiMylearningList);
+//        cmiList.addAll(cmiMylearningList);
+        hs.addAll(cmiMylearningList);
         List<CMIModel> cmitrackList = dbh.getAllCmiTrackListDetails();
         cmiList.addAll(cmitrackList);
+//        hs.addAll(cmiMylearningList);
         List<CMIModel> cmiEventRelated = dbh.getAllCmiRelatedContentDetails();
-        cmiList.addAll(cmiEventRelated);
+//        cmiList.addAll(cmiEventRelated);
+        hs.addAll(cmiMylearningList);
+        cmiList.addAll(hs);
+
+//        List<String> al = new ArrayList<>();
+//// add elements to al, including duplicates
+//        Set<String> hs = new HashSet<>();
+//        hs.addAll(cmiList);
+//        al.clear();
+//        al.addAll(hs);
+
         for (CMIModel tempCmi : cmiList) {
             bundlevalue1 = String.valueOf(tempCmi.get_userId());
             StringBuilder sb = new StringBuilder();
@@ -112,12 +128,12 @@ public class SynchData {
 
 
             // need to send data  parentcontentid and parentscoid
-            sb.append("<TrackScoID>"+String.valueOf(tempCmi.get_scoId())+"</TrackScoID>");
+            sb.append("<TrackScoID>" + String.valueOf(tempCmi.get_scoId()) + "</TrackScoID>");
             sb.append("<TrackContentID></TrackContentID>");
 
 
-           // need to send parent obj type id
-            sb.append("<TrackObjectTypeID>"+tempCmi.get_objecttypeid()+"</TrackObjectTypeID>");
+            // need to send parent obj type id
+            sb.append("<TrackObjectTypeID>" + tempCmi.get_objecttypeid() + "</TrackObjectTypeID>");
 
 
             sb.append("<OrgUnitID>" + tempCmi.get_siteId() + "</OrgUnitID>");

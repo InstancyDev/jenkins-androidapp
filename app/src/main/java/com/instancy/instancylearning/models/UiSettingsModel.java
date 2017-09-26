@@ -6,6 +6,10 @@ package com.instancy.instancylearning.models;
 
 public class UiSettingsModel {
 
+    // for acclife
+    private String brandingColor = "#003d77";
+// for instancy
+//    private String  brandingColor = "#8dc73f";
 
     private String menuTextColor = "";
 
@@ -119,10 +123,6 @@ public class UiSettingsModel {
     }
 
 
-    public String getAppButtonBgColor() {
-        return appButtonBgColor.isEmpty() ? "#8dc73f" : appButtonBgColor;
-    }
-
     public void setAppButtonBgColor(String appButtonBgColor) {
         this.appButtonBgColor = appButtonBgColor;
     }
@@ -154,12 +154,6 @@ public class UiSettingsModel {
 
     private String selectedMenuBGColor = "";
 
-
-    public String getAppHeaderTextColor() {
-
-        return appHeaderTextColor.isEmpty() ? "#8dc73f" : appHeaderTextColor;
-
-    }
 
     public void setAppHeaderTextColor(String appHeaderTextColor) {
         this.appHeaderTextColor = appHeaderTextColor;
@@ -230,9 +224,6 @@ public class UiSettingsModel {
         this.selectedMenuTextColor = selectedMenuTextColor;
     }
 
-    public String getSelectedMenuBGColor() {
-        return selectedMenuBGColor.isEmpty() ? "#8dc73f" : selectedMenuBGColor;
-    }
 
     public void setSelectedMenuBGColor(String selectedMenuBGColor) {
         this.selectedMenuBGColor = selectedMenuBGColor;
@@ -244,9 +235,6 @@ public class UiSettingsModel {
 
     }
 
-    public String getHeaderBGColor() {
-        return headerBGColor.isEmpty() ? "#8dc73f" : headerBGColor;
-    }
 
     public void setHeaderBGColor(String headerBGColor) {
         this.headerBGColor = headerBGColor;
@@ -268,9 +256,6 @@ public class UiSettingsModel {
         this.listBorderColor = listBorderColor;
     }
 
-    public String getMenuHeaderBGColor() {
-        return menuHeaderBGColor.isEmpty() ? "#8dc73f" : menuHeaderBGColor;
-    }
 
     public void setMenuHeaderBGColor(String menuHeaderBGColor) {
         this.menuHeaderBGColor = menuHeaderBGColor;
@@ -285,9 +270,6 @@ public class UiSettingsModel {
         this.menuHeaderTextColor = menuHeaderTextColor;
     }
 
-    public String getMenuBGAlternativeColor() {
-        return menuBGAlternativeColor.isEmpty() ? "#8dc73f" : menuBGAlternativeColor;
-    }
 
     public void setMenuBGAlternativeColor(String menuBGAlternativeColor) {
         this.menuBGAlternativeColor = menuBGAlternativeColor;
@@ -307,10 +289,6 @@ public class UiSettingsModel {
 
     public void setFileUploadButtonColor(String fileUploadButtonColor) {
         this.fileUploadButtonColor = fileUploadButtonColor;
-    }
-
-    public String getAppHeaderColor() {
-        return appHeaderColor.isEmpty() ? "#8dc73f" : appHeaderColor;
     }
 
     public void setAppHeaderColor(String appHeaderColor) {
@@ -445,4 +423,39 @@ public class UiSettingsModel {
         }
         return instance;
     }
+
+    // for accilife app
+
+    public String getAppButtonBgColor() {
+        return appButtonBgColor.isEmpty() ? brandingColor : appButtonBgColor;
+    }
+
+    public String getAppHeaderTextColor() {
+
+        return appHeaderTextColor.isEmpty() ? brandingColor : appHeaderTextColor;
+
+    }
+
+    public String getSelectedMenuBGColor() {
+        return selectedMenuBGColor.isEmpty() ? brandingColor : selectedMenuBGColor;
+    }
+
+    public String getHeaderBGColor() {
+        return headerBGColor.isEmpty() ? brandingColor : headerBGColor;
+    }
+
+
+    public String getMenuHeaderBGColor() {
+        return menuHeaderBGColor.isEmpty() ? brandingColor : menuHeaderBGColor;
+    }
+
+    public String getMenuBGAlternativeColor() {
+        return menuBGAlternativeColor.isEmpty() ? brandingColor : menuBGAlternativeColor;
+    }
+
+    public String getAppHeaderColor() {
+        return appHeaderColor.isEmpty() ? brandingColor : appHeaderColor;
+    }
+
+    // end for acclife
 }

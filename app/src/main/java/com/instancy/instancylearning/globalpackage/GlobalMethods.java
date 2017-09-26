@@ -847,6 +847,23 @@ public class GlobalMethods {
         }
     }
 
+
+    public void downloadJwContentOffline(Context context, MyLearningModel learningModel) {
+
+//jwvideos.xml
+        String path = context.getExternalFilesDir(null)
+                + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID()+"/"+"jwvideos.xml";
+        Log.d("Files", "Path: " + path);
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+        Log.d("Files", "Size: " + files.length);
+        for (int i = 0; i < files.length; i++) {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
+
+
+    }
+
 //    public static void catalogContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 //
 //        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);

@@ -144,7 +144,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public static final String TBL_USERPRIVILEGES = "USERPRIVILEGES";
     /**
-     * This table is to store all the user profile field details
+     * This table is to store all the user profile field details from here ---------------------
      */
     public static final String TBL_USERPROFILEFIELDS = "USERPROFILEFIELDS";
     /**
@@ -161,8 +161,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * mode
      */
     public static final String TBL_USERPROFILEFIELDOPTIONS = "USERPROFILEFIELDOPTIONS";
-
+    /**
+     * This is to store the options to show for user profile fields in editing to here ------------------------
+     * mode
+     */
     public static final String TBL_CALENDARADDEDEVENTS = "CALENDERADDEDEVENTS";
+
 
     // ////////////////////////////DISCUSSION
     // FORUMS/////////////////////////////////////////
@@ -349,16 +353,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + "(siteid INTEGER, prefid INTEGER, keyname TEXT, defaultvalue TEXT, displaytext TEXT, PRIMARY KEY(siteid,keyname))");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILEFIELDS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, objectid TEXT,accounttype TEXT,orgunitid TEXT, siteid TEXT, approvalstatus TEXT, firstname TEXT, lastname TEXT, displayname TEXT, organization TEXT, email TEXT, usersite TEXT, supervisoremployeeid TEXT, addressline1 TEXT, addresscity TEXT, addressstate TEXT, addresszip TEXT , addresscountry TEXT, phone TEXT, mobilephone TEXT, imaddress TEXT,dateofbirth TEXT, gender TEXT, nvarchar6 TEXT, paymentmode TEXT, nvarchar7 TEXT, nvarchar8 TEXT, nvarchar9 TEXT, securepaypalid TEXT, nvarchar10 TEXT, picture TEXT, highschool TEXT, college TEXT, highestdegree TEXT, jobtitle TEXT, businessfunction TEXT, primaryjobfunction TEXT, payeeaccountno TEXT, payeename TEXT, paypalaccountname TEXT, paypalemail TEXT, shipaddline1 TEXT, shipaddcity TEXT, shipaddstate TEXT, shipaddzip TEXT, shipaddcountry TEXT, shipaddphone TEXT, isupdated TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, objectid TEXT,accounttype TEXT,orgunitid TEXT, siteid TEXT, approvalstatus TEXT, firstname TEXT, lastname TEXT, displayname TEXT, organization TEXT, email TEXT, usersite TEXT, supervisoremployeeid TEXT, addressline1 TEXT, addresscity TEXT, addressstate TEXT, addresszip TEXT , addresscountry TEXT, phone TEXT, mobilephone TEXT, imaddress TEXT,dateofbirth TEXT, gender TEXT, nvarchar6 TEXT, paymentmode TEXT, nvarchar7 TEXT, nvarchar8 TEXT, nvarchar9 TEXT, securepaypalid TEXT, nvarchar10 TEXT, picture TEXT, highschool TEXT, college TEXT, highestdegree TEXT, jobtitle TEXT, businessfunction TEXT, primaryjobfunction TEXT, payeeaccountno TEXT, payeename TEXT, paypalaccountname TEXT, paypalemail TEXT, shipaddline1 TEXT, shipaddcity TEXT, shipaddstate TEXT, shipaddzip TEXT, shipaddcountry TEXT, shipaddphone TEXT, firsttimeautodownloadpopup TEXT, isupdated TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILEGROUPS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, groupid  INTEGER,groupname TEXT, objecttypeid TEXT, siteid TEXT,showinprofile TEXT,displayorder INTEGER)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, groupid  TEXT,groupname TEXT, objecttypeid TEXT, siteid TEXT,showinprofile TEXT, userid TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILECONFIGS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, datafieldname TEXT, aliasname TEXT, attributedisplaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, name TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, attributedisplaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, name TEXT, userid TEXT, siteid TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILEFIELDOPTIONS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, choiceid INTEGER, attributeconfigid INTEGER, choicetext TEXT, choicevalue TEXT, localename TEXT, parenttext TEXT, siteid TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, choiceid TEXT, attributeconfigid TEXT, choicetext TEXT, choicevalue TEXT, localename TEXT, parenttext TEXT, siteid TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CALENDARADDEDEVENTS
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, userid INTEGER,siteid INTEGER,scoid INTEGER,eventid INTEGER, eventname TEXT, reminderid INTEGER)");
@@ -3826,6 +3834,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("courseattempts", trackListModel.getCourseAttempts());
             contentValues.put("offlinepath", trackListModel.getOfflinepath());
             contentValues.put("trackContentId", trackListModel.getTrackOrRelatedContentID());
+            contentValues.put("ruleid", "0");
+            contentValues.put("stepid", "0");
+            contentValues.put("wmessage", "");
 
             db.insert(TBL_TRACKLISTDATA, null, contentValues);
 
@@ -3997,6 +4008,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         trackListModel.setRelatedContentCount(cursor.getString(cursor
                                 .getColumnIndex("relatedcontentcount")));
+
 
                     }
 
@@ -4427,7 +4439,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("datecompleted", cmiModel.get_datecompleted());
             contentValues.put("noofattempts", cmiModel.get_noofattempts());
             contentValues.put("score", cmiModel.get_score());
-            contentValues.put("sequencenumber", cmiModel.get_score());
+            contentValues.put("sequencenumber", cmiModel.get_seqNum());
             contentValues.put("startdate", cmiModel.get_startdate());
             contentValues.put("timespent", cmiModel.get_timespent());
             contentValues.put("coursemode", cmiModel.get_coursemode());
@@ -4901,7 +4913,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String assessmentAttempt = "";
                 try {
-                    String sqlQuery = "SELECT NoOfAttempts FROM CMI WHERE SITEID = " + mylearningModel.getSiteID() + " AND SCOID = " + mylearningModel.getScoId() + " AND USERID = " + mylearningModel.getUserID();
+                    String sqlQuery = "SELECT noofattempts FROM CMI WHERE SITEID = " + mylearningModel.getSiteID() + " AND SCOID = " + mylearningModel.getScoId() + " AND USERID = " + mylearningModel.getUserID();
                     SQLiteDatabase db = this.getWritableDatabase();
                     Cursor cursor = null;
                     cursor = db.rawQuery(sqlQuery, null);
@@ -5494,7 +5506,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
 
                 }
-                ;
             }
         } catch (SQLiteException ex) {
             ex.printStackTrace();
@@ -7485,11 +7496,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String returnStr = "";
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String selQuery = "SELECT trackscoid, userid, showstatus, ruleid, stepid, contentid, wmessage FROM " + TBL_TRACKLISTDATA + " WHERE trackscoid = '" + trackID + "' AND userid = '" + learningModel.getUserID() + "' AND siteid = '" + learningModel.getSiteID() + "'";
+        String selQuery = "SELECT trackContentId, userid, showstatus, ruleid, stepid, contentid, wmessage FROM " + TBL_TRACKLISTDATA + " WHERE trackContentId = '" + trackID + "' AND userid = '" + learningModel.getUserID() + "' AND siteid = '" + learningModel.getSiteID() + "'";
         Cursor cursor = db.rawQuery(selQuery, null);
 
         JSONArray jsonArray = new JSONArray();
-        if (cursor.moveToFirst()) {
+        if (cursor != null) {
 
             while (cursor.moveToNext()) {
 
@@ -7504,7 +7515,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 try {
 
                     trackObj.put("userid", (cursor.getString(cursor.getColumnIndex("userid"))));
-                    trackObj.put("trackid", (cursor.getString(cursor.getColumnIndex("trackscoid"))));
+                    trackObj.put("trackcontentid", (cursor.getString(cursor.getColumnIndex("trackContentId"))));
                     trackObj.put("trackobjectid", (cursor.getString(cursor.getColumnIndex("contentid"))));
                     trackObj.put("result", (cursor.getString(cursor.getColumnIndex("showstatus"))));
                     trackObj.put("wmessage", (cursor.getString(cursor.getColumnIndex("wmessage"))));
@@ -7533,36 +7544,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public String getTrackTemplateAllItemsResult(String trackID, MyLearningModel learningModel) {
         String returnStr = "";
         SQLiteDatabase db = this.getWritableDatabase();
-        String selQuery = "SELECT TL.contentid, CASE WHEN C.status is NOT NULL OR NOT C.status = '' THEN C.status ELSE TL.status END AS objStatus, C.score FROM " + TBL_TRACKLISTDATA + " TL LEFT OUTER JOIN " + TBL_CMI + " C ON TL.userid = C.userid AND TL.scoid = C.scoid AND TL.siteid = C.siteid WHERE TL.trackscoid = '" + trackID + "' AND TL.userid = '" + learningModel.getUserID() + "' AND TL.siteid = '" + learningModel.getSiteID() + "'";
+        String selQuery = "SELECT TL.contentid, CASE WHEN C.status is NOT NULL OR NOT C.status = '' THEN C.status ELSE TL.status END AS objStatus, C.score FROM " + TBL_TRACKLISTDATA + " TL LEFT OUTER JOIN " + TBL_CMI + " C ON TL.userid = C.userid AND TL.scoid = C.scoid AND TL.siteid = C.siteid WHERE TL.trackContentId = '" + trackID + "' AND TL.userid = '" + learningModel.getUserID() + "' AND TL.siteid = '" + learningModel.getSiteID() + "'";
         JSONArray jsonArray = new JSONArray();
         try {
 
             Cursor cursor = db.rawQuery(selQuery, null);
 
-            if (cursor.moveToFirst()) {
+            if (cursor != null) {
 
                 while (cursor.moveToNext()) {
-
-                    String ruleID = (cursor.getString(cursor.getColumnIndex("ruleid")));
-
-                    if (ruleID.equalsIgnoreCase("0")) {
-
-                        break;
-                    }
-
                     JSONObject trackObj = new JSONObject();
                     try {
 
 
-                        String score = (cursor.getString(cursor.getColumnIndex("contentid")));
+                        String score = (cursor.getString(cursor.getColumnIndex("score")));
 
-                        if (score.equalsIgnoreCase("")) {
+                        if (!isValidString(score)) {
 
                             score = "0";
                         }
 
                         trackObj.put("contentid", (cursor.getString(cursor.getColumnIndex("contentid"))));
-                        trackObj.put("status", (cursor.getString(cursor.getColumnIndex("status"))));
+                        trackObj.put("status", (cursor.getString(cursor.getColumnIndex("objStatus"))));
                         trackObj.put("score", score);
 
                         jsonArray.put(trackObj);
@@ -7587,10 +7590,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void updateWorkFlowRulesInDBForTrackTemplate(String trackID, String trackItemID, String trackItemState, String wmessage, String ruleID, String stepID, String siteID, String userID) {
-
-
-        // try database.executeUpdate("UPDATE \(DBTables.TrackListTable.rawValue) SET showstatus = ?, ruleid = ?, stepid = ?, wmessage = ? WHERE trackcontentid = ? AND contentid = ? AND siteid = ? AND userid = ? ", values: ["\(trackItemState)", "\(ruleID)", "\(stepID)", "\(wmessage)", "\(trackID)", "\(trackItemID)", "\(siteID)", "\(userID)"])
-
 
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -8354,6 +8353,115 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             e.printStackTrace();
         }
     }
+
+    public void InjectAllProfileDetails(JSONObject jsonObject) throws JSONException {
+
+        if (jsonObject != null || jsonObject.length() != 0) {
+
+            Log.d(TAG, "InjectAllProfileDetails: " + jsonObject);
+
+            JSONArray jsonProfile = null;
+            JSONArray jsonConfig = null;
+            JSONArray jsonStory = null;
+            JSONArray json = null;
+
+
+            jsonProfile = jsonObject.getJSONArray("table");
+            jsonConfig = jsonObject.getJSONArray("table1");
+            jsonStory = jsonObject.getJSONArray("table2");
+            json = jsonObject.getJSONArray("table3");
+
+
+
+
+
+
+
+
+
+        }
+    }
+
+
+    public void injectProfileIntoTable(MyLearningModel myLearningModel, JSONObject jsonObject) {
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        try {
+
+            contentValues = new ContentValues();
+            contentValues.put("objectid", myLearningModel.getUserName());
+            contentValues.put("accounttype", myLearningModel.getSiteID());
+            contentValues.put("orgunitid", myLearningModel.getUserID());
+            contentValues.put("scoid", myLearningModel.getScoId());
+            contentValues.put("siteid", myLearningModel.getSiteURL());
+            contentValues.put("approvalstatus", myLearningModel.getSiteName());
+            contentValues.put("firstname", myLearningModel.getContentID());
+            contentValues.put("lastname", myLearningModel.getObjectId());
+            contentValues.put("displayname", myLearningModel.getCourseName());
+            contentValues.put("organization", myLearningModel.getAuthor());
+            contentValues.put("email", myLearningModel.getShortDes());
+            contentValues.put("usersite", myLearningModel.getLongDes());
+            contentValues.put("supervisoremployeeid", myLearningModel.getImageData());
+            contentValues.put("addressline1", myLearningModel.getMediaName());
+            contentValues.put("addresscity", myLearningModel.getCreatedDate());
+            contentValues.put("addressstate", myLearningModel.getStartPage());
+            contentValues.put("addresszip", myLearningModel.getEventstartTime());
+            contentValues.put("addresscountry", myLearningModel.getEventendTime());
+            contentValues.put("phone", myLearningModel.getObjecttypeId());
+            contentValues.put("mobilephone", myLearningModel.getLocationName());
+            contentValues.put("imaddress", myLearningModel.getTimeZone());
+            contentValues.put("dateofbirth", myLearningModel.getParticipantUrl());
+            contentValues.put("gender", myLearningModel.getCourseName());
+            contentValues.put("nvarchar6", myLearningModel.getStatus());
+            contentValues.put("paymentmode", myLearningModel.getEventContentid());
+            contentValues.put("nvarchar7", myLearningModel.getIsListView());
+            contentValues.put("nvarchar8", myLearningModel.getPassword());
+            contentValues.put("nvarchar9", myLearningModel.getDisplayName());
+            contentValues.put("securepaypalid", myLearningModel.getIsDownloaded());
+            contentValues.put("nvarchar10", myLearningModel.getCourseAttempts());
+            contentValues.put("picture", "false");
+            contentValues.put("highschool", myLearningModel.getRelatedContentCount());
+            contentValues.put("college", myLearningModel.getDurationEndDate());
+            contentValues.put("highestdegree", myLearningModel.getRatingId());
+            contentValues.put("jobtitle", myLearningModel.getPublishedDate());
+            contentValues.put("businessfunction", myLearningModel.getIsExpiry());
+            contentValues.put("primaryjobfunction", myLearningModel.getMediatypeId());
+            contentValues.put("payeeaccountno", myLearningModel.getDateAssigned());
+            contentValues.put("payeename", myLearningModel.getKeywords());
+            contentValues.put("paypalaccountname", myLearningModel.getDownloadURL());
+            contentValues.put("paypalemail", myLearningModel.getOfflinepath());
+            contentValues.put("shipaddline1", myLearningModel.getPresenter());
+            contentValues.put("shipaddcity", myLearningModel.getEventAddedToCalender());
+            contentValues.put("shipaddstate", myLearningModel.getJoinurl());
+            contentValues.put("shipaddzip", myLearningModel.getTypeofevent());
+            contentValues.put("shipaddcountry", myLearningModel.getProgress());
+            contentValues.put("shipaddphone", myLearningModel.getEventAddedToCalender());
+            contentValues.put("firsttimeautodownloadpopup", myLearningModel.getJoinurl());
+            contentValues.put("isupdated", myLearningModel.getTypeofevent());
+
+
+            db.delete(TBL_USERPROFILEFIELDS, "siteid='" + myLearningModel.getSiteID()
+                    + "' AND userid='" + myLearningModel.getUserID() + "' AND scoid='"
+                    + myLearningModel.getScoId() + "'", null);
+
+
+//                db.delete(TBL_STUDENTRESPONSES, "siteid='" + myLearningModel.getSiteID()
+//                        + "' AND userid='" + myLearningModel.getUserID() + "' AND scoid='"
+//                        + myLearningModel.getScoId() + "'", null);
+
+            db.insert(TBL_USERPROFILEFIELDS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+
+    }
+
+
 }
 
 

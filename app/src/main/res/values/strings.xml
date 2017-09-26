@@ -1,6 +1,7 @@
 <resources>
+    <string name="app_name">Online Lifeskills</string>
     <!--<string name="app_name">CropLife Online Dealer Training</string>-->
-    <string name="app_name">Instancy Learning</string>
+    <!--<string name="app_name">Instancy Learning</string>-->
     <string name="label_signin">Sign In</string>
     <string name="label_login">Login In</string>
     <string name="label_settings">Settings</string>

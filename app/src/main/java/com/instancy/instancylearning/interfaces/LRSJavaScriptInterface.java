@@ -123,6 +123,7 @@ public class LRSJavaScriptInterface {
 
         Log.d("LMSGetTrackAllItemsckID", trackId);
         String returnTrack = databaseHandler.getTrackTemplateAllItemsResult(trackId, _learningModel);
+        Log.d("LMSGetTrackAllItemsckID", returnTrack);
         return returnTrack;
     }
 

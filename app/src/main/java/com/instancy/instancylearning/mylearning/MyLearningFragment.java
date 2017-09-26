@@ -460,12 +460,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         switch (item.getItemId()) {
 
             case R.id.mylearning_search:
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    circleReveal(R.id.toolbar, 1, true, true);
-                else
-                    toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
+//
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+//                    circleReveal(R.id.toolbar, 1, true, true);
+//                else
+//                    toolbar.setVisibility(View.VISIBLE);
+//                item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
@@ -758,6 +758,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                         }
 
+
+                        // write jw content method
+
+
+
+
                     }
 
                     @Override
@@ -899,8 +905,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                    cmiSynchTask.execute();
                     injectFromDbtoModel();
                 }
-                cmiSynchTask = new CmiSynchTask(context);
-                cmiSynchTask.execute();
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    cmiSynchTask = new CmiSynchTask(context);
+                    cmiSynchTask.execute();
+                }
+
             }
 //            cmiSynchTask = new CmiSynchTask(context);
 //            cmiSynchTask.execute();

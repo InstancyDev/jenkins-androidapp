@@ -175,6 +175,8 @@ public class SideMenu extends AppCompatActivity {
                     if (logoutPos == groupPosition) {
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        preferencesManager.setStringValue("", StaticValues.KEY_USERLOGINID);
+                        preferencesManager.setStringValue("", StaticValues.KEY_USERPASSWORD);
                         startActivity(intent);
                         finish();
                         preferencesManager.setStringValue("", StaticValues.KEY_USERID);

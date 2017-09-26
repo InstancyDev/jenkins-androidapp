@@ -491,8 +491,10 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
 //                    injectFromDbtoModel();
 
-                    cmiSynchTask = new CmiSynchTask(context);
-                    cmiSynchTask.execute();
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        cmiSynchTask = new CmiSynchTask(context);
+                        cmiSynchTask.execute();
+                    }
 
                 }
             }

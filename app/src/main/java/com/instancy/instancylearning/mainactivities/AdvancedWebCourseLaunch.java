@@ -52,12 +52,14 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.advancedweb_courselaunch);
         adWebView = (AdvancedWebView) findViewById(R.id.advanced_coursewbview);
+        clearWebViewAbsolutely(adWebView);
         svProgressHUD = new SVProgressHUD(this);
 //        adWebView.setListener(this, this);
         databaseHandler = new DatabaseHandler(this);
         Bundle bundle = getIntent().getExtras();
         String courseUrl;
         String courseName = "";
+
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
 //            try {
@@ -79,7 +81,10 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             } else {
                 isOffline = false;
             }
-            adWebView.loadUrl(courseUrl);
+            if (savedInstanceState != null){
+                adWebView.restoreState(savedInstanceState);}
+            else{
+                adWebView.loadUrl(courseUrl);}
         }
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
@@ -292,8 +297,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 ////        adWebView.pauseTimers();
-        adWebView.loadUrl("");
-        adWebView.stopLoading();
+//        adWebView.loadUrl("");
+//        adWebView.stopLoading();
 
     }
 
@@ -311,4 +316,34 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+    public static void clearWebViewAbsolutely(AdvancedWebView webView) {
+        webView.clearCache(true);
+        webView.clearHistory();
+        webView.clearSslPreferences();
+        webView.clearDisappearingChildren();
+        webView.clearFocus();
+        webView.clearFormData();
+        webView.clearMatches();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        adWebView.saveState(outState);
+
+    }
+
+
+//    @Override
+//    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//
+//        if (savedInstanceState != null) {
+//            adWebView.restoreState(savedInstanceState);
+//        }
+//
+//
+//    }
 }

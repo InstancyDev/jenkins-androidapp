@@ -32,9 +32,12 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
+import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.ApiConstants;
@@ -128,6 +131,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     boolean isAutoSignIn = false;
     DatabaseHandler db;
     AppController appController;
+    VollyService vollyService;
+    IResult resultCallback = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -135,9 +140,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         setContentView(R.layout.login_activity);
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
-        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
-
         uiSettingsModel = UiSettingsModel.getInstance();
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+        initVolleyCallback();
+
+        vollyService = new VollyService(resultCallback, getApplicationContext());
 
         appController = AppController.getInstance();
         PreferencesManager.initializeInstance(this);
@@ -336,6 +343,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
+        profileWebCall("1");
 
         if (userName.length() < 1) {
             Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
@@ -345,25 +353,24 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             if (isNetworkConnectionAvailable(this, -1)) {
 
-
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("username", userName);
-                    jsonObject.put("password", passWord);
-                    jsonObject.put("siteid", preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-                    jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                JSONObject jsonReturn = null;
-                try {
-                    jsonReturn = db.checkOfflineUserCredintials(jsonObject);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                JSONObject jsonObject = new JSONObject();
+//                try {
+//                    jsonObject.put("username", userName);
+//                    jsonObject.put("password", passWord);
+//                    jsonObject.put("siteid", preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//                    jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                JSONObject jsonReturn = null;
+//                try {
+//                    jsonReturn = db.checkOfflineUserCredintials(jsonObject);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
 
 //                if (jsonReturn.length() != 0) {
 //
@@ -468,6 +475,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.KEY_USERNAME);
                                     preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                                     preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
+                                    String userId = jsonobj.get("userid").toString();
+
+
+                                    profileWebCall("1");
+
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intentSideMenu);
@@ -499,6 +511,16 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         };
 
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void profileWebCall(String userId) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        vollyService.getJsonObjResponseVolley("PROFILEDATA", urlStr, appUserModel.getAuthHeaders());
+
     }
 
     void getMyCatalogData() {
@@ -641,5 +663,65 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         }
         return false;
     }
+
+    void initVolleyCallback() {
+
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley Profiledata " + requestType);
+                Log.d(TAG, "Volley Profiledata JSON post" + response);
+
+                if (requestType.equalsIgnoreCase("PROFILEDATA")) {
+                    if (response != null) {
+
+                        try {
+                            db.InjectAllProfileDetails(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                    }
+                }
+
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+                if (requestType.equalsIgnoreCase("MLADP")) {
+
+                    if (response != null) {
+                        try {
+                            db.injectCMIDataInto(response, myLearningModel);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+
+                }
+
+                svProgressHUD.dismiss();
+            }
+        };
+    }
+
 }
 

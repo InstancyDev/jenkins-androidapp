@@ -13,30 +13,62 @@
         <!--no small size screens -->
 
         <!--all normal size screens -->
-        <screen android:screenSize="normal" android:screenDensity="ldpi" />
-        <screen android:screenSize="normal" android:screenDensity="mdpi" />
-        <screen android:screenSize="normal" android:screenDensity="hdpi" />
-        <screen android:screenSize="normal" android:screenDensity="xhdpi" />
+        <screen
+            android:screenDensity="ldpi"
+            android:screenSize="normal" />
+        <screen
+            android:screenDensity="mdpi"
+            android:screenSize="normal" />
+        <screen
+            android:screenDensity="hdpi"
+            android:screenSize="normal" />
+        <screen
+            android:screenDensity="xhdpi"
+            android:screenSize="normal" />
 
         <!-- all large size screens -->
-        <screen android:screenSize="large" android:screenDensity="ldpi" />
-        <screen android:screenSize="large" android:screenDensity="mdpi" />
-        <screen android:screenSize="large" android:screenDensity="hdpi" />
-        <screen android:screenSize="large" android:screenDensity="xhdpi" />
+        <screen
+            android:screenDensity="ldpi"
+            android:screenSize="large" />
+        <screen
+            android:screenDensity="mdpi"
+            android:screenSize="large" />
+        <screen
+            android:screenDensity="hdpi"
+            android:screenSize="large" />
+        <screen
+            android:screenDensity="xhdpi"
+            android:screenSize="large" />
 
         <!-- all xlarge size screens -->
-        <screen android:screenSize="xlarge" android:screenDensity="ldpi" />
-        <screen android:screenSize="xlarge" android:screenDensity="mdpi" />
-        <screen android:screenSize="xlarge" android:screenDensity="hdpi" />
-        <screen android:screenSize="xlarge" android:screenDensity="xhdpi" />
+        <screen
+            android:screenDensity="ldpi"
+            android:screenSize="xlarge" />
+        <screen
+            android:screenDensity="mdpi"
+            android:screenSize="xlarge" />
+        <screen
+            android:screenDensity="hdpi"
+            android:screenSize="xlarge" />
+        <screen
+            android:screenDensity="xhdpi"
+            android:screenSize="xlarge" />
 
         <!-- Special case for Nexus 7 -->
-        <screen android:screenSize="large" android:screenDensity="213" />
+        <screen
+            android:screenDensity="213"
+            android:screenSize="large" />
 
         <!-- Special xxhdpi devices -->
-        <screen android:screenSize="normal" android:screenDensity="480" />
-        <screen android:screenSize="large" android:screenDensity="480" />
-        <screen android:screenSize="xlarge" android:screenDensity="480" />`
+        <screen
+            android:screenDensity="480"
+            android:screenSize="normal" />
+        <screen
+            android:screenDensity="480"
+            android:screenSize="large" />
+        <screen
+            android:screenDensity="480"
+            android:screenSize="xlarge" />`
 
     </compatible-screens>
 
@@ -115,30 +147,30 @@
         <!--aDVANCED WEBVIEW -->
         <activity
             android:name=".mainactivities.AdvancedWebCourseLaunch"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboard|keyboardHidden|orientation"> </activity>
 
 
         <!--<activity-->
-            <!--android:name=".mainactivities.WebLaunchView"-->
-            <!--android:screenOrientation="portrait"></activity>-->
+        <!--android:name=".mainactivities.WebLaunchView"-->
+        <!--android:screenOrientation="portrait"></activity>-->
 
         <!--<activity-->
-            <!--android:name=".mainactivities.WebView_Activity"-->
-            <!--android:screenOrientation="portrait"></activity>-->
+        <!--android:name=".mainactivities.WebView_Activity"-->
+        <!--android:screenOrientation="portrait"></activity>-->
 
 
         <activity
             android:name=".mainactivities.PdfViewer_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"> </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity
             android:name=".mylearning.TrackList_Activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".mylearning.Reports_Activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <receiver android:name=".helper.NetworkChangeReceiver">
             <intent-filter>
