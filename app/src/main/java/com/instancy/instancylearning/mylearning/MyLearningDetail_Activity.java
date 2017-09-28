@@ -464,9 +464,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
             bottomReportLayout.setVisibility(View.INVISIBLE);
             txtBtnView.setText("View");
-
         }
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -476,14 +474,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         if (courseStatus.equalsIgnoreCase("Completed") || (courseStatus.toLowerCase().contains("passed") || courseStatus.toLowerCase().contains("failed"))) {
 
             String progressPercent = "100";
-            String statusValue = myLearningModel.getStatus();
-            if (myLearningModel.getStatus().equalsIgnoreCase("Completed")) {
+            String statusValue = courseStatus;
+            if (courseStatus.equalsIgnoreCase("Completed")) {
                 statusValue = "Completed";
 
-            } else if (myLearningModel.getStatus().equalsIgnoreCase("failed")) {
+            } else if (courseStatus.equalsIgnoreCase("failed")) {
 
                 statusValue = "Completed(failed)";
-            } else if (myLearningModel.getStatus().equalsIgnoreCase("passed")) {
+            } else if (courseStatus.equalsIgnoreCase("passed")) {
 
                 statusValue = "Completed(passed)";
 
@@ -493,47 +491,42 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             progressBar.setProgress(Integer.parseInt(progressPercent));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
 //                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
-            courseStatus = statusValue + " (" + progressPercent;
+            displayStatus = statusValue + " (" + progressPercent;
 
-        } else if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
-
+        } else if (courseStatus.equalsIgnoreCase("Not Started")) {
+            String progressPercent = "0";
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusNotStarted)));
-            progressBar.setProgress(0);
+            progressBar.setProgress(Integer.parseInt(progressPercent));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
-            courseStatus = myLearningModel.getStatus() + "  (0";
+            displayStatus = courseStatus + "  (" + progressPercent;
 
-        } else if (myLearningModel.getStatus().toLowerCase().contains("incomplete") || (myLearningModel.getStatus().toLowerCase().contains("inprogress")) || (myLearningModel.getStatus().toLowerCase().contains("in progress"))) {
+        } else if (courseStatus.toLowerCase().contains("incomplete") || (courseStatus.toLowerCase().contains("inprogress")) || (courseStatus.toLowerCase().contains("in progress"))) {
+            String progressPercent = "50";
             String statusValue = "In Progress";
-
-            if (myLearningModel.getStatus().toLowerCase().equalsIgnoreCase("incomplete") || myLearningModel.getStatus().equalsIgnoreCase("") || myLearningModel.getStatus().toLowerCase().equalsIgnoreCase("in complete")) {
-                statusValue = "In Progress";
-            }
-
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
-            progressBar.setProgress(Integer.parseInt(myLearningModel.getProgress()));
+            progressBar.setProgress(Integer.parseInt(progressPercent));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            courseStatus = statusValue + " (" + myLearningModel.getProgress();
+            displayStatus = statusValue + " (" + progressPercent;
 
-        } else if (myLearningModel.getStatus().toLowerCase().contains("pending review") || (myLearningModel.getStatus().toLowerCase().contains("pendingreview"))) {
+        } else if (courseStatus.toLowerCase().contains("pending review") || (courseStatus.toLowerCase().contains("pendingreview"))) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 
-            status = myLearningModel.getStatus();
-
+            status = courseStatus;
             progressBar.setProgress(100);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status + "(" + 100;
+            displayStatus = status + "(" + 100;
         } else {
 
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
             progressBar.setProgress(0);
             String status = "";
-            status = myLearningModel.getStatus();
-            courseStatus = status + "(" + 0;
+            status = courseStatus;
+            displayStatus = status + "(" + 0;
 
         }
-        txtCourseStatus.setText(courseStatus + "%)");
+        txtCourseStatus.setText(displayStatus + "%)");
     }
 
     void initVolleyCallback() {
@@ -656,26 +649,70 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
                 Log.d(TAG, "onActivityResult if getCourseName :" + myLearningModel.getCourseName());
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                File myFile = new File(myLearningModel.getOfflinepath());
 
-                    if (!isFileExist) {
-                        getStatusFromServer(myLearningModel);
+                if (!myFile.exists()) {
+
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+
+                        if (isNetworkConnectionAvailable(MyLearningDetail_Activity.this, -1)) {
+                            getStatusFromServer(myLearningModel);
+
+                        }
+                    } else {
+                        if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            int i = -1;
+                            i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
+                            if (i == 1) {
+//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+
+                                statusUpdate(getResources().getString(R.string.metadata_status_progress));
+                            } else {
+
+//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
                     }
                 } else {
 
                     if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                         int i = -1;
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
-                        if (i == 1) {
-//                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
-                            statusUpdate(getResources().getString(R.string.metadata_status_progress));
-                        } else {
-//                            Toast.makeText(MyLearningDetail_Activity.this, "Unable to update the status", Toast.LENGTH_SHORT).show();
-                        }
 
+                        if (i == 1) {
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+//                            myLearningAdapter.notifyDataSetChanged();
+//                            injectFromDbtoModel();
+                        } else {
+
+//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        statusUpdate(myLearningModel.getStatus());
                     }
 
                 }
+//                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+//
+//                    if (!isFileExist) {
+//                        getStatusFromServer(myLearningModel);
+//                    }
+//                } else {
+//
+//                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+//                        int i = -1;
+//                        i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
+//                        if (i == 1) {
+////                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
+//                            statusUpdate(getResources().getString(R.string.metadata_status_progress));
+//                        } else {
+////                            Toast.makeText(MyLearningDetail_Activity.this, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                    }
+//
+//                }
             }
         }
     }
@@ -1025,9 +1062,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                             if (userloginAry.length() > 0) {
-
 
                                 String response = null;
                                 try {

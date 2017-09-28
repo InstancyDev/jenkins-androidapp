@@ -50,11 +50,11 @@ public class LRSJavaScriptInterface {
         return "";
     }
 
+    // normal
     @JavascriptInterface
     public void SaveQuestionDataWithQuestionData(String quesData) {
         Log.d("SaveQuesWD", quesData);
-        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData,"");
-//        return status;
+        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData, "");
     }
 
     @JavascriptInterface
@@ -62,14 +62,13 @@ public class LRSJavaScriptInterface {
         Log.d("SaveLocat", location);
         String status = databaseHandler.saveResponseCMI(_learningModel, "location", location);
 
-//        return location;
     }
 
+    // template view
     @JavascriptInterface
     public void SaveQuestionDataWithQuestionDataSeqID(String quesData, String seqID) {
         Log.d("SaveQuesWD", quesData);
-        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData,seqID);
-//        return status;
+        String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData, seqID);
     }
 
     @JavascriptInterface
@@ -77,11 +76,9 @@ public class LRSJavaScriptInterface {
         Log.d("SaveLocationWith", location);
         String status = "";
         databaseHandler.updateCMiRecordForTemplateView(_learningModel, seqID, location);
-//        return location;
     }
 
     // Course close
-
     @JavascriptInterface
     public void OnLineCourseClose() {
 
@@ -91,7 +88,6 @@ public class LRSJavaScriptInterface {
             activity.setResult(RESULT_OK, intent);
             activity.finish();
         }
-
     }
 
     @JavascriptInterface
@@ -108,7 +104,7 @@ public class LRSJavaScriptInterface {
 
     }
 
-    //Track Template view javascriptmethods
+    //Track Template view javascriptmethods for workflow rules
     @JavascriptInterface
     public String LMSGetTrackWorkflowResultsWithTrackID(String trackId) {
 
@@ -132,7 +128,6 @@ public class LRSJavaScriptInterface {
 
         Log.d("SaveLocationWith", trackID);
         databaseHandler.updateWorkFlowRulesInDBForTrackTemplate(trackID, trackItemId, trackIstate, wMessage, ruleId, cStepId, _learningModel.getSiteID(), _learningModel.getUserID());
-//        return cStepId;
 
     }
 

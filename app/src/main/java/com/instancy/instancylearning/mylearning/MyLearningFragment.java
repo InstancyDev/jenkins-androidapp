@@ -43,6 +43,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.instancy.instancylearning.Filter_activity;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -366,6 +367,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
         if (item_search != null) {
@@ -418,7 +420,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (item_filter != null) {
             item_filter.setIcon(R.drawable.ic_filter_list_black_24dp);
             tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
+            Drawable myIcon = getResources().getDrawable(R.drawable.ic_filter_list_black_24dp);
+            item_filter.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
             item_filter.setTitle("Filter");
+
         }
 
         if (itemInfo != null) {
@@ -468,14 +473,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
-                Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
                 appcontroller.setAlreadyViewd(false);
                 preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
                 myLearningAdapter.notifyDataSetChanged();
                 break;
+            case R.id.mylearning_filter:
+                Intent intent = new Intent(context, Filter_activity.class);
+                startActivity(intent);
+                break;
 
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -762,8 +769,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         // write jw content method
 
 
-
-
                     }
 
                     @Override
@@ -798,7 +803,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 + "&userid=" + learningModel.getUserID()
                 + "&DelivoryMode=" + "1";
 
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString, null, new Response.Listener<JSONObject>() {
+        String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, metaDataUrl, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -884,10 +891,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                             }
                         }
-
                     }
                 } else {
-
                     if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                         int i = -1;
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");

@@ -15,7 +15,7 @@
         android:icon="@drawable/ic_filter_list_black_24dp"
         android:orderInCategory="100"
         android:title="filter"
-        app:showAsAction="ifRoom|withText" />
+        app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/mylearning_info_help"
@@ -23,7 +23,6 @@
         android:orderInCategory="100"
         android:title="filter"
         app:showAsAction="always|collapseActionView" />
-
 
     <!--<item-->
     <!--android:id="@+id/action_search"-->

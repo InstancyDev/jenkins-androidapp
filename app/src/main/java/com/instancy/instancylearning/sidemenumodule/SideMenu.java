@@ -34,6 +34,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -42,8 +43,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-
-import static com.instancy.instancylearning.utils.StaticValues.CONTEXT_TITLE;
 
 public class SideMenu extends AppCompatActivity {
 
@@ -162,7 +161,7 @@ public class SideMenu extends AppCompatActivity {
 
             if (savedInstanceState == null) {
                 // on first time to display view for first navigation item based on the number
-                selectItem(1,0); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(1, 0); // 2 is your fragment's number for "CollectionFragment"
                 lastClicked = 0;
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
@@ -171,6 +170,7 @@ public class SideMenu extends AppCompatActivity {
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 //                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
                     int logoutPos = sideMenusModel.size() - 1;
+
                     String filterCondition = sideMenusModel.get(groupPosition).getConditions();
                     if (logoutPos == groupPosition) {
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
@@ -183,10 +183,11 @@ public class SideMenu extends AppCompatActivity {
                     } else {
                         if (lastClicked != groupPosition) {
                             try {
-                                selectItem(Integer.parseInt(sideMenusModel.get(groupPosition).getContextMenuId()),groupPosition);
+                                selectItem(Integer.parseInt(sideMenusModel.get(groupPosition).getContextMenuId()), groupPosition);
+
                             } catch (NumberFormatException numEx) {
                                 numEx.printStackTrace();
-                                selectItem(1,groupPosition);
+                                selectItem(1, groupPosition);
                             }
                         }
                     }

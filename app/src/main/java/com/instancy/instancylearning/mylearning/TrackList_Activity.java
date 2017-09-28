@@ -329,7 +329,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             db.updateCMIstatus(myLearningModel, "Completed");
             myLearningModel.setStatus("Completed");
         }
-
+        myLearningModel.setStatus("waste");
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
@@ -350,16 +350,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     }
 
     public boolean onTrackListClose(MyLearningModel learningModel, List<MyLearningModel> trackList) {
-        boolean isTraxkListCompleted = true;
+        boolean isTraxkListCompleted = false;
 
-        for (int i = 0; i <= trackList.size(); i++) {
+        for (int i = 0; i < trackList.size(); i++) {
 
-            if (!trackList.get(i).getStatus().toLowerCase().contains("completed") || trackList.get(i).getStatus().toLowerCase().contains("failed") || trackList.get(i).getStatus().toLowerCase().contains("passed")) {
+            if (trackList.get(i).getStatus().toLowerCase().contains("completed") || trackList.get(i).getStatus().toLowerCase().contains("failed") || trackList.get(i).getStatus().toLowerCase().contains("passed")) {
 
-                isTraxkListCompleted = false;
+                isTraxkListCompleted = true;
                 break;
             } else {
-                isTraxkListCompleted = true;
+                isTraxkListCompleted = false;
             }
         }
 

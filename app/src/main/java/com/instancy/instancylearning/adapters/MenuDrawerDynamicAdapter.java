@@ -204,7 +204,6 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                         R.drawable.ic_launcher);
                 exp.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()),
                         PorterDuff.Mode.SRC_ATOP);
-
                 expIcon.setImageDrawable(exp);
             } else {
                 Drawable exp = ctx.getResources().getDrawable(
@@ -278,5 +277,17 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
+
+
+//    @Override
+//    public boolean onChildClick(ExpandableListView parent, View v,
+//                                int groupPosition, int childPosition, long id) {
+//
+//        int index = parent.getFlatListPosition(ExpandableListView.getPackedPositionForChild(groupPosition, childPosition));
+//        parent.setItemChecked(index, true);
+//
+//
+//        return true;
+//    }
 
 }

@@ -81,10 +81,11 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             } else {
                 isOffline = false;
             }
-            if (savedInstanceState != null){
-                adWebView.restoreState(savedInstanceState);}
-            else{
-                adWebView.loadUrl(courseUrl);}
+            if (savedInstanceState != null) {
+                adWebView.restoreState(savedInstanceState);
+            } else {
+                adWebView.loadUrl(courseUrl);
+            }
         }
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
@@ -171,7 +172,9 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                }
                                                if (url.contains("blank.html?ioscourseclose=true&cid")) {
                                                    databaseHandler.saveCourseClose(url, myLearningModel);
-
+                                                   if (url.contains("lstatus=completed")) {
+                                                       myLearningModel.setStatus("Completed");
+                                                   }
                                                    Intent intent = getIntent();
                                                    intent.putExtra("myLearningDetalData", myLearningModel);
                                                    setResult(RESULT_OK, intent);

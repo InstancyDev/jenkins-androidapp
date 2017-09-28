@@ -16,7 +16,14 @@
     <color name="colorSiteName">#34aadc</color>
     <color name="colorStatusOther">#5750da</color>
 
+
+    <!--Green Background-->
     <!--<color name="colorDefaultBackGround">#5DB100</color>-->
+
+    <!--White Background-->
     <color name="colorDefaultBackGround">#ffff</color>
+
+    <!--Instancy Market Background-->
+    <!--<color name="colorDefaultBackGround">#4d4d4d</color>-->
 
 </resources>

@@ -343,7 +343,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
-        profileWebCall("1");
+
+//        profileWebCall("1");
 
         if (userName.length() < 1) {
             Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
@@ -478,7 +479,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     String userId = jsonobj.get("userid").toString();
 
 
-                                    profileWebCall("1");
+//                                    profileWebCall("1");
 
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -560,7 +561,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void hideOrShowBtns() {
-
+//        settingTxt.setVisibility(View.INVISIBLE);
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
@@ -676,7 +677,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     if (response != null) {
 
                         try {
-                            db.InjectAllProfileDetails(response);
+                            db.InjectAllProfileDetails(response, "1");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

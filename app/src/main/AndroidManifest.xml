@@ -99,50 +99,50 @@
         <activity
             android:name=".mainactivities.Branding_activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
 
         <!-- Login screen -->
         <activity
             android:name=".mainactivities.Login_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:windowSoftInputMode="adjustNothing"> </activity>
 
         <!-- forgot screen -->
         <activity
             android:name=".mainactivities.ForgotPasswordActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- social screen -->
         <activity
             android:name=".mainactivities.SocialWebLoginsActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- sign screen -->
         <activity
             android:name=".mainactivities.SignUp_Activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- Settings screen -->
         <activity
             android:name=".mainactivities.Settings_activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- NativeSettings screen -->
         <activity
             android:name=".mainactivities.NativeSettings"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- sidemenu screen -->
         <activity
             android:name=".sidemenumodule.SideMenu"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
 
         <!-- MylearningDetail screen -->
         <activity
             android:name=".mylearning.MyLearningDetail_Activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!--aDVANCED WEBVIEW -->
         <activity
@@ -162,15 +162,20 @@
         <activity
             android:name=".mainactivities.PdfViewer_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
 
         <activity
             android:name=".mylearning.TrackList_Activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <activity
             android:name=".mylearning.Reports_Activity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
+
+        <activity
+            android:name=".Filter_activity"
+            android:screenOrientation="portrait"> </activity>
+
 
         <receiver android:name=".helper.NetworkChangeReceiver">
             <intent-filter>

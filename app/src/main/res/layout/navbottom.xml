@@ -105,14 +105,13 @@
     <ImageView
         android:id="@+id/bottom_logo"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="60dp"
         android:layout_gravity="center"
         android:background="@color/colorGray"
         android:padding="3dp"
         android:scaleType="centerInside"
-        android:src="@drawable/playground"
+        android:src="@drawable/acclife__login_logo"
         android:visibility="visible" />
-
 
 </LinearLayout>
 

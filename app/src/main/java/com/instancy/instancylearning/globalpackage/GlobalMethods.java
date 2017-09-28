@@ -841,6 +841,8 @@ public class GlobalMethods {
                 Toast.makeText(v.getContext(), "successfully deleted", Toast.LENGTH_SHORT).show();
                 databaseH = new DatabaseHandler(v.getContext());
                 databaseH.ejectRecordsinCmi(myLearningModel);
+                databaseH.ejectRecordsinStudentResponse(myLearningModel);
+                databaseH.ejectRecordsinTrackObjDb(myLearningModel);
             }
         } else {
 
