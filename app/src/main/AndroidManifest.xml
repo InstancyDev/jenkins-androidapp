@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
 
     <compatible-screens>
@@ -144,20 +145,10 @@
             android:name=".mylearning.MyLearningDetail_Activity"
             android:screenOrientation="portrait"> </activity>
 
-        <!--aDVANCED WEBVIEW -->
+        <!--ADVANCED WEBVIEW -->
         <activity
             android:name=".mainactivities.AdvancedWebCourseLaunch"
             android:configChanges="keyboard|keyboardHidden|orientation"> </activity>
-
-
-        <!--<activity-->
-        <!--android:name=".mainactivities.WebLaunchView"-->
-        <!--android:screenOrientation="portrait"></activity>-->
-
-        <!--<activity-->
-        <!--android:name=".mainactivities.WebView_Activity"-->
-        <!--android:screenOrientation="portrait"></activity>-->
-
 
         <activity
             android:name=".mainactivities.PdfViewer_Activity"
@@ -175,6 +166,14 @@
         <activity
             android:name=".Filter_activity"
             android:screenOrientation="portrait"> </activity>
+
+
+        <!-- INAPP BILLING ACTIVITY -->
+
+        <activity
+            android:name=".inappbilling.InAppBilling_Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Translucent"> </activity>
 
 
         <receiver android:name=".helper.NetworkChangeReceiver">

@@ -1090,7 +1090,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String result = convertStreamToString(inputStream);
 
-            if (isValidString(result) && result.length() > 0) {
+
+//            if (isValidString(result) && result.length() > 0) {
+
+            if (result != null && result.length() > 0) {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
 
@@ -8839,6 +8842,139 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     }
+
+    // uncomment for pagenotes
+//    public void sendOfflineUserPagenotes() {
+//
+//        String selectQuery = "SELECT ContentID, PageID, UserID, Usernotestext, TrackID, SequenceID, NoteDate, Notecount, ModifiedNotedate FROM UserPageNotes";
+//        String pageNOtesString = "", studId = "";
+//        StringBuilder strResult = null;
+//        strResult = new StringBuilder();
+//
+//        boolean iscontentExist = false;
+//
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        Cursor cursor = null;
+//        try {
+//            strResult.append("<UpdateOfflinePageNotes>");
+//
+//            cursor = db.rawQuery(selectQuery, null);
+//            if (cursor.moveToFirst()) {
+//                do {
+//                    iscontentExist = true;
+//
+//                    String ContentID = cursor.getString(cursor
+//                            .getColumnIndex("ContentID"));
+//                    String PageID = cursor.getString(cursor
+//                            .getColumnIndex("PageID"));
+//                    String UserID = cursor.getString(cursor
+//                            .getColumnIndex("UserID"));
+//                    String Usernotestext = cursor.getString(cursor
+//                            .getColumnIndex("Usernotestext"));
+//                    String TrackID = cursor.getString(cursor
+//                            .getColumnIndex("TrackID"));
+//                    String SequenceID = cursor.getString(cursor
+//                            .getColumnIndex("SequenceID"));
+//                    String NoteDate = cursor.getString(cursor
+//                            .getColumnIndex("NoteDate"));
+//                    String Notecount = cursor.getString(cursor
+//                            .getColumnIndex("Notecount"));
+//                    String ModifiedNotedate = cursor.getString(cursor
+//                            .getColumnIndex("ModifiedNotedate"));
+//
+//                    ContentID = getStringOrEmpty(ContentID);
+//                    PageID = getStringOrEmpty(PageID);
+//                    UserID = getStringOrEmpty(UserID);
+//                    Usernotestext = getStringOrEmpty(Usernotestext);
+//                    TrackID = getStringOrEmpty(TrackID);
+//                    SequenceID = getStringOrEmpty(SequenceID);
+//                    NoteDate = getStringOrEmpty(NoteDate);
+//                    Notecount = getStringOrEmpty(Notecount);
+//                    ModifiedNotedate = getStringOrEmpty(ModifiedNotedate);
+//
+//                    strResult.append("<OfflinePageNotes>");
+//                    strResult
+//                            .append("<ContentID>" + ContentID + "</ContentID>");
+//                    strResult.append("<PageID>" + PageID + "</PageID>");
+//                    strResult.append("<UserID>" + UserID + "</UserID>");
+//                    strResult.append("<Usernotestext>" + Usernotestext
+//                            + "</Usernotestext>");
+//                    strResult.append("<TrackID>" + TrackID + "</TrackID>");
+//                    strResult.append("<SequenceID>" + SequenceID
+//                            + "</SequenceID>");
+//                    strResult.append("<NoteDate>" + NoteDate + "</NoteDate>");
+//                    strResult
+//                            .append("<Notecount>" + Notecount + "</Notecount>");
+//                    strResult.append("<ModifiedNotedate>" + ModifiedNotedate
+//                            + "</ModifiedNotedate>");
+//                    strResult.append("</OfflinePageNotes>");
+//
+//                    studId = UserID;
+//
+//                } while (cursor.moveToNext());
+//
+//            }
+//            strResult.append("</UpdateOfflinePageNotes>");
+//
+//            pageNOtesString = strResult.toString();
+//
+//            Log.i("UpdateOffline String", pageNOtesString);
+//
+//        } catch (Exception e) {
+//            Log.d("Select Message: ", e.getMessage());
+//
+//            pageNOtesString = "";
+//        }
+//        cursor.close();
+//        db.close();
+//
+//        if (iscontentExist && isValidString(pageNOtesString)) {
+//            String result = null;
+//            try {
+//
+//                String requestURL = siteAPIUrl
+//                        + "/MobileLMS/MobileUpdateOfflinePageNotes"
+//                        + "?studId=" + studId
+//                        + "&siteURL=http://demo.instancyplatform.com/";
+//                HttpClient httpclient = new DefaultHttpClient();
+//                HttpPost httppost = new HttpPost(requestURL);
+//                httppost.setHeader("Accept", "application/json");
+//                httppost.setHeader("Content-type", "application/json");
+//                StringEntity postentity = new StringEntity("\""
+//                        + pageNOtesString.toString() + "\"", HTTP.UTF_8);
+//                httppost.setEntity(postentity);
+//                HttpUriRequest request = httppost;
+//
+//                String credentials = authentication;
+//                String base64EncodedCredentials = Base64.encodeToString(
+//                        credentials.getBytes(), Base64.NO_WRAP);
+//                request.addHeader("Authorization", "Basic "
+//                        + base64EncodedCredentials);
+//
+//                HttpResponse response = null;
+//
+//                try {
+//                    response = httpclient.execute(request);
+//                    Log.i("In sendOfflineUserPagenotes", "Response status: "
+//                            + response.getStatusLine().toString());
+//
+//                    HttpEntity entity = response.getEntity();
+//
+//                    if (entity != null) {
+//                        InputStream instream = entity.getContent();
+//                        result = convertStreamToString(instream);
+//                        instream.close();
+//                        Log.d("UpdateOfflinePageNotes result", result);
+//                    }
+//                } catch (Exception e) {
+//
+//                }
+//            } catch (Exception e) {
+//
+//            }
+//        }
+//    }
+
 }
 
 

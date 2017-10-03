@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
@@ -37,6 +38,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.SkuDetails;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -75,13 +79,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 6/27/2017 Working on InstancyLearning.
  */
 
-public class MyLearningDetail_Activity extends AppCompatActivity {
+public class MyLearningDetail_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
+
+    BillingProcessor billingProcessor;
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     @Bind(R.id.txt_title_name)
     TextView txtTitle;
@@ -188,6 +195,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             myLearningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
             isFromCatalog = bundle.getBoolean("IFROMCATALOG");
         }
+
+        String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
+
+        billingProcessor = new BillingProcessor(this, null, this);
 
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(this);
@@ -549,6 +560,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 
                 }
 
+
                 svProgressHUD.dismiss();
             }
 
@@ -562,6 +574,24 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+
+                if (requestType.equalsIgnoreCase("INAPP")) {
+
+                    if (response != null) {
+                        if (response.toLowerCase().contains("success")) {
+
+                            addToMyLearning(myLearningModel);
+
+                        } else {
+                            Toast.makeText(MyLearningDetail_Activity.this, "Purchase failed", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+
+                    }
+
+                }
+
 
                 svProgressHUD.dismiss();
             }
@@ -605,7 +635,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                 setResult(RESULT_OK, intent);
 
                 finish();
-                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -621,9 +650,12 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
                 } else if (txtBtnView.getText().toString().equalsIgnoreCase("Add")) {
 //                    Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show();
-                    addToMyLearningCheckUser(myLearningModel, 1);
+                    addToMyLearningCheckUser(myLearningModel, false); // false for
+
                 } else if (txtBtnView.getText().toString().equalsIgnoreCase("Buy")) {
                     Toast.makeText(this, "Buy button", Toast.LENGTH_SHORT).show();
+
+                    addToMyLearningCheckUser(myLearningModel, true);
                 }
                 break;
             case R.id.report_btn_txt:
@@ -636,6 +668,32 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                 downloadTheCourse(myLearningModel, view);
                 break;
         }
+
+    }
+
+
+    public void inAppActivityCall(MyLearningModel learningModel) {
+
+        if (!BillingProcessor.isIabServiceAvailable(this)) {
+
+            Toast.makeText(this, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
+        }
+
+        String testId = "android.test.purchased";
+        String productId = "com.instancy.test";
+
+        if (productId.length() != 0) {
+            billingProcessor.purchase(MyLearningDetail_Activity.this, testId);
+        }
+
+
+//        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
+        String productid = null;
+        productid = learningModel.getGoogleProductID();
+
+        SkuDetails sku = billingProcessor.getPurchaseListingDetails(productid);
+
+//        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
 
     }
 
@@ -714,6 +772,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
 //
 //                }
             }
+        }
+
+        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)){
+
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -952,28 +1015,30 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
             circleProgressBar.setVisibility(View.GONE);
             btnDownload.setEnabled(false);
 
-
         }
-
-
     }
 
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position) {
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, boolean isInApp) {
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
-                checkUserLogin(myLearningDetalData, position);
+                checkUserLogin(myLearningDetalData, false);
+
             } else {
 
-                addToMyLearning(myLearningDetalData, position);
+                if (isInApp) {
+                    inAppActivityCall(myLearningDetalData);
+                } else {
+                    addToMyLearning(myLearningDetalData);
+                }
 
             }
         }
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData) {
 
         if (isNetworkConnectionAvailable(this, -1)) {
             boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -999,8 +1064,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
 
-
-                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
+                            getMobileGetMobileContentMetaData(myLearningDetalData);
                             myLearningModel.setAddedToMylearning(1);
                             refreshCatalogContent = true;
                         } else {
@@ -1039,7 +1103,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
     }
 
 
-    public void checkUserLogin(final MyLearningModel learningModel, final int position) {
+    public void checkUserLogin(final MyLearningModel learningModel, final boolean isInApp) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
@@ -1100,10 +1164,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
                                             .get("userid").toString();
                                     if (userIdresponse.length() != 0) {
 
-                                        addToMyLearning(learningModel, position);
+                                        if (!isInApp) {
+
+                                            addToMyLearning(learningModel);
+
+                                        } else {
+                                            inAppActivityCall(learningModel);
+                                        }
                                     }
                                 }
-
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -1132,7 +1201,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position) {
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
@@ -1202,4 +1271,63 @@ public class MyLearningDetail_Activity extends AppCompatActivity {
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
+    @Override
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+        Toast.makeText(this, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
+        Log.v("chip", "Owned Managed Product: " + details.purchaseInfo.purchaseData);
+        sendInAppDetails(details);
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+        Toast.makeText(this, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
+        for (String sku : billingProcessor.listOwnedProducts())
+            Log.v("chip", "Owned Managed Product: " + sku);
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error) {
+        Toast.makeText(this, "onBillingError", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBillingInitialized() {
+//        Toast.makeText(this, "onBillingInitialized", Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean sendInAppDetails(@Nullable TransactionDetails details) {
+        boolean status = false;
+        String orderId = "";
+        String productId = "";
+        String purchaseToken = "";
+        String purchaseTime = "";
+        try {
+            assert details != null;
+            orderId = details.purchaseInfo.purchaseData.orderId;
+            productId = details.purchaseInfo.purchaseData.productId;
+            purchaseToken = details.purchaseInfo.purchaseData.purchaseToken;
+
+            String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+            purchaseTime = dateString.replace(" ", "%20");
+
+        } catch (Exception jx) {
+            Log.d("sendInAppDetails", jx.getMessage());
+
+        }
+
+//        http://mobiwebapi.instancysoft.com/api//MobileLMS/MobileSaveInAppPurchaseDetails?
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSaveInAppPurchaseDetails?_userId="
+                + myLearningModel.getUserID() + "&_siteURL=" + appUserModel.getSiteURL() + "&_contentId="
+                + myLearningModel.getContentID() + "&_transactionId=" + orderId + "&_receipt="
+                + purchaseToken + "&_productId=" + productId
+                + "&_purchaseDate=" + purchaseTime + "&_devicetype=Android";
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "inappwebcall : " + urlStr);
+
+        vollyService.getStringResponseVolley("INAPP", urlStr, appUserModel.getAuthHeaders());
+
+        return status;
+    }
 }

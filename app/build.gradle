@@ -16,26 +16,26 @@ android {
 //    }
 
 //// for instancy genric app
-//    defaultConfig {
-//        applicationId "com.instancy.instancylearning"
-//        minSdkVersion 19
-//        targetSdkVersion 25
-//        versionCode 49
-//        versionName "4.0.2.48"
-//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//        vectorDrawables.useSupportLibrary = true
-//        multiDexEnabled true
-
-// for acclife genric app
     defaultConfig {
-        applicationId "com.instancy.accilifes"
+        applicationId "com.instancy.instancylearning"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 49
+        versionName "4.0.2.48"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
+
+// for acclife genric app
+//    defaultConfig {
+//        applicationId "com.instancy.accilifes"
+//        minSdkVersion 19
+//        targetSdkVersion 25
+//        versionCode 1
+//        versionName "1.0"
+//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        vectorDrawables.useSupportLibrary = true
+//        multiDexEnabled true
 
     }
 
@@ -82,4 +82,5 @@ dependencies {
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.github.florent37:viewtooltip:1.0.8'
     compile 'com.android.support:multidex:1.0.1'
+
 }

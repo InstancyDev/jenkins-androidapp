@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
@@ -48,6 +49,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.anjlab.android.iab.v3.BillingProcessor;
+import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
@@ -86,6 +89,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -94,7 +98,7 @@ import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
  * Created by Upendranath on 5/19/2017.
  */
 
-public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, SearchView.OnQueryTextListener {
+public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, BillingProcessor.IBillingHandler {
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -120,6 +124,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
+    BillingProcessor billingProcessor;
 
     public Catalog_fragment() {
 
@@ -147,6 +152,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             appcontroller.setAlreadyViewd(false);
         }
         vollyService = new VollyService(resultCallback, context);
+
+        String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
+
+        billingProcessor = new BillingProcessor(context, apiKey, this);
 
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
@@ -245,6 +254,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Log.d(TAG, "Volley String post" + response);
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+
             }
 
             @Override
@@ -353,7 +363,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 public boolean onQueryTextChange(String newText) {
 
                     catalogAdapter.filter(newText.toLowerCase(Locale.getDefault()));
-
 
                     return true;
                 }
@@ -629,13 +638,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (item.getTitle().toString().equalsIgnoreCase("Add")) {
 
 //                    addToMyLearning(myLearningDetalData);
-                    addToMyLearningCheckUser(myLearningDetalData, position);
+                    addToMyLearningCheckUser(myLearningDetalData, position, false);
                 }
-
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
-
-//                  addToMyLearning(myLearningDetalData);
+                    addToMyLearningCheckUser(myLearningDetalData, position, true);
+//
                     Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
+
                 }
                 return true;
             }
@@ -644,17 +653,22 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position) {
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position, boolean isInapp) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
 
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
-                checkUserLogin(myLearningDetalData, position);
+                checkUserLogin(myLearningDetalData, position, isInapp);
             } else {
 
-                addToMyLearning(myLearningDetalData, position);
+                if (isInapp) {
+                    inAppActivityCall(myLearningDetalData);
 
+                } else {
+                    addToMyLearning(myLearningDetalData, position);
+
+                }
             }
         }
     }
@@ -730,7 +744,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
-    public void checkUserLogin(final MyLearningModel learningModel, final int position) {
+    public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
@@ -793,7 +807,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                             .get("userid").toString();
                                     if (userIdresponse.length() != 0) {
 
-                                        addToMyLearning(learningModel, position);
+                                        if (isInapp) {
+
+                                            inAppActivityCall(learningModel);
+
+                                        } else {
+                                            addToMyLearning(learningModel, position);
+                                        }
+
                                     }
                                 }
 
@@ -889,6 +910,165 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
+    public void inAppActivityCall(MyLearningModel learningModel) {
+        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
+        if (!BillingProcessor.isIabServiceAvailable(context)) {
+
+            Toast.makeText(context, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
+        }
+
+        String testId = "android.test.purchased";
+        String productId = "com.instancy.managedproduct";
+        String originalproductid =learningModel.getGoogleProductID();
+
+        if (originalproductid.length() != 0) {
+
+            Intent intent = new Intent();
+            intent.putExtra("learningdata", learningModel);
+            billingProcessor.handleActivityResult(8099, 80, intent);
+            billingProcessor.purchase(getActivity(), originalproductid);
+        }
+
+//        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
+//        String productid = null;
+//        productid = learningModel.getGoogleProductID();
+
+//        SkuDetails sku = billingProcessor.getPurchaseListingDetails(testId);
+
+//        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+        Toast.makeText(context, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
+        Log.v("chip", "Owned Managed Product: " + details.purchaseInfo.purchaseData);
+
+        sendInAppDetails(details);
+
+        preferencesManager.setStringValue("", "contentid");
+
+    }
+
+    @Override
+    public void onPurchaseHistoryRestored() {
+        Toast.makeText(context, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
+        for (String sku : billingProcessor.listOwnedProducts())
+            Log.v("chip", "Owned Managed Product: " + sku);
+    }
+
+    @Override
+    public void onBillingError(int errorCode, @Nullable Throwable error) {
+        Toast.makeText(context, "onBillingError", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBillingInitialized() {
+//        Toast.makeText(context, "onBillingInitialized", Toast.LENGTH_SHORT).show();
+    }
+
+    public boolean sendInAppDetails(@Nullable TransactionDetails details) {
+
+        String contentId = preferencesManager.getStringValue("contentid");
+        MyLearningModel learningModel = new MyLearningModel();
+
+        int position = 0;
+
+        for (int i = 0; i < catalogModelsList.size(); i++) {
+            System.out.println(catalogModelsList.get(i));
+
+            if (contentId.equalsIgnoreCase(catalogModelsList.get(i).getContentID())) {
+                learningModel = catalogModelsList.get(i);
+                position = i;
+                break;
+            }
+        }
+        // upendranath reddy poreddy 918099999060 pytm0123456
+        boolean status = false;
+        String orderId = "";
+        String productId = "";
+        String purchaseToken = "";
+        String purchaseTime = "";
+
+        try {
+            assert details != null;
+            orderId = details.purchaseInfo.purchaseData.orderId;
+            productId = details.purchaseInfo.purchaseData.productId;
+            purchaseToken = details.purchaseInfo.purchaseData.purchaseToken;
+
+            String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+            purchaseTime = dateString.replace(" ", "%20");
+
+        } catch (Exception jx) {
+            Log.d("sendInAppDetails", jx.getMessage());
+
+        }
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSaveInAppPurchaseDetails?_userId="
+                + learningModel.getUserID() + "&_siteURL=" + appUserModel.getSiteURL() + "&_contentId="
+                + learningModel.getContentID() + "&_transactionId=" + orderId + "&_receipt="
+                + purchaseToken + "&_productId=" + productId
+                + "&_purchaseDate=" + purchaseTime + "&_devicetype=Android";
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "inappwebcall : " + urlStr);
+
+
+        try {
+            final MyLearningModel finalLearningModel = learningModel;
+            final int finalPosition = position;
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, urlStr,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String _response) {
+
+                            Log.d("logr  _response =", _response);
+
+                            if (_response.contains("success")) {
+                                addToMyLearning(finalLearningModel, finalPosition);
+                            } else {
+                                Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    // Error handling
+//                    Log.d("logr  error =", error.getMessage());
+
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    final Map<String, String> headers = new HashMap<>();
+                    String authHeaders = appUserModel.getAuthHeaders();
+                    String base64EncodedCredentials = Base64.encodeToString(authHeaders.getBytes(), Base64.NO_WRAP);
+
+                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                    return headers;
+                }
+
+                @Override
+                protected VolleyError parseNetworkError(VolleyError volleyError) {
+                    if (volleyError.networkResponse != null && volleyError.networkResponse.data != null) {
+                        VolleyError error = new VolleyError(new String(volleyError.networkResponse.data));
+                        volleyError = error;
+                        Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
+
+                    }
+                    return volleyError;
+                }
+            };
+            VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
+
+        } catch (Exception e) {
+
+        }
+
+        return status;
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -902,5 +1082,19 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
             }
         }
+
+        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
+
+            super.onActivityResult(requestCode, resultCode, data);
+//            if (data != null) {
+//
+//                MyLearningModel learningModel = (MyLearningModel) data.getSerializableExtra("learningdata");
+////            billingProcessor.handleActivityResult(8099, 80, intent);
+//            }
+
+        }
+
     }
+
+
 }

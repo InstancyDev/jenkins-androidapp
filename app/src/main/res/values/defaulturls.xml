@@ -20,15 +20,14 @@
     <!--<string name="app_default_url">http://mobile.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
-    <!--<string name="app_default_url">http://staging.enlightus.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+    <string name="app_default_url">http://staging.enlightus.com/</string>
+    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
 
     <!--<string name="app_default_url">http://lsonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-
-    <string name="app_default_url">http://lonlinelifeskills.instancy.com/</string>
-    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
+    <!--<string name="app_default_url">http://lonlinelifeskills.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
     <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://mobiwebapi.instancy.net/api/</string>-->
