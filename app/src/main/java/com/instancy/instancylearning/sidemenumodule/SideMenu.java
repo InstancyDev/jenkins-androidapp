@@ -22,8 +22,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -37,6 +35,7 @@ import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +112,7 @@ public class SideMenu extends AppCompatActivity {
 //        LayoutInflaterCompat.setFactory(getLayoutInflater(), new IconicsLayoutInflater(getDelegate()));
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
+        appUserModel.setUserLoginId(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
         ButterKnife.bind(this);
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -143,12 +143,8 @@ public class SideMenu extends AppCompatActivity {
         // navdrawer Top layout initilization
 
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
-        Glide.with(this).load(profileIma)
-                .thumbnail(0.5f)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(profileImage);
 
+        Picasso.with(this).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
         txtUsername.setText(appUserModel.getUserName());
 
         txtAddress.setText(appUserModel.getDisplayName().isEmpty() ? getResources().getString(R.string.app_name) : appUserModel.getDisplayName());
@@ -212,7 +208,7 @@ public class SideMenu extends AppCompatActivity {
                 fragment = new com.instancy.instancylearning.catalog.Catalog_fragment();
                 break;
             case 3:
-                fragment = new Catalog_fragment();
+                fragment = new Profile_fragment();
                 break;
             default:
                 fragment = new Catalog_fragment();
@@ -231,6 +227,7 @@ public class SideMenu extends AppCompatActivity {
 
             navDrawerExpandableView.setItemChecked(position, true);
             navDrawerExpandableView.setSelection(position);
+
             drawer.closeDrawer(Gravity.LEFT);
         } else {
             Log.e("MainActivity", "Error in creating fragment");

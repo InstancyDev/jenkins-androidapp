@@ -155,10 +155,15 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             pView = inflater.inflate(R.layout.drawermenu_item, parentView, false);
         }
+        if (pView.isSelected()) {
+            // set your color
+            pView.setBackgroundColor(Color.RED);
+        }
+
         TextView txtTitle = (TextView) pView.findViewById(R.id.menuText);
         ImageView expIcon = (ImageView) pView.findViewById(R.id.expIcon);
         TextView fontIcon = (TextView) pView.findViewById(R.id.fontawasomeIcon);
-        fontIcon.setTextColor(pView.getResources().getColor(R.color.colorBlack));
+        fontIcon.setTextColor(pView.getResources().getColor(R.color.colorDarkGrey));
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);
 
         switch (mainMenu.getContextMenuId()) {

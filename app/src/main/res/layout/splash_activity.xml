@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorDefaultBackGround"
+    android:background="@color/colorPrimary"
     android:orientation="vertical">
 
     <!--android:background="@drawable/bg"-->
@@ -16,7 +16,7 @@
         android:layout_marginTop="100dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/acclife__login_logo" />
+        android:src="@drawable/playground" />
 
     <Button
         android:id="@+id/splashbtn"

@@ -145,7 +145,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public String getPrice() {
-        return price;
+        return isValidString(price) ? price : "";
     }
 
     public void setPrice(String price) {

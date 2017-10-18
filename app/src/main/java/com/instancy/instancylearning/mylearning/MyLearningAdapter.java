@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -47,6 +49,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +57,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -101,7 +106,6 @@ public class MyLearningAdapter extends BaseAdapter {
         appUserModel.getWebAPIUrl();
           /* setup enter and exit animation */
         appcontroller = AppController.getInstance();
-
     }
 
     public void refreshList(List<MyLearningModel> myLearningModel) {
@@ -110,6 +114,80 @@ public class MyLearningAdapter extends BaseAdapter {
         this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
     }
+
+    public void applyFilter(String typeSort, final boolean isAscn) {
+
+//        Collections.sort(myLearningModel, Collections.reverseOrder());
+
+        if (typeSort.equalsIgnoreCase("coursename")) {
+            Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                @Override
+                public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                    // ## Ascending order
+
+                    if (isAscn) {
+                        return obj1.getCourseName().compareToIgnoreCase(obj2.getCourseName());
+
+                    } else {
+                        return obj2.getCourseName().compareToIgnoreCase(obj1.getCourseName());
+                    }
+
+                    // To compare string values
+                    // return Integer.valueOf(obj1.empId).compareTo(obj2.empId); // To compare integer values
+
+
+                    // ## Descending order
+                    // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
+                    // return Integer.valueOf(obj2.empId).compareTo(obj1.empId); // To compare integer values
+                }
+            });
+        }
+
+        if (typeSort.equalsIgnoreCase("contenttype")) {
+            Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                @Override
+                public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                    // ## Ascending order
+                    return obj1.getContentType().compareToIgnoreCase(obj2.getContentType());
+
+                    // To compare string values
+                    // return Integer.valueOf(obj1.empId).compareTo(obj2.empId); // To compare integer values
+
+
+                    // ## Descending order
+                    // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
+                    // return Integer.valueOf(obj2.empId).compareTo(obj1.empId); // To compare integer values
+                }
+            });
+        }
+
+        if (typeSort.equalsIgnoreCase("status")) {
+            Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+
+                @Override
+                public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                    // ## Ascending order
+                    return obj1.getStatus().compareToIgnoreCase(obj2.getStatus());
+
+
+                    // To compare string values
+                    // return Integer.valueOf(obj1.empId).compareTo(obj2.empId); // To compare integer values
+
+
+                    // ## Descending order
+                    // return obj2.firstName.compareToIgnoreCase(obj1.firstName); // To compare string values
+                    // return Integer.valueOf(obj2.empId).compareTo(obj1.empId); // To compare integer values
+                }
+            });
+        }
+
+
+        this.notifyDataSetChanged();
+    }
+
 
     @Override
     public int getCount() {
@@ -171,6 +249,9 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
 
+        LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+
 //        initVolleyCallback(myLearningModel.get(position), position);
 
         if (myLearningModel.get(position).getShortDes().isEmpty()) {
@@ -187,7 +268,7 @@ public class MyLearningAdapter extends BaseAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36")) {
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36")|| myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
 
@@ -274,11 +355,14 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
         String imgUrl = myLearningModel.get(position).getImageData();
-        Glide.with(vi.getContext()).load(imgUrl)
-                .thumbnail(0.5f)
-                .placeholder(R.drawable.cellimage)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.imgThumb);
+//        Glide.with(vi.getContext()).load(imgUrl)
+//                .thumbnail(0.5f)
+//                .placeholder(R.drawable.cellimage)
+//                .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                .into(holder.imgThumb);
+        Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+
+
         final float oldRating = ratingValue;
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
@@ -434,7 +518,7 @@ public class MyLearningAdapter extends BaseAdapter {
             myLearningModel.addAll(searchList);
         } else {
             for (MyLearningModel s : searchList) {
-                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) ||s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText)) {
                     myLearningModel.add(s);
                 }
             }

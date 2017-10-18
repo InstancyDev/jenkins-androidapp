@@ -43,10 +43,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
-import com.instancy.instancylearning.Filter_activity;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.filter.Filter_activity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
@@ -84,6 +84,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -240,19 +241,23 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     }
                 }
-//                if (requestType.equalsIgnoreCase("MLADP")) {
-//
-//                    if (response != null) {
-//                        try {
-//                            db.injectCMIDataInto(response,lear);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    } else {
-//
-//                    }
-//
-//                }
+                if (requestType.equalsIgnoreCase("FILTER")) {
+
+                    if (response != null) {
+                        try {
+                            db.insertFilterIntoDB(response, appUserModel);
+                            Intent intent = new Intent(context, Filter_activity.class);
+                            startActivityForResult(intent, FILTER_CLOSE_CODE);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                        Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -263,6 +268,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("FILTER")) {
+
+                    Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -418,9 +427,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         if (item_filter != null) {
-            item_filter.setIcon(R.drawable.ic_filter_list_black_24dp);
+            item_filter.setIcon(R.drawable.filter_icon);
             tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
-            Drawable myIcon = getResources().getDrawable(R.drawable.ic_filter_list_black_24dp);
+            Drawable myIcon = getResources().getDrawable(R.drawable.filter_icon);
             item_filter.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
             item_filter.setTitle("Filter");
 
@@ -478,8 +487,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 myLearningAdapter.notifyDataSetChanged();
                 break;
             case R.id.mylearning_filter:
-                Intent intent = new Intent(context, Filter_activity.class);
-                startActivity(intent);
+                filterApiCall();
+
                 break;
 
         }
@@ -766,7 +775,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         }
 
 
-                        // write jw content method
+                        // write jw content method download
 
 
                     }
@@ -921,15 +930,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
+//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
+            if (data.getStringExtra("refresh").equalsIgnoreCase("refresh")) {
+                injectFromDbtoModel();
+            }
+        }
+
+        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
 
 //            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
 
-            if (data.getStringExtra("refresh").equalsIgnoreCase("refresh")) {
-
-                injectFromDbtoModel();
-
-            }
         }
+
 
     }
 
@@ -1000,6 +1012,30 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
         };
+    }
+
+    public void filterApiCall() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3134";
+
+            vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
+
+        } else {
+
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel);
+            if (jsonObject != null) {
+
+                Intent intent = new Intent(context, Filter_activity.class);
+                startActivityForResult(intent, FILTER_CLOSE_CODE);
+
+            } else {
+                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+
+
+        }
     }
 
 }

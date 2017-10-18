@@ -517,23 +517,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
     public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position, final int Gposition) {
 
-        String[] startPage = null;
 
         boolean isZipFile = false;
 
-        String localizationFolder = "";
-
-        if (learningModel.getStartPage().contains("/")) {
-            startPage = learningModel.getStartPage().split("/");
-            localizationFolder = "/" + startPage[0];
-        } else {
-            localizationFolder = "";
-        }
-        final String downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         final String[] downloadSourcePath = {null};
-
-        boolean success = (new File(downloadDestFolderPath)).mkdirs();
 
         switch (learningModel.getObjecttypeId()) {
             case "52":
@@ -563,6 +550,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 break;
         }
 
+
         final boolean finalisZipFile = isZipFile;
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -576,17 +564,17 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     if (statusCode != 200) {
                         downloadSourcePath[0] = learningModel.getSiteURL() + "content/downloadfiles/"
                                 + learningModel.getContentID() + ".zip";
-                        downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view, Gposition);
+                        downloadThin(downloadSourcePath[0], learningModel, position, view, Gposition);
 
                     } else {
                         downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
                                 + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
-                        downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view, Gposition);
+                        downloadThin(downloadSourcePath[0], learningModel, position, view, Gposition);
 
                     }
                 } else {
 
-                    downloadThin(downloadSourcePath[0], downloadDestFolderPath, learningModel, position, view, Gposition);
+                    downloadThin(downloadSourcePath[0], learningModel, position, view, Gposition);
                 }
 //                int statusCode = vollyService.checkResponseCode(downloadSourcePath[0]);
 
@@ -596,9 +584,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public void downloadThin(String downloadStruri, final String downloadPath, final MyLearningModel learningModel, final int position, final View view, final int gposition) {
+    public void downloadThin(String downloadStruri, final MyLearningModel learningModel, final int position, final View view, final int gposition) {
 
-        downloadStruri = downloadStruri.replaceAll(" ", "%20");
+
         ThinDownloadManager downloadManager = new ThinDownloadManager();
         Uri downloadUri = Uri.parse(downloadStruri);
         String extensionStr = "";
@@ -606,7 +594,6 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             case "52":
             case "11":
             case "14":
-
                 String[] startPage = null;
                 if (learningModel.getStartPage().contains("/")) {
                     startPage = learningModel.getStartPage().split("/");
@@ -624,23 +611,38 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 extensionStr = learningModel.getContentID() + ".zip";
                 break;
         }
+        String localizationFolder = "";
+        String[] startPage = null;
+        if (learningModel.getStartPage().contains("/")) {
+            startPage = learningModel.getStartPage().split("/");
+            localizationFolder = "/" + startPage[0];
+        } else {
+            localizationFolder = "";
+        }
+        String downloadDestFolderPath = "";
+        if (extensionStr.contains(".zip")) {
 
-        final String finalDownloadedFilePath = downloadPath + "/" + extensionStr;
+            downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+
+        } else {
+            downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+        }
+
+
+//        final String downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
+//                + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+
+        boolean success = (new File(downloadDestFolderPath)).mkdirs();
+
+        downloadStruri = downloadStruri.replaceAll(" ", "%20");
+        final String finalDownloadedFilePath = downloadDestFolderPath + "/" + extensionStr;
 
         final int id = 1;
-//        final NotificationManager mNotifyManager =
-//                (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
-//        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(_context);
-//        mBuilder.setContentTitle("" + learningModel.getCourseName())
-//                .setContentText("" + learningModel.getAuthor())
-//                .setSmallIcon(R.mipmap.ic_launcher);
-
-//        build = new NotificationCompat.Builder(_context);
-//        build.setContentTitle(learningModel.getCourseName())
-//                .setContentText(learningModel.getAuthor())
-//                .setSmallIcon(R.drawable.notification_launcher);
-
+        Log.d("TAG", "downloadThin: " + downloadUri);
         final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
+        final String finalDownloadDestFolderPath = downloadDestFolderPath;
         DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
                 .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
                 .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
@@ -651,7 +653,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                         isDownloading = false;
                         if (finalDownloadedFilePath.contains(".zip")) {
                             String zipFile = finalDownloadedFilePath;
-                            String unzipLocation = downloadPath;
+                            String unzipLocation = finalDownloadDestFolderPath;
                             UnZip d = new UnZip(zipFile,
                                     unzipLocation);
                             File zipfile = new File(zipFile);

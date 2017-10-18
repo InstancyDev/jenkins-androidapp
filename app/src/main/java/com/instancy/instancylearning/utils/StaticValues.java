@@ -89,6 +89,8 @@ public class StaticValues {
 
     public static final int DETAIL_CLOSE_CODE = 9191;
 
+    public static final int FILTER_CLOSE_CODE = 1234;
+
     public static final int COURSE_CLOSE_FROM_WEBSCREEN_CODE = 8888;
 
     /**

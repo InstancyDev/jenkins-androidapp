@@ -9,69 +9,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
-
-    <compatible-screens>
-        <!--no small size screens -->
-
-        <!--all normal size screens -->
-        <screen
-            android:screenDensity="ldpi"
-            android:screenSize="normal" />
-        <screen
-            android:screenDensity="mdpi"
-            android:screenSize="normal" />
-        <screen
-            android:screenDensity="hdpi"
-            android:screenSize="normal" />
-        <screen
-            android:screenDensity="xhdpi"
-            android:screenSize="normal" />
-
-        <!-- all large size screens -->
-        <screen
-            android:screenDensity="ldpi"
-            android:screenSize="large" />
-        <screen
-            android:screenDensity="mdpi"
-            android:screenSize="large" />
-        <screen
-            android:screenDensity="hdpi"
-            android:screenSize="large" />
-        <screen
-            android:screenDensity="xhdpi"
-            android:screenSize="large" />
-
-        <!-- all xlarge size screens -->
-        <screen
-            android:screenDensity="ldpi"
-            android:screenSize="xlarge" />
-        <screen
-            android:screenDensity="mdpi"
-            android:screenSize="xlarge" />
-        <screen
-            android:screenDensity="hdpi"
-            android:screenSize="xlarge" />
-        <screen
-            android:screenDensity="xhdpi"
-            android:screenSize="xlarge" />
-
-        <!-- Special case for Nexus 7 -->
-        <screen
-            android:screenDensity="213"
-            android:screenSize="large" />
-
-        <!-- Special xxhdpi devices -->
-        <screen
-            android:screenDensity="480"
-            android:screenSize="normal" />
-        <screen
-            android:screenDensity="480"
-            android:screenSize="large" />
-        <screen
-            android:screenDensity="480"
-            android:screenSize="xlarge" />`
-
-    </compatible-screens>
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true" />
 
     <application
         android:name=".globalpackage.AppController"
@@ -80,7 +23,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:node="replace">
@@ -100,72 +42,77 @@
         <activity
             android:name=".mainactivities.Branding_activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"> </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <!-- Login screen -->
         <activity
             android:name=".mainactivities.Login_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustNothing"> </activity>
+            android:windowSoftInputMode="adjustNothing"></activity>
 
         <!-- forgot screen -->
         <activity
             android:name=".mainactivities.ForgotPasswordActivity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!-- social screen -->
         <activity
             android:name=".mainactivities.SocialWebLoginsActivity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!-- sign screen -->
         <activity
             android:name=".mainactivities.SignUp_Activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!-- Settings screen -->
         <activity
             android:name=".mainactivities.Settings_activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!-- NativeSettings screen -->
         <activity
             android:name=".mainactivities.NativeSettings"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!-- sidemenu screen -->
         <activity
             android:name=".sidemenumodule.SideMenu"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"> </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <!-- MylearningDetail screen -->
         <activity
             android:name=".mylearning.MyLearningDetail_Activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!--ADVANCED WEBVIEW -->
         <activity
             android:name=".mainactivities.AdvancedWebCourseLaunch"
-            android:configChanges="keyboard|keyboardHidden|orientation"> </activity>
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".mainactivities.PdfViewer_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"> </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity
             android:name=".mylearning.TrackList_Activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".mylearning.Reports_Activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name=".Filter_activity"
-            android:screenOrientation="portrait"> </activity>
+            android:name=".filter.Filter_activity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".filter.Filter_Inner_activity"
+            android:screenOrientation="portrait"></activity>
 
 
         <!-- INAPP BILLING ACTIVITY -->
@@ -173,7 +120,7 @@
         <activity
             android:name=".inappbilling.InAppBilling_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent"> </activity>
+            android:theme="@style/Theme.AppCompat.Translucent"></activity>
 
 
         <receiver android:name=".helper.NetworkChangeReceiver">

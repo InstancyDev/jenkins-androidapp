@@ -45,12 +45,14 @@ public class WebAPIClient {
 
     public String getSiteAPIDetails(String siteurl) {
         String requestURL = siteurl + "/PublicModules/SiteAPIDetails.aspx";
+        Log.d("TAG", "getSiteAPIDetails: "+requestURL);
         String strAPIURL = "";
         inputStream = null;
         httpURLConnection = null;
 
         try {
             URL url = new URL(requestURL);
+
 
             httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -68,7 +70,6 @@ public class WebAPIClient {
                     if (!Utilities.isValidString(strAPIURL)) {
                         strAPIURL = "";
                     } else {
-
                         Log.d("webapiurl", strAPIURL);
                         preferencesManager.setStringValue(strAPIURL, StaticValues.KEY_WEBAPIURL);
                     }

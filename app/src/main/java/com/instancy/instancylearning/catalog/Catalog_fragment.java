@@ -643,7 +643,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
                     addToMyLearningCheckUser(myLearningDetalData, position, true);
 //
-                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
 
                 }
                 return true;
@@ -922,11 +922,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         String originalproductid =learningModel.getGoogleProductID();
 
         if (originalproductid.length() != 0) {
-
             Intent intent = new Intent();
             intent.putExtra("learningdata", learningModel);
             billingProcessor.handleActivityResult(8099, 80, intent);
             billingProcessor.purchase(getActivity(), originalproductid);
+        }
+        else{
+            Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
         }
 
 //        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
@@ -936,6 +938,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //        SkuDetails sku = billingProcessor.getPurchaseListingDetails(testId);
 
 //        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
+
 
     }
 

@@ -7,9 +7,27 @@ package com.instancy.instancylearning.models;
 public class UiSettingsModel {
 
     // for acclife
-    private String brandingColor = "#003d77";
-// for instancy
-//    private String  brandingColor = "#8dc73f";
+//    private String brandingColor = "#003d77";
+
+// for trackton_accilife for all buttons
+//    private String brandingColor = "#0062a6";
+
+
+    // for instancy for all buttons
+//    private String brandingColor = "#1c4585";
+//    private String appBackGroundColor = "#ffffff";
+//    private String defaultTextColor = "#000000";
+    // for instancy for all buttons
+//    private String appBackGroundColor = "#8dc73f";
+
+
+// // for instancy for all buttons
+    private String appBackGroundColor = "#8dc73f";
+
+    private String brandingColor = "#8dc73f";
+
+    private String defaultTextColor = "#ffffff";
+
 
     private String menuTextColor = "";
 
@@ -54,7 +72,7 @@ public class UiSettingsModel {
     private String enableBranding = "";
 
     public String getAppLoginBGColor() {
-        return appLoginBGColor.isEmpty() ? "#ffffff" : appLoginBGColor;
+        return appLoginBGColor.isEmpty() ? appBackGroundColor : appLoginBGColor;
     }
 
     public void setAppLoginBGColor(String appLoginBGColor) {
@@ -65,7 +83,7 @@ public class UiSettingsModel {
 
     public String getAppLoginTextolor() {
 
-        return appLoginTextolor.isEmpty() ? "#000000" : appLoginTextolor;
+        return appLoginTextolor.isEmpty() ? defaultTextColor : appLoginTextolor;
     }
 
     public void setAppLoginTextolor(String appLoginTextolor) {
@@ -129,7 +147,7 @@ public class UiSettingsModel {
 
     public String getAppButtonTextColor() {
 
-        return appButtonTextColor.isEmpty() ? "#000000" : appButtonTextColor;
+        return appButtonTextColor.isEmpty() ? defaultTextColor : appButtonTextColor;
 
     }
 
@@ -424,7 +442,6 @@ public class UiSettingsModel {
         return instance;
     }
 
-    // for accilife app
 
     public String getAppButtonBgColor() {
         return appButtonBgColor.isEmpty() ? brandingColor : appButtonBgColor;
@@ -457,5 +474,4 @@ public class UiSettingsModel {
         return appHeaderColor.isEmpty() ? brandingColor : appHeaderColor;
     }
 
-    // end for acclife
 }

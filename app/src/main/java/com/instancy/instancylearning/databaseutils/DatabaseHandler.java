@@ -118,6 +118,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String TBL_SITETINCANCONFIG = "SITETINCANCONFIG";
     public static final String TBL_CATEGORY = "CATEGORY";
 
+    public static final String TBL_MYLEARNINGFILTER = "MYLEARNINGFILTER";
+
     public static final String TBL_JOBROLES = "JOBROLES";
     public static final String TBL_CONTENTTYPES = "CONTENTTYPES";
     public static final String TBL_CATEGORYCONTENT = "CATEGORYCONTENT";
@@ -295,6 +297,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TINCAN
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, istincan TEXT, lrsendpoint TEXT, lrsauthorization TEXT, lrsauthorizationpassword TEXT, enabletincansupportforco TEXT, enabletincansupportforao TEXT, enabletincansupportforlt TEXT, base64lrsAuthKey TEXT, siteid TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_MYLEARNINGFILTER
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT,siteurl TEXT, userid TEXT, jsonobject BLOB)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
@@ -533,327 +539,331 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String result = convertStreamToString(inputStream);
             JsonParser jsonParser = new JsonParser();
 
-            if (isValidString(result)) {
+//            if (isValidString(result) && result.length() > 0) {
+
+            if (result.length() > 0) {
 
                 JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
                 UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
                 String siteid = "";
                 try {
-
-                    if (jsonObject.has("table")) {
-                        JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
-                        for (int i = 0; i < jsonTable.size(); i++) {
-                            Log.d(TAG, "siteSettingJsonObj: inDB " + jsonTable);
-                            JsonObject siteSettingJsonObj = jsonTable.get(i).getAsJsonObject();
-                            if (siteSettingJsonObj.has("siteid")) {
+                    if (jsonObject != null) {
+                        if (jsonObject.has("table")) {
+                            JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
+                            for (int i = 0; i < jsonTable.size(); i++) {
+                                Log.d(TAG, "siteSettingJsonObj: inDB " + jsonTable);
+                                JsonObject siteSettingJsonObj = jsonTable.get(i).getAsJsonObject();
+                                if (siteSettingJsonObj.has("siteid")) {
 //                            Log.d(TAG, "siteSettingJsonObj: siteid  " + siteSettingJsonObj.get("siteid"));
 //                            [{"SiteID":374,"Name":"Playground","SiteURL":"http://Test-admin.instancy.net/"}]
-                                siteid = siteSettingJsonObj.get("siteid").getAsString();
-                                String strsitename = siteSettingJsonObj.get("name").getAsString();
-                                String platformurl = siteSettingJsonObj.get("siteurl").getAsString();
-                                preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
-                                preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
-                                preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
+                                    siteid = siteSettingJsonObj.get("siteid").getAsString();
+                                    String strsitename = siteSettingJsonObj.get("name").getAsString();
+                                    String platformurl = siteSettingJsonObj.get("siteurl").getAsString();
+                                    preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
+                                    preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
+                                    preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
 //                            prefEditor = sharedPreferences.edit();
 //                            prefEditor.putString(StaticValues.KEY_SITEID, siteid);
 //                            prefEditor.putString(StaticValues.KEY_SITENAME, strsitename);
 //                            prefEditor.putString(StaticValues.KEY_PLATFORMURL, platformurl);
-                                appUserModel.setSiteIDValue(siteid);
-                                appUserModel.setSiteName(strsitename);
+                                    appUserModel.setSiteIDValue(siteid);
+                                    appUserModel.setSiteName(strsitename);
 //                            prefEditor.commit();
+                                }
                             }
                         }
-                    }
-                    if (jsonObject.has("table1")) {
-                        JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
-                        if (jsonTableOne.size() > 0) {
+                        if (jsonObject.has("table1")) {
+                            JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
+                            if (jsonTableOne.size() > 0) {
 
-                            for (int i = 0; i < jsonTableOne.size(); i++) {
-                                JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
+                                for (int i = 0; i < jsonTableOne.size(); i++) {
+                                    JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
 
-                                if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#APP_BACKGROUNDCOLOR#")) {
-                                    uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                    if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#App_backgrndText#")) {
-                                    uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#APP_BACKGROUNDCOLOR#")) {
+                                        uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#HEADER_BACKGROUNDCOLOR#")) {
-                                    uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#App_backgrndText#")) {
+                                        uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#NativeApp_Header_Text#")) {
-                                    uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#HEADER_BACKGROUNDCOLOR#")) {
+                                        uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_BG_COLOR#")) {
-                                    uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#NativeApp_Header_Text#")) {
+                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_TEXT_COLOR#")) {
-                                    uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_BG_COLOR#")) {
+                                        uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_SL_BG_COLOR#")) {
-                                    uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_TEXT_COLOR#")) {
+                                        uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_SL_TEXT_COLOR#")) {
-                                    uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_SL_BG_COLOR#")) {
+                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#HEADER_BG_COLOR#")) {
-                                    uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_SL_TEXT_COLOR#")) {
+                                        uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#HEADER_TEXT_COLOR#")) {
-                                    uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
+                                            .equals("#HEADER_BG_COLOR#")) {
+                                        uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_HEADER_BGCOLOR#")) {
-                                    uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#HEADER_TEXT_COLOR#")) {
+                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_HEADER_TEXT_COLOR#")) {
-                                    uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_HEADER_BGCOLOR#")) {
+                                        uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_BG_ALTERNATIVECOLOR#")) {
-                                    uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_HEADER_TEXT_COLOR#")) {
+                                        uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#MENU_BG_SELECT_TEXTCOLOR#")) {
-                                    uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_BG_ALTERNATIVECOLOR#")) {
+                                        uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#Button_Background_Color#")) {
-                                    uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#MENU_BG_SELECT_TEXTCOLOR#")) {
+                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#Button_Text_Color#")) {
-                                    uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#Button_Background_Color#")) {
+                                        uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#FileUplad_BUTTON#")) {
-                                    uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#Button_Text_Color#")) {
+                                        uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#LIST_BG_COLOR#")) {
-                                    uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#FileUplad_BUTTON#")) {
+                                        uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#LIST_BORDER_COLOR#")) {
-                                    uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#LIST_BG_COLOR#")) {
+                                        uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#NativeLogin_Page_Background#")) {
-                                    uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#LIST_BORDER_COLOR#")) {
+                                        uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
-                                } else if (uisettingsJsonOjb
-                                        .get("csseditingpalceholdername")
-                                        .getAsString()
-                                        .equals("#NativeAppLogin_Page_Text#")) {
-                                    uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
-                                            "csseditingpalceholdervalue")
+                                            .equals("#NativeLogin_Page_Background#")) {
+                                        uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
                                             .getAsString()
-                                            .substring(0, 7));
+                                            .equals("#NativeAppLogin_Page_Text#")) {
+                                        uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    }
+
                                 }
 
                             }
 
                         }
 
-                    }
+                        if (jsonObject.has("table2")) {
+                            JsonArray jsonTableTwo = jsonObject.get("table2").getAsJsonArray();
+                            if (jsonTableTwo.size() > 0) {
 
-                    if (jsonObject.has("table2")) {
-                        JsonArray jsonTableTwo = jsonObject.get("table2").getAsJsonArray();
-                        if (jsonTableTwo.size() > 0) {
-
-                            for (int i = 0; i < jsonTableTwo.size(); i++) {
-                                JsonObject nativeSettingsObj = jsonTableTwo.get(i).getAsJsonObject();
+                                for (int i = 0; i < jsonTableTwo.size(); i++) {
+                                    JsonObject nativeSettingsObj = jsonTableTwo.get(i).getAsJsonObject();
 //                            Log.d(TAG, "uisettingsJsonOjb: "+nativeSettingsObj);
 
-                                if (nativeSettingsObj.get("name").getAsString().equals("autodownloadsizelimit")) {
+                                    if (nativeSettingsObj.get("name").getAsString().equals("autodownloadsizelimit")) {
 
-                                    uiSettingsModel.setAutodownloadsizelimit(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setAutodownloadsizelimit(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if (nativeSettingsObj.get("name").getAsString().equals("CatalogContentDownloadType")) {
+                                    } else if (nativeSettingsObj.get("name").getAsString().equals("CatalogContentDownloadType")) {
 
-                                    uiSettingsModel.setCatalogContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setCatalogContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if ((nativeSettingsObj.get("name").getAsString().equals("courseappcontent"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equals("courseappcontent"))) {
 
-                                    uiSettingsModel.setCourseAppContent(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setCourseAppContent(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if ((nativeSettingsObj.get("name").getAsString().equals("ContentDownloadType"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equals("ContentDownloadType"))) {
 
-                                    uiSettingsModel.setContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setContentDownloadType(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if ((nativeSettingsObj.get("name").getAsString().equals("EnableNativeCatlog"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equals("EnableNativeCatlog"))) {
 
-                                    uiSettingsModel.setEnableNativeCatlog(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setEnableNativeCatlog(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if ((nativeSettingsObj.get("name").getAsString().equals("EnablePushNotification"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equals("EnablePushNotification"))) {
 
-                                    uiSettingsModel.setEnablePushNotification(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setEnablePushNotification(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if ((nativeSettingsObj.get("name").getAsString().equals("nativeapptype"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equals("nativeapptype"))) {
 
-                                    uiSettingsModel.setNativeAppType(nativeSettingsObj.get("keyvalue").getAsString());
+                                        uiSettingsModel.setNativeAppType(nativeSettingsObj.get("keyvalue").getAsString());
 
-                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationAllowed"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationAllowed"))) {
 
-                                    uiSettingsModel.setSelfRegistrationAllowed(nativeSettingsObj.get("keyvalue").getAsString());
-                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
+                                        uiSettingsModel.setSelfRegistrationAllowed(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
 
-                                    uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
-                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
+                                        uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeSplashImage"))) {
 
-                                    uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
-                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationDisplayName"))) {
+                                        uiSettingsModel.setEnableBranding(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("SelfRegistrationDisplayName"))) {
 
-                                    uiSettingsModel.setSignUpName(nativeSettingsObj.get("keyvalue").getAsString());
-                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeAppLoginSetting"))) {
+                                        uiSettingsModel.setSignUpName(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeAppLoginSetting"))) {
 
-                                    uiSettingsModel.setEnableAppLogin(nativeSettingsObj.get("keyvalue").getAsString());
-                                } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
+                                        uiSettingsModel.setEnableAppLogin(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
 
-                                    String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
-                                    if (appLogo.length() == 0) {
-                                        String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
-                                        uiSettingsModel.setEnableAppLogin(appLogos);
+                                        String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
+                                        if (appLogo.length() == 0) {
+                                            String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
+                                            uiSettingsModel.setEnableAppLogin(appLogos);
+                                        }
                                     }
-                                }
-
-                            }
-                        }
-
-                    }
-
-                    if (jsonObject.has("table3")) {
-                        JsonArray jsonTableThree = jsonObject.get("table3").getAsJsonArray();
-                        if (jsonTableThree.size() > 0) {
-
-                            for (int i = 0; i < jsonTableThree.size(); i++) {
-                                JsonObject nativeSettingsObj = jsonTableThree.get(i).getAsJsonObject();
-                                Log.d(TAG, "table three: " + nativeSettingsObj);
-                            }
-                        }
-                    }
-
-                    if (jsonObject.has("table4")) {
-                        JsonArray jsonTableFour = jsonObject.get("table4").getAsJsonArray();
-                        if (jsonTableFour.size() > 0) {
-
-                            for (int i = 0; i < jsonTableFour.size(); i++) {
-                                JsonObject nativeSettingsObj = jsonTableFour.get(i).getAsJsonObject();
-                                Log.d(TAG, "table three: " + nativeSettingsObj);
-                                if (nativeSettingsObj.get("privilegeid").getAsString().equals("908")) {
-
-                                    uiSettingsModel.setIsFaceBook(nativeSettingsObj.get("ismobileprivilege").getAsString());
-
-                                } else if (nativeSettingsObj.get("privilegeid").getAsString().equals("911")) {
-
-                                    uiSettingsModel.setIsTwitter(nativeSettingsObj.get("ismobileprivilege").getAsString());
-
-                                } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("909"))) {
-
-                                    uiSettingsModel.setIsLinkedIn(nativeSettingsObj.get("ismobileprivilege").getAsString());
-
-                                } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("910"))) {
-
-                                    uiSettingsModel.setIsGoogle(nativeSettingsObj.get("ismobileprivilege").getAsString());
 
                                 }
+                            }
 
+                        }
 
+                        if (jsonObject.has("table3")) {
+                            JsonArray jsonTableThree = jsonObject.get("table3").getAsJsonArray();
+                            if (jsonTableThree.size() > 0) {
+
+                                for (int i = 0; i < jsonTableThree.size(); i++) {
+                                    JsonObject nativeSettingsObj = jsonTableThree.get(i).getAsJsonObject();
+                                    Log.d(TAG, "table three: " + nativeSettingsObj);
+                                }
                             }
                         }
+
+                        if (jsonObject.has("table4")) {
+                            JsonArray jsonTableFour = jsonObject.get("table4").getAsJsonArray();
+                            if (jsonTableFour.size() > 0) {
+
+                                for (int i = 0; i < jsonTableFour.size(); i++) {
+                                    JsonObject nativeSettingsObj = jsonTableFour.get(i).getAsJsonObject();
+                                    Log.d(TAG, "table three: " + nativeSettingsObj);
+                                    if (nativeSettingsObj.get("privilegeid").getAsString().equals("908")) {
+
+                                        uiSettingsModel.setIsFaceBook(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                    } else if (nativeSettingsObj.get("privilegeid").getAsString().equals("911")) {
+
+                                        uiSettingsModel.setIsTwitter(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                    } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("909"))) {
+
+                                        uiSettingsModel.setIsLinkedIn(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                    } else if ((nativeSettingsObj.get("privilegeid").getAsString().equals("910"))) {
+
+                                        uiSettingsModel.setIsGoogle(nativeSettingsObj.get("ismobileprivilege").getAsString());
+
+                                    }
+
+
+                                }
+                            }
+                        }
+
+                        Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());
+
+                        insertIntoAppSettingsTable(uiSettingsModel, siteid, siteUrl);
                     }
-
-                    Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());
-
-                    insertIntoAppSettingsTable(uiSettingsModel, siteid, siteUrl);
                 } catch (JsonIOException jsonExce) {
                     jsonExce.printStackTrace();
                 }
+
             }
         }
     }
@@ -1090,10 +1100,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String result = convertStreamToString(inputStream);
 
-
 //            if (isValidString(result) && result.length() > 0) {
 
-            if (result != null && result.length() > 0) {
+            if (result.length() > 0) {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
 
@@ -1377,12 +1386,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String contextMenuID = cursor.getString(cursor
                             .getColumnIndex("contextmenuid"));
                     //
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+//                    if (!contextMenuID.equalsIgnoreCase("1"))
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
 
-//                        if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3")))
-
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3")))
                         continue;
-
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -1394,32 +1402,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     menu.setImage(cursor.getString(cursor
                             .getColumnIndex("image")));
                     int menuIconResId = -1;
-                    switch (cursor.getString(
-                            cursor.getColumnIndex("contextmenuid"))
-                            .toLowerCase()) {
-                        case "1":
-                            menuIconResId = R.drawable.ic_menu_manage;
-                            break;
-                        case "2":
-                            menuIconResId = R.drawable.ic_menu_manage;
-                            break;
-                        case "3":
-                            menuIconResId = R.drawable.ic_menu_manage;
-                            break;
-                        case "4":
-                            menuIconResId = R.drawable.ic_menu_manage;
-                            break;
-                        case "5":
-                            menuIconResId = R.drawable.ic_menu_manage;
-                            break;
-                        // case "events":
-                        // menuIconResId = R.drawable.event;
-                        // break;
-
-                        default:
-                            menuIconResId = R.drawable.ic_menu_camera;
-                            break;
-                    }
+//                    switch (cursor.getString(
+//                            cursor.getColumnIndex("contextmenuid"))
+//                            .toLowerCase()) {
+//                        case "1":
+//                            menuIconResId = R.drawable.ic_menu_manage;
+//                            break;
+//                        case "2":
+//                            menuIconResId = R.drawable.ic_menu_manage;
+//                            break;
+//                        case "3":
+//                            menuIconResId = R.drawable.ic_menu_manage;
+//                            break;
+//                        case "4":
+//                            menuIconResId = R.drawable.ic_menu_manage;
+//                            break;
+//                        case "5":
+//                            menuIconResId = R.drawable.ic_menu_manage;
+//                            break;
+//                        // case "events":
+//                        // menuIconResId = R.drawable.event;
+//                        // break;
+//
+//                        default:
+//                            menuIconResId = R.drawable.ic_menu_camera;
+//                            break;
+//                    }
                     menu.setMenuImageResId(menuIconResId);
                     menu.setIsOfflineMenu(cursor.getString(cursor
                             .getColumnIndex("isofflinemenu")));
@@ -2659,9 +2667,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
                 //sitename
-                if (jsonMyLearningColumnObj.has("price")) {
+                if (jsonMyLearningColumnObj.has("saleprice")) {
 
-                    myLearningModel.setPrice(jsonMyLearningColumnObj.get("price").toString());
+                    myLearningModel.setPrice(jsonMyLearningColumnObj.get("saleprice").toString());
 
                 }
 
@@ -8842,6 +8850,229 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     }
+
+    public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strDelete = "DELETE FROM " + TBL_MYLEARNINGFILTER + " WHERE userid   = " + userModel.getUserIDValue() + " and siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+            if (jsonObject != null) {
+
+                ContentValues contentValues = null;
+                try {
+
+                    contentValues = new ContentValues();
+                    contentValues.put("siteid", appUserModel.getSiteIDValue());
+                    contentValues.put("siteurl", appUserModel.getSiteURL());
+                    contentValues.put("userid", appUserModel.getUserIDValue());
+                    contentValues.put("jsonobject", jsonObject.toString());
+
+                    db.insert(TBL_MYLEARNINGFILTER, null, contentValues);
+                } catch (SQLiteException exception) {
+
+                    exception.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+    }
+
+    public JSONObject fetchFilterObject(AppUserModel appUserModel) {
+        JSONObject jsonObject = null;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_MYLEARNINGFILTER + " WHERE userid = " + appUserModel.getUserIDValue()
+                + " AND siteid="
+                + appUserModel.getSiteIDValue()
+                + " AND siteurl='" + appUserModel.getSiteURL() + "'";
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    String jsonString = (cursor.getString(cursor.getColumnIndex("jsonobject")));
+
+                    if (jsonString.length() > 0) {
+                        jsonObject = new JSONObject(jsonString);
+                    }
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return jsonObject;
+    }
+
+    public CMIModel getCMIDetails(MyLearningModel learningModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        CMIModel cmiDetails = new CMIModel();
+        String selQuery = "SELECT location,status,suspenddata,sequencenumber,coursemode FROM cmi WHERE scoid="
+                + learningModel.getScoId() + " AND userid=" + learningModel.getUserID() + " AND siteid=" + learningModel.getSiteID();
+        Cursor cursor = db.rawQuery(selQuery, null);
+        if (cursor.moveToFirst()) {
+            cmiDetails.set_location(cursor.getString(cursor
+                    .getColumnIndex("location")));
+            cmiDetails.set_status(cursor.getString(cursor
+                    .getColumnIndex("status")));
+            cmiDetails.set_suspenddata(cursor.getString(cursor
+                    .getColumnIndex("suspenddata")));
+            cmiDetails.set_seqNum(cursor.getString(cursor
+                    .getColumnIndex("sequencenumber")));
+            cmiDetails.set_coursemode(cursor.getString(cursor
+                    .getColumnIndex("coursemode")));
+        }
+        cursor.close();
+        db.close();
+        return cmiDetails;
+    }
+
+    public String checkCMIWithGivenQueryElement(String queryElement, MyLearningModel learningModel) {
+        String returnStr = "";
+
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = null;
+            String strExeQuery = "SELECT " + queryElement + " FROM cmi WHERE scoid= "
+                    + learningModel.getScoId()
+                    + " AND userid= "
+                    + learningModel.getUserID()
+                    + " AND siteid= "
+                    + learningModel.getSiteID();
+            cursor = db.rawQuery(strExeQuery, null);
+
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+
+                    returnStr = cursor.getString(cursor
+                            .getColumnIndex(queryElement));
+
+                }
+            }
+
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+
+        return returnStr;
+    }
+
+    public void UpdatetScormCMI(CMIModel cmiNew, String getname, String getvalue) {
+
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            String strExeQuery = "";
+            if (getname.equals("timespent")) {
+                String pretime;
+                Cursor cursor = null;
+
+                strExeQuery = "SELECT timespent,noofattempts,objecttypeid FROM cmi WHERE scoid="
+                        + cmiNew.get_scoId()
+                        + " AND userid="
+                        + cmiNew.get_userId()
+                        + " AND siteid="
+                        + cmiNew.get_siteId();
+                cursor = db.rawQuery(strExeQuery, null);
+
+                if (cursor != null && cursor.getCount() > 0) {
+                    if (cursor.moveToFirst()) {
+
+                        if (isValidString(cursor.getString(cursor
+                                .getColumnIndex("timespent")))) {
+                            pretime = cursor.getString(cursor
+                                    .getColumnIndex("timespent"));
+
+                            if (!isValidString(getvalue)) {
+
+                            } else {
+                                String[] strSplitvalues = pretime.split(":");
+                                String[] strSplitvalues1 = getvalue.split(":");
+                                if (strSplitvalues.length == 3
+                                        && strSplitvalues1.length == 3) {
+                                    try {
+                                        int hours1 = (Integer
+                                                .parseInt(strSplitvalues[0]) + Integer
+                                                .parseInt(strSplitvalues1[0])) * 3600;
+                                        int mins1 = (Integer
+                                                .parseInt(strSplitvalues[1]) + Integer
+                                                .parseInt(strSplitvalues1[1])) * 60;
+                                        int secs1 = (int) (Float
+                                                .parseFloat(strSplitvalues[2]) + Float
+                                                .parseFloat(strSplitvalues1[2]));
+                                        int totaltime = hours1 + mins1 + secs1;
+                                        long longVal = totaltime;
+                                        int hours = (int) longVal / 3600;
+                                        int remainder = (int) longVal - hours
+                                                * 3600;
+                                        int mins = remainder / 60;
+                                        remainder = remainder - mins * 60;
+                                        int secs = remainder;
+
+                                        // cmiNew.set_timespent(hours+":"+mins+":"+secs);
+                                        getvalue = hours + ":" + mins + ":"
+                                                + secs;
+                                    } catch (Exception ex) {
+
+                                    }
+                                }
+                            }
+                        }
+                        if (cursor.getString(1).equals("9")
+                                || cursor.getString(1).equals("8")) {
+                            if (!isValidString(cmiNew.get_score())) {
+
+                            } else {
+                                int intNoAtt = Integer.parseInt(cursor
+                                        .getString(1));
+
+                                intNoAtt = intNoAtt + 1;
+                                strExeQuery = "UPDATE CMI SET noofattempts="
+                                        + intNoAtt + "" + ", isupdate= 'false'"
+                                        + " WHERE scoid=" + cmiNew.get_scoId()
+                                        + " AND siteid=" + cmiNew.get_siteId()
+                                        + " AND userid=" + cmiNew.get_userId();
+
+                                db.execSQL(strExeQuery);
+                            }
+                        }
+                    }
+                }
+            }
+
+            strExeQuery = "UPDATE CMI SET " + getname + "='" + getvalue + "'"
+                    + ", isupdate= 'false'" + " WHERE scoid="
+                    + cmiNew.get_scoId() + " AND siteid=" + cmiNew.get_siteId()
+                    + " AND userid=" + cmiNew.get_userId();
+
+            db.execSQL(strExeQuery);
+
+            db.close();
+
+        } catch (Exception e) {
+            Log.d("UpdatetScormCMI", e.getMessage());
+        }
+
+    }
+
 
     // uncomment for pagenotes
 //    public void sendOfflineUserPagenotes() {

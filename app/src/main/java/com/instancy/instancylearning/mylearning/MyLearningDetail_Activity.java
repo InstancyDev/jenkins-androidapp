@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,8 +43,6 @@ import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.SkuDetails;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -62,6 +61,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -162,6 +162,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @Bind(R.id.detail_layout)
     RelativeLayout relativeLayout;
 
+    @Bind(R.id.btn_price)
+    TextView txtPrice;
+
 
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
@@ -198,7 +201,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
 
-        billingProcessor = new BillingProcessor(this, null, this);
+//        if (!isFromCatalog){
+        billingProcessor = new BillingProcessor(this, apiKey, this);
+//        }
 
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(this);
@@ -210,7 +215,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         appController = AppController.getInstance();
 
         typeLayout(isFromCatalog, uiSettingsModel);
-
 
         if (myLearningModel != null) {
             txtTitle.setText(myLearningModel.getCourseName());
@@ -252,6 +256,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 ratingValue = 0;
             }
             ratingBar.setRating(ratingValue);
+            LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
+            stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+
             if (myLearningModel.getLongDes().isEmpty()) {
                 txtLongDisx.setVisibility(View.GONE);
                 txtDescription.setVisibility(View.GONE);
@@ -266,7 +273,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 txtCourseStatus.setVisibility(View.GONE);
             } else {
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
                     btnDownload.setVisibility(View.GONE);
                     circleProgressBar.setVisibility(View.GONE);
                 } else {
@@ -318,12 +325,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                    .show();
 
 
-            Glide.with(this).load(imgUrl)
-                    .thumbnail(0.5f)
-                    .crossFade()
-                    .placeholder(R.drawable.cellimage)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(imgThumb);
+//            Glide.with(this).load(imgUrl)
+//                    .thumbnail(0.5f)
+//                    .crossFade()
+//                    .placeholder(R.drawable.cellimage)
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .into(imgThumb);
+
+            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(imgThumb);
+
             statusUpdate(myLearningModel.getStatus());
         } else {
             Toast.makeText(this, "Unable to fetch", Toast.LENGTH_SHORT).show();
@@ -460,13 +470,17 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
                 txtFontView.setText(getResources().getString(R.string.fa_icon_cart_plus));
                 txtBtnView.setText("Buy");
+                txtPrice.setText("$" + myLearningModel.getPrice());
+                txtPrice.setVisibility(View.VISIBLE);
+            } else {
+
+                txtPrice.setVisibility(View.GONE);
+                txtPrice.setText("");
             }
             if (myLearningModel.getAddedToMylearning() == 1) {
                 txtBtnView.setText("View");
                 txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
             }
-
-
         } else {
 
             FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
@@ -475,6 +489,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
             bottomReportLayout.setVisibility(View.INVISIBLE);
             txtBtnView.setText("View");
+            txtPrice.setVisibility(View.GONE);
+            txtPrice.setText("");
         }
     }
 
@@ -687,11 +703,19 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
 
 
-//        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
-        String productid = null;
-        productid = learningModel.getGoogleProductID();
+        String originalproductid = learningModel.getGoogleProductID();
 
-        SkuDetails sku = billingProcessor.getPurchaseListingDetails(productid);
+        if (originalproductid.length() != 0) {
+            Intent intent = new Intent();
+            intent.putExtra("learningdata", learningModel);
+            billingProcessor.handleActivityResult(8099, 80, intent);
+            billingProcessor.purchase(MyLearningDetail_Activity.this, originalproductid);
+        } else {
+            Toast.makeText(MyLearningDetail_Activity.this, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
+        }
+
+
+        SkuDetails sku = billingProcessor.getPurchaseListingDetails(originalproductid);
 
 //        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
 
@@ -774,7 +798,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             }
         }
 
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)){
+        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
 
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -801,7 +825,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         jsonArray = result.getJSONArray("contentstatus");
 
                     }
-
                     if (jsonArray.length() > 0) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
@@ -840,7 +863,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         boolean isZipFile = false;
 
         final String[] downloadSourcePath = {null};
-
 
         switch (learningModel.getObjecttypeId()) {
             case "52":
@@ -906,6 +928,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     public void downloadThin(String downloadStruri, View view, final MyLearningModel learningModel) {
 
         downloadStruri = downloadStruri.replace(" ", "%20");
+        Log.d(TAG, "downloadThin: " + downloadStruri);
         ThinDownloadManager downloadManager = new ThinDownloadManager();
         Uri downloadUri = Uri.parse(downloadStruri);
         String extensionStr = "";
@@ -913,7 +936,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             case "52":
             case "11":
             case "14":
-
                 String[] startPage = null;
                 if (learningModel.getStartPage().contains("/")) {
                     startPage = learningModel.getStartPage().split("/");
@@ -1273,21 +1295,21 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     @Override
     public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
-        Toast.makeText(this, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
         Log.v("chip", "Owned Managed Product: " + details.purchaseInfo.purchaseData);
         sendInAppDetails(details);
     }
 
     @Override
     public void onPurchaseHistoryRestored() {
-        Toast.makeText(this, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
         for (String sku : billingProcessor.listOwnedProducts())
             Log.v("chip", "Owned Managed Product: " + sku);
     }
 
     @Override
     public void onBillingError(int errorCode, @Nullable Throwable error) {
-        Toast.makeText(this, "onBillingError", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "onBillingError", Toast.LENGTH_SHORT).show();
     }
 
     @Override

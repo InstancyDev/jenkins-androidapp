@@ -29,8 +29,6 @@ import com.instancy.instancylearning.interfaces.hideProgressListner;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 
-import im.delight.android.webview.AdvancedWebView;
-
 /**
  * Created by Upendranath on 6/29/2017 Working on InstancyLearning.
  * https://github.com/delight-im/Android-AdvancedWebView
@@ -38,7 +36,7 @@ import im.delight.android.webview.AdvancedWebView;
 
 public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
-    private AdvancedWebView adWebView;
+    private WebView adWebView;
     MyLearningModel myLearningModel;
     String TAG = AdvancedWebCourseLaunch.class.getSimpleName();
     String prevStatus = "";
@@ -51,7 +49,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.advancedweb_courselaunch);
-        adWebView = (AdvancedWebView) findViewById(R.id.advanced_coursewbview);
+        adWebView = (WebView) findViewById(R.id.normalwebview);
         clearWebViewAbsolutely(adWebView);
         svProgressHUD = new SVProgressHUD(this);
 //        adWebView.setListener(this, this);
@@ -62,6 +60,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
+//            courseUrl = "http://stagingmontessori.instancysoft.com//remote/ajaxlaunchpage.aspx?path=/content/sitefiles/27fb2122-0928-4571-80c6-0e10844013ca/en-us/index_lms.html&coursename=m6_s1_intro_to_arithmetic&contentid=27fb2122-0928-4571-80c6-0e10844013ca&objecttypeid=26&cantrack=yes&scoid=514&eventkey=&eventtype=&trackinguserid=1";
 //            try {
 //                courseUrl = URLEncoder.encode(courseUrl, "UTF-8");
 //            } catch (UnsupportedEncodingException e) {
@@ -71,7 +70,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //            showSvProgressAlert(svProgressHUD);
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
-
+            clearWebViewAbsolutely(adWebView);
             courseName = myLearningModel.getCourseName();
 
 
@@ -127,6 +126,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         adWebView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         webSettings.setMediaPlaybackRequiresUserGesture(false);
+
+
         adWebView.getSettings().setLoadsImagesAutomatically(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
@@ -155,6 +156,40 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         adWebView.addJavascriptInterface(lrsInterface, "MobileJSInterface");
 
         adWebView.setWebViewClient(new WebViewClient() {
+
+                                       @Override
+                                       public void onLoadResource(WebView view, String url) {
+                                           if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
+                                               if (url.toLowerCase().contains(
+                                                       ".html?ioscourseclose=true")) {
+                                                   adWebView.stopLoading();
+                                                   finish();
+
+                                               } else if (url.toLowerCase().contains(
+                                                       ".html?lrsstatements=true")) {
+
+                                               } else if (url.toLowerCase().contains(".html")) {
+//                                                   CMIModel cmiDetails = new CMIModel();
+//                                                   cmiDetails.set_datecompleted("");
+//                                                   cmiDetails.set_siteId(myLearningModel.getSiteID());
+//                                                   cmiDetails.set_userId(Integer.parseInt(myLearningModel.getUserID()));
+//                                                   cmiDetails.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
+//                                                   cmiDetails.set_location(url);
+//                                                   cmiDetails.set_startdate(myLearningModel.getCreatedDate());
+//                                                   cmiDetails.set_isupdate("false");
+//                                                   cmiDetails.set_status(getString(R.string.metadata_status_progress));
+//                                                   cmiDetails.set_datecompleted("");
+//                                                   cmiDetails.set_seqNum("0");
+//                                                   cmiDetails.set_objecttypeid(myLearningModel.getObjecttypeId());
+//                                                   cmiDetails.set_sitrurl(myLearningModel.getSiteURL());
+//                                                   int seqNo = databaseHandler.insertCMI(cmiDetails, true);
+
+
+                                               }
+
+                                           }
+                                       }
+
                                        @Override
                                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
                                            Log.d(TAG, "shouldOverrideUrlLoading: from normal web " + url);
@@ -195,8 +230,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
 
                                            } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
-                                               view.stopLoading();
-                                               finish();
+//                                               view.stopLoading();
+//                                               finish();
                                            }
 
                                            if (url.contains("logoff")) {
@@ -208,14 +243,14 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
                                            }
 
-                                           if (isOffline) {
-                                               svProgressHUD.dismiss();
-                                               return true;
-
-                                           } else {
-                                               return false;
-                                           }
-
+//                                           if (isOffline) {   uncomment if you find any issue
+////                                               svProgressHUD.dismiss();
+//                                               return true;
+//
+//                                           } else {
+//                                           return false;
+//                                           }
+                                           return false;
                                        }
 
 //                                       @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -242,13 +277,13 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                        @Override
                                        public void onPageStarted(WebView view, String url, Bitmap favicon) {
                                            super.onPageStarted(view, url, favicon);
-
+                                           Log.d(TAG, "onPageStarted: from normal web " + url);
                                        }
 
                                        @Override
                                        public void onPageFinished(WebView view, String url) {
                                            super.onPageFinished(view, url);
-
+                                           Log.d(TAG, "onPageFinished: from normal web " + url);
                                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("26") || !isOffline) {
                                                svProgressHUD.dismiss();
                                            } else {
@@ -263,7 +298,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                            super.onReceivedError(view, errorCode, description, failingUrl);
                                            if (isOffline) {
                                                svProgressHUD.dismiss();
-
+                                               Log.d(TAG, "onReceivedError: from normal web " + failingUrl);
                                            }
                                        }
 
@@ -291,10 +326,10 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        return;
-//    }
+    @Override
+    public void onBackPressed() {
+        return;
+    }
 
     @Override
     protected void onPause() {
@@ -321,7 +356,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     }
 
 
-    public static void clearWebViewAbsolutely(AdvancedWebView webView) {
+    public static void clearWebViewAbsolutely(WebView webView) {
         webView.clearCache(true);
         webView.clearHistory();
         webView.clearSslPreferences();
@@ -334,19 +369,19 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        adWebView.saveState(outState);
+//        adWebView.saveState(outState);
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
 
-//    @Override
-//    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//
 //        if (savedInstanceState != null) {
 //            adWebView.restoreState(savedInstanceState);
 //        }
-//
-//
-//    }
+
+
+    }
+
 }

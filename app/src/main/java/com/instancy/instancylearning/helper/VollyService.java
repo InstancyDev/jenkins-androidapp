@@ -119,6 +119,7 @@ public class VollyService {
 
         }
     }
+
     public void getJsonObjResponseVolley(final String requestType, String url, final String authHeaders, final MyLearningModel learningModel) {
         try {
 
@@ -127,7 +128,7 @@ public class VollyService {
                 @Override
                 public void onResponse(JSONObject response) {
                     if (mResultCallback != null)
-                        mResultCallback.notifySuccessLearningModel(requestType, response,learningModel);
+                        mResultCallback.notifySuccessLearningModel(requestType, response, learningModel);
                     Log.d("logr  response =", "response " + response);
 
                 }

@@ -12,7 +12,7 @@
         app:showAsAction="always|collapseActionView" />
     <item
         android:id="@+id/mylearning_filter"
-        android:icon="@drawable/ic_filter_list_black_24dp"
+        android:icon="@drawable/filter_icon"
         android:orderInCategory="100"
         android:title="filter"
         app:showAsAction="always|collapseActionView" />

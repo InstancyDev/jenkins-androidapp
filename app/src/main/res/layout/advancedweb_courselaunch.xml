@@ -7,5 +7,12 @@
     <im.delight.android.webview.AdvancedWebView
         android:id="@+id/advanced_coursewbview"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <WebView
+        android:id="@+id/normalwebview"
+        android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 </LinearLayout>

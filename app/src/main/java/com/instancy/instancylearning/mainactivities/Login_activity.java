@@ -189,14 +189,14 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 
 //       uncomment for backgroundcolor purpose
-//        View someView = findViewById(R.id.login_layout);
+        View someView = findViewById(R.id.login_layout);
 
         // Find the root view
 //        View root = someView.getRootView();
 
         // Set the color
 
-//        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
         Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
         drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
@@ -479,7 +479,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     String userId = jsonobj.get("userid").toString();
 
 
-//                                    profileWebCall("1");
+//                                    profileWebCall(userId);
 
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

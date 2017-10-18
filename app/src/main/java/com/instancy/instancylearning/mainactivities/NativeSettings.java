@@ -277,7 +277,6 @@ public class NativeSettings extends AppCompatActivity {
         return strAPIURL;
     }
 
-
     @Override
     public void onBackPressed() {
         if (isLogin) {

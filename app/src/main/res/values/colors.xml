@@ -5,7 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorGray">#D3D3D3</color>
     <color name="colorWhite">#ffff</color>
-    <color name="colorBlack">#000000</color>
+    <color name="colorBlack">#111111</color>
     <color name="colorDefault">#ffff</color>
     <color name="colorRed">#EA4941</color>
     <color name="colorFaceBookSilver">#f7f7f7</color>
@@ -15,8 +15,10 @@
     <color name="colorStatusInProgress">#ff9503</color>
     <color name="colorSiteName">#34aadc</color>
     <color name="colorStatusOther">#5750da</color>
+    <color name="colorInstancyMarket">#363636</color>
 
-
+    <color name="colorRating">#FFC000</color>
+    <color name="colorDarkGrey">#757575</color>
     <!--Green Background-->
     <!--<color name="colorDefaultBackGround">#5DB100</color>-->
 

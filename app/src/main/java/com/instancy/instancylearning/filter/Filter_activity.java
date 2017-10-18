@@ -1,0 +1,193 @@
+package com.instancy.instancylearning.filter;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ExpandableListView;
+
+import com.android.volley.VolleyError;
+import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.NativeSetttingsModel;
+import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.PreferencesManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by Upendranath on 9/28/2017 Working on Instancy-Playground-Android.
+ */
+
+public class Filter_activity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = Filter_activity.class.getSimpleName();
+    ExpandableListView expandableListView;
+    List<String> expandableListTitle;
+    HashMap<String, List<NativeSetttingsModel.FilterModel>> expandableListDetail;
+    FilterAdapter filterAdapter;
+    AppUserModel appUserModel;
+
+    DatabaseHandler db;
+    PreferencesManager preferencesManager;
+    UiSettingsModel uiSettingsModel;
+    AppController appcontroller;
+    Button btnApply, btnReset;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.filter_activity);
+        appUserModel = AppUserModel.getInstance();
+        db = new DatabaseHandler(this);
+        uiSettingsModel = UiSettingsModel.getInstance();
+        appcontroller = AppController.getInstance();
+        preferencesManager = PreferencesManager.getInstance();
+
+
+        // Action Bar Color And Tint
+        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Filters</font>"));
+        try {
+            final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+            upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        } catch (RuntimeException ex) {
+
+            ex.printStackTrace();
+        }
+        try {
+//            getFiltersFromDB();
+
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel);
+            if (jsonObject != null) {
+                HashMap<String, List<NativeSetttingsModel.FilterModel>> hashMap = NativeSetttingsModel.getFilterData(jsonObject);
+                Log.d(TAG, "getFiltersFromDB: " + hashMap.get("Sort By"));
+
+                expandableListDetail = NativeSetttingsModel.getFilterData(jsonObject);
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+        expandableListView = (ExpandableListView) findViewById(R.id.filter_list);
+        // Construct our adapter, using our own layout and myTeams
+        filterAdapter = new FilterAdapter(this, expandableListTitle, expandableListDetail);
+        expandableListView.setAdapter(filterAdapter);
+        expandableListView.expandGroup(0);
+        expandableListView.expandGroup(1);
+//        expandableListView.setSelector(R.color.colorBlack);
+
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                if (groupPosition == 1) {
+
+                    NativeSetttingsModel.FilterModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
+                    Log.d(TAG, "onChildClick: " + filterModel.filterInnerModels);
+
+                    Intent intent = new Intent(Filter_activity.this, Filter_Inner_activity.class);
+                    intent.putExtra("filtermodel", filterModel);
+                    startActivity(intent);
+
+                } else {
+                    int index = childPosition - parent.getFirstVisiblePosition();
+                    if (index == childPosition) {
+                        expandableListDetail.get("Sort By").get(childPosition).isSelected = true;
+
+                        if (expandableListDetail.get("Sort By").get(childPosition).isSorted) {
+                            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
+                        } else {
+                            expandableListDetail.get("Sort By").get(childPosition).isSorted = true;
+
+                        }
+
+                    }
+
+                    filterAdapter.notifyDataSetChanged();
+
+                }
+                if (childPosition == (parent.getSelectedItemPosition())) {
+                    // Start your new activity here.
+                    Log.d("TAG", "second push");
+                }
+                return true;
+            }
+        });
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                // Doing nothing
+                return true;
+            }
+        });
+
+        expandableListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+        btnApply = (Button) findViewById(R.id.btnfilterapply);
+        btnApply.setOnClickListener(this);
+
+        btnReset = (Button) findViewById(R.id.btnfilterrest);
+        btnReset.setOnClickListener(this);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // app icon in action bar clicked; go home
+                Log.d("DEBUG", "onOptionsItemSelected: ");
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.btnfilterapply:
+                finish();
+                break;
+            case R.id.btnfilterrest:
+                finish();
+                break;
+        }
+    }
+}

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp">
+    android:layout_height="50dp"
+    android:padding="5dp">
 
     <TextView
         android:id="@+id/fontawasomeIcon"
@@ -12,12 +13,13 @@
         android:layout_marginLeft="2dp"
         android:gravity="center_vertical"
         android:text="@string/fa_icon_calculator"
-        android:textColor="@color/colorDarkGrey"
         android:textAlignment="center"
-        android:textSize="20sp" />
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
     <TextView
-        android:id="@+id/menuText"
+        android:id="@+id/sortfilter"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_centerVertical="true"
@@ -26,8 +28,8 @@
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:text="Menu Item"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        android:textColor="@color/colorBlack"
-        android:textSize="12sp" />
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="16sp" />
 
     <ImageView
         android:id="@+id/expIcon"
@@ -37,5 +39,22 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/ic_launcher"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/sortawasome"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center_vertical"
+        android:text="@string/fa_icon_calculator"
+        android:textAlignment="center"
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="20sp" />
+
+
 </RelativeLayout>

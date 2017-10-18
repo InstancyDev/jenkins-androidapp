@@ -3,7 +3,9 @@ package com.instancy.instancylearning.catalog;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -33,7 +35,6 @@ import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
@@ -43,6 +44,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -144,7 +146,7 @@ public class CatalogAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor()+" ");
+        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
@@ -153,7 +155,16 @@ public class CatalogAdapter extends BaseAdapter {
         } else {
             holder.consolidateLine.setVisibility(View.VISIBLE);
         }
-        holder.txtSiteName.setText(" "+myLearningModel.get(position).getSiteName());
+
+        if (myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
+            holder.txtPrice.setText("$" + myLearningModel.get(position).getPrice());
+            holder.txtPrice.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtPrice.setVisibility(View.GONE);
+            holder.txtPrice.setText("");
+        }
+
+        holder.txtSiteName.setText(" " + myLearningModel.get(position).getSiteName());
         float ratingValue = 0;
         try {
             ratingValue = Float.parseFloat(myLearningModel.get(position).getRatingId());
@@ -162,7 +173,8 @@ public class CatalogAdapter extends BaseAdapter {
             ratingValue = 0;
         }
         holder.ratingBar.setRating(ratingValue);
-
+        LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
         // apply colors
 
         holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -181,7 +193,7 @@ public class CatalogAdapter extends BaseAdapter {
 
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
-//            holder.btnPreview.setVisibility(View.GONE);
+            holder.txtPrice.setVisibility(View.GONE);
 
         } else {
             if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688")) {
@@ -209,11 +221,13 @@ public class CatalogAdapter extends BaseAdapter {
             }
 
             String imgUrl = myLearningModel.get(position).getImageData();
-            Glide.with(vi.getContext()).load(imgUrl)
-                    .thumbnail(0.5f)
-                    .placeholder(R.drawable.cellimage)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(holder.imgThumb);
+//            Glide.with(vi.getContext()).load(imgUrl)
+//                    .thumbnail(0.5f)
+//                    .placeholder(R.drawable.cellimage)
+//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                    .into(holder.imgThumb);
+
+            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
             final float oldRating = ratingValue;
             holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
@@ -379,6 +393,11 @@ public class CatalogAdapter extends BaseAdapter {
         TextView btnDownload;
 
         @Nullable
+        @Bind(R.id.btn_price)
+        TextView txtPrice;
+
+
+        @Nullable
         @Bind(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
@@ -393,10 +412,11 @@ public class CatalogAdapter extends BaseAdapter {
                 }
             };
         }
+
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
         public void actionsForMenu(View view) {
 
-                ((ListView) parent).performItemClick(view, getPosition, 0);
+            ((ListView) parent).performItemClick(view, getPosition, 0);
 
         }
     }

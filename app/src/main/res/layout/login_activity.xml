@@ -3,7 +3,7 @@
     android:id="@+id/login_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/colorDefaultBackGround">
+    android:background="@color/colorWhite">
     <!--android:background="@drawable/bg"-->
     <TextView
         android:id="@+id/id_settings_txt"
@@ -42,7 +42,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/acclife__login_logo" />
+                android:src="@drawable/playground" />
 
             <RelativeLayout
                 android:id="@+id/rlUsername"
@@ -147,7 +147,7 @@
                 android:background="@color/colorDefault"
                 android:text="@string/label_signin"
                 android:textAllCaps="false"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorInstancyMarket"
                 android:textSize="16sp" />
 
             <!--<Button-->
@@ -199,7 +199,7 @@
                     android:textAlignment="textEnd"
                     android:textAllCaps="false"
                     android:textColor="@color/colorWhite"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
             </LinearLayout>
 

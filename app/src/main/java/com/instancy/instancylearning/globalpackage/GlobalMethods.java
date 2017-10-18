@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -27,6 +28,8 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
 import com.instancy.instancylearning.mylearning.TrackList_Activity;
+import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +37,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -52,11 +56,14 @@ public class GlobalMethods {
     static String TAG = GlobalMethods.class.getSimpleName();
 
     private static DatabaseHandler databaseH;
+    PreferencesManager preferencesManager;
 
     public static void launchCourseViewFromGlobalClass(MyLearningModel myLearningModel, Context context) {
         databaseH = new DatabaseHandler(context);
         File myFile = new File(myLearningModel.getOfflinepath());
-
+        PreferencesManager.initializeInstance(context);
+        String userLoginId = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERLOGINID);
+        String userName = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERNAME);
         String offlinePath = "";
 
         if (myFile.exists()) {
@@ -71,17 +78,18 @@ public class GlobalMethods {
                 e.printStackTrace();
             }
             String lrsEndPoint = "";
-            String lrsActor = "{ \"mbox\":[\"mailto:admin@instancy.com\"], \"name\":[\"Instancy Admin\"] }";
+            String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
             String lrsAuthorizationKey = "";
             String enabletincanSupportforco = "";
             String enabletincanSupportforao = "";
             String enabletincanSupportforlt = "";
             String isTinCan = "";
+            String autKey = "";
             try {
 
                 if (jsonObject.length() != 0) {
                     lrsEndPoint = jsonObject.getString("lrsendpoint");
-                    lrsAuthorizationKey = "Basic " + jsonObject.getString("base64lrsAuthKey");
+                    autKey = jsonObject.getString("base64lrsAuthKey");
                     enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
                     enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
                     enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
@@ -90,7 +98,14 @@ public class GlobalMethods {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
+            byte[] encrpt = new byte[0];
+            try {
+                encrpt = autKey.getBytes("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
+            lrsAuthorizationKey = "Basic " + base64;
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
                 offlinePath = "file://" + myLearningModel.getOfflinepath();
                 // LRS is implemented completed disabled for some resons
@@ -119,7 +134,18 @@ public class GlobalMethods {
 
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
 
-                offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
+                String encodedString = "";
+
+                try {
+                    encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                offlinePath = "file://" + myLearningModel.getOfflinepath();
+                offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&cid=0&nativeappURL=true&IsInstancyContent=true";
 
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
 
@@ -130,6 +156,7 @@ public class GlobalMethods {
                         + context.getExternalFilesDir(null)
                         + "/Mydownloads/Content/LaunchCourse.html?contentpath=file://"
                         + myLearningModel.getOfflinepath();
+
 
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
 
@@ -334,6 +361,10 @@ public class GlobalMethods {
                 iWeb.putExtra("myLearningDetalData", myLearningModel);
                 ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
 
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse(offlinePathEncode));
+//                ((Activity) context).startActivity(i);
+
             }
 
             /// ONLINE
@@ -385,7 +416,6 @@ public class GlobalMethods {
                         }
 
                     }
-
                     databaseH = new DatabaseHandler(context);
                     JSONObject jsonObject = new JSONObject();
                     try {
@@ -395,18 +425,21 @@ public class GlobalMethods {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+
                     String lrsEndPoint = "";
-                    String lrsActor = "{ \"mbox\":[\"mailto:admin@instancy.com\"], \"name\":[\"Instancy Admin\"] }";
+                    String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
                     String lrsAuthorizationKey = "";
                     String enabletincanSupportforco = "";
                     String enabletincanSupportforao = "";
                     String enabletincanSupportforlt = "";
                     String isTinCan = "";
+                    String autKey = "";
                     try {
 
                         if (jsonObject.length() != 0) {
                             lrsEndPoint = jsonObject.getString("lrsendpoint");
-                            lrsAuthorizationKey = "Basic " + jsonObject.getString("base64lrsAuthKey");
+                            autKey = jsonObject.getString("base64lrsAuthKey");
                             enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
                             enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
                             enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
@@ -416,6 +449,15 @@ public class GlobalMethods {
                         e.printStackTrace();
                     }
 
+                    byte[] encrpt = new byte[0];
+                    try {
+                        encrpt = autKey.getBytes("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
+                    lrsAuthorizationKey = "Basic " + base64;
+//                      String basicNewKey=base64.replace("\n","");
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
 
@@ -444,14 +486,25 @@ public class GlobalMethods {
                         urlForView = myLearningModel.getStartPage();
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
 
-                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/SiteFiles/"
-                                + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "& trackinguserid=" + myLearningModel.getUserID();
+                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/SiteFiles/"
+                                + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
                         urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
-                        urlForView = myLearningModel.getSiteURL() + "/Content/SiteFiles/" + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
+                        String encodedString = "";
+
+                        try {
+                            encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        urlForView = myLearningModel.getSiteURL() + "/Content/SiteFiles/" + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
+
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
                         String cerName = myLearningModel.getContentID() + "_Certificate";
                         urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getSiteID() + "/UserCertificates/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
@@ -467,7 +520,15 @@ public class GlobalMethods {
 
 
                     }
-                    String encodedStr = replace(urlForView);
+                    String encodedStr = "";
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")){
+                        encodedStr = replace(urlForView);
+                    }
+                    else {
+                        encodedStr = replace(urlForView.toLowerCase());
+                    }
+
+
                     Log.d("DBG", "launchCourseView: " + encodedStr);
                     if (encodedStr.endsWith(".pdf")) {
                         Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
@@ -677,6 +738,7 @@ public class GlobalMethods {
 
 
                     } else {
+
                         Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
                         iWeb.putExtra("COURSE_URL", encodedStr);
                         iWeb.putExtra("myLearningDetalData", myLearningModel);
@@ -854,7 +916,7 @@ public class GlobalMethods {
 
 //jwvideos.xml
         String path = context.getExternalFilesDir(null)
-                + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID()+"/"+"jwvideos.xml";
+                + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + "/" + "jwvideos.xml";
         Log.d("Files", "Path: " + path);
         File directory = new File(path);
         File[] files = directory.listFiles();
@@ -862,7 +924,6 @@ public class GlobalMethods {
         for (int i = 0; i < files.length; i++) {
             Log.d("Files", "FileName:" + files[i].getName());
         }
-
 
     }
 

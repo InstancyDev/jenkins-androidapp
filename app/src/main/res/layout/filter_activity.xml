@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ExpandableListView
+        android:id="@+id/filter_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/filter_btn_layout"
+        android:background="@drawable/filter_key"
+        android:choiceMode="singleChoice"
+        android:groupIndicator="@null"
+        android:padding="1dp" />
+
+    <LinearLayout
+        android:id="@+id/filter_btn_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnfilterapply"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="Reset"
+            android:textColor="@color/colorWhite" />
+
+        <android.support.v4.widget.Space
+            android:layout_width="1dp"
+            android:layout_height="45dp" />
+
+        <Button
+            android:id="@+id/btnfilterrest"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:text="Apply"
+            android:textColor="@color/colorWhite" />
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,150 @@
+package com.instancy.instancylearning.filter;
+
+import android.content.Context;
+import android.graphics.Typeface;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.models.NativeSetttingsModel;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by Upendranath on 5/29/2017. used tutorial
+ * http://www.journaldev.com/9942/android-expandablelistview-example-tutorial
+ * http://thedeveloperworldisyours.com/android/notifydatasetchanged/
+ */
+
+public class FilterAdapter extends BaseExpandableListAdapter {
+
+    Typeface iconFon;
+    private Context context;
+    private List<String> expandableListTitle;
+    private HashMap<String, List<NativeSetttingsModel.FilterModel>> expandableListDetail;
+
+    public FilterAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<NativeSetttingsModel.FilterModel>> expandableListDetail) {
+        this.context = context;
+        this.expandableListDetail = expandableListDetail;
+        this.expandableListTitle = expandableListTitle;
+        Collections.sort(this.expandableListTitle, Collections.reverseOrder());
+        iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+    }
+
+    @Override
+    public int getGroupCount() {
+        return this.expandableListDetail.size();
+
+    }
+
+    @Override
+    public int getChildrenCount(int groupPosition) {
+        return this.expandableListDetail.get(this.expandableListTitle.get(groupPosition))
+                .size();
+    }
+
+    @Override
+    public Object getGroup(int groupPosition) {
+        return this.expandableListTitle.get(groupPosition);
+    }
+
+    @Override
+    public Object getChild(int groupPosition, int childPosition) {
+        return this.expandableListDetail.get(this.expandableListTitle.get(groupPosition))
+                .get(childPosition);
+    }
+
+    @Override
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
+    }
+
+    @Override
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+
+        String listTitle = (String) getGroup(groupPosition);
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) this.context.
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.nativesettingsplaingroup, null);
+        }
+        TextView listTitleTextView = (TextView) convertView
+                .findViewById(R.id.category_title);
+        listTitleTextView.setTypeface(null, Typeface.BOLD);
+        listTitleTextView.setText(listTitle);
+        return convertView;
+
+    }
+
+    @Override
+    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        final NativeSetttingsModel.FilterModel expandedListText = (NativeSetttingsModel.FilterModel) getChild(groupPosition, childPosition);
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) this.context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.filter_item, null);
+        }
+
+        TextView expandedListTextView = (TextView) convertView
+                .findViewById(R.id.sortfilter);
+        expandedListTextView.setText(expandedListText.name);
+        ImageView iconimage = (ImageView) convertView.findViewById(R.id.expIcon);
+
+        TextView sortAwasomeIcon = (TextView) convertView
+                .findViewById(R.id.sortawasome);
+        FontManager.markAsIconContainer(convertView.findViewById(R.id.sortawasome), iconFon);
+        if (groupPosition == 0) {
+            sortAwasomeIcon.setVisibility(View.VISIBLE);
+        } else {
+            sortAwasomeIcon.setVisibility(View.GONE);
+        }
+
+        if (expandedListText.isSelected) {
+            expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+            expandableListDetail.get("Sort By").get(childPosition).isSelected = false;
+//            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
+            sortAwasomeIcon.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+
+            if (expandedListText.isSorted) {
+                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_asc));
+            } else {
+                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_desc));
+            }
+
+
+        } else {
+            expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
+            sortAwasomeIcon.setVisibility(View.GONE);
+        }
+
+        return convertView;
+    }
+
+    @Override
+    public int getChildType(int groupPosition, int childPosition) {
+        return super.getChildType(groupPosition, childPosition);
+    }
+
+    @Override
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
+        return true;
+
+    }
+}

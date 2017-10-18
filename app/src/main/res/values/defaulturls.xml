@@ -14,14 +14,15 @@
     <!--  <string name="app_default_url">http://qacle.instancy.net/</string>
         <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
+    <!--for instancy market place-->
     <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://mobile.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
-    <string name="app_default_url">http://staging.enlightus.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">http://staging.enlightus.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://lsonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
@@ -29,14 +30,32 @@
     <!--<string name="app_default_url">http://lonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
+    <!--<string name="app_default_url">http://mobileup.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://mobiwebapi.instancy.net/api/</string>-->
 
-    <!--<string name="app_default_url">http://development.instancy.net/</string>
-        <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>  -->
+    <!--<string name="app_default_url">http://ltracktechlifeskills.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
 
+    <!--for instancy market place-->
+    <!--<string name="app_default_url">https://ecommerce.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
+
+    <!--<string name="app_default_url">http://development.instancy.net/</string>
+       <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>  -->
+
+    <!--fo enterprise lite app -->
     <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
+
+    <!-- SCROM testing qalearning -->
+    <string name="app_default_url">http://qalearning.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>
+
+    <!--<string name="app_default_url">http://stagingmontessori.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://stagingmonteapi.instancysoft.com/api/</string>-->
+
+    <!--<string name="app_default_url">http://staging.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!-- <string name="app_default_url">http://montessoritraining.instancy.net/</string>   4166
     <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>  -->

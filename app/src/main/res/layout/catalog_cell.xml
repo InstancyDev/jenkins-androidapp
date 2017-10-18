@@ -10,12 +10,12 @@
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
-        android:layout_marginTop="3dp"
         app:cardCornerRadius="5dp"
-        app:cardElevation="5dp">
+        app:cardElevation="5dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
                     android:id="@+id/relattitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2.7">
+                    android:layout_weight="2.6">
 
                     <TextView
                         android:id="@+id/txt_title_name"
@@ -159,7 +159,7 @@
                 <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_weight=".3"
+                    android:layout_weight=".4"
                     android:padding="4dp">
 
                     <ImageButton
@@ -197,6 +197,19 @@
                             android:text="@string/fa_icon_cloud_download"
                             android:textColor="@color/text_color"
                             android:textSize="24sp" />
+
+                        <TextView
+                            android:id="@+id/btn_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:background="@android:color/transparent"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:text="$122.0"
+                            android:textColor="@color/colorStatusOther"
+                            android:textSize="12sp" />
+
                     </RelativeLayout>
                 </RelativeLayout>
             </LinearLayout>

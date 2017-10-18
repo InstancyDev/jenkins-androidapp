@@ -3,7 +3,6 @@
     android:id="@+id/layout_sing_in"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/edittext_border"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -101,16 +100,19 @@
             android:textColor="@color/colorBlack"
             android:textSize="12sp" />
     </RelativeLayout>
-
+<View
+    android:layout_width="match_parent"
+    android:background="@color/colorGray"
+    android:layout_height="1dp" />
     <ImageView
         android:id="@+id/bottom_logo"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_gravity="center"
-        android:background="@color/colorGray"
         android:padding="3dp"
+        android:background="@color/colorWhite"
         android:scaleType="centerInside"
-        android:src="@drawable/acclife__login_logo"
+        android:src="@drawable/bottom_ecommerce"
         android:visibility="visible" />
 
 </LinearLayout>
