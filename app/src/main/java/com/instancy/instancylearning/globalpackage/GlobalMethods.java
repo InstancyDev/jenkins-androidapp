@@ -521,10 +521,9 @@ public class GlobalMethods {
 
                     }
                     String encodedStr = "";
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")){
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                         encodedStr = replace(urlForView);
-                    }
-                    else {
+                    } else {
                         encodedStr = replace(urlForView.toLowerCase());
                     }
 

@@ -17,15 +17,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 
-import com.android.volley.VolleyError;
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -36,6 +31,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.instancy.instancylearning.utils.StaticValues.INNER_FILTER_CLOSE;
 
 /**
  * Created by Upendranath on 9/28/2017 Working on Instancy-Playground-Android.
@@ -49,6 +46,11 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
     HashMap<String, List<NativeSetttingsModel.FilterModel>> expandableListDetail;
     FilterAdapter filterAdapter;
     AppUserModel appUserModel;
+    String sortName = "";
+    String atributeConfigId = "";
+    String innerCategoryId = "";
+    String innerCategorryName = "";
+    boolean typeOrder = false;
 
     DatabaseHandler db;
     PreferencesManager preferencesManager;
@@ -65,7 +67,6 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
 
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
@@ -113,11 +114,12 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
                 if (groupPosition == 1) {
 
                     NativeSetttingsModel.FilterModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
-                    Log.d(TAG, "onChildClick: " + filterModel.filterInnerModels);
+                    Log.d(TAG, "onChildClick: " + filterModel.name);
 
                     Intent intent = new Intent(Filter_activity.this, Filter_Inner_activity.class);
                     intent.putExtra("filtermodel", filterModel);
-                    startActivity(intent);
+                    intent.putExtra("filtername", filterModel.name);
+                    startActivityForResult(intent, INNER_FILTER_CLOSE);
 
                 } else {
                     int index = childPosition - parent.getFirstVisiblePosition();
@@ -126,9 +128,15 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
 
                         if (expandableListDetail.get("Sort By").get(childPosition).isSorted) {
                             expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
+                            typeOrder = false;
+                            sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
+                            atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
+
                         } else {
                             expandableListDetail.get("Sort By").get(childPosition).isSorted = true;
-
+                            typeOrder = true;
+                            sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
+                            atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
                         }
 
                     }
@@ -183,11 +191,34 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
 
         switch (v.getId()) {
             case R.id.btnfilterapply:
-                finish();
+                insertBundleValues();
                 break;
             case R.id.btnfilterrest:
                 finish();
                 break;
+        }
+    }
+
+    public void insertBundleValues() {
+
+        Intent intent = getIntent();
+        intent.putExtra("coursetype", sortName);
+        intent.putExtra("sortby", typeOrder);
+        intent.putExtra("configid", atributeConfigId);
+        intent.putExtra("categoryid", innerCategoryId);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult inneractivity:");
+        if (requestCode == INNER_FILTER_CLOSE && resultCode == RESULT_OK) {
+
+            innerCategoryId = data.getStringExtra("categoryid");
+            innerCategorryName = data.getStringExtra("filtername");
+
         }
     }
 }

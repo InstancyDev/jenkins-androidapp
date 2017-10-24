@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.filter;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -15,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
@@ -46,6 +46,7 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
     Button btnApply;
+    String filterName = "", categoryId = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             NativeSetttingsModel.FilterModel filterModel = (NativeSetttingsModel.FilterModel) bundle.getSerializable("filtermodel");
+            filterName = bundle.getString("filtername");
             assert filterModel != null;
             filterInnerModelList = filterModel.filterInnerModels;
         }
@@ -104,24 +106,24 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        Toast.makeText(Filter_Inner_activity.this, "position" + position, Toast.LENGTH_SHORT).show();
         filterInnerModelList.get(position).isSelected = true;
         filter_inner_adapter = new Filter_Inner_Adapter(this, BIND_ABOVE_CLIENT, filterInnerModelList);
         listView.setAdapter(filter_inner_adapter);
-
-//        Runnable run = new Runnable(){
-//            public void run(){
-//
-//                filter_inner_adapter.updateList(filterInnerModelList);
-//            }
-//        };
-//        runOnUiThread(run);
+        categoryId = filterInnerModelList.get(position).id;
     }
 
     @Override
     public void onClick(View v) {
-
-        finish();
-
+        insertBundleValues();
     }
+
+    public void insertBundleValues() {
+
+        Intent intent = getIntent();
+        intent.putExtra("filtername", filterName);
+        intent.putExtra("categoryid", categoryId);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
 }

@@ -29,8 +29,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -196,16 +194,12 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtPrice.setVisibility(View.GONE);
 
         } else {
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688")) {
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
 
             } else {
-                holder.btnDownload.setVisibility(View.VISIBLE);
-                holder.btnDownload.setVisibility(View.GONE);
-                holder.circleProgressBar.setVisibility(View.GONE);
 
-//              File extStore = Environment.getExternalStorageDirectory();
                 File myFile = new File(myLearningModel.get(position).getOfflinepath());
 
                 if (myFile.exists()) {
@@ -218,15 +212,21 @@ public class CatalogAdapter extends BaseAdapter {
                     holder.btnDownload.setVisibility(View.GONE);
 
                 }
+
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                    holder.btnDownload.setVisibility(View.GONE);
+                }
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+                    holder.btnDownload.setVisibility(View.VISIBLE);
+                }
+
+                holder.circleProgressBar.setVisibility(View.GONE);
+
+//              File extStore = Environment.getExternalStorageDirectory();
+
             }
 
             String imgUrl = myLearningModel.get(position).getImageData();
-//            Glide.with(vi.getContext()).load(imgUrl)
-//                    .thumbnail(0.5f)
-//                    .placeholder(R.drawable.cellimage)
-//                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                    .into(holder.imgThumb);
-
             Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
             final float oldRating = ratingValue;
             holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -322,7 +322,9 @@ public class CatalogAdapter extends BaseAdapter {
 
 
         }
-
+        if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+            holder.btnDownload.setVisibility(View.GONE);
+        }
         return vi;
     }
 

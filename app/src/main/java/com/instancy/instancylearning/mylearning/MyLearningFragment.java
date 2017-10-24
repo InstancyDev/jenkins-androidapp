@@ -95,7 +95,7 @@ import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
  * https://github.com/majidgolshadi/Android-Download-Manager-Pro
  */
 
-public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, SearchView.OnQueryTextListener {
+public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -378,7 +378,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-        item_filter.setVisible(false);
+//        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
@@ -546,16 +546,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext());
         }
 
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -915,18 +905,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     }
-//                    cmiSynchTask = new CmiSynchTask(context);
-//                    cmiSynchTask.execute();
+
                     injectFromDbtoModel();
                 }
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
                     cmiSynchTask = new CmiSynchTask(context);
                     cmiSynchTask.execute();
                 }
-
             }
-//            cmiSynchTask = new CmiSynchTask(context);
-//            cmiSynchTask.execute();
         }
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
@@ -938,11 +924,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
 
-//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
+            String sortName = data.getStringExtra("coursetype");
+            boolean filterAscend = data.getBooleanExtra("sortby", false);
+            String configId = data.getStringExtra("configid");
+            String categoryId = data.getStringExtra("categoryid");
+            myLearningAdapter.filterByCategoryId("10");
+            myLearningAdapter.applyFilter(sortName, filterAscend, configId);
 
         }
-
-
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
@@ -1019,7 +1008,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3134";
-
             vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
 
         } else {
@@ -1033,7 +1021,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             } else {
                 Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
-
 
         }
     }

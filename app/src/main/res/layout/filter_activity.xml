@@ -27,7 +27,7 @@
             android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:text="Reset"
+            android:text="Apply"
             android:textColor="@color/colorWhite" />
 
         <android.support.v4.widget.Space
@@ -40,7 +40,7 @@
             android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            android:text="Apply"
+            android:text="Reset"
             android:textColor="@color/colorWhite" />
 
     </LinearLayout>

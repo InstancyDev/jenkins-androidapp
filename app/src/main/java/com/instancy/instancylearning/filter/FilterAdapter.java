@@ -127,8 +127,6 @@ public class FilterAdapter extends BaseExpandableListAdapter {
             } else {
                 sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_desc));
             }
-
-
         } else {
             expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
             sortAwasomeIcon.setVisibility(View.GONE);

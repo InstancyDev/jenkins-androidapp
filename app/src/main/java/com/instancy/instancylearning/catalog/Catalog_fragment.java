@@ -18,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -87,6 +88,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
@@ -98,7 +100,7 @@ import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
  * Created by Upendranath on 5/19/2017.
  */
 
-public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, BillingProcessor.IBillingHandler {
+public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler {
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -352,7 +354,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
-
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -366,7 +367,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     return true;
                 }
+
             });
+
         }
 
         if (item_filter != null) {
@@ -436,6 +439,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onRefresh() {
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(true);
+            MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -458,17 +462,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
         return responMap;
     }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
-
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -701,13 +694,23 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             catalogModelsList.get(position).setAddedToMylearning(1);
                             catalogAdapter.notifyDataSetChanged();
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
-                            Toast toast = Toast.makeText(
-                                    context,
-                                    context.getString(R.string.cat_add_success),
-                                    Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-
+//                            Toast toast = Toast.makeText(
+//                                    context,
+//                                    context.getString(R.string.cat_add_success),
+//                                    Toast.LENGTH_SHORT);
+//                            toast.setGravity(Gravity.CENTER, 0, 0);
+//                            toast.show();
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(context.getString(R.string.cat_add_success))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
 
                         } else {
                             Toast toast = Toast.makeText(
@@ -919,15 +922,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         String testId = "android.test.purchased";
         String productId = "com.instancy.managedproduct";
-        String originalproductid =learningModel.getGoogleProductID();
+        String originalproductid = learningModel.getGoogleProductID();
 
         if (originalproductid.length() != 0) {
             Intent intent = new Intent();
             intent.putExtra("learningdata", learningModel);
             billingProcessor.handleActivityResult(8099, 80, intent);
             billingProcessor.purchase(getActivity(), originalproductid);
-        }
-        else{
+        } else {
             Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
         }
 
@@ -944,7 +946,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
-        Toast.makeText(context, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
         Log.v("chip", "Owned Managed Product: " + details.purchaseInfo.purchaseData);
 
         sendInAppDetails(details);
@@ -955,7 +957,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Override
     public void onPurchaseHistoryRestored() {
-        Toast.makeText(context, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
         for (String sku : billingProcessor.listOwnedProducts())
             Log.v("chip", "Owned Managed Product: " + sku);
     }
@@ -1093,10 +1095,102 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //
 //                MyLearningModel learningModel = (MyLearningModel) data.getSerializableExtra("learningdata");
 ////            billingProcessor.handleActivityResult(8099, 80, intent);
-//            }
+        }
+
+        if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
+
+            if (data != null) {
+                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+
+                File myFile = new File(myLearningModel.getOfflinepath());
+
+                if (!myFile.exists()) {
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        getStatusFromServer(myLearningModel);
+
+                    }
+                } else {
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        cmiSynchTask = new CmiSynchTask(context);
+                        cmiSynchTask.execute();
+                    }
+                }
+                injectFromDbtoModel();
+            }
 
         }
 
+    }
+
+    public void getStatusFromServer(final MyLearningModel myLearningModel) {
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        String paramsString = "";
+        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
+
+            paramsString = "userId="
+                    + myLearningModel.getUserID()
+                    + "&scoId="
+                    + myLearningModel.getScoId()
+                    + "&TrackObjectTypeID="
+                    + myLearningModel.getObjecttypeId()
+                    + "&TrackContentID="
+                    + myLearningModel.getContentID()
+                    + "&TrackScoID=" + myLearningModel.getScoId()
+                    + "&SiteID=" + myLearningModel.getSiteID()
+                    + "&OrgUnitID=" + myLearningModel.getSiteID()
+                    + "&isonexist=onexit";
+
+        } else {
+            paramsString = "userId="
+                    + myLearningModel.getUserID()
+                    + "&scoId="
+                    + myLearningModel.getScoId();
+
+        }
+
+        vollyService.getJsonObjResponseVolley("UPDATESTATUS", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentStatus?" + paramsString, appUserModel.getAuthHeaders());
+
+        resultListner = new ResultListner() {
+            @Override
+            public void statusUpdateFromServer(boolean serverUpdated, JSONObject result) {
+                int i = -1;
+
+                Log.d(TAG, "statusUpdateFromServer JSONObject :" + result);
+
+                JSONArray jsonArray = null;
+                try {
+                    if (result.has("contentstatus")) {
+                        jsonArray = result.getJSONArray("contentstatus");
+
+                    }
+                    if (jsonArray.length() > 0) {
+
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                        String status = jsonObject.get("status").toString();
+                        String progress = "";
+                        if (jsonObject.has("progress")) {
+                            progress = jsonObject.get("progress").toString();
+                        }
+                        i = db.updateContentStatus(myLearningModel, status, progress);
+                        if (i == 1) {
+
+                            injectFromDbtoModel();
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+
+                        } else {
+
+//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
 

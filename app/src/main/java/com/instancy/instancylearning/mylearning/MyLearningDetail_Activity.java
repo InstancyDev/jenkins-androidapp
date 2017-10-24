@@ -464,7 +464,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             bottomReportLayout.setVisibility(View.GONE);
             txtBtnView.setText("Add");
             FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
-            txtFontView.setText(getResources().getString(R.string.fa_icon_plus));
+            txtFontView.setText(getResources().getString(R.string.fa_icon_plus_circle));
 
             if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
                 FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);

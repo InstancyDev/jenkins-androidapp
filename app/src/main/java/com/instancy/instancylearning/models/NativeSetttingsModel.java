@@ -70,6 +70,7 @@ public class NativeSetttingsModel {
         public String name = "";
         public boolean isSelected = false;
         public boolean isSorted = false;
+        public String attributeConfigId = "";
         public List<FilterInnerModel> filterInnerModels = new ArrayList<>();
 
     }
@@ -96,6 +97,7 @@ public class NativeSetttingsModel {
                         FilterModel model = new FilterModel();
                         model.id = object.get("attributeconfigid").toString();
                         model.name = object.get("displaytext").toString();
+                        model.attributeConfigId = object.get("attributeconfigid").toString();
                         filterModelList.add(i, model);
                     }
                 }

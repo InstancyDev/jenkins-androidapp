@@ -29,8 +29,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
@@ -50,6 +48,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -391,12 +390,8 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         }
 
         String imgUrl = trackChildList.getImageData();
-        Glide.with(childView.getContext()).load(imgUrl)
-                .thumbnail(0.5f)
-                .crossFade()
-                .placeholder(R.drawable.cellimage)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.imgThumb);
+
+        Picasso.with(childView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
         childView.setTag("view");
         return childView;
     }
