@@ -1104,7 +1104,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             if (result.length() > 0) {
                 JsonParser jsonParser = new JsonParser();
-                JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
+                JsonObject jsonObject = null;
+
+                try {
+                    jsonObject = jsonParser.parse(result).getAsJsonObject();
+                } catch (IllegalStateException es) {
+                    es.printStackTrace();
+                }
 
                 try {
                     JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
@@ -1129,7 +1135,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                 nativeMenuModel.setMenuid("");
                             }
-
                         }
                         if (nativeMenuJsonObj.has("displayname")) {
 
@@ -1142,8 +1147,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                 nativeMenuModel.setDisplayname("");
                             }
-
-
                         }
                         if (nativeMenuJsonObj.has("displayorder")) {
 
@@ -1388,8 +1391,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     //
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7")))
                         continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
@@ -1402,32 +1404,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     menu.setImage(cursor.getString(cursor
                             .getColumnIndex("image")));
                     int menuIconResId = -1;
-//                    switch (cursor.getString(
-//                            cursor.getColumnIndex("contextmenuid"))
-//                            .toLowerCase()) {
-//                        case "1":
-//                            menuIconResId = R.drawable.ic_menu_manage;
-//                            break;
-//                        case "2":
-//                            menuIconResId = R.drawable.ic_menu_manage;
-//                            break;
-//                        case "3":
-//                            menuIconResId = R.drawable.ic_menu_manage;
-//                            break;
-//                        case "4":
-//                            menuIconResId = R.drawable.ic_menu_manage;
-//                            break;
-//                        case "5":
-//                            menuIconResId = R.drawable.ic_menu_manage;
-//                            break;
-//                        // case "events":
-//                        // menuIconResId = R.drawable.event;
-//                        // break;
-//
-//                        default:
-//                            menuIconResId = R.drawable.ic_menu_camera;
-//                            break;
-//                    }
                     menu.setMenuImageResId(menuIconResId);
                     menu.setIsOfflineMenu(cursor.getString(cursor
                             .getColumnIndex("isofflinemenu")));
@@ -5814,7 +5790,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String scoID = learningModel.getScoId();
 
         int assessmentAttempt = Getassessmentattempt(learningModel, "false");
-
+        String objecTypeId = "";
         if (quesAry.length > 3) {
 
             if (learningModel.getObjecttypeId().equalsIgnoreCase("10") && seqID.length() != 0) {
@@ -5823,7 +5799,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 if (objectTypeIDScoid.length > 1) {
                     scoID = objectTypeIDScoid[0];
+                    objecTypeId = objectTypeIDScoid[1];
                 }
+            } else {
+
             }
 
             StudentResponseModel studentresponse = new StudentResponseModel();
@@ -5837,7 +5816,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String formattedDate = GetCurrentDateTime();
             studentresponse.set_attemptdate(formattedDate);
 
-            if (learningModel.getObjecttypeId().equalsIgnoreCase("8")) {
+            if (objecTypeId.equalsIgnoreCase("8")) {
                 studentresponse.set_questionid(Integer
                         .parseInt(quesAry[0]) + 1);
 

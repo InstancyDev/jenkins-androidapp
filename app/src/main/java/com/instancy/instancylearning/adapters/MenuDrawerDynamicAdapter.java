@@ -184,7 +184,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_home));
                 break;
             case "7":
-                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_wikipedia_w));
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_firefox));
                 break;
             case "8":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_calendar));

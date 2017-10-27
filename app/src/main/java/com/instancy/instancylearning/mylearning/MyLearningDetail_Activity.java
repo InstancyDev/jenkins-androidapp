@@ -74,7 +74,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -90,79 +90,79 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     BillingProcessor billingProcessor;
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    @Bind(R.id.txt_title_name)
+    @BindView(R.id.txt_title_name)
     TextView txtTitle;
 
-    @Bind(R.id.btntxt_download_detail)
+    @BindView(R.id.btntxt_download_detail)
     TextView btnDownload;
 
-    @Bind(R.id.txtDescription)
+    @BindView(R.id.txtDescription)
     TextView txtDescription;
 
-    @Bind(R.id.txtLongDesc)
+    @BindView(R.id.txtLongDesc)
     TextView txtLongDisx;
 
-    @Bind(R.id.imagethumb)
+    @BindView(R.id.imagethumb)
     ImageView imgThumb;
 
-    @Bind(R.id.txt_coursename)
+    @BindView(R.id.txt_coursename)
     TextView txtCourseName;
 
-    @Bind(R.id.rat_detail_ratingbar)
+    @BindView(R.id.rat_detail_ratingbar)
     RatingBar ratingBar;
 
-    @Bind(R.id.txt_course_progress)
+    @BindView(R.id.txt_course_progress)
     TextView txtCourseStatus;
 
-    @Bind(R.id.course_progress_bar)
+    @BindView(R.id.course_progress_bar)
     ProgressBar progressBar;
 
-    @Bind(R.id.txt_author)
+    @BindView(R.id.txt_author)
     TextView txtAuthor;
 
-    @Bind(R.id.txt_site_name)
+    @BindView(R.id.txt_site_name)
     TextView txtSiteName;
 
     @Nullable
-    @Bind(R.id.circle_progress)
+    @BindView(R.id.circle_progress)
     CircleProgressBar circleProgressBar;
 
     @Nullable
-    @Bind(R.id.consolidateline)
+    @BindView(R.id.consolidateline)
     View consolidateLine;
 
     @Nullable
-    @Bind(R.id.bottom_button_layout)
+    @BindView(R.id.bottom_button_layout)
     LinearLayout bottomLayout;
 
     @Nullable
-    @Bind(R.id.viewtypeLayout)
+    @BindView(R.id.viewtypeLayout)
     RelativeLayout bottomViewLayout;
 
     @Nullable
-    @Bind(R.id.reportLayout)
+    @BindView(R.id.reportLayout)
     RelativeLayout bottomReportLayout;
 
-    @Bind(R.id.view_btn_txt)
+    @BindView(R.id.view_btn_txt)
     TextView txtBtnView;
 
-    @Bind(R.id.report_btn_txt)
+    @BindView(R.id.report_btn_txt)
     TextView txtBtnReport;
 
-    @Bind(R.id.report_fa_icon)
+    @BindView(R.id.report_fa_icon)
     TextView txtFontReport;
 
-    @Bind(R.id.view_fa_icon)
+    @BindView(R.id.view_fa_icon)
     TextView txtFontView;
 
-    @Bind(R.id.downloadlayout)
+    @BindView(R.id.downloadlayout)
     RelativeLayout downloadlayout;
 
     @Nullable
-    @Bind(R.id.detail_layout)
+    @BindView(R.id.detail_layout)
     RelativeLayout relativeLayout;
 
-    @Bind(R.id.btn_price)
+    @BindView(R.id.btn_price)
     TextView txtPrice;
 
 

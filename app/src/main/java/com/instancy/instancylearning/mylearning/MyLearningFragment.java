@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -77,7 +78,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
@@ -103,9 +104,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
-    @Bind(R.id.swipemylearning)
+    @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
-    @Bind(R.id.mylearninglistview)
+    @BindView(R.id.mylearninglistview)
     ListView myLearninglistView;
     MyLearningAdapter myLearningAdapter;
     List<MyLearningModel> myLearningModelsList = null;
@@ -378,7 +379,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-//        item_filter.setVisible(false);
+        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
@@ -522,6 +523,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshMyLearning(true);
+            MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();

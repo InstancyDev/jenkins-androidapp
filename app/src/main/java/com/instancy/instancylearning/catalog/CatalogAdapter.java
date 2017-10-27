@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -350,57 +350,57 @@ public class CatalogAdapter extends BaseAdapter {
         public ViewGroup parent;
         public DownloadInterface downloadInterface;
         @Nullable
-        @Bind(R.id.txt_title_name)
+        @BindView(R.id.txt_title_name)
         TextView txtTitle;
 
         @Nullable
-        @Bind(R.id.card_view)
+        @BindView(R.id.card_view)
         CardView card_view;
 
         @Nullable
-        @Bind(R.id.txtShortDesc)
+        @BindView(R.id.txtShortDesc)
         TextView txtShortDisc;
 
         @Nullable
-        @Bind(R.id.imagethumb)
+        @BindView(R.id.imagethumb)
         ImageView imgThumb;
 
         @Nullable
-        @Bind(R.id.txt_coursename)
+        @BindView(R.id.txt_coursename)
         TextView txtCourseName;
 
         @Nullable
-        @Bind(R.id.rat_adapt_ratingbar)
+        @BindView(R.id.rat_adapt_ratingbar)
         RatingBar ratingBar;
 
 
         @Nullable
-        @Bind(R.id.txt_author)
+        @BindView(R.id.txt_author)
         TextView txtAuthor;
 
         @Nullable
-        @Bind(R.id.txt_site_name)
+        @BindView(R.id.txt_site_name)
         TextView txtSiteName;
 
         @Nullable
-        @Bind(R.id.consolidateline)
+        @BindView(R.id.consolidateline)
         View consolidateLine;
 
         @Nullable
-        @Bind(R.id.btn_contextmenu)
+        @BindView(R.id.btn_contextmenu)
         ImageButton btnContextMenu;
 
         @Nullable
-        @Bind(R.id.btntxt_download)
+        @BindView(R.id.btntxt_download)
         TextView btnDownload;
 
         @Nullable
-        @Bind(R.id.btn_price)
+        @BindView(R.id.btn_price)
         TextView txtPrice;
 
 
         @Nullable
-        @Bind(R.id.circle_progress)
+        @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
         public ViewHolder(View view) {

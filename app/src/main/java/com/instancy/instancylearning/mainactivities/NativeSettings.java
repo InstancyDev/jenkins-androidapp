@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 import static android.webkit.URLUtil.isValidUrl;
 import static com.instancy.instancylearning.utils.Utilities.formatURL;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -106,13 +104,44 @@ public class NativeSettings extends AppCompatActivity {
 
                 if (childPosition == 0 && !isLogin) {
 
-                    new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                            .setTitleText("Are you sure?")
-                            .setContentText("Do you want to reset the site URL!")
-                            .setConfirmText("Yes,reset it!")
-                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
+//                    new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+//                            .setTitleText("Are you sure?")
+//                            .setContentText("Do you want to reset the site URL!")
+//                            .setConfirmText("Yes,reset it!")
+//                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                                @Override
+//                                public void onClick(SweetAlertDialog sDialog) {
+//                                    if (isNetworkConnectionAvailable(context, -1)) {
+//                                        preferencesManager.setStringValue(getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+//                                        Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+//                                        intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                        startActivity(intentBranding);
+//                                        Toast.makeText(context, "Default url set " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
+//                                    } else {
+//                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//                                    }
+//
+//
+//                                    sDialog.dismissWithAnimation();
+//
+//                                }
+//                            }).setCancelText("Cancel").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+//
+//                            sweetAlertDialog.dismissWithAnimation();
+//
+//                        }
+//                    })
+//                            .show();
+
+                    final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(NativeSettings.this);
+                    builder.setMessage("Do you want to reset the site URL!").setTitle("Are you sure?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes,reset it!", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+
                                     if (isNetworkConnectionAvailable(context, -1)) {
                                         preferencesManager.setStringValue(getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
                                         Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
@@ -123,21 +152,18 @@ public class NativeSettings extends AppCompatActivity {
                                         Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                                     }
 
-
-                                    sDialog.dismissWithAnimation();
-
+                                    dialog.dismiss();
                                 }
-                            }).setCancelText("Cancel").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                            sweetAlertDialog.dismissWithAnimation();
-
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                         }
-                    })
-                            .show();
-                } else {
+                    });
+                    android.support.v7.app.AlertDialog alert = builder.create();
+                    alert.show();
 
+                } else {
 
                     resetUrlEditDialog();
                 }

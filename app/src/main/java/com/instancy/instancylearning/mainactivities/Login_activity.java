@@ -56,7 +56,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -70,55 +70,55 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 public class Login_activity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
-    @Bind(R.id.id_settings_txt)
+    @BindView(R.id.id_settings_txt)
     TextView settingTxt;
 
-    @Bind(R.id.txt_pass)
+    @BindView(R.id.txt_pass)
     TextView imgPassword;
 
-    @Bind(R.id.txtalert)
+    @BindView(R.id.txtalert)
     TextView alertText;
 
-    @Bind(R.id.txt_user)
+    @BindView(R.id.txt_user)
     TextView imgUser;
 
-    @Bind(R.id.id_loginbtn)
+    @BindView(R.id.id_loginbtn)
     Button btnLogin;
 
-    @Bind(R.id.btnewuser)
+    @BindView(R.id.btnewuser)
     Button btnSignup;
 
-    @Bind(R.id.btnforgot)
+    @BindView(R.id.btnforgot)
     Button btnForgot;
 
-    @Bind(R.id.id_useredit)
+    @BindView(R.id.id_useredit)
     EditText editUserName;
 
-    @Bind(R.id.id_passwordedit)
+    @BindView(R.id.id_passwordedit)
     EditText editPassword;
 
-    @Bind(R.id.btntxt_facebook)
+    @BindView(R.id.btntxt_facebook)
     TextView btnFacebook;
 
-    @Bind(R.id.btntxt_twitter)
+    @BindView(R.id.btntxt_twitter)
     TextView btnTwitter;
 
-    @Bind(R.id.btntxt_google)
+    @BindView(R.id.btntxt_google)
     TextView btnGoogle;
 
-    @Bind(R.id.btntxt_linkedin)
+    @BindView(R.id.btntxt_linkedin)
     TextView btnLinkedin;
 
-    @Bind(R.id.txt_orsocialmedia)
+    @BindView(R.id.txt_orsocialmedia)
     TextView txtOrSocialmedia;
 
-    @Bind(R.id.rlSocialLogin)
+    @BindView(R.id.rlSocialLogin)
     LinearLayout linearLayoutOr;
 
-    @Bind(R.id.lineview1)
+    @BindView(R.id.lineview1)
     View lineView1;
 
-    @Bind(R.id.lineview2)
+    @BindView(R.id.lineview2)
     View lineView2;
 
     AppUserModel appUserModel;

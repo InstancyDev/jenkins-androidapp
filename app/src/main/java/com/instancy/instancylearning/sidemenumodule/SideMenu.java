@@ -35,12 +35,13 @@ import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SideMenu extends AppCompatActivity {
@@ -50,34 +51,34 @@ public class SideMenu extends AppCompatActivity {
     private List<SideMenusModel> sideMenusModel;
     DatabaseHandler db;
 
-    @Bind(R.id.expanded_menu_drawer)
+    @BindView(R.id.expanded_menu_drawer)
     ExpandableListView navDrawerExpandableView;
 
-    @Bind(R.id.profile_thumbs)
+    @BindView(R.id.profile_thumbs)
     ImageView profileImage;
 
-    @Bind(R.id.id_username)
+    @BindView(R.id.id_username)
     TextView txtUsername;
 
-    @Bind(R.id.id_user_address)
+    @BindView(R.id.id_user_address)
     TextView txtAddress;
 
-    @Bind(R.id.txtbtn_settings)
+    @BindView(R.id.txtbtn_settings)
     TextView txtBtnSettings;
 
-    @Bind(R.id.txtbtn_back)
+    @BindView(R.id.txtbtn_back)
     TextView textBtnBack;
 
-    @Bind(R.id.back_font)
+    @BindView(R.id.back_font)
     TextView fontBack;
 
-    @Bind(R.id.settings_font)
+    @BindView(R.id.settings_font)
     TextView fontSettings;
 
-    @Bind(R.id.notification_font)
+    @BindView(R.id.notification_font)
     TextView fontNotification;
 
-    @Bind(R.id.txtbtn_notification)
+    @BindView(R.id.txtbtn_notification)
     TextView txtBtnNotification;
 
     private static int lastClicked = 0;
@@ -209,6 +210,9 @@ public class SideMenu extends AppCompatActivity {
                 break;
             case 3:
                 fragment = new Profile_fragment();
+                break;
+            case 7:
+                fragment = new Webpage_fragment();
                 break;
             default:
                 fragment = new Catalog_fragment();

@@ -46,43 +46,6 @@ public class LRSJavaScriptInterface {
         return "true";
     }
 
-//    @JavascriptInterface  android old
-//    public String SCORM_LMSGetValueWithGetValue(String getvalue) {
-//        Log.d(TAG, "SCORM_LMSGetValueWithGetValue: " + getvalue);
-//
-//        String returntring = "";
-//
-//        CMIModel cmi = new CMIModel();
-//        cmi = databaseHandler.getCMIDetails(_learningModel);
-//
-//        if (cmi.get_location() == null)
-//            cmi.set_location("");
-//        if (cmi.get_suspenddata() == null)
-//            cmi.set_suspenddata("");
-//        if (cmi.get_status() == null)
-//            cmi.set_status("");
-//        if (cmi.get_coursemode() == null)
-//            cmi.set_coursemode("");
-//
-//        if (getvalue.contains("core.lesson_mode")) {
-//            returntring = cmi.get_coursemode();
-//        } else if (getvalue.contains("lesson_status")) {
-//            returntring = cmi.get_status();
-//        } else if (getvalue.contains("lesson_location")) {
-//            returntring = cmi.get_location();
-//        } else if (getvalue.contains("suspend_data")) {
-//            returntring = cmi.get_suspenddata();
-//        } else if (getvalue.contains("score.min")) {
-//            returntring = cmi.get_scoremin();
-//        } else if (getvalue.contains("score.max")) {
-//            returntring = cmi.get_scoremax();
-//        }
-//        Log.d("returntring", returntring);
-//
-//
-//        return returntring;
-//    }
-
 
     @JavascriptInterface
     public String SCORM_LMSGetValueWithGetValue(String getvalue) {
@@ -193,7 +156,7 @@ public class LRSJavaScriptInterface {
     public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
 
 
-        Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404: "+lrs);
+        Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404: " + lrs);
     }
 
     @JavascriptInterface

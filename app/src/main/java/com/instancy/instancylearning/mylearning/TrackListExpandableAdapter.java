@@ -61,7 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -418,47 +418,47 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         DownloadInterface downloadInterface;
         SetCompleteListner setCompleteListner;
         @Nullable
-        @Bind(R.id.txt_title_name)
+        @BindView(R.id.txt_title_name)
         TextView txtTitle;
 
         @Nullable
-        @Bind(R.id.relative_layout)
+        @BindView(R.id.relative_layout)
         RelativeLayout relativeLayout;
 
         @Nullable
-        @Bind(R.id.txtShortDesc)
+        @BindView(R.id.txtShortDesc)
         TextView txtShortDisc;
 
         @Nullable
-        @Bind(R.id.imagethumb)
+        @BindView(R.id.imagethumb)
         ImageView imgThumb;
 
         @Nullable
-        @Bind(R.id.txt_coursename)
+        @BindView(R.id.txt_coursename)
         TextView txtCourseName;
 
         @Nullable
-        @Bind(R.id.txt_course_progress)
+        @BindView(R.id.txt_course_progress)
         TextView txtCourseStatus;
 
         @Nullable
-        @Bind(R.id.course_progress_bar)
+        @BindView(R.id.course_progress_bar)
         ProgressBar progressBar;
 
         @Nullable
-        @Bind(R.id.txt_author)
+        @BindView(R.id.txt_author)
         TextView txtAuthor;
 
         @Nullable
-        @Bind(R.id.btn_contextmenu)
+        @BindView(R.id.btn_contextmenu)
         ImageButton btnContextMenu;
 
         @Nullable
-        @Bind(R.id.btntxt_download)
+        @BindView(R.id.btntxt_download)
         TextView btnDownload;
 
         @Nullable
-        @Bind(R.id.circle_progress_track)
+        @BindView(R.id.circle_progress_track)
         CircleProgressBar circleProgressBar;
 
         public ViewHolder(View view) {

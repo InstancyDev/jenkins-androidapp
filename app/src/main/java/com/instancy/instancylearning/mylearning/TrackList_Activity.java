@@ -63,7 +63,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import butterknife.Bind;
+
+import butterknife.BindView;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
@@ -94,7 +95,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     Boolean isTraxkList = true;
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
-    @Bind(R.id.lable_catalog)
+    @BindView(R.id.lable_catalog)
     TextView frqagmentName;
     CmiSynchTask cmiSynchTask;
     DownloadXmlAsynchTask downloadXmlAsynchTask;

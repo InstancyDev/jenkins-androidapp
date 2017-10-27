@@ -110,7 +110,7 @@
         android:layout_height="60dp"
         android:layout_gravity="center"
         android:padding="3dp"
-        android:background="@color/colorWhite"
+        android:background="@color/colorGray"
         android:scaleType="centerInside"
         android:src="@drawable/bottom_ecommerce"
         android:visibility="visible" />

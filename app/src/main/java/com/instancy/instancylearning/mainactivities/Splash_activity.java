@@ -40,7 +40,7 @@ import com.instancy.instancylearning.utils.StaticValues;
 import java.io.File;
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -63,7 +63,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     Context context;
     NetworkUtils networkUtils;
     UiSettingsModel uiSettingsModel;
-    @Bind(R.id.progressBarSplash)
+    @BindView(R.id.progressBarSplash)
     ProgressBar progressBar;
     private int progressStatus = 0;
     AppUserModel appUserModel;

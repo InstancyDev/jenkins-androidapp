@@ -83,7 +83,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.Bind;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
@@ -108,9 +109,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
-    @Bind(R.id.swipemylearning)
+    @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
-    @Bind(R.id.mylearninglistview)
+    @BindView(R.id.mylearninglistview)
     ListView myLearninglistView;
     CatalogAdapter catalogAdapter;
     List<MyLearningModel> catalogModelsList = null;
@@ -1087,7 +1088,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
             }
         }
-
         if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
 
             super.onActivityResult(requestCode, resultCode, data);

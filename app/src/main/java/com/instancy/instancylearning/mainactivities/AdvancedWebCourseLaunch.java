@@ -60,7 +60,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
-//            courseUrl = "http://stagingmontessori.instancysoft.com//remote/ajaxlaunchpage.aspx?path=/content/sitefiles/27fb2122-0928-4571-80c6-0e10844013ca/en-us/index_lms.html&coursename=m6_s1_intro_to_arithmetic&contentid=27fb2122-0928-4571-80c6-0e10844013ca&objecttypeid=26&cantrack=yes&scoid=514&eventkey=&eventtype=&trackinguserid=1";
 //            try {
 //                courseUrl = URLEncoder.encode(courseUrl, "UTF-8");
 //            } catch (UnsupportedEncodingException e) {
@@ -72,7 +71,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
             clearWebViewAbsolutely(adWebView);
             courseName = myLearningModel.getCourseName();
-
 
             if (courseUrl.startsWith("file:///")) {
                 isOffline = true;
@@ -328,6 +326,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
         return;
     }
 

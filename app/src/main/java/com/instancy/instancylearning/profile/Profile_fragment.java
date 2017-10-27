@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
@@ -46,12 +46,12 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
 
 public class Profile_fragment extends Fragment {
 
-    @Bind(R.id.profile_thumbs)
+    @BindView(R.id.profile_thumbs)
     ImageView profileImage;
 
     ImageView profileRound;
 
-    @Bind(R.id.profileexpandablelist)
+    @BindView(R.id.profileexpandablelist)
     ExpandableListView profileExpandableList;
 
     String TAG = MyLearningFragment.class.getSimpleName();
