@@ -218,7 +218,7 @@ public class WebAPIClient {
         }
 
         try {
-
+            Log.d("TAG", "SYNC URL " + requestURL);
             Log.d("TAG", "HERE " + encodedPostData);
 
             URL url = new URL(requestURL);

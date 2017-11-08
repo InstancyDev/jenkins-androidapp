@@ -208,7 +208,7 @@
 
                 <RelativeLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="75dp"
                     android:layout_weight=".4"
                     android:padding="4dp">
 
@@ -252,17 +252,18 @@
                             android:text="@string/fa_icon_cloud_download"
                             android:textColor="@color/text_color"
                             android:textSize="24sp" />
+
                         <TextView
                             android:id="@+id/btn_price"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="5dp"
                             android:background="@android:color/transparent"
-                            android:textStyle="bold"
                             android:gravity="center"
-                            android:text="$122.0"
+                            android:text=""
                             android:textColor="@color/colorStatusOther"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
                     </RelativeLayout>
 
@@ -287,13 +288,14 @@
         android:weightSum="1">
 
         <RelativeLayout
-            android:layout_weight="1"
             android:id="@+id/viewtypeLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
             android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
             android:gravity="center">
+
             <TextView
                 android:id="@+id/view_fa_icon"
                 android:layout_width="44dp"
@@ -304,6 +306,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorWhite"
                 android:textSize="20sp" />
+
             <TextView
                 android:id="@+id/view_btn_txt"
                 android:layout_width="wrap_content"
@@ -320,13 +323,14 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_gravity="center"
             android:id="@+id/reportLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:gravity="center"
             android:visibility="gone">
+
             <TextView
                 android:id="@+id/report_fa_icon"
                 android:layout_width="44dp"
@@ -355,37 +359,37 @@
         </RelativeLayout>
 
         <!--<RelativeLayout-->
-            <!--android:id="@+id/addLayout"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:gravity="center"-->
-            <!--android:visibility="gone">-->
-            <!--<TextView-->
-                <!--android:id="@+id/report_fa_icon"-->
-                <!--android:layout_width="44dp"-->
-                <!--android:layout_height="44dp"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:gravity="center_vertical"-->
-                <!--android:text="@string/fa_icon_line_chart"-->
-                <!--android:textAlignment="textStart"-->
-                <!--android:textColor="@color/colorWhite"-->
-                <!--android:textSize="20sp" />-->
+        <!--android:id="@+id/addLayout"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="center"-->
+        <!--android:visibility="gone">-->
+        <!--<TextView-->
+        <!--android:id="@+id/report_fa_icon"-->
+        <!--android:layout_width="44dp"-->
+        <!--android:layout_height="44dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:text="@string/fa_icon_line_chart"-->
+        <!--android:textAlignment="textStart"-->
+        <!--android:textColor="@color/colorWhite"-->
+        <!--android:textSize="20sp" />-->
 
-            <!--<TextView-->
-                <!--android:id="@+id/report_btn_txt"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="44dp"-->
+        <!--<TextView-->
+        <!--android:id="@+id/report_btn_txt"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="44dp"-->
 
-                <!--android:layout_centerVertical="true"-->
-                <!--android:layout_toRightOf="@id/report_fa_icon"-->
-                <!--android:gravity="center_vertical"-->
-                <!--android:minHeight="?android:attr/listPreferredItemHeightSmall"-->
-                <!--android:text="Report"-->
-                <!--android:textAlignment="textStart"-->
-                <!--android:textAppearance="?android:attr/textAppearanceListItemSmall"-->
-                <!--android:textColor="@color/colorWhite"-->
-                <!--android:textSize="16sp" />-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toRightOf="@id/report_fa_icon"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:minHeight="?android:attr/listPreferredItemHeightSmall"-->
+        <!--android:text="Report"-->
+        <!--android:textAlignment="textStart"-->
+        <!--android:textAppearance="?android:attr/textAppearanceListItemSmall"-->
+        <!--android:textColor="@color/colorWhite"-->
+        <!--android:textSize="16sp" />-->
         <!--</RelativeLayout>-->
 
     </LinearLayout>

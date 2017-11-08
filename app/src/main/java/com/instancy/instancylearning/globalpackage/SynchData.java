@@ -126,7 +126,6 @@ public class SynchData {
             sb.append("<NoOfAttempts>" + tempCmi.get_noofattempts()
                     + "</NoOfAttempts>");
 
-
             // need to send data  parentcontentid and parentscoid
             sb.append("<TrackScoID>" + String.valueOf(tempCmi.get_scoId()) + "</TrackScoID>");
             sb.append("<TrackContentID></TrackContentID>");

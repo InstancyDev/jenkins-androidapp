@@ -397,6 +397,7 @@ public class GlobalMethods {
                             model.set_seqNum("0");
                             model.set_timespent("");
                             model.set_objecttypeid(myLearningModel.getObjecttypeId());
+                            model.set_contentId(myLearningModel.getContentID());
                             model.set_sitrurl(myLearningModel.getSiteURL());
                             databaseH = new DatabaseHandler(context);
                             databaseH.injectIntoCMITable(model, "false");
@@ -521,7 +522,7 @@ public class GlobalMethods {
 
                     }
                     String encodedStr = "";
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
                         encodedStr = replace(urlForView);
                     } else {
                         encodedStr = replace(urlForView.toLowerCase());

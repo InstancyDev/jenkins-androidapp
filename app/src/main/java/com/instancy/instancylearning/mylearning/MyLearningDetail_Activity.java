@@ -300,7 +300,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                     }
 
-                    btnDownload.setVisibility(View.VISIBLE);
+//                    btnDownload.setVisibility(View.GONE);
                     circleProgressBar.setVisibility(View.GONE);
                 }
                 progressBar.setVisibility(View.VISIBLE);
@@ -438,8 +438,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         Toast.makeText(MyLearningDetail_Activity.this, "No internet", Toast.LENGTH_SHORT).show();
                     }
                 }
-
-
             }
         });
 
@@ -451,16 +449,20 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        txtBtnReport.setVisibility(View.GONE);
+
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 //            relatedContentView(myLearningModel, context);
             bottomLayout.setVisibility(View.GONE);
         }
 
+        FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
+
         if (isCatalog) {
 
-            downloadlayout.setVisibility(View.GONE);
+//            downloadlayout.setVisibility(View.GONE);
             bottomReportLayout.setVisibility(View.GONE);
             txtBtnView.setText("Add");
             FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
@@ -472,25 +474,32 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 txtBtnView.setText("Buy");
                 txtPrice.setText("$" + myLearningModel.getPrice());
                 txtPrice.setVisibility(View.VISIBLE);
+                btnDownload.setVisibility(View.GONE);
             } else {
+
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                    btnDownload.setVisibility(View.GONE);
+                }
+                else {
+                    btnDownload.setVisibility(View.VISIBLE);
+                }
 
                 txtPrice.setVisibility(View.GONE);
                 txtPrice.setText("");
             }
             if (myLearningModel.getAddedToMylearning() == 1) {
                 txtBtnView.setText("View");
+                txtPrice.setVisibility(View.GONE);
+                txtPrice.setText("");
                 txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
             }
         } else {
-
-            FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
-            FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
-            FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
             txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
             bottomReportLayout.setVisibility(View.INVISIBLE);
             txtBtnView.setText("View");
             txtPrice.setVisibility(View.GONE);
             txtPrice.setText("");
+            btnDownload.setVisibility(View.VISIBLE);
         }
     }
 
@@ -669,7 +678,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     addToMyLearningCheckUser(myLearningModel, false); // false for
 
                 } else if (txtBtnView.getText().toString().equalsIgnoreCase("Buy")) {
-                    Toast.makeText(this, "Buy button", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "Buy button", Toast.LENGTH_SHORT).show();
 
                     addToMyLearningCheckUser(myLearningModel, true);
                 }
@@ -696,7 +705,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
 
         String testId = "android.test.purchased";
-        String productId = "com.instancy.test";
+        String productId = learningModel.getGoogleProductID();
 
         if (productId.length() != 0) {
             billingProcessor.purchase(MyLearningDetail_Activity.this, testId);
@@ -713,7 +722,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         } else {
             Toast.makeText(MyLearningDetail_Activity.this, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
         }
-
 
         SkuDetails sku = billingProcessor.getPurchaseListingDetails(originalproductid);
 
@@ -1312,6 +1320,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //        Toast.makeText(this, "onBillingError", Toast.LENGTH_SHORT).show();
     }
 
+
     @Override
     public void onBillingInitialized() {
 //        Toast.makeText(this, "onBillingInitialized", Toast.LENGTH_SHORT).show();
@@ -1336,9 +1345,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             Log.d("sendInAppDetails", jx.getMessage());
 
         }
-
-//        http://mobiwebapi.instancysoft.com/api//MobileLMS/MobileSaveInAppPurchaseDetails?
-
         String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSaveInAppPurchaseDetails?_userId="
                 + myLearningModel.getUserID() + "&_siteURL=" + appUserModel.getSiteURL() + "&_contentId="
                 + myLearningModel.getContentID() + "&_transactionId=" + orderId + "&_receipt="

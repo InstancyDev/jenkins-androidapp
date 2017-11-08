@@ -1390,8 +1390,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("contextmenuid"));
                     //
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7")))
                         continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
@@ -8281,6 +8281,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                         ejectRecordsinCmi(myLearningModel);
                     }
+                } else {
+                    myLearningModel.setStatus("Not Started");
                 }
 
                 getTrackScoIdsAndDeleteCMI(myLearningModel);

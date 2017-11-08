@@ -15,14 +15,18 @@
           <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
     <!--for instancy market place-->
-    <string name="app_default_url">https://learning.instancy.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
-
-    <!--<string name="app_default_url">http://mobile.instancysoft.com/</string>-->
+    <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
-    <!--<string name="app_default_url">http://staging.enlightus.com/</string>-->
+    <!--for app  development place-->
+    <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
+
+    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+
+    <!--    <string name="app_default_url">http://qalearning.instancysoft.com/</string>
+        <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://lsonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
@@ -36,12 +40,16 @@
     <!--<string name="app_default_url">http://ltracktechlifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
 
-    <!--for instancy market place-->
+    <!--for training  place-->
     <!--<string name="app_default_url">https://ecommerce.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://development.instancy.net/</string>
-       <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>  -->
+    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
+
+
+    <string name="app_default_url">http://app.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>
 
     <!--fo enterprise lite app -->
     <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->

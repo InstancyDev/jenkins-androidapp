@@ -153,38 +153,6 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:id="@+id/pricelayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/author_site_layout"
-                        android:orientation="horizontal"
-                        android:padding="1dp">
-
-                        <TextView
-                            android:id="@+id/pricelabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:gravity="left"
-                            android:maxLines="1"
-                            android:padding="1dp"
-                            android:text="Price "
-                            android:textColor="@color/colorGray"
-                            android:textSize="12sp" />
-
-                        <TextView
-                            android:id="@+id/btn_price"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="left"
-                            android:maxLines="1"
-                            android:padding="3dp"
-                            android:paddingLeft="6dp"
-                            android:text="22.4 USD"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
 
                 </RelativeLayout>
 
@@ -230,6 +198,17 @@
                             android:textColor="@color/text_color"
                             android:textSize="24sp" />
 
+                        <TextView
+                            android:id="@+id/btn_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:background="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="$122.0"
+                            android:textColor="@color/colorStatusOther"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
                     </RelativeLayout>
                 </RelativeLayout>

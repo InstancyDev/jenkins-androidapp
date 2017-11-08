@@ -458,53 +458,53 @@ public class MyLearningAdapter extends BaseAdapter {
 // uncomment for crop life
 
         String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
-        if (position == 0 && isViewd.equalsIgnoreCase("false")) {
-
-            ViewTooltip
-                    .on(holder.btnDownload)
-                    .autoHide(true, 5000)
-                    .corner(30)
-                    .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
-                @Override
-                public void onHide(View view) {
-                    appcontroller.setAlreadyViewd(true);
-                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-                }
-            })
-                    .text("Click to download the content").clickToHide(true)
-                    .show();
-
-            ViewTooltip
-                    .on(holder.btnContextMenu)
-                    .autoHide(true, 5000)
-                    .corner(30)
-                    .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
-                    .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
-                @Override
-                public void onHide(View view) {
-                    appcontroller.setAlreadyViewd(true);
-                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-                }
-            })
-                    .show();
-
-            ViewTooltip
-                    .on(holder.imgThumb)
-                    .autoHide(true, 5000)
-                    .corner(30)
-                    .position(ViewTooltip.Position.BOTTOM)
-                    .clickToHide(true)
-                    .animation(new ViewTooltip.FadeTooltipAnimation(500))
-                    .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
-                @Override
-                public void onHide(View view) {
-                    appcontroller.setAlreadyViewd(true);
-                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-                }
-            })
-                    .show();
-
-        }
+//        if (position == 0 && isViewd.equalsIgnoreCase("false")) {
+//
+//            ViewTooltip
+//                    .on(holder.btnDownload)
+//                    .autoHide(true, 5000)
+//                    .corner(30)
+//                    .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
+//                @Override
+//                public void onHide(View view) {
+//                    appcontroller.setAlreadyViewd(true);
+//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+//                }
+//            })
+//                    .text("Click to download the content").clickToHide(true)
+//                    .show();
+//
+//            ViewTooltip
+//                    .on(holder.btnContextMenu)
+//                    .autoHide(true, 5000)
+//                    .corner(30)
+//                    .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
+//                    .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
+//                @Override
+//                public void onHide(View view) {
+//                    appcontroller.setAlreadyViewd(true);
+//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+//                }
+//            })
+//                    .show();
+//
+//            ViewTooltip
+//                    .on(holder.imgThumb)
+//                    .autoHide(true, 5000)
+//                    .corner(30)
+//                    .position(ViewTooltip.Position.BOTTOM)
+//                    .clickToHide(true)
+//                    .animation(new ViewTooltip.FadeTooltipAnimation(500))
+//                    .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
+//                @Override
+//                public void onHide(View view) {
+//                    appcontroller.setAlreadyViewd(true);
+//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+//                }
+//            })
+//                    .show();
+//
+//        }
 
 
         return vi;

@@ -135,7 +135,7 @@ public class CatalogAdapter extends BaseAdapter {
         View vi = convertView;
         if (convertView == null)
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        vi = inflater.inflate(R.layout.catalog_cell, null);
+        vi = inflater.inflate(R.layout.catalog_cell_old, null);
         holder = new ViewHolder(vi);
         holder.parent = parent;
         holder.getPosition = position;
@@ -156,10 +156,18 @@ public class CatalogAdapter extends BaseAdapter {
 
         if (myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
             holder.txtPrice.setText("$" + myLearningModel.get(position).getPrice());
+//            holder.txtPrice.setText(myLearningModel.get(position).getPrice() + " "+myLearningModel.get(position).getCurrency());
             holder.txtPrice.setVisibility(View.VISIBLE);
+//            holder.txtPriceLabel.setVisibility(View.VISIBLE);
         } else {
             holder.txtPrice.setVisibility(View.GONE);
+//            holder.txtPriceLabel.setVisibility(View.GONE);
             holder.txtPrice.setText("");
+        }
+
+        if (myLearningModel.get(position).getAddedToMylearning() == 1) {
+            holder.txtPrice.setVisibility(View.GONE);
+
         }
 
         holder.txtSiteName.setText(" " + myLearningModel.get(position).getSiteName());
@@ -179,6 +187,8 @@ public class CatalogAdapter extends BaseAdapter {
         holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+//        holder.txtPriceLabel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+//        holder.txtPrice.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTag(position);
 //        initVolleyCallback(myLearningModel.get(position), position);
 
@@ -397,6 +407,10 @@ public class CatalogAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.btn_price)
         TextView txtPrice;
+
+//        @Nullable
+//        @BindView(R.id.pricelabel)
+//        TextView txtPriceLabel;
 
 
         @Nullable

@@ -83,7 +83,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -91,6 +90,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -174,15 +174,17 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
         }
-        if (responMap != null && responMap.containsKey("showconsolidatedlearning")) {
-            String consolidate = responMap.get("showconsolidatedlearning");
-            if (consolidate.equalsIgnoreCase("true")) {
+        if (responMap != null && responMap.containsKey("Type")) {
+            String consolidate = responMap.get("Type");
+            if (consolidate.equalsIgnoreCase("consolidate")) {
                 consolidationType = "consolidate";
             } else {
+
+                // keep all
                 consolidationType = "all";
             }
         } else {
-            // No such key
+            // No such key // keep all
             consolidationType = "all";
         }
         if (responMap != null && responMap.containsKey("sortby")) {
@@ -595,6 +597,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         menu.getItem(4).setVisible(false);
                     }
 
+                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                        menu.getItem(4).setVisible(false);
+                    }
+                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+
+                        menu.getItem(4).setVisible(true);
+                    }
                 }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
                 menu.getItem(0).setVisible(false);
@@ -602,6 +611,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 menu.getItem(3).setVisible(true);
                 menu.getItem(1).setVisible(false);
             }
+
+
         }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -928,7 +939,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (originalproductid.length() != 0) {
             Intent intent = new Intent();
             intent.putExtra("learningdata", learningModel);
-            billingProcessor.handleActivityResult(8099, 80, intent);
+            billingProcessor.handleActivityResult(IAP_LAUNCH_FLOW_CODE, 80, intent);
             billingProcessor.purchase(getActivity(), originalproductid);
         } else {
             Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
@@ -1088,21 +1099,28 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
             }
         }
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
 
-            super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IAP_LAUNCH_FLOW_CODE && resultCode == 80) {
+            if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
+
+                super.onActivityResult(requestCode, resultCode, data);
 //            if (data != null) {
 //
 //                MyLearningModel learningModel = (MyLearningModel) data.getSerializableExtra("learningdata");
 ////            billingProcessor.handleActivityResult(8099, 80, intent);
+            }
         }
-
         if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
 
             if (data != null) {
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
 
                 File myFile = new File(myLearningModel.getOfflinepath());
+
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    cmiSynchTask = new CmiSynchTask(context);
+                    cmiSynchTask.execute();
+                }
 
                 if (!myFile.exists()) {
 
@@ -1112,11 +1130,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
                 } else {
 
-                    if (isNetworkConnectionAvailable(getContext(), -1)) {
-                        cmiSynchTask = new CmiSynchTask(context);
-                        cmiSynchTask.execute();
-                    }
+//                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+//                        cmiSynchTask = new CmiSynchTask(context);
+//                        cmiSynchTask.execute();
+//                    }
                 }
+
+
                 injectFromDbtoModel();
             }
 
@@ -1169,7 +1189,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
                         String status = jsonObject.get("status").toString();
-                        String progress = "";
+                        if (status.contains("failed to get statusObject reference not set to an instance of an object.")) {
+                            status = "In Progress";
+                        }
+                        String progress = "0";
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }

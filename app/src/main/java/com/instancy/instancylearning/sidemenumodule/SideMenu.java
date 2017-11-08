@@ -85,7 +85,6 @@ public class SideMenu extends AppCompatActivity {
 
     AppUserModel appUserModel;
 
-
     MenuDrawerDynamicAdapter menuDynamicAdapter;
     PreferencesManager preferencesManager;
     // protected List<Menus> menus = null;

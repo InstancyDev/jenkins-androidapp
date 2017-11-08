@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
 
     defaultConfig {
@@ -17,13 +17,13 @@ android {
 
 // ----------------------------------for instancy lite app-------------------------
 //        applicationId "com.instancy.instancy_lite"
-//        versionCode 3
-//        versionName "1.2"
+//        versionCode 6
+//        versionName "1.5"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
-           applicationId "com.instancy.enterpriselearninglite"
-           versionCode 6
-           versionName "1.5"
+//           applicationId "com.instancy.enterpriselearninglite"
+//           versionCode 7
+//           versionName "1.6"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"
@@ -36,9 +36,9 @@ android {
 //        versionName "1.0"
 
 //  -------------------------------- for trainingcompany app----------------------------------
-//        applicationId "com.instancy.trainingcompany"
-//        versionCode 3
-//        versionName "1.2"
+        applicationId "com.instancy.trainingcompany"
+        versionCode 4
+        versionName "1.3"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.mobileup"
@@ -46,7 +46,7 @@ android {
 //        versionName "1.1"
 
         minSdkVersion 19
-        targetSdkVersion 25
+        targetSdkVersion 26
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

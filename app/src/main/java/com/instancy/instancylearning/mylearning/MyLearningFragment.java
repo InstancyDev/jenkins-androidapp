@@ -874,7 +874,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                 if (!myFile.exists()) {
 
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")|| myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
                         if (isNetworkConnectionAvailable(getContext(), -1)) {
                             getStatusFromServer(myLearningModel);
