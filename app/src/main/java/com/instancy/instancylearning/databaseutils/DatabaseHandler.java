@@ -30,6 +30,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.StudentResponseModel;
 import com.instancy.instancylearning.models.TrackObjectsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.models.UserExperienceModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -229,6 +230,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public static final String TBL_TINCAN = "TINCAN";
 
+
+    public static final String USER_EDUCATION_DETAILS = "USER_EDUCATION_DETAILS";
+    public static final String USER_EXPERIENCE_DETAILS = "USER_EXPERIENCE_DETAILS";
+
     private Context dbctx;
     private WebAPIClient wap;
     private SharedPreferences sharedPreferences;
@@ -364,7 +369,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILEGROUPS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, groupid  TEXT,groupname TEXT, objecttypeid TEXT, siteid TEXT,showinprofile TEXT, userid TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, groupid  TEXT,groupname TEXT, objecttypeid TEXT, siteid TEXT,showinprofile TEXT, userid TEXT, localeid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILECONFIGS
@@ -459,13 +464,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_CATEGORYCOMMUNITYLISTING
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, categoryid INTEGER, name TEXT, shortcategoryname TEXT, categorydescription TEXT, parentid INTEGER, displayorder INTEGER, componentid INTEGER, parentsiteid INTEGER, userid INTEGER, parentsiteurl TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EDUCATION_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, titleeducation TEXT, totalperiod TEXT, fromyear TEXT, degree TEXT, titleid TEXT, userid TEXT, displayno TEXT, description TEXT, toyear TEXT, country TEXT, school TEXT, isupdated TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EXPERIENCE_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,  title TEXT, location TEXT, companyname TEXT, fromdate TEXT, todate TEXT, userid TEXT, description TEXT, difference TEXT, tilldate INTEGER, displayno TEXT, isupdated TEXT)");
+
         Log.d(TAG, "onCreate:  TABLES CREATED");
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
 
     }
 
@@ -630,7 +638,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                             .get("csseditingpalceholdername")
                                             .getAsString()
                                             .equals("#MENU_SL_BG_COLOR#")) {
-                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+                                        uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
                                                 "csseditingpalceholdervalue")
                                                 .getAsString()
                                                 .substring(0, 7));
@@ -1390,8 +1398,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("contextmenuid"));
                     //
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7")))
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7")))
                         continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
@@ -7393,13 +7401,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-
         Cursor isUpdated = null;
         try {
+//            String strUpdate = "UPDATE " + TBL_CMI
+//                    + " SET status = '" + updatedStatus + "' WHERE siteid ='"
+//                    + learningmodel.getSiteID() + "'" + " AND " + " scoid=" + "'" + learningmodel.getScoId() + "'"
+//                    + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
+
             String strUpdate = "UPDATE " + TBL_CMI
-                    + " SET status = '" + updatedStatus + "' WHERE siteid ='"
+                    + " SET status = '" + updatedStatus + ", isupdate= 'false'" + "' WHERE siteid ='"
                     + learningmodel.getSiteID() + "'" + " AND " + " scoid=" + "'" + learningmodel.getScoId() + "'"
                     + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
+
+
             db.execSQL(strUpdate);
 
         } catch (Exception e) {
@@ -8360,199 +8374,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void InjectAllProfileDetails(JSONObject jsonObject, String userID) throws JSONException {
-
         if (jsonObject != null || jsonObject.length() != 0) {
 
             Log.d(TAG, "InjectAllProfileDetails: " + jsonObject);
 
             JSONArray jsonProfileAry = null;
-            JSONArray jsonConfigAry = null;
+
             JSONArray jsonGroupsAry = null;
-            JSONArray json = null;
-            jsonProfileAry = jsonObject.getJSONArray("table");
-            jsonConfigAry = jsonObject.getJSONArray("table1");
-            jsonGroupsAry = jsonObject.getJSONArray("table2");
-            json = jsonObject.getJSONArray("table3");
 
-            Log.d(TAG, "InjectAllProfileDetails: length " + jsonProfileAry.length());
+            JSONArray jsonEducationAry = null;
 
-            if (jsonProfileAry.length() > 0) {
+            JSONArray jsonExperienceAry = null;
 
-                String deleteStr = "DELETE FROM " + TBL_USERPROFILEFIELDS + " WHERE userid =  and siteid =";
+            jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
+            jsonGroupsAry = jsonObject.getJSONArray("userprofilegroups");
 
-
-                for (int i = 0; i < jsonProfileAry.length(); i++) {
-                    ProfileDetailsModel profileModel = new ProfileDetailsModel();
-
-                    SQLiteDatabase db = this.getWritableDatabase();
-                    try {
-                        String strDelete = "DELETE FROM " + TBL_USERPROFILEFIELDS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
-                        db.execSQL(strDelete);
-
-                    } catch (SQLiteException sqlEx) {
-
-                        sqlEx.printStackTrace();
-                    }
-
-                    JSONObject profileObj = jsonProfileAry.getJSONObject(i);
+            jsonEducationAry = jsonObject.getJSONArray("usereducationdata");
+            jsonExperienceAry = jsonObject.getJSONArray("userexperiencedata");
 
 
-                    if (profileObj.has("firstname")) {
-
-                        profileModel.firstname = profileObj.get("firstname").toString();
-                    }
-                    if (profileObj.has("lastname")) {
-                        profileModel.lastname = profileObj.get("lastname").toString();
-                    }
-                    if (profileObj.has("accounttype")) {
-                        profileModel.accounttype = profileObj.get("accounttype").toString();
-                    }
-                    if (profileObj.has("orgunitid")) {
-                        profileModel.orgunitid = profileObj.get("orgunitid").toString();
-                    }
-                    if (profileObj.has("siteid")) {
-                        profileModel.siteid = profileObj.get("siteid").toString();
-                    }
-                    if (profileObj.has("approvalstatus")) {
-                        profileModel.approvalstatus = profileObj.get("approvalstatus").toString();
-                    }
-                    if (profileObj.has("displayname")) {
-                        profileModel.displayname = profileObj.get("displayname").toString();
-                    }
-                    if (profileObj.has("organization")) {
-                        profileModel.organization = profileObj.get("organization").toString();
-                    }
-                    if (profileObj.has("email")) {
-                        profileModel.email = profileObj.get("email").toString();
-                    }
-                    if (profileObj.has("usersite")) {
-                        profileModel.usersite = profileObj.get("usersite").toString();
-                    }
-                    if (profileObj.has("supervisoremployeeid")) {
-                        profileModel.supervisoremployeeid = profileObj.get("supervisoremployeeid").toString();
-                    }
-                    if (profileObj.has("addressline1")) {
-                        profileModel.addressline1 = profileObj.get("addressline1").toString();
-                    }
-                    if (profileObj.has("addresscity")) {
-                        profileModel.addresscity = profileObj.get("addresscity").toString();
-                    }
-                    if (profileObj.has("addressstate")) {
-                        profileModel.addressstate = profileObj.get("addressstate").toString();
-                    }
-                    if (profileObj.has("addresszip")) {
-                        profileModel.addresszip = profileObj.get("addresszip").toString();
-                    }
-                    if (profileObj.has("addresscountry")) {
-                        profileModel.addresscountry = profileObj.get("addresscountry").toString();
-                    }
-                    if (profileObj.has("phone")) {
-                        profileModel.phone = profileObj.get("phone").toString();
-                    }
-                    if (profileObj.has("mobilephone")) {
-                        profileModel.mobilephone = profileObj.get("mobilephone").toString();
-                    }
-                    if (profileObj.has("imaddress")) {
-                        profileModel.imaddress = profileObj.get("imaddress").toString();
-                    }
-                    if (profileObj.has("dateofbirth")) {
-                        profileModel.dateofbirth = profileObj.get("dateofbirth").toString();
-                    }
-                    if (profileObj.has("gender")) {
-                        profileModel.gender = profileObj.get("gender").toString();
-                    }
-                    if (profileObj.has("nvarchar6")) {
-                        profileModel.nvarchar6 = profileObj.get("nvarchar6").toString();
-                    }
-                    if (profileObj.has("paymentmode")) {
-                        profileModel.paymentmode = profileObj.get("paymentmode").toString();
-                    }
-                    if (profileObj.has("nvarchar7")) {
-                        profileModel.nvarchar7 = profileObj.get("nvarchar7").toString();
-                    }
-                    if (profileObj.has("nvarchar8")) {
-                        profileModel.nvarchar8 = profileObj.get("nvarchar8").toString();
-                    }
-                    if (profileObj.has("nvarchar9")) {
-                        profileModel.nvarchar9 = profileObj.get("nvarchar9").toString();
-                    }
-                    if (profileObj.has("securepaypalid")) {
-                        profileModel.securepaypalid = profileObj.get("securepaypalid").toString();
-                    }
-                    if (profileObj.has("nvarchar10")) {
-                        profileModel.nvarchar10 = profileObj.get("nvarchar10").toString();
-                    }
-                    if (profileObj.has("picture")) {
-                        profileModel.picture = profileObj.get("picture").toString();
-                    }
-                    if (profileObj.has("highschool")) {
-                        profileModel.highschool = profileObj.get("highschool").toString();
-                    }
-                    if (profileObj.has("college")) {
-                        profileModel.college = profileObj.get("college").toString();
-                    }
-                    if (profileObj.has("jobtitle")) {
-                        profileModel.jobtitle = profileObj.get("jobtitle").toString();
-                    }
-                    if (profileObj.has("businessfunction")) {
-                        profileModel.businessfunction = profileObj.get("businessfunction").toString();
-                    }
-                    if (profileObj.has("primaryjobfunction")) {
-                        profileModel.primaryjobfunction = profileObj.get("primaryjobfunction").toString();
-                    }
-                    if (profileObj.has("payeeaccountno")) {
-                        profileModel.payeeaccountno = profileObj.get("payeeaccountno").toString();
-                    }
-
-                    if (profileObj.has("payeename")) {
-                        profileModel.payeename = profileObj.get("payeename").toString();
-                    }
-                    if (profileObj.has("paypalaccountname")) {
-                        profileModel.paypalaccountname = profileObj.get("paypalaccountname").toString();
-                    }
-                    if (profileObj.has("paypalemail")) {
-                        profileModel.paypalemail = profileObj.get("paypalemail").toString();
-                    }
-
-                    if (profileObj.has("shipaddline1")) {
-                        profileModel.shipaddline1 = profileObj.get("shipaddline1").toString();
-                    }
-                    if (profileObj.has("shipaddcity")) {
-                        profileModel.shipaddcity = profileObj.get("shipaddcity").toString();
-                    }
-
-                    if (profileObj.has("shipaddstate")) {
-                        profileModel.shipaddstate = profileObj.get("shipaddstate").toString();
-                    }
-                    if (profileObj.has("shipaddzip")) {
-                        profileModel.shipaddzip = profileObj.get("shipaddzip").toString();
-                    }
-
-                    if (profileObj.has("shipaddcountry")) {
-                        profileModel.shipaddcountry = profileObj.get("shipaddcountry").toString();
-                    }
-                    if (profileObj.has("shipaddphone")) {
-                        profileModel.shipaddphone = profileObj.get("shipaddphone").toString();
-                    }
-
-                    profileModel.objetId = userID;
-
-                    Log.d(TAG, "InjectAllProfileDetails: at index " + profileModel);
-                    injectProfileIntoTable(profileModel);
-                }
-
-            }
-
-
-            if (jsonConfigAry.length() > 0) {
-                injectProfileConfigs(jsonConfigAry, userID);
-            }
-
+            // for all groups and chaild data
             if (jsonGroupsAry.length() > 0) {
 
                 injectProfileGroups(jsonGroupsAry, userID);
             }
 
+            // for all profile data
+            if (jsonProfileAry.length() > 0) {
+
+                injectProfileDetails(jsonProfileAry, userID);
+            }
+
+            // for all education data
+            if (jsonEducationAry.length() > 0) {
+
+                injectUserEducation(jsonEducationAry, userID);
+            }
+
+            // for experience data
+            if (jsonExperienceAry.length() > 0) {
+
+                injectUserExperience(jsonExperienceAry, userID);
+            }
 
         }
     }
@@ -8747,13 +8610,180 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+    public void injectProfileDetails(JSONArray jsonProfileAry, String userID) throws JSONException {
+
+        if (jsonProfileAry.length() > 0) {
+
+
+            for (int i = 0; i < jsonProfileAry.length(); i++) {
+                ProfileDetailsModel profileModel = new ProfileDetailsModel();
+
+                SQLiteDatabase db = this.getWritableDatabase();
+                try {
+                    String strDelete = "DELETE FROM " + TBL_USERPROFILEFIELDS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                    db.execSQL(strDelete);
+
+                } catch (SQLiteException sqlEx) {
+
+                    sqlEx.printStackTrace();
+                }
+
+                JSONObject profileObj = jsonProfileAry.getJSONObject(i);
+
+
+                if (profileObj.has("firstname")) {
+
+                    profileModel.firstname = profileObj.get("firstname").toString();
+                }
+                if (profileObj.has("lastname")) {
+                    profileModel.lastname = profileObj.get("lastname").toString();
+                }
+                if (profileObj.has("accounttype")) {
+                    profileModel.accounttype = profileObj.get("accounttype").toString();
+                }
+                if (profileObj.has("orgunitid")) {
+                    profileModel.orgunitid = profileObj.get("orgunitid").toString();
+                }
+                if (profileObj.has("siteid")) {
+                    profileModel.siteid = profileObj.get("siteid").toString();
+                }
+                if (profileObj.has("approvalstatus")) {
+                    profileModel.approvalstatus = profileObj.get("approvalstatus").toString();
+                }
+                if (profileObj.has("displayname")) {
+                    profileModel.displayname = profileObj.get("displayname").toString();
+                }
+                if (profileObj.has("organization")) {
+                    profileModel.organization = profileObj.get("organization").toString();
+                }
+                if (profileObj.has("email")) {
+                    profileModel.email = profileObj.get("email").toString();
+                }
+                if (profileObj.has("usersite")) {
+                    profileModel.usersite = profileObj.get("usersite").toString();
+                }
+                if (profileObj.has("supervisoremployeeid")) {
+                    profileModel.supervisoremployeeid = profileObj.get("supervisoremployeeid").toString();
+                }
+                if (profileObj.has("addressline1")) {
+                    profileModel.addressline1 = profileObj.get("addressline1").toString();
+                }
+                if (profileObj.has("addresscity")) {
+                    profileModel.addresscity = profileObj.get("addresscity").toString();
+                }
+                if (profileObj.has("addressstate")) {
+                    profileModel.addressstate = profileObj.get("addressstate").toString();
+                }
+                if (profileObj.has("addresszip")) {
+                    profileModel.addresszip = profileObj.get("addresszip").toString();
+                }
+                if (profileObj.has("addresscountry")) {
+                    profileModel.addresscountry = profileObj.get("addresscountry").toString();
+                }
+                if (profileObj.has("phone")) {
+                    profileModel.phone = profileObj.get("phone").toString();
+                }
+                if (profileObj.has("mobilephone")) {
+                    profileModel.mobilephone = profileObj.get("mobilephone").toString();
+                }
+                if (profileObj.has("imaddress")) {
+                    profileModel.imaddress = profileObj.get("imaddress").toString();
+                }
+                if (profileObj.has("dateofbirth")) {
+                    profileModel.dateofbirth = profileObj.get("dateofbirth").toString();
+                }
+                if (profileObj.has("gender")) {
+                    profileModel.gender = profileObj.get("gender").toString();
+                }
+                if (profileObj.has("nvarchar6")) {
+                    profileModel.nvarchar6 = profileObj.get("nvarchar6").toString();
+                }
+                if (profileObj.has("paymentmode")) {
+                    profileModel.paymentmode = profileObj.get("paymentmode").toString();
+                }
+                if (profileObj.has("nvarchar7")) {
+                    profileModel.nvarchar7 = profileObj.get("nvarchar7").toString();
+                }
+                if (profileObj.has("nvarchar8")) {
+                    profileModel.nvarchar8 = profileObj.get("nvarchar8").toString();
+                }
+                if (profileObj.has("nvarchar9")) {
+                    profileModel.nvarchar9 = profileObj.get("nvarchar9").toString();
+                }
+                if (profileObj.has("securepaypalid")) {
+                    profileModel.securepaypalid = profileObj.get("securepaypalid").toString();
+                }
+                if (profileObj.has("nvarchar10")) {
+                    profileModel.nvarchar10 = profileObj.get("nvarchar10").toString();
+                }
+                if (profileObj.has("picture")) {
+                    profileModel.picture = profileObj.get("picture").toString();
+                }
+                if (profileObj.has("highschool")) {
+                    profileModel.highschool = profileObj.get("highschool").toString();
+                }
+                if (profileObj.has("college")) {
+                    profileModel.college = profileObj.get("college").toString();
+                }
+                if (profileObj.has("jobtitle")) {
+                    profileModel.jobtitle = profileObj.get("jobtitle").toString();
+                }
+                if (profileObj.has("businessfunction")) {
+                    profileModel.businessfunction = profileObj.get("businessfunction").toString();
+                }
+                if (profileObj.has("primaryjobfunction")) {
+                    profileModel.primaryjobfunction = profileObj.get("primaryjobfunction").toString();
+                }
+                if (profileObj.has("payeeaccountno")) {
+                    profileModel.payeeaccountno = profileObj.get("payeeaccountno").toString();
+                }
+
+                if (profileObj.has("payeename")) {
+                    profileModel.payeename = profileObj.get("payeename").toString();
+                }
+                if (profileObj.has("paypalaccountname")) {
+                    profileModel.paypalaccountname = profileObj.get("paypalaccountname").toString();
+                }
+                if (profileObj.has("paypalemail")) {
+                    profileModel.paypalemail = profileObj.get("paypalemail").toString();
+                }
+
+                if (profileObj.has("shipaddline1")) {
+                    profileModel.shipaddline1 = profileObj.get("shipaddline1").toString();
+                }
+                if (profileObj.has("shipaddcity")) {
+                    profileModel.shipaddcity = profileObj.get("shipaddcity").toString();
+                }
+
+                if (profileObj.has("shipaddstate")) {
+                    profileModel.shipaddstate = profileObj.get("shipaddstate").toString();
+                }
+                if (profileObj.has("shipaddzip")) {
+                    profileModel.shipaddzip = profileObj.get("shipaddzip").toString();
+                }
+
+                if (profileObj.has("shipaddcountry")) {
+                    profileModel.shipaddcountry = profileObj.get("shipaddcountry").toString();
+                }
+                if (profileObj.has("shipaddphone")) {
+                    profileModel.shipaddphone = profileObj.get("shipaddphone").toString();
+                }
+
+                profileModel.userid = userID;
+
+                Log.d(TAG, "InjectAllProfileDetails: at index " + profileModel);
+                injectProfileIntoTable(profileModel);
+            }
+
+        }
+
+    }
+
     public void injectProfileGroups(JSONArray jsonGroupsAry, String userID) throws JSONException {
-
-
-        String[] profileAry = {"objectid", "accounttype", "orgunitid", "siteid", "approvalstatus", "firstname", "lastname", "displayname", "organization", "email", "usersite", "supervisoremployeeid", "addressline1", "addresscity", "addressstate", "addresszip", "addresscountry", "phone", "mobilephone", "imaddress", "dateofbirth", "gender", "nvarchar6", "paymentmode", "nvarchar7", "nvarchar8", "nvarchar9", "securepaypalid", "nvarchar10", "picture", "highschool", "college", "highestdegree", "jobtitle", "businessfunction", "primaryjobfunction", "payeeaccountno", "payeename", "paypalaccountname", "paypalemail", "shipaddline1", "shipaddcity", "shipaddstate", "shipaddzip", "shipaddcountry", "shipaddphone"};
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
+
             String strDelete = "DELETE FROM " + TBL_USERPROFILEGROUPS + " WHERE userid   = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
             db.execSQL(strDelete);
 
@@ -8764,73 +8794,264 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonGroupsAry.length(); i++) {
 
-            JSONObject profileObj = jsonGroupsAry.getJSONObject(i);
+            JSONObject profileGroupObj = jsonGroupsAry.getJSONObject(i);
 
-            if (profileObj.has("datafieldname")) {
+            JSONObject jsonObjectProfileConfigs = jsonGroupsAry.getJSONObject(i);
+            if (jsonObjectProfileConfigs.has("datafilelist")) {
 
-                String dataFieldName = profileObj.get("datafieldname").toString();
+//                injectProfileDetail(jsonObjectProfileConfigs, userID);
+                JSONArray jsonProfileConfigArray = jsonObjectProfileConfigs.getJSONArray("datafilelist");
 
-                for (String fieldName : profileAry) {
+                if (jsonProfileConfigArray.length() > 0) {
 
-                    if (dataFieldName.toLowerCase().contains(fieldName)) {
-                        Log.d(TAG, "injectProfileConfigs: dataFieldName " + dataFieldName);
+                    injectProfileConfigs(jsonProfileConfigArray, userID);
 
-                        String aliasname = "";
-                        String attributedisplaytext = "";
-                        String groupid = "";
-                        String displayOrder = "";
-                        String attributeconfigid = "";
-
-                        if (profileObj.has("aliasname")) {
-
-                            aliasname = profileObj.get("aliasname").toString();
-                        }
-                        if (profileObj.has("attributedisplaytext")) {
-
-                            attributedisplaytext = profileObj.get("attributedisplaytext").toString();
-                        }
-
-                        if (profileObj.has("groupid")) {
-
-                            groupid = profileObj.get("groupid").toString();
-                        }
-
-                        if (profileObj.has("displayorder")) {
-
-                            displayOrder = profileObj.get("displayorder").toString();
-                        }
-
-                        if (profileObj.has("attributeconfigid")) {
-                            attributeconfigid = profileObj.get("attributeconfigid").toString();
-
-                        }
-
-                        ContentValues contentValues = null;
-                        try {
-                            contentValues = new ContentValues();
-                            contentValues.put("aliasname", aliasname);
-                            contentValues.put("attributedisplaytext", attributedisplaytext);
-                            contentValues.put("groupid", groupid);
-                            contentValues.put("displayOrder", displayOrder);
-                            contentValues.put("attributeconfigid", attributeconfigid);
-                            contentValues.put("userid", userID);
-                            contentValues.put("siteid", appUserModel.getSiteIDValue());
-
-                            db.insert(TBL_USERPROFILEGROUPS, null, contentValues);
-                        } catch (SQLiteException exception) {
-
-                            exception.printStackTrace();
-                        }
-
-                    }
-
+                } else {
+                    continue;
                 }
 
             }
+
+            String groupid = "";
+            String groupname = "";
+            String objecttypeid = "";
+            String showinprofile = "";
+            String localeid = "";
+
+            if (profileGroupObj.has("groupname")) {
+
+                groupname = profileGroupObj.get("groupname").toString();
+            }
+
+            if (groupname.contains("None"))
+                continue;
+
+            if (profileGroupObj.has("groupid")) {
+
+                groupid = profileGroupObj.get("groupid").toString();
+            }
+
+
+            if (profileGroupObj.has("groupid")) {
+
+                groupid = profileGroupObj.get("groupid").toString();
+            }
+
+            if (profileGroupObj.has("objecttypeid")) {
+
+                objecttypeid = profileGroupObj.get("objecttypeid").toString();
+            }
+
+            if (profileGroupObj.has("showinprofile")) {
+                showinprofile = profileGroupObj.get("showinprofile").toString();
+
+            }
+
+            if (profileGroupObj.has("localeid")) {
+                localeid = profileGroupObj.get("localeid").toString();
+
+            }
+
+            ContentValues contentValues = null;
+            try {
+                contentValues = new ContentValues();
+                contentValues.put("groupid", groupid);
+                contentValues.put("groupname", groupname);
+                contentValues.put("objecttypeid", objecttypeid);
+                contentValues.put("showinprofile", showinprofile);
+                contentValues.put("userid", userID);
+                contentValues.put("localeid", localeid);
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+                db.insert(TBL_USERPROFILEGROUPS, null, contentValues);
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+
+    public void injectUserExperience(JSONArray jsonExperienceAry, String userID) throws JSONException {
+
+        if (jsonExperienceAry.length() > 0) {
+
+
+            for (int i = 0; i < jsonExperienceAry.length(); i++) {
+
+                UserExperienceModel userExperienceModel = new UserExperienceModel();
+
+                SQLiteDatabase db = this.getWritableDatabase();
+                try {
+                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                    db.execSQL(strDelete);
+
+                } catch (SQLiteException sqlEx) {
+
+                    sqlEx.printStackTrace();
+                }
+
+                JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
+
+                if (experiencObj.has("firstname")) {
+
+                    userExperienceModel.userID = experiencObj.get("firstname").toString();
+                }
+                if (experiencObj.has("lastname")) {
+                    userExperienceModel.title = experiencObj.get("lastname").toString();
+                }
+                if (experiencObj.has("accounttype")) {
+                    userExperienceModel.location = experiencObj.get("accounttype").toString();
+                }
+                if (experiencObj.has("orgunitid")) {
+                    userExperienceModel.description = experiencObj.get("orgunitid").toString();
+                }
+                if (experiencObj.has("siteid")) {
+                    userExperienceModel.difference = experiencObj.get("siteid").toString();
+                }
+                if (experiencObj.has("approvalstatus")) {
+                    userExperienceModel.displayNo = experiencObj.get("approvalstatus").toString();
+                }
+                if (experiencObj.has("displayname")) {
+                    userExperienceModel.fromDate = experiencObj.get("displayname").toString();
+                }
+                if (experiencObj.has("organization")) {
+                    userExperienceModel.toDate = experiencObj.get("organization").toString();
+                }
+
+                if (experiencObj.has("usersite")) {
+                    userExperienceModel.companyName = experiencObj.get("usersite").toString();
+                }
+
+                userExperienceModel.userID = userID;
+
+                Log.d(TAG, "InjectAllProfileDetails: at index " + userExperienceModel);
+                injectExperienceIntoTable(userExperienceModel);
+            }
+
         }
 
 
     }
+
+    public void injectExperienceIntoTable(UserExperienceModel experienceModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        try {
+            contentValues = new ContentValues();
+            contentValues.put("title", experienceModel.title);
+            contentValues.put("location", experienceModel.location);
+            contentValues.put("companyname", experienceModel.companyName);
+            contentValues.put("fromdate", experienceModel.fromDate);
+            contentValues.put("todate", experienceModel.toDate);
+            contentValues.put("userid", experienceModel.userID);
+            contentValues.put("description", experienceModel.description);
+            contentValues.put("difference", experienceModel.difference);
+            contentValues.put("tilldate", experienceModel.tillDate);
+            contentValues.put("displayno", experienceModel.displayNo);
+            contentValues.put("isupdated", true);
+
+
+            db.insert(USER_EXPERIENCE_DETAILS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
+
+    public void injectUserEducation(JSONArray jsonExperienceAry, String userID) throws JSONException {
+
+        if (jsonExperienceAry.length() > 0) {
+
+
+            for (int i = 0; i < jsonExperienceAry.length(); i++) {
+
+                UserExperienceModel userExperienceModel = new UserExperienceModel();
+
+                SQLiteDatabase db = this.getWritableDatabase();
+                try {
+                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                    db.execSQL(strDelete);
+
+                } catch (SQLiteException sqlEx) {
+
+                    sqlEx.printStackTrace();
+                }
+
+                JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
+
+                if (experiencObj.has("firstname")) {
+
+                    userExperienceModel.userID = experiencObj.get("firstname").toString();
+                }
+                if (experiencObj.has("lastname")) {
+                    userExperienceModel.title = experiencObj.get("lastname").toString();
+                }
+                if (experiencObj.has("accounttype")) {
+                    userExperienceModel.location = experiencObj.get("accounttype").toString();
+                }
+                if (experiencObj.has("orgunitid")) {
+                    userExperienceModel.description = experiencObj.get("orgunitid").toString();
+                }
+                if (experiencObj.has("siteid")) {
+                    userExperienceModel.difference = experiencObj.get("siteid").toString();
+                }
+                if (experiencObj.has("approvalstatus")) {
+                    userExperienceModel.displayNo = experiencObj.get("approvalstatus").toString();
+                }
+                if (experiencObj.has("displayname")) {
+                    userExperienceModel.fromDate = experiencObj.get("displayname").toString();
+                }
+                if (experiencObj.has("organization")) {
+                    userExperienceModel.toDate = experiencObj.get("organization").toString();
+                }
+
+                if (experiencObj.has("usersite")) {
+                    userExperienceModel.companyName = experiencObj.get("usersite").toString();
+                }
+
+                userExperienceModel.userID = userID;
+
+                Log.d(TAG, "InjectAllProfileDetails: at index " + userExperienceModel);
+                injectEducationIntoTable(userExperienceModel);
+            }
+
+        }
+
+
+    }
+
+    public void injectEducationIntoTable(UserExperienceModel experienceModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        try {
+            contentValues = new ContentValues();
+            contentValues.put("title", experienceModel.title);
+            contentValues.put("location", experienceModel.location);
+            contentValues.put("companyname", experienceModel.companyName);
+            contentValues.put("fromdate", experienceModel.fromDate);
+            contentValues.put("todate", experienceModel.toDate);
+            contentValues.put("userid", experienceModel.userID);
+            contentValues.put("description", experienceModel.description);
+            contentValues.put("difference", experienceModel.difference);
+            contentValues.put("tilldate", experienceModel.tillDate);
+            contentValues.put("displayno", experienceModel.displayNo);
+            contentValues.put("isupdated", true);
+
+
+            db.insert(USER_EDUCATION_DETAILS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
 
     public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel) throws JSONException {
 

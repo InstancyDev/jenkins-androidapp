@@ -161,13 +161,27 @@ public class SideMenu extends AppCompatActivity {
                 lastClicked = 0;
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
+            navDrawerExpandableView.setOnGroupExpandListener((new ExpandableListView.OnGroupExpandListener() {
+                @Override
+                public void onGroupExpand(int groupPosition) {
+                    int len = menuDynamicAdapter.getGroupCount();
+
+                    for (int i = 0; i < len; i++) {
+                        if (i != groupPosition) {
+                            navDrawerExpandableView.collapseGroup(i);
+                        }
+                    }
+                }
+
+            }));
+
             navDrawerExpandableView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 //                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
                     int logoutPos = sideMenusModel.size() - 1;
 
-                    String filterCondition = sideMenusModel.get(groupPosition).getConditions();
+//                    String filterCondition = sideMenusModel.get(groupPosition).getConditions();
                     if (logoutPos == groupPosition) {
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -189,9 +203,14 @@ public class SideMenu extends AppCompatActivity {
                     }
                     drawer.closeDrawer(Gravity.LEFT);
                     lastClicked = groupPosition;
+
                     return false;
                 }
+
+
             });
+
+            navDrawerExpandableView.expandGroup(lastClicked);
         }
     }
 

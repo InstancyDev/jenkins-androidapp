@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.mainactivities;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -28,6 +29,8 @@ import com.instancy.instancylearning.interfaces.LRSJavaScriptInterface;
 import com.instancy.instancylearning.interfaces.hideProgressListner;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.mukesh.Prevailer;
+import com.mukesh.PrevailerFactory;
 
 /**
  * Created by Upendranath on 6/29/2017 Working on InstancyLearning.
@@ -60,13 +63,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
-//            try {
-//                courseUrl = URLEncoder.encode(courseUrl, "UTF-8");
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
+
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-//            showSvProgressAlert(svProgressHUD);
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
             clearWebViewAbsolutely(adWebView);
@@ -78,11 +76,17 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             } else {
                 isOffline = false;
             }
-            if (savedInstanceState != null) {
-                adWebView.restoreState(savedInstanceState);
-            } else {
+//            if (savedInstanceState != null) {
+//                adWebView.restoreState(savedInstanceState);
+//            } else {
+//                adWebView.loadUrl(courseUrl);
+//            }
+
+            if (savedInstanceState == null)
+            {
                 adWebView.loadUrl(courseUrl);
             }
+
         }
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
@@ -366,21 +370,17 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState )
+    {
         super.onSaveInstanceState(outState);
-//        adWebView.saveState(outState);
-
+        adWebView.saveState(outState);
     }
 
     @Override
-    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
         super.onRestoreInstanceState(savedInstanceState);
-
-//        if (savedInstanceState != null) {
-//            adWebView.restoreState(savedInstanceState);
-//        }
-
-
+        adWebView.restoreState(savedInstanceState);
     }
 
 }

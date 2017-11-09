@@ -90,8 +90,8 @@
         <!--ADVANCED WEBVIEW -->
         <activity
             android:name=".mainactivities.AdvancedWebCourseLaunch"
-            android:configChanges="keyboard|keyboardHidden|orientation"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            > </activity>
 
         <activity
             android:name=".mainactivities.PdfViewer_Activity"

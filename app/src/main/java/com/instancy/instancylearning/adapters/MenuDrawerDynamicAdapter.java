@@ -155,15 +155,24 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             pView = inflater.inflate(R.layout.drawermenu_item, parentView, false);
         }
-        if (pView.isSelected()) {
-            // set your color
-            pView.setBackgroundColor(Color.RED);
-        }
 
         TextView txtTitle = (TextView) pView.findViewById(R.id.menuText);
         ImageView expIcon = (ImageView) pView.findViewById(R.id.expIcon);
         TextView fontIcon = (TextView) pView.findViewById(R.id.fontawasomeIcon);
-        fontIcon.setTextColor(pView.getResources().getColor(R.color.colorDarkGrey));
+
+        if(isExpanded){
+            pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
+            txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
+            fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
+        }
+        else {
+//            pView.setBackgroundColor(Color.WHITE);
+            pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+            txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+            fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+
+        }
+
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);
 
         switch (mainMenu.getContextMenuId()) {
@@ -221,13 +230,13 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         } else {
             expIcon.setVisibility(View.GONE);
         }
-//        if (parentPosition % 2 == 0) {
-//            pView.setBackgroundColor(Color
-//                    .parseColor("#5DB100"));
-//        } else {
-//            pView.setBackgroundColor(Color
-//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-//        }
+        if (parentPosition % 2 == 0) {
+            pView.setBackgroundColor(Color
+                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+        } else {
+            pView.setBackgroundColor(Color
+                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+        }
         return pView;
     }
 

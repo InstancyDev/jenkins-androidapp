@@ -42,7 +42,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/playground" />
+                android:src="@drawable/marketplacelogo" />
 
             <RelativeLayout
                 android:id="@+id/rlUsername"

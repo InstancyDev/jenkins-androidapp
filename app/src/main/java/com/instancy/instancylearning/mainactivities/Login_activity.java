@@ -344,7 +344,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
 
-//        profileWebCall("1");
+        profileWebCall("1");
 
         if (userName.length() < 1) {
             Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
@@ -478,8 +478,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
                                     String userId = jsonobj.get("userid").toString();
 
+                                    appUserModel.setUserIDValue(userId);
 
-//                                    profileWebCall(userId);
+                                    profileWebCall(userId);
 
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -516,9 +517,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     private void profileWebCall(String userId) {
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL();
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
 
         urlStr = urlStr.replaceAll(" ", "%20");
+
+        Log.d(TAG, "profileWebCall: " + urlStr);
 
         vollyService.getJsonObjResponseVolley("PROFILEDATA", urlStr, appUserModel.getAuthHeaders());
 
@@ -670,14 +673,16 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-                Log.d(TAG, "Volley Profiledata " + requestType);
-                Log.d(TAG, "Volley Profiledata JSON post" + response);
+//                Log.d(TAG, "Volley Profiledata " + requestType);
+//                Log.d(TAG, "Volley Profiledata JSON post" + response);
 
                 if (requestType.equalsIgnoreCase("PROFILEDATA")) {
                     if (response != null) {
 
                         try {
-                            db.InjectAllProfileDetails(response, "1");
+//             Uncomment for old         db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
+
+                            db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -705,19 +710,19 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
-                if (requestType.equalsIgnoreCase("MLADP")) {
-
-                    if (response != null) {
-                        try {
-                            db.injectCMIDataInto(response, myLearningModel);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-
-                    }
-
-                }
+//                if (requestType.equalsIgnoreCase("MLADP")) {
+//
+//                    if (response != null) {
+//                        try {
+//                            db.injectCMIDataInto(response, myLearningModel);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    } else {
+//
+//                    }
+//
+//                }
 
                 svProgressHUD.dismiss();
             }

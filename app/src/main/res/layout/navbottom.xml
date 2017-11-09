@@ -112,7 +112,7 @@
         android:padding="3dp"
         android:background="@color/colorGray"
         android:scaleType="centerInside"
-        android:src="@drawable/bottom_ecommerce"
+        android:src="@drawable/bottom_marketplace"
         android:visibility="visible" />
 
 </LinearLayout>
