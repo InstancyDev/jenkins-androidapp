@@ -88,6 +88,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
@@ -302,7 +303,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
         initilizeView();
 
-        if (isNetworkConnectionAvailable(getContext(), -1)) {
+        if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
             refreshCatalog(false);
         } else {
             injectFromDbtoModel();
@@ -486,6 +487,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: in Mylearning fragment");
+        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 2;
+    }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
@@ -1000,7 +1009,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 break;
             }
         }
-        // upendranath reddy poreddy 918099999060 pytm0123456
         boolean status = false;
         String orderId = "";
         String productId = "";

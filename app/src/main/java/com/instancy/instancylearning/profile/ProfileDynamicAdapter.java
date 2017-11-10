@@ -48,14 +48,14 @@ public class ProfileDynamicAdapter extends BaseExpandableListAdapter {
     @Override
     public int getGroupCount() {
 
-        return 3;
+        return 2;
 
     }
 
     @Override
     public int getChildrenCount(int parentPosition) {
 
-        return 5;
+        return 3;
     }
 
     @Override

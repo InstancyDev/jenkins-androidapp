@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.profile;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -22,6 +24,9 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.ProfileConfigsModel;
+import com.instancy.instancylearning.models.ProfileDetailsModel;
+import com.instancy.instancylearning.models.ProfileGroupModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
@@ -62,6 +67,7 @@ public class Profile_fragment extends Fragment {
     DatabaseHandler db;
     PreferencesManager preferencesManager;
     Context context;
+    ContentValues cvEditFields = null;
 
     private List<SideMenusModel> sideMenusModelList = new ArrayList<>();
     SideMenusModel sideMenusModel;
@@ -83,7 +89,6 @@ public class Profile_fragment extends Fragment {
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(context);
         db = new DatabaseHandler(context);
-
 
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
@@ -110,6 +115,55 @@ public class Profile_fragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        boolean isProfileExists = getALlProfilesDetailsFromDB();
+
+
+    }
+
+
+    public boolean getALlProfilesDetailsFromDB() {
+
+        boolean isProfileExists = false;
+        List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
+
+        List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
+
+        ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
+
+        profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+        if (!profileDetailsModel.isProfilexist) {
+
+            return false;
+        }
+
+        profileGroupModelList = db.fetchProfileGroupNames(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+        profileConfigsModelList = db.fetchUserConfigs(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
+
+        isProfileExists = true;
+        HashMapGenerate();
+        return isProfileExists;
+
+    }
+
+
+    public void HashMapGenerate() {
+        HashMap<String, ArrayList<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, ArrayList<ProfileConfigsModel>>();
+
+        ContentValues cvFields = new ContentValues();
+        cvFields = db.getProfileFieldsDictionary(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
+        if (cvFields != null) {
+            cvEditFields = new ContentValues();
+            cvEditFields.putAll(cvFields);
+        }
+
+
+        ArrayList<ProfileConfigsModel> filteredGroups = new ArrayList<ProfileConfigsModel>();
+
+        filteredGroups = db.getProfileConfigsArray(appUserModel.getSiteIDValue(), "1");
 
     }
 

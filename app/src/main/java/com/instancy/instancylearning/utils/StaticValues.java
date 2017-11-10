@@ -249,4 +249,7 @@ public class StaticValues {
     public static int SUB_MENU_POSITION = -1;
 
 
+    public static int MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+    public static int CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
 }

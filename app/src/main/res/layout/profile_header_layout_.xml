@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upendranath"
+            android:textColor="@color/colorWhite"
             android:textStyle="bold" />
 
         <Space
@@ -39,6 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hyderabad"
+            android:textColor="@color/colorWhite"
             android:textStyle="bold" />
 
     </LinearLayout>

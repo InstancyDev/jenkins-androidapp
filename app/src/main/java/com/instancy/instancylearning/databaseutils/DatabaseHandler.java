@@ -25,11 +25,14 @@ import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.NativeMenuModel;
+import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
+import com.instancy.instancylearning.models.ProfileGroupModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.StudentResponseModel;
 import com.instancy.instancylearning.models.TrackObjectsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -8405,17 +8408,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 injectProfileDetails(jsonProfileAry, userID);
             }
 
-            // for all education data
-            if (jsonEducationAry.length() > 0) {
-
-                injectUserEducation(jsonEducationAry, userID);
-            }
-
-            // for experience data
-            if (jsonExperienceAry.length() > 0) {
-
-                injectUserExperience(jsonExperienceAry, userID);
-            }
+//            // for all education data
+//            if (jsonEducationAry.length() > 0) {
+//
+//                injectUserEducation(jsonEducationAry, userID);
+//            }
+//
+//            // for experience data
+//            if (jsonExperienceAry.length() > 0) {
+//
+//                injectUserExperience(jsonExperienceAry, userID);
+//            }
 
         }
     }
@@ -8428,7 +8431,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         try {
             contentValues = new ContentValues();
-            contentValues.put("objectid", profileDetailsModel.objetId);
+            contentValues.put("objectid", profileDetailsModel.userid);
             contentValues.put("accounttype", profileDetailsModel.accounttype);
             contentValues.put("orgunitid", profileDetailsModel.orgunitid);
             contentValues.put("siteid", profileDetailsModel.siteid);
@@ -8769,7 +8772,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     profileModel.shipaddphone = profileObj.get("shipaddphone").toString();
                 }
 
-                profileModel.userid = userID;
+                if (profileObj.has("objectid")) {
+                    profileModel.userid = profileObj.get("objectid").toString();
+                }
+
+//                profileModel.userid = userID;
 
                 Log.d(TAG, "InjectAllProfileDetails: at index " + profileModel);
                 injectProfileIntoTable(profileModel);
@@ -8970,7 +8977,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             for (int i = 0; i < jsonExperienceAry.length(); i++) {
 
-                UserExperienceModel userExperienceModel = new UserExperienceModel();
+                UserEducationModel userEducationModel = new UserEducationModel();
 
                 SQLiteDatabase db = this.getWritableDatabase();
                 try {
@@ -8986,62 +8993,71 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 if (experiencObj.has("firstname")) {
 
-                    userExperienceModel.userID = experiencObj.get("firstname").toString();
+                    userEducationModel.userid = experiencObj.get("firstname").toString();
                 }
                 if (experiencObj.has("lastname")) {
-                    userExperienceModel.title = experiencObj.get("lastname").toString();
+                    userEducationModel.school = experiencObj.get("lastname").toString();
                 }
                 if (experiencObj.has("accounttype")) {
-                    userExperienceModel.location = experiencObj.get("accounttype").toString();
+                    userEducationModel.country = experiencObj.get("accounttype").toString();
                 }
                 if (experiencObj.has("orgunitid")) {
-                    userExperienceModel.description = experiencObj.get("orgunitid").toString();
+                    userEducationModel.degree = experiencObj.get("orgunitid").toString();
                 }
                 if (experiencObj.has("siteid")) {
-                    userExperienceModel.difference = experiencObj.get("siteid").toString();
+                    userEducationModel.fromyear = experiencObj.get("siteid").toString();
                 }
                 if (experiencObj.has("approvalstatus")) {
-                    userExperienceModel.displayNo = experiencObj.get("approvalstatus").toString();
+                    userEducationModel.totalperiod = experiencObj.get("approvalstatus").toString();
                 }
                 if (experiencObj.has("displayname")) {
-                    userExperienceModel.fromDate = experiencObj.get("displayname").toString();
+                    userEducationModel.toyear = experiencObj.get("displayname").toString();
                 }
                 if (experiencObj.has("organization")) {
-                    userExperienceModel.toDate = experiencObj.get("organization").toString();
+                    userEducationModel.titleeducation = experiencObj.get("organization").toString();
                 }
 
                 if (experiencObj.has("usersite")) {
-                    userExperienceModel.companyName = experiencObj.get("usersite").toString();
+                    userEducationModel.titleid = experiencObj.get("usersite").toString();
                 }
 
-                userExperienceModel.userID = userID;
+                if (experiencObj.has("usersite")) {
+                    userEducationModel.description = experiencObj.get("usersite").toString();
+                }
 
-                Log.d(TAG, "InjectAllProfileDetails: at index " + userExperienceModel);
-                injectEducationIntoTable(userExperienceModel);
+                if (experiencObj.has("usersite")) {
+                    userEducationModel.displayno = experiencObj.get("usersite").toString();
+                }
+
+                userEducationModel.userid = userID;
+
+                Log.d(TAG, "InjectAllProfileDetails: at index " + userEducationModel);
+                injectEducationIntoTable(userEducationModel);
             }
 
         }
 
-
     }
 
-    public void injectEducationIntoTable(UserExperienceModel experienceModel) {
+    public void injectEducationIntoTable(UserEducationModel educationModel) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
 
+
         try {
             contentValues = new ContentValues();
-            contentValues.put("title", experienceModel.title);
-            contentValues.put("location", experienceModel.location);
-            contentValues.put("companyname", experienceModel.companyName);
-            contentValues.put("fromdate", experienceModel.fromDate);
-            contentValues.put("todate", experienceModel.toDate);
-            contentValues.put("userid", experienceModel.userID);
-            contentValues.put("description", experienceModel.description);
-            contentValues.put("difference", experienceModel.difference);
-            contentValues.put("tilldate", experienceModel.tillDate);
-            contentValues.put("displayno", experienceModel.displayNo);
+            contentValues.put("title", educationModel.titleeducation);
+            contentValues.put("totalperiod", educationModel.totalperiod);
+            contentValues.put("fromyear", educationModel.fromyear);
+            contentValues.put("degree", educationModel.degree);
+            contentValues.put("titleid", educationModel.titleid);
+            contentValues.put("userid", educationModel.userid);
+            contentValues.put("displayno", educationModel.displayno);
+            contentValues.put("description", educationModel.description);
+            contentValues.put("toyear", educationModel.toyear);
+            contentValues.put("country", educationModel.country);
+            contentValues.put("school", educationModel.school);
             contentValues.put("isupdated", true);
 
 
@@ -9050,6 +9066,276 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             exception.printStackTrace();
         }
+    }
+
+
+    public List<ProfileGroupModel> fetchProfileGroupNames(String siteId, String userID) {
+
+        List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_USERPROFILEGROUPS + " WHERE userid =" + userID + " AND siteid = " + siteId + " AND showinprofile = 1";
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    ProfileGroupModel profileGroupModel = new ProfileGroupModel();
+                    profileGroupModel.groupId = (cursor.getString(cursor.getColumnIndex("groupid")));
+                    profileGroupModel.groupname = (cursor.getString(cursor.getColumnIndex("groupname")));
+                    profileGroupModel.objecttypeid = (cursor.getString(cursor.getColumnIndex("objecttypeid")));
+                    profileGroupModel.showinprofile = (cursor.getString(cursor.getColumnIndex("showinprofile")));
+                    profileGroupModel.userid = (cursor.getString(cursor.getColumnIndex("userid")));
+//                  profileGroupModel.isEditMode = (cursor.getString(cursor.getColumnIndex("isEditMode")));
+                    profileGroupModel.siteid = (cursor.getString(cursor.getColumnIndex("siteid")));
+                    profileGroupModelList.add(profileGroupModel);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return profileGroupModelList;
+    }
+
+
+    public ProfileDetailsModel fetchProfileDetails(String siteId, String userID) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT UPT.picture as firstPrefImage, UI.picture as secondPrefImage , UPT.*, UI.profileimagepath FROM " + TBL_USERPROFILEFIELDS + " UPT LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON UPT.objectid = UI.userid AND UPT.siteid = UI.siteid WHERE UPT.objectid =" + userID + " AND UPT.siteid = " + siteId;
+
+        ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    profileDetailsModel.objetId = (cursor.getString(cursor.getColumnIndex("objectid")));
+                    profileDetailsModel.accounttype = (cursor.getString(cursor.getColumnIndex("accounttype")));
+                    profileDetailsModel.orgunitid = (cursor.getString(cursor.getColumnIndex("orgunitid")));
+                    profileDetailsModel.siteid = (cursor.getString(cursor.getColumnIndex("siteid")));
+                    profileDetailsModel.approvalstatus = (cursor.getString(cursor.getColumnIndex("approvalstatus")));
+                    profileDetailsModel.firstname = (cursor.getString(cursor.getColumnIndex("firstname")));
+                    profileDetailsModel.lastname = (cursor.getString(cursor.getColumnIndex("lastname")));
+                    profileDetailsModel.displayname = (cursor.getString(cursor.getColumnIndex("displayname")));
+                    profileDetailsModel.organization = (cursor.getString(cursor.getColumnIndex("organization")));
+                    profileDetailsModel.email = (cursor.getString(cursor.getColumnIndex("email")));
+                    profileDetailsModel.usersite = (cursor.getString(cursor.getColumnIndex("usersite")));
+                    profileDetailsModel.supervisoremployeeid = (cursor.getString(cursor.getColumnIndex("supervisoremployeeid")));
+                    profileDetailsModel.addressline1 = (cursor.getString(cursor.getColumnIndex("addressline1")));
+                    profileDetailsModel.addresscity = (cursor.getString(cursor.getColumnIndex("addresscity")));
+                    profileDetailsModel.addressstate = (cursor.getString(cursor.getColumnIndex("addressstate")));
+                    profileDetailsModel.addresszip = (cursor.getString(cursor.getColumnIndex("addresszip")));
+                    profileDetailsModel.addresscountry = (cursor.getString(cursor.getColumnIndex("addresscountry")));
+                    profileDetailsModel.phone = (cursor.getString(cursor.getColumnIndex("phone")));
+                    profileDetailsModel.mobilephone = (cursor.getString(cursor.getColumnIndex("mobilephone")));
+                    profileDetailsModel.imaddress = (cursor.getString(cursor.getColumnIndex("imaddress")));
+                    profileDetailsModel.dateofbirth = (cursor.getString(cursor.getColumnIndex("dateofbirth")));
+                    profileDetailsModel.gender = (cursor.getString(cursor.getColumnIndex("gender")));
+                    profileDetailsModel.nvarchar6 = (cursor.getString(cursor.getColumnIndex("nvarchar6")));
+                    profileDetailsModel.paymentmode = (cursor.getString(cursor.getColumnIndex("paymentmode")));
+                    profileDetailsModel.nvarchar7 = (cursor.getString(cursor.getColumnIndex("nvarchar7")));
+                    profileDetailsModel.nvarchar8 = (cursor.getString(cursor.getColumnIndex("nvarchar8")));
+                    profileDetailsModel.nvarchar9 = (cursor.getString(cursor.getColumnIndex("nvarchar9")));
+                    profileDetailsModel.securepaypalid = (cursor.getString(cursor.getColumnIndex("securepaypalid")));
+                    profileDetailsModel.nvarchar10 = (cursor.getString(cursor.getColumnIndex("nvarchar10")));
+                    profileDetailsModel.highschool = (cursor.getString(cursor.getColumnIndex("highschool")));
+                    profileDetailsModel.college = (cursor.getString(cursor.getColumnIndex("college")));
+                    profileDetailsModel.highestdegree = (cursor.getString(cursor.getColumnIndex("highestdegree")));
+                    profileDetailsModel.jobtitle = (cursor.getString(cursor.getColumnIndex("jobtitle")));
+                    profileDetailsModel.businessfunction = (cursor.getString(cursor.getColumnIndex("businessfunction")));
+                    profileDetailsModel.primaryjobfunction = (cursor.getString(cursor.getColumnIndex("primaryjobfunction")));
+                    profileDetailsModel.payeeaccountno = (cursor.getString(cursor.getColumnIndex("payeeaccountno")));
+                    profileDetailsModel.payeename = (cursor.getString(cursor.getColumnIndex("payeename")));
+                    profileDetailsModel.paypalaccountname = (cursor.getString(cursor.getColumnIndex("paypalaccountname")));
+                    profileDetailsModel.paypalemail = (cursor.getString(cursor.getColumnIndex("paypalemail")));
+                    profileDetailsModel.shipaddline1 = (cursor.getString(cursor.getColumnIndex("shipaddline1")));
+                    profileDetailsModel.shipaddcity = (cursor.getString(cursor.getColumnIndex("shipaddcity")));
+                    profileDetailsModel.shipaddstate = (cursor.getString(cursor.getColumnIndex("shipaddstate")));
+                    profileDetailsModel.shipaddzip = (cursor.getString(cursor.getColumnIndex("shipaddzip")));
+                    profileDetailsModel.shipaddcountry = (cursor.getString(cursor.getColumnIndex("shipaddcountry")));
+                    profileDetailsModel.shipaddphone = (cursor.getString(cursor.getColumnIndex("shipaddphone")));
+                    profileDetailsModel.isProfilexist = true;
+                    String imagePath = (cursor.getString(cursor.getColumnIndex("firstPrefImage")));
+
+                    if (imagePath.length() > 0) {
+                        profileDetailsModel.profileimagepath = imagePath;
+                    }
+
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("profileDetails db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return profileDetailsModel;
+    }
+
+
+    public List<ProfileConfigsModel> fetchUserConfigs(String userID, String siteID) {
+
+
+        List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
+
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    ProfileConfigsModel profileConfigsModel = new ProfileConfigsModel();
+                    profileConfigsModel.datafieldname = (cursor.getString(cursor.getColumnIndex("datafieldname")));
+                    profileConfigsModel.aliasname = (cursor.getString(cursor.getColumnIndex("aliasname")));
+                    profileConfigsModel.attributedisplaytext = (cursor.getString(cursor.getColumnIndex("attributedisplaytext")));
+                    profileConfigsModel.groupid = (cursor.getString(cursor.getColumnIndex("groupid")));
+                    profileConfigsModel.displayorder = (cursor.getString(cursor.getColumnIndex("displayorder")));
+                    profileConfigsModel.attributeconfigid = (cursor.getString(cursor.getColumnIndex("attributeconfigid")));
+                    profileConfigsModel.isrequired = (cursor.getString(cursor.getColumnIndex("isrequired")));
+                    profileConfigsModel.iseditable = (cursor.getString(cursor.getColumnIndex("iseditable")));
+                    profileConfigsModel.enduservisibility = (cursor.getString(cursor.getColumnIndex("enduservisibility")));
+                    profileConfigsModel.uicontroltypeid = (cursor.getString(cursor.getColumnIndex("uicontroltypeid")));
+                    profileConfigsModel.names = (cursor.getString(cursor.getColumnIndex("name")));
+                    profileConfigsModelList.add(profileConfigsModel);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+
+        return profileConfigsModelList;
+    }
+
+    public ContentValues getProfileFieldsDictionary(String userID, String siteID) {
+        ContentValues cvFields = null;
+
+        String selFieldsQuery = "SELECT * FROM " + TBL_USERPROFILEFIELDS
+                + " WHERE objectid='" + userID + "' AND siteid='" + siteID
+                + "'";
+
+        SQLiteDatabase db = null;
+        Cursor curFields = null;
+        try {
+            db = this.getWritableDatabase();
+            curFields = db.rawQuery(selFieldsQuery, null);
+            if (curFields != null && curFields.getCount() > 0) {
+                int colCount = curFields.getColumnCount();
+                cvFields = new ContentValues();
+                curFields.moveToFirst();
+                for (int i = 0; i < colCount; i++) {
+                    cvFields.put(curFields.getColumnName(i).toLowerCase(),
+                            curFields.getString(i));
+                }
+
+            } else {
+                cvFields = null;
+            }
+            curFields.close();
+
+        } catch (Exception e) {
+            Log.d("getProfileFieldsDictionary", e.getMessage());
+            cvFields = null;
+            curFields.close();
+        }
+        db.close();
+        return cvFields;
+    }
+
+    public ArrayList<ProfileConfigsModel> getProfileConfigsArray(String siteID,
+                                                                String groupID) {
+        ArrayList<ProfileConfigsModel> arrUserProfileConfigs = null;
+        SQLiteDatabase db = null;
+        String configsQuery = "";
+        if (groupID.equals("")) {
+            configsQuery = "SELECT distinct UPC.*,UPG.groupname FROM "
+                    + TBL_USERPROFILEGROUPS
+                    + " UPG LEFT OUTER JOIN "
+                    + TBL_USERPROFILECONFIGS
+                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPC.enduservisibility='true' ORDER BY UPC.displayorder";
+        } else {
+            configsQuery = "SELECT UPC.*,UPG.groupname FROM "
+                    + TBL_USERPROFILEGROUPS
+                    + " UPG LEFT OUTER JOIN "
+                    + TBL_USERPROFILECONFIGS
+                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPG.groupid='"
+                    + groupID
+                    + "' AND UPC.enduservisibility='true' ORDER BY UPC.displayorder";
+        }
+
+        db = this.getWritableDatabase();
+        try {
+            Cursor curConfigs = db.rawQuery(configsQuery, null);
+
+            if (curConfigs != null) {
+                arrUserProfileConfigs = new ArrayList<ProfileConfigsModel>();
+                while (curConfigs.moveToNext()) {
+                    ProfileConfigsModel userProfileConfigs = new ProfileConfigsModel();
+
+                    userProfileConfigs.aliasname=(curConfigs.getString(curConfigs.getColumnIndex("aliasname")));
+                    userProfileConfigs.attributeconfigid=(curConfigs
+                            .getString(curConfigs
+                                    .getColumnIndex("attributeconfigid")));
+                    userProfileConfigs.attributedisplaytext=(curConfigs
+                            .getString(curConfigs
+                                    .getColumnIndex("attributedisplaytext")));
+                    userProfileConfigs.datafieldname=(curConfigs
+                            .getString(curConfigs
+                                    .getColumnIndex("datafieldname")));
+                    userProfileConfigs.displayorder=(curConfigs
+                            .getString(curConfigs
+                                    .getColumnIndex("displayorder")));
+                    userProfileConfigs.groupid=(curConfigs
+                            .getString(curConfigs.getColumnIndex("groupid")));
+                    userProfileConfigs
+                            .iseditable=(curConfigs.getString(curConfigs
+                                    .getColumnIndex("iseditable")));
+                    userProfileConfigs
+                            .isrequired=(curConfigs.getString(curConfigs
+                                    .getColumnIndex("isrequired")));
+                    userProfileConfigs.names=(curConfigs.getString(curConfigs
+                            .getColumnIndex("name")));
+                    userProfileConfigs.uicontroltypeid=(curConfigs
+                            .getString(curConfigs
+                                    .getColumnIndex("uicontroltypeid")));
+
+                    arrUserProfileConfigs.add(userProfileConfigs);
+                } ;
+            }
+            curConfigs.close();
+        } catch (Exception e) {
+            Log.d("getProfileConfigsArray", e.getMessage());
+        }
+
+        db.close();
+        return arrUserProfileConfigs;
     }
 
 

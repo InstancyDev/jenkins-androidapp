@@ -344,7 +344,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
 
-        profileWebCall("1");
+//        profileWebCall("1");
 
         if (userName.length() < 1) {
             Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
@@ -673,8 +673,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-//                Log.d(TAG, "Volley Profiledata " + requestType);
-//                Log.d(TAG, "Volley Profiledata JSON post" + response);
+
 
                 if (requestType.equalsIgnoreCase("PROFILEDATA")) {
                     if (response != null) {

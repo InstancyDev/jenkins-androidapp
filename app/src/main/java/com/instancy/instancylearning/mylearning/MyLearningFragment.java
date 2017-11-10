@@ -86,6 +86,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -122,6 +123,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     CmiSynchTask cmiSynchTask;
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
+
 
     public MyLearningFragment() {
 
@@ -224,6 +226,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         try {
                             db.injectMyLearningData(response);
                             injectFromDbtoModel();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -349,7 +352,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
 //        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contextTitle + "</font>"));
 
-        if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+        if (isNetworkConnectionAvailable(getContext(), -1) && MYLEARNING_FRAGMENT_OPENED_FIRSTTIME == 0) {
+
             refreshMyLearning(false);
         } else {
 //            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -366,6 +371,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (bundle != null) {
             String link = bundle.getString("url");
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: in Mylearning fragment");
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 2;
     }
 
     @Override
@@ -874,7 +886,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                 if (!myFile.exists()) {
 
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")|| myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
                         if (isNetworkConnectionAvailable(getContext(), -1)) {
                             getStatusFromServer(myLearningModel);

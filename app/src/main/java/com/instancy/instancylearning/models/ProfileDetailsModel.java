@@ -57,4 +57,5 @@ public class ProfileDetailsModel implements Serializable {
     public String shipaddphone = "";
     public String profileimagepath = "";
     public String objetId = "";
+    public boolean isProfilexist = false;
 }
