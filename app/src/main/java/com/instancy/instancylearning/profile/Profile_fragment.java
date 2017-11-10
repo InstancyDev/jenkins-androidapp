@@ -143,6 +143,19 @@ public class Profile_fragment extends Fragment {
 
         profileConfigsModelList = db.fetchUserConfigs(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
 
+
+        HashMap<String, ArrayList<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, ArrayList<ProfileConfigsModel>>();
+
+        for (ProfileGroupModel grp : profileGroupModelList) {
+
+            String groupID = grp.groupId;
+
+            if (groupID==profileConfigsModelList.get(1).groupid){
+
+
+            }
+
+        }
         isProfileExists = true;
         HashMapGenerate();
         return isProfileExists;
@@ -152,18 +165,18 @@ public class Profile_fragment extends Fragment {
 
     public void HashMapGenerate() {
         HashMap<String, ArrayList<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, ArrayList<ProfileConfigsModel>>();
-
-        ContentValues cvFields = new ContentValues();
-        cvFields = db.getProfileFieldsDictionary(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
-        if (cvFields != null) {
-            cvEditFields = new ContentValues();
-            cvEditFields.putAll(cvFields);
-        }
-
-
-        ArrayList<ProfileConfigsModel> filteredGroups = new ArrayList<ProfileConfigsModel>();
-
-        filteredGroups = db.getProfileConfigsArray(appUserModel.getSiteIDValue(), "1");
+//
+//        ContentValues cvFields = new ContentValues();
+//        cvFields = db.getProfileFieldsDictionary(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
+//        if (cvFields != null) {
+//            cvEditFields = new ContentValues();
+//            cvEditFields.putAll(cvFields);
+//        }
+//
+//
+//        ArrayList<ProfileConfigsModel> filteredGroups = new ArrayList<ProfileConfigsModel>();
+//
+//        filteredGroups = db.getProfileConfigsArray(appUserModel.getSiteIDValue(), "1");
 
     }
 
