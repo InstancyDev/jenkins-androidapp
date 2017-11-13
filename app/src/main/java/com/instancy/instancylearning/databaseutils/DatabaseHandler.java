@@ -8487,13 +8487,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void injectProfileConfigs(JSONArray configAry, String userId) throws JSONException {
+    public void injectProfileConfigs(JSONArray configAry, String userId,String groupId) throws JSONException {
 
         String[] profileAry = {"objectid", "accounttype", "orgunitid", "siteid", "approvalstatus", "firstname", "lastname", "displayname", "organization", "email", "usersite", "supervisoremployeeid", "addressline1", "addresscity", "addressstate", "addresszip", "addresscountry", "phone", "mobilephone", "imaddress", "dateofbirth", "gender", "nvarchar6", "paymentmode", "nvarchar7", "nvarchar8", "nvarchar9", "securepaypalid", "nvarchar10", "picture", "highschool", "college", "highestdegree", "jobtitle", "businessfunction", "primaryjobfunction", "payeeaccountno", "payeename", "paypalaccountname", "paypalemail", "shipaddline1", "shipaddcity", "shipaddstate", "shipaddzip", "shipaddcountry", "shipaddphone"};
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String strDelete = "DELETE FROM " + TBL_USERPROFILECONFIGS + " WHERE userid   = " + userId + " and siteid = " + appUserModel.getSiteIDValue();
+            String strDelete = "DELETE FROM " + TBL_USERPROFILECONFIGS + " WHERE userid   = " + userId + " and siteid = " + appUserModel.getSiteIDValue() +" and groupid = " +groupId;
             db.execSQL(strDelete);
 
         } catch (SQLiteException sqlEx) {
@@ -8804,6 +8804,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             JSONObject profileGroupObj = jsonGroupsAry.getJSONObject(i);
 
             JSONObject jsonObjectProfileConfigs = jsonGroupsAry.getJSONObject(i);
+
+            String groupid = "";
+            if (profileGroupObj.has("groupid")) {
+
+                groupid = profileGroupObj.get("groupid").toString();
+            }
+
             if (jsonObjectProfileConfigs.has("datafilelist")) {
 
 //                injectProfileDetail(jsonObjectProfileConfigs, userID);
@@ -8811,7 +8818,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 if (jsonProfileConfigArray.length() > 0) {
 
-                    injectProfileConfigs(jsonProfileConfigArray, userID);
+                    injectProfileConfigs(jsonProfileConfigArray, userID,groupid);
 
                 } else {
                     continue;
@@ -8819,7 +8826,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            String groupid = "";
+
             String groupname = "";
             String objecttypeid = "";
             String showinprofile = "";
@@ -8878,7 +8885,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
-
 
     public void injectUserExperience(JSONArray jsonExperienceAry, String userID) throws JSONException {
 
@@ -9194,16 +9200,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public List<ProfileConfigsModel> fetchUserConfigs(String userID, String siteID) {
+    public List<ProfileConfigsModel> fetchUserConfigs(String userID, String siteID,String groupID) {
 
 
         List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
 
-
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
+        String strSelQuery = "" ;//"SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
 
+        if (groupID.equals("")) {
+            strSelQuery = "SELECT DISTINCT UPC.*,UPG.groupname FROM "
+                    + TBL_USERPROFILEGROUPS
+                    + " UPG LEFT OUTER JOIN "
+                    + TBL_USERPROFILECONFIGS
+                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPC.enduservisibility='true' ORDER BY UPC.displayorder";
+        } else {
+            strSelQuery = "SELECT DISTINCT UPC.*,UPG.groupname FROM "
+                    + TBL_USERPROFILEGROUPS
+                    + " UPG LEFT OUTER JOIN "
+                    + TBL_USERPROFILECONFIGS
+                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPG.groupid='"
+                    + groupID +"' AND UPC.siteid = '" + siteID + "' AND UPC.userid = '" + userID
+                    + "' AND UPC.enduservisibility='true' ORDER BY UPC.displayorder";
+//                    + "' ORDER BY UPC.displayorder";
+
+        }
 
         try {
             Cursor cursor = null;
@@ -9269,74 +9291,74 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return cvFields;
     }
 
-    public ArrayList<ProfileConfigsModel> getProfileConfigsArray(String siteID,
-                                                                String groupID) {
-        ArrayList<ProfileConfigsModel> arrUserProfileConfigs = null;
-        SQLiteDatabase db = null;
-        String configsQuery = "";
-        if (groupID.equals("")) {
-            configsQuery = "SELECT distinct UPC.*,UPG.groupname FROM "
-                    + TBL_USERPROFILEGROUPS
-                    + " UPG LEFT OUTER JOIN "
-                    + TBL_USERPROFILECONFIGS
-                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPC.enduservisibility='true' ORDER BY UPC.displayorder";
-        } else {
-            configsQuery = "SELECT UPC.*,UPG.groupname FROM "
-                    + TBL_USERPROFILEGROUPS
-                    + " UPG LEFT OUTER JOIN "
-                    + TBL_USERPROFILECONFIGS
-                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPG.groupid='"
-                    + groupID
-                    + "' AND UPC.enduservisibility='true' ORDER BY UPC.displayorder";
-        }
-
-        db = this.getWritableDatabase();
-        try {
-            Cursor curConfigs = db.rawQuery(configsQuery, null);
-
-            if (curConfigs != null) {
-                arrUserProfileConfigs = new ArrayList<ProfileConfigsModel>();
-                while (curConfigs.moveToNext()) {
-                    ProfileConfigsModel userProfileConfigs = new ProfileConfigsModel();
-
-                    userProfileConfigs.aliasname=(curConfigs.getString(curConfigs.getColumnIndex("aliasname")));
-                    userProfileConfigs.attributeconfigid=(curConfigs
-                            .getString(curConfigs
-                                    .getColumnIndex("attributeconfigid")));
-                    userProfileConfigs.attributedisplaytext=(curConfigs
-                            .getString(curConfigs
-                                    .getColumnIndex("attributedisplaytext")));
-                    userProfileConfigs.datafieldname=(curConfigs
-                            .getString(curConfigs
-                                    .getColumnIndex("datafieldname")));
-                    userProfileConfigs.displayorder=(curConfigs
-                            .getString(curConfigs
-                                    .getColumnIndex("displayorder")));
-                    userProfileConfigs.groupid=(curConfigs
-                            .getString(curConfigs.getColumnIndex("groupid")));
-                    userProfileConfigs
-                            .iseditable=(curConfigs.getString(curConfigs
-                                    .getColumnIndex("iseditable")));
-                    userProfileConfigs
-                            .isrequired=(curConfigs.getString(curConfigs
-                                    .getColumnIndex("isrequired")));
-                    userProfileConfigs.names=(curConfigs.getString(curConfigs
-                            .getColumnIndex("name")));
-                    userProfileConfigs.uicontroltypeid=(curConfigs
-                            .getString(curConfigs
-                                    .getColumnIndex("uicontroltypeid")));
-
-                    arrUserProfileConfigs.add(userProfileConfigs);
-                } ;
-            }
-            curConfigs.close();
-        } catch (Exception e) {
-            Log.d("getProfileConfigsArray", e.getMessage());
-        }
-
-        db.close();
-        return arrUserProfileConfigs;
-    }
+//    public ArrayList<ProfileConfigsModel> getProfileConfigsArray(String siteID,
+//                                                                String groupID) {
+//        ArrayList<ProfileConfigsModel> arrUserProfileConfigs = null;
+//        SQLiteDatabase db = null;
+//        String configsQuery = "";
+//        if (groupID.equals("")) {
+//            configsQuery = "SELECT distinct UPC.*,UPG.groupname FROM "
+//                    + TBL_USERPROFILEGROUPS
+//                    + " UPG LEFT OUTER JOIN "
+//                    + TBL_USERPROFILECONFIGS
+//                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPC.enduservisibility='true' ORDER BY UPC.displayorder";
+//        } else {
+//            configsQuery = "SELECT UPC.*,UPG.groupname FROM "
+//                    + TBL_USERPROFILEGROUPS
+//                    + " UPG LEFT OUTER JOIN "
+//                    + TBL_USERPROFILECONFIGS
+//                    + " UPC ON UPG.groupid= UPC.groupid WHERE UPG.groupid='"
+//                    + groupID
+//                    + "' AND UPC.enduservisibility='true' ORDER BY UPC.displayorder";
+//        }
+//
+//        db = this.getWritableDatabase();
+//        try {
+//            Cursor curConfigs = db.rawQuery(configsQuery, null);
+//
+//            if (curConfigs != null) {
+//                arrUserProfileConfigs = new ArrayList<ProfileConfigsModel>();
+//                while (curConfigs.moveToNext()) {
+//                    ProfileConfigsModel userProfileConfigs = new ProfileConfigsModel();
+//
+//                    userProfileConfigs.aliasname=(curConfigs.getString(curConfigs.getColumnIndex("aliasname")));
+//                    userProfileConfigs.attributeconfigid=(curConfigs
+//                            .getString(curConfigs
+//                                    .getColumnIndex("attributeconfigid")));
+//                    userProfileConfigs.attributedisplaytext=(curConfigs
+//                            .getString(curConfigs
+//                                    .getColumnIndex("attributedisplaytext")));
+//                    userProfileConfigs.datafieldname=(curConfigs
+//                            .getString(curConfigs
+//                                    .getColumnIndex("datafieldname")));
+//                    userProfileConfigs.displayorder=(curConfigs
+//                            .getString(curConfigs
+//                                    .getColumnIndex("displayorder")));
+//                    userProfileConfigs.groupid=(curConfigs
+//                            .getString(curConfigs.getColumnIndex("groupid")));
+//                    userProfileConfigs
+//                            .iseditable=(curConfigs.getString(curConfigs
+//                                    .getColumnIndex("iseditable")));
+//                    userProfileConfigs
+//                            .isrequired=(curConfigs.getString(curConfigs
+//                                    .getColumnIndex("isrequired")));
+//                    userProfileConfigs.names=(curConfigs.getString(curConfigs
+//                            .getColumnIndex("name")));
+//                    userProfileConfigs.uicontroltypeid=(curConfigs
+//                            .getString(curConfigs
+//                                    .getColumnIndex("uicontroltypeid")));
+//
+//                    arrUserProfileConfigs.add(userProfileConfigs);
+//                } ;
+//            }
+//            curConfigs.close();
+//        } catch (Exception e) {
+//            Log.d("getProfileConfigsArray", e.getMessage());
+//        }
+//
+//        db.close();
+//        return arrUserProfileConfigs;
+//    }
 
 
     public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel) throws JSONException {

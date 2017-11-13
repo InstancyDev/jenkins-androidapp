@@ -2,26 +2,29 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="3dp"
+    android:padding="8dp"
     android:background="#ffff">
 
     <TextView
-        android:id="@+id/profile_item"
+        android:padding="3dp"
+        android:id="@+id/profile_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:text="Name"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/colorBlack"
-        android:textSize="12sp" />
+        android:textSize="10sp" />
 
-    <EditText
-        android:id="@+id/subMenuExpIcon"
+    <TextView
+        android:padding="3dp"
+        android:layout_below="@id/profile_label"
+        android:id="@+id/profile_value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profile_item"
-        android:layout_centerVertical="true"
-        android:text="Upendra"
-        android:src="@drawable/ic_launcher" />
+        android:gravity="center_vertical"
+        android:text="Upendra Nath Reddy"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="12sp" />
 </RelativeLayout>

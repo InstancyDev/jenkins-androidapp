@@ -344,7 +344,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
 
-//        profileWebCall("1");
 
         if (userName.length() < 1) {
             Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
@@ -353,36 +352,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         } else {
 
             if (isNetworkConnectionAvailable(this, -1)) {
-
-//                JSONObject jsonObject = new JSONObject();
-//                try {
-//                    jsonObject.put("username", userName);
-//                    jsonObject.put("password", passWord);
-//                    jsonObject.put("siteid", preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//                    jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                JSONObject jsonReturn = null;
-//                try {
-//                    jsonReturn = db.checkOfflineUserCredintials(jsonObject);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-
-//                if (jsonReturn.length() != 0) {
-//
-//                    appController.setAlreadyViewd(true);
-//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-//
-//                } else {
-//                    preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
-//                    appController.setAlreadyViewd(false);
-//                }
-
                 svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
                 loginVollyWebCall(userName, passWord);
             } else {
@@ -696,7 +665,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             @Override
             public void notifyError(String requestType, VolleyError error) {
-                Log.d(TAG, "Volley requester " + requestType);
+
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
             }

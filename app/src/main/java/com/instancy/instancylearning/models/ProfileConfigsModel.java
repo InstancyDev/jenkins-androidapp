@@ -20,6 +20,7 @@ public class ProfileConfigsModel implements Serializable {
     public String enduservisibility = "";
     public String uicontroltypeid = "";
     public String names = "";
+    public String valueName = "";
 
 
 }

@@ -8,14 +8,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
@@ -49,7 +52,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * Created by Upendranath on 5/19/2017.
  */
 
-public class Profile_fragment extends Fragment {
+public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.profile_thumbs)
     ImageView profileImage;
@@ -58,6 +61,9 @@ public class Profile_fragment extends Fragment {
 
     @BindView(R.id.profileexpandablelist)
     ExpandableListView profileExpandableList;
+
+    @BindView(R.id.swipeprofile)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -69,13 +75,13 @@ public class Profile_fragment extends Fragment {
     Context context;
     ContentValues cvEditFields = null;
 
-    private List<SideMenusModel> sideMenusModelList = new ArrayList<>();
     SideMenusModel sideMenusModel;
 
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-    ProfileDynamicAdapter profileDynamicAdapter;
-    HashMap<Integer, List<SideMenusModel>> hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+    ProfileExpandAdapter profileDynamicAdapter;
+    HashMap<String, List<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, List<ProfileConfigsModel>>();
+    List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
 
     public Profile_fragment() {
 
@@ -107,7 +113,6 @@ public class Profile_fragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
-
         }
     }
 
@@ -119,14 +124,11 @@ public class Profile_fragment extends Fragment {
 
         boolean isProfileExists = getALlProfilesDetailsFromDB();
 
-
     }
-
 
     public boolean getALlProfilesDetailsFromDB() {
 
         boolean isProfileExists = false;
-        List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
 
         List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
 
@@ -141,20 +143,36 @@ public class Profile_fragment extends Fragment {
 
         profileGroupModelList = db.fetchProfileGroupNames(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
-        profileConfigsModelList = db.fetchUserConfigs(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
-
-
-        HashMap<String, ArrayList<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, ArrayList<ProfileConfigsModel>>();
-
         for (ProfileGroupModel grp : profileGroupModelList) {
 
             String groupID = grp.groupId;
 
-            if (groupID==profileConfigsModelList.get(1).groupid){
+            profileConfigsModelList = db.fetchUserConfigs(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue(), groupID);
 
-
+            ContentValues cvFields = new ContentValues();
+            cvFields = db.getProfileFieldsDictionary(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
+            if (cvFields != null) {
+                cvEditFields = new ContentValues();
+                cvEditFields.putAll(cvFields);
             }
 
+            for (int i = 0; i < profileConfigsModelList.size(); i++) {
+
+                String keyName = profileConfigsModelList.get(i).datafieldname.toLowerCase().toLowerCase();
+
+                if (keyName.contains("picture")){
+                    profileConfigsModelList.remove(i);
+                    continue;
+
+                }
+
+                Log.d(TAG, "names here: " + cvFields.get(keyName));
+                String valueName = cvFields.get(keyName).toString();
+
+                profileConfigsModelList.get(i).valueName = valueName;
+
+                hmGroupWiseConfigs.put(grp.groupname, profileConfigsModelList);
+            }
         }
         isProfileExists = true;
         HashMapGenerate();
@@ -162,21 +180,8 @@ public class Profile_fragment extends Fragment {
 
     }
 
-
     public void HashMapGenerate() {
-        HashMap<String, ArrayList<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, ArrayList<ProfileConfigsModel>>();
-//
-//        ContentValues cvFields = new ContentValues();
-//        cvFields = db.getProfileFieldsDictionary(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
-//        if (cvFields != null) {
-//            cvEditFields = new ContentValues();
-//            cvEditFields.putAll(cvFields);
-//        }
-//
-//
-//        ArrayList<ProfileConfigsModel> filteredGroups = new ArrayList<ProfileConfigsModel>();
-//
-//        filteredGroups = db.getProfileConfigsArray(appUserModel.getSiteIDValue(), "1");
+
 
     }
 
@@ -186,10 +191,13 @@ public class Profile_fragment extends Fragment {
         View rootView = inflater.inflate(R.layout.profile_activity, container, false);
         ButterKnife.bind(this, rootView);
         View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.profile_header_layout_, null);
-
+        swipeRefreshLayout.setOnRefreshListener(this);
         profileRound = (ImageView) header.findViewById(R.id.profile_round);
 
-        profileDynamicAdapter = new ProfileDynamicAdapter(rootView.getContext(), hmSubMenuList, sideMenusModelList);
+        TextView textView=header.findViewById(R.id.profilename);
+
+        textView.setText("James Thomas");
+        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
         profileExpandableList.addHeaderView(header);
@@ -197,6 +205,9 @@ public class Profile_fragment extends Fragment {
         initilizeView();
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+
+
 
         } else {
 
@@ -217,11 +228,6 @@ public class Profile_fragment extends Fragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
-//        Glide.with(this).load(profileIma)
-//                .thumbnail(0.5f).placeholder(R.drawable.user_placeholder)
-//                .crossFade()
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(profileRound);
 
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileRound);
@@ -255,5 +261,11 @@ public class Profile_fragment extends Fragment {
                 boolean refresh = data.getBooleanExtra("REFRESH", false);
             }
         }
+    }
+
+    @Override
+    public void onRefresh() {
+
+
     }
 }
