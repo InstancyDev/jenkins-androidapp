@@ -648,9 +648,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     if (response != null) {
 
                         try {
-//             Uncomment for old         db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
-
                             db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -678,19 +677,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
-//                if (requestType.equalsIgnoreCase("MLADP")) {
-//
-//                    if (response != null) {
-//                        try {
-//                            db.injectCMIDataInto(response, myLearningModel);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    } else {
-//
-//                    }
-//
-//                }
+
 
                 svProgressHUD.dismiss();
             }

@@ -2,11 +2,14 @@ package com.instancy.instancylearning.profile;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
@@ -78,7 +81,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+    public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, final ViewGroup parent) {
         View pView = convertView;
         if (pView == null) {
             LayoutInflater inflater = (LayoutInflater) context
@@ -86,6 +89,15 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             pView = inflater.inflate(R.layout.profilesectionview, parent, false);
 
         }
+        ImageView moreOptions=(ImageView)pView.findViewById(R.id.moreoptionsicon);
+        moreOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d("TAG", "onClick: ");
+            }
+        });
+
         TextView listTitleTextView = (TextView) pView
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
@@ -108,10 +120,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             if (isLastChild) {
                 cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitembottom));
             }
-
         }
-
-
             TextView profileLabel = (TextView) cView
                     .findViewById(R.id.profile_label);
             TextView profileValue = (TextView) cView

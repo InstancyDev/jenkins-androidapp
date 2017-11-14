@@ -29,6 +29,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.menufragments.Catalog_fragment;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
@@ -142,12 +143,21 @@ public class SideMenu extends AppCompatActivity {
 
         // navdrawer Top layout initilization
 
+        ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
+
+        profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+
+        String[] strAry = new String[2];
+
+        strAry = extractProfileNameAndLocation(profileDetailsModel);
+
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
 
         Picasso.with(this).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
-        txtUsername.setText(appUserModel.getUserName());
+        txtUsername.setText(strAry[0]);
 
-        txtAddress.setText(appUserModel.getDisplayName().isEmpty() ? getResources().getString(R.string.app_name) : appUserModel.getDisplayName());
+        txtAddress.setText(strAry[1]);
 
         sideMenusModel = db.getNativeMainMenusData();
 
@@ -318,6 +328,43 @@ public class SideMenu extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public String[] extractProfileNameAndLocation(ProfileDetailsModel detailsModel) {
+
+        String[] strAry = new String[2];
+
+        String name = "";
+        String location = "";
+
+
+        if (!detailsModel.displayname.equalsIgnoreCase("")) {
+            name = detailsModel.displayname;
+        } else if (!detailsModel.firstname.equalsIgnoreCase("")) {
+            name = detailsModel.firstname + " " + detailsModel.lastname;
+        } else {
+            name = "Anonymous";
+        }
+
+        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("na")) {
+            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+                location = detailsModel.addresscity + "," + detailsModel.addressstate;
+            } else {
+                location = detailsModel.addresscity;
+            }
+        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+            location = detailsModel.addressstate;
+        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("na")) {
+            location = detailsModel.addresscountry;
+        } else {
+            location = "";
+        }
+
+
+        strAry[0] = name;
+        strAry[1] = location;
+
+        return strAry;
     }
 
 

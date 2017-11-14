@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -27,6 +29,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.ProfileGroupModel;
@@ -37,6 +40,9 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,15 +50,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.app.Activity.RESULT_OK;
-import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 5/19/2017.
  */
 
-public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     @BindView(R.id.profile_thumbs)
     ImageView profileImage;
@@ -76,6 +80,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     ContentValues cvEditFields = null;
 
     SideMenusModel sideMenusModel;
+    TextView userName, userLocation;
 
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
@@ -95,7 +100,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(context);
         db = new DatabaseHandler(context);
-
+        initVolleyCallback();
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
@@ -114,6 +119,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
         }
+
     }
 
 
@@ -121,8 +127,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        boolean isProfileExists = getALlProfilesDetailsFromDB();
 
     }
 
@@ -140,6 +144,13 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             return false;
         }
+
+        String[] strAry = new String[2];
+
+        strAry = extractProfileNameAndLocation(profileDetailsModel);
+
+        userName.setText(strAry[0]);
+        userLocation.setText(strAry[1]);
 
         profileGroupModelList = db.fetchProfileGroupNames(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
@@ -160,7 +171,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 String keyName = profileConfigsModelList.get(i).datafieldname.toLowerCase().toLowerCase();
 
-                if (keyName.contains("picture")){
+                if (keyName.contains("picture")) {
                     profileConfigsModelList.remove(i);
                     continue;
 
@@ -190,30 +201,57 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.profile_activity, container, false);
         ButterKnife.bind(this, rootView);
+
         View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.profile_header_layout_, null);
         swipeRefreshLayout.setOnRefreshListener(this);
         profileRound = (ImageView) header.findViewById(R.id.profile_round);
 
-        TextView textView=header.findViewById(R.id.profilename);
+        userName = header.findViewById(R.id.profilename);
+        userLocation = header.findViewById(R.id.userlocation);
 
-        textView.setText("James Thomas");
+        boolean isProfileExists = getALlProfilesDetailsFromDB();
+
+
         profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
         profileExpandableList.addHeaderView(header);
 
-        initilizeView();
+        profileExpandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                // Doing nothing
+                return true;
+            }
+        });
 
-        if (isNetworkConnectionAvailable(getContext(), -1)) {
-
-
-
-
-        } else {
-
+        if (profileGroupModelList != null && profileGroupModelList.size() > 0) {
+            for (int i = 0; i < profileGroupModelList.size(); i++)
+                profileExpandableList.expandGroup(i);
         }
 
+
+        initilizeView();
+
+
         return rootView;
+    }
+
+
+    private void profileWebCall(String userId, boolean isRefreshed) {
+
+        if (!isRefreshed) {
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        Log.d(TAG, "profileWebCall: " + urlStr);
+
+        vollyService.getJsonObjResponseVolley("PROFILEDATA", urlStr, appUserModel.getAuthHeaders());
+
     }
 
 
@@ -232,6 +270,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileRound);
         profileImage.setImageAlpha(25);
+        profileRound.setOnClickListener(this);
+
     }
 
     @Override
@@ -251,21 +291,126 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
+    public String[] extractProfileNameAndLocation(ProfileDetailsModel detailsModel) {
+
+        String[] strAry = new String[2];
+
+        String name = "";
+        String location = "";
+
+
+        if (!detailsModel.displayname.equalsIgnoreCase("")) {
+            name = detailsModel.displayname;
+        } else if (!detailsModel.firstname.equalsIgnoreCase("")) {
+            name = detailsModel.firstname + " " + detailsModel.lastname;
+        } else {
+            name = "Anonymous";
+        }
+
+        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("na")) {
+            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+                location = detailsModel.addresscity + "," + detailsModel.addressstate;
+            } else {
+                location = detailsModel.addresscity;
+            }
+        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+            location = detailsModel.addressstate;
+        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("na")) {
+            location = detailsModel.addresscountry;
+        } else {
+            location = "";
+        }
+
+
+        strAry[0] = name;
+        strAry[1] = location;
+
+        return strAry;
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == DETAIL_CATALOG_CODE && resultCode == RESULT_OK && data != null) {
 
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("REFRESH", false);
-            }
-        }
     }
 
     @Override
     public void onRefresh() {
 
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            swipeRefreshLayout.setRefreshing(true);
+            profileWebCall(appUserModel.getUserIDValue(), true);
+
+        } else {
+
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    void initVolleyCallback() {
+
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+
+                if (requestType.equalsIgnoreCase("PROFILEDATA")) {
+                    if (response != null) {
+
+                        try {
+                            swipeRefreshLayout.setRefreshing(false);
+                            db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
+                            boolean isProfileExists = getALlProfilesDetailsFromDB();
+                            if (isProfileExists) {
+                                profileDynamicAdapter.notifyDataSetChanged();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                    }
+                }
+
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+
+                svProgressHUD.dismiss();
+            }
+        };
+    }
+
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()){
+
+            case R.id.profile_round:
+                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                break;
+
+        }
 
     }
 }

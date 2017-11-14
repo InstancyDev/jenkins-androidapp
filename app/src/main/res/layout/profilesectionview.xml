@@ -34,7 +34,7 @@
                 android:textSize="14sp" />
 
             <ImageView
-                android:id="@+id/expIcon"
+                android:id="@+id/moreoptionsicon"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_alignParentRight="true"
