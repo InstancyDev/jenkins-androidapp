@@ -9,12 +9,12 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.ProfileGroupModel;
+import com.instancy.instancylearning.models.UserEducationModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +30,12 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
     Typeface iconFon;
     private Context context;
     private List<ProfileGroupModel> expandableListTitle;
+    private List<UserEducationModel> userEducationModelList;
     private HashMap<String, List<ProfileConfigsModel>> expandableHashDetail;
 
-    public ProfileExpandAdapter(Context context, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
+    public ProfileExpandAdapter(Context context, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
         this.context = context;
+        this.userEducationModelList = userEducationModelList;
         this.expandableHashDetail = expandableHashDetail;
         this.expandableListTitle = expandableListTitle;
 //        Collections.sort(this.expandableListTitle, Collections.reverseOrder());
@@ -48,8 +50,16 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this.expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname) == null ? 0 : this.expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname)
-                .size();
+
+        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
+
+            return this.userEducationModelList == null ? 0 : this.userEducationModelList
+                    .size();
+
+        } else {
+            return this.expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname) == null ? 0 : this.expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname)
+                    .size();
+        }
 
 
     }
@@ -61,8 +71,16 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
+
+//        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
+//
+//            return this.userEducationModelList.get(groupPosition);
+//
+//        } else {
+
         return this.expandableHashDetail.get(this.expandableListTitle.get(groupPosition).groupname)
                 .get(childPosition);
+//        }
     }
 
     @Override
@@ -89,7 +107,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             pView = inflater.inflate(R.layout.profilesectionview, parent, false);
 
         }
-        ImageView moreOptions=(ImageView)pView.findViewById(R.id.moreoptionsicon);
+        ImageView moreOptions = (ImageView) pView.findViewById(R.id.moreoptionsicon);
         moreOptions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,14 +120,20 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(expandableListTitle.get(groupPosition).groupname);
+
         return pView;
 
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        ProfileConfigsModel configsModel = new ProfileConfigsModel();
+        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
 
-        ProfileConfigsModel configsModel = (ProfileConfigsModel) getChild(groupPosition, childPosition);
+        } else {
+            configsModel = (ProfileConfigsModel) getChild(groupPosition, childPosition);
+        }
+
 
         View cView = convertView;
         if (cView == null) {
@@ -121,12 +145,25 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitembottom));
             }
         }
+
+        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
+
+            TextView profileLabel = (TextView) cView
+                    .findViewById(R.id.profile_label);
+            TextView profileValue = (TextView) cView
+                    .findViewById(R.id.profile_value);
+            profileLabel.setText(this.userEducationModelList.get(childPosition).country);
+            profileValue.setText(this.userEducationModelList.get(childPosition).country);
+
+        } else {
+
             TextView profileLabel = (TextView) cView
                     .findViewById(R.id.profile_label);
             TextView profileValue = (TextView) cView
                     .findViewById(R.id.profile_value);
             profileLabel.setText(configsModel.attributedisplaytext);
             profileValue.setText(configsModel.valueName);
+        }
         return cView;
     }
 

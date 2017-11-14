@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.profile;
+package com.instancy.instancylearning.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -26,8 +26,6 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
@@ -38,6 +36,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.profile.ProfileExpandAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -90,10 +89,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     HashMap<String, List<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, List<ProfileConfigsModel>>();
     List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
 
-    List<UserEducationModel> educationModelArrayList = new ArrayList<>();
-
-    List<UserExperienceModel> experienceModelArrayList = new ArrayList<>();
-
     public Profile_fragment() {
 
 
@@ -144,7 +139,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
 
+        List<UserEducationModel> educationModelArrayList = new ArrayList<>();
 
+        List<UserExperienceModel> experienceModelArrayList = new ArrayList<>();
 
         profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
@@ -229,7 +226,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
         boolean isProfileExists = getALlProfilesDetailsFromDB();
-        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(),educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
+//        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
         profileExpandableList.addHeaderView(header);

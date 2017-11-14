@@ -35,7 +35,7 @@
             android:layout_height="match_parent"
             android:childDivider="@android:color/white"
             android:divider="@android:color/transparent"
-            android:dividerHeight="2sp"
+            android:dividerHeight="10sp"
             android:focusable="true"
             android:groupIndicator="@null"
             android:paddingBottom="5dp"

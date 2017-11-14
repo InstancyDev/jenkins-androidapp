@@ -467,9 +467,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_CATEGORYCOMMUNITYLISTING
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, categoryid INTEGER, name TEXT, shortcategoryname TEXT, categorydescription TEXT, parentid INTEGER, displayorder INTEGER, componentid INTEGER, parentsiteid INTEGER, userid INTEGER, parentsiteurl TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EDUCATION_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, titleeducation TEXT, totalperiod TEXT, fromyear TEXT, degree TEXT, titleid TEXT, userid TEXT, displayno TEXT, description TEXT, toyear TEXT, country TEXT, school TEXT, isupdated TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EDUCATION_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, titleeducation TEXT, totalperiod TEXT, fromyear TEXT, degree TEXT, titleid TEXT, userid TEXT, displayno TEXT, description TEXT, toyear TEXT, country TEXT, school TEXT, isupdated TEXT, siteid TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EXPERIENCE_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,  title TEXT, location TEXT, companyname TEXT, fromdate TEXT, todate TEXT, userid TEXT, description TEXT, difference TEXT, tilldate INTEGER, displayno TEXT, isupdated TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EXPERIENCE_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,  title TEXT, location TEXT, companyname TEXT, fromdate TEXT, todate TEXT, userid TEXT, description TEXT, difference TEXT, tilldate INTEGER, displayno TEXT, isupdated TEXT, siteid TEXT)");
 
         Log.d(TAG, "onCreate:  TABLES CREATED");
 
@@ -8408,17 +8408,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 injectProfileDetails(jsonProfileAry, userID);
             }
 
-//            // for all education data
-//            if (jsonEducationAry.length() > 0) {
-//
-//                injectUserEducation(jsonEducationAry, userID);
-//            }
-//
-//            // for experience data
-//            if (jsonExperienceAry.length() > 0) {
-//
-//                injectUserExperience(jsonExperienceAry, userID);
-//            }
+            // for all education data
+            if (jsonEducationAry.length() > 0) {
+
+                injectUserEducation(jsonEducationAry, userID);
+            }
+
+            // for experience data
+            if (jsonExperienceAry.length() > 0) {
+
+                injectUserExperience(jsonExperienceAry, userID);
+            }
 
         }
     }
@@ -8487,13 +8487,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void injectProfileConfigs(JSONArray configAry, String userId,String groupId) throws JSONException {
+    public void injectProfileConfigs(JSONArray configAry, String userId, String groupId) throws JSONException {
 
         String[] profileAry = {"objectid", "accounttype", "orgunitid", "siteid", "approvalstatus", "firstname", "lastname", "displayname", "organization", "email", "usersite", "supervisoremployeeid", "addressline1", "addresscity", "addressstate", "addresszip", "addresscountry", "phone", "mobilephone", "imaddress", "dateofbirth", "gender", "nvarchar6", "paymentmode", "nvarchar7", "nvarchar8", "nvarchar9", "securepaypalid", "nvarchar10", "picture", "highschool", "college", "highestdegree", "jobtitle", "businessfunction", "primaryjobfunction", "payeeaccountno", "payeename", "paypalaccountname", "paypalemail", "shipaddline1", "shipaddcity", "shipaddstate", "shipaddzip", "shipaddcountry", "shipaddphone"};
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String strDelete = "DELETE FROM " + TBL_USERPROFILECONFIGS + " WHERE userid   = " + userId + " and siteid = " + appUserModel.getSiteIDValue() +" and groupid = " +groupId;
+            String strDelete = "DELETE FROM " + TBL_USERPROFILECONFIGS + " WHERE userid   = " + userId + " and siteid = " + appUserModel.getSiteIDValue() + " and groupid = " + groupId;
             db.execSQL(strDelete);
 
         } catch (SQLiteException sqlEx) {
@@ -8818,7 +8818,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 if (jsonProfileConfigArray.length() > 0) {
 
-                    injectProfileConfigs(jsonProfileConfigArray, userID,groupid);
+                    injectProfileConfigs(jsonProfileConfigArray, userID, groupid);
 
                 } else {
                     continue;
@@ -8897,7 +8897,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 SQLiteDatabase db = this.getWritableDatabase();
                 try {
-                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE userid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
                     db.execSQL(strDelete);
 
                 } catch (SQLiteException sqlEx) {
@@ -8907,37 +8907,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
 
-                if (experiencObj.has("firstname")) {
+                if (experiencObj.has("userid")) {
 
-                    userExperienceModel.userID = experiencObj.get("firstname").toString();
+                    userExperienceModel.userID = experiencObj.get("userid").toString();
                 }
-                if (experiencObj.has("lastname")) {
-                    userExperienceModel.title = experiencObj.get("lastname").toString();
+                if (experiencObj.has("title")) {
+                    userExperienceModel.title = experiencObj.get("title").toString();
                 }
-                if (experiencObj.has("accounttype")) {
-                    userExperienceModel.location = experiencObj.get("accounttype").toString();
+                if (experiencObj.has("location")) {
+                    userExperienceModel.location = experiencObj.get("location").toString();
                 }
-                if (experiencObj.has("orgunitid")) {
-                    userExperienceModel.description = experiencObj.get("orgunitid").toString();
+                if (experiencObj.has("description")) {
+                    userExperienceModel.description = experiencObj.get("description").toString();
                 }
-                if (experiencObj.has("siteid")) {
-                    userExperienceModel.difference = experiencObj.get("siteid").toString();
+                if (experiencObj.has("difference")) {
+                    userExperienceModel.difference = experiencObj.get("difference").toString();
                 }
-                if (experiencObj.has("approvalstatus")) {
-                    userExperienceModel.displayNo = experiencObj.get("approvalstatus").toString();
+                if (experiencObj.has("displayno")) {
+                    userExperienceModel.displayNo = experiencObj.get("displayno").toString();
                 }
-                if (experiencObj.has("displayname")) {
-                    userExperienceModel.fromDate = experiencObj.get("displayname").toString();
+                if (experiencObj.has("fromdate")) {
+                    userExperienceModel.fromDate = experiencObj.get("fromdate").toString();
                 }
-                if (experiencObj.has("organization")) {
-                    userExperienceModel.toDate = experiencObj.get("organization").toString();
-                }
-
-                if (experiencObj.has("usersite")) {
-                    userExperienceModel.companyName = experiencObj.get("usersite").toString();
+                if (experiencObj.has("todate")) {
+                    userExperienceModel.toDate = experiencObj.get("todate").toString();
                 }
 
-                userExperienceModel.userID = userID;
+                if (experiencObj.has("companyname")) {
+                    userExperienceModel.companyName = experiencObj.get("companyname").toString();
+                }
+
+//                userExperienceModel.userID = userID;
 
                 Log.d(TAG, "InjectAllProfileDetails: at index " + userExperienceModel);
                 injectExperienceIntoTable(userExperienceModel);
@@ -8965,6 +8965,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("difference", experienceModel.difference);
             contentValues.put("tilldate", experienceModel.tillDate);
             contentValues.put("displayno", experienceModel.displayNo);
+            contentValues.put("siteid", appUserModel.getSiteIDValue());
             contentValues.put("isupdated", true);
 
 
@@ -8987,7 +8988,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 SQLiteDatabase db = this.getWritableDatabase();
                 try {
-                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                    String strDelete = "DELETE FROM " + USER_EDUCATION_DETAILS + " WHERE userid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
                     db.execSQL(strDelete);
 
                 } catch (SQLiteException sqlEx) {
@@ -8997,45 +8998,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
 
-                if (experiencObj.has("firstname")) {
+                if (experiencObj.has("userid")) {
 
-                    userEducationModel.userid = experiencObj.get("firstname").toString();
+                    userEducationModel.userid = experiencObj.get("userid").toString();
                 }
-                if (experiencObj.has("lastname")) {
-                    userEducationModel.school = experiencObj.get("lastname").toString();
+                if (experiencObj.has("school")) {
+                    userEducationModel.school = experiencObj.get("school").toString();
                 }
-                if (experiencObj.has("accounttype")) {
-                    userEducationModel.country = experiencObj.get("accounttype").toString();
+                if (experiencObj.has("country")) {
+                    userEducationModel.country = experiencObj.get("country").toString();
                 }
-                if (experiencObj.has("orgunitid")) {
-                    userEducationModel.degree = experiencObj.get("orgunitid").toString();
+                if (experiencObj.has("degree")) {
+                    userEducationModel.degree = experiencObj.get("degree").toString();
                 }
-                if (experiencObj.has("siteid")) {
-                    userEducationModel.fromyear = experiencObj.get("siteid").toString();
+                if (experiencObj.has("fromyear")) {
+                    userEducationModel.fromyear = experiencObj.get("fromyear").toString();
                 }
-                if (experiencObj.has("approvalstatus")) {
-                    userEducationModel.totalperiod = experiencObj.get("approvalstatus").toString();
+                if (experiencObj.has("totalperiod")) {
+                    userEducationModel.totalperiod = experiencObj.get("totalperiod").toString();
                 }
-                if (experiencObj.has("displayname")) {
-                    userEducationModel.toyear = experiencObj.get("displayname").toString();
+                if (experiencObj.has("toyear")) {
+                    userEducationModel.toyear = experiencObj.get("toyear").toString();
                 }
-                if (experiencObj.has("organization")) {
-                    userEducationModel.titleeducation = experiencObj.get("organization").toString();
-                }
-
-                if (experiencObj.has("usersite")) {
-                    userEducationModel.titleid = experiencObj.get("usersite").toString();
+                if (experiencObj.has("titleeducation")) {
+                    userEducationModel.titleeducation = experiencObj.get("titleeducation").toString();
                 }
 
-                if (experiencObj.has("usersite")) {
-                    userEducationModel.description = experiencObj.get("usersite").toString();
+                if (experiencObj.has("titleid")) {
+                    userEducationModel.titleid = experiencObj.get("titleid").toString();
                 }
 
-                if (experiencObj.has("usersite")) {
-                    userEducationModel.displayno = experiencObj.get("usersite").toString();
+                if (experiencObj.has("description")) {
+                    userEducationModel.description = experiencObj.get("description").toString();
                 }
 
-                userEducationModel.userid = userID;
+                if (experiencObj.has("displayno")) {
+                    userEducationModel.displayno = experiencObj.get("displayno").toString();
+                }
+
+//                userEducationModel.userid = userID;
 
                 Log.d(TAG, "InjectAllProfileDetails: at index " + userEducationModel);
                 injectEducationIntoTable(userEducationModel);
@@ -9050,10 +9051,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
 
-
         try {
             contentValues = new ContentValues();
-            contentValues.put("title", educationModel.titleeducation);
+            contentValues.put("titleeducation", educationModel.titleeducation);
             contentValues.put("totalperiod", educationModel.totalperiod);
             contentValues.put("fromyear", educationModel.fromyear);
             contentValues.put("degree", educationModel.degree);
@@ -9064,6 +9064,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("toyear", educationModel.toyear);
             contentValues.put("country", educationModel.country);
             contentValues.put("school", educationModel.school);
+            contentValues.put("siteid", appUserModel.getSiteIDValue());
+
             contentValues.put("isupdated", true);
 
 
@@ -9200,14 +9202,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public List<ProfileConfigsModel> fetchUserConfigs(String userID, String siteID,String groupID) {
+    public List<ProfileConfigsModel> fetchUserConfigs(String userID, String siteID, String groupID) {
 
 
         List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "" ;//"SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
+        String strSelQuery = "";//"SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
 
         if (groupID.equals("")) {
             strSelQuery = "SELECT DISTINCT UPC.*,UPG.groupname FROM "
@@ -9221,7 +9223,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + " UPG LEFT OUTER JOIN "
                     + TBL_USERPROFILECONFIGS
                     + " UPC ON UPG.groupid= UPC.groupid WHERE UPG.groupid='"
-                    + groupID +"' AND UPC.siteid = '" + siteID + "' AND UPC.userid = '" + userID
+                    + groupID + "' AND UPC.siteid = '" + siteID + "' AND UPC.userid = '" + userID
                     + "' AND UPC.enduservisibility='true' ORDER BY UPC.displayorder";
 //                    + "' ORDER BY UPC.displayorder";
 
@@ -9290,6 +9292,96 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return cvFields;
     }
+
+    public List<UserEducationModel> fetchUserEducationModel(String siteId, String userID) {
+
+        List<UserEducationModel> userEducationModelList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + USER_EDUCATION_DETAILS + " WHERE userid =" + userID + " AND siteid = " + siteId;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+
+                    UserEducationModel userEducationModel = new UserEducationModel();
+                    userEducationModel.userid = (cursor.getString(cursor.getColumnIndex("userid")));
+                    userEducationModel.school = (cursor.getString(cursor.getColumnIndex("school")));
+                    userEducationModel.country = (cursor.getString(cursor.getColumnIndex("country")));
+                    userEducationModel.degree = (cursor.getString(cursor.getColumnIndex("degree")));
+                    userEducationModel.fromyear = (cursor.getString(cursor.getColumnIndex("fromyear")));
+                    userEducationModel.totalperiod = (cursor.getString(cursor.getColumnIndex("totalperiod")));
+                    userEducationModel.toyear = (cursor.getString(cursor.getColumnIndex("toyear")));
+                    userEducationModel.titleeducation = (cursor.getString(cursor.getColumnIndex("titleeducation")));
+                    userEducationModel.titleid = (cursor.getString(cursor.getColumnIndex("titleid")));
+                    userEducationModel.description = (cursor.getString(cursor.getColumnIndex("description")));
+                    userEducationModel.displayno = (cursor.getString(cursor.getColumnIndex("displayno")));
+                    userEducationModelList.add(userEducationModel);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return userEducationModelList;
+    }
+
+
+    public List<UserExperienceModel> fetchUserExperienceModel(String siteId, String userID) {
+
+        List<UserExperienceModel> userExperienceModelList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + USER_EXPERIENCE_DETAILS + " WHERE userid =" + userID + " AND siteid = " + siteId;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+
+                    UserExperienceModel userExperienceModel = new UserExperienceModel();
+                    userExperienceModel.title = (cursor.getString(cursor.getColumnIndex("title")));
+                    userExperienceModel.location = (cursor.getString(cursor.getColumnIndex("location")));
+                    userExperienceModel.companyName = (cursor.getString(cursor.getColumnIndex("companyname")));
+                    userExperienceModel.fromDate = (cursor.getString(cursor.getColumnIndex("fromdate")));
+                    userExperienceModel.toDate = (cursor.getString(cursor.getColumnIndex("fromyear")));
+                    userExperienceModel.displayNo = (cursor.getString(cursor.getColumnIndex("displayno")));
+                    userExperienceModel.description = (cursor.getString(cursor.getColumnIndex("description")));
+                    userExperienceModel.difference = (cursor.getString(cursor.getColumnIndex("difference")));
+
+                    userExperienceModelList.add(userExperienceModel);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return userExperienceModelList;
+    }
+
 
 //    public ArrayList<ProfileConfigsModel> getProfileConfigsArray(String siteID,
 //                                                                String groupID) {
