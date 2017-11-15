@@ -75,7 +75,9 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_activity);
         ButterKnife.bind(this);
-        initilizeView();
+        context = this;
+        imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
+//        initilizeView();
         requestPermission();
         db = new DatabaseHandler(context);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -102,6 +104,8 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
 
+//        checkPermission();
+
     }
 
     /*
@@ -111,8 +115,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     * */
     public void initilizeView() {
 
-        context = this;
-        imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
+
 //      animation
         zoomin = AnimationUtils.loadAnimation(this, R.anim.zoomin);
         zoomout = AnimationUtils.loadAnimation(this, R.anim.zoomout);
@@ -161,6 +164,8 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             }
         });
+
+
     }
 
     public void callWebMethods() {

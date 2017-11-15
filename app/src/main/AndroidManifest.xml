@@ -90,8 +90,7 @@
         <!--ADVANCED WEBVIEW -->
         <activity
             android:name=".mainactivities.AdvancedWebCourseLaunch"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            > </activity>
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"></activity>
 
         <activity
             android:name=".mainactivities.PdfViewer_Activity"
@@ -128,6 +127,8 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
+
     </application>
 
 </manifest>

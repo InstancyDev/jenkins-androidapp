@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="#ffff">
+
+    <TextView
+        android:padding="3dp"
+        android:id="@+id/profile_school"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="Rajiv Gandhi college"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="12sp" />
+
+    <TextView
+        android:padding="3dp"
+        android:layout_below="@id/profile_school"
+        android:id="@+id/profile_degree"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="B tech"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="12sp" />
+
+
+    <TextView
+        android:padding="3dp"
+        android:layout_below="@id/profile_degree"
+        android:id="@+id/profile_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="2009 - 2011 total 2 Years"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="12sp" />
+</RelativeLayout>

@@ -2,16 +2,24 @@ package com.instancy.instancylearning.profile;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +29,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -45,13 +59,18 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -93,6 +112,12 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     List<UserEducationModel> educationModelArrayList = new ArrayList<>();
 
     List<UserExperienceModel> experienceModelArrayList = new ArrayList<>();
+
+    static final int REQUEST_IMAGE_CAMERA = 1;
+    private static final int REQUEST_CAMERA = 0;
+    private int GALLERY = 1, CAMERA = 2;
+    private Uri uri;
+    private File scaledFile;
 
     public Profile_fragment() {
 
@@ -143,8 +168,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
 
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
-
-
 
         profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
@@ -210,6 +233,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
 
+        if (experienceModelArrayList.size() > 0) {
+
+            ProfileGroupModel profileGroupModel = new ProfileGroupModel();
+            profileGroupModel.groupId = "124";
+            profileGroupModel.groupname = "Experience";
+
+            hmGroupWiseConfigs.put("Experience", profileConfigsModelList);
+
+            profileGroupModelList.add(profileGroupModel);
+        }
+
         isProfileExists = true;
         return isProfileExists;
 
@@ -229,7 +263,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
         boolean isProfileExists = getALlProfilesDetailsFromDB();
-        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(),educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
+        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), profileExpandableList, experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
         profileExpandableList.addHeaderView(header);
@@ -338,7 +372,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             location = "";
         }
 
-
         strAry[0] = name;
         strAry[1] = location;
 
@@ -348,8 +381,84 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_CANCELED) {
+            return;
+        }
+        if (requestCode == GALLERY) {
+            if (data != null) {
+                Uri contentURI = data.getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+//                    String path = saveImage(bitmap);
+                    Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
 
 
+                    ExifInterface exif = null;
+                    try {
+                        File pictureFile = new File(contentURI.getPath());
+                        exif = new ExifInterface(pictureFile.getAbsolutePath());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    int orientation = ExifInterface.ORIENTATION_NORMAL;
+
+                    if (exif != null)
+                        orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+                    switch (orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            bitmap = rotateBitmap(bitmap, 90);
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            bitmap = rotateBitmap(bitmap, 180);
+                            break;
+
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            bitmap = rotateBitmap(bitmap, 270);
+                            break;
+                    }
+
+
+                    profileImage.setImageBitmap(bitmap);
+                    profileRound.setImageBitmap(bitmap);
+                    String imageENcode = encodeImage(bitmap);
+                    sendImageTOServer(imageENcode);
+                    Log.d(TAG, "onActivityResult: " + imageENcode);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+        } else if (requestCode == CAMERA) {
+            Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+            profileRound.setImageBitmap(thumbnail);
+            profileImage.setImageBitmap(thumbnail);
+//            saveImage(thumbnail);
+            String imageENcode = encodeImage(thumbnail);
+            Log.d(TAG, "onActivityResult: " + imageENcode);
+            Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
+
+            sendImageTOServer(imageENcode);
+        }
+
+    }
+
+    private String encodeImage(Bitmap bm) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String encImage = Base64.encodeToString(b, Base64.DEFAULT);
+
+        return encImage;
+    }
+
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     @Override
@@ -424,10 +533,90 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                showPictureDialog();
                 break;
 
         }
 
     }
+
+    private void showPictureDialog() {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(context);
+        pictureDialog.setTitle("Select Action");
+        String[] pictureDialogItems = {
+                "Select photo from gallery",
+                "Capture photo from camera"};
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallary();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
+                        }
+                    }
+                });
+        pictureDialog.show();
+    }
+
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(galleryIntent, GALLERY);
+    }
+
+    private void takePhotoFromCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAMERA);
+    }
+
+
+    public void sendImageTOServer(final String imageString) {
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        //sending image to server
+
+        String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=somename&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
+
+        StringRequest request = new StringRequest(Request.Method.POST, apiString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+
+
+            //adding parameters to send
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> parameters = new HashMap<String, String>();
+                parameters.put("image", imageString);
+                return parameters;
+            }
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+    }
+
+
 }
+
