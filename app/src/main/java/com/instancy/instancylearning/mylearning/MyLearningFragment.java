@@ -391,7 +391,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-        item_filter.setVisible(false);
+//        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));

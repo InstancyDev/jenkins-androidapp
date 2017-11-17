@@ -4,9 +4,15 @@
     tools:context=".MainActivity">
 
     <item
-        android:title="@string/fa_icon_search"
         android:id="@+id/catalog_search"
         android:orderInCategory="100"
+        android:title="@string/fa_icon_search"
         app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/mylearning_filter"
+        android:icon="@drawable/filter_icon"
+        android:orderInCategory="100"
+        android:title="filter"
+        app:showAsAction="always|collapseActionView" />
 
 </menu>

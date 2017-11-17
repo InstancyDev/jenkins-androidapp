@@ -9354,17 +9354,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
 
-
                     UserExperienceModel userExperienceModel = new UserExperienceModel();
                     userExperienceModel.title = (cursor.getString(cursor.getColumnIndex("title")));
                     userExperienceModel.location = (cursor.getString(cursor.getColumnIndex("location")));
                     userExperienceModel.companyName = (cursor.getString(cursor.getColumnIndex("companyname")));
                     userExperienceModel.fromDate = (cursor.getString(cursor.getColumnIndex("fromdate")));
-                    userExperienceModel.toDate = (cursor.getString(cursor.getColumnIndex("fromyear")));
+                    userExperienceModel.toDate = (cursor.getString(cursor.getColumnIndex("todate")));
                     userExperienceModel.displayNo = (cursor.getString(cursor.getColumnIndex("displayno")));
                     userExperienceModel.description = (cursor.getString(cursor.getColumnIndex("description")));
                     userExperienceModel.difference = (cursor.getString(cursor.getColumnIndex("difference")));
-
                     userExperienceModelList.add(userExperienceModel);
                 }
             }
@@ -9602,9 +9600,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.d("UpdatetScormCMI", e.getMessage());
         }
-
     }
-
 
     // uncomment for pagenotes
 //    public void sendOfflineUserPagenotes() {

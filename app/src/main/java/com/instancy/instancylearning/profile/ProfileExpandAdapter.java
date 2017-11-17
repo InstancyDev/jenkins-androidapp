@@ -33,15 +33,13 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
     private List<UserEducationModel> userEducationModelList;
     private List<UserExperienceModel> userExperienceModelList;
     private HashMap<String, List<ProfileConfigsModel>> expandableHashDetail;
-    private ExpandableListView exp;
 
-    public ProfileExpandAdapter(Context context, ExpandableListView exp, List<UserExperienceModel> userExperienceModelList, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
+    public ProfileExpandAdapter(Context context, List<UserExperienceModel> userExperienceModelList, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
         this.context = context;
         this.userEducationModelList = userEducationModelList;
         this.userExperienceModelList = userExperienceModelList;
         this.expandableHashDetail = expandableHashDetail;
         this.expandableListTitle = expandableListTitle;
-        this.exp = exp;
     }
 
     @Override
@@ -105,7 +103,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             pView = inflater.inflate(R.layout.profilesectionview, parent, false);
-
+            View view = (View) pView.findViewById(R.id.topview);
         }
         ImageView moreOptions = (ImageView) pView.findViewById(R.id.moreoptionsicon);
         moreOptions.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +118,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(expandableListTitle.get(groupPosition).groupname);
-//        exp.setDividerHeight(20);
+
 
         return pView;
 
@@ -136,58 +134,42 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         }
         View cView = convertView;
 
-        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education") || expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Experience")) {
-
-//            if (cView == null) {
-                LayoutInflater inflater = (LayoutInflater) context
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                cView = inflater.inflate(R.layout.profile_education_item, parent, false);
-//            }
-
-            TextView profileSchool = (TextView) cView
-                    .findViewById(R.id.profile_school);
-            TextView profileDegree = (TextView) cView
-                    .findViewById(R.id.profile_degree);
-
-            TextView profileDuration = (TextView) cView
-                    .findViewById(R.id.profile_duration);
-
-            if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
-                profileSchool.setText(this.userEducationModelList.get(childPosition).school);
-                profileDegree.setText(this.userEducationModelList.get(childPosition).titleeducation);
-                profileDuration.setText(this.userEducationModelList.get(childPosition).totalperiod);
-            } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Experience")) {
-                profileSchool.setText(this.userExperienceModelList.get(childPosition).title);
-                profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
-                profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate);
-
-            }
-        } else {
-
-            if (cView == null) {
-                LayoutInflater inflater = (LayoutInflater) context
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                cView = inflater.inflate(R.layout.profile_item, parent, false);
-
-            }
-
-            try {
-                TextView profileLabel = (TextView) cView
-                        .findViewById(R.id.profile_label);
-                TextView profileValue = (TextView) cView
-                        .findViewById(R.id.profile_value);
-                profileLabel.setText(configsModel.attributedisplaytext);
-                profileValue.setText(configsModel.valueName);
-            } catch (NullPointerException ex) {
-
-                ex.printStackTrace();
-            }
+        if (cView == null) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            cView = inflater.inflate(R.layout.profile_education_item, parent, false);
         }
+
+        TextView profileSchool = (TextView) cView
+                .findViewById(R.id.profile_school);
+        TextView profileDegree = (TextView) cView
+                .findViewById(R.id.profile_degree);
+
+        TextView profileDuration = (TextView) cView
+                .findViewById(R.id.profile_duration);
+
+        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
+            profileSchool.setText(this.userEducationModelList.get(childPosition).school);
+            profileDegree.setText(this.userEducationModelList.get(childPosition).titleeducation);
+            profileDuration.setText(this.userEducationModelList.get(childPosition).totalperiod);
+            profileDuration.setVisibility(View.VISIBLE);
+        } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Experience")) {
+            profileSchool.setText(this.userExperienceModelList.get(childPosition).title);
+            profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
+            profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate);
+            profileDuration.setVisibility(View.VISIBLE);
+        } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Personal Info")) {
+            profileSchool.setText(configsModel.attributedisplaytext);
+            profileDegree.setText(configsModel.valueName);
+            profileDuration.setVisibility(View.GONE);
+        }
+
         if (isLastChild) {
             cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitembottom));
+        } else {
+            cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitemmiddle));
         }
 
-//        exp.setDividerHeight(0);
         return cView;
     }
 

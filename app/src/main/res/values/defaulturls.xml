@@ -44,12 +44,12 @@
     <!--<string name="app_default_url">https://ecommerce.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
-
-
-    <string name="app_default_url">http://app.instancysoft.com/</string>
+    <string name="app_default_url">http://mobilelocal.instancysoft.com/</string>
     <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>
+
+
+    <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
 
     <!--fo enterprise lite app -->
     <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->

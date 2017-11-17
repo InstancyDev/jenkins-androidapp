@@ -56,6 +56,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.filter.Filter_activity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
@@ -91,6 +92,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
@@ -243,6 +245,26 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
                 }
 
+                if (requestType.equalsIgnoreCase("FILTER")) {
+
+                    if (response != null) {
+                        try {
+                            db.insertFilterIntoDB(response, appUserModel);
+                            Intent intent = new Intent(context, Filter_activity.class);
+                            startActivityForResult(intent, FILTER_CLOSE_CODE);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                        Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
+
+                    }
+
+                }
+
+
+
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -253,6 +275,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("FILTER")) {
+
+                    Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -343,9 +369,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(false);
+//        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
@@ -377,9 +404,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
         if (item_filter != null) {
-            item_filter.setIcon(R.drawable.ic_filter_list_black_24dp);
+            item_filter.setIcon(R.drawable.filter_icon);
             tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
+            Drawable myIcon = getResources().getDrawable(R.drawable.filter_icon);
+            item_filter.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
             item_filter.setTitle("Filter");
+
         }
 
         if (itemInfo != null) {
@@ -431,6 +461,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 appcontroller.setAlreadyViewd(false);
                 preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
                 catalogAdapter.notifyDataSetChanged();
+                break;
+            case R.id.mylearning_filter:
+                filterApiCall();
                 break;
 
         }
@@ -1222,6 +1255,28 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
             }
         };
+    }
+
+    public void filterApiCall() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3134";
+            vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
+
+        } else {
+
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel);
+            if (jsonObject != null) {
+
+                Intent intent = new Intent(context, Filter_activity.class);
+                startActivityForResult(intent, FILTER_CLOSE_CODE);
+
+            } else {
+                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+
+        }
     }
 
 

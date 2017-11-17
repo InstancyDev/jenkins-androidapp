@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -30,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -62,6 +62,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -263,7 +265,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
         boolean isProfileExists = getALlProfilesDetailsFromDB();
-        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), profileExpandableList, experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
+        profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
         profileExpandableList.addHeaderView(header);
@@ -392,34 +394,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                    String path = saveImage(bitmap);
                     Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
 
-
-                    ExifInterface exif = null;
-                    try {
-                        File pictureFile = new File(contentURI.getPath());
-                        exif = new ExifInterface(pictureFile.getAbsolutePath());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    int orientation = ExifInterface.ORIENTATION_NORMAL;
-
-                    if (exif != null)
-                        orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
-                    switch (orientation) {
-                        case ExifInterface.ORIENTATION_ROTATE_90:
-                            bitmap = rotateBitmap(bitmap, 90);
-                            break;
-                        case ExifInterface.ORIENTATION_ROTATE_180:
-                            bitmap = rotateBitmap(bitmap, 180);
-                            break;
-
-                        case ExifInterface.ORIENTATION_ROTATE_270:
-                            bitmap = rotateBitmap(bitmap, 270);
-                            break;
-                    }
-
-
                     profileImage.setImageBitmap(bitmap);
                     profileRound.setImageBitmap(bitmap);
                     String imageENcode = encodeImage(bitmap);
@@ -439,7 +413,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            saveImage(thumbnail);
             String imageENcode = encodeImage(thumbnail);
             Log.d(TAG, "onActivityResult: " + imageENcode);
-            Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
 
             sendImageTOServer(imageENcode);
         }
@@ -575,17 +549,26 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         startActivityForResult(intent, CAMERA);
     }
 
-
     public void sendImageTOServer(final String imageString) {
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         //sending image to server
 
         String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=somename&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
 
-        StringRequest request = new StringRequest(Request.Method.POST, apiString, new Response.Listener<String>() {
+        final StringRequest request = new StringRequest(Request.Method.POST, apiString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("true")) {
+
+                    Toast.makeText(context, "Profile Picture Successfully Updated", Toast.LENGTH_SHORT).show();
+                } else {
+
+                    Toast.makeText(context, "Profile Picture failed to Update", Toast.LENGTH_SHORT).show();
+                }
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -593,28 +576,59 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
-        }) {
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/x-www-form-urlencoded";
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                String str = "\"\"" + imageString + "\"\"";
+                String encodedString = "";
+
+                try {
+                    encodedString = URLEncoder.encode(str, "UTF-8");
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                return encodedString.getBytes();
+            }
+
+            ;
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
                 return headers;
             }
 
 
             //adding parameters to send
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("image", imageString);
-                return parameters;
-            }
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> parameters = new HashMap<String, String>();
+//                parameters.put("image", imageString);
+//                return parameters;
+//            }
         };
 
         RequestQueue rQueue = Volley.newRequestQueue(context);
         rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
     }
 
 
