@@ -29,8 +29,7 @@ import com.instancy.instancylearning.interfaces.LRSJavaScriptInterface;
 import com.instancy.instancylearning.interfaces.hideProgressListner;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.mukesh.Prevailer;
-import com.mukesh.PrevailerFactory;
+
 
 /**
  * Created by Upendranath on 6/29/2017 Working on InstancyLearning.
@@ -337,10 +336,18 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-////        adWebView.pauseTimers();
+
 //        adWebView.loadUrl("");
 //        adWebView.stopLoading();
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        adWebView.pauseTimers();
+//        adWebView.stopLoading();
+        adWebView.destroy();
     }
 
     @Override
@@ -357,7 +364,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     public static void clearWebViewAbsolutely(WebView webView) {
         webView.clearCache(true);

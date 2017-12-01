@@ -22,6 +22,7 @@ import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
+import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.NativeMenuModel;
@@ -55,7 +56,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.instancy.instancylearning.utils.StaticValues.DATABASE_NAME;
@@ -1402,8 +1406,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     //
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7")))
-                        continue;
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7") || contextMenuID.equalsIgnoreCase("6")))
+//                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -1501,6 +1505,96 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return menuList;
     }
+
+    public List<SideMenusModel> getNativeSubMenusData(int parentMenuId) {
+        List<SideMenusModel> menuList = null;
+        SideMenusModel menu = null;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_NATIVEMENUS
+                + " WHERE siteurl= '" + appUserModel.getSiteURL() + "' AND isenabled='true' AND parentmenuid='" + parentMenuId + "' ORDER BY displayorder";
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                menuList = new ArrayList<SideMenusModel>();
+                do {
+                    menu = new SideMenusModel();
+                    menu.setMenuId(cursor.getInt(cursor
+                            .getColumnIndex("menuid")));
+                    menu.setDisplayName(cursor.getString(cursor
+                            .getColumnIndex("displayname")));
+                    menu.setDisplayOrder(cursor.getInt(cursor
+                            .getColumnIndex("displayorder")));
+                    menu.setImage(cursor.getString(cursor
+                            .getColumnIndex("image")));
+                    int menuIconResId = -1;
+//                    switch (cursor.getString(
+//                            cursor.getColumnIndex("contextmenuid"))
+//                            .toLowerCase()) {
+//                        case "1":
+//                            menuIconResId = R.drawable.learning;
+//                            break;
+//                        case "2":
+//                            menuIconResId = R.drawable.catalog;
+//                            break;
+//                        case "3":
+//                            menuIconResId = R.drawable.profile;
+//                            break;
+//                        case "4":
+//                            menuIconResId = R.drawable.comment;
+//                            break;
+//                        case "5":
+//                            menuIconResId = R.drawable.ic_ask_the_expert;
+//                            break;
+//                        // case "events":
+//                        // menuIconResId = R.drawable.event;
+//                        // break;
+//
+//                        default:
+//                            menuIconResId = R.drawable.home;
+//                            break;
+//                    }
+                    menu.setMenuImageResId(menuIconResId);
+                    menu.setIsOfflineMenu(cursor.getString(cursor
+                            .getColumnIndex("isofflinemenu")));
+                    menu.setIsEnabled(cursor.getString(cursor
+                            .getColumnIndex("isenabled")));
+                    menu.setContextTitle(cursor.getString(cursor
+                            .getColumnIndex("contexttitle")));
+                    menu.setContextMenuId(cursor.getString(cursor
+                            .getColumnIndex("contextmenuid")));
+                    menu.setRepositoryId(cursor.getString(cursor
+                            .getColumnIndex("repositoryid")));
+                    menu.setLandingPageType(cursor.getString(cursor
+                            .getColumnIndex("landingpagetype")));
+                    menu.setCategoryStyle(cursor.getString(cursor
+                            .getColumnIndex("categorystyle")));
+                    menu.setComponentId(cursor.getString(cursor
+                            .getColumnIndex("componentid")));
+                    menu.setConditions(cursor.getString(cursor
+                            .getColumnIndex("conditions")));
+                    menu.setParentMenuId(cursor.getString(cursor
+                            .getColumnIndex("parentmenuid")));
+                    menu.setParameterStrings(cursor.getString(cursor
+                            .getColumnIndex("parameterstrings")));
+
+                    menuList.add(menu);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("getNativeSubMenusData", e.getMessage() != null ? e.getMessage() : "Error getting menus");
+
+        }
+        return menuList;
+    }
+
 
     public void deleteRecordsinTable(String siteid, String siteUrl, String TABLENAME) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -4423,6 +4517,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void injectIntoCMITable(CMIModel cmiModel, String isviewd) {
         SQLiteDatabase db = this.getWritableDatabase();
+
+
         ContentValues contentValues = null;
         try {
 
@@ -8389,11 +8485,47 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             JSONArray jsonExperienceAry = null;
 
-            jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
-            jsonGroupsAry = jsonObject.getJSONArray("userprofilegroups");
+            if (jsonObject.has("userprofiledetails")) {
+                jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
+            } else {
 
-            jsonEducationAry = jsonObject.getJSONArray("usereducationdata");
-            jsonExperienceAry = jsonObject.getJSONArray("userexperiencedata");
+                jsonProfileAry = jsonObject.getJSONArray("table");
+            }
+
+            if (jsonObject.has("userprofilegroups")) {
+
+                jsonGroupsAry = jsonObject.getJSONArray("userprofilegroups");
+            } else {
+                jsonGroupsAry = jsonObject.getJSONArray("table2");
+            }
+
+            if (jsonObject.has("table1")) {
+                JSONArray jsonProfileConfigArray = jsonObject.getJSONArray("table1");
+                if (jsonProfileConfigArray.length() > 0) {
+                    injectProfileConfigsOld(jsonProfileConfigArray, userID);
+                }
+            }
+            if (jsonObject.has("usereducationdata")) {
+
+                jsonEducationAry = jsonObject.getJSONArray("usereducationdata");
+            } else {
+                //no else
+            }
+
+            if (jsonObject.has("userexperiencedata")) {
+
+                jsonExperienceAry = jsonObject.getJSONArray("userexperiencedata");
+            } else {
+                //no else for old apis
+            }
+
+//            jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
+//
+//            jsonGroupsAry = jsonObject.getJSONArray("userprofilegroups");
+//
+//            jsonEducationAry = jsonObject.getJSONArray("usereducationdata");
+//
+//            jsonExperienceAry = jsonObject.getJSONArray("userexperiencedata");
 
 
             // for all groups and chaild data
@@ -8408,21 +8540,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 injectProfileDetails(jsonProfileAry, userID);
             }
 
-            // for all education data
-            if (jsonEducationAry.length() > 0) {
-
-                injectUserEducation(jsonEducationAry, userID);
-            }
-
-            // for experience data
-            if (jsonExperienceAry.length() > 0) {
-
-                injectUserExperience(jsonExperienceAry, userID);
-            }
+            // for all education data hide for cle
+//                if (jsonEducationAry.length() > 0) {
+//
+//                    injectUserEducation(jsonEducationAry, userID);
+//                }
+//
+//                // for experience data
+//                if (jsonExperienceAry.length() > 0) {
+//
+//                    injectUserExperience(jsonExperienceAry, userID);
+//                }
 
         }
     }
-
 
     public void injectProfileIntoTable(ProfileDetailsModel profileDetailsModel) {
 
@@ -8612,6 +8743,130 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public void injectProfileConfigsOld(JSONArray configAry, String userId) throws JSONException {
+
+        String[] profileAry = {"objectid", "accounttype", "orgunitid", "siteid", "approvalstatus", "firstname", "lastname", "displayname", "organization", "email", "usersite", "supervisoremployeeid", "addressline1", "addresscity", "addressstate", "addresszip", "addresscountry", "phone", "mobilephone", "imaddress", "dateofbirth", "gender", "nvarchar6", "paymentmode", "nvarchar7", "nvarchar8", "nvarchar9", "securepaypalid", "nvarchar10", "picture", "highschool", "college", "highestdegree", "jobtitle", "businessfunction", "primaryjobfunction", "payeeaccountno", "payeename", "paypalaccountname", "paypalemail", "shipaddline1", "shipaddcity", "shipaddstate", "shipaddzip", "shipaddcountry", "shipaddphone"};
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strDelete = "DELETE FROM " + TBL_USERPROFILECONFIGS + " WHERE userid   = " + userId + " and siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        for (int i = 0; i < configAry.length(); i++) {
+
+            JSONObject profileObj = configAry.getJSONObject(i);
+
+            if (profileObj.has("datafieldname")) {
+
+                String dataFieldName = profileObj.get("datafieldname").toString();
+
+                for (String fieldName : profileAry) {
+
+                    if (dataFieldName.toLowerCase().equalsIgnoreCase(fieldName)) {
+                        Log.d(TAG, "injectProfileConfigs: dataFieldName " + dataFieldName);
+
+                        String aliasname = "";
+                        String attributedisplaytext = "";
+                        String groupid = "";
+                        String displayOrder = "";
+                        String attributeconfigid = "";
+                        String isrequired = "";
+                        String iseditable = "";
+                        String enduservisibility = "";
+                        String uicontroltypeid = "";
+                        String name = "";
+                        String datafieldname = "";
+
+                        if (profileObj.has("datafieldname")) {
+
+                            datafieldname = profileObj.get("datafieldname").toString();
+                        }
+
+                        if (profileObj.has("aliasname")) {
+
+                            aliasname = profileObj.get("aliasname").toString();
+                        }
+                        if (profileObj.has("attributedisplaytext")) {
+
+                            attributedisplaytext = profileObj.get("attributedisplaytext").toString();
+                        }
+
+                        if (profileObj.has("groupid")) {
+
+                            groupid = profileObj.get("groupid").toString();
+                        }
+
+                        if (profileObj.has("displayorder")) {
+
+                            displayOrder = profileObj.get("displayorder").toString();
+                        }
+
+                        if (profileObj.has("attributeconfigid")) {
+                            attributeconfigid = profileObj.get("attributeconfigid").toString();
+
+                        }
+
+                        if (profileObj.has("isrequired")) {
+
+                            isrequired = profileObj.get("isrequired").toString();
+                        }
+
+                        if (profileObj.has("iseditable")) {
+                            iseditable = profileObj.get("iseditable").toString();
+
+                        }
+
+                        if (profileObj.has("enduservisibility")) {
+                            enduservisibility = profileObj.get("enduservisibility").toString();
+
+                        }
+
+                        if (profileObj.has("uicontroltypeid")) {
+                            uicontroltypeid = profileObj.get("uicontroltypeid").toString();
+
+                        }
+
+                        if (profileObj.has("name")) {
+                            name = profileObj.get("name").toString();
+
+                        }
+                        ContentValues contentValues = null;
+                        try {
+                            contentValues = new ContentValues();
+                            contentValues.put("aliasname", aliasname);
+                            contentValues.put("attributedisplaytext", attributedisplaytext);
+                            contentValues.put("groupid", groupid);
+                            contentValues.put("displayOrder", displayOrder);
+                            contentValues.put("attributeconfigid", attributeconfigid);
+                            contentValues.put("isrequired", isrequired);
+                            contentValues.put("iseditable", iseditable);
+                            contentValues.put("iseditable", iseditable);
+                            contentValues.put("enduservisibility", enduservisibility);
+                            contentValues.put("uicontroltypeid", uicontroltypeid);
+                            contentValues.put("name", name);
+                            contentValues.put("userid", userId);
+                            contentValues.put("datafieldname", datafieldname);
+                            contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+                            db.insert(TBL_USERPROFILECONFIGS, null, contentValues);
+                        } catch (SQLiteException exception) {
+
+                            exception.printStackTrace();
+                        }
+
+
+                    }
+
+                }
+
+            }
+        }
+    }
 
     public void injectProfileDetails(JSONArray jsonProfileAry, String userID) throws JSONException {
 
@@ -9122,7 +9377,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT UPT.picture as firstPrefImage, UI.picture as secondPrefImage , UPT.*, UI.profileimagepath FROM " + TBL_USERPROFILEFIELDS + " UPT LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON UPT.objectid = UI.userid AND UPT.siteid = UI.siteid WHERE UPT.objectid =" + userID + " AND UPT.siteid = " + siteId;
+        String strSelQuery = "SELECT distinct UPT.picture as firstPrefImage, UI.picture as secondPrefImage , UPT.*, UI.profileimagepath FROM " + TBL_USERPROFILEFIELDS + " UPT LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON UPT.objectid = UI.userid AND UPT.siteid = UI.siteid WHERE UPT.objectid =" + userID + " AND UPT.siteid = " + siteId;
 
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
         try {
@@ -9210,7 +9465,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "";//"SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
+//        String strSelQuery = "";//"SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
+        String strSelQuery = "SELECT * from " + TBL_USERPROFILECONFIGS + " WHERE siteid = " + siteID + " AND userid = " + userID;
 
         if (groupID.equals("")) {
             strSelQuery = "SELECT DISTINCT UPC.*,UPG.groupname FROM "
@@ -9254,7 +9510,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
 
         return profileConfigsModelList;
     }
@@ -9600,6 +9855,459 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.d("UpdatetScormCMI", e.getMessage());
         }
+    }
+
+
+    public List<CatalogCategoryButtonModel> getCatalogCategoryDetails(
+            String siteId, String componentId) {
+        List<CatalogCategoryButtonModel> catalogCategoryDetailsList = null;
+        CatalogCategoryButtonModel catalogCategoryDetails = null;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_CATEGORIES
+                + " WHERE siteid='" + siteId + "' AND componentid='"
+                + componentId + "'";
+        try {
+
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                catalogCategoryDetailsList = new ArrayList<CatalogCategoryButtonModel>();
+                do {
+                    catalogCategoryDetails = new CatalogCategoryButtonModel();
+                    catalogCategoryDetails.setParentId(cursor.getInt(cursor
+                            .getColumnIndex("parentid")));
+                    catalogCategoryDetails.setCategoryName(cursor
+                            .getString(cursor.getColumnIndex("categoryname")));
+                    catalogCategoryDetails.setCategoryId(cursor.getInt(cursor
+                            .getColumnIndex("categoryid")));
+                    catalogCategoryDetails.setCategoryIcon(cursor
+                            .getString(cursor.getColumnIndex("categoryicon")));
+                    catalogCategoryDetails.setContentCount(cursor
+                            .getString(cursor.getColumnIndex("contentcount")));
+                    catalogCategoryDetails.setColumn1(cursor.getString(cursor
+                            .getColumnIndex("column1")));
+                    catalogCategoryDetails.setSiteId(cursor.getString(cursor
+                            .getColumnIndex("siteid")));
+
+                    catalogCategoryDetailsList.add(catalogCategoryDetails);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("getCatalogCategoryDetails", e.getMessage());
+
+        }
+        return catalogCategoryDetailsList;
+    }
+
+    public void injectCatalogCategories(JSONObject jsonObj, String componentId) throws JSONException {
+
+        JSONArray categoriesTable = jsonObj
+                .getJSONArray("table");
+        JSONArray subCategoriesTable = jsonObj
+                .getJSONArray("table1");
+        JSONArray categoryContentTable = jsonObj
+                .getJSONArray("table2");
+
+        SQLiteDatabase db = null;
+        ContentValues cv = null;
+
+        try {
+            if (categoriesTable.length() > 0) {
+
+                injectCatalogCategoriesIntoTable(categoriesTable, componentId);
+            }
+            if (subCategoriesTable.length() > 0) {
+
+                injectCatalogSubCategoriesIntoTable(subCategoriesTable, componentId);
+            }
+            if (categoryContentTable.length() > 0) {
+
+                injectCatalogCategoriesContentIntoTable(categoryContentTable, componentId);
+            }
+        } catch (Exception e) {
+            Log.d("categoriesTable", e.getMessage());
+        }
+
+    }
+
+    public void injectCatalogCategoriesIntoTable(JSONArray jsonArray, String componentID) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        db.delete(TBL_CATEGORIES, "siteid='"
+                + appUserModel.getSiteIDValue() + "' AND componentid='"
+                + componentID + "'", null);
+
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject categoryOjb = jsonArray.getJSONObject(i);
+
+            contentValues = new ContentValues();
+            contentValues.put("parentid", categoryOjb.getString("parentid"));
+            contentValues.put("categoryname", categoryOjb.getString("categoryname"));
+            contentValues.put("categoryid", categoryOjb.getString("categoryid"));
+            contentValues.put("categoryicon", categoryOjb.getString("categoryicon"));
+            contentValues.put("contentcount", categoryOjb.getString("contentcount"));
+            contentValues.put("column1", categoryOjb.getString("column1"));
+            contentValues.put("componentid", componentID);
+            contentValues.put("siteid", appUserModel.getSiteIDValue());
+            db.insert(TBL_CATEGORIES, null, contentValues);
+        }
+        try {
+
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
+
+    public void injectCatalogSubCategoriesIntoTable(JSONArray jsonArray, String componentID) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        db.delete(TBL_SUBCATEGORIES, "siteid='"
+                + appUserModel.getSiteIDValue() + "' AND componentid='"
+                + componentID + "'", null);
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject categoryOjb = jsonArray.getJSONObject(i);
+
+            contentValues = new ContentValues();
+            contentValues.put("parentid", categoryOjb.getString("parentid"));
+            contentValues.put("categoryname", categoryOjb.getString("categoryname"));
+            contentValues.put("categoryid", categoryOjb.getString("categoryid"));
+            contentValues.put("subcategoryicon", categoryOjb.getString("subcategoryicon"));
+            contentValues.put("contentcount", categoryOjb.getString("contentcount"));
+            contentValues.put("column1", categoryOjb.getString("column1"));
+            contentValues.put("componentid", componentID);
+            contentValues.put("siteid", appUserModel.getSiteIDValue());
+            db.insert(TBL_SUBCATEGORIES, null, contentValues);
+        }
+        try {
+
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
+    public void injectCatalogCategoriesContentIntoTable(JSONArray jsonArray, String componentID) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        db.delete(TBL_CATEGORIESCONTENT, "siteid='"
+                + appUserModel.getSiteIDValue() + "' AND componentid='"
+                + componentID + "'", null);
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject categoryOjb = jsonArray.getJSONObject(i);
+            contentValues = new ContentValues();
+            contentValues.put("categoryid", categoryOjb.getString("categoryid"));
+            contentValues.put("contentid", categoryOjb.getString("contentid"));
+            contentValues.put("displayorder", categoryOjb.getString("displayorder"));
+            contentValues.put("modifieddate", categoryOjb.getString("modifieddate"));
+            contentValues.put("componentid", componentID);
+            contentValues.put("siteid", appUserModel.getSiteIDValue());
+            db.insert(TBL_CATEGORIESCONTENT, null, contentValues);
+        }
+        try {
+
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
+    public List<CatalogCategoryButtonModel> openNewCategoryDetailsFromSQLite(String siteId, String componentId) {
+        List<CatalogCategoryButtonModel> catalogCategoryButtonModelList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_CATEGORIES + " WHERE siteid  =" + siteId + " AND componentid  = " + componentId;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    CatalogCategoryButtonModel catalogCategoryButtonModel = new CatalogCategoryButtonModel();
+                    catalogCategoryButtonModel.setParentId(cursor.getInt(cursor.getColumnIndex("parentid")));
+                    catalogCategoryButtonModel.setCategoryName(cursor.getString(cursor.getColumnIndex("categoryname")));
+                    catalogCategoryButtonModel.setCategoryId(cursor.getInt(cursor.getColumnIndex("categoryid")));
+                    catalogCategoryButtonModel.setContentCount(cursor.getString(cursor.getColumnIndex("contentcount")));
+                    catalogCategoryButtonModel.setColumn1(cursor.getString(cursor.getColumnIndex("column1")));
+                    catalogCategoryButtonModel.setComponentId(cursor.getString(cursor.getColumnIndex("componentid")));
+                    catalogCategoryButtonModelList.add(catalogCategoryButtonModel);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return catalogCategoryButtonModelList;
+    }
+
+
+    public List<CatalogCategoryButtonModel> openSubCategoryDetailsFromSQLite(String siteId, String componentId, String categoryId) {
+
+        List<CatalogCategoryButtonModel> catalogCategoryButtonModelList = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_SUBCATEGORIES + " WHERE siteid  =" + siteId + " AND parentid  = " + categoryId + " AND componentid  = " + componentId;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    CatalogCategoryButtonModel catalogCategoryButtonModel = new CatalogCategoryButtonModel();
+                    catalogCategoryButtonModel.setParentId(cursor.getInt(cursor.getColumnIndex("parentid")));
+                    catalogCategoryButtonModel.setCategoryName(cursor.getString(cursor.getColumnIndex("categoryname")));
+                    catalogCategoryButtonModel.setCategoryId(cursor.getInt(cursor.getColumnIndex("categoryid")));
+                    catalogCategoryButtonModel.setContentCount(cursor.getString(cursor.getColumnIndex("contentcount")));
+                    catalogCategoryButtonModel.setColumn1(cursor.getString(cursor.getColumnIndex("column1")));
+                    catalogCategoryButtonModel.setComponentId(cursor.getString(cursor.getColumnIndex("componentid")));
+                    catalogCategoryButtonModel.setCategoryIcon(cursor.getString(cursor.getColumnIndex("subcategoryicon")));
+                    catalogCategoryButtonModelList.add(catalogCategoryButtonModel);
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+
+        return catalogCategoryButtonModelList;
+    }
+
+    public List<MyLearningModel> openCategoryContentDetailsFromSQLite(String categoryID, String componentID) {
+
+        List<MyLearningModel> myLearningModelList = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT DISTINCT CD.* FROM " + TBL_CATALOGDATA + " CD LEFT OUTER JOIN " + TBL_CATEGORIESCONTENT + " CC ON CC.contentid = CD.contentid WHERE CC.categoryid = " + categoryID + " AND CD.categorycompid = " + componentID + " ORDER BY CD.publisheddate DESC";
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(sqlQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+
+                do {
+                    MyLearningModel myLearningModel = new MyLearningModel();
+
+                    myLearningModel.setSiteID(cursor.getString(cursor
+                            .getColumnIndex("siteid")));
+
+
+                    myLearningModel.setSiteURL(cursor.getString(cursor
+                            .getColumnIndex("siteurl")));
+
+                    myLearningModel.setSiteName(cursor.getString(cursor
+                            .getColumnIndex("sitename")));
+
+                    myLearningModel.setDisplayName(cursor.getString(cursor
+                            .getColumnIndex("displayname")));
+
+                    myLearningModel.setUserName(cursor.getString(cursor
+                            .getColumnIndex("username")));
+
+                    myLearningModel.setPassword(cursor.getString(cursor
+                            .getColumnIndex("password")));
+
+                    myLearningModel.setUserID(cursor.getString(cursor
+                            .getColumnIndex("userid")));
+
+                    myLearningModel.setContentID(cursor.getString(cursor
+                            .getColumnIndex("contentid")));
+
+                    myLearningModel.setCourseName(cursor.getString(cursor
+                            .getColumnIndex("coursename")));
+
+                    myLearningModel.setAuthor(cursor.getString(cursor
+                            .getColumnIndex("author")));
+
+                    myLearningModel.setShortDes(cursor.getString(cursor
+                            .getColumnIndex("shortdes")));
+
+                    myLearningModel.setLongDes(cursor.getString(cursor
+                            .getColumnIndex("longdes")));
+
+                    myLearningModel.setImageData(cursor.getString(cursor
+                            .getColumnIndex("imagedata")));
+
+                    myLearningModel.setMediaName(cursor.getString(cursor
+                            .getColumnIndex("medianame")));
+
+                    myLearningModel.setCreatedDate(cursor.getString(cursor
+                            .getColumnIndex("createddate")));
+
+                    myLearningModel.setStartPage(cursor.getString(cursor
+                            .getColumnIndex("startpage")));
+
+                    myLearningModel.setObjecttypeId(cursor.getString(cursor
+                            .getColumnIndex("objecttypeid")));
+
+                    myLearningModel.setLocationName(cursor.getString(cursor
+                            .getColumnIndex("locationname")));
+
+                    myLearningModel.setTimeZone(cursor.getString(cursor
+                            .getColumnIndex("timezone")));
+
+                    myLearningModel.setScoId(cursor.getString(cursor
+                            .getColumnIndex("scoid")));
+
+                    myLearningModel.setParticipantUrl(cursor.getString(cursor
+                            .getColumnIndex("participanturl")));
+
+                    myLearningModel.setViewType(cursor.getString(cursor
+                            .getColumnIndex("viewtype")));
+
+                    myLearningModel.setIsListView(cursor.getString(cursor
+                            .getColumnIndex("islistview")));
+                    myLearningModel.setPrice(cursor.getString(cursor
+                            .getColumnIndex("price")));
+
+                    myLearningModel.setRatingId(cursor.getString(cursor
+                            .getColumnIndex("ratingid")));
+
+                    myLearningModel.setPublishedDate(cursor.getString(cursor
+                            .getColumnIndex("publisheddate")));
+
+                    myLearningModel.setMediatypeId(cursor.getString(cursor
+                            .getColumnIndex("mediatypeid")));
+
+                    myLearningModel.setKeywords(cursor.getString(cursor
+                            .getColumnIndex("keywords")));
+
+                    myLearningModel.setGoogleProductID(cursor.getString(cursor
+                            .getColumnIndex("googleproductid")));
+                    myLearningModel.setCurrency(cursor.getString(cursor
+                            .getColumnIndex("currency")));
+                    myLearningModel.setItemType(cursor.getString(cursor
+                            .getColumnIndex("itemtype")));
+                    myLearningModel.setComponentId(cursor.getString(cursor
+                            .getColumnIndex("categorycompid")));
+
+                    myLearningModel.setDownloadURL(cursor.getString(cursor
+                            .getColumnIndex("downloadurl")));
+                    myLearningModel.setOfflinepath(cursor.getString(cursor
+                            .getColumnIndex("offlinepath")));
+
+                    myLearningModel.setAddedToMylearning(cursor.getInt(cursor
+                            .getColumnIndex("isaddedtomylearning")));
+
+                    myLearningModel.setEventAddedToCalender(false);
+
+                    myLearningModelList.add(myLearningModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+
+        return myLearningModelList;
+    }
+
+
+    public List<SideMenusModel> getHomeInnerMenusData(String selectedMenus) {
+        List<SideMenusModel> menuList = null;
+        SideMenusModel menu = null;
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT *,CASE WHEN menuid IN (SELECT parentmenuid FROM " + TBL_NATIVEMENUS + ") THEN 1 ELSE 0 END AS issubmenuexists FROM " + TBL_NATIVEMENUS
+                + " WHERE menuid IN (" + selectedMenus + ") AND siteurl= '" + appUserModel.getSiteURL() + "' AND isenabled='true' ORDER BY displayorder";
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                menuList = new ArrayList<SideMenusModel>();
+                do {
+                    menu = new SideMenusModel();
+                    menu.setMenuId(cursor.getInt(cursor
+                            .getColumnIndex("menuid")));
+                    menu.setDisplayName(cursor.getString(cursor
+                            .getColumnIndex("displayname")));
+                    menu.setDisplayOrder(cursor.getInt(cursor
+                            .getColumnIndex("displayorder")));
+                    menu.setImage(cursor.getString(cursor
+                            .getColumnIndex("image")));
+                    int menuIconResId = -1;
+                    menu.setMenuImageResId(menuIconResId);
+                    menu.setIsOfflineMenu(cursor.getString(cursor
+                            .getColumnIndex("isofflinemenu")));
+                    menu.setIsEnabled(cursor.getString(cursor
+                            .getColumnIndex("isenabled")));
+                    menu.setContextTitle(cursor.getString(cursor
+                            .getColumnIndex("contexttitle")));
+                    menu.setContextMenuId(cursor.getString(cursor
+                            .getColumnIndex("contextmenuid")));
+                    menu.setRepositoryId(cursor.getString(cursor
+                            .getColumnIndex("repositoryid")));
+                    menu.setLandingPageType(cursor.getString(cursor
+                            .getColumnIndex("landingpagetype")));
+                    menu.setCategoryStyle(cursor.getString(cursor
+                            .getColumnIndex("categorystyle")));
+                    menu.setComponentId(cursor.getString(cursor
+                            .getColumnIndex("componentid")));
+                    menu.setConditions(cursor.getString(cursor
+                            .getColumnIndex("conditions")));
+                    menu.setParentMenuId(cursor.getString(cursor
+                            .getColumnIndex("parentmenuid")));
+                    menu.setParameterStrings(cursor.getString(cursor
+                            .getColumnIndex("parameterstrings")));
+                    menu.setIsSubMenuExists(cursor.getInt(cursor
+                            .getColumnIndex("issubmenuexists")));
+
+                    menuList.add(menu);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("getHomeInnerMenusData", e.getMessage() != null ? e.getMessage() : "Error getting menus");
+
+        }
+        return menuList;
     }
 
     // uncomment for pagenotes

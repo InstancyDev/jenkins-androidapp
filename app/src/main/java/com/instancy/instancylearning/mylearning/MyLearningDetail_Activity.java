@@ -707,10 +707,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         String testId = "android.test.purchased";
         String productId = learningModel.getGoogleProductID();
 
-        if (productId.length() != 0) {
-            billingProcessor.purchase(MyLearningDetail_Activity.this, testId);
-        }
-
+//        if (productId.length() != 0) {
+//            billingProcessor.purchase(MyLearningDetail_Activity.this, productId);
+//        }
 
         String originalproductid = learningModel.getGoogleProductID();
 
@@ -769,7 +768,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
                         int i = -1;
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
-
+                        statusUpdate(getResources().getString(R.string.metadata_status_progress));
                         if (i == 1) {
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 //                            myLearningAdapter.notifyDataSetChanged();

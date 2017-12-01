@@ -22,11 +22,23 @@ public class UiSettingsModel {
 
 
 // // for instancy for all buttons
-    private String appBackGroundColor = "#8dc73f";
 
-    private String brandingColor = "#8dc73f";
+//    private String appBackGroundColor = "#8dc73f";
+//
+//    private String brandingColor = "#8dc73f";
+//
+//    private String defaultTextColor = "#ffffff";
+
+
+// for cle app
+
+    private String appBackGroundColor = "#4A2D1F";
+
+    private String brandingColor = "#4A2D1F";
 
     private String defaultTextColor = "#ffffff";
+
+
 
 
     private String menuTextColor = "";
@@ -294,7 +306,8 @@ public class UiSettingsModel {
     }
 
     public String getMenuBGSelectTextColor() {
-        return menuBGSelectTextColor;
+
+        return menuBGSelectTextColor.isEmpty() ? "#FFFFFF" : menuBGSelectTextColor;
     }
 
     public void setMenuBGSelectTextColor(String menuBGSelectTextColor) {

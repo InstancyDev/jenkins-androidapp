@@ -107,12 +107,12 @@
     <ImageView
         android:id="@+id/bottom_logo"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="70dp"
         android:layout_gravity="center"
         android:padding="3dp"
         android:background="@color/colorGray"
         android:scaleType="centerInside"
-        android:src="@drawable/bottom_marketplace"
+        android:src="@drawable/cle_logo"
         android:visibility="visible" />
 
 </LinearLayout>

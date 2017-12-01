@@ -208,14 +208,18 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 String keyName = profileConfigsModelList.get(i).datafieldname.toLowerCase().toLowerCase();
 
-                if (keyName.contains("picture")) {
+                if (keyName.equalsIgnoreCase("picture")) {
                     profileConfigsModelList.remove(i);
                     continue;
-
                 }
 
                 Log.d(TAG, "names here: " + cvFields.get(keyName));
                 String valueName = cvFields.get(keyName).toString();
+
+                if (valueName.contains("null")) {
+                    valueName="";
+//                    continue;
+                }
 
                 profileConfigsModelList.get(i).valueName = valueName;
 
@@ -429,11 +433,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         return encImage;
     }
 
-    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degrees);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
 
     @Override
     public void onRefresh() {
@@ -507,11 +506,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-                showPictureDialog();
+//                showPictureDialog();
                 break;
-
         }
-
     }
 
     private void showPictureDialog() {

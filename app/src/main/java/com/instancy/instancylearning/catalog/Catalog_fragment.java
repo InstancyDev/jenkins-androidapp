@@ -3,11 +3,13 @@ package com.instancy.instancylearning.catalog;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -17,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -40,7 +43,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -53,6 +58,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -69,7 +77,6 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
-import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -78,6 +85,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,16 +134,23 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     SideMenusModel sideMenusModel = null;
     String filterContentType = "", consolidationType = "all", sortBy = "";
     ResultListner resultListner = null;
-    WebAPIClient webAPIClient;
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
+    boolean isFromCatogories = false;
+
+    CustomFlowLayout category_breadcrumb = null;
+
+    List<ContentValues> breadcrumbItemsList = null;
+
+    Communicator communicator;
 
     public Catalog_fragment() {
 
 
     }
+
 
     @Override
     public void onAttach(Context context) {
@@ -149,6 +164,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
+
+//        try {
+//            communicator = (Communicator) context;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(context.toString()
+//                    + " must implement Communicator");
+//        }
+
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
 //        synchData = new SynchData(context);
         if (isViewed.equalsIgnoreCase("true")) {
@@ -170,12 +193,20 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = null;
-        webAPIClient = new WebAPIClient(context);
         HashMap<String, String> responMap = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
+
+            isFromCatogories = bundle.getBoolean("ISFROMCATEGORIES");
+            catalogModelsList = new ArrayList<>();
+            if (isFromCatogories) {
+
+                catalogModelsList = (List<MyLearningModel>) bundle.getSerializable("cataloglist");
+                breadcrumbItemsList = new ArrayList<ContentValues>();
+                breadcrumbItemsList = (List<ContentValues>) bundle.getSerializable("breadicrumblist");
+            }
         }
         if (responMap != null && responMap.containsKey("Type")) {
             String consolidate = responMap.get("Type");
@@ -209,7 +240,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=1&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
 
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -233,6 +264,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
+
                 if (requestType.equalsIgnoreCase("UPDATESTATUS")) {
 
                     if (response != null) {
@@ -262,7 +294,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
 
                 }
-
 
 
                 svProgressHUD.dismiss();
@@ -319,24 +350,36 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_mylearning, container, false);
+
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        catalogModelsList = new ArrayList<MyLearningModel>();
+        if (isFromCatogories) {
+            breadCrumbPlusButtonInit(rootView);
+        }
         catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-        initilizeView();
 
-        if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
-            refreshCatalog(false);
+        if (!isFromCatogories) {
+            catalogModelsList = new ArrayList<MyLearningModel>();
+            if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
+                refreshCatalog(false);
+            } else {
+                injectFromDbtoModel();
+            }
         } else {
-            injectFromDbtoModel();
+            swipeRefreshLayout.setEnabled(false);
+
+            catalogAdapter.refreshList(catalogModelsList);
         }
+
+        initilizeView();
 
         return rootView;
     }
+
 
     public void injectFromDbtoModel() {
         catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId());
@@ -372,7 +415,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         itemInfo.setVisible(false);
 
-//        item_filter.setVisible(false);
+        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
@@ -430,11 +473,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            String link = bundle.getString("url");
-
-        }
     }
 
     private ActionBar getActionBar() {
@@ -807,7 +845,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
                 + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
 
-
         urlStr = urlStr.replaceAll(" ", "%20");
         Log.d(TAG, "inside catalog login : " + urlStr);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
@@ -1065,7 +1102,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 + learningModel.getUserID() + "&_siteURL=" + appUserModel.getSiteURL() + "&_contentId="
                 + learningModel.getContentID() + "&_transactionId=" + orderId + "&_receipt="
                 + purchaseToken + "&_productId=" + productId
-                + "&_purchaseDate=" + purchaseTime + "&_devicetype=Android";
+                + "&_purchaseDate=" + purchaseTime + "&_devicetype=Android";//"&_objectTypeId="+learningModel.getObjecttypeId();
 
         urlStr = urlStr.replaceAll(" ", "%20");
         Log.d(TAG, "inappwebcall : " + urlStr);
@@ -1171,12 +1208,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
                 } else {
 
-//                    if (isNetworkConnectionAvailable(getContext(), -1)) {
-//                        cmiSynchTask = new CmiSynchTask(context);
-//                        cmiSynchTask.execute();
-//                    }
-                }
 
+                }
 
                 injectFromDbtoModel();
             }
@@ -1277,6 +1310,107 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         }
+    }
+
+    public void breadCrumbPlusButtonInit(View rootView) {
+
+        LinearLayout llCatalogGridCatageory = (LinearLayout) rootView.findViewById(R.id.llCatalogGridCatageory);
+        llCatalogGridCatageory.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppBGColor())));
+        category_breadcrumb = (CustomFlowLayout) rootView.findViewById(R.id.cflBreadcrumb);
+
+        llCatalogGridCatageory.setVisibility(View.VISIBLE);
+        generateBreadcrumb(breadcrumbItemsList);
+
+    }
+
+
+    @Override
+    public void onDetach() {
+        communicator = null;
+        super.onDetach();
+    }
+
+    public void generateBreadcrumb(List<ContentValues> dicBreadcrumbItems) {
+        boolean isFirstCategory = true;
+        ContentValues cvBreadcrumbItem = null;
+        category_breadcrumb.removeAllViews();
+        final int breadcrumbCount = dicBreadcrumbItems.size();
+        View.OnClickListener onBreadcrumbItemCLick = null;
+        onBreadcrumbItemCLick = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TextView tv = (TextView) v;
+                String categoryId = tv.getTag(R.id.CATALOG_CATEGORY_ID_TAG)
+                        .toString();
+                int categoryLevel = Integer.valueOf(tv.getTag(
+                        R.id.CATALOG_CATEGORY_LEVEL_TAG).toString());
+                if (categoryLevel == (breadcrumbItemsList.size() - 1)) {
+                    return;
+                }
+                String categoryName = tv.getText().toString();
+                removeItemFromBreadcrumbList(categoryLevel);
+                generateBreadcrumb(breadcrumbItemsList);
+                if (getFragmentManager().getBackStackEntryCount() > 0) {
+//                    try {
+//                        communicator.breadCrumbStatus(breadcrumbItemsList);
+//                    } catch (NullPointerException e) {
+//                        throw new ClassCastException(context.toString()
+//                                + " must implement IFragmentToActivity");
+//                    }
+                    getFragmentManager().popBackStack();
+
+                }
+            }
+        };
+
+        for (int i = 0; i < breadcrumbCount; i++) {
+            if (i == 0) {
+                isFirstCategory = true;
+            } else {
+                isFirstCategory = false;
+            }
+
+            TextView textView = new TextView(context);
+            TextView arrowView = new TextView(context);// &#8811;
+
+            Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+            FontManager.markAsIconContainer(arrowView, iconFont);
+
+            arrowView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderColor() + "'><medium><b>"
+                    + getResources().getString(R.string.fa_icon_angle_right) + "</b></big> </font>"));
+
+//            arrowView.setText(getResources().getString(R.string.fa_icon_forward));
+//            arrowView.setTextColor(getResources().getColor(R.color.colorPrimary)));
+            arrowView.setTextSize(20);
+
+
+            arrowView.setGravity(Gravity.CENTER | Gravity.LEFT);
+            // String text = coountries[i];
+            cvBreadcrumbItem = dicBreadcrumbItems.get(i);
+            String categoryId = cvBreadcrumbItem.getAsString("categoryid");
+            String categoryName = cvBreadcrumbItem.getAsString("categoryname");
+
+            textView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderColor() + "'><big><b><u>"
+                    + categoryName + "</u></b></big>  </font>"));
+
+            textView.setGravity(Gravity.BOTTOM | Gravity.BOTTOM);
+            textView.setTag(R.id.CATALOG_CATEGORY_ID_TAG, categoryId);
+            textView.setTag(R.id.CATALOG_CATEGORY_LEVEL_TAG, i);
+            // textView.setBackgroundColor(R.color.alert_no_button);
+            textView.setOnClickListener(onBreadcrumbItemCLick);
+            textView.setClickable(true);
+            if (!isFirstCategory) {
+                category_breadcrumb.addView(arrowView, new CustomFlowLayout.LayoutParams(
+                        CustomFlowLayout.LayoutParams.WRAP_CONTENT, 50));
+            }
+            category_breadcrumb.addView(textView, new CustomFlowLayout.LayoutParams(
+                    CustomFlowLayout.LayoutParams.WRAP_CONTENT, CustomFlowLayout.LayoutParams.WRAP_CONTENT));
+
+        }
+    }
+
+    public void removeItemFromBreadcrumbList(int categoryLevel) {
+        breadcrumbItemsList = breadcrumbItemsList.subList(0, categoryLevel + 1);
     }
 
 

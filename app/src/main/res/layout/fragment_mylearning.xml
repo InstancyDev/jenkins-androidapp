@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <TextView
         android:id="@+id/nodata_label"
         android:layout_width="fill_parent"
@@ -10,22 +11,45 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:text="@string/no_data"
-        android:textSize="24sp"
-        />
+        android:textSize="24sp" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipemylearning"
+    <LinearLayout
+        android:id="@+id/llCatalogGridCatageory"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorWhite"
+        android:orientation="horizontal"
+        android:visibility="gone">
+        <include layout="@layout/catalog_categories_list_breadcrumb" />
+    </LinearLayout>
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_below="@id/llCatalogGridCatageory">
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipemylearning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
 
-        <ListView
-            android:id="@+id/mylearninglistview"
+            <ListView
+                android:id="@+id/mylearninglistview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:dividerHeight="2dp"> </ListView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:visibility="gone"
+            android:id="@+id/catalog_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            > </ListView>
+            android:background="@color/colorDarkGrey">
+        </android.support.v7.widget.RecyclerView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </FrameLayout>
+
 
 </RelativeLayout>

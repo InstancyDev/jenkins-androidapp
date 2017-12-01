@@ -150,6 +150,7 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
+
         finish();
         super.onBackPressed();
     }

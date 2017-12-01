@@ -29,13 +29,21 @@
         android:textColor="@color/colorBlack"
         android:textSize="12sp" />
 
-    <ImageView
+
+
+    <TextView
         android:id="@+id/expIcon"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ic_launcher" />
+        android:text="@string/fa_icon_angle_down"
+        android:textColor="@color/colorDarkGrey"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:textSize="20sp" />
+
+
 </RelativeLayout>

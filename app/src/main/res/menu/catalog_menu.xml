@@ -15,4 +15,12 @@
         android:title="filter"
         app:showAsAction="always|collapseActionView" />
 
+    <item
+        android:id="@+id/catalog_categories"
+        android:icon="@drawable/filter_icon"
+        android:orderInCategory="100"
+        android:title="filter"
+        app:showAsAction="always|collapseActionView" />
+
+
 </menu>

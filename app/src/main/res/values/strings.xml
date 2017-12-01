@@ -7,6 +7,10 @@
     <!--<string name="app_name">Learn Up - Learn on your phone</string>-->
     <!--<string name="app_name">Tracktech lifeskills</string>-->
     <!--<string name="app_name">Training Company Lite</string>-->
+    <!--<string name="app_name">CLE Academy</string>-->
+
+    <string name="label_existing_user">Existing Student</string>
+    <string name="label_new_user">New Student</string>
 
     <string name="label_signin">Sign In</string>
     <string name="label_login">Login In</string>

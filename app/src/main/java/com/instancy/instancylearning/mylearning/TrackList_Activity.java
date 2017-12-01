@@ -95,8 +95,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     Boolean isTraxkList = true;
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
-    @BindView(R.id.lable_catalog)
-    TextView frqagmentName;
+
     CmiSynchTask cmiSynchTask;
     DownloadXmlAsynchTask downloadXmlAsynchTask;
     List<MyLearningModel> trackListModelList;

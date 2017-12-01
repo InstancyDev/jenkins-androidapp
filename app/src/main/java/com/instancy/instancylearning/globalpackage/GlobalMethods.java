@@ -210,8 +210,10 @@ public class GlobalMethods {
                 Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
                 pdfIntent.putExtra("PDF_URL", offlinePathEncode);
                 pdfIntent.putExtra("ISONLINE", "NO");
+                pdfIntent.putExtra("myLearningDetalData", myLearningModel);
                 pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
-                context.startActivity(pdfIntent);
+//                context.startActivity(pdfIntent);
+                ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
 
             } else if (offlinePathEncode.toLowerCase().contains(".ppt")
                     || offlinePathEncode.toLowerCase().contains(".pptx")) {

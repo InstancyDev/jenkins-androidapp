@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/clebackground"
+    android:orientation="vertical"
+    android:weightSum="2">
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:id="@+id/relative_layout"
+        android:layout_weight="1.70">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true" />
+
+        <me.relex.circleindicator.CircleIndicator
+            android:id="@+id/indicator"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+
+    <Button
+        android:layout_marginTop="2dp"
+        android:id="@+id/signin_brand"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight=".15"
+        android:background="@color/colorRed"
+        android:text="@string/label_existing_user"
+        android:textColor="@color/colorWhite"
+        android:textAllCaps="false"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/signup_brand"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight=".15"
+        android:textAllCaps="false"
+        android:background="@color/colorRed"
+        android:text="@string/label_new_user"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+</LinearLayout>

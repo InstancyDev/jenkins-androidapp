@@ -43,6 +43,7 @@
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
                 android:src="@drawable/marketplacelogo" />
+            <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout
                 android:id="@+id/rlUsername"
@@ -199,7 +200,7 @@
                     android:textAlignment="textEnd"
                     android:textAllCaps="false"
                     android:textColor="@color/colorWhite"
-                    android:textSize="12sp" />
+                    android:textSize="15sp" />
 
             </LinearLayout>
 

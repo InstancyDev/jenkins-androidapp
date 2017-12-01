@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -119,7 +118,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(expandableListTitle.get(groupPosition).groupname);
 
-
         return pView;
 
     }
@@ -139,7 +137,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             cView = inflater.inflate(R.layout.profile_education_item, parent, false);
         }
-
         TextView profileSchool = (TextView) cView
                 .findViewById(R.id.profile_school);
         TextView profileDegree = (TextView) cView
@@ -159,6 +156,10 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate);
             profileDuration.setVisibility(View.VISIBLE);
         } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Personal Info")) {
+            profileSchool.setText(configsModel.attributedisplaytext);
+            profileDegree.setText(configsModel.valueName);
+            profileDuration.setVisibility(View.GONE);
+        } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Contact")) {
             profileSchool.setText(configsModel.attributedisplaytext);
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);

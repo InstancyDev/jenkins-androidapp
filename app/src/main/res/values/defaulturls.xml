@@ -3,10 +3,9 @@
     <!-- <string name="app_default_url">http://demo.instancyplatform.com/</string>
    <string name="app_default_webapi_url">http://webapi.instancyplatform.com/api/</string> -->
 
-    <!--
-    <string name="app_default_url">http://247cle.instancy.com/</string>
-    <string name="app_default_webapi_url">http://Citnwebapi.instancyplatform.com/api/</string>
-    -->
+    <!--<string name="app_default_url">http://247cle.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://Citnwebapi.instancyplatform.com/api/</string>-->
+
     <!--
     <string name="app_default_url">http://247cle.instancy.net/</string>
     <string name="app_default_webapi_url">http://247clewebapi.instancy.net/api/</string>
@@ -18,7 +17,7 @@
     <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
-    <!--for app  development place-->
+    <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
     <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
@@ -34,6 +33,9 @@
     <!--<string name="app_default_url">http://lonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
+    <string name="app_default_url">http://cvcta.instancy.com/</string>
+    <string name="app_default_webapi_url">http://cvctaapi.instancy.com/api/</string>
+
     <!--<string name="app_default_url">http://mobileup.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://mobiwebapi.instancy.net/api/</string>-->
 
@@ -44,12 +46,11 @@
     <!--<string name="app_default_url">https://ecommerce.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
 
-    <string name="app_default_url">http://mobilelocal.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>
-
-
-    <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
+    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
+
+<!--    <string name="app_default_url">http://app.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
 
     <!--fo enterprise lite app -->
     <!--<string name="app_default_url">http://enterprisedemo.instancyplatform.com/</string>-->

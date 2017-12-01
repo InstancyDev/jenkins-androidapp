@@ -51,8 +51,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         this.subMenuList = subMenuList;
     }
 
-    public MenuDrawerDynamicAdapter(Context ctx,
-                                    HashMap<Integer, List<SideMenusModel>> subMenuList,
+    public MenuDrawerDynamicAdapter(Context ctx, HashMap<Integer, List<SideMenusModel>> subMenuList,
                                     List<SideMenusModel> mainMenuList) {
 
         this.ctx = ctx;
@@ -157,23 +156,30 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         }
 
         TextView txtTitle = (TextView) pView.findViewById(R.id.menuText);
-        ImageView expIcon = (ImageView) pView.findViewById(R.id.expIcon);
+        TextView expTxtIcon = (TextView) pView.findViewById(R.id.expIcon);
         TextView fontIcon = (TextView) pView.findViewById(R.id.fontawasomeIcon);
 
         if(isExpanded){
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
+            expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
+            expTxtIcon.setVisibility(View.VISIBLE);
+            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
         }
         else {
 //            pView.setBackgroundColor(Color.WHITE);
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-
+            expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+//            expTxtIcon.setVisibility(View.INVISIBLE);
+            expTxtIcon.setVisibility(View.VISIBLE);
+            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_up));
         }
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);
+        FontManager.markAsIconContainer(pView.findViewById(R.id.expIcon), iconFon);
 
         switch (mainMenu.getContextMenuId()) {
 
@@ -212,31 +218,18 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         txtTitle.setText(mainMenu.getDisplayName());
 
         if (mainMenu.getIsSubMenuExists() == 1) {
-            expIcon.setVisibility(View.VISIBLE);
-            if (isExpanded) {
-                Drawable exp = ctx.getResources().getDrawable(
-                        R.drawable.ic_launcher);
-                exp.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()),
-                        PorterDuff.Mode.SRC_ATOP);
-                expIcon.setImageDrawable(exp);
-            } else {
-                Drawable exp = ctx.getResources().getDrawable(
-                        R.drawable.ic_launcher);
-                exp.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()),
-                        PorterDuff.Mode.SRC_ATOP);
+            expTxtIcon.setVisibility(View.VISIBLE);
 
-                expIcon.setImageDrawable(exp);
-            }
         } else {
-            expIcon.setVisibility(View.GONE);
+            expTxtIcon.setVisibility(View.INVISIBLE);
         }
-        if (parentPosition % 2 == 0) {
-            pView.setBackgroundColor(Color
-                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-        } else {
-            pView.setBackgroundColor(Color
-                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-        }
+//        if (parentPosition % 2 == 0) {
+//            pView.setBackgroundColor(Color
+//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//        } else {
+//            pView.setBackgroundColor(Color
+//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//        }
         return pView;
     }
 
@@ -252,9 +245,11 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             cView = inflater.inflate(R.layout.drawermenu_sub_item, parentView, false);
         }
 
-        ImageView imgIcon = (ImageView) cView.findViewById(R.id.subMenuIcon);
-        TextView txtTitle = (TextView) cView.findViewById(R.id.subMenuText);
-        imgIcon.setImageResource(childMenu.getMenuImageResId());
+
+        TextView txtTitle = (TextView) cView.findViewById(R.id.submenuText);
+        TextView iconFont = (TextView) cView.findViewById(R.id.fontawasomesubIcon);
+        FontManager.markAsIconContainer(cView.findViewById(R.id.fontawasomesubIcon), iconFon);
+        iconFont.setText(cView.getResources().getString(R.string.fa_icon_home));
         txtTitle.setText(childMenu.getDisplayName());
         if (MAIN_MENU_POSITION == -1) {
             for (int i = 0; i < mainMenuList.size() - 1; i++) {
@@ -266,12 +261,12 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             }
             cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-            imgIcon.getDrawable().mutate().setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderColor()), PorterDuff.Mode.SRC_ATOP);
+
         } else {
             if (parentPosition == MAIN_MENU_POSITION && childPosition == StaticValues.SUB_MENU_POSITION) {
                 cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-                imgIcon.getDrawable().mutate().setColorFilter(Color.parseColor(uiSettingsModel.getMenuTextColor()), PorterDuff.Mode.SRC_ATOP);
+
             } else {
                 if (parentPosition % 2 == 0) {
                     cView.setBackgroundColor(Color
@@ -281,7 +276,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                             .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
                 }
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-                imgIcon.getDrawable().mutate().setColorFilter(Color.parseColor(uiSettingsModel.getMenuTextColor()), PorterDuff.Mode.SRC_ATOP);
+
             }
         }
         return cView;

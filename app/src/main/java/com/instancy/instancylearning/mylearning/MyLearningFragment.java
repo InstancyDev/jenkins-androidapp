@@ -391,7 +391,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-//        item_filter.setVisible(false);
+        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
@@ -743,6 +743,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         final String finalDownloadedFilePath = downloadDestFolderPath + "/" + extensionStr;
         final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
         final String finalDownloadDestFolderPath = downloadDestFolderPath;
+        Log.d(TAG, "downloadThin: "+downloadUri);
         DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
                 .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
                 .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
@@ -791,7 +792,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     @Override
                     public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
-                        Log.d(TAG, "onProgress: " + progress);
+//                        Log.d(TAG, "onProgress: " + progress);
                         View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
                         if (v != null) {
                             updateStatus(position, progress);

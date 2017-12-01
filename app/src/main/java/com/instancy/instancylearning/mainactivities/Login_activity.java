@@ -194,9 +194,16 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         // Find the root view
 //        View root = someView.getRootView();
 
-        // Set the color
+        // Set the color comment for cle
 
-        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+//        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+
+
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase("CLE Academy")) {
+
+            settingTxt.setVisibility(View.INVISIBLE);
+        }
+
 
         Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
         drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color

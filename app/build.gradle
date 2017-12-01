@@ -16,9 +16,9 @@ android {
 //        versionName "4.0.2.48"
 
 // ----------------------------------for instancy lite app-------------------------
-        applicationId "com.instancy.instancy_lite"
-        versionCode 7
-        versionName "1.6"
+//        applicationId "com.instancy.instancy_lite"
+//        versionCode 7
+//        versionName "1.6"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
@@ -44,6 +44,11 @@ android {
 //        applicationId "com.instancy.mobileup"
 //        versionCode 2
 //        versionName "1.1"
+
+//  -------------------------------- for Mobile up app----------------------------------
+        applicationId "com.instancy.cle"
+        versionCode 1
+        versionName "1.0"
 
         minSdkVersion 19
         targetSdkVersion 26
@@ -98,5 +103,4 @@ dependencies {
     compile 'com.github.florent37:viewtooltip:1.0.8'
     compile 'com.android.support:multidex:1.0.2'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.github.mukeshsolanki:Prevailer-orientation-support-library-for-Android:1.0.2'
 }
