@@ -29,9 +29,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
     private List<SideMenusModel> mainMenuList;
     private HashMap<Integer, List<SideMenusModel>> subMenuList;
     Typeface iconFon;
-//    private SharedPreferences sharedPrefs;
-//    private String menubgcolor, menuslcolor, menubgalternatecolor,
-//            menutextcolor, menusltextcolor; 17061790438
+
 
     UiSettingsModel uiSettingsModel;
 
