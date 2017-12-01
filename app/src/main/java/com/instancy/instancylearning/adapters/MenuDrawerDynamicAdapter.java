@@ -157,15 +157,14 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         TextView expTxtIcon = (TextView) pView.findViewById(R.id.expIcon);
         TextView fontIcon = (TextView) pView.findViewById(R.id.fontawasomeIcon);
 
-        if(isExpanded){
+        if (isExpanded) {
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             expTxtIcon.setVisibility(View.VISIBLE);
             expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
-        }
-        else {
+        } else {
 //            pView.setBackgroundColor(Color.WHITE);
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
@@ -263,8 +262,8 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         } else {
             if (parentPosition == MAIN_MENU_POSITION && childPosition == StaticValues.SUB_MENU_POSITION) {
                 cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
-                txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-
+                txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
+                iconFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             } else {
                 if (parentPosition % 2 == 0) {
                     cView.setBackgroundColor(Color
@@ -274,7 +273,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                             .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
                 }
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-
+                iconFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             }
         }
         return cView;
