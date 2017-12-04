@@ -1,11 +1,17 @@
 package com.instancy.instancylearning.sidemenumodule;
 
+import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -16,9 +22,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -45,12 +54,14 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
 import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
 import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
@@ -92,14 +103,13 @@ public class SideMenu extends AppCompatActivity {
     @BindView(R.id.txtbtn_notification)
     TextView txtBtnNotification;
 
-
     private static int lastClicked = 0;
 
     AppUserModel appUserModel;
 
     MenuDrawerDynamicAdapter menuDynamicAdapter;
     PreferencesManager preferencesManager;
-//    protected List<SideMenusModel> mainMenuList = null;
+    //    protected List<SideMenusModel> mainMenuList = null;
     protected List<SideMenusModel> subMenuList = null;
 
     HashMap<Integer, List<SideMenusModel>> hmSubMenuList = null;
@@ -109,12 +119,16 @@ public class SideMenu extends AppCompatActivity {
 
     public Toolbar toolbar;
 
+    SideMenusModel homeModel;
+    int homeIndex = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_side_menu);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         db = new DatabaseHandler(this);
@@ -135,6 +149,21 @@ public class SideMenu extends AppCompatActivity {
         FontManager.markAsIconContainer(findViewById(R.id.settings_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.notification_font), iconFont);
 
+        View customNav = LayoutInflater.from(this).inflate(R.layout.homebutton, null);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
+        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
+        toolbar.setLogo(d);
+        toolbar.setContentInsetStartWithNavigation(0);
+        View logoView = getToolbarLogoIcon(toolbar);
+        logoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //logo clicked
+                homeControllClicked();
+            }
+        });
+
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -211,6 +240,8 @@ public class SideMenu extends AppCompatActivity {
 
                 // on first time to display view for first navigation item based on the number
                 selectItem(Integer.parseInt(indexed), model); // 2 is your fragment's number for "CollectionFragment"
+                homeModel = model;
+                homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
@@ -251,13 +282,14 @@ public class SideMenu extends AppCompatActivity {
                                     return false;
                                 } else {
 
-                                try {
-                                    selectItem(Integer.parseInt(sideMenusModel.get(groupPosition).getContextMenuId()), sideMenusModel.get(groupPosition));
+                                    try {
+                                        selectItem(Integer.parseInt(sideMenusModel.get(groupPosition).getContextMenuId()), sideMenusModel.get(groupPosition));
 
-                                } catch (NumberFormatException numEx) {
-                                    numEx.printStackTrace();
-                                    selectItem(1, sideMenusModel.get(groupPosition));
-                                } }
+                                    } catch (NumberFormatException numEx) {
+                                        numEx.printStackTrace();
+                                        selectItem(1, sideMenusModel.get(groupPosition));
+                                    }
+                                }
                             }
                         }
                     }
@@ -271,7 +303,7 @@ public class SideMenu extends AppCompatActivity {
             });
 
 
-            navDrawerExpandableView.setOnChildClickListener(new ExpandableListView.OnChildClickListener(){
+            navDrawerExpandableView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v,
@@ -287,6 +319,28 @@ public class SideMenu extends AppCompatActivity {
         }
     }
 
+    public void homeControllClicked() {
+
+        selectItem(homeIndex, homeModel);
+
+    }
+
+
+    private Bitmap createBitmapFromView(Context context, View view) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
+    }
 
     public void selectItem(int menuid, SideMenusModel sideMenusModel) {
 
@@ -378,11 +432,11 @@ public class SideMenu extends AppCompatActivity {
             List<SideMenusModel> mList = hmSubMenuList.get(sideMenusModel.get(MAIN_MENU_POSITION).getMenuId());
             SideMenusModel m = mList.get(childPosition);
 
-            if(m.getIsOfflineMenu().equals("true")){
+            if (m.getIsOfflineMenu().equals("true")) {
                 navDrawerExpandableView.setSelectedGroup(groupPosition);
                 navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-                selectItem(Integer.parseInt(m.getContextMenuId()),m);
-            } else{
+                selectItem(Integer.parseInt(m.getContextMenuId()), m);
+            } else {
 
             }
 

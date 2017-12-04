@@ -13,7 +13,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="actionMenuTextColor">@color/colorWhite</item>
-
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
     </style>
 
     <style name="NoActionBar" parent="@android:style/Theme.Holo.Light">
