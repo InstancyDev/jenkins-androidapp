@@ -86,7 +86,7 @@ public class CatalogAdapter extends BaseAdapter {
         this.activity = activity;
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
-        this.searchList.addAll(myLearningModel);
+//        this.searchList.addAll(myLearningModel);
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -114,7 +114,7 @@ public class CatalogAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return myLearningModel.size();
+        return myLearningModel != null ? myLearningModel.size() : 0;
     }
 
     @Override

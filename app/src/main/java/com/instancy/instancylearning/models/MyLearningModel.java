@@ -100,6 +100,17 @@ public class MyLearningModel implements Serializable {
 
     String currency = "";
 
+
+    public String getAviliableSeats() {
+        return aviliableSeats;
+    }
+
+    public void setAviliableSeats(String aviliableSeats) {
+        this.aviliableSeats = aviliableSeats;
+    }
+
+    String aviliableSeats = "";
+
     public int getAddedToMylearning() {
 
 

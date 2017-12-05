@@ -39,6 +39,7 @@ import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
 import com.instancy.instancylearning.interfaces.Communicator;
@@ -322,7 +323,7 @@ public class SideMenu extends AppCompatActivity {
     public void homeControllClicked() {
 
         selectItem(homeIndex, homeModel);
-
+        navDrawerExpandableView.expandGroup(0);
     }
 
 
@@ -366,7 +367,11 @@ public class SideMenu extends AppCompatActivity {
             case 6:
                 fragment = new HomeCategories_Fragment();
                 break;
+            case 8:
+                fragment = new Event_fragment();
+                break;
             default:
+                Log.d(TAG, "selectItem: default contextmenu");
                 fragment = new Catalog_fragment();
                 break;
         }
