@@ -4,13 +4,16 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ContentValues;
+
+import com.github.sundeepk.compactcalendarview.domain.Event;
+
+import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.Typeface;
+
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
@@ -44,9 +47,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,18 +63,19 @@ import com.android.volley.toolbox.StringRequest;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.catalog.CatalogAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.filter.Filter_activity;
+
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
-import com.instancy.instancylearning.helper.FontManager;
+
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.Communicator;
+
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -79,7 +83,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
-import com.instancy.instancylearning.utils.CustomFlowLayout;
+
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -90,12 +94,16 @@ import org.json.JSONObject;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
+import java.util.Random;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -106,19 +114,21 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
-import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
+import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
+import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
-import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
+
 
 /**
  * Created by Upendranath on 5/19/2017.
  */
 
-public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler, RadioGroup.OnCheckedChangeListener {
+@TargetApi(Build.VERSION_CODES.N)
+public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler, RadioGroup.OnCheckedChangeListener, CompactCalendarView.CompactCalendarViewListener {
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -148,6 +158,17 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @BindView(R.id.segmentedswitch)
     SegmentedGroup segmentedSwitch;
+
+    @BindView(R.id.compactcalendar_view)
+    CompactCalendarView compactCalendarView;
+
+    @BindView(R.id.yearandmonth)
+    TextView YearTitle;
+
+
+    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
+    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
+    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
     public Event_fragment() {
 
@@ -323,32 +344,28 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         View rootView = inflater.inflate(R.layout.event_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
-        swipeRefreshLayout.setOnRefreshListener(this);
+//        swipeRefreshLayout.setOnRefreshListener(this);
 
         catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        LayoutInflater myinflater = getLayoutInflater();
-        ViewGroup myHeader = (ViewGroup) myinflater.inflate(R.layout.calenderview, myLearninglistView, false);
-//        myLearninglistView.addHeaderView(myHeader, null, false);
-
         segmentedSwitch.setOnCheckedChangeListener(this);
         if (!isFromCatogories) {
             catalogModelsList = new ArrayList<MyLearningModel>();
             if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
-                refreshCatalog(false);
+                refreshCatalog(true);
             } else {
                 injectFromDbtoModel();
             }
         } else {
             swipeRefreshLayout.setEnabled(false);
-
             catalogAdapter.refreshList(catalogModelsList);
         }
 
         initilizeView();
+        initilizeCalander();
 
         return rootView;
     }
@@ -362,6 +379,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
         }
+        loadEvents();
+    }
+
+    public void initilizeCalander() {
+
+        compactCalendarView.setListener(this);
+        YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+
     }
 
     public void initilizeView() {
@@ -472,6 +497,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
@@ -480,7 +506,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
         }
     }
-
 
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
 
@@ -1262,11 +1287,19 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onCheckedChanged(RadioGroup radioGroup, int isChecked) {
         switch (isChecked) {
             case R.id.upcomingbtn:
+                compactCalendarView.setVisibility(View.GONE);
+                YearTitle.setVisibility(View.GONE);
                 sortByDate("before");
                 break;
             case R.id.calanderbtn:
+
+                compactCalendarView.setVisibility(View.VISIBLE);
+                YearTitle.setVisibility(View.VISIBLE);
+                catalogAdapter.refreshList(catalogModelsList);
                 break;
             case R.id.pastbtn:
+                compactCalendarView.setVisibility(View.GONE);
+                YearTitle.setVisibility(View.GONE);
                 sortByDate("after");
                 break;
             default:
@@ -1275,29 +1308,135 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     @TargetApi(Build.VERSION_CODES.N)
-    public List<MyLearningModel> sortByDate(String typeTime) {
+    public void sortByDate(String typeTime) {
         List<MyLearningModel> myLearningModelList = new ArrayList<>();
-        String checkDate = catalogModelsList.get(0).getEventendTime();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date strDate = null;
-        try {
-            strDate = sdf.parse(checkDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+
         if (typeTime.equalsIgnoreCase("before")) {
 
-            if (new Date().before(strDate)) {
-                Toast.makeText(context, typeTime + " event " + strDate, Toast.LENGTH_SHORT).show();
+            for (int i = 0; i < catalogModelsList.size(); i++) {
+                Date strDate = null;
+                String checkDate = catalogModelsList.get(i).getEventstartTime();
+
+                try {
+                    strDate = sdf.parse(checkDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (new Date().before(strDate)) {
+                    myLearningModelList.add(catalogModelsList.get(i));
+                    catalogAdapter.refreshList(myLearningModelList);
+//                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
+                }
+
+
             }
+
         } else {
-            if (new Date().after(strDate)) {
-                Toast.makeText(context, typeTime + " event " + strDate, Toast.LENGTH_SHORT).show();
+
+            for (int i = 0; i < catalogModelsList.size(); i++) {
+                Date strDate = null;
+                String checkDate = catalogModelsList.get(i).getEventstartTime();
+
+                try {
+                    strDate = sdf.parse(checkDate);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (new Date().after(strDate)) {
+                    myLearningModelList.add(catalogModelsList.get(i));
+                    catalogAdapter.refreshList(myLearningModelList);
+//                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
+                } else {
+
+                    catalogAdapter.refreshList(myLearningModelList);
+                }
+
+
             }
+
 
         }
 
-        return myLearningModelList;
     }
 
+
+    @Override
+    public void onDayClick(Date dateClicked) {
+        List<MyLearningModel> calanderEventList = new ArrayList<>();
+//        Toast.makeText(context, " " + dateFormatForDisplaying.format(dateClicked), Toast.LENGTH_SHORT).show();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (int i = 0; i < catalogModelsList.size(); i++) {
+            Date strDate = null;
+            String checkDateStr = catalogModelsList.get(i).getEventstartTime();
+
+            try {
+                strDate = sdf.parse(checkDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Date clickedDate = GetZeroTimeDate(dateClicked);
+            Date checkDate = GetZeroTimeDate(strDate);
+
+            if (!clickedDate.after(checkDate) && !clickedDate.before(checkDate)) {
+
+                calanderEventList.add(catalogModelsList.get(i));
+                catalogAdapter.refreshList(calanderEventList);
+            } else {
+
+                catalogAdapter.refreshList(calanderEventList);
+            }
+        }
+
+    }
+
+    @Override
+    public void onMonthScroll(Date firstDayOfNewMonth) {
+
+        YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+    }
+
+    private void loadEvents() {
+        addEvents();
+    }
+
+    private void addEvents() {
+
+        for (int i = 0; i < catalogModelsList.size(); i++) {
+
+            Date date = ConvertToDate(catalogModelsList.get(i).getEventstartTime());
+            currentCalender.setTime(date);
+
+            currentCalender.add(Calendar.DATE, i);
+            setToMidnight(currentCalender);
+            long timeInMillis = currentCalender.getTimeInMillis();
+            List<Event> events = getEvents(timeInMillis, i);
+
+            compactCalendarView.addEvents(events);
+        }
+    }
+
+    private List<Event> getEvents(long timeInMillis, int day) {
+        if (day < 2) {
+            return Arrays.asList(new Event(Color.argb(255, 169, 68, 65), timeInMillis, "Event at " + new Date(timeInMillis)));
+        } else if (day > 2 && day <= 4) {
+            return Arrays.asList(
+                    new Event(Color.argb(255, 169, 68, 65), timeInMillis, "Event at " + new Date(timeInMillis)),
+                    new Event(Color.argb(255, 100, 68, 65), timeInMillis, "Event 2 at " + new Date(timeInMillis)));
+        } else {
+            return Arrays.asList(
+                    new Event(Color.argb(255, 169, 68, 65), timeInMillis, "Event at " + new Date(timeInMillis)),
+                    new Event(Color.argb(255, 100, 68, 65), timeInMillis, "Event 2 at " + new Date(timeInMillis)),
+                    new Event(Color.argb(255, 70, 68, 65), timeInMillis, "Event 3 at " + new Date(timeInMillis)));
+        }
+    }
+
+    private void setToMidnight(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+    }
 }

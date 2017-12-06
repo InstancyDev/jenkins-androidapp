@@ -29,6 +29,8 @@
 
     <string name="no_data">No Data</string>
 
+    <string name="no_event">No Events</string>
+
     <string name="pref_head_sitesettings">Site Settings</string>
     <string name="pref_head_preferences">Preferences</string>
     <string name="pref_head_notifications">Notifications</string>
