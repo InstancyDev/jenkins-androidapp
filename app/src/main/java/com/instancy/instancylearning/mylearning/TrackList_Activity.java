@@ -321,9 +321,10 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
     @Override
     public void onBackPressed() {
-
-        boolean isCompleted = onTrackListClose(myLearningModel, trackListModelList);
-
+        boolean isCompleted=false;
+        if (trackListModelList!=null) {
+             isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+        }
         if (isCompleted) {
 
             db.updateCMIstatus(myLearningModel, "Completed");
@@ -372,7 +373,10 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             case android.R.id.home:
                 // app icon in action bar clicked; go home
                 Log.d("DEBUG", "onOptionsItemSelected: ");
-                boolean isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+                boolean isCompleted=false;
+                if (trackListModelList!=null) {
+                    isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+                }
 
                 if (isCompleted) {
 

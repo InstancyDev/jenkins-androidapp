@@ -44,7 +44,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -91,7 +93,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
         if (siteUrl.length() == 0) {
             preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
-
 
         }
         if (siteID.length() == 0) {
@@ -258,13 +259,15 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         int CAMERA = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
         int READSTORAGE = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
         int WRITESTORAGE = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
-        return READSTORAGE == PackageManager.PERMISSION_GRANTED && WRITESTORAGE == PackageManager.PERMISSION_GRANTED && CAMERA == PackageManager.PERMISSION_GRANTED;
+        int WRITECALENDAR = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_CALENDAR);
+        int READCALENDAR = ContextCompat.checkSelfPermission(getApplicationContext(), READ_CALENDAR);
+        return READSTORAGE == PackageManager.PERMISSION_GRANTED && WRITESTORAGE == PackageManager.PERMISSION_GRANTED && CAMERA == PackageManager.PERMISSION_GRANTED && WRITECALENDAR == PackageManager.PERMISSION_GRANTED && READCALENDAR == PackageManager.PERMISSION_GRANTED;
 
     }
 
     private void requestPermission() {
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, WRITE_CALENDAR, READ_CALENDAR}, PERMISSION_REQUEST_CODE);
 
 
     }
@@ -277,7 +280,9 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                 if (grantResults.length > 0) {
                     boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     boolean storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (storageAccepted && cameraAccepted) {
+                    boolean writeCalenderAccepted = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+                    boolean readCalendarAccepted = grantResults[3] == PackageManager.PERMISSION_GRANTED;
+                    if (storageAccepted && cameraAccepted && writeCalenderAccepted && readCalendarAccepted) {
 //                        Toast.makeText(Splash_activity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
                         callWebMethods();
 

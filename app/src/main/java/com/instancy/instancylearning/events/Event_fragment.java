@@ -8,6 +8,7 @@ import android.app.Activity;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 
 import android.app.usage.UsageEvents;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -592,7 +594,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.catalog_contextmenu, popup.getMenu());
+        popup.getMenuInflater().inflate(R.menu.event_contextmenu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
@@ -601,7 +603,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         menu.getItem(1).setVisible(false);//add
         menu.getItem(2).setVisible(false);//buy
         menu.getItem(3).setVisible(false);//detail
-        menu.getItem(4).setVisible(false);//delete
+        menu.getItem(4).setVisible(false);//cancel enrollment
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
@@ -610,6 +612,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
+            menu.getItem(4).setVisible(true);
+
 
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
@@ -651,16 +655,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 menu.getItem(3).setVisible(true);
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
-                    File myFile = new File(myLearningDetalData.getOfflinepath());
-
-                    if (myFile.exists()) {
-
-                        menu.getItem(4).setVisible(true);
-
-                    } else {
-
-                        menu.getItem(4).setVisible(false);
-                    }
 
                     if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                         menu.getItem(4).setVisible(false);
@@ -693,25 +687,28 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("View")) {
-                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                if (item.getTitle().toString().equalsIgnoreCase("Related Content")) {
+//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
 //                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
+                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrollment")) {
 //                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-
+                    cancelEnrollment(myLearningDetalData);
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Add")) {
+                if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
 
 //                    addToMyLearning(myLearningDetalData);
                     addToMyLearningCheckUser(myLearningDetalData, position, false);
+                    Log.d(TAG, "onMenuItemClick:  Enroll here");
+
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
-                    addToMyLearningCheckUser(myLearningDetalData, position, true);
+//                    addToMyLearningCheckUser(myLearningDetalData, position, true);
 //
 //                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
 
@@ -732,13 +729,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 checkUserLogin(myLearningDetalData, position, isInapp);
             } else {
 
-                if (isInapp) {
-                    inAppActivityCall(myLearningDetalData);
+//                if (isInapp) {
+//                    inAppActivityCall(myLearningDetalData);
+//
+//                } else {
+                addToMyLearning(myLearningDetalData, position);
+//
+//                }
 
-                } else {
-                    addToMyLearning(myLearningDetalData, position);
-
-                }
             }
         }
     }
@@ -771,19 +769,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                             catalogModelsList.get(position).setAddedToMylearning(1);
                             catalogAdapter.notifyDataSetChanged();
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
-//                            Toast toast = Toast.makeText(
-//                                    context,
-//                                    context.getString(R.string.cat_add_success),
-//                                    Toast.LENGTH_SHORT);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
+
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.cat_add_success))
+                            builder.setMessage(context.getString(R.string.event_add_success))
                                     .setCancelable(false)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
                                             dialog.dismiss();
+                                            // add event to android calander
+                                            addEventToAndroidDevice(myLearningDetalData);
                                         }
                                     });
                             AlertDialog alert = builder.create();
@@ -886,13 +881,13 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             .get("userid").toString();
                                     if (userIdresponse.length() != 0) {
 
-                                        if (isInapp) {
-
-                                            inAppActivityCall(learningModel);
-
-                                        } else {
-                                            addToMyLearning(learningModel, position);
-                                        }
+//                                        if (isInapp) {
+//
+//                                            inAppActivityCall(learningModel);
+//
+//                                        } else {
+//                                            addToMyLearning(learningModel, position);
+//                                        }
 
                                     }
                                 }
@@ -1389,7 +1384,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 catalogAdapter.refreshList(calanderEventList);
             }
         }
-
     }
 
     @Override
@@ -1438,5 +1432,111 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+    }
+
+    public void addEventToAndroidDevice(MyLearningModel eventModel) {
+
+        try {
+            String eventUriString = "content://com.android.calendar/events";
+            ContentValues eventValues = new ContentValues();
+            eventValues.put("calendar_id", 1); // id, We need to choose from
+            // our mobile for primary its 1
+            eventValues.put("title", eventModel.getCourseName());
+            eventValues.put("description", eventModel.getShortDes());
+            eventValues.put("eventLocation", eventModel.getLocationName());
+
+
+            long startMillis = 0;
+            long endMillis = 0;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date startDate = null, endDate = null;
+            try {
+                startDate = simpleDateFormat.parse(eventModel.getEventstartTime());
+                startMillis = startDate.getTime();
+                endDate = simpleDateFormat.parse(eventModel.getEventendTime());
+                endMillis = endDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+//            long endDate = startDate + 1000 * 10 * 10; // For next 10min
+            eventValues.put("dtstart", startMillis);
+            eventValues.put("dtend", endMillis);
+
+            // values.put("allDay", 1); //If it is bithday alarm or such
+            // kind (which should remind me for whole day) 0 for false, 1
+            // for true
+            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
+            // sufficient for most
+            // entries tentative (0),
+            // confirmed (1) or canceled
+            // (2):
+            eventValues.put("eventTimezone", "UTC/GMT +5:30");
+
+            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
+
+            Uri eventUri = context.getApplicationContext()
+                    .getContentResolver()
+                    .insert(Uri.parse(eventUriString), eventValues);
+//           String eventID = Long.parseLong(eventUri.getLastPathSegment());
+        } catch (Exception ex) {
+            Log.e(TAG, "addEventToAndroidDevice: " + ex.getMessage());
+        }
+    }
+
+    public void cancelEnrollment(final MyLearningModel eventModel) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/CancelEnrolledEvent?EventContentId="
+                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        StringRequest jsonObjectRequest = new StringRequest(urlStr,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        svProgressHUD.dismiss();
+                        Log.d("Response: ", " " + response);
+
+                        if (response.contains("true")) {
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(context.getString(R.string.event_cancelled))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                            // remove event from android calander
+                                            injectFromDbtoModel();
+                                            db.ejectEventsFromDownloadData(eventModel);
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

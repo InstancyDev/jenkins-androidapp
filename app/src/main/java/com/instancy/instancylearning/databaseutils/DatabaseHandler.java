@@ -1669,6 +1669,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     }
+
+
     // Methods for inserting naive menus to local db
 
     public void insertIntoNativeMenusTable(NativeMenuModel nativeMenuModel, String siteid, String siteUrl) {
@@ -10932,6 +10934,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return menuList;
     }
+
+
+    public void ejectEventsFromDownloadData(MyLearningModel learningModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strDelete = "DELETE FROM " + TBL_DOWNLOADDATA + " WHERE siteid= '" + learningModel.getSiteID() +
+                    "' AND scoid= '" + learningModel.getScoId() +
+                    "' AND userid= '" + learningModel.getUserID() + "' AND contentid= '" + learningModel.getContentID() +
+            "'";
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+
+    }
+
 
     // uncomment for pagenotes
 //    public void sendOfflineUserPagenotes() {

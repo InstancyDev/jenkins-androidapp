@@ -79,7 +79,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:checked="true"
-            android:text="Upcomming Events"
+            android:text="Upcoming Events"
             android:textSize="12dp" />
 
         <RadioButton

@@ -241,9 +241,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        editUserName.setText("admin@Instancy.com");
 //        editPassword.setText("abc");
 
-//        LogUtils.d("DBG", "KEY_WEBAPIURL " + appUserModel.getWebAPIUrl());
-//        LogUtils.d("KEY_SITEURL :" + appUserModel.getSiteURL());
-//        LogUtils.d("Authorization: " + appUserModel.getAuthHeaders());
+
         getMyCatalogData();
     }
 
