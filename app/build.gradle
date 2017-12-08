@@ -105,4 +105,5 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.github.sundeepk:compact-calendar-view:2.0.2.2'
     compile 'info.hoang8f:android-segmented:1.0.6'
+    compile 'com.github.clans:fab:1.6.4'
 }

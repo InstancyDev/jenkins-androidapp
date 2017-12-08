@@ -742,7 +742,7 @@ public class Utilities {
         return map;
     }
 
-    public static Date ConvertToDate(String dateString){
+    public static Date ConvertToDate(String dateString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date convertedDate = new Date();
         try {
@@ -753,11 +753,12 @@ public class Utilities {
         }
         return convertedDate;
     }
+
     public static Date GetZeroTimeDate(Date fecha) {
         Date res = fecha;
         Calendar calendar = Calendar.getInstance();
 
-        calendar.setTime( fecha );
+        calendar.setTime(fecha);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);

@@ -21,6 +21,12 @@ https://github.com/mikepenz/Android-ActionItemBadge
 http://android-holo-colors.com/
 https://romannurik.github.io/AndroidAssetStudio/index.html
 http://jakewharton.github.io/butterknife/
+
+https://github.com/ajaydewari/FloatingActionButtonMenu
+
+https://github.com/Clans/FloatingActionButton/blob/master/sample/src/main/res/layout/menus_fragment.xml this one is used for float icons
+
+https://github.com/Clans/FloatingActionButton/tree/master/sample
   */
 
 }

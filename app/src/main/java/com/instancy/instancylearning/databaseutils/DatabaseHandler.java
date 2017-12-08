@@ -3242,6 +3242,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventendTime(formattedDate);
                 }
 
+                // timezone
+                if (jsonMyLearningColumnObj.has("timezone")) {
+
+                    // timezone
+                    if (jsonMyLearningColumnObj.has("timezone")) {
+
+                        String timez = jsonMyLearningColumnObj.get("timezone").toString();
+
+                        String timezone = "EST";
+                        switch (timez.toLowerCase()) {
+                            case "eastern standard time":
+                                timezone = "EST";
+                                break;
+                            case "india standard time":
+                                timezone = "IST";
+                                break;
+                            case "pacific standard time":
+                                timezone = "PST";
+                                break;
+                            case "mountain daylight time":
+                                timezone = "MDT";
+                                break;
+                            case "central standard time":
+                                timezone = "CST";
+                                break;
+                            case "central daylight time":
+                                timezone = "CDT";
+                                break;
+                            default:
+                                timezone = "EST";
+                                break;
+                        }
+
+                        long currentTime = System.currentTimeMillis();
+                        myLearningModel.setTimeZone(timezone);
+                    }
+
+                }
+
                 // mediatypeid
                 if (jsonMyLearningColumnObj.has("mediatypeid")) {
 
@@ -3279,13 +3318,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
 
                 }
-                // timezone
-                if (jsonMyLearningColumnObj.has("timezone")) {
-
-                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
-
-                }
-                // participanturl
+                              // participanturl
                 if (jsonMyLearningColumnObj.has("participanturl")) {
 
                     myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());

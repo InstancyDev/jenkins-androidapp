@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
@@ -50,6 +51,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import android.widget.TextView;
@@ -166,6 +168,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @BindView(R.id.yearandmonth)
     TextView YearTitle;
+
+
+    RadioButton upBtn, calenderBtn, pastBtn;
 
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
@@ -353,6 +358,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
+        upBtn = (RadioButton) rootView.findViewById(R.id.upcomingbtn);
+        calenderBtn = (RadioButton) rootView.findViewById(R.id.calanderbtn);
+        pastBtn = (RadioButton) rootView.findViewById(R.id.pastbtn);
+
+        upBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        calenderBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        pastBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        upBtn.setTypeface(null, Typeface.BOLD);
         segmentedSwitch.setOnCheckedChangeListener(this);
         if (!isFromCatogories) {
             catalogModelsList = new ArrayList<MyLearningModel>();
@@ -1280,19 +1293,29 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int isChecked) {
+
+
         switch (isChecked) {
             case R.id.upcomingbtn:
                 compactCalendarView.setVisibility(View.GONE);
                 YearTitle.setVisibility(View.GONE);
+                upBtn.setTypeface(null, Typeface.BOLD);
+                calenderBtn.setTypeface(null, Typeface.NORMAL);
+                pastBtn.setTypeface(null, Typeface.NORMAL);
                 sortByDate("before");
                 break;
             case R.id.calanderbtn:
-
+                upBtn.setTypeface(null, Typeface.NORMAL);
+                calenderBtn.setTypeface(null, Typeface.BOLD);
+                pastBtn.setTypeface(null, Typeface.NORMAL);
                 compactCalendarView.setVisibility(View.VISIBLE);
                 YearTitle.setVisibility(View.VISIBLE);
                 catalogAdapter.refreshList(catalogModelsList);
                 break;
             case R.id.pastbtn:
+                upBtn.setTypeface(null, Typeface.NORMAL);
+                calenderBtn.setTypeface(null, Typeface.NORMAL);
+                pastBtn.setTypeface(null, Typeface.BOLD);
                 compactCalendarView.setVisibility(View.GONE);
                 YearTitle.setVisibility(View.GONE);
                 sortByDate("after");
@@ -1356,7 +1379,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
     }
-
 
     @Override
     public void onDayClick(Date dateClicked) {
@@ -1459,9 +1481,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 e.printStackTrace();
             }
 
-//            long endDate = startDate + 1000 * 10 * 10; // For next 10min
+            long endDates = startMillis + 1000 * 10 * 10; // For next 10min
             eventValues.put("dtstart", startMillis);
-            eventValues.put("dtend", endMillis);
+            eventValues.put("dtend", endDates);
 
             // values.put("allDay", 1); //If it is bithday alarm or such
             // kind (which should remind me for whole day) 0 for false, 1
@@ -1471,7 +1493,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             // entries tentative (0),
             // confirmed (1) or canceled
             // (2):
+//            eventValues.put("eventTimezone", "UTC/GMT +5:30");
             eventValues.put("eventTimezone", "UTC/GMT +5:30");
+
 
             eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
 

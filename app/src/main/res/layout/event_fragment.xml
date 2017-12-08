@@ -48,7 +48,8 @@
         android:id="@+id/swipemylearning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/compactcalendar_view" android:layout_above="@+id/segmentedswitch">
+        android:layout_above="@+id/segmentedswitch"
+        android:layout_below="@+id/compactcalendar_view">
 
         <ListView
             android:id="@+id/mylearninglistview"
@@ -70,7 +71,7 @@
         segmentedgroup:backgroundTint="@color/colorPrimary"
         segmentedgroup:sc_border_width="0dp"
         segmentedgroup:sc_checked_text_color="@color/colorPrimary"
-        segmentedgroup:sc_tint_color="@color/colorWhite">
+        segmentedgroup:sc_tint_color="@color/colorPrimary">
 
         <RadioButton
             android:id="@+id/upcomingbtn"
@@ -80,18 +81,20 @@
             android:layout_weight="1"
             android:checked="true"
             android:text="Upcoming Events"
+            android:textColor="@color/colorWhite"
             android:textSize="12dp" />
 
         <RadioButton
             android:id="@+id/calanderbtn"
-
             style="@style/RadioButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Calendar" />
+            android:text="Calendar"
+            android:textColor="@color/colorWhite" />
 
         <RadioButton
+
             android:id="@+id/pastbtn"
             style="@style/RadioButton"
             android:layout_width="0dp"

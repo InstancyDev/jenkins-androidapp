@@ -40,6 +40,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -94,6 +95,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
@@ -379,6 +381,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         return rootView;
     }
+
 
 
     public void injectFromDbtoModel() {
