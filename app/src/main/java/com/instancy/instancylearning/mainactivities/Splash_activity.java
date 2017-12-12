@@ -80,7 +80,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         context = this;
         imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
 //        initilizeView();
-        requestPermission();
+//        requestPermission();
         db = new DatabaseHandler(context);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         appUserModel = AppUserModel.getInstance();
@@ -105,7 +105,20 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
 
-//        checkPermission();
+
+        if (Build.VERSION.SDK_INT > 22)
+        {
+
+            requestPermission();
+
+
+        }
+        else
+        {
+            callWebMethods();
+
+
+        }
 
     }
 

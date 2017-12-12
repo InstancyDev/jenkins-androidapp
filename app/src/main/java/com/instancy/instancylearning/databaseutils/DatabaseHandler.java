@@ -391,8 +391,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_CALENDARADDEDEVENTS
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, userid INTEGER,siteid INTEGER,scoid INTEGER,eventid INTEGER, eventname TEXT, reminderid INTEGER)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_FORUMS
-                + "(forumname TEXT,forumid INTEGER,name TEXT, createddate TEXT,author TEXT,nooftopics TEXT,totalposts TEXT,existing TEXT,description TEXT,isprivate TEXT,active TEXT,siteid TEXT,createduserid TEXT,parentforumid TEXT,displayorder TEXT,requiressubscription TEXT,createnewtopic TEXT,attachfile TEXT,likeposts TEXT,sendemail TEXT,moderation TEXT,siteurl TEXT, PRIMARY KEY(siteurl,forumid))");
+                + TBL_FORUMS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,forumname TEXT,forumid TEXT,name TEXT,createddate TEXT,author TEXT,nooftopics TEXT,totalposts TEXT,existing TEXT,description TEXT,isprivate TEXT, active TEXT, siteid TEXT, createduserid TEXT,parentforumid TEXT,displayorder TEXT,requiressubscription TEXT,createnewtopic TEXT,attachfile TEXT,likeposts TEXT, sendemail TEXT, moderation TEXT,imagedata TEXT)");
+
+//                + "(forumname TEXT,forumid INTEGER,name TEXT, createddate TEXT,author TEXT,nooftopics TEXT,totalposts TEXT,existing TEXT,description TEXT,isprivate TEXT,active TEXT,siteid TEXT,createduserid TEXT,parentforumid TEXT,displayorder TEXT,requiressubscription TEXT,createnewtopic TEXT,attachfile TEXT,likeposts TEXT,sendemail TEXT,moderation TEXT,siteurl TEXT, PRIMARY KEY(siteurl,forumid))");
+
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_FORUMTOPICS
                 + "(contentid TEXT,forumid TEXT,name TEXT, createddate TEXT,createduserid TEXT,noofreplies TEXT,noofviews TEXT,siteid INTEGER, longdescription TEXT,uploadfilename TEXT, siteurl TEXT, PRIMARY KEY(siteurl,forumid,contentid))");
@@ -1676,52 +1679,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void insertIntoNativeMenusTable(NativeMenuModel nativeMenuModel, String siteid, String siteUrl) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+
+        ContentValues contentValues = null;
         try {
-            String strExeQuery = "";
-            strExeQuery = "INSERT INTO NATIVEMENUS (menuid , displayname , displayorder, image, isofflinemenu , isenabled, contexttitle , contextmenuid , repositoryid, landingpagetype, categorystyle, componentid, conditions, parentmenuid, parameterstrings, siteid, siteurl)"
-                    + " VALUES ('"
-                    + nativeMenuModel.getMenuid()
-                    + "','"
-                    + nativeMenuModel.getDisplayname()
-                    + "','"
-                    + nativeMenuModel.getDisplayOrder()
-                    + "','"
-                    + nativeMenuModel.getImage()
-                    + "','"
-                    + nativeMenuModel.getIsofflineMenu()
-                    + "','"
-                    + nativeMenuModel.getIsEnabled()
-                    + "','"
-                    + nativeMenuModel.getContextTitle()
-                    + "','"
-                    + nativeMenuModel.getContextmenuId()
-                    + "','"
-                    + nativeMenuModel.getRepositoryId()
-                    + "','"
-                    + nativeMenuModel.getLandingpageType()
-                    + "','"
-                    + nativeMenuModel.getCategoryStyle()
-                    + "','"
-                    + nativeMenuModel.getComponentId()
-                    + "','"
-                    + nativeMenuModel.getConditions()
-                    + "','"
-                    + nativeMenuModel.getParentMenuId()
-                    + "','"
-                    + nativeMenuModel.getParameterString()
-                    + "','"
-                    + siteid
-                    + "','"
-                    + siteUrl
-                    + "')";
-            db.execSQL(strExeQuery);
+
+            contentValues = new ContentValues();
+
+            contentValues.put("menuid", nativeMenuModel.getMenuid());
+            contentValues.put("displayname", nativeMenuModel.getDisplayname());
+            contentValues.put("displayorder", nativeMenuModel.getDisplayOrder());
+            contentValues.put("image", nativeMenuModel.getImage());
+            contentValues.put("isofflinemenu", nativeMenuModel.getIsofflineMenu());
+            contentValues.put("isenabled", nativeMenuModel.getIsEnabled());
+            contentValues.put("contexttitle", nativeMenuModel.getContextTitle());
+            contentValues.put("contextmenuid", nativeMenuModel.getContextmenuId());
+            contentValues.put("repositoryid", nativeMenuModel.getRepositoryId());
+            contentValues.put("landingpagetype", nativeMenuModel.getLandingpageType());
+            contentValues.put("categorystyle", nativeMenuModel.getCategoryStyle());
+            contentValues.put("componentid", nativeMenuModel.getComponentId());
+            contentValues.put("conditions", nativeMenuModel.getConditions());
+            contentValues.put("parentmenuid", nativeMenuModel.getParentMenuId());
+            contentValues.put("parameterstrings", nativeMenuModel.getParameterString());
+            contentValues.put("siteid", siteid);
+            contentValues.put("siteurl", siteUrl);
+
+            db.insert(TBL_NATIVEMENUS, null, contentValues);
         } catch (SQLiteException sqlEx) {
             sqlEx.printStackTrace();
 
         }
         db.close();
     }
-
 
     // Method for tincan details
 
@@ -3003,7 +2991,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             MyLearningModel myLearningModel = new MyLearningModel();
 
-
             //sitename
             if (jsonMyLearningColumnObj.has("sitename")) {
 
@@ -3318,7 +3305,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
 
                 }
-                              // participanturl
+                // participanturl
                 if (jsonMyLearningColumnObj.has("participanturl")) {
 
                     myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
@@ -10975,7 +10962,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String strDelete = "DELETE FROM " + TBL_DOWNLOADDATA + " WHERE siteid= '" + learningModel.getSiteID() +
                     "' AND scoid= '" + learningModel.getScoId() +
                     "' AND userid= '" + learningModel.getUserID() + "' AND contentid= '" + learningModel.getContentID() +
-            "'";
+                    "'";
             db.execSQL(strDelete);
 
         } catch (SQLiteException sqlEx) {
