@@ -282,18 +282,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     }
                 }
 
-                if (requestType.equalsIgnoreCase("UPDATESTATUS")) {
-
-                    if (response != null) {
-
-                        if (resultListner != null)
-                            resultListner.statusUpdateFromServer(true, response);
-
-                    } else {
-
-                    }
-                }
-
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -367,16 +355,12 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         pastBtn.setTextColor(getResources().getColor(R.color.colorWhite));
         upBtn.setTypeface(null, Typeface.BOLD);
         segmentedSwitch.setOnCheckedChangeListener(this);
-        if (!isFromCatogories) {
-            catalogModelsList = new ArrayList<MyLearningModel>();
-            if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
-                refreshCatalog(true);
-            } else {
-                injectFromDbtoModel();
-            }
+
+        catalogModelsList = new ArrayList<MyLearningModel>();
+        if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
+            refreshCatalog(true);
         } else {
-            swipeRefreshLayout.setEnabled(false);
-            catalogAdapter.refreshList(catalogModelsList);
+            injectFromDbtoModel();
         }
 
         initilizeView();
@@ -394,7 +378,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
         }
-        loadEvents();
+        addEvents();
     }
 
     public void initilizeCalander() {
@@ -458,7 +442,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             });
 
         }
-
 
     }
 
@@ -997,36 +980,36 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void inAppActivityCall(MyLearningModel learningModel) {
-        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
-        if (!BillingProcessor.isIabServiceAvailable(context)) {
-
-            Toast.makeText(context, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
-        }
-
-        String testId = "android.test.purchased";
-        String productId = "com.instancy.managedproduct";
-        String originalproductid = learningModel.getGoogleProductID();
-
-        if (originalproductid.length() != 0) {
-            Intent intent = new Intent();
-            intent.putExtra("learningdata", learningModel);
-            billingProcessor.handleActivityResult(IAP_LAUNCH_FLOW_CODE, 80, intent);
-            billingProcessor.purchase(getActivity(), originalproductid);
-        } else {
-            Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
-        }
-
-//        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
-//        String productid = null;
-//        productid = learningModel.getGoogleProductID();
-
-//        SkuDetails sku = billingProcessor.getPurchaseListingDetails(testId);
-
-//        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
-
-
-    }
+//    public void inAppActivityCall(MyLearningModel learningModel) {
+//        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
+//        if (!BillingProcessor.isIabServiceAvailable(context)) {
+//
+//            Toast.makeText(context, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        String testId = "android.test.purchased";
+//        String productId = "com.instancy.managedproduct";
+//        String originalproductid = learningModel.getGoogleProductID();
+//
+//        if (originalproductid.length() != 0) {
+//            Intent intent = new Intent();
+//            intent.putExtra("learningdata", learningModel);
+//            billingProcessor.handleActivityResult(IAP_LAUNCH_FLOW_CODE, 80, intent);
+//            billingProcessor.purchase(getActivity(), originalproductid);
+//        } else {
+//            Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
+//        }
+//
+////        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
+////        String productid = null;
+////        productid = learningModel.getGoogleProductID();
+//
+////        SkuDetails sku = billingProcessor.getPurchaseListingDetails(testId);
+//
+////        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
+//
+//
+//    }
 
     @Override
     public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
@@ -1414,9 +1397,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
     }
 
-    private void loadEvents() {
-        addEvents();
-    }
 
     private void addEvents() {
 

@@ -39,11 +39,12 @@
             android:layout_height="wrap_content">
 
             <ListView
+
                 android:id="@+id/mylearninglistview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:divider="@null"
-                android:dividerHeight="2dp"></ListView>
+                android:divider="@android:color/transparent"
+                android:dividerHeight="3dp"></ListView>
 
 
         </android.support.v4.widget.SwipeRefreshLayout>
@@ -53,48 +54,48 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorDarkGrey"
-            android:visibility="gone"> </android.support.v7.widget.RecyclerView>
+            android:visibility="gone"></android.support.v7.widget.RecyclerView>
 
     </FrameLayout>
 
     <com.github.clans.fab.FloatingActionMenu
-        android:visibility="gone"
         android:id="@+id/menu_red"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:paddingRight="10dp"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
-        fab:menu_labels_ellipsize="end"
-        fab:menu_labels_singleLine="true"
+        android:paddingRight="10dp"
+        android:visibility="gone"
         fab:menu_backgroundColor="#ccffffff"
-        fab:menu_fab_label="Menu label">
+        fab:menu_fab_label="Menu label"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true">
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_launcher"
-            fab:fab_size="mini"
-            fab:fab_label="Disabled" />
+            fab:fab_label="Disabled"
+            fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_launcher"
-            fab:fab_size="mini"
-            fab:fab_label="Remove button" />
+            fab:fab_label="Remove button"
+            fab:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_launcher"
-            fab:fab_size="mini"
-            fab:fab_label="Restore Button" />
+            fab:fab_label="Restore Button"
+            fab:fab_size="mini" />
 
     </com.github.clans.fab.FloatingActionMenu>
 

@@ -115,6 +115,9 @@
             android:name=".filter.Filter_Inner_activity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".discussionfourms.DiscussionTopicActivity"
+            android:screenOrientation="portrait"></activity>
 
         <!-- INAPP BILLING ACTIVITY -->
 

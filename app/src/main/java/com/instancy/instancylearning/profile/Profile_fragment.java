@@ -214,10 +214,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
 
                 Log.d(TAG, "names here: " + cvFields.get(keyName));
-                String valueName = cvFields.get(keyName).toString();
+                String valueName = "";
+                try {
+                    valueName = cvFields.get(keyName).toString();
+
+                } catch (NullPointerException ex) {
+
+                    ex.printStackTrace();
+                }
 
                 if (valueName.contains("null")) {
-                    valueName="";
+                    valueName = "";
 //                    continue;
                 }
 
@@ -506,7 +513,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-//                showPictureDialog();
+                showPictureDialog();
                 break;
         }
     }

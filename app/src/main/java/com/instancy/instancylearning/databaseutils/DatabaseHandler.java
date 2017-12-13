@@ -23,6 +23,8 @@ import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
+import com.instancy.instancylearning.models.DiscussionForumModel;
+import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.NativeMenuModel;
@@ -397,8 +399,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_FORUMTOPICS
-                + "(contentid TEXT,forumid TEXT,name TEXT, createddate TEXT,createduserid TEXT,noofreplies TEXT,noofviews TEXT,siteid INTEGER, longdescription TEXT,uploadfilename TEXT, siteurl TEXT, PRIMARY KEY(siteurl,forumid,contentid))");
+                + TBL_FORUMTOPICS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, topicid TEXT,forumid TEXT,name TEXT, createddate TEXT,latestreplyby TEXT,noofreplies TEXT,noofviews TEXT,siteid TEXT,longdescription TEXT,createduserid TEXT,imagedata TEXT, attachment TEXT)");
+
+//                + "(contentid TEXT,forumid TEXT,name TEXT, createddate TEXT,createduserid TEXT,noofreplies TEXT,noofviews TEXT,siteid INTEGER, longdescription TEXT,uploadfilename TEXT, siteurl TEXT, PRIMARY KEY(siteurl,forumid,contentid))");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TOPICCOMMENTS
                 + "(commentid INTEGER,topicid TEXT,forumid TEXT,message TEXT,posteddate TEXT,postedby TEXT,replyid TEXT,siteid INTEGER,uploadfilename TEXT, siteurl TEXT, PRIMARY KEY(siteurl,forumid,topicid,commentid))");
@@ -10971,6 +10975,533 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
 
+    }
+
+    public void injectDiscussionFourmList(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_FORUMS);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            DiscussionForumModel discussionForumModel = new DiscussionForumModel();
+
+            //active
+            if (jsonMyLearningColumnObj.has("active")) {
+
+                discussionForumModel.active = jsonMyLearningColumnObj.get("active").toString();
+            }
+            // attachfile
+            if (jsonMyLearningColumnObj.has("attachfile")) {
+
+                discussionForumModel.attachfile = jsonMyLearningColumnObj.get("attachfile").toString();
+
+            }
+            // author
+            if (jsonMyLearningColumnObj.has("author")) {
+
+                discussionForumModel.author = jsonMyLearningColumnObj.get("author").toString();
+
+            }
+            // createduserid
+            if (jsonMyLearningColumnObj.has("createduserid")) {
+
+                discussionForumModel.createduserid = jsonMyLearningColumnObj.get("createduserid").toString();
+
+            }
+            // createnewtopic
+
+            if (jsonMyLearningColumnObj.has("createnewtopic")) {
+
+                discussionForumModel.createnewtopic = jsonMyLearningColumnObj.get("createnewtopic").toString();
+
+            }
+
+            // description
+            if (jsonMyLearningColumnObj.has("description")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("description").toString());
+
+                discussionForumModel.descriptionValue = result.toString();
+
+            }
+
+            if (jsonMyLearningColumnObj.has("displayorder")) {
+                discussionForumModel.displayorder = jsonMyLearningColumnObj.get("displayorder").toString();
+
+            }
+
+            // existing
+            if (jsonMyLearningColumnObj.has("existing")) {
+
+                discussionForumModel.existing = jsonMyLearningColumnObj.get("existing").toString();
+
+            }
+            // forumname
+            if (jsonMyLearningColumnObj.has("forumname")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("forumname").toString());
+
+                discussionForumModel.forumname = result.toString();
+
+            }
+
+            // isprivate
+            if (jsonMyLearningColumnObj.has("isprivate")) {
+
+                discussionForumModel.isprivate = jsonMyLearningColumnObj.get("isprivate").toString();
+
+            }
+            // likeposts
+            if (jsonMyLearningColumnObj.has("likeposts")) {
+
+                discussionForumModel.likeposts = jsonMyLearningColumnObj.get("likeposts").toString();
+
+            }
+            // moderation
+            if (jsonMyLearningColumnObj.has("moderation")) {
+
+                discussionForumModel.moderation = jsonMyLearningColumnObj.get("moderation").toString();
+
+            }
+            // name
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                discussionForumModel.name = jsonMyLearningColumnObj.get("name").toString();
+            }
+            // nooftopics
+            if (jsonMyLearningColumnObj.has("nooftopics")) {
+
+                discussionForumModel.nooftopics = jsonMyLearningColumnObj.get("nooftopics").toString();
+
+            }
+            // parentforumid
+            if (jsonMyLearningColumnObj.has("parentforumid")) {
+
+                discussionForumModel.parentforumid = jsonMyLearningColumnObj.get("parentforumid").toString();
+
+            }
+            // requiressubscription
+            if (jsonMyLearningColumnObj.has("requiressubscription")) {
+
+                discussionForumModel.requiressubscription = jsonMyLearningColumnObj.get("requiressubscription").toString();
+
+            }
+            // sendemail
+            if (jsonMyLearningColumnObj.has("sendemail")) {
+
+                discussionForumModel.sendemail = jsonMyLearningColumnObj.get("sendemail").toString();
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                discussionForumModel.siteid = jsonMyLearningColumnObj.get("siteid").toString();
+
+            }
+            // totalposts
+            if (jsonMyLearningColumnObj.has("totalposts")) {
+
+                discussionForumModel.totalposts = jsonMyLearningColumnObj.get("totalposts").toString();
+
+            }
+
+            // forumid
+            if (jsonMyLearningColumnObj.has("forumid")) {
+
+                int fourmID = Integer.parseInt(jsonMyLearningColumnObj.get("forumid").toString());
+
+                discussionForumModel.forumid = fourmID;
+
+            }
+
+            // publishedDate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                discussionForumModel.createddate = formattedDate;
+
+
+            }
+
+            injectDiscussionFourmsDataIntoTable(discussionForumModel);
+        }
+
+    }
+
+
+    public void injectDiscussionFourmsDataIntoTable(DiscussionForumModel discussionForumModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("forumname", discussionForumModel.forumname);
+            contentValues.put("forumid", discussionForumModel.forumid);
+            contentValues.put("name", discussionForumModel.name);
+            contentValues.put("createddate", discussionForumModel.createddate);
+            contentValues.put("author", discussionForumModel.author);
+            contentValues.put("nooftopics", discussionForumModel.nooftopics);
+            contentValues.put("totalposts", discussionForumModel.totalposts);
+            contentValues.put("existing", discussionForumModel.existing);
+            contentValues.put("description", discussionForumModel.descriptionValue);
+            contentValues.put("isprivate", discussionForumModel.isprivate);
+            contentValues.put("active", discussionForumModel.active);
+            contentValues.put("siteid", discussionForumModel.siteid);
+            contentValues.put("createduserid", discussionForumModel.createduserid);
+            contentValues.put("parentforumid", discussionForumModel.parentforumid);
+            contentValues.put("displayorder", discussionForumModel.displayorder);
+            contentValues.put("requiressubscription", discussionForumModel.requiressubscription);
+
+            contentValues.put("createnewtopic", discussionForumModel.createnewtopic);
+            contentValues.put("attachfile", discussionForumModel.attachfile);
+            contentValues.put("likeposts", discussionForumModel.likeposts);
+            contentValues.put("sendemail", discussionForumModel.sendemail);
+            contentValues.put("moderation", discussionForumModel.moderation);
+            db.insert(TBL_FORUMS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+
+    public List<DiscussionForumModel> fetchDiscussionModel(String siteID) {
+        List<DiscussionForumModel> discussionForumModelList = null;
+        DiscussionForumModel discussionForumModel = new DiscussionForumModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_FORUMS + " WHERE siteid = " + siteID + "  ORDER BY forumid  DESC";
+
+//        let rs = try database.executeQuery("SELECT DF.*, UI.profileimagepath from \(DBTables.DiscussionForumTable.rawValue) DF LEFT OUTER JOIN USERSINFO UI ON DF.createduserid = UI.userid WHERE DF.siteid = ? ORDER BY forumid DESC", values: ["\(siteIDValue)"])
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                discussionForumModelList = new ArrayList<DiscussionForumModel>();
+                do {
+
+                    discussionForumModel = new DiscussionForumModel();
+
+                    discussionForumModel.siteid = cursor.getString(cursor
+                            .getColumnIndex("forumname"));
+
+                    discussionForumModel.name = cursor.getString(cursor
+                            .getColumnIndex("name"));
+
+                    discussionForumModel.createddate = cursor.getString(cursor
+                            .getColumnIndex("createddate"));
+
+                    discussionForumModel.author = cursor.getString(cursor
+                            .getColumnIndex("author"));
+
+                    discussionForumModel.nooftopics = cursor.getString(cursor
+                            .getColumnIndex("nooftopics"));
+
+                    discussionForumModel.totalposts = cursor.getString(cursor
+                            .getColumnIndex("totalposts"));
+
+                    discussionForumModel.existing = cursor.getString(cursor
+                            .getColumnIndex("existing"));
+
+
+                    discussionForumModel.descriptionValue = cursor.getString(cursor
+                            .getColumnIndex("description"));
+
+
+                    discussionForumModel.isprivate = cursor.getString(cursor
+                            .getColumnIndex("isprivate"));
+
+
+                    discussionForumModel.active = cursor.getString(cursor
+                            .getColumnIndex("active"));
+
+
+                    discussionForumModel.siteid = cursor.getString(cursor
+                            .getColumnIndex("siteid"));
+
+
+                    discussionForumModel.createduserid = cursor.getString(cursor
+                            .getColumnIndex("createduserid"));
+
+
+                    discussionForumModel.createduserid = cursor.getString(cursor
+                            .getColumnIndex("createduserid"));
+
+
+                    discussionForumModel.parentforumid = cursor.getString(cursor
+                            .getColumnIndex("parentforumid"));
+
+
+                    discussionForumModel.displayorder = cursor.getString(cursor
+                            .getColumnIndex("displayorder"));
+
+
+                    discussionForumModel.requiressubscription = cursor.getString(cursor
+                            .getColumnIndex("requiressubscription"));
+
+
+                    discussionForumModel.createnewtopic = cursor.getString(cursor
+                            .getColumnIndex("createnewtopic"));
+
+                    discussionForumModel.attachfile = cursor.getString(cursor
+                            .getColumnIndex("attachfile"));
+
+                    discussionForumModel.likeposts = cursor.getString(cursor
+                            .getColumnIndex("likeposts"));
+
+
+                    discussionForumModel.sendemail = cursor.getString(cursor
+                            .getColumnIndex("sendemail"));
+
+                    discussionForumModel.moderation = cursor.getString(cursor
+                            .getColumnIndex("moderation"));
+// uncomment for discussion once completed the peoplelisting
+//                    discussionForumModel.imagedata = cursor.getString(cursor
+//                            .getColumnIndex("profileimagepath"));
+
+                    discussionForumModel.forumid = cursor.getInt(cursor
+                            .getColumnIndex("forumid"));
+
+
+                    discussionForumModelList.add(discussionForumModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return discussionForumModelList;
+    }
+// Discussion Topics
+
+    public void injectDiscussionTopicsList(JSONObject jsonObject, DiscussionForumModel discussionForumModel) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_FORUMTOPICS);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            DiscussionTopicModel discussionTopicModel = new DiscussionTopicModel();
+
+            //contentid
+            if (jsonMyLearningColumnObj.has("contentid")) {
+
+                discussionTopicModel.topicid = jsonMyLearningColumnObj.get("contentid").toString();
+            }
+            // createddate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                discussionTopicModel.createddate = formattedDate;
+
+
+            }
+            // createduserid
+            if (jsonMyLearningColumnObj.has("createduserid")) {
+
+                discussionTopicModel.createduserid = jsonMyLearningColumnObj.get("createduserid").toString();
+
+            }
+            // latestreplyby
+            if (jsonMyLearningColumnObj.has("latestreplyby")) {
+
+                discussionTopicModel.latestreplyby = jsonMyLearningColumnObj.get("latestreplyby").toString();
+
+            }
+            // name
+
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                discussionTopicModel.name = jsonMyLearningColumnObj.get("name").toString();
+
+            }
+
+            // longdescription
+            if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+
+                discussionTopicModel.longdescription = result.toString();
+
+            }
+
+            if (jsonMyLearningColumnObj.has("noofreplies")) {
+                discussionTopicModel.noofreplies = jsonMyLearningColumnObj.get("noofreplies").toString();
+
+            }
+
+            // existing
+            if (jsonMyLearningColumnObj.has("noofviews")) {
+
+                discussionTopicModel.noofviews = jsonMyLearningColumnObj.get("noofviews").toString();
+
+            }
+            // uploadfilename
+            if (jsonMyLearningColumnObj.has("uploadfilename")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("uploadfilename").toString());
+
+                discussionTopicModel.attachment = result.toString();
+
+            }
+
+
+            discussionTopicModel.siteid = appUserModel.getSiteIDValue();
+
+            discussionTopicModel.forumid = "" + discussionForumModel.forumid;
+
+
+            injectDiscussionTopicsDataIntoTable(discussionTopicModel);
+        }
+
+    }
+
+    public void injectDiscussionTopicsDataIntoTable(DiscussionTopicModel discussionTopicModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("topicid", discussionTopicModel.topicid);
+            contentValues.put("forumid", discussionTopicModel.forumid);
+            contentValues.put("name", discussionTopicModel.name);
+            contentValues.put("createddate", discussionTopicModel.createddate);
+            contentValues.put("latestreplyby", discussionTopicModel.latestreplyby);
+            contentValues.put("noofreplies", discussionTopicModel.noofreplies);
+            contentValues.put("noofviews", discussionTopicModel.noofviews);
+            contentValues.put("siteid", discussionTopicModel.siteid);
+            contentValues.put("longdescription", discussionTopicModel.longdescription);
+            contentValues.put("createduserid", discussionTopicModel.createduserid);
+            contentValues.put("imagedata", discussionTopicModel.imagedata);
+            contentValues.put("attachment", discussionTopicModel.attachment);
+
+            db.insert(TBL_FORUMTOPICS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+
+    public List<DiscussionTopicModel> fetchDiscussionTopicModelList(String siteID, int fourmID) {
+        List<DiscussionTopicModel> discussionTopicModelList = null;
+        DiscussionTopicModel discussionTopicModel = new DiscussionTopicModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_FORUMTOPICS + " WHERE siteid = " + siteID + " AND forumid =" + fourmID + "  ORDER BY createddate DESC";
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                discussionTopicModelList = new ArrayList<DiscussionTopicModel>();
+                do {
+
+                    discussionTopicModel = new DiscussionTopicModel();
+
+                    discussionTopicModel.topicid = cursor.getString(cursor
+                            .getColumnIndex("topicid"));
+
+                    discussionTopicModel.forumid = cursor.getString(cursor
+                            .getColumnIndex("forumid"));
+
+                    discussionTopicModel.name = cursor.getString(cursor
+                            .getColumnIndex("name"));
+
+                    discussionTopicModel.createddate = cursor.getString(cursor
+                            .getColumnIndex("createddate"));
+
+                    discussionTopicModel.latestreplyby = cursor.getString(cursor
+                            .getColumnIndex("latestreplyby"));
+
+                    discussionTopicModel.noofreplies = cursor.getString(cursor
+                            .getColumnIndex("noofreplies"));
+
+                    discussionTopicModel.noofviews = cursor.getString(cursor
+                            .getColumnIndex("noofviews"));
+
+
+                    discussionTopicModel.siteid = cursor.getString(cursor
+                            .getColumnIndex("siteid"));
+
+
+                    discussionTopicModel.longdescription = cursor.getString(cursor
+                            .getColumnIndex("longdescription"));
+
+
+                    discussionTopicModel.createduserid = cursor.getString(cursor
+                            .getColumnIndex("createduserid"));
+
+
+                    discussionTopicModel.siteid = cursor.getString(cursor
+                            .getColumnIndex("siteid"));
+
+
+                    discussionTopicModel.createduserid = cursor.getString(cursor
+                            .getColumnIndex("createduserid"));
+
+
+
+
+
+                    discussionTopicModel.imagedata = cursor.getString(cursor
+                            .getColumnIndex("imagedata"));
+
+
+                    discussionTopicModel.attachment = cursor.getString(cursor
+                            .getColumnIndex("attachment"));
+
+
+                    discussionTopicModelList.add(discussionTopicModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchDiscussionTopicModelList db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return discussionTopicModelList;
     }
 
 

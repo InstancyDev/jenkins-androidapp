@@ -39,6 +39,7 @@ import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
@@ -369,6 +370,9 @@ public class SideMenu extends AppCompatActivity {
                 break;
             case 8:
                 fragment = new Event_fragment();
+                break;
+            case 4:
+                fragment = new DiscussionFourm_fragment();
                 break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");

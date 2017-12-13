@@ -60,6 +60,9 @@ public class StaticValues {
     public static final String KEY_HIDE_ANNOTATION = "KEY_HIDE_ANNOTATION";
 
     public static final String CONTEXT_TITLE = "COONTEXT_TITLE";
+
+
+    public static final String BACK_STACK_ROOT_TAG = "root_fragment";
     /**
      * To get the FontAwsome font .ttf asset path
      *
