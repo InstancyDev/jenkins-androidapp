@@ -79,8 +79,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         ButterKnife.bind(this);
         context = this;
         imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
-//        initilizeView();
-//        requestPermission();
+
         db = new DatabaseHandler(context);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         appUserModel = AppUserModel.getInstance();
@@ -106,20 +105,13 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
 
 
-        if (Build.VERSION.SDK_INT > 22)
-        {
-
+        if (Build.VERSION.SDK_INT > 22) {
             requestPermission();
 
-
-        }
-        else
-        {
+        } else {
             callWebMethods();
 
-
         }
-
     }
 
     /*
@@ -127,60 +119,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     * all view are initilize here like binding views to class
     *
     * */
-    public void initilizeView() {
-
-
-//      animation
-        zoomin = AnimationUtils.loadAnimation(this, R.anim.zoomin);
-        zoomout = AnimationUtils.loadAnimation(this, R.anim.zoomout);
-
-//        imageBrandLogo.setAnimation(zoomin);
-//        imageBrandLogo.setAnimation(zoomout);
-
-        zoomin.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation arg0) {
-                imageBrandLogo.startAnimation(zoomout);
-
-            }
-        });
-
-        zoomout.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation arg0) {
-                imageBrandLogo.startAnimation(zoomin);
-
-            }
-        });
-
-
-    }
 
     public void callWebMethods() {
 
@@ -226,17 +164,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
                 }
 
-//                if (!appUserModel.getUserIDValue().equalsIgnoreCase("-1")) {
-//
-//                    Intent i = new Intent(context, Branding_activity.class);
-//                    startActivity(i);
-//
-//                } else {
-//
-//                    Intent i = new Intent(context, Branding_activity.class);
-//                    startActivity(i);
-//
-//                }
 
             }
         }

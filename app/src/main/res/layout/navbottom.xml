@@ -113,7 +113,7 @@
         android:background="@color/colorGray"
         android:padding="3dp"
         android:scaleType="centerInside"
-        android:src="@drawable/bottom_marketplace"
+        android:src="@drawable/croplife_logo"
         android:visibility="visible" />
 
 </LinearLayout>

@@ -276,7 +276,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_NATIVEMENUS
@@ -824,6 +824,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableNativeAppLoginSetting"))) {
 
                                         uiSettingsModel.setEnableAppLogin(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AutoLaunchFirstContentInMyLearning"))) {
+
+                                        uiSettingsModel.setAutoLaunchMyLearningFirst(nativeSettingsObj.get("keyvalue").getAsString());
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
 
                                         String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
@@ -832,7 +835,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                             uiSettingsModel.setEnableAppLogin(appLogos);
                                         }
                                     }
-
                                 }
                             }
 
@@ -891,13 +893,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-
     public void insertIntoAppSettingsTable(UiSettingsModel uiSettingsModel, String siteid, String siteUrl) {
         SQLiteDatabase db = this.getWritableDatabase();
         deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
         try {
             String strExeQuery = "";
-            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL )"
+            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName, AutoLaunchFirstContentInMyLearning , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL )"
                     + " VALUES ('"
                     + uiSettingsModel.getAppTextColor()
                     + "','"
@@ -972,6 +973,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + uiSettingsModel.getEnableBranding()
                     + "','"
                     + uiSettingsModel.getSignUpName()
+                    + "','"
+                    + uiSettingsModel.getAutoLaunchMyLearningFirst()
                     + "','"
                     + uiSettingsModel.getFirstEvent()
                     + "','"
@@ -1087,6 +1090,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setContentUnassigned(cursor.getString(cursor
                     .getColumnIndex("contentUnassigned")));
+
+            uiSettingsModel.setAutoLaunchMyLearningFirst(cursor.getString(cursor
+                    .getColumnIndex("AutoLaunchFirstContentInMyLearning")));
 
             uiSettingsModel.setFirstEvent(cursor.getString(cursor
                     .getColumnIndex("firstEvent")));
@@ -11472,9 +11478,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     discussionTopicModel.createduserid = cursor.getString(cursor
                             .getColumnIndex("createduserid"));
-
-
-
 
 
                     discussionTopicModel.imagedata = cursor.getString(cursor

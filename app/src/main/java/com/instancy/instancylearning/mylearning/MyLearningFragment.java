@@ -123,7 +123,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     CmiSynchTask cmiSynchTask;
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
-
+    boolean firstTimeVisible = true;
 
     public MyLearningFragment() {
 
@@ -298,7 +298,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     } else {
 
                     }
-
                 }
 
                 svProgressHUD.dismiss();
@@ -319,6 +318,27 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             myLearningAdapter.refreshList(myLearningModelsList);
 //            myLearninglistView.setVisibility(View.GONE);
         }
+        triggerActionForFirstItem();
+    }
+
+
+    public void triggerActionForFirstItem() {
+
+        if (uiSettingsModel.getAutoLaunchMyLearningFirst().equalsIgnoreCase("true")) {
+
+            if (myLearningModelsList.size() > 0) {
+
+                if (!myLearningModelsList.get(0).getStatus().toLowerCase().contains("completed") && firstTimeVisible) {
+
+                    if (myLearninglistView != null) {
+                        myLearninglistView.performItemClick(getView(), 0, R.id.title_text);
+                    }
+                    firstTimeVisible = false;
+                }
+            }
+
+        }
+
     }
 
     @Override
@@ -390,7 +410,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
-        itemInfo.setVisible(false);
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
+            itemInfo.setVisible(true);
+        } else {
+            itemInfo.setVisible(false);
+        }
+
         item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -404,17 +429,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
-//            final PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-//
-//
-//            for (int i = 0; i < toolbar.getChildCount(); i++) {
-//
-//                final View v = toolbar.getChildAt(i);
-//
-//                if (v instanceof ImageButton) {
-//                    ((ImageButton) v).setColorFilter(colorFilter);
-//                }
-//            }
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -425,15 +439,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-//                    if (TextUtils.isEmpty(newText)) {
-//                        myLearningAdapter.filter("");
-//                        myLearninglistView.clearTextFilter();
-//                        injectFromDbtoModel();
-//                    } else {
-
                     myLearningAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
-//                    }
                     return true;
                 }
             });
@@ -545,6 +552,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+        if (view == null) {
+            firstTimeVisible = true;
+            return;
+        }
         switch (view.getId()) {
             case R.id.btntxt_download:
                 if (isNetworkConnectionAvailable(context, -1)) {
@@ -554,6 +565,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
                 break;
             case R.id.imagethumb:
+            case R.id.txt_title_name:
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext());
                 break;
             default:
@@ -602,8 +614,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onResume() {
         super.onResume();
-//        synchData.SyncData();
-//onactivity
+        triggerActionForFirstItem();
     }
 
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
@@ -615,8 +626,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 int conditionCount = conditionsArray.length;
                 if (conditionCount > 0) {
                     responMap = generateHashMap(conditionsArray);
-//                    Log.d("Type", "Called On Type" + responMap.keySet());
-//                    Log.d("Type", "Called On Type" + responMap.values());
+
                 }
             }
         }
@@ -743,7 +753,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         final String finalDownloadedFilePath = downloadDestFolderPath + "/" + extensionStr;
         final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
         final String finalDownloadDestFolderPath = downloadDestFolderPath;
-        Log.d(TAG, "downloadThin: "+downloadUri);
+        Log.d(TAG, "downloadThin: " + downloadUri);
         DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
                 .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
                 .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)

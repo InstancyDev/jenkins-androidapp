@@ -38,7 +38,15 @@ public class UiSettingsModel {
 
     private String defaultTextColor = "#ffffff";
 
+    public String getAutoLaunchMyLearningFirst() {
+        return autoLaunchMyLearningFirst;
+    }
 
+    public void setAutoLaunchMyLearningFirst(String autoLaunchMyLearningFirst) {
+        this.autoLaunchMyLearningFirst = autoLaunchMyLearningFirst;
+    }
+
+    private String autoLaunchMyLearningFirst = "false";
 
 
     private String menuTextColor = "";
@@ -164,7 +172,7 @@ public class UiSettingsModel {
     }
 
     public void setAppButtonTextColor(String appButtonTextColor) {
-        this.appButtonTextColor = appButtonTextColor;
+        this.appButtonTextColor = appButtonTextColor ;
     }
 
     private String appButtonBgColor = "";

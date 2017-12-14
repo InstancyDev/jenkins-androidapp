@@ -224,7 +224,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         discussionForumModelList = new ArrayList<DiscussionForumModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshCatalog(true);
+            refreshCatalog(false);
         } else {
             injectFromDbtoModel();
         }

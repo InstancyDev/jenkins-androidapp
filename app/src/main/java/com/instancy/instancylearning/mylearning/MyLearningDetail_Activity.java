@@ -259,6 +259,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
             stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
+            if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
+                ratingBar.setVisibility(View.INVISIBLE);
+            }
+
             if (myLearningModel.getLongDes().isEmpty()) {
                 txtLongDisx.setVisibility(View.GONE);
                 txtDescription.setVisibility(View.GONE);
@@ -479,8 +483,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                     btnDownload.setVisibility(View.GONE);
-                }
-                else {
+                } else {
                     btnDownload.setVisibility(View.VISIBLE);
                 }
 

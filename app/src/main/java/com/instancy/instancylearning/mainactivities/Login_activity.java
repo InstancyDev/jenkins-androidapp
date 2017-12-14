@@ -185,7 +185,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
-//        btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
 
 //       uncomment for backgroundcolor purpose
@@ -199,7 +199,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
 
-        if (getResources().getString(R.string.app_name).equalsIgnoreCase("CLE Academy")) {
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))) {
 
             settingTxt.setVisibility(View.INVISIBLE);
         }
@@ -240,7 +240,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 //        editUserName.setText("admin@Instancy.com");
 //        editPassword.setText("abc");
-
 
         getMyCatalogData();
     }
@@ -429,9 +428,12 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                             try {
                                 JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
                                 if (loginResponseAry.length() != 0) {
-                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
 
+
+                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
                                     JSONObject jsonObject = new JSONObject();
+                                    String userId = jsonobj.get("userid").toString();
+                                    profileWebCall(userId);
                                     jsonObject.put("userid", jsonobj.get("userid").toString());
                                     jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
                                     jsonObject.put("userstatus", jsonobj.get("userstatus"));
@@ -450,11 +452,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.KEY_USERNAME);
                                     preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                                     preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
-                                    String userId = jsonobj.get("userid").toString();
+
 
                                     appUserModel.setUserIDValue(userId);
 
-                                    profileWebCall(userId);
 
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -465,7 +466,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                 e.printStackTrace();
                             }
 
-//                            SweetAlert.sweetAlertSuccess(Login_activity.this, "Great...", "Success Login ");
                         }
 
                     }
@@ -648,11 +648,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
 
-
                 if (requestType.equalsIgnoreCase("PROFILEDATA")) {
                     if (response != null) {
 
                         try {
+
                             db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
 
                         } catch (JSONException e) {
@@ -662,6 +662,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     } else {
 
                     }
+
+//                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+//                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(intentSideMenu);
                 }
 
                 svProgressHUD.dismiss();

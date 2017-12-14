@@ -241,6 +241,11 @@ public class MyLearningAdapter extends BaseAdapter {
         }
         holder.ratingBar.setRating(ratingValue);
 
+
+        if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
+            holder.ratingBar.setVisibility(View.INVISIBLE);
+        }
+
         // apply colors
 
         holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -356,11 +361,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
         String imgUrl = myLearningModel.get(position).getImageData();
-//        Glide.with(vi.getContext()).load(imgUrl)
-//                .thumbnail(0.5f)
-//                .placeholder(R.drawable.cellimage)
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(holder.imgThumb);
+
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
         final float oldRating = ratingValue;
@@ -457,59 +458,61 @@ public class MyLearningAdapter extends BaseAdapter {
 
 // uncomment for crop life
 
-        String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
-//        if (position == 0 && isViewd.equalsIgnoreCase("false")) {
-//
-//            ViewTooltip
-//                    .on(holder.btnDownload)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-//                }
-//            })
-//                    .text("Click to download the content").clickToHide(true)
-//                    .show();
-//
-//            ViewTooltip
-//                    .on(holder.btnContextMenu)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
-//                    .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-//                }
-//            })
-//                    .show();
-//
-//            ViewTooltip
-//                    .on(holder.imgThumb)
-//                    .autoHide(true, 5000)
-//                    .corner(30)
-//                    .position(ViewTooltip.Position.BOTTOM)
-//                    .clickToHide(true)
-//                    .animation(new ViewTooltip.FadeTooltipAnimation(500))
-//                    .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
-//                @Override
-//                public void onHide(View view) {
-//                    appcontroller.setAlreadyViewd(true);
-//                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-//                }
-//            })
-//                    .show();
-//
-//        }
+        if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
+
+            String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
+            if (position == 0 && isViewd.equalsIgnoreCase("false")) {
+
+                ViewTooltip
+                        .on(holder.btnDownload)
+                        .autoHide(true, 5000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
+                    @Override
+                    public void onHide(View view) {
+                        appcontroller.setAlreadyViewd(true);
+                        preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    }
+                })
+                        .text("Click to download the content").clickToHide(true)
+                        .show();
+
+                ViewTooltip
+                        .on(holder.btnContextMenu)
+                        .autoHide(true, 5000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
+                        .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
+                    @Override
+                    public void onHide(View view) {
+                        appcontroller.setAlreadyViewd(true);
+                        preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    }
+                })
+                        .show();
+
+                ViewTooltip
+                        .on(holder.imgThumb)
+                        .autoHide(true, 5000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.BOTTOM)
+                        .clickToHide(true)
+                        .animation(new ViewTooltip.FadeTooltipAnimation(500))
+                        .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
+                    @Override
+                    public void onHide(View view) {
+                        appcontroller.setAlreadyViewd(true);
+                        preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    }
+                })
+                        .show();
+
+            }
+        }
 
 
         return vi;
     }
-
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
@@ -629,7 +632,7 @@ public class MyLearningAdapter extends BaseAdapter {
             };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name})
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {

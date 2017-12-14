@@ -63,6 +63,7 @@ public class SignUp_Activity extends AppCompatActivity {
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
 
@@ -126,6 +127,7 @@ public class SignUp_Activity extends AppCompatActivity {
                 if (url.toLowerCase().contains("sign%20in") || url.toLowerCase().contains("sign in")) {
                     Intent signinIntent = new Intent(SignUp_Activity.this, Login_activity.class);
                     startActivity(signinIntent);
+
                 }
 
                 svProgressHUD.dismiss();

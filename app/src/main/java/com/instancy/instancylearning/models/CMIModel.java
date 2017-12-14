@@ -30,6 +30,7 @@ public class CMIModel implements Serializable {
     private String _textResponses = "";
 
 
+
     public String getParentObjTypeId() {
         return parentObjTypeId;
     }

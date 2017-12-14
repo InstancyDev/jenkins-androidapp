@@ -119,6 +119,11 @@
             android:name=".discussionfourms.DiscussionTopicActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".discussionfourms.DiscussionCommentsActivity"
+            android:screenOrientation="portrait"></activity>
+
+
         <!-- INAPP BILLING ACTIVITY -->
 
         <activity

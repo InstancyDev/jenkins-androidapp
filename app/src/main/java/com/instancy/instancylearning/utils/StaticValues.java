@@ -258,4 +258,9 @@ public class StaticValues {
 
 
     public static int EVENT_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+
+
+    /// all app configurations
+
 }

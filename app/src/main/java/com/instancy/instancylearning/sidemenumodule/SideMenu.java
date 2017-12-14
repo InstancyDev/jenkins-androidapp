@@ -165,6 +165,13 @@ public class SideMenu extends AppCompatActivity {
             }
         });
 
+        ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
+//        imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
+            logoView.setVisibility(View.GONE);
+        }
+
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -177,8 +184,7 @@ public class SideMenu extends AppCompatActivity {
         RelativeLayout rl = (RelativeLayout) findViewById(R.id.drawerheaderview);
         rl.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-        ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
-//        imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
 
         // navdrawer Top layout initilization
 

@@ -58,18 +58,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
  */
 
-public class DiscussionTopicActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class DiscussionCommentsActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
     final Context context = this;
     SVProgressHUD svProgressHUD;
-    String TAG = DiscussionTopicActivity.class.getSimpleName();
+    String TAG = DiscussionCommentsActivity.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;

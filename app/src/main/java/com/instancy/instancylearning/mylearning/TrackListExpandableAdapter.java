@@ -319,6 +319,8 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //            }
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
+
+
         String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
 
         if (childPosition == 0 && isViewd.equalsIgnoreCase("false")) {
@@ -335,7 +337,6 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 }
             })
                     .show();
-
 
             ViewTooltip
                     .on(holder.btnContextMenu)
@@ -483,14 +484,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name})
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
                 GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
 
-            } else if (view.getId() == R.id.imagethumb) {
+            } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());
             } else {
 //                ((ExpandableListView) parent).performItemClick(view, getChildPosition, getGroupPosition);

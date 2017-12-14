@@ -346,7 +346,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         MenuItem itemInfo = menu.findItem(R.id.tracklist_help);
         Drawable myIcon = getResources().getDrawable(R.drawable.help);
         itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
-        itemInfo.setVisible(false);
+
+
+             if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
+                 itemInfo.setVisible(true);
+        }
+        else {
+                 itemInfo.setVisible(false);
+             }
+
+
         return true;
     }
 
