@@ -1,6 +1,5 @@
 package com.instancy.instancylearning.discussionfourms;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -42,7 +41,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
+import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -59,34 +58,33 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
  */
 
-public class DiscussionTopicActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class CreateNewTopicActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
     final Context context = this;
     SVProgressHUD svProgressHUD;
-    String TAG = DiscussionTopicActivity.class.getSimpleName();
+    String TAG = CreateNewTopicActivity.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
 
     DatabaseHandler db;
-    List<DiscussionTopicModel> discussionTopicModels = null;
+    List<DiscussionCommentsModel> discussionCommentsModelList = null;
     SwipeRefreshLayout swipeRefreshLayout;
     ResultListner resultListner = null;
 
     ListView discussionFourmlistView;
-    DiscussionForumModel discussionForumModel;
+    DiscussionTopicModel discussionTopicModel;
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
     UiSettingsModel uiSettingsModel;
-    DiscussionTopicAdapter fourmAdapter;
+    DiscussionCommentsAdapter commentsAdapter;
 
 
     @Nullable
@@ -154,20 +152,21 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         swipeRefreshLayout.setOnRefreshListener(this);
         svProgressHUD = new SVProgressHUD(context);
 
+
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
-        discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
+        discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("topicModel");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Topics" + "</font>"));
+                "Comments" + "</font>"));
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
-        fourmAdapter = new DiscussionTopicAdapter(this, BIND_ABOVE_CLIENT, discussionTopicModels);
-        discussionFourmlistView.setAdapter(fourmAdapter);
+        commentsAdapter = new DiscussionCommentsAdapter(this, BIND_ABOVE_CLIENT, discussionCommentsModelList);
+        discussionFourmlistView.setAdapter(commentsAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
         discussionFourmlistView.setEmptyView(findViewById(R.id.nodata_label));
 
-        discussionTopicModels = new ArrayList<DiscussionTopicModel>();
+        discussionCommentsModelList = new ArrayList<DiscussionCommentsModel>();
 
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -200,13 +199,15 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         btnContextMenu.setVisibility(View.INVISIBLE);
         txtTopicsCount.setVisibility(View.INVISIBLE);
 
-        txtName.setText(discussionForumModel.name);
-        txtShortDisc.setText(discussionForumModel.descriptionValue);
-        txtAuthor.setText("Moderator:" + discussionForumModel.author + " ");
-        txtLastUpdate.setText("Last update: " + discussionForumModel.createddate + " ");
+        txtName.setText(discussionTopicModel.name);
+        txtShortDisc.setText(discussionTopicModel.longdescription);
+        txtAuthor.setText(discussionTopicModel.latestreplyby);
+        txtLastUpdate.setText(discussionTopicModel.createddate + " ");
 
-        txtTopicsCount.setText(discussionForumModel.nooftopics + " Topic(s)");
-        txtCommentsCount.setText(discussionForumModel.totalposts + " Comment(s)");
+        txtCommentsCount.setText(discussionTopicModel.noofreplies + " Comment(s)");
+
+        txtTopicsCount.setVisibility(View.INVISIBLE);
+
 
         txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -216,6 +217,14 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+
+        if (discussionTopicModel.longdescription.isEmpty() || discussionTopicModel.longdescription.contains("null")) {
+            txtShortDisc.setVisibility(View.GONE);
+        } else {
+            txtShortDisc.setVisibility(View.VISIBLE);
+        }
+
+
     }
 
     public void refreshMyLearning(Boolean isRefreshed) {
@@ -223,7 +232,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumid, appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumComments?SiteID=" + appUserModel.getSiteIDValue() + "&ForumID=" + discussionTopicModel.forumid + "&TopicID=" + discussionTopicModel.topicid, appUserModel.getAuthHeaders());
+
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -237,7 +247,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 if (requestType.equalsIgnoreCase("GETCALL")) {
 
                     try {
-                        db.injectDiscussionTopicsList(response, discussionForumModel);
+                        db.injectDiscussionCommentsList(response, discussionTopicModel);
                         injectFromDbtoModel();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -268,16 +278,15 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     }
 
     public void injectFromDbtoModel() {
-        discussionTopicModels = db.fetchDiscussionTopicModelList(appUserModel.getSiteIDValue(), discussionForumModel.forumid);
-        if (discussionTopicModels != null) {
-            fourmAdapter.refreshList(discussionTopicModels);
+        discussionCommentsModelList = db.fetchDiscussionCommentsModelList(appUserModel.getSiteIDValue(), discussionTopicModel);
+        if (discussionCommentsModelList != null) {
+            commentsAdapter.refreshList(discussionCommentsModelList);
         } else {
-            discussionTopicModels = new ArrayList<DiscussionTopicModel>();
-            fourmAdapter.refreshList(discussionTopicModels);
+            discussionCommentsModelList = new ArrayList<DiscussionCommentsModel>();
+            commentsAdapter.refreshList(discussionCommentsModelList);
         }
 
     }
-
 
     @Override
     public void onBackPressed() {
@@ -348,9 +357,6 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        Intent intentDetail = new Intent(context, DiscussionCommentsActivity.class);
-        intentDetail.putExtra("topicModel", discussionTopicModels.get(i));
-        startActivity(intentDetail);
 
     }
 }

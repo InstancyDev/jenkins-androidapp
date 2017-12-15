@@ -21,7 +21,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionTopicModel;
+import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -42,7 +42,7 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<DiscussionTopicModel> discussionTopicModelList = null;
+    private List<DiscussionCommentsModel> discussionCommentsModels = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -51,14 +51,14 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = DiscussionCommentsAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<DiscussionTopicModel> searchList;
+    private List<DiscussionCommentsModel> searchList;
     AppController appcontroller;
 
 
-    public DiscussionCommentsAdapter(Activity activity, int resource, List<DiscussionTopicModel> discussionTopicModelList) {
+    public DiscussionCommentsAdapter(Activity activity, int resource, List<DiscussionCommentsModel> discussionTopicModelList) {
         this.activity = activity;
-        this.discussionTopicModelList = discussionTopicModelList;
-        this.searchList = new ArrayList<DiscussionTopicModel>();
+        this.discussionCommentsModels = discussionTopicModelList;
+        this.searchList = new ArrayList<DiscussionCommentsModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -75,23 +75,24 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         appcontroller = AppController.getInstance();
 
+
     }
 
-    public void refreshList(List<DiscussionTopicModel> discussionTopicModelList) {
-        this.discussionTopicModelList = discussionTopicModelList;
-        this.searchList = new ArrayList<DiscussionTopicModel>();
+    public void refreshList(List<DiscussionCommentsModel> discussionTopicModelList) {
+        this.discussionCommentsModels = discussionTopicModelList;
+        this.searchList = new ArrayList<DiscussionCommentsModel>();
         this.searchList.addAll(discussionTopicModelList);
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return discussionTopicModelList != null ? discussionTopicModelList.size() : 0;
+        return discussionCommentsModels != null ? discussionCommentsModels.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return discussionTopicModelList.get(position);
+        return discussionCommentsModels.get(position);
     }
 
     @Override
@@ -101,24 +102,19 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
 
-        final ViewHolder holder;
-        View vi = convertView;
-        if (convertView == null) {
+        ViewHolder holder;
+
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            vi = inflater.inflate(R.layout.discussionfourmcell, null);
-            holder = new ViewHolder(vi);
+            convertView = inflater.inflate(R.layout.discussionfourmcell, null);
+            holder = new ViewHolder(convertView);
             holder.parent = parent;
             holder.getPosition = position;
             holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-            holder.txtName.setText(discussionTopicModelList.get(position).name);
-            holder.txtShortDisc.setText(discussionTopicModelList.get(position).longdescription);
-            holder.txtAuthor.setText("Moderator:" + discussionTopicModelList.get(position).name + " ");
-            holder.txtLastUpdate.setText("Last update: " + discussionTopicModelList.get(position).createddate + " ");
-
-            holder.txtTopicsCount.setText(discussionTopicModelList.get(position).noofviews + " Topic(s)");
-            holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noofreplies + " Comment(s)");
+            holder.txtName.setText(discussionCommentsModels.get(position).displayName + "" + discussionCommentsModels.get(position).postedDate);
+            holder.txtShortDisc.setText(discussionCommentsModels.get(position).message);
+            holder.txtShortDisc.setMaxLines(200);
 
             holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -128,36 +124,33 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
             holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-            if (discussionTopicModelList.get(position).longdescription.isEmpty()) {
-                holder.txtShortDisc.setVisibility(View.GONE);
-            } else {
-                holder.txtShortDisc.setVisibility(View.VISIBLE);
-            }
+            holder.txtLastUpdate.setVisibility(View.GONE);
+            holder.txtTopicsCount.setVisibility(View.GONE);
+            holder.txtCommentsCount.setVisibility(View.GONE);
+            holder.txtAuthor.setVisibility(View.GONE);
+            holder.view.setVisibility(View.INVISIBLE);
+            convertView.setTag(holder);
 
-//            String imgUrl = discussionTopicModels.get(position).imagedata;
-//            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
-
-        }
-        return vi;
+        return convertView;
     }
 
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        discussionTopicModelList.clear();
+        discussionCommentsModels.clear();
         if (charText.length() == 0) {
-            discussionTopicModelList.addAll(searchList);
+            discussionCommentsModels.addAll(searchList);
         } else {
-            for (DiscussionTopicModel s : searchList) {
-                if (s.name.toLowerCase(Locale.getDefault()).contains(charText) || s.longdescription.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    discussionTopicModelList.add(s);
+            for (DiscussionCommentsModel s : searchList) {
+                if (s.message.toLowerCase(Locale.getDefault()).contains(charText) || s.displayName.toLowerCase(Locale.getDefault()).contains(charText)) {
+                    discussionCommentsModels.add(s);
                 }
             }
         }
         notifyDataSetChanged();
     }
 
-    class ViewHolder {
+    static class ViewHolder {
 
         public int getPosition;
         public ViewGroup parent;
@@ -202,6 +195,10 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.txtcomments)
         TextView txtCommentsCount;
+
+        @Nullable
+        @BindView(R.id.lineview)
+        View view;
 
         @OnClick({R.id.btn_contextmenu, R.id.card_view})
         public void actionsForMenu(View view) {

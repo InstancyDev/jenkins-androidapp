@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fab="http://schemas.android.com/tools"
-    android:padding="4dp"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="4dp">
 
     <TextView
         android:id="@+id/nodata_label"
@@ -22,15 +21,13 @@
         android:layout_height="wrap_content">
 
         <ListView
-            android:padding="6dp"
             android:id="@+id/discussionfourmlist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="none"
-
             android:divider="@android:color/transparent"
-            android:dividerHeight="10dp"> </ListView>
-
+            android:dividerHeight="10dp"
+            android:padding="6dp"
+            android:scrollbars="none"></ListView>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

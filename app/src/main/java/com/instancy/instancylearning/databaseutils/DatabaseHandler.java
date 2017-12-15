@@ -23,6 +23,7 @@ import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
+import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
@@ -195,7 +196,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * To store the discussion forum comment details
      */
-    public static final String TBL_TOPICCOMMENTS = "TOPICCOMMENTDETAILS";
+    public static final String TBL_TOPICCOMMENTS = "FORUMTOPICCOMMENTSDETAILS";
 
     // //////////////////////////////ASKE THE
     // EXPERT/////////////////////////////////////////
@@ -405,7 +406,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TOPICCOMMENTS
-                + "(commentid INTEGER,topicid TEXT,forumid TEXT,message TEXT,posteddate TEXT,postedby TEXT,replyid TEXT,siteid INTEGER,uploadfilename TEXT, siteurl TEXT, PRIMARY KEY(siteurl,forumid,topicid,commentid))");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, commentid TEXT, topicid TEXT, forumid TEXT, message TEXT,posteddate TEST, postedby TEXT,replyid TEXT,siteid TEXT, attachment TEXT)");
+
         // db.execSQL("CREATE TABLE IF NOT EXISTS "
         // + TBL_TOPICCOMMENTS
         // +
@@ -11306,7 +11308,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table");
         // for deleting records in table for respective table
-        ejectRecordsinTable(TBL_FORUMTOPICS);
+//        ejectRecordsinTable(TBL_FORUMTOPICS);
+
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
@@ -11386,13 +11389,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             discussionTopicModel.forumid = "" + discussionForumModel.forumid;
 
 
-            injectDiscussionTopicsDataIntoTable(discussionTopicModel);
+            injectDiscussionTopicsDataIntoTable(discussionTopicModel, discussionForumModel);
         }
 
     }
 
-    public void injectDiscussionTopicsDataIntoTable(DiscussionTopicModel discussionTopicModel) {
+    public void injectDiscussionTopicsDataIntoTable(DiscussionTopicModel discussionTopicModel, DiscussionForumModel discussionForumModel) {
         SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            String strDelete = "DELETE FROM " + TBL_FORUMTOPICS + " WHERE  siteID ='"
+                    + appUserModel.getSiteIDValue() + "' AND forumid ='" + discussionForumModel.forumid + "' AND topicid  ='" + discussionTopicModel.topicid + "'";
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+
         ContentValues contentValues = null;
         try {
 
@@ -11499,6 +11514,202 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 db.close();
             }
             Log.d("fetchDiscussionTopicModelList db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return discussionTopicModelList;
+    }
+
+
+    // discussion comments
+
+    public void injectDiscussionCommentsList(JSONObject jsonObject, DiscussionTopicModel discussionTopicModel) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("comments");
+
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            DiscussionCommentsModel discussionCommentsModel = new DiscussionCommentsModel();
+
+            //contentid
+            if (jsonMyLearningColumnObj.has("commentid")) {
+
+                discussionCommentsModel.commentID = jsonMyLearningColumnObj.get("commentid").toString();
+            }
+            // createddate
+            if (jsonMyLearningColumnObj.has("posteddate")) {
+
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("posteddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                discussionCommentsModel.postedDate = formattedDate;
+
+            }
+            // createduserid
+            if (jsonMyLearningColumnObj.has("replyid")) {
+
+                discussionCommentsModel.replyID
+                        = jsonMyLearningColumnObj.get("replyid").toString();
+
+            }
+            // latestreplyby
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                discussionCommentsModel.siteID = jsonMyLearningColumnObj.get("siteid").toString();
+
+            }
+            // name
+
+            if (jsonMyLearningColumnObj.has("forumid")) {
+
+                discussionCommentsModel.forumID = jsonMyLearningColumnObj.get("forumid").toString();
+
+            }
+
+
+            if (jsonMyLearningColumnObj.has("topicid")) {
+
+                discussionCommentsModel.topicID = jsonMyLearningColumnObj.get("topicid").toString();
+
+            }
+
+
+            if (jsonMyLearningColumnObj.has("postedby")) {
+
+                discussionCommentsModel.postedBy = jsonMyLearningColumnObj.get("postedby").toString();
+
+            }
+
+            // longdescription
+            if (jsonMyLearningColumnObj.has("message")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("message").toString());
+
+                discussionCommentsModel.message = result.toString();
+
+            }
+
+            // uploadfilename
+            if (jsonMyLearningColumnObj.has("uploadfilename")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("uploadfilename").toString());
+
+                discussionCommentsModel.attachment = result.toString();
+
+            }
+
+
+
+            injectDiscussionCommetnsDataIntoTable(discussionCommentsModel, discussionTopicModel);
+        }
+
+    }
+
+    public void injectDiscussionCommetnsDataIntoTable(DiscussionCommentsModel discussionCommentsModel, DiscussionTopicModel discussionTopicModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            String strDelete = "DELETE FROM " + TBL_TOPICCOMMENTS + " WHERE  siteID ='"
+                    + appUserModel.getSiteIDValue() + "' AND forumid ='" + discussionTopicModel.forumid + "' AND commentid  ='" + discussionCommentsModel.commentID + "'";
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+
+        ContentValues contentValues = null;
+        try {
+
+
+            contentValues = new ContentValues();
+
+            contentValues.put("commentid", discussionCommentsModel.commentID);
+            contentValues.put("topicid", discussionCommentsModel.topicID);
+            contentValues.put("forumid", discussionCommentsModel.forumID);
+            contentValues.put("message", discussionCommentsModel.message);
+            contentValues.put("posteddate", discussionCommentsModel.postedDate);
+            contentValues.put("postedby", discussionCommentsModel.postedBy);
+            contentValues.put("replyid", discussionCommentsModel.replyID);
+            contentValues.put("siteid", discussionCommentsModel.siteID);
+            contentValues.put("attachment", discussionCommentsModel.attachment);
+
+
+            db.insert(TBL_TOPICCOMMENTS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+    public List<DiscussionCommentsModel> fetchDiscussionCommentsModelList(String siteID, DiscussionTopicModel topicModel) {
+        List<DiscussionCommentsModel> discussionTopicModelList = null;
+        DiscussionCommentsModel discussionCommentsModel = new DiscussionCommentsModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_TOPICCOMMENTS + " WHERE siteid = " + siteID + " AND forumid ='" + topicModel.forumid + "' AND topicid ='" + topicModel.topicid +
+        "' ORDER BY commentid  DESC";
+
+        Log.d(TAG, "fetchDiscussionCommentsModelList: " + strSelQuery);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                discussionTopicModelList = new ArrayList<DiscussionCommentsModel>();
+                do {
+                    discussionCommentsModel = new DiscussionCommentsModel();
+
+                    discussionCommentsModel.commentID = cursor.getString(cursor
+                            .getColumnIndex("commentid"));
+
+                    discussionCommentsModel.forumID = cursor.getString(cursor
+                            .getColumnIndex("forumid"));
+
+                    discussionCommentsModel.topicID = cursor.getString(cursor
+                            .getColumnIndex("topicid"));
+
+                    discussionCommentsModel.message = cursor.getString(cursor
+                            .getColumnIndex("message"));
+
+                    discussionCommentsModel.postedDate = cursor.getString(cursor
+                            .getColumnIndex("posteddate"));
+
+                    discussionCommentsModel.postedBy = cursor.getString(cursor
+                            .getColumnIndex("postedby"));
+
+                    discussionCommentsModel.replyID = cursor.getString(cursor
+                            .getColumnIndex("replyid"));
+
+
+                    discussionCommentsModel.siteID = cursor.getString(cursor
+                            .getColumnIndex("siteid"));
+
+
+                    discussionCommentsModel.attachment = cursor.getString(cursor
+                            .getColumnIndex("attachment"));
+
+
+                    discussionTopicModelList.add(discussionCommentsModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchTopicList db",
                     e.getMessage() != null ? e.getMessage()
                             : "Error getting menus");
 

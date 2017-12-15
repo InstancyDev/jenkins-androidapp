@@ -152,7 +152,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", "http://edemowebapi.instancyplatform.com/api//MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl()+"/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
 
     }
 
@@ -460,12 +460,9 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                 }
             }
         }
-
-
     }
 
     public void attachFragment(DiscussionForumModel forumModel) {
-
         Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
         intentDetail.putExtra("forumModel", forumModel);
         ((Activity) context).startActivity(intentDetail);
@@ -476,6 +473,5 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         super.onDetach();
     }
-
 
 }

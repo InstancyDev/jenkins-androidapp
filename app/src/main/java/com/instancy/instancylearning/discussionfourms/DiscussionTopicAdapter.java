@@ -115,8 +115,8 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
             holder.txtName.setText(discussionTopicModelList.get(position).name);
             holder.txtShortDisc.setText(discussionTopicModelList.get(position).longdescription);
-            holder.txtAuthor.setText("Moderator:" + discussionTopicModelList.get(position).name + " ");
-            holder.txtLastUpdate.setText("Last update: " + discussionTopicModelList.get(position).createddate + " ");
+            holder.txtAuthor.setText(discussionTopicModelList.get(position).latestreplyby + " ");
+            holder.txtLastUpdate.setText(discussionTopicModelList.get(position).createddate + " ");
 
             holder.txtTopicsCount.setText(discussionTopicModelList.get(position).noofviews + " Topic(s)");
             holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noofreplies + " Comment(s)");
@@ -129,7 +129,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-            if (discussionTopicModelList.get(position).longdescription.isEmpty()) {
+            if (discussionTopicModelList.get(position).longdescription.isEmpty() || discussionTopicModelList.get(position).longdescription.contains("null")) {
                 holder.txtShortDisc.setVisibility(View.GONE);
             } else {
                 holder.txtShortDisc.setVisibility(View.VISIBLE);
