@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -48,6 +51,7 @@ import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
@@ -74,6 +78,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -109,6 +114,9 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
+    @Nullable
+    @BindView(R.id.fab_fourm_button)
+    FloatingActionButton floatingActionButton;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -152,7 +160,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl()+"/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
 
     }
 
@@ -230,6 +238,23 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         }
 
         initilizeView();
+
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
+        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+
+        floatingActionButton.setImageDrawable(d);
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
+                intentDetail.putExtra("forumModel", "");
+                startActivity(intentDetail);
+            }
+        });
 
         return rootView;
     }
@@ -436,8 +461,10 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             public boolean onMenuItemClick(MenuItem item) {
 
                 if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
+                    Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
+                    intentDetail.putExtra("forumModel", discussionForumModelList.get(position));
+                    startActivity(intentDetail);
 
-                    Toast.makeText(context, "Edit Here", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }

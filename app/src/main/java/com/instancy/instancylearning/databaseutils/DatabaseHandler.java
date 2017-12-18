@@ -564,9 +564,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String result = convertStreamToString(inputStream);
             JsonParser jsonParser = new JsonParser();
 
-//            if (isValidString(result) && result.length() > 0) {
+            if (isValidString(result) && result.length() > 0) {
 
-            if (result.length() > 0) {
+//            if (result.length() > 0) {
 
                 JsonObject jsonObject = jsonParser.parse(result).getAsJsonObject();
                 UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
@@ -1131,9 +1131,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String result = convertStreamToString(inputStream);
 
-//            if (isValidString(result) && result.length() > 0) {
+            if (isValidString(result) && result.length() > 0) {
 
-            if (result.length() > 0) {
+//            if (result.length() > 0) {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jsonObject = null;
 
@@ -1742,7 +1742,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             try {
                 JSONObject jsonObj = new JSONObject(replaceStr);
                 Log.d(TAG, "getSiteTinCanDetails: " + jsonObj);
-                injectTinCanConfigurationValues(jsonObj, siteID);
+
+                if (replaceStr.length() > 5) {
+                    injectTinCanConfigurationValues(jsonObj, siteID);
+                }
+
             } catch (JSONException e) {
 
                 e.printStackTrace();
@@ -11606,7 +11610,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
 
-
             injectDiscussionCommetnsDataIntoTable(discussionCommentsModel, discussionTopicModel);
         }
 
@@ -11624,7 +11627,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             sqlEx.printStackTrace();
         }
-
 
         ContentValues contentValues = null;
         try {
@@ -11657,7 +11659,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String strSelQuery = "SELECT DISTINCT * FROM " + TBL_TOPICCOMMENTS + " WHERE siteid = " + siteID + " AND forumid ='" + topicModel.forumid + "' AND topicid ='" + topicModel.topicid +
-        "' ORDER BY commentid  DESC";
+                "' ORDER BY commentid  DESC";
 
         Log.d(TAG, "fetchDiscussionCommentsModelList: " + strSelQuery);
         try {

@@ -106,34 +106,33 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
         ViewHolder holder;
 
-            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.discussionfourmcell, null);
-            holder = new ViewHolder(convertView);
-            holder.parent = parent;
-            holder.getPosition = position;
-            holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-            holder.txtName.setText(discussionCommentsModels.get(position).displayName + "" + discussionCommentsModels.get(position).postedDate);
-            holder.txtShortDisc.setText(discussionCommentsModels.get(position).message);
-            holder.txtShortDisc.setMaxLines(200);
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.discussionfourmcell, null);
+        holder = new ViewHolder(convertView);
+        holder.parent = parent;
+        holder.getPosition = position;
+        holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        holder.txtName.setText(discussionCommentsModels.get(position).displayName + "" + discussionCommentsModels.get(position).postedDate);
+        holder.txtShortDisc.setText(discussionCommentsModels.get(position).message);
+        holder.txtShortDisc.setMaxLines(200);
 
-            holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-            holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-            holder.txtLastUpdate.setVisibility(View.GONE);
-            holder.txtTopicsCount.setVisibility(View.GONE);
-            holder.txtCommentsCount.setVisibility(View.GONE);
-            holder.txtAuthor.setVisibility(View.GONE);
-            holder.view.setVisibility(View.INVISIBLE);
-            convertView.setTag(holder);
+        holder.txtLastUpdate.setVisibility(View.GONE);
+        holder.txtTopicsCount.setVisibility(View.GONE);
+        holder.txtCommentsCount.setVisibility(View.GONE);
+        holder.txtAuthor.setVisibility(View.GONE);
+        holder.view.setVisibility(View.INVISIBLE);
+        convertView.setTag(holder);
 
         return convertView;
     }
-
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());

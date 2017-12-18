@@ -188,11 +188,23 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             injectFromDbtoModel();
         }
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
-        View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomment, null);
+        View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomments, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
 
-        floatingActionButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.user_placeholder));
+        floatingActionButton.setImageDrawable(d);
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentDetail = new Intent(context, CreateNewTopicActivity.class);
+                intentDetail.putExtra("forumModel", discussionForumModel);
+                startActivity(intentDetail);
+            }
+        });
+
+        floatingActionButton.setBackgroundColor(getResources().getColor(R.color.colorStatusInProgress));
+
     }
 
     public void initilizeHeaderView() {
@@ -344,6 +356,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         super.onResume();
 
     }
+
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

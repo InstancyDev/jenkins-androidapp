@@ -10,7 +10,8 @@
     android:layout_marginRight="3dp"
     android:layout_marginTop="3dp"
     app:cardCornerRadius="3dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:contentPadding="4dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -24,16 +25,15 @@
             android:weightSum="4">
 
             <RelativeLayout
-                android:layout_width="0dp"
+                android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_weight=".4"
-                android:padding="4dp">
+                android:layout_gravity="center_horizontal"
+                android:padding="2dp">
 
                 <ImageView
                     android:id="@+id/imagethumb"
-                    android:layout_width="40dp"
-                    android:layout_height="30dp"
-                    android:layout_alignParentRight="true"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_alignParentTop="true"
                     android:layout_gravity="center"
                     android:background="@drawable/user_placeholder" />
@@ -45,7 +45,7 @@
                 android:id="@+id/relattitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3.2">
+                android:layout_weight="3.6">
 
                 <TextView
                     android:id="@+id/txt_name"
@@ -75,8 +75,7 @@
                     android:padding="2dp"
                     android:text="e Learning course course"
                     android:textColor="@color/colorGray"
-                    android:textSize="14sp" />
-
+                    android:textSize="12sp" />
 
 
                 <TextView
@@ -91,7 +90,7 @@
                     android:padding="2dp"
                     android:text="Moderator : "
                     android:textColor="@color/colorGray"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
                 <TextView
                     android:id="@+id/txtLastUpdate"
@@ -105,7 +104,7 @@
                     android:padding="2dp"
                     android:text="Last update:"
                     android:textColor="@color/colorGray"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
 
             </RelativeLayout>
@@ -153,7 +152,7 @@
                 android:text="15 Topic(s)"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/txtcomments"
@@ -165,8 +164,7 @@
                 android:text="1 Comment(s)"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
-                android:textSize="14sp" />
-
+                android:textSize="12sp" />
 
         </RelativeLayout>
     </RelativeLayout>

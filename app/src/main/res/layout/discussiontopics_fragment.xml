@@ -21,7 +21,6 @@
         android:id="@+id/fab_comment_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_dialog_email"
         android:layout_gravity="bottom|end"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"

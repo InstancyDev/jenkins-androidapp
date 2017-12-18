@@ -190,12 +190,24 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         } else {
             injectFromDbtoModel();
         }
+
+
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomment, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
 
-        floatingActionButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.user_placeholder));
+        floatingActionButton.setImageDrawable(d);
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intentDetail = new Intent(context, AddNewCommentActivity.class);
+                intentDetail.putExtra("forumModel", discussionTopicModel);
+                startActivity(intentDetail);
+            }
+        });
     }
 
     public void initilizeHeaderView() {
@@ -227,7 +239,6 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         } else {
             txtShortDisc.setVisibility(View.VISIBLE);
         }
-
 
     }
 
@@ -430,6 +441,11 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             }
 
         }
+
+    }
+
+    public void deleteCommentFromServer() {
+
 
     }
 }

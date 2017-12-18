@@ -127,6 +127,14 @@
             android:name=".discussionfourms.CreateNewTopicActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".discussionfourms.CreateNewForumActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".discussionfourms.AddNewCommentActivity"
+            android:screenOrientation="portrait"></activity>
+
 
         <!-- INAPP BILLING ACTIVITY -->
 

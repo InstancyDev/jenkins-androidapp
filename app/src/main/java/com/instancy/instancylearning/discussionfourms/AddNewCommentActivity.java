@@ -4,18 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-
-
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
-
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -23,43 +19,34 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
 import android.widget.EditText;
-
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-
 import com.instancy.instancylearning.models.DiscussionForumModel;
-
+import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
-
 import org.json.JSONObject;
-
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -68,11 +55,11 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * http://androidcocktail.blogspot.in/2014/03/android-spannablestring-example.html
  */
 
-public class CreateNewTopicActivity extends AppCompatActivity {
+public class AddNewCommentActivity extends AppCompatActivity {
 
     final Context context = this;
     SVProgressHUD svProgressHUD;
-    String TAG = CreateNewTopicActivity.class.getSimpleName();
+    String TAG = AddNewCommentActivity.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
@@ -81,7 +68,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     ResultListner resultListner = null;
 
 
-    DiscussionForumModel discussionForumModel;
+    DiscussionTopicModel discussionTopicModel;
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
@@ -148,11 +135,12 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
-        discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
+        discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("forumModel");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "       New Topic" + "</font>"));
+                "Add Comment" + "</font>"));
+
 
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -177,18 +165,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
     public void initilizeHeaderView() {
 
-
-        labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
-
-        SpannableString styledTitle
-                = new SpannableString("*Tittle");
-        styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
-        styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
-        styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledTitle.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        labelTitle.setText(styledTitle);
 
         SpannableString styledDescription
                 = new SpannableString("*Description");
@@ -197,6 +174,9 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelDescritpion.setText(styledDescription);
+
+        labelTitle.setVisibility(View.GONE);
+        editTitle.setVisibility(View.GONE);
     }
 
     void initVolleyCallback() {
@@ -235,6 +215,16 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tracklistmenu, menu);
+        MenuItem itemInfo = menu.findItem(R.id.tracklist_help);
+        Drawable myIcon = getResources().getDrawable(R.drawable.help);
+        itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+        itemInfo.setVisible(false);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
