@@ -55,8 +55,10 @@
             android:id="@+id/mylearninglistview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="2dp"></ListView>
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10dp"
+            android:padding="6dp"
+            android:scrollbars="none"></ListView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"

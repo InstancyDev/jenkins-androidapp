@@ -134,7 +134,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
     @BindView(R.id.switchemailnotifications)
     Switch switchEmail;
 
-    boolean allowNotification = true, allowNewTopic = true, allowAttachFile = true;
+    boolean allowNotification = true, allowNewTopic = true, allowAttachFile = true, isUpdateForum = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -163,8 +163,16 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
+        discussionForumModel = new DiscussionForumModel();
+        if (getIntent().getBooleanExtra("isfromedit", false)) {
 
-        discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
+            discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
+            isUpdateForum = true;
+        } else {
+
+            isUpdateForum = false;
+        }
+
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -184,7 +192,6 @@ public class CreateNewForumActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
         initilizeHeaderView();
-
 
     }
 

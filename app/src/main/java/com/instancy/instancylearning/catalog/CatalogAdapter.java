@@ -135,7 +135,7 @@ public class CatalogAdapter extends BaseAdapter {
         View vi = convertView;
         if (convertView == null)
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        vi = inflater.inflate(R.layout.catalog_cell_old, null);
+        vi = inflater.inflate(R.layout.catalogcellitem, null);
         holder = new ViewHolder(vi);
         holder.parent = parent;
         holder.getPosition = position;

@@ -5,9 +5,6 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:elevation="6dp"
-    android:clickable="true"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
@@ -24,13 +21,16 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
             android:elevation="5dp"
-            app:popupTheme="@style/AppTheme.NoActionBar"> </android.support.v7.widget.Toolbar>
+            app:popupTheme="@style/AppTheme.NoActionBar">
+
+        </android.support.v7.widget.Toolbar>
 
         <FrameLayout
             android:id="@+id/container_body"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
+
 
     </LinearLayout>
 
@@ -38,8 +38,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:clickable="true"
-        android:layout_marginRight="56dp">
+        android:layout_marginRight="56dp"
+
+        android:clickable="true">
 
         <RelativeLayout
             android:id="@+id/rl_profile"
@@ -49,7 +50,6 @@
             android:background="@color/colorPrimary">
 
             <include layout="@layout/nav_header_side_menu" />
-
         </RelativeLayout>
 
         <ExpandableListView
@@ -64,8 +64,7 @@
             android:divider="@color/colorWhite"
             android:dividerHeight="0.5dp"
             android:groupIndicator="@null"
-            android:overScrollMode="never"
-            />
+            android:overScrollMode="never" />
 
         <LinearLayout
             android:id="@+id/layout_sing_in"
@@ -74,8 +73,8 @@
             android:layout_alignParentBottom="true">
 
             <include layout="@layout/navbottom" />
-
         </LinearLayout>
 
     </RelativeLayout>
+
 </android.support.v4.widget.DrawerLayout>

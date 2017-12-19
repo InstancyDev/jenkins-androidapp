@@ -564,7 +564,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String result = convertStreamToString(inputStream);
             JsonParser jsonParser = new JsonParser();
 
-            if (isValidString(result) && result.length() > 0) {
+            if (isValidString(result)) {
 
 //            if (result.length() > 0) {
 
@@ -1131,7 +1131,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String result = convertStreamToString(inputStream);
 
-            if (isValidString(result) && result.length() > 0) {
+            if (isValidString(result)) {
 
 //            if (result.length() > 0) {
                 JsonParser jsonParser = new JsonParser();
@@ -1546,32 +1546,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     menu.setImage(cursor.getString(cursor
                             .getColumnIndex("image")));
                     int menuIconResId = -1;
-//                    switch (cursor.getString(
-//                            cursor.getColumnIndex("contextmenuid"))
-//                            .toLowerCase()) {
-//                        case "1":
-//                            menuIconResId = R.drawable.learning;
-//                            break;
-//                        case "2":
-//                            menuIconResId = R.drawable.catalog;
-//                            break;
-//                        case "3":
-//                            menuIconResId = R.drawable.profile;
-//                            break;
-//                        case "4":
-//                            menuIconResId = R.drawable.comment;
-//                            break;
-//                        case "5":
-//                            menuIconResId = R.drawable.ic_ask_the_expert;
-//                            break;
-//                        // case "events":
-//                        // menuIconResId = R.drawable.event;
-//                        // break;
-//
-//                        default:
-//                            menuIconResId = R.drawable.home;
-//                            break;
-//                    }
                     menu.setMenuImageResId(menuIconResId);
                     menu.setIsOfflineMenu(cursor.getString(cursor
                             .getColumnIndex("isofflinemenu")));
@@ -1638,7 +1612,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             sqlEx.printStackTrace();
         }
-
 
     }
 

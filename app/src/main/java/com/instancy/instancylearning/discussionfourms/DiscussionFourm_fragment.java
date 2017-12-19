@@ -239,7 +239,6 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         initilizeView();
 
-
         Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
         View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
@@ -251,6 +250,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             @Override
             public void onClick(View view) {
                 Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
+                intentDetail.putExtra("isfromedit", false);
                 intentDetail.putExtra("forumModel", "");
                 startActivity(intentDetail);
             }
@@ -462,6 +462,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
                 if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
                     Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
+                    intentDetail.putExtra("isfromedit", true);
                     intentDetail.putExtra("forumModel", discussionForumModelList.get(position));
                     startActivity(intentDetail);
 

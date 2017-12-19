@@ -217,12 +217,13 @@ public class Utilities {
      */
     public static boolean isValidString(String str) {
         try {
-            if (str == null || str.equals("") || str.contains("null") || str.equals("undefined") || str.equals("null\n")) {
+            if (str == null || str.equals("") || str.equals("null") || str.equals("undefined") || str.equals("null\n")) {
                 return false;
             } else {
                 return true;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 

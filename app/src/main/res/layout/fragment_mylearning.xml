@@ -39,13 +39,13 @@
             android:layout_height="wrap_content">
 
             <ListView
-
                 android:id="@+id/mylearninglistview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:divider="@android:color/transparent"
-                android:dividerHeight="3dp"></ListView>
-
+                android:dividerHeight="10dp"
+                android:padding="6dp"
+                android:scrollbars="none"></ListView>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
