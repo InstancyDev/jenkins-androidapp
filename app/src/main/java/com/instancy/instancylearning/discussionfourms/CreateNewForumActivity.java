@@ -20,7 +20,6 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -52,6 +51,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -63,6 +63,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -168,6 +169,8 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
             discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
             isUpdateForum = true;
+            editTitle.setText(discussionForumModel.name);
+            editDescription.setText(discussionForumModel.descriptionValue);
         } else {
 
             isUpdateForum = false;
@@ -251,8 +254,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             }
         });
 
-        editTitle.setText(discussionForumModel.name);
-        editDescription.setText(discussionForumModel.descriptionValue);
+
     }
 
     void initVolleyCallback() {
@@ -291,19 +293,62 @@ public class CreateNewForumActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
-    public void validateNewForumCreation() {
+    public void validateNewForumCreation() throws JSONException {
 
         String titleStr = editTitle.getText().toString().trim();
         String descriptionStr = editDescription.getText().toString().trim();
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (titleStr.length() < 4) {
             Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
         } else if (descriptionStr.length() < 10) {
             Toast.makeText(this, "Enter description", Toast.LENGTH_SHORT).show();
         } else {
+//            Map<String, String> parameters = new HashMap<String, String>();
+            JSONObject parameters = new JSONObject();
+            if (isUpdateForum) {
+                parameters.put("ParentForumID", "0");
+                parameters.put("CreateNewTopic", "" + allowNewTopic);
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("LikePosts", "true");
+                parameters.put("SendEmail", "" + allowNotification);
+                parameters.put("ForumID", "" + discussionForumModel.forumid);
+                parameters.put("IsPrivate", "false");
+                parameters.put("Moderation", "true");
+                parameters.put("CreatedDate", "" + discussionForumModel.createddate);
+                parameters.put("Description", descriptionStr);
+                parameters.put("CreatedUserID", appUserModel.getUserIDValue());
+                parameters.put("RequiresSubscription", "true");
+                parameters.put("Name", titleStr);
+                parameters.put("AttachFile", "" + allowAttachFile);
+            } else {
+
+                parameters.put("ParentForumID", "0");
+                parameters.put("CreateNewTopic", "" + allowNewTopic);
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("LikePosts", "true");
+                parameters.put("SendEmail", "" + allowNotification);
+                parameters.put("ForumID", "-1");
+                parameters.put("IsPrivate", "false");
+                parameters.put("Moderation", "true");
+                parameters.put("CreatedDate", dateString);
+                parameters.put("Description", descriptionStr);
+                parameters.put("CreatedUserID", appUserModel.getUserIDValue());
+                parameters.put("RequiresSubscription", "true");
+                parameters.put("Name", titleStr);
+                parameters.put("AttachFile", "" + allowAttachFile);
+
+            }
+
+            String parameterString = parameters.toString();
+            Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
             if (isNetworkConnectionAvailable(this, -1)) {
-                sendNewForumDataToServer();
+
+                String replaceDataString = parameterString.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+
+                sendNewForumDataToServer(addQuotes);
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
@@ -311,8 +356,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
     }
 
-    public void sendNewForumDataToServer() {
-
+    public void sendNewForumDataToServer(final String postData) {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
@@ -324,9 +368,10 @@ public class CreateNewForumActivity extends AppCompatActivity {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 
-                if (s.contains("true")) {
+                if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \n Your new forum has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Success! \nYour new forum has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    closeForum(true);
                 } else {
 
                     Toast.makeText(context, "New forum cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
@@ -345,44 +390,27 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
             @Override
             public String getBodyContentType() {
-                return "application/x-www-form-urlencoded";
+                return "application/json";
+
             }
 
             @Override
             public byte[] getBody() throws com.android.volley.AuthFailureError {
-                String str = "\"\"" + "" + "\"\"";
-                String encodedString = "";
-
-                try {
-                    encodedString = URLEncoder.encode(str, "UTF-8");
-
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-                return encodedString.getBytes();
+                return postData.getBytes();
             }
-
-            ;
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-//                headers.put("Content-Type", "application/json; charset=utf-8");
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
                 return headers;
             }
 
-
-            //adding parameters to send
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String, String> parameters = new HashMap<String, String>();
-//                parameters.put("image", imageString);
-//                return parameters;
-//            }
         };
 
         RequestQueue rQueue = Volley.newRequestQueue(context);
@@ -400,8 +428,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
-                finish();
-
+                closeForum(false);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -438,7 +465,11 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         switch (view.getId()) {
             case R.id.txtsave:
-                validateNewForumCreation();
+                try {
+                    validateNewForumCreation();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.txtcancel:
                 finish();
@@ -447,5 +478,11 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
     }
 
+    public void closeForum(boolean refresh) {
+        Intent intent = getIntent();
+        intent.putExtra("NEWFORUM", refresh);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
 }
 

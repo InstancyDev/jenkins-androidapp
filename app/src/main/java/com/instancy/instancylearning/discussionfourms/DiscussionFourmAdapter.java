@@ -106,44 +106,43 @@ public class DiscussionFourmAdapter extends BaseAdapter {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
 
-        final ViewHolder holder;
-        View vi = convertView;
-        if (convertView == null) {
-            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            vi = inflater.inflate(R.layout.discussionfourmcell, null);
-            holder = new ViewHolder(vi);
-            holder.parent = parent;
-            holder.getPosition = position;
-            holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-            holder.txtName.setText(discussionForumModelList.get(position).name);
-            holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
-            holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
-            holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
+        ViewHolder holder;
 
-            holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
-            holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.discussionfourmcell, null);
+        holder = new ViewHolder(convertView);
+        holder.parent = parent;
+        holder.getPosition = position;
+        holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        holder.txtName.setText(discussionForumModelList.get(position).name);
+        holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
+        holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
+        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
 
-            holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
+        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
 
-            holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-            if (discussionForumModelList.get(position).descriptionValue.isEmpty()) {
-                holder.txtShortDisc.setVisibility(View.GONE);
-            } else {
-                holder.txtShortDisc.setVisibility(View.VISIBLE);
-            }
+        holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        if (discussionForumModelList.get(position).descriptionValue.isEmpty()) {
+            holder.txtShortDisc.setVisibility(View.GONE);
+        } else {
+            holder.txtShortDisc.setVisibility(View.VISIBLE);
+        }
 
 //            String imgUrl = discussionTopicModels.get(position).imagedata;
 //            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
-        }
-        return vi;
+
+        return convertView;
     }
 
     public void filter(String charText) {

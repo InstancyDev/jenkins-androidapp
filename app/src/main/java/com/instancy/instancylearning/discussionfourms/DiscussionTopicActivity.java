@@ -18,6 +18,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,6 +61,7 @@ import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
+import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -198,8 +200,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             @Override
             public void onClick(View view) {
                 Intent intentDetail = new Intent(context, CreateNewTopicActivity.class);
-                intentDetail.putExtra("forumModel", discussionForumModel);
-                startActivity(intentDetail);
+                intentDetail.putExtra("isfromedit", false);
+                intentDetail.putExtra("topicModel", "");
+                intentDetail.putExtra("forummodel", discussionForumModel);
+
+                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
             }
         });
 
@@ -359,12 +364,57 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        Intent intentDetail = new Intent(context, DiscussionCommentsActivity.class);
-        intentDetail.putExtra("topicModel", discussionTopicModels.get(i));
-        startActivity(intentDetail);
+        switch (view.getId()) {
+            case R.id.card_view:
+                attachFragment(discussionTopicModels.get(position));
+                break;
+            case R.id.btn_contextmenu:
+                View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
+                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+                catalogContextMenuMethod(position, view, txtBtnDownload, discussionTopicModels.get(position));
+                break;
+            default:
+
+        }
 
     }
+
+    public void attachFragment(DiscussionTopicModel forumModel) {
+        Intent intentDetail = new Intent(context, DiscussionCommentsActivity.class);
+        intentDetail.putExtra("topicModel", forumModel);
+        startActivity(intentDetail);
+    }
+
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final DiscussionTopicModel discussionTopicModel) {
+
+        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.discussonforum, popup.getMenu());
+        //registering popup with OnMenuItemClickListene
+
+        Menu menu = popup.getMenu();
+
+        menu.getItem(0).setVisible(true);//view
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
+                    Intent intentDetail = new Intent(context, CreateNewTopicActivity.class);
+                    intentDetail.putExtra("isfromedit", true);
+                    intentDetail.putExtra("topicModel", discussionTopicModel);
+                    intentDetail.putExtra("forummodel", discussionForumModel);
+                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+
+                }
+                return true;
+            }
+        });
+        popup.show();//showing popup menu
+
+    }
+
 }
 

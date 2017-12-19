@@ -79,8 +79,8 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
-import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+
+import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
@@ -464,7 +464,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                     Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
                     intentDetail.putExtra("isfromedit", true);
                     intentDetail.putExtra("forumModel", discussionForumModelList.get(position));
-                    startActivity(intentDetail);
+                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
 
                 }
                 return true;
@@ -479,12 +479,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == DETAIL_CATALOG_CODE && resultCode == RESULT_OK && data != null) {
+        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
 
             if (data != null) {
-                boolean refresh = data.getBooleanExtra("REFRESH", false);
+                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
                 if (refresh) {
-                    injectFromDbtoModel();
+                    refreshCatalog(false);
                 }
             }
         }

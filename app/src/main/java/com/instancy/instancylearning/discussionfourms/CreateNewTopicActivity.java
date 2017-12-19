@@ -2,13 +2,16 @@ package com.instancy.instancylearning.discussionfourms;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 
 
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 
@@ -22,6 +25,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
+import android.util.Base64;
 import android.util.Log;
 
 import android.view.Menu;
@@ -32,9 +36,17 @@ import android.widget.EditText;
 
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -47,20 +59,28 @@ import com.instancy.instancylearning.models.AppUserModel;
 
 import com.instancy.instancylearning.models.DiscussionForumModel;
 
+import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.encodeImage;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -76,11 +96,12 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
-
+    private int GALLERY = 1;
     DatabaseHandler db;
     ResultListner resultListner = null;
 
 
+    DiscussionTopicModel discussionTopicModel;
     DiscussionForumModel discussionForumModel;
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
@@ -120,6 +141,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     @BindView(R.id.edit_attachment)
     EditText editAttachment;
 
+    boolean isUpdateForum = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -148,7 +170,19 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
-        discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
+
+        if (getIntent().getBooleanExtra("isfromedit", false)) {
+
+            discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("topicModel");
+            isUpdateForum = true;
+            editTitle.setText(discussionTopicModel.name);
+            editDescription.setText(discussionTopicModel.longdescription);
+        } else {
+
+            isUpdateForum = false;
+        }
+
+        discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forummodel");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -265,6 +299,25 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == GALLERY) {
+            if (data != null) {
+                Uri contentURI = data.getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+
+                    Toast.makeText(context, "Image Attached!", Toast.LENGTH_SHORT).show();
+//                    String imageENcode = encodeImage(bitmap);
+                    editAttachment.setText(contentURI.toString());
+//                    Log.d(TAG, "onActivityResult: " + imageENcode);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+        }
+
     }
 
 
@@ -274,17 +327,153 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
     }
 
-    @OnClick({R.id.txtsave, R.id.txtcancel})
+    @OnClick({R.id.txtsave, R.id.txtcancel, R.id.txtbrowse})
     public void actionsBottomBtns(View view) {
 
         switch (view.getId()) {
             case R.id.txtsave:
-
+                try {
+                    validateNewForumCreation();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.txtcancel:
                 finish();
                 break;
+            case R.id.txtbrowse:
+                choosePhotoFromGallary();
+                break;
         }
+
+    }
+
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(galleryIntent, GALLERY);
+    }
+
+    public void validateNewForumCreation() throws JSONException {
+
+        String titleStr = editTitle.getText().toString().trim();
+        String descriptionStr = editDescription.getText().toString().trim();
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+
+        if (titleStr.length() < 4) {
+            Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
+        } else if (descriptionStr.length() < 10) {
+            Toast.makeText(this, "Enter description", Toast.LENGTH_SHORT).show();
+        } else {
+
+            JSONObject parameters = new JSONObject();
+            if (isUpdateForum) {
+
+                parameters.put("strContentID", discussionTopicModel.topicid);
+                parameters.put("strTitle", titleStr);
+                parameters.put("strDescription", descriptionStr);
+                parameters.put("UserID", appUserModel.getUserIDValue());
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("Locale", "en-us");
+                parameters.put("ForumID", discussionForumModel.forumid);
+                parameters.put("ForumName", discussionForumModel.name);
+                parameters.put("strAttachFile", "");
+
+            } else {
+
+                parameters.put("UserID", appUserModel.getUserIDValue());
+                parameters.put("Title", titleStr);
+                parameters.put("Description", descriptionStr);
+                parameters.put("ForumID", discussionForumModel.forumid);
+                parameters.put("OrgID", appUserModel.getSiteIDValue());
+                parameters.put("InvolvedUsers", "");
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("LocaleID", "en-us");
+                parameters.put("ForumName", discussionForumModel.name);
+                parameters.put("strAttachFile", "" + discussionForumModel.createddate);
+
+            }
+
+            String parameterString = parameters.toString();
+            Log.d(TAG, "validateNewForumCreation: " + parameterString);
+
+            if (isNetworkConnectionAvailable(this, -1)) {
+
+                String replaceDataString = parameterString.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+
+                sendNewForumDataToServer(addQuotes);
+            } else {
+                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    public void sendNewForumDataToServer(final String postData) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/CreateForumTopic?ForumID=" + discussionForumModel.forumid;
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    Toast.makeText(context, "Success! \nYour new topic has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+//                    closeForum(true);
+                } else {
+
+                    Toast.makeText(context, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
 

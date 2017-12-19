@@ -94,6 +94,8 @@ public class StaticValues {
 
     public static final int FILTER_CLOSE_CODE = 1234;
 
+    public static final int FORUM_CREATE_NEW_FORUM = 2111;
+
     public static final int INNER_FILTER_CLOSE = 2121;
 
     public static final int COURSE_CLOSE_FROM_WEBSCREEN_CODE = 8888;
