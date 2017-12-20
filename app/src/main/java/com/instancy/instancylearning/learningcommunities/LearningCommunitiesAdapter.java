@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.discussionfourms;
+package com.instancy.instancylearning.learningcommunities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -22,7 +22,6 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
-import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -39,27 +38,27 @@ import butterknife.OnClick;
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
  */
 
-public class DiscussionTopicAdapter extends BaseAdapter {
+public class LearningCommunitiesAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<DiscussionTopicModel> discussionTopicModelList = null;
+    private List<DiscussionForumModel> discussionForumModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
     PreferencesManager preferencesManager;
-    private String TAG = DiscussionTopicAdapter.class.getSimpleName();
+    private String TAG = LearningCommunitiesAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<DiscussionTopicModel> searchList;
+    private List<DiscussionForumModel> searchList;
     AppController appcontroller;
 
 
-    public DiscussionTopicAdapter(Activity activity, int resource, List<DiscussionTopicModel> discussionTopicModelList) {
+    public LearningCommunitiesAdapter(Activity activity, int resource, List<DiscussionForumModel> discussionForumModelList) {
         this.activity = activity;
-        this.discussionTopicModelList = discussionTopicModelList;
-        this.searchList = new ArrayList<DiscussionTopicModel>();
+        this.discussionForumModelList = discussionForumModelList;
+        this.searchList = new ArrayList<DiscussionForumModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -78,21 +77,21 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<DiscussionTopicModel> discussionTopicModelList) {
-        this.discussionTopicModelList = discussionTopicModelList;
-        this.searchList = new ArrayList<DiscussionTopicModel>();
-        this.searchList.addAll(discussionTopicModelList);
+    public void refreshList(List<DiscussionForumModel> myLearningModel) {
+        this.discussionForumModelList = myLearningModel;
+        this.searchList = new ArrayList<DiscussionForumModel>();
+        this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return discussionTopicModelList != null ? discussionTopicModelList.size() : 0;
+        return discussionForumModelList != null ? discussionForumModelList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return discussionTopicModelList.get(position);
+        return discussionForumModelList.get(position);
     }
 
     @Override
@@ -104,7 +103,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
 
-        final ViewHolder holder;
+        ViewHolder holder;
 
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         convertView = inflater.inflate(R.layout.discussionfourmcell, null);
@@ -112,13 +111,13 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtName.setText(discussionTopicModelList.get(position).name);
-        holder.txtShortDisc.setText(discussionTopicModelList.get(position).longdescription);
-        holder.txtAuthor.setText(discussionTopicModelList.get(position).latestreplyby + " ");
-        holder.txtLastUpdate.setText(discussionTopicModelList.get(position).createddate + " ");
+        holder.txtName.setText(discussionForumModelList.get(position).name);
+        holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
+        holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
+        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
 
-        holder.txtTopicsCount.setText(discussionTopicModelList.get(position).noofviews + " Topic(s)");
-        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noofreplies + " Comment(s)");
+        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
+        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -128,7 +127,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        if (discussionTopicModelList.get(position).longdescription.isEmpty() || discussionTopicModelList.get(position).longdescription.contains("null")) {
+        if (discussionForumModelList.get(position).descriptionValue.isEmpty()) {
             holder.txtShortDisc.setVisibility(View.GONE);
         } else {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
@@ -137,18 +136,19 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 //            String imgUrl = discussionTopicModels.get(position).imagedata;
 //            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
+
         return convertView;
     }
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        discussionTopicModelList.clear();
+        discussionForumModelList.clear();
         if (charText.length() == 0) {
-            discussionTopicModelList.addAll(searchList);
+            discussionForumModelList.addAll(searchList);
         } else {
-            for (DiscussionTopicModel s : searchList) {
-                if (s.name.toLowerCase(Locale.getDefault()).contains(charText) || s.longdescription.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    discussionTopicModelList.add(s);
+            for (DiscussionForumModel s : searchList) {
+                if (s.name.toLowerCase(Locale.getDefault()).contains(charText) || s.author.toLowerCase(Locale.getDefault()).contains(charText)) {
+                    discussionForumModelList.add(s);
                 }
             }
         }

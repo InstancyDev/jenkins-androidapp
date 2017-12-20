@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,7 +34,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -55,13 +63,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_TOPICCOMMENTS;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -70,7 +81,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
 
 public class DiscussionCommentsActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
-    final Context context = this;
+    Context context = this;
     SVProgressHUD svProgressHUD;
     String TAG = DiscussionCommentsActivity.class.getSimpleName();
     AppUserModel appUserModel;
@@ -79,7 +90,6 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     DatabaseHandler db;
     List<DiscussionCommentsModel> discussionCommentsModelList = null;
-    SwipeRefreshLayout swipeRefreshLayout;
     ResultListner resultListner = null;
 
     ListView discussionFourmlistView;
@@ -131,6 +141,10 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     @BindView(R.id.fab_comment_button)
     FloatingActionButton floatingActionButton;
 
+    @Nullable
+    @BindView(R.id.swipemylearning)
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,10 +166,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipemylearning);
         swipeRefreshLayout.setOnRefreshListener(this);
         svProgressHUD = new SVProgressHUD(context);
-
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -205,7 +217,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
                 Intent intentDetail = new Intent(context, AddNewCommentActivity.class);
                 intentDetail.putExtra("forumModel", discussionTopicModel);
-                startActivity(intentDetail);
+                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+
             }
         });
     }
@@ -345,8 +358,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
-//            refreshCatalog(true);
-            swipeRefreshLayout.setRefreshing(false);
+            refreshMyLearning(true);
+            swipeRefreshLayout.setRefreshing(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -359,6 +372,15 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
+
+            if (data != null) {
+                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
+                if (refresh) {
+                    refreshMyLearning(false);
+                }
+            }
+        }
 
     }
 
@@ -399,8 +421,13 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
                 if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
 
-                    Toast.makeText(context, "Delete Here " + discussionCommentsModel.displayName, Toast.LENGTH_SHORT).show();
-                    deleteCommentFromDiscussionForumTopic(discussionCommentsModel);
+//                    Toast.makeText(context, "Delete Here " + discussionCommentsModel.displayName, Toast.LENGTH_SHORT).show();
+
+                    try {
+                        deleteCommentFromServerBuildObj(discussionCommentsModel);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return true;
             }
@@ -409,12 +436,13 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     }
 
-    public void deleteCommentFromDiscussionForumTopic(DiscussionCommentsModel discussionCommentsModel) {
+    public void deleteCommentFromLocalDB(DiscussionCommentsModel discussionCommentsModel) {
 
         try {
             String strDelete = "DELETE FROM " + TBL_TOPICCOMMENTS + " WHERE  siteID ='"
                     + appUserModel.getSiteIDValue() + "' AND forumid ='" + discussionTopicModel.forumid + "' AND commentid  ='" + discussionCommentsModel.commentID + "'";
             db.executeQuery(strDelete);
+            injectFromDbtoModel();
 
         } catch (SQLiteException sqlEx) {
 
@@ -432,7 +460,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         if (commentCount > 0) {
             try {
 
-                int count = commentCount - 1;
+                int count = commentCount;
                 db.executeQuery("UPDATE " + TBL_TOPICCOMMENTS + "SET noofreplies = " + count + " WHERE forumid =" + discussionTopicModel.forumid + "' AND topicid = '" + discussionTopicModel.topicid + "' AND siteid = '" + discussionTopicModel.siteid);
 
             } catch (SQLiteException sqlEx) {
@@ -444,8 +472,101 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     }
 
-    public void deleteCommentFromServer() {
+    public void deleteCommentFromServerBuildObj(DiscussionCommentsModel commentsModel) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("TopicID", commentsModel.topicID);
+        parameters.put("ReplyID", commentsModel.replyID);
+        parameters.put("ForumID", commentsModel.forumID);
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("TopicName", appUserModel.getSiteIDValue());
+        parameters.put("NoofReplies", "0");
+        parameters.put("LocaleID", "en-us");
+        parameters.put("LastPostedDate", commentsModel.postedDate);
+        parameters.put("CreatedUserID", commentsModel.postedBy);
+
+        String parameterString = parameters.toString();
+        Log.d(TAG, "validateNewForumCreation: " + parameterString);
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+
+            String replaceDataString = parameterString.replace("\"", "\\\"");
+            String addQuotes = ('"' + replaceDataString + '"');
+
+            deleteCommentFromServer(addQuotes, commentsModel);
+        } else {
+            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+        }
 
 
     }
+
+    public void deleteCommentFromServer(final String postData, final DiscussionCommentsModel commentsModel) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteForumComment";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    Toast.makeText(context, "Success! \nYour new topic has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+
+                    deleteCommentFromLocalDB(commentsModel);
+                } else {
+
+                    Toast.makeText(context, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
 }

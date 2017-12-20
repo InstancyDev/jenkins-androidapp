@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.discussionfourms;
+package com.instancy.instancylearning.learningcommunities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -20,7 +20,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -47,10 +46,11 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.discussionfourms.CreateNewForumActivity;
+import com.instancy.instancylearning.discussionfourms.DiscussionFourmAdapter;
+import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
@@ -60,14 +60,12 @@ import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -79,10 +77,8 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 
 /**
@@ -90,9 +86,9 @@ import static com.instancy.instancylearning.utils.Utilities.showToast;
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class LearningCommunities_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
-    String TAG = DiscussionFourm_fragment.class.getSimpleName();
+    String TAG = LearningCommunities_fragment.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
@@ -102,7 +98,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.discussionfourmlist)
     ListView discussionFourmlistView;
-    DiscussionFourmAdapter discussionFourmAdapter;
+    LearningCommunitiesAdapter learningCommunitiesAdapter;
     List<DiscussionForumModel> discussionForumModelList = null;
     PreferencesManager preferencesManager;
     Context context;
@@ -122,7 +118,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
-    public DiscussionFourm_fragment() {
+    public LearningCommunities_fragment() {
 
 
     }
@@ -225,8 +221,8 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        discussionFourmAdapter = new DiscussionFourmAdapter(getActivity(), BIND_ABOVE_CLIENT, discussionForumModelList);
-        discussionFourmlistView.setAdapter(discussionFourmAdapter);
+        learningCommunitiesAdapter = new LearningCommunitiesAdapter(getActivity(), BIND_ABOVE_CLIENT, discussionForumModelList);
+        discussionFourmlistView.setAdapter(learningCommunitiesAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
         discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
@@ -263,10 +259,10 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     public void injectFromDbtoModel() {
         discussionForumModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
         if (discussionForumModelList != null) {
-            discussionFourmAdapter.refreshList(discussionForumModelList);
+            learningCommunitiesAdapter.refreshList(discussionForumModelList);
         } else {
             discussionForumModelList = new ArrayList<DiscussionForumModel>();
-            discussionFourmAdapter.refreshList(discussionForumModelList);
+            learningCommunitiesAdapter.refreshList(discussionForumModelList);
         }
 
     }
@@ -317,7 +313,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-                    discussionFourmAdapter.filter(newText.toLowerCase(Locale.getDefault()));
+                    learningCommunitiesAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
                     return true;
                 }

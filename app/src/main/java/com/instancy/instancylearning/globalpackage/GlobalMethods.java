@@ -981,6 +981,9 @@ public class GlobalMethods {
         return encImage;
     }
 
+
+
+
 //    public static void catalogContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 //
 //        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);

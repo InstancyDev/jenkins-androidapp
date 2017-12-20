@@ -2,11 +2,15 @@ package com.instancy.instancylearning.discussionfourms;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +22,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,8 +30,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -42,12 +55,20 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.encodeImage;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -57,7 +78,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
 
 public class AddNewCommentActivity extends AppCompatActivity {
 
-    final Context context = this;
+    Context context = this;
     SVProgressHUD svProgressHUD;
     String TAG = AddNewCommentActivity.class.getSimpleName();
     AppUserModel appUserModel;
@@ -107,6 +128,10 @@ public class AddNewCommentActivity extends AppCompatActivity {
     @BindView(R.id.edit_attachment)
     EditText editAttachment;
 
+    private int GALLERY = 1;
+
+    Bitmap bitmapAttachment = null;
+    String endocedImageStr = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -254,6 +279,27 @@ public class AddNewCommentActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GALLERY) {
+            if (data != null) {
+                Uri contentURI = data.getData();
+                try {
+                    final Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+
+//                    Toast.makeText(context, "Image Attached!", Toast.LENGTH_SHORT).show();
+
+                    editAttachment.setText(contentURI.toString());
+//                    Log.d(TAG, "onActivityResult: " + imageENcode);
+                    bitmapAttachment = bitmap;
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(AddNewCommentActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+        }
 
     }
 
@@ -264,19 +310,292 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
     }
 
-    @OnClick({R.id.txtsave, R.id.txtcancel})
+    @OnClick({R.id.txtsave, R.id.txtcancel, R.id.txtbrowse})
     public void actionsBottomBtns(View view) {
 
         switch (view.getId()) {
             case R.id.txtsave:
-
+                try {
+                    validateNewForumCreation();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.txtcancel:
                 finish();
                 break;
+            case R.id.txtbrowse:
+                choosePhotoFromGallary();
+                break;
+
         }
 
     }
+
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, GALLERY);
+    }
+
+
+    public void validateNewForumCreation() throws JSONException {
+
+        String titleStr = editTitle.getText().toString().trim();
+        String descriptionStr = editDescription.getText().toString().trim();
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+
+        if (descriptionStr.length() < 10) {
+            Toast.makeText(AddNewCommentActivity.this, "Enter description", Toast.LENGTH_SHORT).show();
+        } else {
+
+            JSONObject parameters = new JSONObject();
+
+            parameters.put("TopicID", discussionTopicModel.topicid);
+            parameters.put("TopicName", discussionTopicModel.name);
+            parameters.put("ForumID", discussionTopicModel.forumid);
+            parameters.put("Message", descriptionStr);
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("SiteID", appUserModel.getSiteIDValue());
+            parameters.put("InvolvedUserIDList", "");
+            parameters.put("LocaleID", "en-us");
+            parameters.put("strAttachFile", "");
+
+            String parameterString = parameters.toString();
+            Log.d(TAG, "validateNewForumCreation: " + parameterString);
+
+            if (isNetworkConnectionAvailable(this, -1)) {
+
+                String replaceDataString = parameterString.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+
+                sendNewForumDataToServer(addQuotes);
+            } else {
+                Toast.makeText(AddNewCommentActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+
+    public void sendNewForumDataToServer(final String postData) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostComment";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    String replaceString = s.replace("#$#", "=");
+                    String[] strSplitvalues = replaceString.split("=");
+
+                    String replyID = "";
+                    if (strSplitvalues.length > 1) {
+                        replyID = strSplitvalues[1].replace("\"", "");
+                        Log.d(TAG, "onResponse: " + replyID);
+                    }
+                    String attachmentImg = editAttachment.getText().toString();
+
+                    if (attachmentImg.length() > 7) {
+                        try {
+                            encodeAttachment(replyID);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        Toast.makeText(AddNewCommentActivity.this, "Success! \nYour comment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+
+                        closeForum(true);
+
+                    }
+
+                } else {
+
+                    Toast.makeText(AddNewCommentActivity.this, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener()
+
+        {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(AddNewCommentActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new
+
+                DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
+    /// photo upload to server
+
+    public void encodeAttachment(String replayId) throws JSONException {
+
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        });
+        if (bitmapAttachment != null) {
+            endocedImageStr = convertToBase64(bitmapAttachment);
+        }
+
+        String titleStr = editTitle.getText().toString().trim();
+        String descriptionStr = editDescription.getText().toString().trim();
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+
+        if (endocedImageStr.length() < 10) {
+            Toast.makeText(AddNewCommentActivity.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
+        } else {
+
+            Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
+
+            if (isNetworkConnectionAvailable(this, -1)) {
+
+                String replaceDataString = endocedImageStr.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+                sendAttachmentDataToServer(addQuotes, replayId);
+
+            } else {
+                Toast.makeText(AddNewCommentActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private String convertToBase64(Bitmap bitmap) {
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        byte[] byteArrayImage = baos.toByteArray();
+
+        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
+
+        return encodedImage;
+
+    }
+
+    public void sendAttachmentDataToServer(final String postData, String replayId) {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment?fileName=" + "&TopicID=" + discussionTopicModel.topicid + "&ReplyID=" + replayId + "&isTopic=false&isEdit=false";
+
+        StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    Toast.makeText(AddNewCommentActivity.this, "Success! \nYour attachment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    closeForum(true);
+                } else {
+
+                    Toast.makeText(AddNewCommentActivity.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(AddNewCommentActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(AddNewCommentActivity.this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    /// End photo upload to server
+    public void closeForum(boolean refresh) {
+        Intent intent = getIntent();
+        intent.putExtra("NEWFORUM", refresh);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
 
 }
 

@@ -275,8 +275,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
-                finish();
-
+                closeForum(false);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -426,7 +425,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 if (s.contains("success")) {
 
                     Toast.makeText(context, "Success! \nYour new topic has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-//                    closeForum(true);
+                    closeForum(true);
                 } else {
 
                     Toast.makeText(context, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
@@ -477,5 +476,11 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
     }
 
+    public void closeForum(boolean refresh) {
+        Intent intent = getIntent();
+        intent.putExtra("NEWFORUM", refresh);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
 }
 

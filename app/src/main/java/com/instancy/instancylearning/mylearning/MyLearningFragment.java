@@ -70,6 +70,7 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -124,6 +125,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
     boolean firstTimeVisible = true;
+
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
 
     public MyLearningFragment() {
 
@@ -231,6 +235,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             e.printStackTrace();
                         }
                     } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -276,6 +281,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
                 }
+
+                if (requestType.equalsIgnoreCase("MYLEARNINGDATA")) {
+
+                    nodata_Label.setText(getResources().getString(R.string.no_data));
+                }
+
             }
 
             @Override
@@ -317,6 +328,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             myLearningModelsList = new ArrayList<MyLearningModel>();
             myLearningAdapter.refreshList(myLearningModelsList);
 //            myLearninglistView.setVisibility(View.GONE);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
         triggerActionForFirstItem();
     }
@@ -379,6 +391,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         } else {
 //            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             injectFromDbtoModel();
+
         }
 
         return rootView;

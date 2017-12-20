@@ -185,9 +185,6 @@ public class SideMenu extends AppCompatActivity {
         rl.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
 
-
-        // navdrawer Top layout initilization
-
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
 
         profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
@@ -378,6 +375,9 @@ public class SideMenu extends AppCompatActivity {
                 fragment = new Event_fragment();
                 break;
             case 4:
+                fragment = new DiscussionFourm_fragment();
+                break;
+            case 9:
                 fragment = new DiscussionFourm_fragment();
                 break;
             default:

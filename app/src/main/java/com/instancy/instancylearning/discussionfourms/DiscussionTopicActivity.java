@@ -79,7 +79,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     DatabaseHandler db;
     List<DiscussionTopicModel> discussionTopicModels = null;
-    SwipeRefreshLayout swipeRefreshLayout;
+
+
     ResultListner resultListner = null;
 
     ListView discussionFourmlistView;
@@ -131,6 +132,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     @BindView(R.id.fab_comment_button)
     FloatingActionButton floatingActionButton;
 
+    @Nullable
+    @BindView(R.id.swipemylearning)
+    SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,7 +146,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         appController = AppController.getInstance();
         db = new DatabaseHandler(this);
         ButterKnife.bind(this);
-
+        swipeRefreshLayout.setOnRefreshListener(this);
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -152,8 +157,6 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipemylearning);
-        swipeRefreshLayout.setOnRefreshListener(this);
         svProgressHUD = new SVProgressHUD(context);
 
         initVolleyCallback();
@@ -209,7 +212,6 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         });
 
         floatingActionButton.setBackgroundColor(getResources().getColor(R.color.colorStatusInProgress));
-
     }
 
     public void initilizeHeaderView() {
@@ -338,7 +340,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
-//            refreshCatalog(true);
+            refreshMyLearning(true);
+
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -352,6 +355,15 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
+
+            if (data != null) {
+                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
+                if (refresh) {
+                    refreshMyLearning(false);
+                }
+            }
+        }
 
     }
 

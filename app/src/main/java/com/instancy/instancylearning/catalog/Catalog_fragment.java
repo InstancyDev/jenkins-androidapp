@@ -122,10 +122,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
-    @BindView(R.id.swipemylearning)
-    SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.mylearninglistview)
-    ListView myLearninglistView;
+
     CatalogAdapter catalogAdapter;
     List<MyLearningModel> catalogModelsList = null;
     PreferencesManager preferencesManager;
@@ -145,6 +142,15 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     CustomFlowLayout category_breadcrumb = null;
 
     List<ContentValues> breadcrumbItemsList = null;
+
+    @BindView(R.id.swipemylearning)
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    @BindView(R.id.mylearninglistview)
+    ListView myLearninglistView;
+
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
 
     Communicator communicator;
 
@@ -263,6 +269,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             e.printStackTrace();
                         }
                     } else {
+
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -312,6 +320,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
                 }
+
+                if (requestType.equalsIgnoreCase("CATALOGDATA")) {
+
+                    nodata_Label.setText(getResources().getString(R.string.no_data));
+                }
+
+
             }
 
             @Override
@@ -383,7 +398,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-
     public void injectFromDbtoModel() {
         catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId());
         if (catalogModelsList != null) {
@@ -391,6 +405,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         } else {
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
     }
 

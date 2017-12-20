@@ -11582,6 +11582,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
+            String attachment = discussionCommentsModel.attachment;
+
+            String[] strSplitvalues = attachment.split("\"");
+            String finalSplit = "";
+            if (strSplitvalues.length > 1) {
+                finalSplit = strSplitvalues[1];
+
+            }
+
+            if (finalSplit.length() > 1) {
+
+                attachment = appUserModel.getSiteURL() + "/content/sitefiles/" + finalSplit;
+            } else {
+                attachment = "";
+            }
+
 
             injectDiscussionCommetnsDataIntoTable(discussionCommentsModel, discussionTopicModel);
         }
