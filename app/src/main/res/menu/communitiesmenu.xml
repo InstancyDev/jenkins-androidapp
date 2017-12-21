@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/ctx_gotocommunity"
+        android:orderInCategory="100"
+        android:title="Go to Community" />
+
+    <item
+        android:id="@+id/ctx_joincommunity"
+        android:orderInCategory="100"
+        android:title="Join Community" />
+
+
+</menu>
+

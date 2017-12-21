@@ -23,6 +23,7 @@ import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
+import com.instancy.instancylearning.models.CommunitiesModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
@@ -475,7 +476,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_COMMUNITYLISTING
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,learningportalid INTEGER, learningprovidername TEXT, communitydescription TEXT, keywords TEXT, userid INTEGER, siteid INTEGER, siteurl TEXT, parentsiteid INTEGER, parentsiteurl TEXT, orgunitid INTEGER, objectid INTEGER, name TEXT, categoryid INTEGER, imagepath TEXT, actiongoto INTEGER, labelalreadyamember TEXT, actionjoincommunity INTEGER, labelpendingrequest TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, learningportalid INTEGER, learningprovidername TEXT, communitydescription TEXT, keywords TEXT, userid INTEGER, siteid INTEGER, siteurl TEXT, parentsiteid INTEGER, parentsiteurl TEXT, orgunitid INTEGER, objectid INTEGER, name TEXT, categoryid INTEGER, imagepath TEXT, actiongoto INTEGER, labelalreadyamember TEXT, actionjoincommunity INTEGER, labelpendingrequest TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATEGORYCOMMUNITYLISTING
@@ -1421,9 +1422,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("contextmenuid"));
                     //
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7") || contextMenuID.equalsIgnoreCase("6")))
-//                        continue;
+                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -11556,7 +11557,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-
             if (jsonMyLearningColumnObj.has("postedby")) {
 
                 discussionCommentsModel.postedBy = jsonMyLearningColumnObj.get("postedby").toString();
@@ -11584,7 +11584,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             String attachment = discussionCommentsModel.attachment;
 
-            String[] strSplitvalues = attachment.split("\"");
+            String[] strSplitvalues = attachment.split("/");
             String finalSplit = "";
             if (strSplitvalues.length > 1) {
                 finalSplit = strSplitvalues[1];
@@ -11592,13 +11592,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
             if (finalSplit.length() > 1) {
-
-                attachment = appUserModel.getSiteURL() + "/content/sitefiles/" + finalSplit;
+                attachment = appUserModel.getSiteURL() + "/content/sitefiles/" + discussionCommentsModel.topicID + "/" + finalSplit;
             } else {
                 attachment = "";
             }
 
-
+            discussionCommentsModel.attachment = attachment;
             injectDiscussionCommetnsDataIntoTable(discussionCommentsModel, discussionTopicModel);
         }
 
@@ -11707,6 +11706,244 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return discussionTopicModelList;
+    }
+
+    // inject communities listing
+
+    public void injectCommunitiesListing(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("portallistingdata");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_COMMUNITYLISTING);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            CommunitiesModel communitiesModel = new CommunitiesModel();
+
+            //active
+            if (jsonMyLearningColumnObj.has("learningportalid")) {
+
+                communitiesModel.learningportalid = jsonMyLearningColumnObj.getInt("learningportalid");
+            }
+            // attachfile
+            if (jsonMyLearningColumnObj.has("learningprovidername")) {
+
+                communitiesModel.learningprovidername = jsonMyLearningColumnObj.get("learningprovidername").toString();
+
+            }
+            // description
+            if (jsonMyLearningColumnObj.has("description")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("description").toString());
+
+                communitiesModel.communitydescription = result.toString();
+
+            }
+            // keywords
+            if (jsonMyLearningColumnObj.has("keywords")) {
+
+                communitiesModel.keywords = jsonMyLearningColumnObj.get("keywords").toString();
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                communitiesModel.siteid = jsonMyLearningColumnObj.getInt("siteid");
+
+            }
+
+            // learnersiteurl
+            if (jsonMyLearningColumnObj.has("learnersiteurl")) {
+                communitiesModel.siteurl = jsonMyLearningColumnObj.getString("learnersiteurl");
+
+            }
+
+            // parentid
+            if (jsonMyLearningColumnObj.has("parentid")) {
+
+                communitiesModel.parentsiteid = jsonMyLearningColumnObj.getInt("parentid");
+
+            }
+            // forumname
+            if (jsonMyLearningColumnObj.has("imagepath")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.getString("imagepath"));
+
+                communitiesModel.imagepath = appUserModel.getSiteURL() + result.toString();
+
+            }
+
+            // isprivate
+            if (jsonMyLearningColumnObj.has("orgunitid")) {
+
+                communitiesModel.orgunitid = jsonMyLearningColumnObj.getInt("orgunitid");
+
+            }
+            // name
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                communitiesModel.name = jsonMyLearningColumnObj.get("name").toString();
+
+            }
+            // moderation
+            if (jsonMyLearningColumnObj.has("objectid")) {
+
+                communitiesModel.objectid = jsonMyLearningColumnObj.getInt("objectid");
+
+            }
+            // name
+            if (jsonMyLearningColumnObj.has("categoryid")) {
+
+                communitiesModel.categoryid = jsonMyLearningColumnObj.getInt("categoryid");
+            }
+            // actiongoto
+            if (jsonMyLearningColumnObj.has("actiongoto")) {
+
+                communitiesModel.actiongoto = jsonMyLearningColumnObj.getInt("actiongoto");
+
+            }
+            // labelalreadyamember
+            if (jsonMyLearningColumnObj.has("labelalreadyamember")) {
+
+                communitiesModel.labelalreadyamember = jsonMyLearningColumnObj.get("labelalreadyamember").toString();
+
+            }
+            // actionjoincommunity
+            if (jsonMyLearningColumnObj.has("actionjoincommunity")) {
+
+                communitiesModel.actionjoincommunity = jsonMyLearningColumnObj.getInt("actionjoincommunity");
+
+            }
+            // labelpendingrequest
+            if (jsonMyLearningColumnObj.has("labelpendingrequest")) {
+
+                communitiesModel.labelpendingrequest = jsonMyLearningColumnObj.get("labelpendingrequest").toString();
+                if (null == communitiesModel.labelpendingrequest){
+                    communitiesModel.labelpendingrequest="";
+                }
+
+            }
+
+
+            communitiesModel.userid = Integer.parseInt(appUserModel.getUserIDValue());
+            communitiesModel.parentsiteurl = appUserModel.getSiteURL();
+
+
+            injectCommunitiesDataIntoTable(communitiesModel);
+        }
+
+    }
+
+
+    public void injectCommunitiesDataIntoTable(CommunitiesModel communitiesModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("learningportalid", communitiesModel.learningportalid);
+            contentValues.put("learningprovidername", communitiesModel.learningprovidername);
+            contentValues.put("communitydescription", communitiesModel.communitydescription);
+            contentValues.put("keywords", communitiesModel.keywords);
+            contentValues.put("userid", communitiesModel.userid);
+            contentValues.put("siteid", communitiesModel.siteid);
+            contentValues.put("siteurl", communitiesModel.siteurl);
+            contentValues.put("parentsiteid", communitiesModel.parentsiteid);
+            contentValues.put("parentsiteurl", communitiesModel.parentsiteurl);
+            contentValues.put("orgunitid", communitiesModel.orgunitid);
+            contentValues.put("objectid", communitiesModel.objectid);
+            contentValues.put("name", communitiesModel.name);
+            contentValues.put("categoryid", communitiesModel.categoryid);
+            contentValues.put("imagepath", communitiesModel.imagepath);
+            contentValues.put("actiongoto", communitiesModel.actiongoto);
+            contentValues.put("labelalreadyamember", communitiesModel.labelalreadyamember);
+            contentValues.put("actionjoincommunity", communitiesModel.actionjoincommunity);
+            contentValues.put("labelpendingrequest", communitiesModel.labelpendingrequest);
+
+
+            db.insert(TBL_COMMUNITYLISTING, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+    public List<CommunitiesModel> fetchCommunitiesList(AppUserModel apuserModel) {
+        List<CommunitiesModel> communitiesModelList = null;
+        CommunitiesModel communitiesModel = new CommunitiesModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_COMMUNITYLISTING + " WHERE parentsiteid = " + apuserModel.getSiteIDValue() + " AND parentsiteurl  ='" + apuserModel.getSiteURL() + "' AND userid  ='" + apuserModel.getUserIDValue() +
+                "'";
+
+        Log.d(TAG, "fetchCommunitiesList: " + strSelQuery);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                communitiesModelList = new ArrayList<CommunitiesModel>();
+                do {
+                    communitiesModel = new CommunitiesModel();
+
+                    communitiesModel.learningportalid = cursor.getInt(cursor.getColumnIndex("learningportalid"));
+
+                    communitiesModel.learningprovidername = cursor.getString(cursor.getColumnIndex("learningprovidername"));
+
+                    communitiesModel.communitydescription = cursor.getString(cursor.getColumnIndex("communitydescription"));
+
+                    communitiesModel.keywords = cursor.getString(cursor.getColumnIndex("keywords"));
+
+                    communitiesModel.userid = cursor.getInt(cursor.getColumnIndex("userid"));
+
+                    communitiesModel.siteurl = cursor.getString(cursor.getColumnIndex("siteurl"));
+
+                    communitiesModel.siteid = cursor.getInt(cursor.getColumnIndex("siteid"));
+
+                    communitiesModel.parentsiteid = cursor.getInt(cursor.getColumnIndex("parentsiteid"));
+
+                    communitiesModel.parentsiteurl = cursor.getString(cursor.getColumnIndex("parentsiteurl"));
+
+                    communitiesModel.orgunitid = cursor.getInt(cursor.getColumnIndex("orgunitid"));
+
+                    communitiesModel.objectid = cursor.getInt(cursor.getColumnIndex("objectid"));
+
+                    communitiesModel.name = cursor.getString(cursor.getColumnIndex("name"));
+
+                    communitiesModel.categoryid = cursor.getInt(cursor.getColumnIndex("categoryid"));
+
+                    communitiesModel.imagepath = cursor.getString(cursor.getColumnIndex("imagepath"));
+
+                    communitiesModel.actiongoto = cursor.getInt(cursor.getColumnIndex("actiongoto"));
+
+                    communitiesModel.labelalreadyamember = cursor.getString(cursor.getColumnIndex("labelalreadyamember"));
+
+                    communitiesModel.actionjoincommunity = cursor.getInt(cursor.getColumnIndex("actionjoincommunity"));
+
+                    communitiesModel.labelpendingrequest = cursor.getString(cursor.getColumnIndex("labelpendingrequest"));
+
+                    communitiesModelList.add(communitiesModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchTopicList db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return communitiesModelList;
     }
 
 

@@ -50,12 +50,14 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -393,15 +395,20 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        Intent intentSocial = new Intent(this, SocialWebLoginsActivity.class);
         switch (view.getId()) {
             case R.id.btn_contextmenu:
 //                View v = discussionFourmlistView.getChildAt(i - discussionFourmlistView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) view.findViewById(R.id.btn_contextmenu);
                 catalogContextMenuMethod(i, view, txtBtnDownload, discussionCommentsModelList.get(i));
                 break;
+            case R.id.btn_attachment:
+//                Toast.makeText(context, "attachment" + discussionCommentsModelList.get(i).attachment, Toast.LENGTH_SHORT).show();
+                intentSocial.putExtra("ATTACHMENT", true);
+                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, discussionCommentsModelList.get(i).attachment);
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, discussionTopicModel.displayName);//9963014569
+                startActivity(intentSocial);
             default:
-
         }
     }
 

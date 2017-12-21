@@ -21,10 +21,12 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.CommunitiesModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,7 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<DiscussionForumModel> discussionForumModelList = null;
+    private List<CommunitiesModel> communitiesModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -51,14 +53,14 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = LearningCommunitiesAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<DiscussionForumModel> searchList;
+    private List<CommunitiesModel> searchList;
     AppController appcontroller;
 
 
-    public LearningCommunitiesAdapter(Activity activity, int resource, List<DiscussionForumModel> discussionForumModelList) {
+    public LearningCommunitiesAdapter(Activity activity, int resource, List<CommunitiesModel> communitiesModelList) {
         this.activity = activity;
-        this.discussionForumModelList = discussionForumModelList;
-        this.searchList = new ArrayList<DiscussionForumModel>();
+        this.communitiesModelList = communitiesModelList;
+        this.searchList = new ArrayList<CommunitiesModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -77,21 +79,21 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<DiscussionForumModel> myLearningModel) {
-        this.discussionForumModelList = myLearningModel;
-        this.searchList = new ArrayList<DiscussionForumModel>();
+    public void refreshList(List<CommunitiesModel> myLearningModel) {
+        this.communitiesModelList = myLearningModel;
+        this.searchList = new ArrayList<CommunitiesModel>();
         this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return discussionForumModelList != null ? discussionForumModelList.size() : 0;
+        return communitiesModelList != null ? communitiesModelList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return discussionForumModelList.get(position);
+        return communitiesModelList.get(position);
     }
 
     @Override
@@ -106,35 +108,36 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         ViewHolder holder;
 
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.discussionfourmcell, null);
+        convertView = inflater.inflate(R.layout.learningcommunitycell, null);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtName.setText(discussionForumModelList.get(position).name);
-        holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
-        holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
-        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
+        holder.txtCmtyName.setText(communitiesModelList.get(position).name);
+        holder.txtShortDisc.setText(communitiesModelList.get(position).communitydescription);
 
-        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
-        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
 
-        holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCmtyName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtIsMember.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
-        if (discussionForumModelList.get(position).descriptionValue.isEmpty()) {
+        if (communitiesModelList.get(position).labelalreadyamember.equalsIgnoreCase("null") || communitiesModelList.get(position).labelalreadyamember.equalsIgnoreCase("")) {
+            holder.txtIsMember.setText("Pending Request");
+
+        } else {
+
+            holder.txtIsMember.setText(communitiesModelList.get(position).labelalreadyamember);
+        }
+
+        if (communitiesModelList.get(position).communitydescription.isEmpty()) {
             holder.txtShortDisc.setVisibility(View.GONE);
         } else {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-//            String imgUrl = discussionTopicModels.get(position).imagedata;
-//            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+        String imgUrl = communitiesModelList.get(position).imagepath;
+        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
 
         return convertView;
@@ -142,13 +145,13 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        discussionForumModelList.clear();
+        communitiesModelList.clear();
         if (charText.length() == 0) {
-            discussionForumModelList.addAll(searchList);
+            communitiesModelList.addAll(searchList);
         } else {
-            for (DiscussionForumModel s : searchList) {
-                if (s.name.toLowerCase(Locale.getDefault()).contains(charText) || s.author.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    discussionForumModelList.add(s);
+            for (CommunitiesModel s : searchList) {
+                if (s.name.toLowerCase(Locale.getDefault()).contains(charText) || s.communitydescription.toLowerCase(Locale.getDefault()).contains(charText)) {
+                    communitiesModelList.add(s);
                 }
             }
         }
@@ -166,8 +169,8 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         }
 
         @Nullable
-        @BindView(R.id.txt_name)
-        TextView txtName;
+        @BindView(R.id.txt_comminity_name)
+        TextView txtCmtyName;
 
         @Nullable
         @BindView(R.id.card_view)
@@ -182,24 +185,13 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         ImageView imgThumb;
 
         @Nullable
-        @BindView(R.id.txtLastUpdate)
-        TextView txtLastUpdate;
-
-        @Nullable
-        @BindView(R.id.txt_author)
-        TextView txtAuthor;
-
-        @Nullable
-        @BindView(R.id.txttopics)
-        TextView txtTopicsCount;
-
-        @Nullable
         @BindView(R.id.btn_contextmenu)
         ImageButton btnContextMenu;
 
         @Nullable
-        @BindView(R.id.txtcomments)
-        TextView txtCommentsCount;
+        @BindView(R.id.txt_ismember)
+        TextView txtIsMember;
+
 
         @OnClick({R.id.btn_contextmenu, R.id.card_view})
         public void actionsForMenu(View view) {

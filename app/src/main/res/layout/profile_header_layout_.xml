@@ -12,7 +12,7 @@
         android:layout_height="200dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/user_placeholder"
-        app:civ_border_color="@color/colorPrimaryDark"
+        app:civ_border_color="@color/colorWhite"
         app:civ_border_width="2dp" />
 
     <LinearLayout
@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
+            android:textSize="16sp"
             android:textColor="@color/colorWhite"
             android:textStyle="bold" />
 
@@ -36,12 +37,14 @@
             android:layout_height="3dp" />
 
         <TextView
+            android:textSize="14sp"
+
             android:id="@+id/userlocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="@color/colorWhite"
-            android:textStyle="bold" />
+            android:textStyle="normal" />
 
     </LinearLayout>
 

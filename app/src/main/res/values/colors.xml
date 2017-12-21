@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#8dc73f</color>
+    <color name="colorPrimary">#5db100</color>
     <!--<color name="colorPrimary">#BBA284</color>-->
     <color name="colorPrimaryDark">#36454f</color>
     <color name="colorAccent">#FF4081</color>
@@ -21,10 +21,10 @@
     <color name="colorRating">#FFC000</color>
     <color name="colorDarkGrey">#757575</color>
     <!--Green Background-->
-    <!--<color name="colorDefaultBackGround">#5DB100</color>-->
+    <color name="colorDefaultBackGround">#5DB100</color>
 
     <!--White Background-->
-    <color name="colorDefaultBackGround">#ffff</color>
+    <!--<color name="colorDefaultBackGround">#ffff</color>-->
 
     <!--Instancy Market Background-->
     <!--<color name="colorDefaultBackGround">#4d4d4d</color>-->

@@ -44,6 +44,7 @@ import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
 import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
@@ -378,7 +379,7 @@ public class SideMenu extends AppCompatActivity {
                 fragment = new DiscussionFourm_fragment();
                 break;
             case 9:
-                fragment = new DiscussionFourm_fragment();
+                fragment = new LearningCommunities_fragment();
                 break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");

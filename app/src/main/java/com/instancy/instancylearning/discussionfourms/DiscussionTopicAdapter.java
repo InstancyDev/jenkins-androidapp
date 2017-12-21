@@ -3,6 +3,7 @@ package com.instancy.instancylearning.discussionfourms;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -20,6 +21,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
@@ -200,6 +202,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.txtcomments)
         TextView txtCommentsCount;
+
 
         @OnClick({R.id.btn_contextmenu, R.id.card_view})
         public void actionsForMenu(View view) {

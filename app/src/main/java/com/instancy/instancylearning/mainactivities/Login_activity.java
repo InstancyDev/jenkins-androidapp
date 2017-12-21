@@ -186,7 +186,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
-        btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+//        btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
 
 //       uncomment for backgroundcolor purpose
@@ -307,6 +307,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     public void methodCallByTag(int tag) {
 
         Intent intentSocial = new Intent(this, SocialWebLoginsActivity.class);
+        intentSocial.putExtra("ATTACHMENT", true);
 
         switch (tag) {
 

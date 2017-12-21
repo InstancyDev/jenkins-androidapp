@@ -11,7 +11,7 @@
     android:layout_marginTop="3dp"
     app:cardCornerRadius="3dp"
     app:cardElevation="4dp"
-    app:contentPadding="5dp">
+    app:contentPadding="4dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
                     android:gravity="left"
                     android:maxLines="2"
                     android:padding="2dp"
-                    android:text="e Learning course course"
+                    android:text="e Learning course course e Learning course course e Learning course course e Learning course course"
                     android:textColor="@color/colorGray"
                     android:textSize="12sp" />
 
@@ -100,7 +100,7 @@
                     android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:gravity="left"
-                    android:maxLines="2"
+                    android:maxLines="1"
                     android:padding="2dp"
                     android:text="Last update:"
                     android:textColor="@color/colorGray"
@@ -111,8 +111,8 @@
 
             <RelativeLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight=".4"
+                android:layout_height="75dp"
+                android:layout_weight=".5"
                 android:padding="4dp">
 
                 <ImageButton
@@ -124,6 +124,20 @@
                     android:layout_gravity="center"
                     android:background="@drawable/ic_more_vert_black_24dp" />
 
+                <TextView
+                    android:id="@+id/btn_attachment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="2dp"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:text="@string/fa_icon_paperclip"
+                    android:textColor="@color/text_color"
+                    android:textSize="24sp"
+                    android:visibility="invisible" />
+
             </RelativeLayout>
         </LinearLayout>
 
@@ -132,24 +146,24 @@
             android:layout_width="match_parent"
             android:layout_height=".05dp"
             android:layout_below="@+id/linearlayout"
-            android:layout_marginTop="3dp"
-            android:background="@color/colorBlack"></View>
+            android:layout_marginTop="1dp"
+            android:background="@color/colorDarkGrey"></View>
 
         <RelativeLayout
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/lineview"
             android:orientation="horizontal">
 
-
             <TextView
                 android:id="@+id/txttopics"
                 android:layout_width="100dp"
-                android:layout_height="45dp"
+                android:layout_height="35dp"
                 android:layout_alignParentStart="true"
                 android:gravity="center"
                 android:padding="2dp"
-                android:text="15 Topic(s)"
+                android:text="0 Topic(s)"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
                 android:textSize="12sp" />
@@ -157,11 +171,11 @@
             <TextView
                 android:id="@+id/txtcomments"
                 android:layout_width="100dp"
-                android:layout_height="45dp"
+                android:layout_height="35dp"
                 android:layout_alignParentEnd="true"
                 android:gravity="center"
                 android:padding="2dp"
-                android:text="1 Comment(s)"
+                android:text="0 Comment(s)"
                 android:textAlignment="center"
                 android:textColor="@color/colorBlack"
                 android:textSize="12sp" />

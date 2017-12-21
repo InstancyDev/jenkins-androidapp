@@ -113,7 +113,7 @@
         android:background="@color/colorGray"
         android:padding="3dp"
         android:scaleType="centerInside"
-        android:src="@drawable/croplife_logo"
+        android:src="@drawable/playground"
         android:visibility="visible" />
 
 </LinearLayout>

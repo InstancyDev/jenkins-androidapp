@@ -15,7 +15,7 @@
         android:id="@+id/profile_thumbs"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        app:civ_border_color="@color/colorPrimaryDark"
+        app:civ_border_color="@color/colorWhite"
         app:civ_border_width="2dp" />
 
     <LinearLayout
@@ -32,6 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="4dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
             android:text="Android Studio"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 

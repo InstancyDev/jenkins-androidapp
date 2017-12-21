@@ -14,7 +14,7 @@
         android:text="@string/fa_icon_calculator"
         android:textColor="@color/colorDarkGrey"
         android:textAlignment="center"
-        android:textSize="20sp" />
+        android:textSize="22sp" />
 
     <TextView
         android:id="@+id/menuText"
@@ -25,9 +25,10 @@
         android:gravity="center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:text="Menu Item"
+        android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/colorBlack"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
 
 
 

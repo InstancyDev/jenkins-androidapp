@@ -3,6 +3,7 @@ package com.instancy.instancylearning.discussionfourms;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -20,6 +21,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -116,6 +118,13 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.txtShortDisc.setText(discussionCommentsModels.get(position).message);
         holder.txtShortDisc.setMaxLines(200);
 
+        if (discussionCommentsModels.get(position).attachment.length() == 0) {
+            holder.txtCommentsAttachment.setVisibility(View.INVISIBLE);
+        }
+        else {
+            holder.txtCommentsAttachment.setVisibility(View.VISIBLE);
+        }
+
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -130,7 +139,6 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.txtAuthor.setVisibility(View.GONE);
         holder.view.setVisibility(View.INVISIBLE);
         convertView.setTag(holder);
-
         return convertView;
     }
 
@@ -156,7 +164,8 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
-
+            Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
+            FontManager.markAsIconContainer(view.findViewById(R.id.btn_attachment), iconFont);
         }
 
         @Nullable
@@ -196,10 +205,15 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         TextView txtCommentsCount;
 
         @Nullable
+        @BindView(R.id.btn_attachment)
+        TextView txtCommentsAttachment;
+
+        @Nullable
         @BindView(R.id.lineview)
         View view;
 
-        @OnClick({R.id.btn_contextmenu, R.id.card_view})
+
+        @OnClick({R.id.btn_contextmenu, R.id.card_view,R.id.btn_attachment})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

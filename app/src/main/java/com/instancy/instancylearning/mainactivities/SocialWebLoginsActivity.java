@@ -51,15 +51,22 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
 
         Bundle bundle = getIntent().getExtras();
-        String actionBaritle="Login";
+        String actionBaritle = "Login";
+        boolean isFromAttachment = false;
         if (bundle != null) {
+            isFromAttachment=bundle.getBoolean("ATTACHMENT",false);
+            if (isFromAttachment) {
+                url = bundle.getString(StaticValues.KEY_SOCIALLOGIN);
+            } else {
+                url = appUserModel.getSiteURL().concat(bundle.getString(StaticValues.KEY_SOCIALLOGIN));
+            }
 
-            url = appUserModel.getSiteURL().concat(bundle.getString(StaticValues.KEY_SOCIALLOGIN));
-            actionBaritle=bundle.getString(StaticValues.KEY_ACTIONBARTITLE);
+            actionBaritle = bundle.getString(StaticValues.KEY_ACTIONBARTITLE);
+
         }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>"+actionBaritle+"</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + actionBaritle + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -179,7 +186,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
 
-                    svProgressHUD.dismiss();
+                svProgressHUD.dismiss();
             }
 
             @Override

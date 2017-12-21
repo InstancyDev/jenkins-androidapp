@@ -41,6 +41,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -56,6 +57,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.CommunitiesModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
@@ -94,12 +96,8 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
-    @BindView(R.id.swipemylearning)
-    SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.discussionfourmlist)
-    ListView discussionFourmlistView;
     LearningCommunitiesAdapter learningCommunitiesAdapter;
-    List<DiscussionForumModel> discussionForumModelList = null;
+    List<CommunitiesModel> communitiesModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -110,9 +108,14 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
-    @Nullable
-    @BindView(R.id.fab_fourm_button)
-    FloatingActionButton floatingActionButton;
+    @BindView(R.id.swipemylearning)
+    SwipeRefreshLayout swipeRefreshLayout;
+
+    @BindView(R.id.mylearninglistview)
+    ListView discussionFourmlistView;
+
+    @BindView(R.id.nodata_label)
+    TextView nodataLable;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -155,7 +158,17 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+        if (sideMenusModel.getRepositoryId().length() < 1) {
+            sideMenusModel.setRepositoryId("4026");
+        }
+
+        if (sideMenusModel.getComponentId().length() < 1) {
+            sideMenusModel.setComponentId("189");
+        }
+
+        String apiURL = appUserModel.getWebAPIUrl() + "/Mobilelms/GetPortalListing?siteid=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Locale=en-us&compid=" + sideMenusModel.getComponentId() + "&CompInsID=" + sideMenusModel.getRepositoryId();
+
+        vollyService.getJsonObjResponseVolley("COMMSLIST", apiURL, appUserModel.getAuthHeaders());
 
     }
 
@@ -166,16 +179,17 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("FOURMSLIST")) {
+                if (requestType.equalsIgnoreCase("COMMSLIST")) {
                     if (response != null) {
                         try {
-                            db.injectDiscussionFourmList(response);
+                            db.injectCommunitiesListing(response);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
+                        nodataLable.setText(getResources().getString(R.string.no_data));
                     }
                 }
 
@@ -188,6 +202,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
+                nodataLable.setText(getResources().getString(R.string.no_data));
                 svProgressHUD.dismiss();
             }
 
@@ -216,17 +231,17 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.discussionfourm_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_mylearning, container, false);
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        learningCommunitiesAdapter = new LearningCommunitiesAdapter(getActivity(), BIND_ABOVE_CLIENT, discussionForumModelList);
+        learningCommunitiesAdapter = new LearningCommunitiesAdapter(getActivity(), BIND_ABOVE_CLIENT, communitiesModelList);
         discussionFourmlistView.setAdapter(learningCommunitiesAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
         discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        discussionForumModelList = new ArrayList<DiscussionForumModel>();
+        communitiesModelList = new ArrayList<CommunitiesModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
@@ -240,29 +255,17 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
 
-        floatingActionButton.setImageDrawable(d);
-
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                intentDetail.putExtra("isfromedit", false);
-                intentDetail.putExtra("forumModel", "");
-                startActivity(intentDetail);
-            }
-        });
-
         return rootView;
     }
 
 
     public void injectFromDbtoModel() {
-        discussionForumModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
-        if (discussionForumModelList != null) {
-            learningCommunitiesAdapter.refreshList(discussionForumModelList);
+        communitiesModelList = db.fetchCommunitiesList(appUserModel);
+        if (communitiesModelList != null) {
+            learningCommunitiesAdapter.refreshList(communitiesModelList);
         } else {
-            discussionForumModelList = new ArrayList<DiscussionForumModel>();
-            learningCommunitiesAdapter.refreshList(discussionForumModelList);
+            communitiesModelList = new ArrayList<CommunitiesModel>();
+            learningCommunitiesAdapter.refreshList(communitiesModelList);
         }
 
     }
@@ -349,24 +352,16 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         switch (item.getItemId()) {
 
             case R.id.mylearning_search:
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
                 item_search.expandActionView();
                 break;
-            case R.id.mylearning_info_help:
-
-                break;
-            case R.id.mylearning_filter:
-                break;
-
         }
 
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onRefresh() {
@@ -385,12 +380,12 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
         switch (view.getId()) {
             case R.id.card_view:
-                attachFragment(discussionForumModelList.get(position));
+                attachFragment(communitiesModelList.get(position));
                 break;
             case R.id.btn_contextmenu:
                 View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, discussionForumModelList.get(position));
+                catalogContextMenuMethod(position, view, txtBtnDownload, communitiesModelList.get(position));
                 break;
             default:
 
@@ -442,25 +437,35 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, DiscussionForumModel discussionForumModel) {
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, CommunitiesModel communitiesModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.discussonforum, popup.getMenu());
+        popup.getMenuInflater().inflate(R.menu.communitiesmenu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
 
-        menu.getItem(0).setVisible(true);//view
+        if (communitiesModel.actiongoto == 1) {
+            menu.getItem(0).setVisible(true);
+            menu.getItem(1).setVisible(false);
+        } else {
+            menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(true);
+
+        }
+
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
-                    Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                    intentDetail.putExtra("isfromedit", true);
-                    intentDetail.putExtra("forumModel", discussionForumModelList.get(position));
-                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+                if (item.getTitle().toString().equalsIgnoreCase("Go to Community")) {
+
+
+                }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Join Community")) {
+
 
                 }
                 return true;
@@ -475,21 +480,11 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
-
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
-                if (refresh) {
-                    refreshCatalog(false);
-                }
-            }
-        }
     }
 
-    public void attachFragment(DiscussionForumModel forumModel) {
-        Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
-        intentDetail.putExtra("forumModel", forumModel);
-        ((Activity) context).startActivity(intentDetail);
+    public void attachFragment(CommunitiesModel forumModel) {
+
+
     }
 
     @Override
