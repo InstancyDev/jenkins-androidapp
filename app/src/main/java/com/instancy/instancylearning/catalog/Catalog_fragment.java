@@ -12,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -59,8 +60,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
@@ -80,6 +84,9 @@ import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.thin.downloadmanager.DownloadRequest;
+import com.thin.downloadmanager.DownloadStatusListenerV1;
+import com.thin.downloadmanager.ThinDownloadManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -138,6 +145,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
     boolean isFromCatogories = false;
+    WebAPIClient webAPIClient;
 
     CustomFlowLayout category_breadcrumb = null;
 
@@ -200,6 +208,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        webAPIClient = new WebAPIClient(context);
+
         sideMenusModel = null;
         HashMap<String, String> responMap = null;
         Bundle bundle = getArguments();
@@ -562,6 +572,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
             case R.id.btntxt_download:
                 if (isNetworkConnectionAvailable(context, -1)) {
+                    downloadTheCourse(catalogModelsList.get(position), view, position);
                 } else {
                     showToast(context, "No Internet");
                 }
@@ -643,14 +654,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
-
+            menu.getItem(3).setVisible(false);
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
                 File myFile = new File(myLearningDetalData.getOfflinepath());
 
                 if (myFile.exists()) {
 
-                    menu.getItem(4).setVisible(true);
+                    menu.getItem(4).setVisible(false);
 
                 } else {
 
@@ -1431,5 +1442,253 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         breadcrumbItemsList = breadcrumbItemsList.subList(0, categoryLevel + 1);
     }
 
+    public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
 
+        boolean isZipFile = false;
+
+        final String[] downloadSourcePath = {null};
+
+
+        switch (learningModel.getObjecttypeId()) {
+            case "52":
+                downloadSourcePath[0] = learningModel.getSiteURL() + "/content/sitefiles/"
+                        + learningModel.getSiteID() + "/usercertificates/" + learningModel.getSiteID() + "/"
+                        + learningModel.getContentID() + ".pdf";
+                isZipFile = false;
+                break;
+            case "11":
+            case "14":
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
+                        + learningModel.getContentID() + "/" + learningModel.getStartPage();
+                isZipFile = false;
+                break;
+            case "8":
+            case "9":
+            case "10":
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
+                        + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                isZipFile = true;
+                break;
+            default:
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
+                        + learningModel.getContentID() + "/" + learningModel.getContentID()
+                        + ".zip";
+                isZipFile = true;
+                break;
+        }
+
+        final boolean finalisZipFile = isZipFile;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int statusCode = 0;
+                //code to do the HTTP request
+                if (finalisZipFile) {
+
+                    statusCode = webAPIClient.checkFileFoundOrNot(downloadSourcePath[0], appUserModel.getAuthHeaders());
+
+                    if (statusCode != 200) {
+                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/downloadfiles/"
+                                + learningModel.getContentID() + ".zip";
+                        downloadThin(downloadSourcePath[0], view, learningModel, position);
+
+                    } else {
+                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
+                                + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                        downloadThin(downloadSourcePath[0], view, learningModel, position);
+
+                    }
+                } else {
+
+                    downloadThin(downloadSourcePath[0], view, learningModel, position);
+                }
+//                int statusCode = vollyService.checkResponseCode(downloadSourcePath[0]);
+
+            }
+        });
+        thread.start();
+
+    }
+
+    public void downloadThin(String downloadStruri, View view, final MyLearningModel learningModel, final int position) {
+
+        downloadStruri = downloadStruri.replace(" ", "%20");
+        ThinDownloadManager downloadManager = new ThinDownloadManager();
+        Uri downloadUri = Uri.parse(downloadStruri);
+        String extensionStr = "";
+        switch (learningModel.getObjecttypeId()) {
+            case "52":
+            case "11":
+            case "14":
+
+                String[] startPage = null;
+                if (learningModel.getStartPage().contains("/")) {
+                    startPage = learningModel.getStartPage().split("/");
+                    extensionStr = startPage[1];
+                } else {
+                    extensionStr = learningModel.getStartPage();
+                }
+                break;
+            case "8":
+            case "9":
+            case "10":
+                extensionStr = learningModel.getContentID() + ".zip";
+                break;
+            default:
+                extensionStr = learningModel.getContentID() + ".zip";
+                break;
+        }
+
+        String localizationFolder = "";
+        String[] startPage = null;
+        if (learningModel.getStartPage().contains("/")) {
+            startPage = learningModel.getStartPage().split("/");
+            localizationFolder = "/" + startPage[0];
+        } else {
+            localizationFolder = "";
+        }
+        String downloadDestFolderPath = "";
+        if (extensionStr.contains(".zip")) {
+
+            downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+
+        } else {
+            downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+        }
+
+        boolean success = (new File(downloadDestFolderPath)).mkdirs();
+        final String finalDownloadedFilePath = downloadDestFolderPath + "/" + extensionStr;
+        final Uri destinationUri = Uri.parse(finalDownloadedFilePath);
+        final String finalDownloadDestFolderPath = downloadDestFolderPath;
+        Log.d(TAG, "downloadThin: " + downloadUri);
+        DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+                .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
+                .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH)
+                .setStatusListener(new DownloadStatusListenerV1() {
+                    @Override
+                    public void onDownloadComplete(DownloadRequest downloadRequest) {
+                        Log.d(TAG, "onDownloadComplete: ");
+
+                        if (finalDownloadedFilePath.contains(".zip")) {
+                            String zipFile = finalDownloadedFilePath;
+                            String unzipLocation = finalDownloadDestFolderPath;
+                            UnZip d = new UnZip(zipFile,
+                                    unzipLocation);
+                            File zipfile = new File(zipFile);
+                            zipfile.delete();
+                        }
+                        catalogAdapter.notifyDataSetChanged();
+
+                        if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                                callMobileGetContentTrackedData(learningModel);
+                                callMobileGetMobileContentMetaData(learningModel);
+                            } else {
+                                callMobileGetMobileContentMetaData(learningModel);
+
+                            }
+
+                        } else {
+                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                                callMobileGetContentTrackedData(learningModel);
+
+                            }
+
+                        }
+
+
+                        // write jw content method download
+
+
+                    }
+
+                    @Override
+                    public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
+                        Log.d(TAG, "onDownloadFailed: " + +errorCode);
+                    }
+
+                    @Override
+                    public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
+//                        Log.d(TAG, "onProgress: " + progress);
+                        View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
+                        if (v != null) {
+                            updateStatus(position, progress);
+                        }
+                    }
+
+                });
+        int downloadId = downloadManager.add(downloadRequest);
+    }
+
+    public void callMobileGetContentTrackedData(MyLearningModel learningModel) {
+        String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
+
+        vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
+
+    }
+
+    public void callMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
+
+        String paramsString = "SiteURL=" + learningModel.getSiteURL()
+                + "&ContentID=" + learningModel.getContentID()
+                + "&userid=" + learningModel.getUserID()
+                + "&DelivoryMode=" + "1";
+
+        String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, metaDataUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                if (response != null) {
+                    try {
+                        db.insertTrackObjects(response, learningModel);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjReq);
+
+    }
+
+    private void updateStatus(int index, int Status) {
+        // Update ProgressBar
+        // Update Text to ColStatus
+        View v = myLearninglistView.getChildAt(index - myLearninglistView.getFirstVisiblePosition());
+        TextView txtBtnDownload = (TextView) v.findViewById(R.id.btntxt_download);
+        CircleProgressBar circleProgressBar = (CircleProgressBar) v.findViewById(R.id.circle_progress);
+        circleProgressBar.setVisibility(View.VISIBLE);
+        txtBtnDownload.setVisibility(View.GONE);
+        circleProgressBar.setProgress(Status);
+        // Enabled Button View
+        if (Status >= 100) {
+            if (isAdded()) {
+                txtBtnDownload.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
+                txtBtnDownload.setVisibility(View.VISIBLE);
+                circleProgressBar.setVisibility(View.GONE);
+                txtBtnDownload.setEnabled(false);
+
+            }
+        }
+    }
 }

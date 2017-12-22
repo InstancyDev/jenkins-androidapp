@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -437,10 +438,15 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
+
+//            searchView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
+
+
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

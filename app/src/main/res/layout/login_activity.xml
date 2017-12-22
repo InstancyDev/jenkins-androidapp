@@ -4,6 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/colorDefaultBackGround">
+
     <TextView
         android:id="@+id/id_settings_txt"
         android:layout_width="40dp"
@@ -23,7 +24,8 @@
         android:id="@+id/scroll1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/id_settings_txt">
+        android:layout_below="@+id/id_settings_txt"
+        android:layout_marginTop="10dp">
 
         <RelativeLayout
             android:id="@+id/llLogin"
@@ -41,7 +43,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/playground" />
+                android:src="@drawable/cvctabanner" />
             <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout
@@ -151,16 +153,16 @@
                 android:textSize="16sp" />
 
             <!--<Button-->
-                <!--android:id="@+id/btnewuser"-->
-                <!--android:layout_width="300dp"-->
-                <!--android:layout_height="45dp"-->
-                <!--android:layout_below="@+id/id_loginbtn"-->
-                <!--android:background="@color/colorDefault"-->
-                <!--android:gravity="center"-->
-                <!--android:text="Subscribe Now"-->
-                <!--android:textAllCaps="false"-->
-                <!--android:textColor="@color/colorWhite"-->
-                <!--android:textSize="16sp" />-->
+            <!--android:id="@+id/btnewuser"-->
+            <!--android:layout_width="300dp"-->
+            <!--android:layout_height="45dp"-->
+            <!--android:layout_below="@+id/id_loginbtn"-->
+            <!--android:background="@color/colorDefault"-->
+            <!--android:gravity="center"-->
+            <!--android:text="Subscribe Now"-->
+            <!--android:textAllCaps="false"-->
+            <!--android:textColor="@color/colorWhite"-->
+            <!--android:textSize="16sp" />-->
 
 
             <LinearLayout
@@ -188,18 +190,18 @@
 
 
                 <Button
-                android:id="@+id/btnewuser"
-                android:layout_width="100dp"
-                android:layout_height="20dp"
-                android:layout_gravity="end"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:gravity="center"
-                android:text="@string/btn_txt_signup"
-                android:textAlignment="textEnd"
-                android:textAllCaps="false"
-                android:textColor="@color/colorWhite"
-                android:textSize="15sp" />
+                    android:id="@+id/btnewuser"
+                    android:layout_width="100dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="end"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="center"
+                    android:text="@string/btn_txt_signup"
+                    android:textAlignment="textEnd"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="15sp" />
 
             </LinearLayout>
 

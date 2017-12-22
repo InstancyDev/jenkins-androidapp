@@ -98,12 +98,12 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, final ViewGroup parent) {
         View pView = convertView;
-        if (pView == null) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            pView = inflater.inflate(R.layout.profilesectionview, parent, false);
-            View view = (View) pView.findViewById(R.id.topview);
-        }
+//        if (pView == null) {
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        pView = inflater.inflate(R.layout.profilesectionview, parent, false);
+        View view = (View) pView.findViewById(R.id.topview);
+//        }
         ImageView moreOptions = (ImageView) pView.findViewById(R.id.moreoptionsicon);
         moreOptions.setOnClickListener(new View.OnClickListener() {
             @Override

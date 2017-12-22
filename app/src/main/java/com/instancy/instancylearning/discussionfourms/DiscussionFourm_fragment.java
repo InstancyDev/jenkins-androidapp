@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -245,6 +246,9 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
 
         floatingActionButton.setImageDrawable(d);
+
+//        floatingActionButton.(getResources().getColor(R.color.colorWhite));
+        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override

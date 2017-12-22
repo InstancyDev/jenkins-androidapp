@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -128,6 +129,10 @@ public class AddNewCommentActivity extends AppCompatActivity {
     @BindView(R.id.edit_attachment)
     EditText editAttachment;
 
+    @Nullable
+    @BindView(R.id.bottomlayout)
+    LinearLayout bottomLayout;
+
     private int GALLERY = 1;
 
     Bitmap bitmapAttachment = null;
@@ -202,6 +207,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         labelTitle.setVisibility(View.GONE);
         editTitle.setVisibility(View.GONE);
+
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
     }
 
     void initVolleyCallback() {

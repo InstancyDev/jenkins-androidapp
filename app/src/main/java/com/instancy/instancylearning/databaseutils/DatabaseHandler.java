@@ -1422,9 +1422,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("contextmenuid"));
                     //
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7") || contextMenuID.equalsIgnoreCase("6")))
-                        continue;
+//                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -1570,8 +1570,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("parentmenuid")));
                     menu.setParameterStrings(cursor.getString(cursor
                             .getColumnIndex("parameterstrings")));
+                    if (!menu.getContextMenuId().equalsIgnoreCase("5")){
+                        menuList.add(menu);
+                    }
 
-                    menuList.add(menu);
+//                    menuList.add(menu);
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -10876,6 +10879,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
 
+
         return myLearningModelList;
     }
 
@@ -10930,7 +10934,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     menu.setIsSubMenuExists(cursor.getInt(cursor
                             .getColumnIndex("issubmenuexists")));
 
-                    menuList.add(menu);
+                        menuList.add(menu);
+
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -11821,8 +11826,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonMyLearningColumnObj.has("labelpendingrequest")) {
 
                 communitiesModel.labelpendingrequest = jsonMyLearningColumnObj.get("labelpendingrequest").toString();
-                if (null == communitiesModel.labelpendingrequest){
-                    communitiesModel.labelpendingrequest="";
+                if (null == communitiesModel.labelpendingrequest) {
+                    communitiesModel.labelpendingrequest = "";
                 }
 
             }

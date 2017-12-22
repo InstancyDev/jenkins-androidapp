@@ -181,7 +181,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         switch (mainMenu.getContextMenuId()) {
 
             case "1":
-                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_graduation_cap));
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_leanpub));
                 break;
             case "2":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_book));
@@ -191,6 +191,9 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 break;
             case "4":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_comments));
+                break;
+            case "5":
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_question_circle));
                 break;
             case "6":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_home));
@@ -247,6 +250,44 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         TextView iconFont = (TextView) cView.findViewById(R.id.fontawasomesubIcon);
         FontManager.markAsIconContainer(cView.findViewById(R.id.fontawasomesubIcon), iconFon);
         iconFont.setText(cView.getResources().getString(R.string.fa_icon_home));
+
+        switch (childMenu.getContextMenuId()) {
+
+            case "1":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_leanpub));
+                break;
+            case "2":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_book));
+                break;
+            case "3":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_user));
+                break;
+            case "4":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_comments));
+                break;
+            case "5":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_question_circle));
+                break;
+            case "6":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_home));
+                break;
+            case "7":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_firefox));
+                break;
+            case "8":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_calendar));
+                break;
+            case "9":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_users));
+                break;
+            case "9999":
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_sign_out));
+                break;
+            default:
+                iconFont.setText(cView.getResources().getString(R.string.fa_icon_align_left));
+                break;
+        }
+
         txtTitle.setText(childMenu.getDisplayName());
         if (MAIN_MENU_POSITION == -1) {
             for (int i = 0; i < mainMenuList.size() - 1; i++) {

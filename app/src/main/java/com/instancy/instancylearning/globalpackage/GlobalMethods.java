@@ -956,7 +956,7 @@ public class GlobalMethods {
     }
 
 
-    public static  Bitmap createBitmapFromView(Context context, View view) {
+    public static Bitmap createBitmapFromView(Context context, View view) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -980,8 +980,6 @@ public class GlobalMethods {
 
         return encImage;
     }
-
-
 
 
 //    public static void catalogContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {

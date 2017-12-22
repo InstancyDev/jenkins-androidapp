@@ -8,11 +8,10 @@
     android:layout_height="wrap_content"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
-    android:layout_marginLeft="3dp"
-    android:layout_marginRight="3dp"
+
     app:cardCornerRadius="5dp"
     app:cardElevation="5dp"
-    app:contentPadding="4dp">
+    app:contentPadding="0dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -25,7 +24,6 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:padding="2dp"
             android:src="@drawable/cellimage" />
 
         <LinearLayout

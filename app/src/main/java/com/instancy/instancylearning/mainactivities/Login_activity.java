@@ -540,7 +540,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void hideOrShowBtns() {
-//        settingTxt.setVisibility(View.INVISIBLE);
+        settingTxt.setVisibility(View.INVISIBLE);
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);

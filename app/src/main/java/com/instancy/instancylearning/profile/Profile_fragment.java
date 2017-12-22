@@ -513,7 +513,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-                showPictureDialog();
+//                showPictureDialog();
                 break;
         }
     }

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -70,7 +71,6 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
     DatabaseHandler db;
     private RecyclerViewClickListener clicklistener;
 
-
     @BindView(R.id.catalog_recycler)
     RecyclerView recyclerView;
 
@@ -89,6 +89,10 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
 
     HomeButtonAdapter mAdapter;
 
+    @Nullable
+    @BindView(R.id.swipemylearning)
+    SwipeRefreshLayout swipeRefreshLayout;
+
     protected List<SideMenusModel> homeMenuList = null;
 
     @Override
@@ -104,13 +108,14 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
         preferencesManager = PreferencesManager.getInstance();
 
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
-//        synchData = new SynchData(context);
         if (isViewed.equalsIgnoreCase("true")) {
             appcontroller.setAlreadyViewd(true);
         } else {
 
             appcontroller.setAlreadyViewd(false);
         }
+
+
         vollyService = new VollyService(resultCallback, context);
         List<CatalogCategoryButtonModel> categoryButtonModelList;
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
@@ -173,6 +178,7 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
             rootView = inflater.inflate(R.layout.cataloggrid_fragment, container, false);
             ButterKnife.bind(this, rootView);
             createRecyclerView(rootView);
+            swipeRefreshLayout.setEnabled(false);
             initilizeView();
 
         }
@@ -200,7 +206,6 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
 
     public void createRecyclerView(View rootView) {
 
-//        refreshCatalog(false);
 
         LinearLayout llCatalogGridCatageory = (LinearLayout) rootView.findViewById(R.id.llCatalogGridCatageory);
 
@@ -249,7 +254,6 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
                     ((SideMenu) getActivity()).selectItem(Integer.parseInt(indexed), homeMenuList.get(position));
                 }
 
-
             }
         }));
     }
@@ -276,7 +280,6 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
         Log.d(TAG, "breadCrumbStatus: in HomeFragment " + dicBreadcrumbItems);
 
     }
-
 
     // for recycler view listners
 

@@ -33,8 +33,8 @@
     <!--<string name="app_default_url">http://lonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://cvcta.instancy.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://cvctaapi.instancy.com/api/</string>-->
+    <string name="app_default_url">http://cvcta.instancy.com/</string>
+    <string name="app_default_webapi_url">http://cvctaapi.instancy.com/api/</string>
 
     <!--<string name="app_default_url">http://mobileup.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://mobiwebapi.instancy.net/api/</string>-->
@@ -53,8 +53,8 @@
     <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
 
     <!--fo enterprise lite app -->
-    <string name="app_default_url">http://enterprisedemo.instancy.com/</string>
-    <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>
+    <!--<string name="app_default_url">http://enterprisedemo.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
     <!-- SCROM testing qalearning -->
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->

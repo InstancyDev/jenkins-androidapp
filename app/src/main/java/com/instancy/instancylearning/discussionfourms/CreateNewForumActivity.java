@@ -2,10 +2,12 @@ package com.instancy.instancylearning.discussionfourms;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -24,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -134,6 +137,10 @@ public class CreateNewForumActivity extends AppCompatActivity {
     @Nullable
     @BindView(R.id.switchemailnotifications)
     Switch switchEmail;
+
+    @Nullable
+    @BindView(R.id.bottomlayout)
+    LinearLayout bottomLayout;
 
     boolean allowNotification = true, allowNewTopic = true, allowAttachFile = true, isUpdateForum = false;
 
@@ -254,7 +261,17 @@ public class CreateNewForumActivity extends AppCompatActivity {
             }
         });
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            switchNewTopics.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            switchEmail.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            switchAttachFiles.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            switchEmail.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            switchAttachFiles.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            switchNewTopics.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+        }
 
+
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
     }
 
     void initVolleyCallback() {

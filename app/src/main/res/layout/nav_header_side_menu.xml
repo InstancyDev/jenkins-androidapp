@@ -19,6 +19,7 @@
         app:civ_border_width="2dp" />
 
     <LinearLayout
+        android:id="@+id/profilelinear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"

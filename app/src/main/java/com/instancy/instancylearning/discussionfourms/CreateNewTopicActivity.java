@@ -34,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -141,6 +142,10 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     @BindView(R.id.edit_attachment)
     EditText editAttachment;
 
+    @Nullable
+    @BindView(R.id.bottomlayout)
+    LinearLayout bottomLayout;
+
     boolean isUpdateForum = false;
 
     @Override
@@ -231,6 +236,10 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelDescritpion.setText(styledDescription);
+
+        assert bottomLayout != null;
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
     }
 
     void initVolleyCallback() {
