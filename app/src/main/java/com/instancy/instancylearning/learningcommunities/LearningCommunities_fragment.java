@@ -29,6 +29,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,7 +45,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -54,24 +58,31 @@ import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CommunitiesModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.instancy.instancylearning.utils.SweetAlert;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,6 +91,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 
@@ -194,7 +206,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                 }
 
                 svProgressHUD.dismiss();
-                swipeRefreshLayout.setRefreshing(false);
+                swipeRefreshLayout.setRefreshing(false);// 5 Lakhs rupees
             }
 
             @Override
@@ -461,12 +473,12 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
                 if (item.getTitle().toString().equalsIgnoreCase("Go to Community")) {
 
-
+                    Toast.makeText(context, "this is got to " + communitiesModelList.get(position).siteurl, Toast.LENGTH_SHORT).show();
+                    loginVollyWebCall(communitiesModelList.get(position));
                 }
-
                 if (item.getTitle().toString().equalsIgnoreCase("Join Community")) {
 
-
+                    Toast.makeText(context, "this is join Community", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -475,6 +487,96 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
     }
 
+
+    public void loginVollyWebCall(final CommunitiesModel communitiesModel) {
+
+        if (isNetworkConnectionAvailable(context, -1)) {
+
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
+            final String passWord = preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD);
+
+            String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
+                    + userName + "&Password=" + passWord + "&MobileSiteURL="
+                    + communitiesModel.siteurl + "&DownloadContent=&SiteID=" + communitiesModel.siteid;
+
+            Log.d(TAG, "subsite login : " + urlStr);
+
+            urlStr = urlStr.replaceAll(" ", "%20");
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            svProgressHUD.dismiss();
+                            Log.d("Response: ", " " + response.has("faileduserlogin"));
+                            if (response.has("faileduserlogin")) {
+//                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
+
+                            } else if (response.has("successfulluserlogin")) {
+
+                                try {
+                                    JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
+                                    if (loginResponseAry.length() != 0) {
+
+                                        JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+                                        JSONObject jsonObject = new JSONObject();
+                                        String userId = jsonobj.get("userid").toString();
+//                                    profileWebCall(userId);
+                                        jsonObject.put("userid", jsonobj.get("userid").toString());
+                                        jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
+                                        jsonObject.put("userstatus", jsonobj.get("userstatus"));
+                                        jsonObject.put("displayname", jsonobj.get("username"));
+                                        jsonObject.put("siteid", jsonobj.get("siteid"));
+                                        jsonObject.put("username", userName);
+                                        jsonObject.put("password", passWord);
+                                        jsonObject.put("siteurl", communitiesModel.siteurl);
+
+//                                        db.insertUserCredentialsForOfflineLogin(jsonObject);
+
+                                        Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
+                                        preferencesManager.setStringValue(userName, StaticValues.SUB_KEY_USERLOGINID);
+                                        preferencesManager.setStringValue(passWord, StaticValues.SUB_KEY_USERPASSWORD);
+                                        preferencesManager.setStringValue(jsonobj.get("userid").toString(), StaticValues.SUB_KEY_USERID);
+                                        preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.SUB_KEY_USERNAME);
+                                        preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.SUB_KEY_USERSTATUS);
+                                        preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.SUB_KEY_USERPROFILEIMAGE);
+
+                                        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+//                                    Intent intentSideMenu = new Intent(context, SideMenu.class);
+//                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                    startActivity(intentSideMenu);
+                                    }
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                        }
+                    }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    final Map<String, String> headers = new HashMap<>();
+                    String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                    return headers;
+                }
+            };
+
+            VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        }
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

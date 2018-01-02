@@ -27,6 +27,9 @@ public class StaticValues {
 
 
     public static final String INSTANCYPREFS_NAME = "instancyprefs";
+
+
+    //Main Site
     public static final String KEY_USERLOGINID = "KEY_USERLOGINID";
     public static final String KEY_USERPASSWORD = "KEY_USERPASSWORD";
     public static final String KEY_USERID = "KEY_USERID";
@@ -34,12 +37,27 @@ public class StaticValues {
     public static final String KEY_SITEURL = "KEY_SITEURL";
     public static final String KEY_AUTHENTICATION = "KEY_AUTHENTICATION";
     public static final String KEY_USERNAME = "KEY_USERNAME";
+    public static final String KEY_SITEID = "KEY_SITEID";
+
 
     public static final String KEY_USERSTATUS = "KEY_USERSTATUS";
 
     public static final String KEY_USERPROFILEIMAGE = "KEY_USERIMAGE";
 
-    public static final String KEY_SITEID = "KEY_SITEID";
+    // SubSite
+
+    public static final String SUB_KEY_USERLOGINID = "KEY_USERLOGINID";
+    public static final String SUB_KEY_USERPASSWORD = "KEY_USERPASSWORD";
+    public static final String SUB_KEY_USERID = "KEY_USERID";
+    public static final String SUB_KEY_WEBAPIURL = "KEY_WEBAPIURL";
+    public static final String SUB_KEY_SITEURL = "KEY_SITEURL";
+    public static final String SUB_KEY_AUTHENTICATION = "KEY_AUTHENTICATION";
+    public static final String SUB_KEY_USERNAME = "KEY_USERNAME";
+    public static final String SUB_KEY_SITEID = "KEY_SITEID";
+
+    public static final String SUB_KEY_USERSTATUS = "KEY_USERSTATUS";
+
+    public static final String SUB_KEY_USERPROFILEIMAGE = "KEY_USERIMAGE";
 
     public static final String KEY_SITENAME = "KEY_SITENAME";
 
@@ -51,11 +69,9 @@ public class StaticValues {
 
     public static final String KEY_ACTIONBARTITLE = "KEY_ACTIONBARTITLE";
 
-
     public static final String BUNDLE_USERNAME = "BUNDLE_USERNAME";
 
     public static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
-
 
     public static final String KEY_HIDE_ANNOTATION = "KEY_HIDE_ANNOTATION";
 

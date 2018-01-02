@@ -228,7 +228,11 @@ public class CatalogAdapter extends BaseAdapter {
                 }
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
                     holder.btnDownload.setVisibility(View.VISIBLE);
+                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
+                        holder.btnDownload.setVisibility(View.GONE);
+                    }
                 }
+
 
                 holder.circleProgressBar.setVisibility(View.GONE);
 
@@ -411,7 +415,6 @@ public class CatalogAdapter extends BaseAdapter {
 //        @Nullable
 //        @BindView(R.id.pricelabel)
 //        TextView txtPriceLabel;
-
 
         @Nullable
         @BindView(R.id.circle_progress)

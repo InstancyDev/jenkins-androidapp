@@ -649,6 +649,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
+
         if (myLearningDetalData.getAddedToMylearning() == 1) {
             menu.getItem(0).setVisible(true);
             menu.getItem(1).setVisible(false);
@@ -709,10 +710,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                         menu.getItem(4).setVisible(false);
                     }
-                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                        menu.getItem(4).setVisible(true);
-                    }
+//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//
+//                        menu.getItem(4).setVisible(true);
+//                    }
                 }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
                 menu.getItem(0).setVisible(false);
@@ -1363,7 +1364,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         boolean isFirstCategory = true;
         ContentValues cvBreadcrumbItem = null;
         category_breadcrumb.removeAllViews();
-        final int breadcrumbCount = dicBreadcrumbItems.size();
+        int breadcrumbCount = 0;
+        if (null != dicBreadcrumbItems) {
+            breadcrumbCount = dicBreadcrumbItems.size();
+        }
         View.OnClickListener onBreadcrumbItemCLick = null;
         onBreadcrumbItemCLick = new View.OnClickListener() {
             @Override

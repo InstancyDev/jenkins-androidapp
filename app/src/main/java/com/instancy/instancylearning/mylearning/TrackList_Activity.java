@@ -593,7 +593,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
     }
 
-    private void executeWorkFlowRules(final String workflowtype) {
+    public void executeWorkFlowRules(final String workflowtype) {
 
         try {
 

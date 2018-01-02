@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,7 +90,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     RecyclerView recyclerView;
 
     PreferencesManager preferencesManager;
-    String filterContentType = "", consolidationType = "all", sortBy = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", ddlsortBy = "publisheddate";
     Context context;
     Toolbar toolbar;
     Menu search_menu;
@@ -174,6 +175,15 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             // No such key
             sortBy = "";
         }
+
+        if (responMap != null && responMap.containsKey("ddlSortList")) {
+            ddlsortBy = getTheDatabaseColumnName(responMap.get("ddlSortList").toLowerCase());
+
+        } else {
+            // No such key
+            ddlsortBy = "publisheddate";
+        }
+
         if (responMap != null && responMap.containsKey("FilterContentType")) {
             filterContentType = responMap.get("FilterContentType");
         } else {
@@ -181,6 +191,30 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             filterContentType = "";
         }
     }
+
+    public static String getTheDatabaseColumnName(String unformatedName) {
+        String coloumnName = "publisheddate";
+        switch (unformatedName) {
+            case "contenttype":
+                coloumnName = "objecttypeid";
+                break;
+            case "authordisplayname":
+                coloumnName = "author";
+                break;
+            case "name":
+                coloumnName = "coursename";
+                break;
+            case "publisheddate":
+                coloumnName = "publisheddate";
+                break;
+            default:
+                coloumnName = "publisheddate";
+                break;
+        }
+
+        return coloumnName;
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -300,7 +334,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                     mAdapter.reloadAllContent(categoryButtonModelList2);
                 } else {
 
-                    List<MyLearningModel> myLearningModelList = db.openCategoryContentDetailsFromSQLite("" + finalCategoryButtonModelList.get(position).getCategoryId(), sideMenusModel.getComponentId());
+                    List<MyLearningModel> myLearningModelList = db.openCategoryContentDetailsFromSQLite("" + finalCategoryButtonModelList.get(position).getCategoryId(), sideMenusModel.getComponentId(), ddlsortBy);
 
                     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 
@@ -487,7 +521,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
             TextView textView = new TextView(context);
             TextView arrowView = new TextView(context);// &#8811;
-
 
             Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(arrowView, iconFont);

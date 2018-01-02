@@ -1570,7 +1570,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("parentmenuid")));
                     menu.setParameterStrings(cursor.getString(cursor
                             .getColumnIndex("parameterstrings")));
-                    if (!menu.getContextMenuId().equalsIgnoreCase("5")){
+                    if (!menu.getContextMenuId().equalsIgnoreCase("5")) {
                         menuList.add(menu);
                     }
 
@@ -10743,12 +10743,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return catalogCategoryButtonModelList;
     }
 
-    public List<MyLearningModel> openCategoryContentDetailsFromSQLite(String categoryID, String componentID) {
+    public List<MyLearningModel> openCategoryContentDetailsFromSQLite(String categoryID, String componentID, String ddlsortBy) {
 
         List<MyLearningModel> myLearningModelList = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String sqlQuery = "SELECT DISTINCT CD.* FROM " + TBL_CATALOGDATA + " CD LEFT OUTER JOIN " + TBL_CATEGORIESCONTENT + " CC ON CC.contentid = CD.contentid WHERE CC.categoryid = " + categoryID + " AND CD.categorycompid = " + componentID + " ORDER BY CD.publisheddate DESC";
+        if (ddlsortBy.equalsIgnoreCase("publisheddate")) {
+
+            ddlsortBy = ddlsortBy + " DESC";
+        } else {
+            ddlsortBy = ddlsortBy + " asc";
+        }
+
+        String sqlQuery = "SELECT DISTINCT CD.* FROM " + TBL_CATALOGDATA + " CD LEFT OUTER JOIN " + TBL_CATEGORIESCONTENT + " CC ON CC.contentid = CD.contentid WHERE CC.categoryid = " + categoryID + " AND CD.categorycompid = " + componentID + " ORDER BY CD." + ddlsortBy;
 
         try {
             Cursor cursor = null;
@@ -10879,7 +10886,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
 
-
         return myLearningModelList;
     }
 
@@ -10934,7 +10940,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     menu.setIsSubMenuExists(cursor.getInt(cursor
                             .getColumnIndex("issubmenuexists")));
 
-                        menuList.add(menu);
+                    menuList.add(menu);
 
                 } while (cursor.moveToNext());
             }

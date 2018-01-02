@@ -480,6 +480,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     myLearningDetalData.setStatus("Completed");
                     myLearningDetalData.setProgress("100");
                     notifyDataSetChanged();
+                  if(_context instanceof TrackList_Activity){
+                    ((TrackList_Activity)_context).executeWorkFlowRules("onitemChange");
+                    }
                 }
             };
         }
