@@ -2384,12 +2384,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public void injectCatalogData(JSONObject jsonObject) throws JSONException {
+    public void injectCatalogData(JSONObject jsonObject, boolean isFromCatageories) throws JSONException {
 
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
-        ejectRecordsinTable(TBL_CATALOGDATA);
+
+        if (!isFromCatageories) {
+
+            ejectRecordsinTable(TBL_CATALOGDATA);
+        }
+
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
@@ -2771,16 +2776,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setAddedToMylearning(Integer.parseInt(jsonMyLearningColumnObj.get("isaddedtomylearning").toString()));
 
                 }
-                injectCatalogDataIntoTable(myLearningModel);
+                injectCatalogDataIntoTable(myLearningModel, isFromCatageories);
             }
 
         }
 
     }
 
-    public void injectCatalogDataIntoTable(MyLearningModel myLearningModel) {
+
+    public void injectCatalogDataIntoTable(MyLearningModel myLearningModel, boolean isFromCatageories) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
+        if (isFromCatageories) {
+            ejectRecordsFromCategories(myLearningModel);
+        }
         try {
 
             contentValues = new ContentValues();
@@ -2826,7 +2835,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             exception.printStackTrace();
         }
+        db.close();
+    }
 
+    public void ejectRecordsFromCategories(MyLearningModel myLearningModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strDelete = "DELETE FROM " + TBL_CATALOGDATA
+                + " WHERE siteid='" + myLearningModel.getSiteID() + "' AND userid='" + myLearningModel.getUserID()
+                + "' AND siteurl='" + myLearningModel.getSiteURL() + "' AND categorycompid='"
+                + myLearningModel.getComponentId() + "' AND contentid='"
+                + myLearningModel.getContentID() + "'";
+        try {
+            db.execSQL(strDelete);
+        } catch (Exception ex) {
+            Log.d("deteleTackListItems", ex.getMessage());
+        }
+
+//        db.close();
     }
 
 
@@ -10702,7 +10727,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return catalogCategoryButtonModelList;
     }
-
 
     public List<CatalogCategoryButtonModel> openSubCategoryDetailsFromSQLite(String siteId, String componentId, String categoryId) {
 

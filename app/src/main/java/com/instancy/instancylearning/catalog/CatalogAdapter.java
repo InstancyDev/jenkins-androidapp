@@ -228,11 +228,10 @@ public class CatalogAdapter extends BaseAdapter {
                 }
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
                     holder.btnDownload.setVisibility(View.VISIBLE);
-                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
-                        holder.btnDownload.setVisibility(View.GONE);
-                    }
+//                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
+//                        holder.btnDownload.setVisibility(View.GONE);
+//                    }
                 }
-
 
                 holder.circleProgressBar.setVisibility(View.GONE);
 

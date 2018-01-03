@@ -34,7 +34,8 @@ public class ButtonAdapter extends RecyclerView.Adapter<ButtonAdapter.ViewHolder
     public ButtonAdapter(List<CatalogCategoryButtonModel> categoryButtonModelList1, RecyclerViewClickListener mListener) {
         this.categoryButtonModelList = categoryButtonModelList1;
         this.mListener = mListener;
-        uiSettingsModel = UiSettingsModel.getInstance();    }
+        uiSettingsModel = UiSettingsModel.getInstance();
+    }
 
     public void reloadAllContent(List<CatalogCategoryButtonModel> dataset) {
         categoryButtonModelList.clear();
@@ -47,7 +48,7 @@ public class ButtonAdapter extends RecyclerView.Adapter<ButtonAdapter.ViewHolder
         // create a new view
         RelativeLayout relativeLayout = (RelativeLayout) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.catalog_button, parent, false);
-        CardView cardView =(CardView)relativeLayout.findViewById(R.id.card_view);
+        CardView cardView = (CardView) relativeLayout.findViewById(R.id.card_view);
 //        // set the view's size, margins, paddings and layout parameters
         cardView.setCardBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         cardView.setRadius(14);
@@ -59,7 +60,6 @@ public class ButtonAdapter extends RecyclerView.Adapter<ButtonAdapter.ViewHolder
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         TextView txtCategoryName = (TextView) holder.relativeLayout.findViewById(R.id.categoryname);
-
         txtCategoryName.setText(categoryButtonModelList.get(position).getCategoryName());
 
     }

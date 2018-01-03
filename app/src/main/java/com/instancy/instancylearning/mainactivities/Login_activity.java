@@ -28,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.blankj.utilcode.util.ToastUtils;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -352,9 +353,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 
         if (userName.length() < 1) {
-            Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "  Enter Username  ", Toast.LENGTH_SHORT).show();
         } else if (passWord.length() < 1) {
-            Toast.makeText(this, "Enter Password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "  Enter Password  ", Toast.LENGTH_SHORT).show();
         } else {
 
             if (isNetworkConnectionAvailable(this, -1)) {

@@ -473,12 +473,13 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
                 if (item.getTitle().toString().equalsIgnoreCase("Go to Community")) {
 
-                    Toast.makeText(context, "this is got to " + communitiesModelList.get(position).siteurl, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "this is got to " + communitiesModelList.get(position).siteurl, Toast.LENGTH_SHORT).show();
                     loginVollyWebCall(communitiesModelList.get(position));
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Join Community")) {
 
-                    Toast.makeText(context, "this is join Community", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "this is join Community", Toast.LENGTH_SHORT).show();
+                    loginVollyWebCall(communitiesModelList.get(position));
                 }
                 return true;
             }
@@ -492,7 +493,8 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
             final String passWord = preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD);
 
@@ -509,9 +511,46 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                         @Override
                         public void onResponse(JSONObject response) {
                             svProgressHUD.dismiss();
-                            Log.d("Response: ", " " + response.has("faileduserlogin"));
+
                             if (response.has("faileduserlogin")) {
-//                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
+
+                                JSONArray userloginAry = null;
+                                try {
+                                    userloginAry = response
+                                            .getJSONArray("faileduserlogin");
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (userloginAry.length() > 0) {
+
+
+                                    String resultForLogin = null;
+                                    try {
+                                        resultForLogin = userloginAry.getJSONObject(0)
+                                                .get("userstatus").toString();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    if (resultForLogin.contains("Login Failed")) {
+
+                                        Toast.makeText(context,
+                                                "Authentication Failed. Contact site admin",
+                                                Toast.LENGTH_LONG).show();
+
+                                    }
+
+                                    if (resultForLogin.contains("Pending Registration")) {
+
+                                        Toast.makeText(context, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
+                                                Toast.LENGTH_LONG).show();
+
+                                        refreshCatalog(false);
+                                    }
+
+                                }
+
 
                             } else if (response.has("successfulluserlogin")) {
 

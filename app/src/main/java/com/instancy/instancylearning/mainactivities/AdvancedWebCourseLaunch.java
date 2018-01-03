@@ -63,7 +63,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
 
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
             clearWebViewAbsolutely(adWebView);

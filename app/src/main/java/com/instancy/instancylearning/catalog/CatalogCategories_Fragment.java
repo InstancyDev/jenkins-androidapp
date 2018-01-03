@@ -237,8 +237,15 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             breadCrumbPlusButtonInit(rootView);
             initilizeView();
 
-            if (isNetworkConnectionAvailable(context, -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
-                refreshCatalog(false);
+            if (isNetworkConnectionAvailable(context, -1)) {
+
+                if (CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
+                    refreshCatalog(false);
+                } else {
+                    refreshCatalog(true);
+                }
+
+
                 refreshCatalogData();
             } else {
 
@@ -366,7 +373,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
                     } else {
 
-                        Toast.makeText(context, "No Content found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "  No Content found  ", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -390,7 +397,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectCatalogData(response);
+                            db.injectCatalogData(response,true);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -560,7 +567,9 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         String paramsString = "siteURL=" + appUserModel.getSiteURL() + "&componentId="

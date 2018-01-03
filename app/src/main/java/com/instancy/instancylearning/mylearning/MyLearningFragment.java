@@ -204,7 +204,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
         String paramsString = "FilterCondition=" + filterContentType +
                 "&SortCondition=" + sortBy +
@@ -1050,7 +1051,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void filterApiCall() {
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3134";
             vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
 

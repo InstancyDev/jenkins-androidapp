@@ -255,7 +255,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
@@ -273,7 +274,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectCatalogData(response);
+                            db.injectCatalogData(response,false);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -655,7 +656,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
-            menu.getItem(3).setVisible(false);
+
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
                 File myFile = new File(myLearningDetalData.getOfflinepath());
@@ -814,6 +815,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
                             catalogModelsList.get(position).setAddedToMylearning(1);
+                            db.updateContenToCatalog(catalogModelsList.get(position));
                             catalogAdapter.notifyDataSetChanged();
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
 //                            Toast toast = Toast.makeText(
@@ -863,9 +865,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 ;
                 VolleySingleton.getInstance(context).addToRequestQueue(strReq);
 
-
             }
-
         }
     }
 
@@ -875,7 +875,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
                 + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
 
-        urlStr = urlStr.replaceAll(" ", "%20");
+        urlStr = urlStr.replaceAll(" ", "%20");// year end ki 20 k cheyali
         Log.d(TAG, "inside catalog login : " + urlStr);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
                 new Response.Listener<JSONObject>() {
@@ -990,6 +990,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
                                 if (isInserted) {
                                     catalogModelsList.get(position).setAddedToMylearning(1);
+//                                    db.updateContenToCatalog(catalogModelsList.get(position));
                                     catalogAdapter.notifyDataSetChanged();
 //                                    Toast toast = Toast.makeText(
 //                                            context,
@@ -1250,6 +1251,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
 //        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         String paramsString = "";
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
 
@@ -1323,7 +1325,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void filterApiCall() {
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3134";
             vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
 
@@ -1448,6 +1451,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
 
+        if (learningModel.getAddedToMylearning() == 0) {
+            addToMyLearning(learningModel, position);
+        }
+//        else {
+//
+//        }
         boolean isZipFile = false;
 
         final String[] downloadSourcePath = {null};

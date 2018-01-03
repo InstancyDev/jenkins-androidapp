@@ -870,6 +870,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void downloadTheCourse(final MyLearningModel learningModel, final View view) {
 
+        if (learningModel.getAddedToMylearning() == 0) {
+            addToMyLearning(learningModel);
+        }
+
         boolean isZipFile = false;
 
         final String[] downloadSourcePath = {null};
