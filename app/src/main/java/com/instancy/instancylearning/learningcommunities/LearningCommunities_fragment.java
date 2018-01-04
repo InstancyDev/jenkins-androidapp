@@ -510,7 +510,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            svProgressHUD.dismiss();
+
 
                             if (response.has("faileduserlogin")) {
 
@@ -593,14 +593,14 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                                 }
 
                             }
-
+                            svProgressHUD.dismiss();
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-//                        Log.e("Error: ", error.getMessage());
-//                        svProgressHUD.dismiss();
+//                        Log.e("Error: ", error.getMessage()); 18 wed, 19 thurs, 20 friday, 21 saturday, 22 sunday, 23 monday, 24 tuesday , 25 wednesday, 26, 27, 28, 29;
+                            svProgressHUD.dismiss();
                         }
                     }) {
                 @Override

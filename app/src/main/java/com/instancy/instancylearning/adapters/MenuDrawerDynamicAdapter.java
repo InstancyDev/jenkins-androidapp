@@ -163,7 +163,8 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             expTxtIcon.setVisibility(View.VISIBLE);
-            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
+
+            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_up));
         } else {
 //            pView.setBackgroundColor(Color.WHITE);
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
@@ -172,7 +173,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
 //            expTxtIcon.setVisibility(View.INVISIBLE);
             expTxtIcon.setVisibility(View.VISIBLE);
-            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_up));
+            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
         }
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);

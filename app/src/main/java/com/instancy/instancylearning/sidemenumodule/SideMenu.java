@@ -163,6 +163,7 @@ public class SideMenu extends AppCompatActivity {
             public void onClick(View v) {
                 //logo clicked
                 homeControllClicked();
+                lastClicked=0;
             }
         });
 

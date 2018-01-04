@@ -198,7 +198,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             myLearningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
             isFromCatalog = bundle.getBoolean("IFROMCATALOG");
         }
-
         String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
 
 //        if (!isFromCatalog){
@@ -870,7 +869,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void downloadTheCourse(final MyLearningModel learningModel, final View view) {
 
-        if (learningModel.getAddedToMylearning() == 0) {
+        if (learningModel.getAddedToMylearning() == 0 && isFromCatalog) {
             addToMyLearning(learningModel);
         }
 
@@ -1268,18 +1267,19 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                                    toast.setGravity(Gravity.CENTER, 0, 0);
 //                                    toast.show();
 
-                                    final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
-                                    builder.setMessage(MyLearningDetail_Activity.this.getString(R.string.cat_add_success))
-                                            .setCancelable(false)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    //do things
-                                                    dialog.dismiss();
-                                                }
-                                            });
-                                    AlertDialog alert = builder.create();
-                                    alert.show();
-
+                                    if (!isFromCatalog) {
+                                        final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
+                                        builder.setMessage(MyLearningDetail_Activity.this.getString(R.string.cat_add_success))
+                                                .setCancelable(false)
+                                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int id) {
+                                                        //do things
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+                                        AlertDialog alert = builder.create();
+                                        alert.show();
+                                    }
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();

@@ -12,7 +12,7 @@
         android:layout_marginLeft="2dp"
         android:gravity="center_vertical"
         android:text="@string/fa_icon_calculator"
-        android:textColor="@color/colorDarkGrey"
+        android:textColor="@color/colorBlack"
         android:textAlignment="center"
         android:textSize="22sp" />
 

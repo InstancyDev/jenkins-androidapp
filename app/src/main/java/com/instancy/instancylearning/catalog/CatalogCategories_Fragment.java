@@ -86,6 +86,8 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    TextView nodata_Label;
+
     @BindView(R.id.catalog_recycler)
     RecyclerView recyclerView;
 
@@ -224,6 +226,8 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     @Override
     public void onResume() {
         super.onResume();
+//        mAdapter.reloadAllContent(categoryButtonModelList1);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Nullable
@@ -233,23 +237,26 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         if (container != null) {
             rootView = inflater.inflate(R.layout.cataloggrid_fragment, container, false);
             ButterKnife.bind(this, rootView);
+            nodata_Label = (TextView) rootView.findViewById(R.id.nodata_label);
             swipeRefreshLayout.setOnRefreshListener(this);
-            breadCrumbPlusButtonInit(rootView);
             initilizeView();
 
             if (isNetworkConnectionAvailable(context, -1)) {
 
                 if (CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
                     refreshCatalog(false);
+
                 } else {
                     refreshCatalog(true);
                 }
-
-
                 refreshCatalogData();
             } else {
 
             }
+
+
+            breadCrumbPlusButtonInit(rootView);
+
         }
 
         return rootView;
@@ -311,6 +318,13 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
         categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
 
+        if (categoryButtonModelList1.size() == 0) {
+            nodata_Label.setText(getResources().getString(R.string.no_categories));
+            nodata_Label.setVisibility(View.VISIBLE);
+        } else {
+            nodata_Label.setVisibility(View.GONE);
+        }
+
         // specify an adapter (see also next example) 3250+
         mAdapter = new ButtonAdapter(categoryButtonModelList1, clicklistener);
 
@@ -331,6 +345,9 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             public void onClick(View view, int position) {
 
                 Log.d(TAG, "onClick: " + position);
+                if (position == -1) {
+                    position = 1;
+                }
 //                Toast.makeText(context, "positions " + finalCategoryButtonModelList.get(position).getCategoryName(), Toast.LENGTH_SHORT).show();
 
                 List<CatalogCategoryButtonModel> categoryButtonModelList2 = db.openSubCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId(), "" + finalCategoryButtonModelList.get(position).getCategoryId());
@@ -387,6 +404,24 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
+    public void refreshMethod(){
+        if (categoryButtonModelList1.size()==0){
+            categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
+
+            if (categoryButtonModelList1.size() == 0) {
+                nodata_Label.setText(getResources().getString(R.string.no_categories));
+                nodata_Label.setVisibility(View.VISIBLE);
+            } else {
+                nodata_Label.setVisibility(View.GONE);
+            }
+
+            // specify an adapter (see also next example) 3250+
+            mAdapter.reloadAllContent(categoryButtonModelList1);
+            mAdapter.notifyDataSetChanged();
+        }
+
+    }
+
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
@@ -397,21 +432,27 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectCatalogData(response,true);
+                            db.injectCatalogData(response, true);
+                            refreshMethod();
+//                            categoryButtonModelList1 = new ArrayList<>();
+//                            categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
+//                            mAdapter.reloadAllContent(categoryButtonModelList1);
+                            mAdapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
-
 
                 if (requestType.equalsIgnoreCase("CATALOGCATEGORIES")) {
                     if (response != null) {
                         try {
                             db.injectCatalogCategories(response, "" + sideMenusModel.getComponentId());
 
+                            refreshMethod();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -428,6 +469,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             public void notifyError(String requestType, VolleyError error) {
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+                refreshMethod();
             }
 
             @Override
@@ -435,12 +477,12 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                 Log.d(TAG, "Volley String post" + response);
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-
+                refreshMethod();
             }
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
-
+                refreshMethod();
                 svProgressHUD.dismiss();
             }
         };
@@ -583,7 +625,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
             refreshCatalog(true);
-
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();

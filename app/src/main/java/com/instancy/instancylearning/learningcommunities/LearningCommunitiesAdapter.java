@@ -124,7 +124,7 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
 
         if (communitiesModelList.get(position).labelalreadyamember.equalsIgnoreCase("null") || communitiesModelList.get(position).labelalreadyamember.equalsIgnoreCase("")) {
             holder.txtIsMember.setText("Pending Request");
-
+            holder.txtIsMember.setVisibility(View.GONE);
         } else {
 
             holder.txtIsMember.setText(communitiesModelList.get(position).labelalreadyamember);

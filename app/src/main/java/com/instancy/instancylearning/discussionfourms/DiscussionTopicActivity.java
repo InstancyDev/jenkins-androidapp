@@ -239,7 +239,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumid, appUserModel.getAuthHeaders());

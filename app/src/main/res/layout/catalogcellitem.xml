@@ -161,8 +161,8 @@
                     android:id="@+id/btn_contextmenu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
                     android:layout_gravity="center"
                     android:background="@drawable/ic_more_vert_black_24dp" />
 

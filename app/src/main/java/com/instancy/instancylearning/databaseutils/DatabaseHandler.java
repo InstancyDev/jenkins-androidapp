@@ -2841,7 +2841,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void ejectRecordsFromCategories(MyLearningModel myLearningModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         String strDelete = "DELETE FROM " + TBL_CATALOGDATA
-                + " WHERE siteid='" + myLearningModel.getSiteID() + "' AND userid='" + myLearningModel.getUserID()
+                + " WHERE siteid='" + myLearningModel.getSiteID()
                 + "' AND siteurl='" + myLearningModel.getSiteURL() + "' AND categorycompid='"
                 + myLearningModel.getComponentId() + "' AND contentid='"
                 + myLearningModel.getContentID() + "'";
@@ -7934,7 +7934,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-
             Log.d(TAG, "saveCourseClose: end ");
 
 
@@ -8171,10 +8170,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
 
             String strUpdate = "UPDATE " + TBL_CMI
-                    + " SET status = '" + updatedStatus + ", isupdate= 'false'" + "' WHERE siteid ='"
+                    + " SET status = '" + updatedStatus + "', isupdate= 'false'" + "' WHERE siteid ='"
                     + learningmodel.getSiteID() + "'" + " AND " + " scoid=" + "'" + learningmodel.getScoId() + "'"
                     + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
-
 
             db.execSQL(strUpdate);
 

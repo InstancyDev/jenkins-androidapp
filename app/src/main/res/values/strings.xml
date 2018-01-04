@@ -31,6 +31,8 @@
 
     <string name="no_data">No items to display</string>
 
+    <string name="no_categories">No Categories</string>
+
     <string name="no_event">No Events to display</string>
 
     <string name="loadingtxt">Loading...</string>

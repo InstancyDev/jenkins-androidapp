@@ -274,7 +274,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectCatalogData(response,false);
+                            db.injectCatalogData(response, false);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -782,14 +782,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     inAppActivityCall(myLearningDetalData);
 
                 } else {
-                    addToMyLearning(myLearningDetalData, position);
+                    addToMyLearning(myLearningDetalData, position,false);
 
                 }
             }
         }
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position, final boolean isAutoAdd) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
             boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -824,17 +824,20 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                                    Toast.LENGTH_SHORT);
 //                            toast.setGravity(Gravity.CENTER, 0, 0);
 //                            toast.show();
-                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.cat_add_success))
-                                    .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            //do things
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            AlertDialog alert = builder.create();
-                            alert.show();
+
+                            if (!isAutoAdd){
+                                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setMessage(context.getString(R.string.cat_add_success))
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                //do things
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
 
                         } else {
                             Toast toast = Toast.makeText(
@@ -936,7 +939,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                             inAppActivityCall(learningModel);
 
                                         } else {
-                                            addToMyLearning(learningModel, position);
+                                            addToMyLearning(learningModel, position,false);
                                         }
 
                                     }
@@ -1150,7 +1153,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             Log.d("logr  _response =", _response);
 
                             if (_response.contains("success")) {
-                                addToMyLearning(finalLearningModel, finalPosition);
+                                addToMyLearning(finalLearningModel, finalPosition,false);
                             } else {
                                 Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show();
                             }
@@ -1452,7 +1455,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
 
         if (learningModel.getAddedToMylearning() == 0) {
-            addToMyLearning(learningModel, position);
+            addToMyLearning(learningModel, position,true);
         }
 //        else {
 //
