@@ -65,11 +65,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
+import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
 import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
 
-public class SideMenu extends AppCompatActivity {
+public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
 
     public String TAG = SideMenu.class.getSimpleName();
 
@@ -94,6 +96,9 @@ public class SideMenu extends AppCompatActivity {
     @BindView(R.id.txtbtn_back)
     TextView textBtnBack;
 
+    @BindView(R.id.back_layout)
+    RelativeLayout backLayout;
+
     @BindView(R.id.back_font)
     TextView fontBack;
 
@@ -109,14 +114,13 @@ public class SideMenu extends AppCompatActivity {
     private static int lastClicked = 0;
 
     AppUserModel appUserModel;
-
     MenuDrawerDynamicAdapter menuDynamicAdapter;
     PreferencesManager preferencesManager;
     //    protected List<SideMenusModel> mainMenuList = null;
     protected List<SideMenusModel> subMenuList = null;
 
     HashMap<Integer, List<SideMenusModel>> hmSubMenuList = null;
-    DrawerLayout drawer;
+   public DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
     UiSettingsModel uiSettingsModel;
 
@@ -125,6 +129,8 @@ public class SideMenu extends AppCompatActivity {
     SideMenusModel homeModel;
     int homeIndex = 0;
 
+    RelativeLayout drawerHeaderView;
+    public View logoView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,18 +163,20 @@ public class SideMenu extends AppCompatActivity {
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
         toolbar.setLogo(d);
         toolbar.setContentInsetStartWithNavigation(0);
-        View logoView = getToolbarLogoIcon(toolbar);
+        logoView = getToolbarLogoIcon(toolbar);
         logoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //logo clicked
                 homeControllClicked();
-                lastClicked=0;
+
             }
         });
 
+        backLayout.setOnClickListener(this);
+
         ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
-//        imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+//       imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
@@ -179,12 +187,13 @@ public class SideMenu extends AppCompatActivity {
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+//        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(this);
         toggle.getDrawerArrowDrawable().setColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
         toggle.syncState();
 
-        RelativeLayout rl = (RelativeLayout) findViewById(R.id.drawerheaderview);
-        rl.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        drawerHeaderView = (RelativeLayout) findViewById(R.id.drawerheaderview);
+        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
 
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
@@ -330,6 +339,7 @@ public class SideMenu extends AppCompatActivity {
 
         selectItem(homeIndex, homeModel);
         navDrawerExpandableView.expandGroup(0);
+        lastClicked = 0;
     }
 
 
@@ -460,6 +470,49 @@ public class SideMenu extends AppCompatActivity {
         }
     }
 
+
+    public void backToMainSite() {
+        preferencesManager.setStringValue("false", StaticValues.SUB_SITE_ENTERED);
+        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+        appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        sideMenusModel = new ArrayList<SideMenusModel>();
+        sideMenusModel = db.getNativeMainMenusData();
+
+        hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+
+        int i = 0;
+        for (SideMenusModel menu : sideMenusModel) {
+            int parentMenuId = menu.getMenuId();
+            subMenuList = db.getNativeSubMenusData(parentMenuId);
+            if (subMenuList != null && subMenuList.size() > 0) {
+                hmSubMenuList.put(parentMenuId, subMenuList);
+            }
+
+            if (menu.getContextMenuId().equals("1")) {
+                if (IS_MENUS_FIRST_TIME) {
+                    IS_MENUS_FIRST_TIME = false;
+                }
+            }
+            i++;
+        }
+
+        menuDynamicAdapter.refreshList(sideMenusModel, hmSubMenuList);
+        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+        backLayout.setVisibility(View.GONE);
+
+        homeControllClicked();
+    }
+
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -518,4 +571,75 @@ public class SideMenu extends AppCompatActivity {
         return strAry;
     }
 
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.back_layout:
+                backToMainSite();
+                break;
+        }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        Log.d(TAG, "onPostResume: sidemenu");
+    }
+
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+//        Log.d(TAG, "onDrawerSlide: sidemenu");
+    }
+
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        Log.d(TAG, "onDrawerOpened: sidemenu");
+
+        enteredSubsiteMethods();
+    }
+
+    public void enteredSubsiteMethods() {
+        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+        if (isSubSiteEntered.equalsIgnoreCase("true")) {
+            backLayout.setVisibility(View.VISIBLE);
+            drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+            sideMenusModel = new ArrayList<SideMenusModel>();
+            sideMenusModel = db.getNativeMainMenusData();
+
+            hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+
+            int i = 0;
+            for (SideMenusModel menu : sideMenusModel) {
+                int parentMenuId = menu.getMenuId();
+                subMenuList = db.getNativeSubMenusData(parentMenuId);
+                if (subMenuList != null && subMenuList.size() > 0) {
+                    hmSubMenuList.put(parentMenuId, subMenuList);
+                }
+
+                if (menu.getContextMenuId().equals("1")) {
+                    if (IS_MENUS_FIRST_TIME) {
+                        IS_MENUS_FIRST_TIME = false;
+                    }
+                }
+                i++;
+            }
+
+            menuDynamicAdapter.refreshList(sideMenusModel, hmSubMenuList);
+        } else {
+            backLayout.setVisibility(View.GONE);
+        }
+
+    }
+
+    @Override
+    public void onDrawerClosed(View drawerView) {
+        Log.d(TAG, "onDrawerClosed: sidemenu");
+    }
+
+    @Override
+    public void onDrawerStateChanged(int newState) {
+
+    }
 }

@@ -12,4 +12,5 @@ public interface Communicator {
 
     public void breadCrumbStatus(List<ContentValues> dicBreadcrumbItems);
 
+//    public void enteredSideMenu();
 }

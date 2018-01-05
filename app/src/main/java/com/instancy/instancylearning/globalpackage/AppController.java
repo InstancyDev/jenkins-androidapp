@@ -33,44 +33,6 @@ public class AppController extends MultiDexApplication {
 
     private boolean isAlreadyViewd = false;
 
-    private String webApiUrl;
-
-    public String getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(String siteId) {
-        this.siteId = siteId;
-    }
-
-    private String siteId = "";
-
-    public String getWebApiUrl() {
-        return webApiUrl;
-    }
-
-    public void setWebApiUrl(String webApiUrl) {
-        this.webApiUrl = webApiUrl;
-    }
-
-    public String getSiteUrl() {
-        return siteUrl;
-    }
-
-    public void setSiteUrl(String siteUrl) {
-        this.siteUrl = siteUrl;
-    }
-
-    public String getAuthentication() {
-        return authentication;
-    }
-
-    public void setAuthentication(String authentication) {
-        this.authentication = authentication;
-    }
-
-    private String siteUrl;
-    private String authentication;
 
     public static final String TAG = AppController.class
             .getSimpleName();

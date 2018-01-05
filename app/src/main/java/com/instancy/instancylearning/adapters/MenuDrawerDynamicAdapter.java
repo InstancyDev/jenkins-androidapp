@@ -41,6 +41,14 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         this.mainMenuList = mainMenuList;
     }
 
+    public void refreshList(List<SideMenusModel> mainMenuList, HashMap<Integer, List<SideMenusModel>> subMenuList) {
+        this.mainMenuList = mainMenuList;
+        this.subMenuList = subMenuList;
+
+        this.notifyDataSetChanged();
+    }
+
+
     public HashMap<Integer, List<SideMenusModel>> getSubMenuList() {
         return subMenuList;
     }

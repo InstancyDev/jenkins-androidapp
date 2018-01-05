@@ -134,12 +134,12 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         }
         vollyService = new VollyService(resultCallback, context);
         List<CatalogCategoryButtonModel> categoryButtonModelList;
-        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
+//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = null;
         HashMap<String, String> responMap = null;
         Bundle bundle = getArguments();

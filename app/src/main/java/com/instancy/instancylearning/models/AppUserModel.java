@@ -92,14 +92,6 @@ public class AppUserModel {
         this.authHeaders = authHeaders;
     }
 
-    public String getAuthSubsiteHeaders() {
-        return authSubsiteHeaders;
-    }
-
-    public void setAuthSubsiteHeaders(String authSubsiteHeaders) {
-        this.authSubsiteHeaders = authSubsiteHeaders;
-    }
-
     private String password = "";
     private String displayName = "";
     private String userIDValue = "";
@@ -109,7 +101,7 @@ public class AppUserModel {
     private String webAPIUrl = "";
     private String base64Credentials = "";
     private String authHeaders = "";
-    private String authSubsiteHeaders = "";
+
 
     public String getUserLoginId() {
         return userLoginId;

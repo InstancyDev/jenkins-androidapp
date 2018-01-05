@@ -246,6 +246,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String USER_EDUCATION_DETAILS = "USER_EDUCATION_DETAILS";
     public static final String USER_EXPERIENCE_DETAILS = "USER_EXPERIENCE_DETAILS";
 
+
+    public static final String TBL_SUBSITESETTINGS = "TBL_SUBSITESETTINGS";
+
     private Context dbctx;
     private WebAPIClient wap;
     private SharedPreferences sharedPreferences;
@@ -265,13 +268,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         appUserModel = AppUserModel.getInstance();
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
-        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-        appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
+
+        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+
+        if (isSubSiteEntered.equalsIgnoreCase("false")) {
+            appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+            appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+            appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+            appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+            appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+            appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+            appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
+        } else {
+            appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.SUB_KEY_WEBAPIURL));
+            appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.SUB_KEY_USERID));
+            appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.SUB_KEY_SITEID));
+            appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.SUB_KEY_SITEURL));
+            appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.SUB_KEY_AUTHENTICATION));
+            appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+            appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
+
+        }
+
+
     }
 
     @Override
@@ -486,6 +505,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EXPERIENCE_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,  title TEXT, location TEXT, companyname TEXT, fromdate TEXT, todate TEXT, userid TEXT, description TEXT, difference TEXT, tilldate INTEGER, displayno TEXT, isupdated TEXT, siteid TEXT)");
 
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_SUBSITESETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, siteurl TEXT, authid TEXT, authpwd TEXT, userid TEXT, sitename TEXT, parentsiteid TEXT, parentsiteurl TEXT)");
+
         Log.d(TAG, "onCreate:  TABLES CREATED");
 
     }
@@ -551,14 +573,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // Methods for inserting the values into tables
 
-    public void getSiteSettingsServer(String webApiUrl, String siteUrl) {
+    public void getSiteSettingsServer(String webApiUrl, String siteUrl, boolean isMainSite) {
 
-        appController.setAuthentication(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        if (isMainSite) {
+            appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        } else {
+            appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.SUB_KEY_AUTHENTICATION));
+        }
 
         String paramsString = "SiteURL=" + siteUrl;
 
         InputStream inputStream = wap.callWebAPIMethod(webApiUrl, "MobileLMS",
-                "MobileGetLearningPortalInfo", appController.getAuthentication(), paramsString);
+                "MobileGetLearningPortalInfo", appUserModel.getAuthHeaders(), paramsString);
 
         if (inputStream != null) {
 
@@ -585,16 +611,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     siteid = siteSettingJsonObj.get("siteid").getAsString();
                                     String strsitename = siteSettingJsonObj.get("name").getAsString();
                                     String platformurl = siteSettingJsonObj.get("siteurl").getAsString();
-                                    preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
-                                    preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
-                                    preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
-//                            prefEditor = sharedPreferences.edit();
-//                            prefEditor.putString(StaticValues.KEY_SITEID, siteid);
-//                            prefEditor.putString(StaticValues.KEY_SITENAME, strsitename);
-//                            prefEditor.putString(StaticValues.KEY_PLATFORMURL, platformurl);
-                                    appUserModel.setSiteIDValue(siteid);
-                                    appUserModel.setSiteName(strsitename);
-//                            prefEditor.commit();
+
+                                    if (isMainSite) {
+
+                                        preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
+                                        preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
+                                        preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
+                                        appUserModel.setSiteIDValue(siteid);
+                                        appUserModel.setSiteName(strsitename);
+                                        appUserModel.setSiteURL(platformurl);
+                                        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+                                        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
+                                    } else {
+                                        preferencesManager.setStringValue(siteid, StaticValues.SUB_KEY_SITEID);
+                                        preferencesManager.setStringValue(strsitename, StaticValues.SUB_SITE_NAME);
+//                                        preferencesManager.setStringValue(platformurl, StaticValues.SUB_KEY_SITEURL);
+                                        preferencesManager.setStringValue(siteUrl, StaticValues.SUB_KEY_SITEURL);
+                                        appUserModel.setSiteIDValue(siteid);
+                                        appUserModel.setSiteName(strsitename);
+                                        appUserModel.setSiteURL(platformurl);
+                                        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.SUB_KEY_WEBAPIURL));
+                                        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.SUB_KEY_AUTHENTICATION));
+
+                                    }
                                 }
                             }
                         }
@@ -1125,9 +1165,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void getNativeMenusFromServer(String webApiUrl, String siteUrl) {
         String paramsString = "SiteURL=" + siteUrl;
         InputStream inputStream = wap.callWebAPIMethod(webApiUrl,
-                "MobileLMS", "MobileGetNativeMenus", appController.getAuthentication(),
+                "MobileLMS", "MobileGetNativeMenus", appUserModel.getAuthHeaders(),
                 paramsString);
-        appController.setSiteId(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         if (inputStream != null) {
 
             String result = convertStreamToString(inputStream);
@@ -1147,7 +1187,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 try {
                     JsonArray jsonTable = jsonObject.get("table").getAsJsonArray();
                     // for deleting records in table for respective table
-                    deleteRecordsinTable(appController.getSiteId(), siteUrl, TBL_NATIVEMENUS);
+                    deleteRecordsinTable(appUserModel.getSiteIDValue(), siteUrl, TBL_NATIVEMENUS);
 
                     for (int i = 0; i < jsonTable.size(); i++) {
 
@@ -1377,7 +1417,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             }
 
                         }
-                        insertIntoNativeMenusTable(nativeMenuModel, appController.getSiteId(), siteUrl);
+                        insertIntoNativeMenusTable(nativeMenuModel, appUserModel.getSiteIDValue(), siteUrl);
                     }
 
                 } catch (JsonIOException ex) {
@@ -1403,13 +1443,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SideMenusModel menu = null;
         Boolean isMylearning = false;
         SQLiteDatabase db = this.getWritableDatabase();
+//        String strSelQuery = "SELECT *,CASE WHEN menuid IN (SELECT parentmenuid FROM "
+//                + TBL_NATIVEMENUS
+//                + ") THEN 1 ELSE 0 END AS issubmenuexists FROM "
+//                + TBL_NATIVEMENUS
+//                + " WHERE" +
+//                " siteurl= '"
+//                + appUserModel.getSiteURL()
+//                + "' AND isenabled='true'"
+//                + " AND siteid='" + appUserModel.getSiteIDValue() +
+//                "' AND parentmenuid='0' ORDER BY displayorder";
+
         String strSelQuery = "SELECT *,CASE WHEN menuid IN (SELECT parentmenuid FROM "
                 + TBL_NATIVEMENUS
                 + ") THEN 1 ELSE 0 END AS issubmenuexists FROM "
                 + TBL_NATIVEMENUS
-                + " WHERE siteurl= '"
-                + appUserModel.getSiteURL()
-                + "' AND isenabled='true' AND parentmenuid='0' ORDER BY displayorder";
+                + " WHERE" +
+//                " siteurl= '"
+//                + appUserModel.getSiteURL()
+                 " isenabled='true'"
+                + " AND siteid='" + appUserModel.getSiteIDValue() +
+                "' AND parentmenuid='0' ORDER BY displayorder";
+
+
+        Log.d(TAG, "getNativeMainMenusData: strSelQuery " + strSelQuery);
 
         try {
             Cursor cursor = null;
@@ -1420,7 +1477,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String contextMenuID = cursor.getString(cursor
                             .getColumnIndex("contextmenuid"));
-                    //
+//
 //                    if (!contextMenuID.equalsIgnoreCase("1"))
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("7") || contextMenuID.equalsIgnoreCase("6")))
@@ -1705,7 +1762,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void getSiteTinCanDetails(String webAPiUrl, String siteUrl) {
         String paramsString = "SiteURL=" + siteUrl;
         InputStream inputStream = wap.callWebAPIMethod(webAPiUrl, "MobileLMS",
-                "MobileTinCanConfigurations", appController.getAuthentication(), paramsString);
+                "MobileTinCanConfigurations", appUserModel.getAuthHeaders(), paramsString);
 
         if (inputStream != null) {
 
@@ -8536,10 +8593,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 paramsString = paramsString.replace(" ", "%20");
 
-                appController.setWebApiUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+//                appController.setWebApiUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
 
-                InputStream inputStream = wap.callWebAPIMethod(appController.getWebApiUrl(), "MobileLMS",
-                        "MobileSetStatusCompleted", appController.getAuthentication(), paramsString);
+                InputStream inputStream = wap.callWebAPIMethod(appUserModel.getWebAPIUrl(), "MobileLMS",
+                        "MobileSetStatusCompleted", appUserModel.getAuthHeaders(), paramsString);
 
                 try {
                     if (inputStream != null) {

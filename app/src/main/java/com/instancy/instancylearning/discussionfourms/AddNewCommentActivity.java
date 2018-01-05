@@ -149,12 +149,12 @@ public class AddNewCommentActivity extends AppCompatActivity {
         db = new DatabaseHandler(this);
         ButterKnife.bind(this);
 
-        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
+//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
@@ -172,9 +172,9 @@ public class AddNewCommentActivity extends AppCompatActivity {
                 "Add Comment" + "</font>"));
 
 
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);

@@ -69,12 +69,12 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         appcontroller = AppController.getInstance();
 
     }
@@ -138,7 +138,6 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
 
         String imgUrl = communitiesModelList.get(position).imagepath;
         Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
-
 
         return convertView;
     }

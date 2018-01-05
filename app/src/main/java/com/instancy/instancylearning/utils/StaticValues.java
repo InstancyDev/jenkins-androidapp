@@ -39,25 +39,27 @@ public class StaticValues {
     public static final String KEY_USERNAME = "KEY_USERNAME";
     public static final String KEY_SITEID = "KEY_SITEID";
 
-
     public static final String KEY_USERSTATUS = "KEY_USERSTATUS";
 
     public static final String KEY_USERPROFILEIMAGE = "KEY_USERIMAGE";
 
     // SubSite
 
-    public static final String SUB_KEY_USERLOGINID = "KEY_USERLOGINID";
-    public static final String SUB_KEY_USERPASSWORD = "KEY_USERPASSWORD";
-    public static final String SUB_KEY_USERID = "KEY_USERID";
-    public static final String SUB_KEY_WEBAPIURL = "KEY_WEBAPIURL";
-    public static final String SUB_KEY_SITEURL = "KEY_SITEURL";
-    public static final String SUB_KEY_AUTHENTICATION = "KEY_AUTHENTICATION";
-    public static final String SUB_KEY_USERNAME = "KEY_USERNAME";
-    public static final String SUB_KEY_SITEID = "KEY_SITEID";
+    public static final String SUB_SITE_ENTERED = "SUB_SITE_ENTERED";
 
-    public static final String SUB_KEY_USERSTATUS = "KEY_USERSTATUS";
+    public static final String SUB_KEY_USERLOGINID = "SUB_KEY_USERLOGINID";
+    public static final String SUB_KEY_USERPASSWORD = "SUB_KEY_USERPASSWORD";
+    public static final String SUB_KEY_USERID = "SUB_KEY_USERID";
+    public static final String SUB_KEY_WEBAPIURL = "SUB_KEY_WEBAPIURL";
+    public static final String SUB_KEY_SITEURL = "SUB_KEY_SITEURL";
+    public static final String SUB_KEY_AUTHENTICATION = "SUB_KEY_AUTHENTICATION";
+    public static final String SUB_KEY_USERNAME = "SUB_KEY_USERNAME";
+    public static final String SUB_KEY_SITEID = "SUB_KEY_SITEID";
+    public static final String SUB_SITE_NAME = "SUB_SITE_NAME";
 
-    public static final String SUB_KEY_USERPROFILEIMAGE = "KEY_USERIMAGE";
+    public static final String SUB_KEY_USERSTATUS = "SUB_KEY_USERSTATUS";
+
+    public static final String SUB_KEY_USERPROFILEIMAGE = "SUB_KEY_USERPROFILEIMAGE";
 
     public static final String KEY_SITENAME = "KEY_SITENAME";
 

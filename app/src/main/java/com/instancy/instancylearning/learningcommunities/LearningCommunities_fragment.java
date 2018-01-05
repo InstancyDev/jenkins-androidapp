@@ -13,8 +13,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -31,6 +34,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,7 +54,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
+import com.instancy.instancylearning.asynchtask.GetSubSiteConfigsAsycTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.CreateNewForumActivity;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourmAdapter;
@@ -60,7 +67,9 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.interfaces.SiteConfigInterface;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CommunitiesModel;
@@ -90,6 +99,7 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -111,6 +121,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
     LearningCommunitiesAdapter learningCommunitiesAdapter;
     List<CommunitiesModel> communitiesModelList = null;
     PreferencesManager preferencesManager;
+    GetSubSiteConfigsAsycTask getSubSiteConfigsAsycTask;
     Context context;
     Toolbar toolbar;
     Menu search_menu;
@@ -149,15 +160,14 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
+        getSubSiteConfigsAsycTask = new GetSubSiteConfigsAsycTask(context);
         vollyService = new VollyService(resultCallback, context);
-
-        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
+//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -206,7 +216,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                 }
 
                 svProgressHUD.dismiss();
-                swipeRefreshLayout.setRefreshing(false);// 5 Lakhs rupees
+                swipeRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -488,7 +498,6 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
     }
 
-
     public void loginVollyWebCall(final CommunitiesModel communitiesModel) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
@@ -524,7 +533,6 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
                                 if (userloginAry.length() > 0) {
 
-
                                     String resultForLogin = null;
                                     try {
                                         resultForLogin = userloginAry.getJSONObject(0)
@@ -551,7 +559,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
                                 }
 
-
+                                svProgressHUD.dismiss();
                             } else if (response.has("successfulluserlogin")) {
 
                                 try {
@@ -586,14 +594,15 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 //                                    Intent intentSideMenu = new Intent(context, SideMenu.class);
 //                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                    startActivity(intentSideMenu);
-                                    }
 
+                                        subsiteApiCalls(jsonObject.getString("siteurl"), jsonObject.getString("siteid"));
+                                    }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
 
                             }
-                            svProgressHUD.dismiss();
+
                         }
                     },
                     new Response.ErrorListener() {
@@ -613,8 +622,9 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             };
 
             VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+        } else {
+            Toast.makeText(getContext(), "  " + getString(R.string.alert_headtext_no_internet) + "  ", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override
@@ -632,6 +642,51 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
     public void onDetach() {
 
         super.onDetach();
+    }
+
+    public void subsiteApiCalls(String subSiteUrl, String subSiteID) {
+
+        if (isNetworkConnectionAvailable(context, -1)) {
+
+            if (getSubSiteConfigsAsycTask.getStatus() == AsyncTask.Status.PENDING) {
+                // My getSiteConfigsAsycTask is currently doing work in doInBackground()
+                getSubSiteConfigsAsycTask.siteConfigInterface = new SiteConfigInterface() {
+                    @Override
+                    public void preExecuteIn() {
+                        Log.d(TAG, "preExecuteIn: ");
+                    }
+
+                    @Override
+                    public void progressUpdateIn(int status) {
+                        Log.d(TAG, "progressUpdateIn: " + status);
+                    }
+
+                    @Override
+                    public void postExecuteIn(String results) {
+                        Log.d(TAG, "postExecuteIn: " + results);
+                        if (results.equalsIgnoreCase("true")) {
+                            preferencesManager.setStringValue(results, StaticValues.SUB_SITE_ENTERED);
+                            try {
+                                CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+                                MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+//                                ((SideMenu) getActivity()).selectItem(0, sideMenusModel);
+                                ((SideMenu) getActivity()).drawer.openDrawer(Gravity.LEFT);
+                            } catch (NullPointerException ex) {
+                                ex.printStackTrace();
+                            }
+
+                        }
+                        svProgressHUD.dismiss();
+                    }
+                };
+                getSubSiteConfigsAsycTask.execute(subSiteUrl, subSiteID);
+
+            } else {
+
+//                LogUtils.d("already running ");
+            }
+        }
+
     }
 
 }
