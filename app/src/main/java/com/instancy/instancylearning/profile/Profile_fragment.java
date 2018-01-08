@@ -333,6 +333,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileRound);
+        profileImage.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+
         profileImage.setImageAlpha(25);
         profileRound.setOnClickListener(this);
 

@@ -593,9 +593,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
-        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 2;
+        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 1;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+//        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 1;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
@@ -782,7 +787,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     inAppActivityCall(myLearningDetalData);
 
                 } else {
-                    addToMyLearning(myLearningDetalData, position,false);
+                    addToMyLearning(myLearningDetalData, position, false);
 
                 }
             }
@@ -825,7 +830,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                            toast.setGravity(Gravity.CENTER, 0, 0);
 //                            toast.show();
 
-                            if (!isAutoAdd){
+                            if (!isAutoAdd) {
                                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                 builder.setMessage(context.getString(R.string.cat_add_success))
                                         .setCancelable(false)
@@ -939,7 +944,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                             inAppActivityCall(learningModel);
 
                                         } else {
-                                            addToMyLearning(learningModel, position,false);
+                                            addToMyLearning(learningModel, position, false);
                                         }
 
                                     }
@@ -1153,7 +1158,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             Log.d("logr  _response =", _response);
 
                             if (_response.contains("success")) {
-                                addToMyLearning(finalLearningModel, finalPosition,false);
+                                addToMyLearning(finalLearningModel, finalPosition, false);
                             } else {
                                 Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show();
                             }
@@ -1455,7 +1460,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
 
         if (learningModel.getAddedToMylearning() == 0) {
-            addToMyLearning(learningModel, position,true);
+            addToMyLearning(learningModel, position, true);
         }
 //        else {
 //

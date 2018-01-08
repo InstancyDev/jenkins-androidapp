@@ -617,6 +617,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                         preferencesManager.setStringValue(siteid, StaticValues.KEY_SITEID);
                                         preferencesManager.setStringValue(strsitename, StaticValues.KEY_SITENAME);
                                         preferencesManager.setStringValue(platformurl, StaticValues.KEY_PLATFORMURL);
+                                        appUserModel.setMainSiteName(strsitename);
                                         appUserModel.setSiteIDValue(siteid);
                                         appUserModel.setSiteName(strsitename);
                                         appUserModel.setSiteURL(platformurl);
@@ -624,6 +625,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                         appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
 
                                     } else {
+                                        appUserModel.setMainSiteName(preferencesManager.getStringValue(StaticValues.KEY_SITENAME));
                                         preferencesManager.setStringValue(siteid, StaticValues.SUB_KEY_SITEID);
                                         preferencesManager.setStringValue(strsitename, StaticValues.SUB_SITE_NAME);
 //                                        preferencesManager.setStringValue(platformurl, StaticValues.SUB_KEY_SITEURL);
@@ -1461,7 +1463,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + " WHERE" +
 //                " siteurl= '"
 //                + appUserModel.getSiteURL()
-                 " isenabled='true'"
+                " isenabled='true'"
                 + " AND siteid='" + appUserModel.getSiteIDValue() +
                 "' AND parentmenuid='0' ORDER BY displayorder";
 
@@ -9749,7 +9751,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     profileModel.userid = profileObj.get("objectid").toString();
                 }
 
-//                profileModel.userid = userID;
+                profileModel.userid = appUserModel.getUserIDValue();
 
                 Log.d(TAG, "InjectAllProfileDetails: at index " + profileModel);
                 injectProfileIntoTable(profileModel);

@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,6 +70,7 @@ import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_
 import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
 import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
 
 public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
@@ -99,6 +101,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @BindView(R.id.back_layout)
     RelativeLayout backLayout;
 
+    @BindView(R.id.subsitelayout)
+    LinearLayout subsiteLayout;
+
+
     @BindView(R.id.back_font)
     TextView fontBack;
 
@@ -120,7 +126,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     protected List<SideMenusModel> subMenuList = null;
 
     HashMap<Integer, List<SideMenusModel>> hmSubMenuList = null;
-   public DrawerLayout drawer;
+    public DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
     UiSettingsModel uiSettingsModel;
 
@@ -131,6 +137,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     RelativeLayout drawerHeaderView;
     public View logoView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -472,6 +479,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
 
     public void backToMainSite() {
+        SIDEMENUOPENED_FIRSTTIME = 0;
+        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
         preferencesManager.setStringValue("false", StaticValues.SUB_SITE_ENTERED);
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
@@ -505,8 +515,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         }
 
         menuDynamicAdapter.refreshList(sideMenusModel, hmSubMenuList);
-        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
-        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+
         backLayout.setVisibility(View.GONE);
 
         homeControllClicked();
@@ -590,19 +599,35 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onDrawerSlide(View drawerView, float slideOffset) {
 //        Log.d(TAG, "onDrawerSlide: sidemenu");
+//        if (SIDEMENUOPENED_FIRSTTIME == 0) {
+//            enteredSubsiteMethods();
+//        }
     }
 
     @Override
     public void onDrawerOpened(View drawerView) {
         Log.d(TAG, "onDrawerOpened: sidemenu");
-
-        enteredSubsiteMethods();
+        if (SIDEMENUOPENED_FIRSTTIME == 0) {
+            enteredSubsiteMethods();
+        }
     }
 
     public void enteredSubsiteMethods() {
         String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
         if (isSubSiteEntered.equalsIgnoreCase("true")) {
             backLayout.setVisibility(View.VISIBLE);
+            subsiteLayout.setVisibility(View.VISIBLE);
+            SIDEMENUOPENED_FIRSTTIME = 1;
+            TextView mainSiteName = (TextView) backLayout.findViewById(R.id.txtbtn_back);
+            TextView subsiteName = (TextView) subsiteLayout.findViewById(R.id.subsitename);
+            LinearLayout subsiteLa = (LinearLayout) subsiteLayout.findViewById(R.id.subsitelays);
+            subsiteName.setText(appUserModel.getSiteName());
+            mainSiteName.setText(appUserModel.getMainSiteName());
+            subsiteLa.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            subsiteLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            subsiteLa.setAlpha(.9f);
+//            subsiteLayout.setAlpha(.7f);
+
             drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
             sideMenusModel = new ArrayList<SideMenusModel>();
@@ -629,8 +654,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             menuDynamicAdapter.refreshList(sideMenusModel, hmSubMenuList);
         } else {
             backLayout.setVisibility(View.GONE);
+            subsiteLayout.setVisibility(View.GONE);
+            SIDEMENUOPENED_FIRSTTIME = 0;
         }
-
     }
 
     @Override

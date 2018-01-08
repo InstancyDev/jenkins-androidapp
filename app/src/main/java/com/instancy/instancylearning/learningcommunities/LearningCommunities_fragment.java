@@ -16,6 +16,7 @@ import android.icu.text.SimpleDateFormat;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.ColorInt;
@@ -669,8 +670,8 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                             try {
                                 CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
                                 MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
-//                                ((SideMenu) getActivity()).selectItem(0, sideMenusModel);
-                                ((SideMenu) getActivity()).drawer.openDrawer(Gravity.LEFT);
+//                                ((SideMenu) getActivity()).drawer.openDrawer(Gravity.LEFT);
+                                clickHomeButton();
                             } catch (NullPointerException ex) {
                                 ex.printStackTrace();
                             }
@@ -686,6 +687,20 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 //                LogUtils.d("already running ");
             }
         }
+
+    }
+
+    public void clickHomeButton() {
+
+        new CountDownTimer(500, 1000) {
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            public void onFinish() {
+                ((SideMenu) getActivity()).homeControllClicked();
+            }
+        }.start();
 
     }
 

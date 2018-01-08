@@ -102,6 +102,16 @@ public class AppUserModel {
     private String base64Credentials = "";
     private String authHeaders = "";
 
+    public String getMainSiteName() {
+        return mainSiteName;
+    }
+
+    public void setMainSiteName(String mainSiteName) {
+        this.mainSiteName = mainSiteName;
+    }
+
+    private String mainSiteName = "";
+
 
     public String getUserLoginId() {
         return userLoginId;

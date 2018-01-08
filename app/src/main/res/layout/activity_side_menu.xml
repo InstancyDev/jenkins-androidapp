@@ -59,13 +59,22 @@
             android:layout_below="@+id/rl_profile"
             android:background="@color/colorGray" />
 
+        <LinearLayout
+            android:visibility="gone"
+            android:layout_below="@id/line"
+            android:id="@+id/subsitelayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <include layout="@layout/subsitename" />
+
+        </LinearLayout>
 
         <ExpandableListView
             android:id="@+id/expanded_menu_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/layout_sing_in"
-            android:layout_below="@+id/line"
+            android:layout_below="@+id/subsitelayout"
             android:background="@color/colorWhite"
             android:childIndicator="@null"
             android:choiceMode="singleChoice"

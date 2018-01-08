@@ -3,6 +3,7 @@ package com.instancy.instancylearning.discussionfourms;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -211,7 +212,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             }
         });
 
-        floatingActionButton.setBackgroundColor(getResources().getColor(R.color.colorStatusInProgress));
+        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+
     }
 
     public void initilizeHeaderView() {

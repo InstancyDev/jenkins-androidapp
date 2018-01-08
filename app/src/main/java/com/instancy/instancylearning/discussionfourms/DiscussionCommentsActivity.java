@@ -2,6 +2,7 @@ package com.instancy.instancylearning.discussionfourms;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -223,6 +224,11 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
             }
         });
+
+        // 34700 - 99474 =  65000 + 47000 = 102000 + 128000
+
+        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+
     }
 
     public void initilizeHeaderView() {
