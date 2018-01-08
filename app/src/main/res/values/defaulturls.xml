@@ -14,8 +14,8 @@
           <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
     <!--for instancy market place-->
-    <string name="app_default_url">https://learning.instancy.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
     <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
@@ -24,8 +24,8 @@
     <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
-    <!--    <string name="app_default_url">http://qalearning.instancysoft.com/</string>
-        <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+    <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://lsonlinelifeskills.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
@@ -49,8 +49,8 @@
     <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
 
-    <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
+    <string name="app_default_url">http://app.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>
 
     <!--fo enterprise lite app -->
     <!--<string name="app_default_url">http://enterprisedemo.instancy.com/</string>-->

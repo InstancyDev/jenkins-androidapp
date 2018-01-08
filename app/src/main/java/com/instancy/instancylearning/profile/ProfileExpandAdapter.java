@@ -39,6 +39,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         this.userExperienceModelList = userExperienceModelList;
         this.expandableHashDetail = expandableHashDetail;
         this.expandableListTitle = expandableListTitle;
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -132,11 +133,11 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         }
         View cView = convertView;
 
-        if (cView == null) {
+//        if (cView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             cView = inflater.inflate(R.layout.profile_education_item, parent, false);
-        }
+//        }
         TextView profileSchool = (TextView) cView
                 .findViewById(R.id.profile_school);
         TextView profileDegree = (TextView) cView
@@ -155,11 +156,11 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
             profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate);
             profileDuration.setVisibility(View.VISIBLE);
-        } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Personal Info")) {
+        } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("1")) {
             profileSchool.setText(configsModel.attributedisplaytext);
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
-        } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Contact")) {
+        } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("2")) {
             profileSchool.setText(configsModel.attributedisplaytext);
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);

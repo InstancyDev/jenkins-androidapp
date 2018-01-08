@@ -85,6 +85,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
@@ -385,7 +386,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         toolbar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
 //        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contextTitle + "</font>"));
-
+        if (BACKTOMAINSITE == 2) {
+            MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+            BACKTOMAINSITE=0;
+        }
 
         if (isNetworkConnectionAvailable(getContext(), -1) && MYLEARNING_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
@@ -412,7 +416,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
-        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 2;
+        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+
+            MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 2;
+
     }
 
     @Override

@@ -72,6 +72,7 @@ import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITIO
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
+import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 
 public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
 
@@ -227,7 +228,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sideMenusModel = db.getNativeMainMenusData();
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
-
 
         int i = 0;
         for (SideMenusModel menu : sideMenusModel) {
@@ -479,6 +479,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
 
     public void backToMainSite() {
+        BACKTOMAINSITE = 2;
         SIDEMENUOPENED_FIRSTTIME = 0;
         CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
         MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
@@ -618,6 +619,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             backLayout.setVisibility(View.VISIBLE);
             subsiteLayout.setVisibility(View.VISIBLE);
             SIDEMENUOPENED_FIRSTTIME = 1;
+            BACKTOMAINSITE = 1;
             TextView mainSiteName = (TextView) backLayout.findViewById(R.id.txtbtn_back);
             TextView subsiteName = (TextView) subsiteLayout.findViewById(R.id.subsitename);
             LinearLayout subsiteLa = (LinearLayout) subsiteLayout.findViewById(R.id.subsitelays);

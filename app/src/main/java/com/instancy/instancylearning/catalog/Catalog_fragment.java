@@ -106,6 +106,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
@@ -390,6 +391,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
+        if (BACKTOMAINSITE == 2) {
+            CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+            BACKTOMAINSITE=0;
+        }
+
         if (!isFromCatogories) {
             catalogModelsList = new ArrayList<MyLearningModel>();
             if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
@@ -593,6 +599,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
+
         CATALOG_FRAGMENT_OPENED_FIRSTTIME = 1;
     }
 

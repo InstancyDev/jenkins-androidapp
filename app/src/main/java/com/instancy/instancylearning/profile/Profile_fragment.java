@@ -271,6 +271,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.profile_header_layout_, null);
         swipeRefreshLayout.setOnRefreshListener(this);
+        onRefresh();
         profileRound = (ImageView) header.findViewById(R.id.profile_round);
 
         userName = header.findViewById(R.id.profilename);
@@ -472,7 +473,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
                             boolean isProfileExists = getALlProfilesDetailsFromDB();
                             if (isProfileExists) {
-                                profileDynamicAdapter.notifyDataSetChanged();
+                                profileDynamicAdapter = new ProfileExpandAdapter(context, experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
+//                                profileExpandableList.setAdapter(profileDynamicAdapter);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
