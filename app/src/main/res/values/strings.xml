@@ -3,10 +3,10 @@
     <!--<string name="app_name">Online Lifeskills</string>-->
     <!--<string name="app_name">Enterprise Learning Lite</string>-->
     <!--<string name="app_name">CropLife Online Dealer Training</string>-->
-    <string name="app_name">Instancy Lite</string>
+    <!--<string name="app_name">Instancy Lite</string>-->
     <!--<string name="app_name">Learn Up - Learn on your phone</string>-->
     <!--<string name="app_name">Tracktech lifeskills</string>-->
-    <!--<string name="app_name">Training Company Lite</string>-->
+    <string name="app_name">Training Company Lite</string>
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
 
@@ -34,6 +34,8 @@
     <string name="no_categories">No Categories</string>
 
     <string name="no_event">No Events to display</string>
+
+    <string name="no_people">No Connections to display</string>
 
     <string name="loadingtxt">Loading...</string>
 

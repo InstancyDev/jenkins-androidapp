@@ -281,6 +281,9 @@ public class StaticValues {
 
     public static int SIDEMENUOPENED_FIRSTTIME = 0;
 
+
+    public static int PROFILE_FRAGMENT_OPENED_FIRSTTIME = 0;
+
     public static int BACKTOMAINSITE = 0;
 
 

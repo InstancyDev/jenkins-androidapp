@@ -73,7 +73,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 /**
  * Created by Upendranath on 5/19/2017.
@@ -271,7 +273,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.profile_header_layout_, null);
         swipeRefreshLayout.setOnRefreshListener(this);
-        onRefresh();
+
         profileRound = (ImageView) header.findViewById(R.id.profile_round);
 
         userName = header.findViewById(R.id.profilename);
@@ -296,12 +298,22 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
 
+        if (isNetworkConnectionAvailable(getContext(), -1) && PROFILE_FRAGMENT_OPENED_FIRSTTIME == 0) {
+
+            profileWebCall(appUserModel.getUserIDValue(), false);
+        } else {
+
+            boolean checkPforile = getALlProfilesDetailsFromDB();
+            if (!checkPforile) {
+                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+
         initilizeView();
 
 
         return rootView;
     }
-
 
     private void profileWebCall(String userId, boolean isRefreshed) {
 
@@ -309,7 +321,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
 
         urlStr = urlStr.replaceAll(" ", "%20");
 
@@ -365,8 +377,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         String name = "";
         String location = "";
 
-
-        if (!detailsModel.displayname.equalsIgnoreCase("")) {
+        if (!(detailsModel.displayname.equalsIgnoreCase("") || detailsModel.displayname.equalsIgnoreCase("null"))) {
             name = detailsModel.displayname;
         } else if (!detailsModel.firstname.equalsIgnoreCase("")) {
             name = detailsModel.firstname + " " + detailsModel.lastname;
@@ -388,8 +399,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             location = "";
         }
 
-        strAry[0] = name;
-        strAry[1] = location;
+        strAry[0] = upperCaseWords(name);
+        strAry[1] = upperCaseWords(location);
 
         return strAry;
     }
@@ -639,6 +650,14 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: in Mylearning fragment");
+
+        PROFILE_FRAGMENT_OPENED_FIRSTTIME = 2;
+
+    }
 
 }
 

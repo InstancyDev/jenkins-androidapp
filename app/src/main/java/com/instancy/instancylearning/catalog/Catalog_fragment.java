@@ -393,7 +393,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (BACKTOMAINSITE == 2) {
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
-            BACKTOMAINSITE=0;
+            BACKTOMAINSITE = 0;
         }
 
         if (!isFromCatogories) {
@@ -1265,8 +1265,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
-//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         String paramsString = "";
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
 

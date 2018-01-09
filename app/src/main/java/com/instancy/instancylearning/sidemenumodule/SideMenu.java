@@ -52,6 +52,7 @@ import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -70,9 +71,11 @@ import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_
 import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
 import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
 import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
+import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
 
@@ -221,9 +224,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         }
-        txtUsername.setText(name);
+        txtUsername.setText(upperCaseWords(name));
 
-        txtAddress.setText(strAry[1]);
+        txtAddress.setText(upperCaseWords(strAry[1]));
 
         sideMenusModel = db.getNativeMainMenusData();
 
@@ -399,6 +402,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             case 9:
                 fragment = new LearningCommunities_fragment();
                 break;
+            case 10:
+                fragment = new PeopleListing_fragment();
+                break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");
                 fragment = new Catalog_fragment();
@@ -483,6 +489,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         SIDEMENUOPENED_FIRSTTIME = 0;
         CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
         MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+        PROFILE_FRAGMENT_OPENED_FIRSTTIME = 0;
         preferencesManager.setStringValue("false", StaticValues.SUB_SITE_ENTERED);
         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));

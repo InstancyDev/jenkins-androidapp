@@ -1,20 +1,15 @@
-package com.instancy.instancylearning.events;
+package com.instancy.instancylearning.peoplelisting;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-
-import com.github.sundeepk.compactcalendarview.domain.Event;
-
-import android.app.usage.UsageEvents;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -53,7 +48,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,25 +62,22 @@ import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.catalog.CatalogAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
-
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
-
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
-
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -100,13 +91,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
-
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -114,9 +102,9 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
-import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
@@ -131,9 +119,9 @@ import static com.instancy.instancylearning.utils.Utilities.showToast;
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler, RadioGroup.OnCheckedChangeListener, CompactCalendarView.CompactCalendarViewListener {
+public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, RadioGroup.OnCheckedChangeListener {
 
-    String TAG = Event_fragment.class.getSimpleName();
+    String TAG = PeopleListing_fragment.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
@@ -141,8 +129,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     DatabaseHandler db;
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.mylearninglistview)
-    ListView myLearninglistView;
+
+    @BindView(R.id.peoplelsitview)
+    ListView peopleListView;
+
     CatalogAdapter catalogAdapter;
     List<MyLearningModel> catalogModelsList = null;
     PreferencesManager preferencesManager;
@@ -153,30 +143,33 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     SideMenusModel sideMenusModel = null;
     String filterContentType = "", consolidationType = "all", sortBy = "";
     ResultListner resultListner = null;
-    CmiSynchTask cmiSynchTask;
+
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-    BillingProcessor billingProcessor;
+
     boolean isFromCatogories = false;
 
     @BindView(R.id.segmentedswitch)
     SegmentedGroup segmentedSwitch;
 
-    @BindView(R.id.compactcalendar_view)
-    CompactCalendarView compactCalendarView;
+    @BindView(R.id.expertsbtn)
+    RadioButton expertsBtn;
 
-    @BindView(R.id.yearandmonth)
-    TextView YearTitle;
+    @BindView(R.id.allPeoplebtn)
+    RadioButton allPBtn;
 
+    @BindView(R.id.myconnectionbtn)
+    RadioButton myConBtn;
 
-    RadioButton upBtn, calenderBtn, pastBtn;
+    @BindView(R.id.pendingbtn)
+    RadioButton pendingBtn;
 
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
-    public Event_fragment() {
+    public PeopleListing_fragment() {
 
 
     }
@@ -190,7 +183,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         svProgressHUD = new SVProgressHUD(context);
         db = new DatabaseHandler(context);
         initVolleyCallback();
-        cmiSynchTask = new CmiSynchTask(context);
+
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
@@ -204,16 +197,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         vollyService = new VollyService(resultCallback, context);
 
-        String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
-
-        billingProcessor = new BillingProcessor(context, apiKey, this);
-
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = null;
         HashMap<String, String> responMap = null;
         Bundle bundle = getArguments();
@@ -335,35 +318,41 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.event_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.peoplelisting_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
-//        swipeRefreshLayout.setOnRefreshListener(this);
 
         catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
-        myLearninglistView.setAdapter(catalogAdapter);
-        myLearninglistView.setOnItemClickListener(this);
-        myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+        peopleListView.setAdapter(catalogAdapter);
+        peopleListView.setOnItemClickListener(this);
+        peopleListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        upBtn = (RadioButton) rootView.findViewById(R.id.upcomingbtn);
-        calenderBtn = (RadioButton) rootView.findViewById(R.id.calanderbtn);
-        pastBtn = (RadioButton) rootView.findViewById(R.id.pastbtn);
 
-        upBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        calenderBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        pastBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        upBtn.setTypeface(null, Typeface.BOLD);
+        pendingBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        allPBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        expertsBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        myConBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+
+        expertsBtn.setTypeface(null, Typeface.BOLD);
+
+
         segmentedSwitch.setOnCheckedChangeListener(this);
+
+        segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        
+        pendingBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        expertsBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        allPBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         catalogModelsList = new ArrayList<MyLearningModel>();
         if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
-            refreshCatalog(true);
+//            refreshCatalog(true);
         } else {
-            injectFromDbtoModel();
+//            injectFromDbtoModel();
         }
 
         initilizeView();
-        initilizeCalander();
 
         return rootView;
     }
@@ -377,13 +366,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
         }
-        addEvents();
-    }
-
-    public void initilizeCalander() {
-
-        compactCalendarView.setListener(this);
-        YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
 
     }
 
@@ -496,7 +478,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshCatalog(true);
+//            refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -531,7 +513,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
                 break;
             case R.id.btn_contextmenu:
-                View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
+                View v = peopleListView.getChildAt(position - peopleListView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
                 catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
                 break;
@@ -676,9 +658,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
                     intentDetail.putExtra("IFROMCATALOG", true);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-//                    v.getContext().startActivity(intentDetail);
-//                    v.getContext().startActivity(intentDetail);
-//                   context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
                 }
@@ -693,7 +672,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrollment")) {
 //                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-                    cancelEnrollment(myLearningDetalData);
+
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
 
@@ -773,7 +752,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             //do things
                                             dialog.dismiss();
                                             // add event to android calander
-                                            addEventToAndroidDevice(myLearningDetalData);
                                         }
                                     });
                             AlertDialog alert = builder.create();
@@ -1010,34 +988,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //
 //    }
 
-    @Override
-    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
-//        Toast.makeText(context, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
-        Log.v("chip", "Owned Managed Product: " + details.purchaseInfo.purchaseData);
-
-        sendInAppDetails(details);
-
-        preferencesManager.setStringValue("", "contentid");
-
-    }
-
-    @Override
-    public void onPurchaseHistoryRestored() {
-//        Toast.makeText(context, "onPurchaseHistoryRestored", Toast.LENGTH_SHORT).show();
-        for (String sku : billingProcessor.listOwnedProducts())
-            Log.v("chip", "Owned Managed Product: " + sku);
-    }
-
-    @Override
-    public void onBillingError(int errorCode, @Nullable Throwable error) {
-        Toast.makeText(context, "onBillingError", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onBillingInitialized() {
-//        Toast.makeText(context, "onBillingInitialized", Toast.LENGTH_SHORT).show();
-    }
-
     public boolean sendInAppDetails(@Nullable TransactionDetails details) {
 
         String contentId = preferencesManager.getStringValue("contentid");
@@ -1152,17 +1102,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
             }
         }
-
-        if (requestCode == IAP_LAUNCH_FLOW_CODE && resultCode == 80) {
-            if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
-
-                super.onActivityResult(requestCode, resultCode, data);
-//            if (data != null) {
-//
-//                MyLearningModel learningModel = (MyLearningModel) data.getSerializableExtra("learningdata");
-////            billingProcessor.handleActivityResult(8099, 80, intent);
-            }
-        }
         if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
 
             if (data != null) {
@@ -1171,8 +1110,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 File myFile = new File(myLearningModel.getOfflinepath());
 
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
-                    cmiSynchTask = new CmiSynchTask(context);
-                    cmiSynchTask.execute();
+
                 }
 
                 if (!myFile.exists()) {
@@ -1276,30 +1214,33 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int isChecked) {
 
-
         switch (isChecked) {
-            case R.id.upcomingbtn:
-                compactCalendarView.setVisibility(View.GONE);
-                YearTitle.setVisibility(View.GONE);
-                upBtn.setTypeface(null, Typeface.BOLD);
-                calenderBtn.setTypeface(null, Typeface.NORMAL);
-                pastBtn.setTypeface(null, Typeface.NORMAL);
+            case R.id.expertsbtn:
+                expertsBtn.setTypeface(null, Typeface.BOLD);
+                allPBtn.setTypeface(null, Typeface.NORMAL);
+                myConBtn.setTypeface(null, Typeface.NORMAL);
+                pendingBtn.setTypeface(null, Typeface.NORMAL);
                 sortByDate("before");
                 break;
-            case R.id.calanderbtn:
-                upBtn.setTypeface(null, Typeface.NORMAL);
-                calenderBtn.setTypeface(null, Typeface.BOLD);
-                pastBtn.setTypeface(null, Typeface.NORMAL);
-                compactCalendarView.setVisibility(View.VISIBLE);
-                YearTitle.setVisibility(View.VISIBLE);
-                catalogAdapter.refreshList(catalogModelsList);
+            case R.id.allPeoplebtn:
+                allPBtn.setTypeface(null, Typeface.BOLD);
+                expertsBtn.setTypeface(null, Typeface.NORMAL);
+                myConBtn.setTypeface(null, Typeface.NORMAL);
+                pendingBtn.setTypeface(null, Typeface.NORMAL);
+//                catalogAdapter.refreshList(catalogModelsList);
                 break;
-            case R.id.pastbtn:
-                upBtn.setTypeface(null, Typeface.NORMAL);
-                calenderBtn.setTypeface(null, Typeface.NORMAL);
-                pastBtn.setTypeface(null, Typeface.BOLD);
-                compactCalendarView.setVisibility(View.GONE);
-                YearTitle.setVisibility(View.GONE);
+            case R.id.myconnectionbtn:
+                myConBtn.setTypeface(null, Typeface.BOLD);
+                expertsBtn.setTypeface(null, Typeface.NORMAL);
+                allPBtn.setTypeface(null, Typeface.NORMAL);
+                pendingBtn.setTypeface(null, Typeface.NORMAL);
+                sortByDate("after");
+                break;
+            case R.id.pendingbtn:
+                pendingBtn.setTypeface(null, Typeface.BOLD);
+                expertsBtn.setTypeface(null, Typeface.NORMAL);
+                myConBtn.setTypeface(null, Typeface.NORMAL);
+                allPBtn.setTypeface(null, Typeface.NORMAL);
                 sortByDate("after");
                 break;
             default:
@@ -1309,237 +1250,56 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @TargetApi(Build.VERSION_CODES.N)
     public void sortByDate(String typeTime) {
-        List<MyLearningModel> myLearningModelList = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        List<MyLearningModel> myLearningModelList = new ArrayList<>();
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//        if (typeTime.equalsIgnoreCase("before")) {
+//
+//            for (int i = 0; i < catalogModelsList.size(); i++) {
+//                Date strDate = null;
+//                String checkDate = catalogModelsList.get(i).getEventstartTime();
+//
+//                try {
+//                    strDate = sdf.parse(checkDate);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (new Date().before(strDate)) {
+//                    myLearningModelList.add(catalogModelsList.get(i));
+//                    catalogAdapter.refreshList(myLearningModelList);
+////                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
+//                }
+//
+//
+//            }
+//
+//        } else {
+//
+//            for (int i = 0; i < catalogModelsList.size(); i++) {
+//                Date strDate = null;
+//                String checkDate = catalogModelsList.get(i).getEventstartTime();
+//
+//                try {
+//                    strDate = sdf.parse(checkDate);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                if (new Date().after(strDate)) {
+//                    myLearningModelList.add(catalogModelsList.get(i));
+//                    catalogAdapter.refreshList(myLearningModelList);
+////                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
+//                } else {
+//
+//                    catalogAdapter.refreshList(myLearningModelList);
+//                }
+//
+//
+//            }
+//
+//
+//        }
 
-        if (typeTime.equalsIgnoreCase("before")) {
-
-            for (int i = 0; i < catalogModelsList.size(); i++) {
-                Date strDate = null;
-                String checkDate = catalogModelsList.get(i).getEventstartTime();
-
-                try {
-                    strDate = sdf.parse(checkDate);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                if (new Date().before(strDate)) {
-                    myLearningModelList.add(catalogModelsList.get(i));
-                    catalogAdapter.refreshList(myLearningModelList);
-//                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
-                }
-
-
-            }
-
-        } else {
-
-            for (int i = 0; i < catalogModelsList.size(); i++) {
-                Date strDate = null;
-                String checkDate = catalogModelsList.get(i).getEventstartTime();
-
-                try {
-                    strDate = sdf.parse(checkDate);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                if (new Date().after(strDate)) {
-                    myLearningModelList.add(catalogModelsList.get(i));
-                    catalogAdapter.refreshList(myLearningModelList);
-//                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
-                } else {
-
-                    catalogAdapter.refreshList(myLearningModelList);
-                }
-
-
-            }
-
-
-        }
-
-    }
-
-    @Override
-    public void onDayClick(Date dateClicked) {
-        List<MyLearningModel> calanderEventList = new ArrayList<>();
-//        Toast.makeText(context, " " + dateFormatForDisplaying.format(dateClicked), Toast.LENGTH_SHORT).show();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        for (int i = 0; i < catalogModelsList.size(); i++) {
-            Date strDate = null;
-            String checkDateStr = catalogModelsList.get(i).getEventstartTime();
-
-            try {
-                strDate = sdf.parse(checkDateStr);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            Date clickedDate = GetZeroTimeDate(dateClicked);
-            Date checkDate = GetZeroTimeDate(strDate);
-
-            if (!clickedDate.after(checkDate) && !clickedDate.before(checkDate)) {
-
-                calanderEventList.add(catalogModelsList.get(i));
-                catalogAdapter.refreshList(calanderEventList);
-            } else {
-
-                catalogAdapter.refreshList(calanderEventList);
-            }
-        }
-    }
-
-    @Override
-    public void onMonthScroll(Date firstDayOfNewMonth) {
-
-        YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
-    }
-
-
-    private void addEvents() {
-
-        for (int i = 0; i < catalogModelsList.size(); i++) {
-
-            Date date = ConvertToDate(catalogModelsList.get(i).getEventstartTime());
-            currentCalender.setTime(date);
-
-            currentCalender.add(Calendar.DATE, i);
-            setToMidnight(currentCalender);
-            long timeInMillis = currentCalender.getTimeInMillis();
-            List<Event> events = getEvents(timeInMillis, i);
-
-            compactCalendarView.addEvents(events);
-        }
-    }
-
-    private List<Event> getEvents(long timeInMillis, int day) {
-        if (day < 2) {
-            return Arrays.asList(new Event(Color.argb(255, 169, 68, 65), timeInMillis, "Event at " + new Date(timeInMillis)));
-        } else if (day > 2 && day <= 4) {
-            return Arrays.asList(
-                    new Event(Color.argb(255, 169, 68, 65), timeInMillis, "Event at " + new Date(timeInMillis)),
-                    new Event(Color.argb(255, 100, 68, 65), timeInMillis, "Event 2 at " + new Date(timeInMillis)));
-        } else {
-            return Arrays.asList(
-                    new Event(Color.argb(255, 169, 68, 65), timeInMillis, "Event at " + new Date(timeInMillis)),
-                    new Event(Color.argb(255, 100, 68, 65), timeInMillis, "Event 2 at " + new Date(timeInMillis)),
-                    new Event(Color.argb(255, 70, 68, 65), timeInMillis, "Event 3 at " + new Date(timeInMillis)));
-        }
-    }
-
-    private void setToMidnight(Calendar calendar) {
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-    }
-
-    public void addEventToAndroidDevice(MyLearningModel eventModel) {
-
-        try {
-            String eventUriString = "content://com.android.calendar/events";
-            ContentValues eventValues = new ContentValues();
-            eventValues.put("calendar_id", 1); // id, We need to choose from
-            // our mobile for primary its 1
-            eventValues.put("title", eventModel.getCourseName());
-            eventValues.put("description", eventModel.getShortDes());
-            eventValues.put("eventLocation", eventModel.getLocationName());
-
-
-            long startMillis = 0;
-            long endMillis = 0;
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date startDate = null, endDate = null;
-            try {
-                startDate = simpleDateFormat.parse(eventModel.getEventstartTime());
-                startMillis = startDate.getTime();
-                endDate = simpleDateFormat.parse(eventModel.getEventendTime());
-                endMillis = endDate.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            long endDates = startMillis + 1000 * 10 * 10; // For next 10min
-            eventValues.put("dtstart", startMillis);
-            eventValues.put("dtend", endDates);
-
-            // values.put("allDay", 1); //If it is bithday alarm or such
-            // kind (which should remind me for whole day) 0 for false, 1
-            // for true
-            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
-            // sufficient for most
-            // entries tentative (0),
-            // confirmed (1) or canceled
-            // (2):
-//            eventValues.put("eventTimezone", "UTC/GMT +5:30");
-            eventValues.put("eventTimezone", "UTC/GMT +5:30");
-
-
-            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
-
-            Uri eventUri = context.getApplicationContext()
-                    .getContentResolver()
-                    .insert(Uri.parse(eventUriString), eventValues);
-//           String eventID = Long.parseLong(eventUri.getLastPathSegment());
-        } catch (Exception ex) {
-            Log.e(TAG, "addEventToAndroidDevice: " + ex.getMessage());
-        }
-    }
-
-    public void cancelEnrollment(final MyLearningModel eventModel) {
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/CancelEnrolledEvent?EventContentId="
-                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue();
-
-        Log.d(TAG, "main login : " + urlStr);
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-
-        StringRequest jsonObjectRequest = new StringRequest(urlStr,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        svProgressHUD.dismiss();
-                        Log.d("Response: ", " " + response);
-
-                        if (response.contains("true")) {
-
-                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.event_cancelled))
-                                    .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            //do things
-                                            dialog.dismiss();
-                                            // remove event from android calander
-                                            injectFromDbtoModel();
-                                            db.ejectEventsFromDownloadData(eventModel);
-                                        }
-                                    });
-                            AlertDialog alert = builder.create();
-                            alert.show();
-
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("Error: ", error.getMessage());
-//                        svProgressHUD.dismiss();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                return headers;
-            }
-        };
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 }

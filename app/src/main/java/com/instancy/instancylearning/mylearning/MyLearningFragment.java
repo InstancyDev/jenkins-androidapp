@@ -388,7 +388,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contextTitle + "</font>"));
         if (BACKTOMAINSITE == 2) {
             MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
-            BACKTOMAINSITE=0;
+            BACKTOMAINSITE = 0;
         }
 
         if (isNetworkConnectionAvailable(getContext(), -1) && MYLEARNING_FRAGMENT_OPENED_FIRSTTIME == 0) {
@@ -416,9 +416,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
-        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
 
-            MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 2;
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 2;
 
     }
 

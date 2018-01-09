@@ -20,6 +20,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
+import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
@@ -1479,11 +1480,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String contextMenuID = cursor.getString(cursor
                             .getColumnIndex("contextmenuid"));
+
+
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
 //
-//                    if (!contextMenuID.equalsIgnoreCase("1"))
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("9")) || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("6"))
-                        continue;
+////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
+////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9")))
+//                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -9205,6 +9208,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             JSONArray jsonExperienceAry = null;
 
+            JSONArray jsonAllUsersInfoAry = null;
+
             if (jsonObject.has("userprofiledetails")) {
                 jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
             } else {
@@ -9228,6 +9233,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonObject.has("usereducationdata")) {
 
                 jsonEducationAry = jsonObject.getJSONArray("usereducationdata");
+
+                // for all education data hide for cle
+                if (jsonEducationAry.length() > 0) {
+
+                    injectUserEducation(jsonEducationAry, userID);
+                }
+
+
             } else {
                 //no else
             }
@@ -9235,9 +9248,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonObject.has("userexperiencedata")) {
 
                 jsonExperienceAry = jsonObject.getJSONArray("userexperiencedata");
+
+
+                // for experience data
+                if (jsonExperienceAry.length() > 0) {
+
+                    injectUserExperience(jsonExperienceAry, userID);
+                }
+
+
             } else {
                 //no else for old apis
             }
+
+/// all user info
+            if (jsonObject.has("siteusersinfo")) {
+
+                jsonAllUsersInfoAry = jsonObject.getJSONArray("siteusersinfo");
+
+                // for all education data hide for cle
+                if (jsonAllUsersInfoAry.length() > 0) {
+
+                    injectAllUserInfo(jsonAllUsersInfoAry, userID);
+                }
+
+
+            } else {
+                //no else
+            }
+
 
 //            jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
 //
@@ -9260,17 +9299,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 injectProfileDetails(jsonProfileAry, userID);
             }
 
-            // for all education data hide for cle
-//                if (jsonEducationAry.length() > 0) {
-//
-//                    injectUserEducation(jsonEducationAry, userID);
-//                }
-//
-//                // for experience data
-//                if (jsonExperienceAry.length() > 0) {
-//
-//                    injectUserExperience(jsonExperienceAry, userID);
-//                }
 
         }
     }
@@ -9362,7 +9390,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 for (String fieldName : profileAry) {
 
-                    if (dataFieldName.toLowerCase().contains(fieldName)) {
+                    if (dataFieldName.toLowerCase().equalsIgnoreCase(fieldName)) {
                         Log.d(TAG, "injectProfileConfigs: dataFieldName " + dataFieldName);
 
                         String aliasname = "";
@@ -9592,19 +9620,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (jsonProfileAry.length() > 0) {
 
+            SQLiteDatabase db = this.getWritableDatabase();
+            try {
+                String strDelete = "DELETE FROM " + TBL_USERPROFILEFIELDS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                db.execSQL(strDelete);
+
+            } catch (SQLiteException sqlEx) {
+
+                sqlEx.printStackTrace();
+            }
 
             for (int i = 0; i < jsonProfileAry.length(); i++) {
                 ProfileDetailsModel profileModel = new ProfileDetailsModel();
 
-                SQLiteDatabase db = this.getWritableDatabase();
-                try {
-                    String strDelete = "DELETE FROM " + TBL_USERPROFILEFIELDS + " WHERE objectid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
-                    db.execSQL(strDelete);
-
-                } catch (SQLiteException sqlEx) {
-
-                    sqlEx.printStackTrace();
-                }
 
                 JSONObject profileObj = jsonProfileAry.getJSONObject(i);
 
@@ -9668,10 +9696,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     profileModel.imaddress = profileObj.get("imaddress").toString();
                 }
                 if (profileObj.has("dateofbirth")) {
-                    profileModel.dateofbirth = profileObj.get("dateofbirth").toString();
+
+
+                    String formattedDate = formatDate(profileObj.get("dateofbirth").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MMM-dd");
+
+                    profileModel.dateofbirth = formattedDate;
+
+                    // format the date
                 }
                 if (profileObj.has("gender")) {
-                    profileModel.gender = profileObj.get("gender").toString();
+
+                    String genderStr = profileObj.get("gender").toString();
+
+                    if (genderStr.toLowerCase().equalsIgnoreCase("true")) {
+                        profileModel.gender = "Male";
+                    } else {
+                        profileModel.gender = "Female";
+                    }
                 }
                 if (profileObj.has("nvarchar6")) {
                     profileModel.nvarchar6 = profileObj.get("nvarchar6").toString();
@@ -9865,20 +9906,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (jsonExperienceAry.length() > 0) {
 
+            SQLiteDatabase db = this.getWritableDatabase();
+            try {
+                String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE userid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+                db.execSQL(strDelete);
+
+            } catch (SQLiteException sqlEx) {
+
+                sqlEx.printStackTrace();
+            }
 
             for (int i = 0; i < jsonExperienceAry.length(); i++) {
 
                 UserExperienceModel userExperienceModel = new UserExperienceModel();
 
-                SQLiteDatabase db = this.getWritableDatabase();
-                try {
-                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE userid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
-                    db.execSQL(strDelete);
-
-                } catch (SQLiteException sqlEx) {
-
-                    sqlEx.printStackTrace();
-                }
+//                SQLiteDatabase db = this.getWritableDatabase();
+//                try {
+//                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE userid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+//                    db.execSQL(strDelete);
+//
+//                } catch (SQLiteException sqlEx) {
+//
+//                    sqlEx.printStackTrace();
+//                }
 
                 JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
 
@@ -10052,6 +10102,83 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    // insert all user info
+
+    public void injectAllUserInfo(JSONArray jsonExperienceAry, String userID) throws JSONException {
+
+        if (jsonExperienceAry.length() > 0) {
+
+            SQLiteDatabase db = this.getWritableDatabase();
+
+
+            for (int i = 0; i < jsonExperienceAry.length(); i++) {
+
+                AllUserInfoModel allUserInfoModel = new AllUserInfoModel();
+
+
+                JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
+
+                if (experiencObj.has("displayname")) {
+
+                    allUserInfoModel.displayName = experiencObj.get("displayname").toString();
+                }
+                if (experiencObj.has("email")) {
+                    allUserInfoModel.email = experiencObj.get("email").toString();
+                }
+                if (experiencObj.has("picture")) {
+                    allUserInfoModel.picture = experiencObj.get("picture").toString();
+                }
+                if (experiencObj.has("profileimagepath")) {
+                    allUserInfoModel.profileImagePath = experiencObj.get("profileimagepath").toString();
+                }
+                if (experiencObj.has("userid")) {
+                    allUserInfoModel.userid = experiencObj.get("userid").toString();
+                }
+                allUserInfoModel.siteID = appUserModel.getSiteIDValue();
+
+
+//                userEducationModel.userid = userID;
+
+                Log.d(TAG, "InjectAllProfileDetails: at index " + allUserInfoModel);
+
+                try {
+                    String strDelete = "DELETE FROM " + TBL_ALLUSERSINFO + " WHERE userid  = " + allUserInfoModel.userid + " and siteid = " + appUserModel.getSiteIDValue();
+                    db.execSQL(strDelete);
+
+                } catch (SQLiteException sqlEx) {
+
+                    sqlEx.printStackTrace();
+                }
+
+                injectAllUserInfoIntoTable(allUserInfoModel);
+            }
+
+        }
+
+    }
+
+    public void injectAllUserInfoIntoTable(AllUserInfoModel allUserInfoModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        try {
+            contentValues = new ContentValues();
+            contentValues.put("picture", allUserInfoModel.picture);
+            contentValues.put("userid", allUserInfoModel.userid);
+            contentValues.put("displayname", allUserInfoModel.displayName);
+            contentValues.put("email", allUserInfoModel.email);
+            contentValues.put("profileimagepath", allUserInfoModel.profileImagePath);
+            contentValues.put("siteid", allUserInfoModel.siteID);
+
+
+            db.insert(TBL_ALLUSERSINFO, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
 
     public List<ProfileGroupModel> fetchProfileGroupNames(String siteId, String userID) {
 
@@ -10173,7 +10300,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             : "Error getting menus");
         }
 
-
         return profileDetailsModel;
     }
 
@@ -10247,7 +10373,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String selFieldsQuery = "SELECT * FROM " + TBL_USERPROFILEFIELDS
                 + " WHERE objectid='" + userID + "' AND siteid='" + siteID
                 + "'";
-
         SQLiteDatabase db = null;
         Cursor curFields = null;
         try {

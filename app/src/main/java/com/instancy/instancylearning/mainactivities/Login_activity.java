@@ -494,7 +494,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     private void profileWebCall(String userId) {
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
 
         urlStr = urlStr.replaceAll(" ", "%20");
 
@@ -541,7 +541,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void hideOrShowBtns() {
-        settingTxt.setVisibility(View.VISIBLE);
+        settingTxt.setVisibility(View.INVISIBLE);
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
