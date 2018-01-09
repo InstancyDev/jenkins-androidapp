@@ -250,6 +250,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public static final String TBL_SUBSITESETTINGS = "TBL_SUBSITESETTINGS";
 
+    public static final String TBL_PEOPLELISTING = "TBL_PEOPLELISTING";
+
+
     private Context dbctx;
     private WebAPIClient wap;
     private SharedPreferences sharedPreferences;
@@ -508,6 +511,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_SUBSITESETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, siteurl TEXT, authid TEXT, authpwd TEXT, userid TEXT, sitename TEXT, parentsiteid TEXT, parentsiteurl TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " +TBL_PEOPLELISTING + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, connectionuserid INTEGER, userid TEXT, jobtitle TEXT, mainofficeaddress TEXT, memberprofileimage TEXT, userdisplayname TEXT, connectionstate TEXT, connectionstateaccept TEXT, viewprofileaction TEXT, acceptaction TEXT, ignoreaction TEXT, viewcontentaction TEXT, sendmessageaction TEXT, addtomyconnectionaction TEXT, removefrommyconnectionaction TEXT, interestareas TEXT, notamember INTEGER, siteurl TEXT, siteid TEXT, tabid TEXT, mainsiteuserid TEXT)");
+
 
         Log.d(TAG, "onCreate:  TABLES CREATED");
 

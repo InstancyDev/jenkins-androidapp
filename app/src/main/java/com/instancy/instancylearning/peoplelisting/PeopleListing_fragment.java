@@ -73,6 +73,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
@@ -133,8 +134,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.peoplelsitview)
     ListView peopleListView;
 
-    CatalogAdapter catalogAdapter;
-    List<MyLearningModel> catalogModelsList = null;
+    PeopleListingAdapter peopleListingAdapter;
+    List<AllUserInfoModel> allUserInfoModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -164,10 +165,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.pendingbtn)
     RadioButton pendingBtn;
 
-
-    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
-    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
-    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
     public PeopleListing_fragment() {
 
@@ -322,11 +319,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         ButterKnife.bind(this, rootView);
 
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
-        peopleListView.setAdapter(catalogAdapter);
+        peopleListingAdapter = new PeopleListingAdapter(getActivity(), BIND_ABOVE_CLIENT, allUserInfoModelList);
+        peopleListView.setAdapter(peopleListingAdapter);
         peopleListView.setOnItemClickListener(this);
         peopleListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-
 
         pendingBtn.setTextColor(getResources().getColor(R.color.colorWhite));
         allPBtn.setTextColor(getResources().getColor(R.color.colorWhite));
@@ -335,21 +331,20 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         expertsBtn.setTypeface(null, Typeface.BOLD);
 
-
         segmentedSwitch.setOnCheckedChangeListener(this);
 
         segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        
+
         pendingBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         expertsBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         allPBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        catalogModelsList = new ArrayList<MyLearningModel>();
-        if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
-//            refreshCatalog(true);
+        allUserInfoModelList = new ArrayList<AllUserInfoModel>();
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            refreshCatalog(true);
         } else {
-//            injectFromDbtoModel();
+            injectFromDbtoModel();
         }
 
         initilizeView();
@@ -359,13 +354,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
 
     public void injectFromDbtoModel() {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId());
-        if (catalogModelsList != null) {
-            catalogAdapter.refreshList(catalogModelsList);
-        } else {
-            catalogModelsList = new ArrayList<MyLearningModel>();
-            catalogAdapter.refreshList(catalogModelsList);
-        }
+//        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId());
+//        if (catalogModelsList != null) {
+//            catalogAdapter.refreshList(catalogModelsList);
+//        } else {
+//            catalogModelsList = new ArrayList<MyLearningModel>();
+//            catalogAdapter.refreshList(catalogModelsList);
+//        }
 
     }
 
@@ -415,7 +410,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-                    catalogAdapter.filter(newText.toLowerCase(Locale.getDefault()));
+                    peopleListingAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
                     return true;
                 }
@@ -463,7 +458,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
                 appcontroller.setAlreadyViewd(false);
                 preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
-                catalogAdapter.notifyDataSetChanged();
+                peopleListingAdapter.notifyDataSetChanged();
                 break;
             case R.id.mylearning_filter:
                 break;
@@ -478,7 +473,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-//            refreshCatalog(true);
+            refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -515,7 +510,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             case R.id.btn_contextmenu:
                 View v = peopleListView.getChildAt(position - peopleListView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
+//                catalogContextMenuMethod(position, view, txtBtnDownload, allUserInfoModelList.get(position), uiSettingsModel, appUserModel);
                 break;
             default:
 
@@ -677,7 +672,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
 
 //                    addToMyLearning(myLearningDetalData);
-                    addToMyLearningCheckUser(myLearningDetalData, position, false);
+
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
 
                 }
@@ -692,400 +687,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         });
         popup.show();//showing popup menu
 
-    }
-
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position, boolean isInapp) {
-
-        if (isNetworkConnectionAvailable(context, -1)) {
-
-            if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
-
-                checkUserLogin(myLearningDetalData, position, isInapp);
-            } else {
-
-//                if (isInapp) {
-//                    inAppActivityCall(myLearningDetalData);
-//
-//                } else {
-                addToMyLearning(myLearningDetalData, position);
-//
-//                }
-
-            }
-        }
-    }
-
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
-
-        if (isNetworkConnectionAvailable(context, -1)) {
-            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
-            if (isSubscribed) {
-                Toast toast = Toast.makeText(
-                        context,
-                        context.getString(R.string.cat_add_already),
-                        Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            } else {
-                String requestURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileAddtoMyCatalog?"
-                        + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
-                        + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
-
-                requestURL = requestURL.replaceAll(" ", "%20");
-                Log.d(TAG, "inside catalog login : " + requestURL);
-
-                StringRequest strReq = new StringRequest(Request.Method.GET,
-                        requestURL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, "add to mylearning data " + response.toString());
-                        if (response.equalsIgnoreCase("true")) {
-                            catalogModelsList.get(position).setAddedToMylearning(1);
-                            catalogAdapter.notifyDataSetChanged();
-                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
-
-                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.event_add_success))
-                                    .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            //do things
-                                            dialog.dismiss();
-                                            // add event to android calander
-                                        }
-                                    });
-                            AlertDialog alert = builder.create();
-                            alert.show();
-
-                        } else {
-                            Toast toast = Toast.makeText(
-                                    context, "Unable to process request",
-                                    Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.d(TAG, "Error: " + error.getMessage());
-
-                    }
-                }) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        final Map<String, String> headers = new HashMap<>();
-                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                        return headers;
-                    }
-                };
-                ;
-                VolleySingleton.getInstance(context).addToRequestQueue(strReq);
-
-
-            }
-
-        }
-    }
-
-    public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
-                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-        Log.d(TAG, "inside catalog login : " + urlStr);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObj) {
-                        svProgressHUD.dismiss();
-                        if (jsonObj.has("faileduserlogin")) {
-
-                            JSONArray userloginAry = null;
-                            try {
-                                userloginAry = jsonObj
-                                        .getJSONArray("faileduserlogin");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            if (userloginAry.length() > 0) {
-
-
-                                String response = null;
-                                try {
-                                    response = userloginAry
-                                            .getJSONObject(0)
-                                            .get("userstatus")
-                                            .toString();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                                if (response.contains("Login Failed")) {
-                                    Toast.makeText(context,
-                                            "Authentication Failed. Contact site admin",
-                                            Toast.LENGTH_LONG)
-                                            .show();
-
-                                }
-                                if (response.contains("Pending Registration")) {
-
-                                    Toast.makeText(context, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
-                                            Toast.LENGTH_LONG)
-                                            .show();
-                                }
-                            }
-                        } else if (jsonObj.has("successfulluserlogin")) {
-
-                            try {
-                                JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
-                                if (loginResponseAry.length() != 0) {
-                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
-
-                                    String userIdresponse = loginResponseAry
-                                            .getJSONObject(0)
-                                            .get("userid").toString();
-                                    if (userIdresponse.length() != 0) {
-
-//                                        if (isInapp) {
-//
-//                                            inAppActivityCall(learningModel);
-//
-//                                        } else {
-//                                            addToMyLearning(learningModel, position);
-//                                        }
-
-                                    }
-                                }
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-//                        Log.e("Error: ", error.getMessage());
-//                        svProgressHUD.dismiss();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                return headers;
-            }
-        };
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
-
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position) {
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
-                + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
-                + appUserModel.getUserIDValue() + "&DelivoryMode=1";
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-        Log.d(TAG, "getMobileGetMobileContentMetaData : " + urlStr);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObj) {
-
-                        Log.d(TAG, "getMobileGetMobileContentMetaData response : " + jsonObj);
-                        if (jsonObj.length() != 0) {
-                            boolean isInserted = false;
-                            try {
-                                isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
-                                if (isInserted) {
-                                    catalogModelsList.get(position).setAddedToMylearning(1);
-                                    catalogAdapter.notifyDataSetChanged();
-//                                    Toast toast = Toast.makeText(
-//                                            context,
-//                                            context.getString(R.string.cat_add_success),
-//                                            Toast.LENGTH_SHORT);
-//                                    toast.setGravity(Gravity.CENTER, 0, 0);
-//                                    toast.show();
-
-                                    final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setMessage(context.getString(R.string.cat_add_success))
-                                            .setCancelable(false)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int id) {
-                                                    //do things
-                                                    dialog.dismiss();
-                                                }
-                                            });
-
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-//                        Log.e("Error: ", error.getMessage());
-//                        svProgressHUD.dismiss();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                return headers;
-            }
-        };
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-    }
-
-//    public void inAppActivityCall(MyLearningModel learningModel) {
-//        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
-//        if (!BillingProcessor.isIabServiceAvailable(context)) {
-//
-//            Toast.makeText(context, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        String testId = "android.test.purchased";
-//        String productId = "com.instancy.managedproduct";
-//        String originalproductid = learningModel.getGoogleProductID();
-//
-//        if (originalproductid.length() != 0) {
-//            Intent intent = new Intent();
-//            intent.putExtra("learningdata", learningModel);
-//            billingProcessor.handleActivityResult(IAP_LAUNCH_FLOW_CODE, 80, intent);
-//            billingProcessor.purchase(getActivity(), originalproductid);
-//        } else {
-//            Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
-//        }
-//
-////        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
-////        String productid = null;
-////        productid = learningModel.getGoogleProductID();
-//
-////        SkuDetails sku = billingProcessor.getPurchaseListingDetails(testId);
-//
-////        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
-//
-//
-//    }
-
-    public boolean sendInAppDetails(@Nullable TransactionDetails details) {
-
-        String contentId = preferencesManager.getStringValue("contentid");
-        MyLearningModel learningModel = new MyLearningModel();
-
-        int position = 0;
-
-        for (int i = 0; i < catalogModelsList.size(); i++) {
-            System.out.println(catalogModelsList.get(i));
-
-            if (contentId.equalsIgnoreCase(catalogModelsList.get(i).getContentID())) {
-                learningModel = catalogModelsList.get(i);
-                position = i;
-                break;
-            }
-        }
-        boolean status = false;
-        String orderId = "";
-        String productId = "";
-        String purchaseToken = "";
-        String purchaseTime = "";
-
-        try {
-            assert details != null;
-            orderId = details.purchaseInfo.purchaseData.orderId;
-            productId = details.purchaseInfo.purchaseData.productId;
-            purchaseToken = details.purchaseInfo.purchaseData.purchaseToken;
-
-            String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
-            purchaseTime = dateString.replace(" ", "%20");
-
-        } catch (Exception jx) {
-            Log.d("sendInAppDetails", jx.getMessage());
-
-        }
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSaveInAppPurchaseDetails?_userId="
-                + learningModel.getUserID() + "&_siteURL=" + appUserModel.getSiteURL() + "&_contentId="
-                + learningModel.getContentID() + "&_transactionId=" + orderId + "&_receipt="
-                + purchaseToken + "&_productId=" + productId
-                + "&_purchaseDate=" + purchaseTime + "&_devicetype=Android";//"&_objectTypeId="+learningModel.getObjecttypeId();
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-        Log.d(TAG, "inappwebcall : " + urlStr);
-
-
-        try {
-            final MyLearningModel finalLearningModel = learningModel;
-            final int finalPosition = position;
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, urlStr,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String _response) {
-
-                            Log.d("logr  _response =", _response);
-
-                            if (_response.contains("success")) {
-                                addToMyLearning(finalLearningModel, finalPosition);
-                            } else {
-                                Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    // Error handling
-//                    Log.d("logr  error =", error.getMessage());
-
-                }
-            }) {
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    final Map<String, String> headers = new HashMap<>();
-                    String authHeaders = appUserModel.getAuthHeaders();
-                    String base64EncodedCredentials = Base64.encodeToString(authHeaders.getBytes(), Base64.NO_WRAP);
-
-                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                    return headers;
-                }
-
-                @Override
-                protected VolleyError parseNetworkError(VolleyError volleyError) {
-                    if (volleyError.networkResponse != null && volleyError.networkResponse.data != null) {
-                        VolleyError error = new VolleyError(new String(volleyError.networkResponse.data));
-                        volleyError = error;
-                        Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
-
-                    }
-                    return volleyError;
-                }
-            };
-            VolleySingleton.getInstance(context).addToRequestQueue(stringRequest);
-
-        } catch (Exception e) {
-
-        }
-
-        return status;
     }
 
 
