@@ -165,6 +165,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.pendingbtn)
     RadioButton pendingBtn;
 
+    String TABBALUE="Experts";
+
 
     public PeopleListing_fragment() {
 
@@ -236,9 +238,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
+        String paramsString = "ComponentID=78&ComponentInstanceID=3473&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType="+TABBALUE;
 
-        vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
     }
 
     void initVolleyCallback() {
@@ -248,11 +250,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("CATALOGDATA")) {
+                if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
                     if (response != null) {
                         try {
-                            db.injectEventCatalog(response);
-                            injectFromDbtoModel();
+                            db.injectPeopleListingListIntoSqLite(response,TABBALUE);
+//                            injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -260,7 +262,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
-
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);

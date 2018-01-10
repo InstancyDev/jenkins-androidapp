@@ -484,8 +484,12 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
                             boolean isProfileExists = getALlProfilesDetailsFromDB();
                             if (isProfileExists) {
-                                profileDynamicAdapter = new ProfileExpandAdapter(context, experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
-//                                profileExpandableList.setAdapter(profileDynamicAdapter);
+                                profileDynamicAdapter.refreshList(experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
+
+                                if (profileGroupModelList != null && profileGroupModelList.size() > 0) {
+                                    for (int i = 0; i < profileGroupModelList.size(); i++)
+                                        profileExpandableList.expandGroup(i);
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -607,7 +607,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     if (response != null) {
                         if (response.toLowerCase().contains("success")) {
 
-                            addToMyLearning(myLearningModel);
+                            addToMyLearning(myLearningModel, false);
 
                         } else {
                             Toast.makeText(MyLearningDetail_Activity.this, "Purchase failed", Toast.LENGTH_SHORT).show();
@@ -870,7 +870,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     public void downloadTheCourse(final MyLearningModel learningModel, final View view) {
 
         if (learningModel.getAddedToMylearning() == 0 && isFromCatalog) {
-            addToMyLearning(learningModel);
+            addToMyLearning(learningModel, false);
         }
 
         boolean isZipFile = false;
@@ -1066,14 +1066,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 if (isInApp) {
                     inAppActivityCall(myLearningDetalData);
                 } else {
-                    addToMyLearning(myLearningDetalData);
+                    addToMyLearning(myLearningDetalData, true);
                 }
 
             }
         }
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final boolean isJoinedCommunity) {
 
         if (isNetworkConnectionAvailable(this, -1)) {
             boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -1099,7 +1099,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
 
-                            getMobileGetMobileContentMetaData(myLearningDetalData);
+                            getMobileGetMobileContentMetaData(myLearningDetalData, isJoinedCommunity);
                             myLearningModel.setAddedToMylearning(1);
                             refreshCatalogContent = true;
                         } else {
@@ -1200,10 +1200,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                     if (userIdresponse.length() != 0) {
 
                                         if (!isInApp) {
-
-                                            addToMyLearning(learningModel);
-
+                                            learningModel.setUserID(userIdresponse);
+                                            addToMyLearning(learningModel, true);
                                         } else {
+
+
                                             inAppActivityCall(learningModel);
                                         }
                                     }
@@ -1236,7 +1237,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final boolean isJoinedCommunity) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
@@ -1268,8 +1269,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                                    toast.show();
 
                                     if (!isFromCatalog) {
+
+                                        String succesMessage = "Content Added to My Learning";
+                                        if (isJoinedCommunity) {
+                                            succesMessage = "This content item has been added to My Learning page. You have successfully joined the Learning Community: " + learningModel.getSiteName();
+                                        }
+
                                         final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
-                                        builder.setMessage(MyLearningDetail_Activity.this.getString(R.string.cat_add_success))
+                                        builder.setMessage(succesMessage)
                                                 .setCancelable(false)
                                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int id) {

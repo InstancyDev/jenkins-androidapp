@@ -788,20 +788,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
                 checkUserLogin(myLearningDetalData, position, isInapp);
+
             } else {
 
                 if (isInapp) {
                     inAppActivityCall(myLearningDetalData);
 
                 } else {
-                    addToMyLearning(myLearningDetalData, position, false);
+                    addToMyLearning(myLearningDetalData, position, false, false);
 
                 }
             }
         }
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position, final boolean isAutoAdd) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position, final boolean isAutoAdd, final boolean isJoinedCommunity) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
             boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -827,6 +828,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
                             catalogModelsList.get(position).setAddedToMylearning(1);
+
                             db.updateContenToCatalog(catalogModelsList.get(position));
                             catalogAdapter.notifyDataSetChanged();
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
@@ -838,8 +840,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                            toast.show();
 
                             if (!isAutoAdd) {
+                                String succesMessage = "Content Added to My Learning";
+                                if (isJoinedCommunity) {
+                                    succesMessage = "This content item has been added to My Learning page. You have successfully joined the Learning Community: " + myLearningDetalData.getSiteName();
+                                }
                                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                builder.setMessage(context.getString(R.string.cat_add_success))
+                                builder.setMessage(succesMessage)
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
@@ -888,9 +894,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+                + learningModel.getSiteURL() + "&DownloadContent=&SiteID=" + learningModel.getSiteID();
 
-        urlStr = urlStr.replaceAll(" ", "%20");// year end ki 20 k cheyali
+        urlStr = urlStr.replaceAll(" ", "%20");
         Log.d(TAG, "inside catalog login : " + urlStr);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
                 new Response.Listener<JSONObject>() {
@@ -951,7 +957,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                             inAppActivityCall(learningModel);
 
                                         } else {
-                                            addToMyLearning(learningModel, position, false);
+                                            learningModel.setUserID(userIdresponse);
+                                            addToMyLearning(learningModel, position, false, true);
                                         }
 
                                     }
@@ -1165,7 +1172,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             Log.d("logr  _response =", _response);
 
                             if (_response.contains("success")) {
-                                addToMyLearning(finalLearningModel, finalPosition, false);
+                                addToMyLearning(finalLearningModel, finalPosition, false, false);
                             } else {
                                 Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show();
                             }
@@ -1465,7 +1472,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
 
         if (learningModel.getAddedToMylearning() == 0) {
-            addToMyLearning(learningModel, position, true);
+            addToMyLearning(learningModel, position, true, false);
         }
 //        else {
 //

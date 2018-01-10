@@ -42,6 +42,15 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         this.notifyDataSetChanged();
     }
 
+
+    public void refreshList(List<UserExperienceModel> userExperienceModelList, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
+        this.userEducationModelList = userEducationModelList;
+        this.userExperienceModelList = userExperienceModelList;
+        this.expandableHashDetail = expandableHashDetail;
+        this.expandableListTitle = expandableListTitle;
+        this.notifyDataSetChanged();
+    }
+
     @Override
     public int getGroupCount() {
         return this.expandableListTitle.size();
@@ -134,9 +143,9 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         View cView = convertView;
 
 //        if (cView == null) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            cView = inflater.inflate(R.layout.profile_education_item, parent, false);
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        cView = inflater.inflate(R.layout.profile_education_item, parent, false);
 //        }
         TextView profileSchool = (TextView) cView
                 .findViewById(R.id.profile_school);
