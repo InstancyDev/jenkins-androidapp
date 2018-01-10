@@ -4,21 +4,16 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.SimpleDateFormat;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
@@ -26,15 +21,12 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,34 +40,21 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.anjlab.android.iab.v3.BillingProcessor;
-import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.github.sundeepk.compactcalendarview.CompactCalendarView;
-import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.asynchtask.CmiSynchTask;
-import com.instancy.instancylearning.catalog.CatalogAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
@@ -87,15 +66,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -106,11 +80,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
-import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
-import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
-import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
-import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
@@ -135,7 +105,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     ListView peopleListView;
 
     PeopleListingAdapter peopleListingAdapter;
-    List<AllUserInfoModel> allUserInfoModelList = null;
+    List<PeopleListingModel> peopleListingModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -233,7 +203,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
-    public void refreshCatalog(Boolean isRefreshed) {
+    public void refreshPeopleListing(Boolean isRefreshed) {
         if (!isRefreshed) {
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
@@ -242,6 +212,14 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
     }
+
+    public void peopleListingTabsEitherFromDatabaseOrAPI() {
+
+        String paramsString = "ComponentID=78&ComponentInstanceID=3394&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
+
+        vollyService.getJsonObjResponseVolley("PEOPLELISTINGTABS", appUserModel.getWebAPIUrl() + "/MobileLMS/GetpeopleListingTab?" + paramsString, appUserModel.getAuthHeaders());
+    }
+
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -254,6 +232,19 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     if (response != null) {
                         try {
                             db.injectPeopleListingListIntoSqLite(response,TABBALUE);
+                            injectFromDbtoModel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
+                if (requestType.equalsIgnoreCase("PEOPLELISTINGTABS")) {
+                    if (response != null) {
+                        try {
+                            db.injectPeopleListingListIntoSqLite(response,TABBALUE);
 //                            injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -262,6 +253,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
+
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -320,7 +312,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         ButterKnife.bind(this, rootView);
 
-        peopleListingAdapter = new PeopleListingAdapter(getActivity(), BIND_ABOVE_CLIENT, allUserInfoModelList);
+        peopleListingAdapter = new PeopleListingAdapter(getActivity(), BIND_ABOVE_CLIENT, peopleListingModelList);
         peopleListView.setAdapter(peopleListingAdapter);
         peopleListView.setOnItemClickListener(this);
         peopleListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -341,9 +333,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         allPBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        allUserInfoModelList = new ArrayList<AllUserInfoModel>();
+        peopleListingModelList = new ArrayList<PeopleListingModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshCatalog(true);
+            refreshPeopleListing(true);
+            peopleListingTabsEitherFromDatabaseOrAPI();
         } else {
             injectFromDbtoModel();
         }
@@ -355,14 +348,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
 
     public void injectFromDbtoModel() {
-//        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId());
-//        if (catalogModelsList != null) {
-//            catalogAdapter.refreshList(catalogModelsList);
-//        } else {
-//            catalogModelsList = new ArrayList<MyLearningModel>();
-//            catalogAdapter.refreshList(catalogModelsList);
-//        }
-
+        peopleListingModelList = db.fetchPeopleListModelList(TABBALUE);
+        if (peopleListingModelList != null) {
+            peopleListingAdapter.refreshList(peopleListingModelList);
+        } else {
+            peopleListingModelList = new ArrayList<PeopleListingModel>();
+            peopleListingAdapter.refreshList(peopleListingModelList);
+        }
     }
 
     public void initilizeView() {
@@ -474,7 +466,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshCatalog(true);
+            refreshPeopleListing(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);

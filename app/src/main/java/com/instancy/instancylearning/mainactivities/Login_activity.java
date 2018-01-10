@@ -61,6 +61,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.copyFile;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -392,6 +393,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     preferencesManager.setStringValue(jsonReturn.get("displayname").toString(), StaticValues.KEY_USERNAME);
                     preferencesManager.setStringValue(jsonReturn.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                     MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                    CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intentSideMenu);

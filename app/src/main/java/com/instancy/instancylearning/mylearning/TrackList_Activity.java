@@ -427,7 +427,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
-//            refreshCatalog(true);
+//            refreshPeopleListing(true);
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);

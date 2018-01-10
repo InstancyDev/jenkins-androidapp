@@ -299,7 +299,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
     public void breadCrumbPlusButtonInit(View rootView) {
 
-//        refreshCatalog(true);
+//        refreshPeopleListing(true);
 
         LinearLayout llCatalogGridCatageory = (LinearLayout) rootView.findViewById(R.id.llCatalogGridCatageory);
         llCatalogGridCatageory.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppBGColor())));

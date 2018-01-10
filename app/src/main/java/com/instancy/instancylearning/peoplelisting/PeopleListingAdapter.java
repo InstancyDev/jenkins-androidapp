@@ -23,6 +23,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
+import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -42,7 +43,7 @@ public class PeopleListingAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<AllUserInfoModel> allUserInfoModelList = null;
+    private List<PeopleListingModel> peopleListingModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -51,13 +52,13 @@ public class PeopleListingAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = PeopleListingAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<AllUserInfoModel> searchList;
+    private List<PeopleListingModel> searchList;
 
 
-    public PeopleListingAdapter(Activity activity, int resource, List<AllUserInfoModel> allUserInfoModelList) {
+    public PeopleListingAdapter(Activity activity, int resource, List<PeopleListingModel> peopleListingModelList) {
         this.activity = activity;
-        this.allUserInfoModelList = allUserInfoModelList;
-        this.searchList = new ArrayList<AllUserInfoModel>();
+        this.peopleListingModelList = peopleListingModelList;
+        this.searchList = new ArrayList<PeopleListingModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -70,21 +71,21 @@ public class PeopleListingAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<AllUserInfoModel> allUserInfoModelList) {
-        this.allUserInfoModelList = allUserInfoModelList;
-        this.searchList = new ArrayList<AllUserInfoModel>();
-        this.searchList.addAll(allUserInfoModelList);
+    public void refreshList(List<PeopleListingModel> peopleListingModelList) {
+        this.peopleListingModelList = peopleListingModelList;
+        this.searchList = new ArrayList<PeopleListingModel>();
+        this.searchList.addAll(peopleListingModelList);
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return allUserInfoModelList != null ? allUserInfoModelList.size() : 100;
+        return peopleListingModelList != null ? peopleListingModelList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return allUserInfoModelList.get(position);
+        return peopleListingModelList.get(position);
     }
 
     @Override
@@ -105,8 +106,8 @@ public class PeopleListingAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-//        holder.txtName.setText(allUserInfoModelList.get(position).displayName);
-//        holder.txtPlace.setText(allUserInfoModelList.get(position).displayName);
+        holder.txtName.setText(peopleListingModelList.get(position).userDisplayname);
+        holder.txtPlace.setText(peopleListingModelList.get(position).mainOfficeAddress);
 
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -122,13 +123,13 @@ public class PeopleListingAdapter extends BaseAdapter {
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        allUserInfoModelList.clear();
+        peopleListingModelList.clear();
         if (charText.length() == 0) {
-            allUserInfoModelList.addAll(searchList);
+            peopleListingModelList.addAll(searchList);
         } else {
-            for (AllUserInfoModel s : searchList) {
-                if (s.displayName.toLowerCase(Locale.getDefault()).contains(charText) || s.displayName.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    allUserInfoModelList.add(s);
+            for (PeopleListingModel s : searchList) {
+                if (s.userDisplayname.toLowerCase(Locale.getDefault()).contains(charText) || s.mainOfficeAddress.toLowerCase(Locale.getDefault()).contains(charText)) {
+                    peopleListingModelList.add(s);
                 }
             }
         }

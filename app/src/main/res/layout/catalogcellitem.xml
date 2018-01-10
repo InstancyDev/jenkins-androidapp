@@ -201,8 +201,9 @@
                         android:background="@android:color/transparent"
                         android:gravity="center"
                         android:text="$122.0"
+
                         android:textColor="@color/colorStatusOther"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                 </RelativeLayout>
