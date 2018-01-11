@@ -17,18 +17,18 @@ android {
 
 // ----------------------------------for instancy lite app-------------------------
 //        applicationId "com.instancy.instancy_lite"
-//        versionCode 8
-//        versionName "1.7"
+//        versionCode 9
+//        versionName "1.8"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 10
-//           versionName "1.9"
+//           versionCode 11
+//           versionName "2.0"
 
 //  -------------------------------- for acclife app----------------------------------
-//        applicationId "com.instancy.accilifes"
-//        versionCode 1
-//        versionName "1.0"
+        applicationId "com.instancy.accilifes"
+        versionCode 2
+        versionName "1.1"
 
 //  -------------------------------- for tracktech app----------------------------------
 //        applicationId "com.instancy.tracktech"
@@ -37,13 +37,13 @@ android {
 
 //  -------------------------------- for trainingcompany app----------------------------------
 //        applicationId "com.instancy.trainingcompany"
-//        versionCode 5
-//        versionName "1.4"
+//        versionCode 6
+//        versionName "1.5"
 
 //  -------------------------------- for Mobile up app----------------------------------
-        applicationId "com.instancy.mobileup"
-        versionCode 2
-        versionName "1.1"
+//        applicationId "com.instancy.mobileup"
+//        versionCode 2
+//        versionName "1.1"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.cle"
@@ -111,4 +111,5 @@ dependencies {
     compile 'com.github.sundeepk:compact-calendar-view:2.0.2.2'
     compile 'info.hoang8f:android-segmented:1.0.6'
     compile 'com.github.clans:fab:1.6.4'
+    compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 }

@@ -200,12 +200,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             filterContentType = "";
         }
 
-
     }
 
     public void refreshPeopleListing(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         String paramsString = "ComponentID=78&ComponentInstanceID=3473&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType="+TABBALUE;
@@ -335,15 +335,15 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         peopleListingModelList = new ArrayList<PeopleListingModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshPeopleListing(true);
-            peopleListingTabsEitherFromDatabaseOrAPI();
+            refreshPeopleListing(false);
+//            peopleListingTabsEitherFromDatabaseOrAPI();
         } else {
             injectFromDbtoModel();
         }
 
         initilizeView();
 
-        return rootView;
+        return rootView; // 31732298673 //
     }
 
 

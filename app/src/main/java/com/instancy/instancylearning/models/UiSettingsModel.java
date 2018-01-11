@@ -7,7 +7,11 @@ package com.instancy.instancylearning.models;
 public class UiSettingsModel {
 
     // for acclife
-//    private String brandingColor = "#003d77";
+    private String brandingColor = "#003d77";
+
+    private String appBackGroundColor = "#ffffff";
+
+    private String defaultTextColor = "#000000";
 
 // for trackton_accilife for all buttons
 //    private String brandingColor = "#0062a6";
@@ -32,11 +36,11 @@ public class UiSettingsModel {
 
 // for cle app
 
-    private String appBackGroundColor = "#4A2D1F";
-
-    private String brandingColor = "#4A2D1F";
-
-    private String defaultTextColor = "#ffffff";
+//    private String appBackGroundColor = "#4A2D1F";
+//
+//    private String brandingColor = "#4A2D1F";
+//
+//    private String defaultTextColor = "#ffffff";
 
     public String getAutoLaunchMyLearningFirst() {
         return autoLaunchMyLearningFirst;
@@ -172,7 +176,7 @@ public class UiSettingsModel {
     }
 
     public void setAppButtonTextColor(String appButtonTextColor) {
-        this.appButtonTextColor = appButtonTextColor ;
+        this.appButtonTextColor = appButtonTextColor;
     }
 
     private String appButtonBgColor = "";

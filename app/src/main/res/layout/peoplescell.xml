@@ -30,14 +30,13 @@
                 android:layout_gravity="center"
                 android:padding="1dp">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/imagethumb"
-                    android:layout_width="62dp"
-                    android:layout_height="62dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/user_placeholder" />
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    app:civ_border_color="@color/colorWhite"
+                    app:civ_border_width="0dp" />
+
 
             </RelativeLayout>
 

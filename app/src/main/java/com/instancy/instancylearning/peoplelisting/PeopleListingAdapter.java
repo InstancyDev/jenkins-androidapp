@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -26,14 +28,18 @@ import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.instancy.instancylearning.utils.Utilities.getFirstCaseWords;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -113,10 +119,22 @@ public class PeopleListingAdapter extends BaseAdapter {
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtPlace.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        String imagePath = peopleListingModelList.get(position).memberProfileImage;
+        if (imagePath.length() > 2) {
+            String imgUrl = peopleListingModelList.get(position).siteURL + peopleListingModelList.get(position).memberProfileImage;
+            Picasso.with(convertView.getContext()).load(imgUrl).into(holder.imgThumb);
+        } else {
 
-//            String imgUrl = discussionTopicModels.get(position).imagedata;
-//            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+            String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
 
+            Random rnd = new Random();
+            int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+            TextDrawable drawable = TextDrawable.builder()
+                    .buildRoundRect(displayNameDrawable, color, 0);
+            holder.imgThumb.setBackground(drawable);
+
+        }
 
         return convertView;
     }

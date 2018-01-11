@@ -781,4 +781,18 @@ public class Utilities {
 
         return newSentence;
     }
+
+    public static String getFirstCaseWords(String sentence) {
+        String words[] = sentence.replaceAll("\\s+", " ").trim().split(" ");
+        String newSentence = "";
+        for (String word : words) {
+            for (int i = 0; i < word.length(); i++)
+                newSentence = newSentence + ((i == 0) ? word.substring(i, i + 1).toUpperCase() :
+
+                        "");
+        }
+
+        return newSentence;
+    }
+
 }

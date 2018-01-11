@@ -21,10 +21,10 @@
     <color name="colorRating">#FFC000</color>
     <color name="colorDarkGrey">#757575</color>
     <!--Green Background-->
-    <color name="colorDefaultBackGround">#5DB100</color>
+    <!--<color name="colorDefaultBackGround">#5DB100</color>-->
 
     <!--White Background-->
-    <!--<color name="colorDefaultBackGround">#ffff</color>-->
+    <color name="colorDefaultBackGround">#ffff</color>
 
     <!--Instancy Market Background-->
     <!--<color name="colorDefaultBackGround">#4d4d4d</color>-->

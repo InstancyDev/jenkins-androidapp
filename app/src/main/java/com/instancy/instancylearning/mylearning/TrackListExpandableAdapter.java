@@ -374,6 +374,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             childView.setBackgroundColor(childView.getResources().getColor(R.color.colorGray));
             holder.btnContextMenu.setEnabled(false);
             holder.imgThumb.setEnabled(false);
+            holder.txtTitle.setEnabled(false);
         } else if (trackChildList.getShowStatus().equalsIgnoreCase("hide")) {
             childView.setVisibility(View.GONE);
         } else {
@@ -388,6 +389,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             }
             holder.btnContextMenu.setEnabled(true);
             holder.imgThumb.setEnabled(true);
+            holder.txtTitle.setEnabled(true);
         }
 
         String imgUrl = trackChildList.getImageData();
