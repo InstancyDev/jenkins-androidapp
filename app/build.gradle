@@ -21,14 +21,14 @@ android {
 //        versionName "1.8"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
-//           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 11
-//           versionName "2.0"
+           applicationId "com.instancy.enterpriselearninglite"
+           versionCode 11
+           versionName "2.0"
 
 //  -------------------------------- for acclife app----------------------------------
-        applicationId "com.instancy.accilifes"
-        versionCode 2
-        versionName "1.1"
+//        applicationId "com.instancy.accilifes"
+//        versionCode 2
+//        versionName "1.1"
 
 //  -------------------------------- for tracktech app----------------------------------
 //        applicationId "com.instancy.tracktech"

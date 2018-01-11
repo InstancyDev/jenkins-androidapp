@@ -120,9 +120,10 @@ public class PeopleListingAdapter extends BaseAdapter {
         holder.txtPlace.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         String imagePath = peopleListingModelList.get(position).memberProfileImage;
-        if (imagePath.length() > 2) {
+        if (imagePath.length() < 2) {
             String imgUrl = peopleListingModelList.get(position).siteURL + peopleListingModelList.get(position).memberProfileImage;
             Picasso.with(convertView.getContext()).load(imgUrl).into(holder.imgThumb);
+
         } else {
 
             String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);

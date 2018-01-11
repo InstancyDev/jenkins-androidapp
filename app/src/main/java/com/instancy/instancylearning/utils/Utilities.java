@@ -785,11 +785,15 @@ public class Utilities {
     public static String getFirstCaseWords(String sentence) {
         String words[] = sentence.replaceAll("\\s+", " ").trim().split(" ");
         String newSentence = "";
+        int moreThan2=0;
         for (String word : words) {
-            for (int i = 0; i < word.length(); i++)
-                newSentence = newSentence + ((i == 0) ? word.substring(i, i + 1).toUpperCase() :
+            moreThan2++;
+            if (moreThan2>2)
+                break;
+            for (int i = 0; i < word.length(); i++) {
 
-                        "");
+                newSentence = newSentence + ((i == 0) ? word.substring(i, i + 1).toUpperCase() : "");
+            }
         }
 
         return newSentence;

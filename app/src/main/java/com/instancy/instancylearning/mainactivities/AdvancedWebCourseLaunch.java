@@ -82,8 +82,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //                adWebView.loadUrl(courseUrl);
 //            }
 
-            if (savedInstanceState == null)
-            {
+            if (savedInstanceState == null) {
                 adWebView.loadUrl(courseUrl);
             }
 
@@ -377,15 +376,13 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState )
-    {
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         adWebView.saveState(outState);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState)
-    {
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         adWebView.restoreState(savedInstanceState);
     }
