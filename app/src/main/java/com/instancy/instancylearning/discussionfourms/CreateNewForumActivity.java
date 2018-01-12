@@ -155,16 +155,8 @@ public class CreateNewForumActivity extends AppCompatActivity {
         db = new DatabaseHandler(this);
         ButterKnife.bind(this);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
-
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-
 
         svProgressHUD = new SVProgressHUD(context);
 

@@ -3,6 +3,7 @@ package com.instancy.instancylearning.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -19,6 +20,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.instancy.instancylearning.BuildConfig;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
 
@@ -35,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -798,5 +801,18 @@ public class Utilities {
 
         return newSentence;
     }
+
+    public Drawable generateDrawableFromString(String nameStr) {
+
+
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(nameStr, color);
+
+        return drawable;
+    }
+
 
 }

@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -104,9 +105,8 @@ public class PeopleListingAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, final ViewGroup parent) {
 
         ViewHolder holder;
-
-        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.peoplescell, null);
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.peoplescell, parent, false);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;
@@ -118,21 +118,45 @@ public class PeopleListingAdapter extends BaseAdapter {
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtPlace.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        String mainOfficeAddress = peopleListingModelList.get(position).mainOfficeAddress;
+        if (mainOfficeAddress.length() > 4) {
+            holder.txtPlace.setText(mainOfficeAddress);
+            holder.txtPlace.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtPlace.setVisibility(View.INVISIBLE);
+        }
+
+        String connectionState = peopleListingModelList.get(position).connectionState;
+
+        if (connectionState.length() > 4) {
+            holder.txtStatus.setText(connectionState);
+            holder.txtStatus.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtStatus.setVisibility(View.INVISIBLE);
+        }
 
         String imagePath = peopleListingModelList.get(position).memberProfileImage;
-        if (imagePath.length() < 2) {
+
+        String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
+
+        if (imagePath.length() > 2) {
             String imgUrl = peopleListingModelList.get(position).siteURL + peopleListingModelList.get(position).memberProfileImage;
-            Picasso.with(convertView.getContext()).load(imgUrl).into(holder.imgThumb);
+
+            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
 
         } else {
 
-            String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
-
-            Random rnd = new Random();
-            int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+// generate random color
+//        int color1 = generator.getRandomColor();
+// generate color based on a key (same key returns the same color), useful for list/grid views
+            int color = generator.getColor(displayNameDrawable);
 
             TextDrawable drawable = TextDrawable.builder()
-                    .buildRoundRect(displayNameDrawable, color, 0);
+                    .buildRound(displayNameDrawable, color);
+
             holder.imgThumb.setBackground(drawable);
 
         }
@@ -185,10 +209,15 @@ public class PeopleListingAdapter extends BaseAdapter {
         @BindView(R.id.btn_contextmenu)
         ImageButton btnContextMenu;
 
+        @Nullable
+        @BindView(R.id.txtStatus)
+        TextView txtStatus;
+
+
         @OnClick({R.id.btn_contextmenu, R.id.card_view})
         public void actionsForMenu(View view) {
 
-//            ((ListView) parent).performItemClick(view, getPosition, 0);
+            ((ListView) parent).performItemClick(view, getPosition, 0);
 
         }
 

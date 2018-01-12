@@ -49,16 +49,16 @@
     <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
 
-    <string name="app_default_url">http://app.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://devstagingwebapi.instancy.net/api/</string>-->
 
     <!--fo enterprise lite app -->
     <!--<string name="app_default_url">http://enterprisedemo.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
     <!-- SCROM testing qalearning -->
-    <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
+    <string name="app_default_url">http://qalearning.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>
 
     <!--<string name="app_default_url">http://stagingmontessori.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://stagingmonteapi.instancysoft.com/api/</string>-->

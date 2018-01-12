@@ -74,9 +74,22 @@
                     android:gravity="left"
                     android:maxLines="2"
                     android:padding="2dp"
-                    android:text="United States"
+                    android:text=""
                     android:textColor="@color/colorBlack"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txtStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtPlace"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="Pending Resuest"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="12sp" />
 
 
             </RelativeLayout>

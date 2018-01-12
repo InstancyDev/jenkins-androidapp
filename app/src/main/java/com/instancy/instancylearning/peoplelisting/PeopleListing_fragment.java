@@ -135,7 +135,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.pendingbtn)
     RadioButton pendingBtn;
 
-    String TABBALUE="Experts";
+    String TABBALUE = "Experts";
 
 
     public PeopleListing_fragment() {
@@ -203,21 +203,19 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     }
 
     public void refreshPeopleListing(Boolean isRefreshed) {
-        if (!isRefreshed) {
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+//            peopleListingTabsEitherFromDatabaseOrAPI();
+            if (!isRefreshed) {
 
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        }
+                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            }
 
-        String paramsString = "ComponentID=78&ComponentInstanceID=3473&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType="+TABBALUE;
+            String paramsString = "ComponentID=78&ComponentInstanceID=3473&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE;
 
-        vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
-    }
+            vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
+        } else
+            injectFromDbtoModel();
 
-    public void peopleListingTabsEitherFromDatabaseOrAPI() {
-
-        String paramsString = "ComponentID=78&ComponentInstanceID=3394&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
-
-        vollyService.getJsonObjResponseVolley("PEOPLELISTINGTABS", appUserModel.getWebAPIUrl() + "/MobileLMS/GetpeopleListingTab?" + paramsString, appUserModel.getAuthHeaders());
     }
 
 
@@ -227,11 +225,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             public void notifySuccess(String requestType, JSONObject response) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
-
+                svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
                     if (response != null) {
                         try {
-                            db.injectPeopleListingListIntoSqLite(response,TABBALUE);
+                            db.injectPeopleListingListIntoSqLite(response, TABBALUE);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -244,7 +242,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("PEOPLELISTINGTABS")) {
                     if (response != null) {
                         try {
-                            db.injectPeopleListingListIntoSqLite(response,TABBALUE);
+                            db.injectPeopleListingListIntoSqLite(response, TABBALUE);
 //                            injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -255,7 +253,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 }
 
 
-                svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
 
@@ -274,31 +271,50 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
-                swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("REMOVEACTION")) {
+                    if (response != null) {
+
+                        Log.d(TAG, "notifySuccess: in  REMOVEACTION " + response);
+                        Toast.makeText(getContext(), " " + response, Toast.LENGTH_SHORT).show();
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                }
+
+                if (requestType.equalsIgnoreCase("ACCEPTACTION")) {
+                    if (response != null) {
+
+                        Log.d(TAG, "notifySuccess: in  ACCEPTACTION " + response);
+                        Toast.makeText(getContext(), " " + response, Toast.LENGTH_SHORT).show();
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                }
+
+                if (requestType.equalsIgnoreCase("ADDACTION")) {
+                    if (response != null) {
+                        Log.d(TAG, "notifySuccess: in  ADDACTION " + response);
+                        Toast.makeText(getContext(), " " + response, Toast.LENGTH_SHORT).show();
+                        refreshPeopleListing(true);
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
+                swipeRefreshLayout.setRefreshing(false);
 
             }
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
-                if (requestType.equalsIgnoreCase("MLADP")) {
-
-                    if (response != null) {
-                        try {
-                            db.injectCMIDataInto(response, myLearningModel);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-
-                    }
-                }
 
                 svProgressHUD.dismiss();
             }
         };
     }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -334,6 +350,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         peopleListingModelList = new ArrayList<PeopleListingModel>();
+
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshPeopleListing(false);
 //            peopleListingTabsEitherFromDatabaseOrAPI();
@@ -503,7 +520,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             case R.id.btn_contextmenu:
                 View v = peopleListView.getChildAt(position - peopleListView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-//                catalogContextMenuMethod(position, view, txtBtnDownload, allUserInfoModelList.get(position), uiSettingsModel, appUserModel);
+                peopelContextMenuMethod(position, view, txtBtnDownload, peopleListingModelList.get(position), uiSettingsModel, appUserModel);
                 break;
             default:
 
@@ -555,126 +572,107 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
+    public void peopelContextMenuMethod(final int position, final View v, ImageButton btnselected, final PeopleListingModel peopleListingModel, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.event_contextmenu, popup.getMenu());
+        popup.getMenuInflater().inflate(R.menu.peoplecontextmenu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
 
-        menu.getItem(0).setVisible(false);//view
-        menu.getItem(1).setVisible(false);//add
-        menu.getItem(2).setVisible(false);//buy
-        menu.getItem(3).setVisible(false);//detail
-        menu.getItem(4).setVisible(false);//cancel enrollment
+        menu.getItem(0).setVisible(false);//view profile
+        menu.getItem(1).setVisible(false);//view content
+        menu.getItem(2).setVisible(false);//accept connection
+        menu.getItem(3).setVisible(false);//remove connection
+        menu.getItem(4).setVisible(false);//ignore enrollment
+        menu.getItem(5).setVisible(false);//send message
+        menu.getItem(6).setVisible(false);//add to my connection
+        menu.getItem(7).setVisible(true);
 
-//        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
-
-        if (myLearningDetalData.getAddedToMylearning() == 1) {
+        if (peopleListingModel.viewProfileAction) {
             menu.getItem(0).setVisible(true);
-            menu.getItem(1).setVisible(false);
-            menu.getItem(2).setVisible(false);
-            menu.getItem(3).setVisible(true);
-            menu.getItem(4).setVisible(true);
-
-
-            if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                File myFile = new File(myLearningDetalData.getOfflinepath());
-
-                if (myFile.exists()) {
-
-                    menu.getItem(4).setVisible(true);
-
-                } else {
-
-                    menu.getItem(4).setVisible(false);
-                }
-            }
-
-        } else {
-            if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
-                menu.getItem(0).setVisible(false);
-                menu.getItem(1).setVisible(true);
-                menu.getItem(2).setVisible(false);
-                menu.getItem(3).setVisible(true);
-
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                    File myFile = new File(myLearningDetalData.getOfflinepath());
-
-                    if (myFile.exists()) {
-
-                        menu.getItem(4).setVisible(true);
-
-                    } else {
-
-                        menu.getItem(4).setVisible(false);
-                    }
-                }
-            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
-                menu.getItem(0).setVisible(false);
-                menu.getItem(1).setVisible(true);
-                menu.getItem(3).setVisible(true);
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-
-                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
-                        menu.getItem(4).setVisible(false);
-                    }
-                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                        menu.getItem(4).setVisible(true);
-                    }
-                }
-            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
-                menu.getItem(0).setVisible(false);
-                menu.getItem(2).setVisible(true);
-                menu.getItem(3).setVisible(true);
-                menu.getItem(1).setVisible(false);
-            }
-
-
         }
+
+        if (peopleListingModel.viewContentAction) {
+            menu.getItem(1).setVisible(true);
+        }
+
+        if (peopleListingModel.sendMessageAction) {
+            menu.getItem(5).setVisible(true);
+        }
+
+        if (peopleListingModel.addToMyConnectionAction) {
+            menu.getItem(6).setVisible(true);
+        }
+
+        if (peopleListingModel.acceptAction) {
+            menu.getItem(2).setVisible(true);
+        }
+
+        if (peopleListingModel.removeFromMyConnectionAction) {
+            menu.getItem(3).setVisible(true);
+        }
+
+        if (peopleListingModel.ignoreAction) {
+            menu.getItem(4).setVisible(true);
+        }
+
+        if (peopleListingModel.viewProfileAction) {
+            menu.getItem(0).setVisible(true);
+        }
+
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
-                    intentDetail.putExtra("IFROMCATALOG", true);
-                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+                if (item.getTitle().toString().equalsIgnoreCase("View Profile")) {
+                    Intent intentDetail = new Intent(context, PeopleListingProfile.class);
+                    intentDetail.putExtra("peopleListingModel", peopleListingModel);
+                    startActivity(intentDetail);
 
+                    Toast.makeText(context, "View Profile", Toast.LENGTH_SHORT).show();
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Related Content")) {
-//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+                if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
+                    Toast.makeText(context, "View Content", Toast.LENGTH_SHORT).show();
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrollment")) {
-//                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+                if (item.getTitle().toString().equalsIgnoreCase("Accept Connection")) {
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        acceptConnectionAction(peopleListingModel);
+                    } else {
+                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    }
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
 
-//                    addToMyLearning(myLearningDetalData);
+                if (item.getTitle().toString().equalsIgnoreCase("Remove Connection")) {
 
-                    Log.d(TAG, "onMenuItemClick:  Enroll here");
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        removeConnectionAction(peopleListingModel);
+                    } else {
+                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                if (item.getTitle().toString().equalsIgnoreCase("Ignore Connection")) {
+//                    Toast.makeText(context, "Ignore Connection", Toast.LENGTH_SHORT).show();
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
-//                    addToMyLearningCheckUser(myLearningDetalData, position, true);
-//
-//                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
+                if (item.getTitle().toString().equalsIgnoreCase("Send Message")) {
+                    Toast.makeText(context, "Send Message", Toast.LENGTH_SHORT).show();
 
                 }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Add to My Connections")) {//
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        addConnectionAction(peopleListingModel);
+                    } else {
+                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
                 return true;
             }
         });
@@ -686,115 +684,43 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == DETAIL_CATALOG_CODE && resultCode == RESULT_OK && data != null) {
-
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("REFRESH", false);
-                if (refresh) {
-                    injectFromDbtoModel();
-                }
-            }
-        }
-        if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
-
-            if (data != null) {
-                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
-
-                File myFile = new File(myLearningModel.getOfflinepath());
-
-                if (isNetworkConnectionAvailable(getContext(), -1)) {
-
-                }
-
-                if (!myFile.exists()) {
-
-                    if (isNetworkConnectionAvailable(getContext(), -1)) {
-                        getStatusFromServer(myLearningModel);
-
-                    }
-                } else {
-
-
-                }
-
-                injectFromDbtoModel();
-            }
-
-        }
-
     }
 
-    public void getStatusFromServer(final MyLearningModel myLearningModel) {
-//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-        String paramsString = "";
-        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
+    public void removeConnectionAction(PeopleListingModel peopleListingModel) {
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        String paramsString = "SelectedObjectID="
+                + peopleListingModel.userID
+                + "&SelectAction=RemoveConnection&UserName="
+                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=en-us";
 
-            paramsString = "userId="
-                    + myLearningModel.getUserID()
-                    + "&scoId="
-                    + myLearningModel.getScoId()
-                    + "&TrackObjectTypeID="
-                    + myLearningModel.getObjecttypeId()
-                    + "&TrackContentID="
-                    + myLearningModel.getContentID()
-                    + "&TrackScoID=" + myLearningModel.getScoId()
-                    + "&SiteID=" + myLearningModel.getSiteID()
-                    + "&OrgUnitID=" + myLearningModel.getSiteID()
-                    + "&isonexist=onexit";
+        String paramsEncodeString = paramsString.replaceAll(" ", "%20");
 
-        } else {
-            paramsString = "userId="
-                    + myLearningModel.getUserID()
-                    + "&scoId="
-                    + myLearningModel.getScoId();
+        vollyService.getStringResponseVolley("REMOVEACTION", appUserModel.getWebAPIUrl() + "/MobileLMS/PeopleListingActions?" + paramsEncodeString, appUserModel.getAuthHeaders());
+    }
 
-        }
 
-        vollyService.getJsonObjResponseVolley("UPDATESTATUS", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentStatus?" + paramsString, appUserModel.getAuthHeaders());
+    public void acceptConnectionAction(PeopleListingModel peopleListingModel) {
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        String paramsString = "SelectedObjectID="
+                + peopleListingModel.userID
+                + "&SelectAction=Accept&UserName="
+                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=en-us";
 
-        resultListner = new ResultListner() {
-            @Override
-            public void statusUpdateFromServer(boolean serverUpdated, JSONObject result) {
-                int i = -1;
+        String paramsEncodeString = paramsString.replaceAll(" ", "%20");
 
-                Log.d(TAG, "statusUpdateFromServer JSONObject :" + result);
+        vollyService.getStringResponseVolley("ACCEPTACTION", appUserModel.getWebAPIUrl() + "/MobileLMS/PeopleListingActions?" + paramsEncodeString, appUserModel.getAuthHeaders());
+    }
 
-                JSONArray jsonArray = null;
-                try {
-                    if (result.has("contentstatus")) {
-                        jsonArray = result.getJSONArray("contentstatus");
+    public void addConnectionAction(PeopleListingModel peopleListingModel) {
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        String paramsString = "SelectedObjectID="
+                + peopleListingModel.userID
+                + "&SelectAction=AddConnection&UserName="
+                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=en-us";
 
-                    }
-                    if (jsonArray.length() > 0) {
+        String paramsEncodeString = paramsString.replaceAll(" ", "%20");
 
-                        JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String status = jsonObject.get("status").toString();
-                        if (status.contains("failed to get statusObject reference not set to an instance of an object.")) {
-                            status = "In Progress";
-                        }
-                        String progress = "0";
-                        if (jsonObject.has("progress")) {
-                            progress = jsonObject.get("progress").toString();
-                        }
-                        i = db.updateContentStatus(myLearningModel, status, progress);
-                        if (i == 1) {
-
-                            injectFromDbtoModel();
-//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-
-                        } else {
-
-//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        vollyService.getStringResponseVolley("ADDACTION", appUserModel.getWebAPIUrl() + "/MobileLMS/PeopleListingActions?" + paramsEncodeString, appUserModel.getAuthHeaders());
     }
 
 
@@ -803,7 +729,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         super.onDetach();
     }
-
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int isChecked) {
@@ -814,7 +739,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 allPBtn.setTypeface(null, Typeface.NORMAL);
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
-                sortByDate("before");
+//                sortByDate("before");
+                TABBALUE = "Experts";
+                refreshPeopleListing(true);
                 break;
             case R.id.allPeoplebtn:
                 allPBtn.setTypeface(null, Typeface.BOLD);
@@ -822,23 +749,33 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
 //                catalogAdapter.refreshList(catalogModelsList);
+
+                TABBALUE = "All";
+                refreshPeopleListing(true);
                 break;
             case R.id.myconnectionbtn:
                 myConBtn.setTypeface(null, Typeface.BOLD);
                 expertsBtn.setTypeface(null, Typeface.NORMAL);
                 allPBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
-                sortByDate("after");
+                TABBALUE = "MyConnections";
+//                sortByDate("after");
+                refreshPeopleListing(true);
+
                 break;
             case R.id.pendingbtn:
                 pendingBtn.setTypeface(null, Typeface.BOLD);
                 expertsBtn.setTypeface(null, Typeface.NORMAL);
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 allPBtn.setTypeface(null, Typeface.NORMAL);
-                sortByDate("after");
+                TABBALUE = "Pending";
+                refreshPeopleListing(true);
+//                sortByDate("after");
+
                 break;
             default:
                 // Nothing to do
+                TABBALUE = "Experts";
         }
     }
 

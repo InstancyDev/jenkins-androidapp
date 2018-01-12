@@ -135,6 +135,10 @@
             android:name=".discussionfourms.AddNewCommentActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".peoplelisting.PeopleListingProfile"
+            android:screenOrientation="portrait"></activity>
+
 
         <!-- INAPP BILLING ACTIVITY -->
 

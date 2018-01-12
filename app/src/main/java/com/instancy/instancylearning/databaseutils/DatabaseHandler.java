@@ -12191,8 +12191,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String strDelete = "DELETE FROM " + TBL_PEOPLELISTING + " WHERE  siteid ="
-                    + appUserModel.getSiteIDValue() + " AND siteurl='" + appUserModel.getSiteURL() + "' AND tabid='" + appUserModel.getSiteURL() + "'";
+            String strDelete = "DELETE FROM " + TBL_PEOPLELISTING + " WHERE  siteid = "
+                    + appUserModel.getSiteIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' AND tabid = '" + TabValue + "'";
             db.execSQL(strDelete);
 
         } catch (SQLiteException sqlEx) {
@@ -12267,10 +12267,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String viewprofileAction = jsonMyLearningColumnObj.getString("ViewProfileAction");
 
-                if (viewprofileAction.length() != 0) {
-                    peopleListingModel.viewContentAction = true;
+                if (isValidString(viewprofileAction)) {
+                    peopleListingModel.viewProfileAction = true;
                 } else {
-                    peopleListingModel.viewContentAction = false;
+                    peopleListingModel.viewProfileAction = false;
                 }
             }
 
@@ -12279,7 +12279,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String acceptAction = jsonMyLearningColumnObj.getString("AcceptAction");
 
-                if (acceptAction.length() != 0) {
+                if (isValidString(acceptAction)) {
                     peopleListingModel.acceptAction = true;
 
                 } else {
@@ -12292,7 +12292,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String ignoreAction = jsonMyLearningColumnObj.getString("IgnoreAction");
 
-                if (ignoreAction.length() != 0) {
+                if (isValidString(ignoreAction)) {
                     peopleListingModel.ignoreAction = true;
 
                 } else {
@@ -12305,7 +12305,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String viewContentAction = jsonMyLearningColumnObj.getString("ViewContentAction");
 
-                if (viewContentAction.length() != 0) {
+                if (isValidString(viewContentAction)) {
                     peopleListingModel.viewContentAction = true;
 
                 } else {
@@ -12318,7 +12318,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String sendMessageAction = jsonMyLearningColumnObj.getString("SendMessageAction");
 
-                if (sendMessageAction.length() != 0) {
+                if (isValidString(sendMessageAction)) {
                     peopleListingModel.sendMessageAction = true;
 
                 } else {
@@ -12330,7 +12330,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String addToMyConnectionAction = jsonMyLearningColumnObj.getString("AddToMyConnectionAction");
 
-                if (addToMyConnectionAction.length() != 0) {
+                if (isValidString(addToMyConnectionAction)) {
                     peopleListingModel.addToMyConnectionAction = true;
 
                 } else {
@@ -12343,7 +12343,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String removeFromMyConnectionAction = jsonMyLearningColumnObj.getString("RemoveFromMyConnectionAction");
 
-                if (removeFromMyConnectionAction.length() != 0) {
+                if (isValidString(removeFromMyConnectionAction)) {
                     peopleListingModel.removeFromMyConnectionAction = true;
 
                 } else {
@@ -12453,6 +12453,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("connectionstate"));
 
                     // bool type variables
+                    int viewProfileAction=0;
                     int viewContentAction=0;
                     int acceptAction=0;
                     int ignoreAction=0;
@@ -12460,10 +12461,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     int addToMyConnectionAction=0;
                     int removeFromMyConnectionAction=0;
 
-
-                    viewContentAction=cursor.getInt(cursor
+                    viewProfileAction=cursor.getInt(cursor
                             .getColumnIndex("viewprofileaction"));
 
+                    viewContentAction=cursor.getInt(cursor
+                            .getColumnIndex("viewcontentaction"));
 
                    acceptAction=cursor.getInt(cursor
                             .getColumnIndex("acceptaction"));
@@ -12480,6 +12482,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     removeFromMyConnectionAction=cursor.getInt(cursor
                             .getColumnIndex("removefrommyconnectionaction"));
 
+
+                    if (viewProfileAction==0){
+                        peopleListingModel.viewProfileAction=false;
+                    }
+                    else {
+                        peopleListingModel.viewProfileAction=true;
+                    }
 
                     if (viewContentAction==0){
                         peopleListingModel.viewContentAction=false;
