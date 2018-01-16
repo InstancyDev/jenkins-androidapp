@@ -188,7 +188,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
-//        btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
 
 //       uncomment for backgroundcolor purpose
@@ -203,6 +202,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))) {
+            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
         }

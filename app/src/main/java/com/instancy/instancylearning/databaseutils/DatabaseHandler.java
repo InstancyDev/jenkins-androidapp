@@ -9708,7 +9708,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
                 if (profileObj.has("dateofbirth")) {
 
-
                     String formattedDate = formatDate(profileObj.get("dateofbirth").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MMM-dd");
 
                     profileModel.dateofbirth = formattedDate;
@@ -9808,9 +9807,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 Log.d(TAG, "InjectAllProfileDetails: at index " + profileModel);
                 injectProfileIntoTable(profileModel);
             }
-
         }
-
     }
 
     public void injectProfileGroups(JSONArray jsonGroupsAry, String userID) throws JSONException {
@@ -10013,9 +10010,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public void injectUserEducation(JSONArray jsonExperienceAry, String userID) throws JSONException {
+    public void injectUserEducation(JSONArray jsonEducationAry, String userID) throws JSONException {
 
-        if (jsonExperienceAry.length() > 0) {
+        if (jsonEducationAry.length() > 0) {
 
             SQLiteDatabase db = this.getWritableDatabase();
             try {
@@ -10028,12 +10025,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
 
-            for (int i = 0; i < jsonExperienceAry.length(); i++) {
+            for (int i = 0; i < jsonEducationAry.length(); i++) {
 
                 UserEducationModel userEducationModel = new UserEducationModel();
 
-
-                JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
+                JSONObject experiencObj = jsonEducationAry.getJSONObject(i);
 
                 if (experiencObj.has("userid")) {
 
@@ -12418,7 +12414,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         PeopleListingModel peopleListingModel = new PeopleListingModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_PEOPLELISTING + " WHERE tabid  = '" + tabID + "' AND siteid = '" + appUserModel.getSiteIDValue() + "' AND siteurl= '" + appUserModel.getSiteURL() +"'";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_PEOPLELISTING + " WHERE tabid  = '" + tabID + "' AND siteid = '" + appUserModel.getSiteIDValue() + "' AND siteurl= '" + appUserModel.getSiteURL() + "'";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -12431,123 +12427,116 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     peopleListingModel = new PeopleListingModel();
 
-                    peopleListingModel.connectionUserID=cursor.getInt(cursor
+                    peopleListingModel.connectionUserID = cursor.getInt(cursor
                             .getColumnIndex("connectionuserid"));
 
-                    peopleListingModel.userID=cursor.getString(cursor
+                    peopleListingModel.userID = cursor.getString(cursor
                             .getColumnIndex("userid"));
 
-                    peopleListingModel.jobTitle=cursor.getString(cursor
+                    peopleListingModel.jobTitle = cursor.getString(cursor
                             .getColumnIndex("jobtitle"));
 
-                    peopleListingModel.mainOfficeAddress=cursor.getString(cursor
+                    peopleListingModel.mainOfficeAddress = cursor.getString(cursor
                             .getColumnIndex("mainofficeaddress"));
 
-                    peopleListingModel.memberProfileImage=cursor.getString(cursor
+                    peopleListingModel.memberProfileImage = cursor.getString(cursor
                             .getColumnIndex("memberprofileimage"));
 
-                    peopleListingModel.userDisplayname=cursor.getString(cursor
+                    peopleListingModel.userDisplayname = cursor.getString(cursor
                             .getColumnIndex("userdisplayname"));
 
-                    peopleListingModel.connectionState=cursor.getString(cursor
+                    peopleListingModel.connectionState = cursor.getString(cursor
                             .getColumnIndex("connectionstate"));
 
                     // bool type variables
-                    int viewProfileAction=0;
-                    int viewContentAction=0;
-                    int acceptAction=0;
-                    int ignoreAction=0;
-                    int sendMessageAction=0;
-                    int addToMyConnectionAction=0;
-                    int removeFromMyConnectionAction=0;
+                    int viewProfileAction = 0;
+                    int viewContentAction = 0;
+                    int acceptAction = 0;
+                    int ignoreAction = 0;
+                    int sendMessageAction = 0;
+                    int addToMyConnectionAction = 0;
+                    int removeFromMyConnectionAction = 0;
 
-                    viewProfileAction=cursor.getInt(cursor
+                    viewProfileAction = cursor.getInt(cursor
                             .getColumnIndex("viewprofileaction"));
 
-                    viewContentAction=cursor.getInt(cursor
+                    viewContentAction = cursor.getInt(cursor
                             .getColumnIndex("viewcontentaction"));
 
-                   acceptAction=cursor.getInt(cursor
+                    acceptAction = cursor.getInt(cursor
                             .getColumnIndex("acceptaction"));
 
-                    ignoreAction=cursor.getInt(cursor
+                    ignoreAction = cursor.getInt(cursor
                             .getColumnIndex("ignoreaction"));
 
-                    sendMessageAction=cursor.getInt(cursor
+                    sendMessageAction = cursor.getInt(cursor
                             .getColumnIndex("sendmessageaction"));
 
-                    addToMyConnectionAction=cursor.getInt(cursor
+                    addToMyConnectionAction = cursor.getInt(cursor
                             .getColumnIndex("addtomyconnectionaction"));
 
-                    removeFromMyConnectionAction=cursor.getInt(cursor
+                    removeFromMyConnectionAction = cursor.getInt(cursor
                             .getColumnIndex("removefrommyconnectionaction"));
 
 
-                    if (viewProfileAction==0){
-                        peopleListingModel.viewProfileAction=false;
-                    }
-                    else {
-                        peopleListingModel.viewProfileAction=true;
-                    }
-
-                    if (viewContentAction==0){
-                        peopleListingModel.viewContentAction=false;
-                    }
-                    else {
-                        peopleListingModel.viewContentAction=true;
+                    if (viewProfileAction == 0) {
+                        peopleListingModel.viewProfileAction = false;
+                    } else {
+                        peopleListingModel.viewProfileAction = true;
                     }
 
-                    if (acceptAction==0){
-                        peopleListingModel.acceptAction=false;
-                    }
-                    else {
-                        peopleListingModel.acceptAction=true;
-                    }
-
-                    if (ignoreAction==0){
-                        peopleListingModel.ignoreAction=false;
-                    }
-                    else {
-                        peopleListingModel.ignoreAction=true;
+                    if (viewContentAction == 0) {
+                        peopleListingModel.viewContentAction = false;
+                    } else {
+                        peopleListingModel.viewContentAction = true;
                     }
 
-                    if (sendMessageAction==0){
-                        peopleListingModel.sendMessageAction=false;
-                    }
-                    else {
-                        peopleListingModel.sendMessageAction=true;
-                    }
-
-                    if (addToMyConnectionAction==0){
-                        peopleListingModel.addToMyConnectionAction=false;
-                    }
-                    else {
-                        peopleListingModel.addToMyConnectionAction=true;
+                    if (acceptAction == 0) {
+                        peopleListingModel.acceptAction = false;
+                    } else {
+                        peopleListingModel.acceptAction = true;
                     }
 
-                    if (removeFromMyConnectionAction==0){
-                        peopleListingModel.removeFromMyConnectionAction=false;
-                    }
-                    else {
-                        peopleListingModel.removeFromMyConnectionAction=true;
+                    if (ignoreAction == 0) {
+                        peopleListingModel.ignoreAction = false;
+                    } else {
+                        peopleListingModel.ignoreAction = true;
                     }
 
-                    peopleListingModel.interestAreas=cursor.getString(cursor
+                    if (sendMessageAction == 0) {
+                        peopleListingModel.sendMessageAction = false;
+                    } else {
+                        peopleListingModel.sendMessageAction = true;
+                    }
+
+                    if (addToMyConnectionAction == 0) {
+                        peopleListingModel.addToMyConnectionAction = false;
+                    } else {
+                        peopleListingModel.addToMyConnectionAction = true;
+                    }
+
+                    if (removeFromMyConnectionAction == 0) {
+                        peopleListingModel.removeFromMyConnectionAction = false;
+                    } else {
+                        peopleListingModel.removeFromMyConnectionAction = true;
+                    }
+
+                    peopleListingModel.interestAreas = cursor.getString(cursor
                             .getColumnIndex("interestareas"));
 
-                    peopleListingModel.notaMember=cursor.getInt(cursor
+                    peopleListingModel.notaMember = cursor.getInt(cursor
                             .getColumnIndex("notamember"));
 
-                    peopleListingModel.siteURL=cursor.getString(cursor
+                    peopleListingModel.siteURL = cursor.getString(cursor
                             .getColumnIndex("siteurl"));
 
-                    peopleListingModel.siteID=cursor.getString(cursor
+                    peopleListingModel.siteID = cursor.getString(cursor
                             .getColumnIndex("siteid"));
 
-                    peopleListingModel.tabID=cursor.getString(cursor
+                    peopleListingModel.tabID = cursor.getString(cursor
                             .getColumnIndex("tabid"));
 
-                    peopleListingModel.mainSiteUserID=cursor.getString(cursor
+                    peopleListingModel.mainSiteUserID = cursor.getString(cursor
                             .getColumnIndex("mainsiteuserid"));
 
                     peopleListingModelList.add(peopleListingModel);

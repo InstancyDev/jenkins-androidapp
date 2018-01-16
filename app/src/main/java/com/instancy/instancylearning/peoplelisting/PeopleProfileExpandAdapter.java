@@ -123,6 +123,8 @@ public class PeopleProfileExpandAdapter extends BaseExpandableListAdapter {
             }
         });
 
+        moreOptions.setVisibility(View.INVISIBLE);
+
         TextView listTitleTextView = (TextView) pView
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);

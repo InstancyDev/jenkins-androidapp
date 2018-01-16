@@ -622,7 +622,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             menu.getItem(0).setVisible(true);
         }
 
-
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
@@ -631,10 +630,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     intentDetail.putExtra("peopleListingModel", peopleListingModel);
                     startActivity(intentDetail);
 
-                    Toast.makeText(context, "View Profile", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "View Profile", Toast.LENGTH_SHORT).show();
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
-                    Toast.makeText(context, "View Content", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "View Content", Toast.LENGTH_SHORT).show();
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Accept Connection")) {

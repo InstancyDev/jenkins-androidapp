@@ -78,7 +78,7 @@ public class SignUp_Activity extends AppCompatActivity {
         }
 
 
-        final String appDefaultUrl = preferencesManager.getStringValue(StaticValues.KEY_SITEURL);
+       final String appDefaultUrl ="http://sslcroplife.instancy.com/";
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
