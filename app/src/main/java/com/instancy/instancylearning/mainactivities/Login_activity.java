@@ -191,7 +191,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 
 //       uncomment for backgroundcolor purpose
-        View someView = findViewById(R.id.login_layout);
+//        View someView = findViewById(R.id.login_layout);
 
         // Find the root view
 //        View root = someView.getRootView();

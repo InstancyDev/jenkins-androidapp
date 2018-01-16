@@ -22,5 +22,4 @@ public class ProfileConfigsModel implements Serializable {
     public String names = "";
     public String valueName = "";
 
-
 }

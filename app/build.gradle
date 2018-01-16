@@ -7,8 +7,8 @@ android {
     defaultConfig {
 // ----------------------------------for crop life----------------------------------
 //        applicationId "com.instancy.croplifeindia"
-//        versionCode 11
-//        versionName "1.7"
+//        versionCode 12
+//        versionName "1.8"
 
 // ----------------------------------for instancy genric app-------------------------
 //        applicationId "com.instancy.instancylearning"
@@ -21,9 +21,9 @@ android {
 //        versionName "1.8"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
-           applicationId "com.instancy.enterpriselearninglite"
-           versionCode 11
-           versionName "2.0"
+//           applicationId "com.instancy.enterpriselearninglite"
+//           versionCode 11
+//           versionName "2.0"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"
@@ -41,9 +41,9 @@ android {
 //        versionName "1.5"
 
 //  -------------------------------- for Mobile up app----------------------------------
-//        applicationId "com.instancy.mobileup"
-//        versionCode 2
-//        versionName "1.1"
+        applicationId "com.instancy.mobileup"
+        versionCode 2
+        versionName "1.1"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.cle"
@@ -112,4 +112,5 @@ dependencies {
     compile 'info.hoang8f:android-segmented:1.0.6'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    compile 'com.github.stfalcon:chatkit:0.2.2'
 }

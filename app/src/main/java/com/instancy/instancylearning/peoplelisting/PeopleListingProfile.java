@@ -80,6 +80,8 @@ import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 /**
  * Created by Upendranath on 5/19/2017.
+ * https://github.com/timigod/android-chat-ui
+ * https://github.com/stfalcon-studio/ChatKit
  */
 
 public class PeopleListingProfile extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
@@ -150,11 +152,8 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Profile " + "</font>"));
+                peopleListingModel.userDisplayname + "</font>"));
 
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -172,7 +171,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
-//        boolean isProfileExists = getALlProfilesDetailsFromDB();
+
         profileDynamicAdapter = new PeopleProfileExpandAdapter(this, experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
@@ -227,9 +226,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
     public void initilizeView() {
 
-
         String imgUrl = peopleListingModel.siteURL + peopleListingModel.memberProfileImage;
-
 
         Picasso.with(this).load(imgUrl).placeholder(R.drawable.defaulttechguy).into(profileImage);
         Picasso.with(this).load(imgUrl).placeholder(R.drawable.defaulttechguy).into(profileRound);

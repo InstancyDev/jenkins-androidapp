@@ -45,6 +45,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.chatmessanger.ChatFragment;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
@@ -658,8 +659,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //                    Toast.makeText(context, "Ignore Connection", Toast.LENGTH_SHORT).show();
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Send Message")) {
-                    Toast.makeText(context, "Send Message", Toast.LENGTH_SHORT).show();
+                if (item.getTitle().toString().equalsIgnoreCase("Cancel")) {
+
+                    Intent intentDetail = new Intent(context, ChatFragment.class);
+                    intentDetail.putExtra("peopleListingModel", peopleListingModel);
+                    startActivity(intentDetail);
 
                 }
 

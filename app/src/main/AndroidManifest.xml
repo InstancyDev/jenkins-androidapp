@@ -139,6 +139,9 @@
             android:name=".peoplelisting.PeopleListingProfile"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".chatmessanger.ChatFragment"
+            android:screenOrientation="portrait"></activity>
 
         <!-- INAPP BILLING ACTIVITY -->
 

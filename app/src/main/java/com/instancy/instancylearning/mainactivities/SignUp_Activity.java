@@ -63,7 +63,7 @@ public class SignUp_Activity extends AppCompatActivity {
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
 
@@ -78,7 +78,8 @@ public class SignUp_Activity extends AppCompatActivity {
         }
 
 
-       final String appDefaultUrl ="http://sslcroplife.instancy.com/";
+
+        final String appDefaultUrl = "http://sslcroplife.instancy.com/";
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -118,7 +119,7 @@ public class SignUp_Activity extends AppCompatActivity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
 
-                svProgressHUD.dismiss();
+//                svProgressHUD.dismiss();
             }
 
             @Override
@@ -127,9 +128,7 @@ public class SignUp_Activity extends AppCompatActivity {
                 if (url.toLowerCase().contains("sign%20in") || url.toLowerCase().contains("sign in")) {
                     Intent signinIntent = new Intent(SignUp_Activity.this, Login_activity.class);
                     startActivity(signinIntent);
-
                 }
-
                 svProgressHUD.dismiss();
             }
 
@@ -158,11 +157,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
     }
 
-    //    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//    }
+
     public static void clearWebViewAbsolutely(WebView webView) {
         webView.clearCache(true);
         webView.clearHistory();
