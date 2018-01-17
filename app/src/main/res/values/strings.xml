@@ -10,6 +10,8 @@
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
 
+    <string name="date_today">Today</string>
+    <string name="date_yesterday">Yesterday</string>
 
     <string name="label_existing_user">Existing Student</string>
     <string name="label_new_user">New Student</string>
@@ -48,6 +50,8 @@
     <string name="pref_chk_label_reset_url">Reset Site URL</string>
     <string name="pref_edit_label_change_url">Change Site URL</string>
     <string name="pref_alert_title_edit_url">Enter Site URL</string>
+
+
     <array name="pref_headers">
         <item name="pref_head_set">Preferences</item>
         <item name="pref_head_notify">Notifications</item>

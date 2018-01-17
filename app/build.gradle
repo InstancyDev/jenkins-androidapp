@@ -7,8 +7,8 @@ android {
     defaultConfig {
 // ----------------------------------for crop life----------------------------------
 //        applicationId "com.instancy.croplifeindia"
-//        versionCode 12
-//        versionName "1.8"
+//        versionCode 13
+//        versionName "1.9"
 
 // ----------------------------------for instancy genric app-------------------------
 //        applicationId "com.instancy.instancylearning"
@@ -112,5 +112,4 @@ dependencies {
     compile 'info.hoang8f:android-segmented:1.0.6'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
-    compile 'com.github.stfalcon:chatkit:0.2.2'
 }

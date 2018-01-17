@@ -1,6 +1,5 @@
 package com.instancy.instancylearning.chatmessanger;
 
-
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -9,14 +8,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
-
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
@@ -24,29 +26,23 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
-
 import com.instancy.instancylearning.models.PeopleListingModel;
-import com.instancy.instancylearning.models.ProfileConfigsModel;
-import com.instancy.instancylearning.models.ProfileDetailsModel;
-import com.instancy.instancylearning.models.ProfileGroupModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.models.UserEducationModel;
-import com.instancy.instancylearning.models.UserExperienceModel;
 import com.instancy.instancylearning.peoplelisting.PeopleProfileExpandAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.squareup.picasso.Picasso;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 5/19/2017.
  * https://github.com/timigod/android-chat-ui
- * https://github.com/stfalcon-studio/ChatKit
+ * https://blog.sendbird.com/android-chat-tutorial-building-a-messaging-ui
  */
 
 public class ChatFragment extends AppCompatActivity {
@@ -66,18 +62,19 @@ public class ChatFragment extends AppCompatActivity {
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     PeopleProfileExpandAdapter profileDynamicAdapter;
-    HashMap<String, List<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, List<ProfileConfigsModel>>();
 
-    List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
-
-    List<UserEducationModel> educationModelArrayList = new ArrayList<>();
-
-    List<UserExperienceModel> experienceModelArrayList = new ArrayList<>();
-
-    ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
+    Button btnSent;
 
 
-    List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
+    // Chat Integration here
+
+    private static final int TOTAL_MESSAGES_COUNT = 100;
+
+    private RecyclerView mMessageRecycler;
+
+    private MessageListAdapter mMessageAdapter;
+
+    private List<BaseMessage> mMessageList;
 
     public ChatFragment() {
 
@@ -89,7 +86,6 @@ public class ChatFragment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.chat_activity);
-
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(this);
 
@@ -106,7 +102,7 @@ public class ChatFragment extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Chat" + "</font>"));
+                peopleListingModel.userDisplayname + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -128,6 +124,31 @@ public class ChatFragment extends AppCompatActivity {
 
         }
 
+        mMessageList = new ArrayList<>();
+
+
+        for (int i = 0; i < 10; i++) {
+            BaseMessage baseMessage = new BaseMessage();
+
+            if (i % 2 == 0) {
+                baseMessage.userID = "1";
+                baseMessage.description = "Give me some description";
+                baseMessage.companyName = "Me";
+            } else {
+                baseMessage.userID = "2";
+                baseMessage.description = "No Yar please come here i will give you full information ok ritht";
+                baseMessage.companyName = "" + peopleListingModel.userDisplayname;
+            }
+            mMessageList.add(baseMessage);
+        }
+
+        mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
+        mMessageAdapter = new MessageListAdapter(this, mMessageList);
+        mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mMessageRecycler.setAdapter(mMessageAdapter);
+
+        // chat load methods
+
 
     }
 
@@ -135,7 +156,7 @@ public class ChatFragment extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy: in Mylearning fragment");
+        Log.d(TAG, "onDestroy: Chat fragment");
 
     }
 
