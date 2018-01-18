@@ -319,7 +319,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
 
         if (categoryButtonModelList1.size() == 0) {
-            nodata_Label.setText(getResources().getString(R.string.no_categories));
+            nodata_Label.setText(getResources().getString(R.string.no_data));
             nodata_Label.setVisibility(View.VISIBLE);
         } else {
             nodata_Label.setVisibility(View.GONE);
@@ -404,12 +404,12 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
-    public void refreshMethod(){
-        if (categoryButtonModelList1.size()==0){
+    public void refreshMethod() {
+        if (categoryButtonModelList1.size() == 0) {
             categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
 
             if (categoryButtonModelList1.size() == 0) {
-                nodata_Label.setText(getResources().getString(R.string.no_categories));
+                nodata_Label.setText(getResources().getString(R.string.no_data));
                 nodata_Label.setVisibility(View.VISIBLE);
             } else {
                 nodata_Label.setVisibility(View.GONE);
@@ -419,7 +419,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             mAdapter.reloadAllContent(categoryButtonModelList1);
             mAdapter.notifyDataSetChanged();
         }
-
     }
 
     void initVolleyCallback() {

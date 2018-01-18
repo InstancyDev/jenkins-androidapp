@@ -8,15 +8,17 @@ import java.io.Serializable;
 
 public class BaseMessage implements Serializable {
 
-    public String title = "";
-    public String location = "";
-    public String companyName = "";
-    public String fromDate = "";
-    public String toDate = "";
-    public String userID = "1";
-    public String displayNo = "";
-    public String description = "";
-    public boolean tillDate = true;
-    public String difference = "";
-
+    public String chatID = "";
+    public String fromUserID = "";
+    public String toUserID = "";
+    public String messageChat = "";
+    public String attachemnt = "";
+    public String sendDateTime = "1";
+    public String markAsRead = "";
+    public String fromStatus = "";
+    public boolean fromUserName = true;
+    public String toUsername = "";
+    public String profilePic = "";
+    public String sentDate = "";
+    
 }

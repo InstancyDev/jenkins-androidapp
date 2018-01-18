@@ -699,13 +699,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         intentDetail.putExtra("peopleListingModel", peopleListingModel);
                         startActivity(intentDetail);
 
-
                     } else {
                         Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                     }
 
                 }
-
 
                 if (item.getTitle().toString().equalsIgnoreCase("Remove Connection")) {
 
@@ -813,7 +811,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int isChecked) {
-
+        MenuItemCompat.collapseActionView(item_search);
         switch (isChecked) {
             case R.id.expertsbtn:
                 expertsBtn.setTypeface(null, Typeface.BOLD);

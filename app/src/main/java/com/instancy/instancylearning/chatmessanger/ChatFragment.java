@@ -104,7 +104,6 @@ public class ChatFragment extends AppCompatActivity {
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
-        vollyService = new VollyService(resultCallback, this);
 
         peopleListingModel = new PeopleListingModel();
 
@@ -117,6 +116,7 @@ public class ChatFragment extends AppCompatActivity {
 
         initilizeView();
         initVolleyCallback();
+        vollyService = new VollyService(resultCallback, this);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -143,7 +143,6 @@ public class ChatFragment extends AppCompatActivity {
         }
 
         mMessageList = new ArrayList<>();
-
 
         for (int i = 0; i < 10; i++) {
             BaseMessage baseMessage = new BaseMessage();
@@ -211,15 +210,15 @@ public class ChatFragment extends AppCompatActivity {
 
             }
 
-            String paramsString = "fromuserid=" + appUserModel.getUserIDValue()  + "&touserid=" +peopleListingModel.connectionUserID + "&msg=&markasread=true";
+            String paramsString = "fromuserid=" + peopleListingModel.userID + "&touserid=" + appUserModel.getUserIDValue() + "&msg=&markasread=true";
+
+//            String paramsString = "fromuserid=" + "17" + "&touserid=" + "1" + "&msg=&markasread=true";
 
             vollyService.getJsonObjResponseVolley("CHATHISTORY", appUserModel.getWebAPIUrl() + "/Chat/GetUserChatHistory?" + paramsString, appUserModel.getAuthHeaders());
         } else {
 
         }
-
     }
-
 
     @Override
     public void onDestroy() {
@@ -253,7 +252,7 @@ public class ChatFragment extends AppCompatActivity {
             public void notifySuccess(String requestType, JSONObject response) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
-                svProgressHUD.dismiss();
+
                 if (requestType.equalsIgnoreCase("CHATHISTORY")) {
                     if (response != null) {
 
@@ -262,7 +261,7 @@ public class ChatFragment extends AppCompatActivity {
                     }
                 }
 
-
+                svProgressHUD.dismiss();
             }
 
             @Override
