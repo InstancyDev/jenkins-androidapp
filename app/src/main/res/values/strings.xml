@@ -4,11 +4,13 @@
     <!--<string name="app_name">Enterprise Learning </string>-->
     <!--<string name="app_name">CropLife Online Dealer Training</string>-->
     <!--<string name="app_name">Instancy </string>-->
-    <string name="app_name">Learn Up - Learn on your phone</string>
+    <!--<string name="app_name">Learn Up - Learn on your phone</string>-->
     <!--<string name="app_name">Tracktech lifeskills</string>-->
     <!--<string name="app_name">Training Company</string>-->
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
+    <string name="app_name">Instancy Development </string>
+
 
     <string name="date_today">Today</string>
     <string name="date_yesterday">Yesterday</string>
@@ -72,6 +74,7 @@
         <item name="pref_item_notify_unassigned">Content items unassigned</item>
     </array>
     <string name="pref_txt_reset_url">This option will reset the site URL to the default learning portal (for demonstration only).</string>
+
     <string name="pref_txt_change_url">You can connect to your learning portal by changing the site URL. Please contact your administrator to get this URL.</string>
     <string name="pref_txt_label_target_reminder">Assigned content target reminder</string>
     <string name="pref_txt_label_assignment">Content assignment</string>
@@ -192,5 +195,10 @@
     <string name="textalert">Please check your email and password.</string>
     <string name="searchdesc">Tap here to search any content</string>
     <string name="searchalert">Please enter atleast one word to search</string>
+
+
+    <string name="removeconnectionalert">Confirmation!</string>
+    <string name="removeconnectionalertmessage">Are you sure you want remove this connection ?</string>
+
 
 </resources>

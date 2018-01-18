@@ -1496,8 +1496,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
 //
 ////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("9")))
-//                        continue;
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10")))
+                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -10363,13 +10363,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-//        List<ProfileConfigsModel> al = new ArrayList<>();
-//// add elements to al, including duplicates
-//        Set<ProfileConfigsModel> hs = new HashSet<>();
-//        hs.addAll(profileConfigsModelList);
-//        al.clear();
-//        al.addAll(hs);
 
         return profileConfigsModelList;
     }

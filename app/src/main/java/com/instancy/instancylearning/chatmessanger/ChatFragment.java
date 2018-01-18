@@ -2,6 +2,7 @@ package com.instancy.instancylearning.chatmessanger;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -10,28 +11,37 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.peoplelisting.PeopleProfileExpandAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,6 +75,7 @@ public class ChatFragment extends AppCompatActivity {
 
     Button btnSent;
 
+    EditText messageEdit;
 
     // Chat Integration here
 
@@ -99,6 +110,13 @@ public class ChatFragment extends AppCompatActivity {
 
         peopleListingModel = (PeopleListingModel) getIntent().getSerializableExtra("peopleListingModel");
 
+        btnSent = (Button) findViewById(R.id.button_chatbox_send);
+
+        Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
+        FontManager.markAsIconContainer(findViewById(R.id.button_chatbox_send), iconFont);
+
+        initilizeView();
+        initVolleyCallback();
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -149,6 +167,56 @@ public class ChatFragment extends AppCompatActivity {
 
         // chat load methods
 
+        refreshPeopleListing(true);
+    }
+
+
+    public void initilizeView() {
+
+        messageEdit = (EditText) findViewById(R.id.edittext_chatbox);
+
+        messageEdit.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() != 0) {
+                    btnSent.setTextColor(getResources().getColor(R.color.colorStatusOther));
+                    btnSent.setEnabled(true);
+
+                } else {
+                    btnSent.setTextColor(getResources().getColor(R.color.colorDarkGrey));
+                    btnSent.setEnabled(false);
+                }
+            }
+        });
+
+
+    }
+
+
+    public void refreshPeopleListing(Boolean isFirstLoad) {
+        if (isNetworkConnectionAvailable(this, -1)) {
+//            peopleListingTabsEitherFromDatabaseOrAPI();
+            if (isFirstLoad) {
+
+                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+
+            }
+
+            String paramsString = "fromuserid=" + appUserModel.getUserIDValue()  + "&touserid=" +peopleListingModel.connectionUserID + "&msg=&markasread=true";
+
+            vollyService.getJsonObjResponseVolley("CHATHISTORY", appUserModel.getWebAPIUrl() + "/Chat/GetUserChatHistory?" + paramsString, appUserModel.getAuthHeaders());
+        } else {
+
+        }
 
     }
 
@@ -176,6 +244,55 @@ public class ChatFragment extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    void initVolleyCallback() {
+
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+                svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("CHATHISTORY")) {
+                    if (response != null) {
+
+
+                    } else {
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+                svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("CHATHISTORY")) {
+                    if (response != null) {
+
+                        Log.d(TAG, "notifySuccess: in  CHATHISTORY " + response);
+                    } else {
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+                svProgressHUD.dismiss();
+            }
+        };
     }
 
 }

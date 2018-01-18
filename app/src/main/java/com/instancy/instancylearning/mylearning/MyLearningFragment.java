@@ -108,8 +108,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
+
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
+
     @BindView(R.id.mylearninglistview)
     ListView myLearninglistView;
     MyLearningAdapter myLearningAdapter;

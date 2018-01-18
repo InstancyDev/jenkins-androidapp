@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -21,6 +22,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
@@ -99,6 +101,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
+
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -244,7 +247,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     if (response != null) {
                         try {
                             db.injectPeopleListingListIntoSqLite(response, TABBALUE);
-//                            injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -263,10 +265,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                if (requestType.equalsIgnoreCase("FILTER")) {
-
-                    Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
-                }
             }
 
             @Override
@@ -275,9 +273,23 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("REMOVEACTION")) {
                     if (response != null) {
-
+                        refreshPeopleListing(true);
                         Log.d(TAG, "notifySuccess: in  REMOVEACTION " + response);
-                        Toast.makeText(getContext(), " " + response, Toast.LENGTH_SHORT).show();
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setMessage(response)
+                                .setCancelable(false)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //do things
+                                        dialog.dismiss();
+
+                                    }
+                                });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
+
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -288,7 +300,22 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     if (response != null) {
 
                         Log.d(TAG, "notifySuccess: in  ACCEPTACTION " + response);
-                        Toast.makeText(getContext(), " " + response, Toast.LENGTH_SHORT).show();
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setMessage(response)
+                                .setCancelable(false)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //do things
+                                        dialog.dismiss();
+
+                                    }
+                                });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
+
+                        refreshPeopleListing(true);
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -298,11 +325,26 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("ADDACTION")) {
                     if (response != null) {
                         Log.d(TAG, "notifySuccess: in  ADDACTION " + response);
-                        Toast.makeText(getContext(), " " + response, Toast.LENGTH_SHORT).show();
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setMessage(response)
+                                .setCancelable(false)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //do things
+                                        dialog.dismiss();
+
+                                    }
+                                });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
+
                         refreshPeopleListing(true);
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
+                    svProgressHUD.dismiss();
                 }
 
                 swipeRefreshLayout.setRefreshing(false);
@@ -328,6 +370,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         View rootView = inflater.inflate(R.layout.peoplelisting_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
 
         peopleListingAdapter = new PeopleListingAdapter(getActivity(), BIND_ABOVE_CLIENT, peopleListingModelList);
         peopleListView.setAdapter(peopleListingAdapter);
@@ -482,7 +526,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     @Override
     public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(false);
+
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshPeopleListing(true);
             MenuItemCompat.collapseActionView(item_search);
@@ -596,7 +640,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 
         if (peopleListingModel.viewContentAction) {
-            menu.getItem(1).setVisible(true);
+            menu.getItem(1).setVisible(false);
         }
 
         if (peopleListingModel.sendMessageAction) {
@@ -647,10 +691,45 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
                 }
 
+                if (item.getTitle().toString().equalsIgnoreCase("Send Message")) {
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+                        Intent intentDetail = new Intent(context, ChatFragment.class);
+                        intentDetail.putExtra("peopleListingModel", peopleListingModel);
+                        startActivity(intentDetail);
+
+
+                    } else {
+                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+
                 if (item.getTitle().toString().equalsIgnoreCase("Remove Connection")) {
 
                     if (isNetworkConnectionAvailable(getContext(), -1)) {
-                        removeConnectionAction(peopleListingModel);
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setMessage(getResources().getString(R.string.removeconnectionalertmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
+                                .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        }).setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //do things
+                                dialog.dismiss();
+                                removeConnectionAction(peopleListingModel);
+
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
+
                     } else {
                         Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                     }
@@ -690,7 +769,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     }
 
     public void removeConnectionAction(PeopleListingModel peopleListingModel) {
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         String paramsString = "SelectedObjectID="
                 + peopleListingModel.userID
                 + "&SelectAction=RemoveConnection&UserName="
@@ -701,9 +780,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         vollyService.getStringResponseVolley("REMOVEACTION", appUserModel.getWebAPIUrl() + "/MobileLMS/PeopleListingActions?" + paramsEncodeString, appUserModel.getAuthHeaders());
     }
 
-
     public void acceptConnectionAction(PeopleListingModel peopleListingModel) {
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
         String paramsString = "SelectedObjectID="
                 + peopleListingModel.userID
                 + "&SelectAction=Accept&UserName="
@@ -715,7 +793,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     }
 
     public void addConnectionAction(PeopleListingModel peopleListingModel) {
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         String paramsString = "SelectedObjectID="
                 + peopleListingModel.userID
                 + "&SelectAction=AddConnection&UserName="
