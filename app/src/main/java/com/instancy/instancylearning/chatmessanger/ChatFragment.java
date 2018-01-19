@@ -40,6 +40,7 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -144,21 +145,6 @@ public class ChatFragment extends AppCompatActivity {
 
         mMessageList = new ArrayList<>();
 
-        for (int i = 0; i < 10; i++) {
-            BaseMessage baseMessage = new BaseMessage();
-
-            if (i % 2 == 0) {
-                baseMessage.userID = "1";
-                baseMessage.description = "Give me some description";
-                baseMessage.companyName = "Me";
-            } else {
-                baseMessage.userID = "2";
-                baseMessage.description = "No Yar please come here i will give you full information ok ritht";
-                baseMessage.companyName = "" + peopleListingModel.userDisplayname;
-            }
-            mMessageList.add(baseMessage);
-        }
-
         mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
         mMessageAdapter = new MessageListAdapter(this, mMessageList);
         mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -255,7 +241,11 @@ public class ChatFragment extends AppCompatActivity {
 
                 if (requestType.equalsIgnoreCase("CHATHISTORY")) {
                     if (response != null) {
-
+                        try {
+                            generateChatConversition(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                     } else {
                     }
@@ -292,6 +282,81 @@ public class ChatFragment extends AppCompatActivity {
                 svProgressHUD.dismiss();
             }
         };
+    }
+
+
+    public void generateChatConversition(JSONObject jsonObject) throws JSONException {
+
+        JSONArray chatHistoryTable = jsonObject.getJSONArray("Table1");
+        mMessageList = new ArrayList<>();
+
+        if (chatHistoryTable.length() > 0) {
+
+            for (int i = 0; i < chatHistoryTable.length(); i++) {
+                JSONObject singleChatObj = chatHistoryTable.getJSONObject(i);
+
+                BaseMessage baseMessage = new BaseMessage();
+
+                if (singleChatObj.has("ChatID")) {
+                    baseMessage.chatID = singleChatObj.getString("ChatID");
+                }
+
+                if (singleChatObj.has("FromUserID")) {
+                    baseMessage.fromUserID = singleChatObj.getString("FromUserID");
+                }
+
+                if (singleChatObj.has("ToUserID")) {
+                    baseMessage.toUserID = singleChatObj.getString("ToUserID");
+                }
+
+                if (singleChatObj.has("Message")) {
+                    baseMessage.messageChat = singleChatObj.getString("Message");
+                }
+
+                if (singleChatObj.has("Attachment")) {
+                    baseMessage.attachemnt = singleChatObj.getString("Attachment");
+                }
+
+                if (singleChatObj.has("MarkAsRead")) {
+                    baseMessage.markAsRead = singleChatObj.getString("MarkAsRead");
+                }
+
+                if (singleChatObj.has("FromStatus")) {
+                    baseMessage.fromStatus = singleChatObj.getString("FromStatus");
+                }
+
+                if (singleChatObj.has("ToStatus")) {
+                    baseMessage.toStatus = singleChatObj.getString("ToStatus");
+                }
+
+                if (singleChatObj.has("FromUserName")) {
+                    baseMessage.fromUserName = singleChatObj.getString("FromUserName");
+                }
+
+
+                if (singleChatObj.has("ToUserName")) {
+                    baseMessage.toUsername = singleChatObj.getString("ToUserName");
+                }
+                if (singleChatObj.has("ProfPic")) {
+                    baseMessage.profilePic = singleChatObj.getString("ProfPic");
+                }
+
+                if (singleChatObj.has("SentDate")) {
+                    baseMessage.sentDate = singleChatObj.getString("SentDate");
+                }
+
+                if (appUserModel.getUserIDValue().equalsIgnoreCase(baseMessage.fromUserID)) {
+                    baseMessage.itsMe = true;
+                } else {
+                    baseMessage.itsMe = false;
+                }
+
+                mMessageList.add(baseMessage);
+            }
+            mMessageAdapter.reloadAllContent(mMessageList);
+        }
+
+
     }
 
 }

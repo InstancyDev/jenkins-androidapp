@@ -7,10 +7,10 @@
 
     android:paddingTop="8dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/image_message_profile"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_marginLeft="8dp"
         android:background="@drawable/round_corners"
         android:src="@drawable/user_placeholder"
@@ -38,7 +38,9 @@
         android:maxWidth="240dp"
         android:padding="8dp"
         android:text="hi man, how are you?"
+
         android:textColor="@color/colorWhite"
+        android:textSize="14dp"
         app:layout_constraintLeft_toRightOf="@+id/image_message_profile"
         app:layout_constraintTop_toBottomOf="@+id/text_message_name" />
 

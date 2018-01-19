@@ -738,9 +738,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Cancel")) {
 
-                    Intent intentDetail = new Intent(context, ChatFragment.class);
-                    intentDetail.putExtra("peopleListingModel", peopleListingModel);
-                    startActivity(intentDetail);
+//                    Intent intentDetail = new Intent(context, ChatFragment.class);
+//                    intentDetail.putExtra("peopleListingModel", peopleListingModel);
+//                    startActivity(intentDetail);
 
                 }
 
@@ -759,7 +759,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         popup.show();//showing popup menu
 
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

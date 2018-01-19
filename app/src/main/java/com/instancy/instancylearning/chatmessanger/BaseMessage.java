@@ -16,9 +16,11 @@ public class BaseMessage implements Serializable {
     public String sendDateTime = "1";
     public String markAsRead = "";
     public String fromStatus = "";
-    public boolean fromUserName = true;
+    public String toStatus = "";
+    public String fromUserName = "";
     public String toUsername = "";
     public String profilePic = "";
     public String sentDate = "";
-    
+    public boolean itsMe = true;
+
 }
