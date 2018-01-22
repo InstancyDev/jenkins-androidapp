@@ -144,7 +144,11 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        communitiesModelList.clear();
+        if (communitiesModelList.size() > 0) {
+            communitiesModelList.clear();
+        }
+
+
         if (charText.length() == 0) {
             communitiesModelList.addAll(searchList);
         } else {

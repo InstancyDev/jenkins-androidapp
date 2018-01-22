@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -74,6 +75,9 @@ public class ChatFragment extends AppCompatActivity {
     UiSettingsModel uiSettingsModel;
     PeopleProfileExpandAdapter profileDynamicAdapter;
 
+    ChatService chatService;
+
+
     Button btnSent;
 
     EditText messageEdit;
@@ -105,12 +109,22 @@ public class ChatFragment extends AppCompatActivity {
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
+        chatService = ChatService.newInstance(getApplicationContext());
 
         peopleListingModel = new PeopleListingModel();
 
         peopleListingModel = (PeopleListingModel) getIntent().getSerializableExtra("peopleListingModel");
 
         btnSent = (Button) findViewById(R.id.button_chatbox_send);
+
+        btnSent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chatService.sendMessage("17", "HI From Android");
+            }
+        });
+
+        chatService.loginMethod(peopleListingModel);
 
         Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.button_chatbox_send), iconFont);
@@ -147,8 +161,11 @@ public class ChatFragment extends AppCompatActivity {
 
         mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
         mMessageAdapter = new MessageListAdapter(this, mMessageList);
-        mMessageRecycler.setLayoutManager(new LinearLayoutManager(this));
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mMessageRecycler.setLayoutManager(linearLayoutManager);
+
         mMessageRecycler.setAdapter(mMessageAdapter);
+
 
         // chat load methods
 
@@ -210,7 +227,7 @@ public class ChatFragment extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: Chat fragment");
-
+//        chatService.destroy();
     }
 
     @Override
@@ -224,6 +241,8 @@ public class ChatFragment extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+
+
     }
 
     @Override
@@ -358,6 +377,7 @@ public class ChatFragment extends AppCompatActivity {
 
 
     }
+
 
 }
 

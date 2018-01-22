@@ -286,6 +286,7 @@ public class StaticValues {
 
     public static int BACKTOMAINSITE = 0;
 
+    public static final String ACTION_INTENT_TEXT_MESSAGE_INCOMING = "ACTION_INTENT_TEXT_MESSAGE_INCOMING";
 
 
     /// all app configurations
