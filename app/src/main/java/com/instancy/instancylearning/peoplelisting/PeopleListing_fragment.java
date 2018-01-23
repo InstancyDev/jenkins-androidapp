@@ -48,6 +48,7 @@ import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.chatmessanger.ChatFragment;
+import com.instancy.instancylearning.chatmessanger.ChatService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
@@ -124,6 +125,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     boolean isFromCatogories = false;
 
+    ChatService chatService;
+
     @BindView(R.id.segmentedswitch)
     SegmentedGroup segmentedSwitch;
 
@@ -141,12 +144,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     String TABBALUE = "Experts";
 
+    String recepientID = "default";
 
     public PeopleListing_fragment() {
 
 
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -160,7 +163,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
+        chatService = ChatService.newInstance(context);
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
         if (isViewed.equalsIgnoreCase("true")) {
             appcontroller.setAlreadyViewd(true);
@@ -227,8 +230,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-                Log.d(TAG, "Volley requester " + requestType);
-                Log.d(TAG, "Volley JSON post" + response);
+//                Log.d(TAG, "Volley requester " + requestType);
+//                Log.d(TAG, "Volley JSON post" + response);
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
                     if (response != null) {
@@ -269,12 +272,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
             @Override
             public void notifySuccess(String requestType, String response) {
-                Log.d(TAG, "Volley String post" + response);
+//                Log.d(TAG, "Volley String post" + response);
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("REMOVEACTION")) {
                     if (response != null) {
                         refreshPeopleListing(true);
-                        Log.d(TAG, "notifySuccess: in  REMOVEACTION " + response);
+//                        Log.d(TAG, "notifySuccess: in  REMOVEACTION " + response);
 
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
@@ -299,7 +302,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("ACCEPTACTION")) {
                     if (response != null) {
 
-                        Log.d(TAG, "notifySuccess: in  ACCEPTACTION " + response);
+//                        Log.d(TAG, "notifySuccess: in  ACCEPTACTION " + response);
 
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
@@ -314,7 +317,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         AlertDialog alert = builder.create();
                         alert.show();
 
-
                         refreshPeopleListing(true);
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
@@ -324,7 +326,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (requestType.equalsIgnoreCase("ADDACTION")) {
                     if (response != null) {
-                        Log.d(TAG, "notifySuccess: in  ADDACTION " + response);
+//                        Log.d(TAG, "notifySuccess: in  ADDACTION " + response);
 
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
@@ -510,7 +512,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
-                Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
+//                Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
                 appcontroller.setAlreadyViewd(false);
                 preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
                 peopleListingAdapter.notifyDataSetChanged();
@@ -694,6 +696,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (item.getTitle().toString().equalsIgnoreCase("Send Message")) {
 
                     if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+                        try {
+                            recepientID = generateUserChatList(peopleListingModel.userID);
+                            peopleListingModel.chatConnectionUserId = recepientID;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                         Intent intentDetail = new Intent(context, ChatFragment.class);
                         intentDetail.putExtra("peopleListingModel", peopleListingModel);
@@ -911,4 +920,31 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //        }
 
     }
+
+    public String generateUserChatList(String userID) throws JSONException {
+        String receipent = "default";
+
+        String chatListStr = preferencesManager.getStringValue(StaticValues.CHAT_LIST);
+        if (chatListStr.length() > 10) {
+            JSONObject jsonObject = new JSONObject(chatListStr);
+//            Log.d(TAG, "log: ConnectionId users List jsonObject  -------------- " + jsonObject);
+            JSONArray jsonArray = null;
+            jsonArray = jsonObject.getJSONArray("R");
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject userJsonOnj = jsonArray.getJSONObject(i);
+                Log.d(TAG, "generateUserChatList: " + userJsonOnj);
+                if (userJsonOnj.getString("ChatuserID").equalsIgnoreCase(userID)) {
+                    receipent = userJsonOnj.getString("ConnectionId");
+                }
+
+            }
+
+        }
+        return receipent;
+    }
+
+
+
+
 }

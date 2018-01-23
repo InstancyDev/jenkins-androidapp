@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +27,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -38,6 +47,7 @@ import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.peoplelisting.PeopleProfileExpandAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
 
@@ -47,8 +57,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -109,6 +122,7 @@ public class ChatFragment extends AppCompatActivity {
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
+
         chatService = ChatService.newInstance(getApplicationContext());
 
         peopleListingModel = new PeopleListingModel();
@@ -117,14 +131,29 @@ public class ChatFragment extends AppCompatActivity {
 
         btnSent = (Button) findViewById(R.id.button_chatbox_send);
 
+
         btnSent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                chatService.sendMessage("17", "HI From Android");
+                String message = messageEdit.getText().toString().trim();
+//                chatService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
+
+                sendMessageToServer(message, peopleListingModel);
             }
         });
 
-        chatService.loginMethod(peopleListingModel);
+//        new CountDownTimer(1000, 1000) {
+//            public void onTick(long millisUntilFinished) {
+//
+//            }
+//
+//            public void onFinish() {
+////                chatService.loginMethod();
+//            }
+//
+//
+//        }.start();
+
 
         Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.button_chatbox_send), iconFont);
@@ -255,8 +284,8 @@ public class ChatFragment extends AppCompatActivity {
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-                Log.d(TAG, "Volley requester " + requestType);
-                Log.d(TAG, "Volley JSON post" + response);
+//                Log.d(TAG, "Volley requester " + requestType);
+//                Log.d(TAG, "Volley JSON post" + response);
 
                 if (requestType.equalsIgnoreCase("CHATHISTORY")) {
                     if (response != null) {
@@ -282,12 +311,12 @@ public class ChatFragment extends AppCompatActivity {
 
             @Override
             public void notifySuccess(String requestType, String response) {
-                Log.d(TAG, "Volley String post" + response);
+//                Log.d(TAG, "Volley String post" + response);
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("CHATHISTORY")) {
                     if (response != null) {
 
-                        Log.d(TAG, "notifySuccess: in  CHATHISTORY " + response);
+//                        Log.d(TAG, "notifySuccess: in  CHATHISTORY " + response);
                     } else {
                     }
 
@@ -378,6 +407,140 @@ public class ChatFragment extends AppCompatActivity {
 
     }
 
+    public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel) {
+
+        String dateString = getCurrentDateTime("dd/MM/yyyy HH:mm:ss.SSS");
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("FromUserID", appUserModel.getUserIDValue());
+            jsonObject.put("ToUserID", peopleListingModel.userID);
+            jsonObject.put("Message", messageStr);
+            jsonObject.put("Attachment", "");
+            jsonObject.put("SendDateTime", dateString);
+            jsonObject.put("MarkAsRead", "false");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        String parameterString = jsonObject.toString();
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+
+            String replaceDataString = parameterString.replace("\"", "\\\"");
+            String addQuotes = ('"' + replaceDataString + '"');
+
+            sendNewChatDataToServer(jsonObject.toString(), messageStr);
+        } else {
+            Toast.makeText(this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public void sendNewChatDataToServer(final String postData, final String message) {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/Chat/InsertChatObjectDetails";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+//                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("1")) {
+
+                    chatService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
+
+                    generateNewConversation(peopleListingModel, message);
+
+                } else {
+
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                volleyError.printStackTrace();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void generateNewConversation(PeopleListingModel peopleListingModel, String message) {
+
+        BaseMessage baseMessage = new BaseMessage();
+
+        baseMessage.chatID = peopleListingModel.chatConnectionUserId;
+
+        baseMessage.fromUserID = appUserModel.getUserIDValue();
+
+        baseMessage.toUserID = peopleListingModel.userID;
+
+        baseMessage.messageChat = message;
+
+        baseMessage.attachemnt = "";
+
+        baseMessage.markAsRead = "false";
+
+        baseMessage.fromStatus = "";
+
+        baseMessage.toStatus = "";
+
+        baseMessage.fromUserName = "";
+
+        baseMessage.toUsername = "";
+
+        baseMessage.profilePic = peopleListingModel.memberProfileImage;
+
+        baseMessage.sentDate = "";
+
+
+        if (appUserModel.getUserIDValue().equalsIgnoreCase(baseMessage.fromUserID)) {
+            baseMessage.itsMe = true;
+        } else {
+            baseMessage.itsMe = false;
+        }
+
+        mMessageList.add(baseMessage);
+
+        mMessageAdapter.reloadAllContent(mMessageList);
+
+    }
 
 }
 

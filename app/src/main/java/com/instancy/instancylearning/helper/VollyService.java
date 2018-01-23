@@ -79,7 +79,7 @@ public class VollyService {
                 public void onResponse(JSONObject response) {
                     if (mResultCallback != null)
                         mResultCallback.notifySuccess(requestType, response);
-                    Log.d("logr  response =", "response " + response);
+//                    Log.d("logr  response =", "response " + response);
 
                 }
             }, new Response.ErrorListener() {

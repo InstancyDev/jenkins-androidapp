@@ -9,12 +9,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
+import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.ExecutionException;
 
+import microsoft.aspnet.signalr.client.Action;
 import microsoft.aspnet.signalr.client.ConnectionState;
 import microsoft.aspnet.signalr.client.LogLevel;
 import microsoft.aspnet.signalr.client.Logger;
@@ -23,6 +27,7 @@ import microsoft.aspnet.signalr.client.SignalRFuture;
 import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
 import microsoft.aspnet.signalr.client.hubs.HubConnection;
 import microsoft.aspnet.signalr.client.hubs.HubProxy;
+import microsoft.aspnet.signalr.client.hubs.HubResult;
 import microsoft.aspnet.signalr.client.hubs.SubscriptionHandler1;
 import microsoft.aspnet.signalr.client.hubs.SubscriptionHandler2;
 
@@ -46,12 +51,17 @@ public class ChatService {
 
     private Context context;
 
+    String name = "";
+
+    PreferencesManager preferencesManager;
+
     private static ChatService chatService;
 
     private ChatService(Context context) {
         this.context = context;
         appUserModel = AppUserModel.getInstance();
-
+        preferencesManager = PreferencesManager.getInstance();
+        name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         initConnection();
     }
 
@@ -69,14 +79,49 @@ public class ChatService {
             @Override
             public void log(String s, LogLevel logLevel) {
 
-                Log.d(TAG, "log: here in  " + s);
+                Log.d(TAG, "log: here in   " + s);
+
+                if (s.contains("ConnectionId:")) {
+
+                    String array1[] = s.split("ConnectionId:");
+
+                    Log.d(TAG, "log: ConnectionId result array  -------------- " + array1[1]);
+
+                    Log.d(TAG, "log: ConnectionId getConnectionId -------------- " + connection.getConnectionId());
+
+                }
+
+                if (s.contains("Connected")) {
+                    connectionID = connection.getConnectionId();
+                    loginMethod();
+                }
+
+                if (s.contains("Trigger onData with data:")) {
+
+                    String array1[] = s.split("Trigger onData with data:");
+
+                    if (array1.length > 1) {
+
+                        Log.d(TAG, "log: ConnectionId users List array  -------------- " + array1[1]);
+
+                        try {
+                            JSONObject jsonObject = new JSONObject(array1[1]);
+                            Log.d(TAG, "log: ConnectionId users List jsonObject  -------------- " + jsonObject);
+
+                            preferencesManager.setStringValue(array1[1], StaticValues.CHAT_LIST);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
 
 
             }
+
         });
-
-
         hub = connection.createHubProxy("chat");
+
 
         // toreceive from chatserver
         hub.on("SendPrivateMessage", new SubscriptionHandler2<String, String>() {
@@ -93,8 +138,8 @@ public class ChatService {
                 },
                 String.class, String.class);
 
-
         awaitConnection = connection.start();
+
         thread = new DemonThread();
         thread.start();
         // https://stackoverflow.com/questions/32505390/signalr-integration-in-android-studio/
@@ -107,44 +152,31 @@ public class ChatService {
             thread.cancel();
             thread = null;
         }
-
         if (connection != null && connection.getState() == ConnectionState.Connected) {
             connection.stop();
         }
     }
 
-    public void sendMessage(String buddy, String message) {
-        new MessageSendTask().execute(buddy, message);
+    public void sendMessage(String buddyId, String message) {
+        new MessageSendTask().execute(buddyId, message);
     }
 
-    public void loginMethod(PeopleListingModel peopleListingModel) {
+    public void userCameOnline() {
+//        new UserCameOnlineTask().execute()
+    }
 
-//        if (connection != null && connection.getState() == ConnectionState.Connected) {
+    public void loginMethod() {
 
-            new loginTask().execute(appUserModel.getDisplayName(), appUserModel.getSiteIDValue(), "" + appUserModel.getUserIDValue(), "content/sitefiles/profile.jpg");
-//        }
+        new loginTask().execute(name, appUserModel.getSiteIDValue(), "" + appUserModel.getUserIDValue(), "content/sitefiles/profile.jpg");
     }
 
     private class MessageSendTask extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... params) {
-            SignalRFuture resultFuture = new SignalRFuture();
 
-            resultFuture = hub.invoke("SendPrivateMessage", "d0e5287f-35b9-4a5a-8e0e-6aa77cc394a0", params[1], true, "");
+            hub.invoke("SendPrivateMessage", params[0], params[1], true, "");
 
-
-//            try {
-//            JSONObject jsonObject  =  decodeResult(resultFuture.get());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            }
-
-
-            return resultFuture.toString();
+            return "Ok";
         }
 
         @Override
@@ -156,34 +188,23 @@ public class ChatService {
 
     private class loginTask extends AsyncTask<String, String, String> {
         @Override
-        protected String doInBackground(String... params) {
-            SignalRFuture resultFuture = new SignalRFuture();
-            resultFuture = hub.invoke("Login", "ChatuserName:" + params[0], "ChatSiteID:" + params[1], "ChatUserID:" + params[2], "ChatProfilepath:" + params[3]);
+        protected String doInBackground(final String... params) {
 
-//            resultFuture = hub.invoke("Login", params[0], params[1], params[2], params[3]);
+            JSONObject jsonObject = new JSONObject();
 
 
-//            hub.invoke("Login", params[0], params[1], params[2], params[3], new SubscriptionHandler1<String[]>() {
-//                @Override
-//                public void run(String[] strings) {
-//
-//                    Log.d(TAG, "run: " + strings);
-//                }
-//            });
+            try {
+                jsonObject.put("ChatuserName", params[0]);
+                jsonObject.put("ChatSiteID", params[1]);
+                jsonObject.put("ChatUserID", params[2]);
+                jsonObject.put("ChatProfilepath", params[3]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
+            hub.invoke("Login", jsonObject);
 
-//            try {
-//                JSONObject jsonObject  =  decodeResult(resultFuture.get());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            }
-
-
-            return resultFuture.toString();
+            return "Ok";
         }
 
         @Override
@@ -191,6 +212,16 @@ public class ChatService {
             super.onPostExecute(s);
             Log.d(TAG, "onPostExecute: loginTask  " + s);
 
+        }
+    }
+
+    private class UserCameOnlineTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+
+            hub.invoke("OtherNewUserLogin", params[0], params[1], true, "");
+
+            return "Ok";
         }
     }
 
@@ -208,7 +239,6 @@ public class ChatService {
                     e.printStackTrace();
                 }
             }
-
             awaitConnection.cancel();
         }
 

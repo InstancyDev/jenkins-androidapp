@@ -295,6 +295,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
             appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
 
+
         }
 
 

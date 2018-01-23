@@ -39,6 +39,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
+import com.instancy.instancylearning.chatmessanger.ChatService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
@@ -141,6 +142,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     RelativeLayout drawerHeaderView;
     public View logoView;
+    ChatService chatService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +155,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         preferencesManager = PreferencesManager.getInstance();
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
+//        chatService = ChatService.newInstance(getApplicationContext());
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
         appUserModel.setUserLoginId(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));

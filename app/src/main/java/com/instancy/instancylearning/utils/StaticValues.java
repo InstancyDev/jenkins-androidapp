@@ -80,6 +80,8 @@ public class StaticValues {
     public static final String CONTEXT_TITLE = "COONTEXT_TITLE";
 
 
+    public static final String CHAT_LIST = "CHAT_LIST";
+
     public static final String BACK_STACK_ROOT_TAG = "root_fragment";
     /**
      * To get the FontAwsome font .ttf asset path
