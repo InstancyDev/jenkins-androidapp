@@ -39,7 +39,6 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
-import com.instancy.instancylearning.chatmessanger.ChatService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
@@ -142,7 +141,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     RelativeLayout drawerHeaderView;
     public View logoView;
-    ChatService chatService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +181,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             public void onClick(View v) {
                 //logo clicked
                 homeControllClicked();
+
 
             }
         });
@@ -264,7 +263,14 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     if (sideMenusModel.get(j).getDisplayOrder() == 1) {
                         indexed = sideMenusModel.get(j).getContextMenuId();
                         model = sideMenusModel.get(j);
+
+                    } else {
+
+                        indexed = sideMenusModel.get(0).getContextMenuId();
+                        model = sideMenusModel.get(0);
+
                     }
+
                 }
 
                 // on first time to display view for first navigation item based on the number
@@ -272,6 +278,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 homeModel = model;
                 homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
+
+
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
             navDrawerExpandableView.setOnGroupExpandListener((new ExpandableListView.OnGroupExpandListener() {

@@ -41,6 +41,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
@@ -70,7 +71,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * https://blog.sendbird.com/android-chat-tutorial-building-a-messaging-ui
  */
 
-public class ChatFragment extends AppCompatActivity {
+public class ChatFragment extends AppCompatActivity implements Communicator {
 
 
     String TAG = ChatFragment.class.getSimpleName();
@@ -88,8 +89,8 @@ public class ChatFragment extends AppCompatActivity {
     UiSettingsModel uiSettingsModel;
     PeopleProfileExpandAdapter profileDynamicAdapter;
 
-    ChatService chatService;
 
+    SignalAService signalAService;
 
     Button btnSent;
 
@@ -123,7 +124,7 @@ public class ChatFragment extends AppCompatActivity {
         preferencesManager = PreferencesManager.getInstance();
 
 
-        chatService = ChatService.newInstance(getApplicationContext());
+        signalAService = SignalAService.newInstance(getApplicationContext());
 
         peopleListingModel = new PeopleListingModel();
 
@@ -449,7 +450,7 @@ public class ChatFragment extends AppCompatActivity {
 
                 if (s.contains("1")) {
 
-                    chatService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
+                    signalAService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
 
                     generateNewConversation(peopleListingModel, message);
 
@@ -542,5 +543,11 @@ public class ChatFragment extends AppCompatActivity {
 
     }
 
+    @Override
+    public void messageRecieved(JSONArray messageReceived) {
+
+        Log.d(TAG, "messageRecieved: in CHATfragment " + messageReceived);
+
+    }
 }
 

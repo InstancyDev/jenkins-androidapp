@@ -2,6 +2,8 @@ package com.instancy.instancylearning.interfaces;
 
 import android.content.ContentValues;
 
+import org.json.JSONArray;
+
 import java.util.List;
 
 /**
@@ -10,7 +12,6 @@ import java.util.List;
 
 public interface Communicator {
 
-    public void breadCrumbStatus(List<ContentValues> dicBreadcrumbItems);
+    public void messageRecieved(JSONArray messageReceived);
 
-//    public void enteredSideMenu();
 }

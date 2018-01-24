@@ -2928,7 +2928,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        db.close();
     }
 
-
     public List<MyLearningModel> fetchCatalogModel(String componentID) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();

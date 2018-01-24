@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!--// cvcta color-->
+    <!--<color name="colorPrimary">#006da5</color>-->
+
     <color name="colorPrimary">#5db100</color>
     <!--<color name="colorPrimary">#BBA284</color>-->
     <color name="colorPrimaryDark">#36454f</color>

@@ -115,7 +115,7 @@
         android:background="@color/colorWhite"
         android:padding="3dp"
         android:scaleType="centerInside"
-        android:src="@drawable/croplife_logo"
+        android:src="@drawable/cvcta_bottom"
         android:visibility="visible" />
 
 </LinearLayout>

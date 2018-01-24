@@ -49,6 +49,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.chatmessanger.ChatFragment;
 import com.instancy.instancylearning.chatmessanger.ChatService;
+import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
@@ -127,6 +128,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     ChatService chatService;
 
+    SignalAService signalAService;
+
     @BindView(R.id.segmentedswitch)
     SegmentedGroup segmentedSwitch;
 
@@ -163,7 +166,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-        chatService = ChatService.newInstance(context);
+//        chatService = ChatService.newInstance(context);
+
+
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
         if (isViewed.equalsIgnoreCase("true")) {
             appcontroller.setAlreadyViewd(true);
@@ -206,7 +211,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             // No such key
             filterContentType = "";
         }
-
+        signalAService = SignalAService.newInstance(context);
+        signalAService.startSignalA();
     }
 
     public void refreshPeopleListing(Boolean isRefreshed) {
@@ -580,6 +586,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
         EVENT_FRAGMENT_OPENED_FIRSTTIME = 2;
+//        chatService.destroy();
     }
 
 
@@ -645,6 +652,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             menu.getItem(1).setVisible(false);
         }
 
+        // comment for cvcta
         if (peopleListingModel.sendMessageAction) {
             menu.getItem(5).setVisible(true);
         }
@@ -926,25 +934,16 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         String chatListStr = preferencesManager.getStringValue(StaticValues.CHAT_LIST);
         if (chatListStr.length() > 10) {
-            JSONObject jsonObject = new JSONObject(chatListStr);
 //            Log.d(TAG, "log: ConnectionId users List jsonObject  -------------- " + jsonObject);
-            JSONArray jsonArray = null;
-            jsonArray = jsonObject.getJSONArray("R");
-
+            JSONArray jsonArray = new JSONArray(chatListStr);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject userJsonOnj = jsonArray.getJSONObject(i);
                 Log.d(TAG, "generateUserChatList: " + userJsonOnj);
                 if (userJsonOnj.getString("ChatuserID").equalsIgnoreCase(userID)) {
                     receipent = userJsonOnj.getString("ConnectionId");
                 }
-
             }
-
         }
         return receipent;
     }
-
-
-
-
 }

@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -22,6 +24,7 @@ import microsoft.aspnet.signalr.client.Action;
 import microsoft.aspnet.signalr.client.ConnectionState;
 import microsoft.aspnet.signalr.client.LogLevel;
 import microsoft.aspnet.signalr.client.Logger;
+import microsoft.aspnet.signalr.client.MessageReceivedHandler;
 import microsoft.aspnet.signalr.client.Platform;
 import microsoft.aspnet.signalr.client.SignalRFuture;
 import microsoft.aspnet.signalr.client.http.android.AndroidPlatformComponent;
@@ -116,35 +119,40 @@ public class ChatService {
                     }
                 }
 
-
             }
 
         });
         hub = connection.createHubProxy("chat");
-
+        awaitConnection = connection.start();
 
         // toreceive from chatserver
-        hub.on("SendPrivateMessage", new SubscriptionHandler2<String, String>() {
-                    @Override
-                    public void run(String msgType, String msg) {
-//                        Intent intent = new Intent();
-//                        intent.setAction(ACTION_INTENT_TEXT_MESSAGE_INCOMING);
-//                        intent.putExtra("name", "server");
-//                        intent.putExtra("body", msg);
-//                        context.sendBroadcast(intent);
-                        Log.d("SendPrivateMessage", "yes, it works " + msg);
+//        hub.on("SendPrivateMessage", new SubscriptionHandler2<String, String>() {
+//                    @Override
+//                    public void run(String msgType, String msg) {
+////                        Intent intent = new Intent();
+////                        intent.setAction(ACTION_INTENT_TEXT_MESSAGE_INCOMING);
+////                        intent.putExtra("name", "server");
+////                        intent.putExtra("body", msg);
+////                        context.sendBroadcast(intent);
+//                        Log.d("SendPrivateMessage", "yes, it works " + msg);
+//
+//                    }
+//                },
+//                String.class, String.class);
 
-                    }
-                },
-                String.class, String.class);
 
-        awaitConnection = connection.start();
+        connection.received(new MessageReceivedHandler() {
+            @Override
+            public void onMessageReceived(final JsonElement json) {
+
+                JsonObject jsonObject = json.getAsJsonObject();
+                Log.e("<Debug>", "response = " + jsonObject.toString());
+            }
+        });
 
         thread = new DemonThread();
         thread.start();
         // https://stackoverflow.com/questions/32505390/signalr-integration-in-android-studio/
-
-
     }
 
     public void destroy() {
@@ -192,7 +200,7 @@ public class ChatService {
 
             JSONObject jsonObject = new JSONObject();
 
-
+            JSONArray array = new JSONArray();
             try {
                 jsonObject.put("ChatuserName", params[0]);
                 jsonObject.put("ChatSiteID", params[1]);
@@ -201,8 +209,15 @@ public class ChatService {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            array.put(jsonObject);
 
-            hub.invoke("Login", jsonObject);
+            hub.invoke("Login", array).done(new Action<Void>() {
+                @Override
+                public void run(Void aVoid) throws Exception {
+                    Log.d("<Debug", "message sent."); // Works fine
+                }
+            });
+
 
             return "Ok";
         }

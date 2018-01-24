@@ -60,7 +60,7 @@ import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
  * Created by Upendranath on 11/27/2017.
  */
 
-public class HomeCategories_Fragment extends Fragment implements Communicator {
+public class HomeCategories_Fragment extends Fragment {
 
     private static final String BACK_STACK_ROOT_TAG = "root_fragment";
     String TAG = HomeCategories_Fragment.class.getSimpleName();
@@ -272,13 +272,6 @@ public class HomeCategories_Fragment extends Fragment implements Communicator {
             }
         }
         return responMap;
-    }
-
-    @Override
-    public void breadCrumbStatus(List<ContentValues> dicBreadcrumbItems) {
-
-        Log.d(TAG, "breadCrumbStatus: in HomeFragment " + dicBreadcrumbItems);
-
     }
 
     // for recycler view listners

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/crop_life_bg"
+    android:background="@color/colorDefaultBackGround"
     android:orientation="vertical">
 
     <!--android:background="@drawable/bg"-->
@@ -16,7 +16,7 @@
         android:layout_marginTop="99dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/croplife_logo" />
+        android:src="@drawable/cvctabanner" />
     <!--android:scaleType="fitcenter"-->
 
     <Button
