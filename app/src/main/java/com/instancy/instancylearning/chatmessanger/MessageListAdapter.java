@@ -19,8 +19,12 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.DateUtils;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -120,8 +124,18 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             messageText.setText(message.messageChat);
 
             // Format the stored timestamp into a readable String using method.
-//            timeText.setText(DateUtils.formatDateTime(message.fromDate));
-            timeText.setText("Today");
+
+            String originalString = message.sentDate;
+            Date date = null;
+            try {
+                date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(originalString);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String newString = new SimpleDateFormat("H:mm").format(date);
+
+            timeText.setText(newString);
 
         }
     }
@@ -142,16 +156,25 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void bind(BaseMessage message) {
             messageText.setText(message.messageChat);
 
-            // Format the stored timestamp into a readable String using method.
-//            timeText.setText(DateUtils.formatDateTime(message.getCreatedAt()));
-
             nameText.setText(message.fromUserName);
 
-            // Insert the profile image from the URL into the ImageView.
-//            Utils.displayRoundImageFromUrl(mContext, message.getSender().getProfileUrl(), profileImage);
+
             String profileIma = appUserModel.getSiteURL() + message.profilePic;
 
             Picasso.with(itemView.getContext()).load(profileIma).placeholder(itemView.getResources().getDrawable(R.drawable.defaulttechguy)).into(profileImage);
+
+            String originalString = message.sentDate;
+            Date date = null;
+            try {
+                date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(originalString);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String newString = new SimpleDateFormat("H:mm").format(date);
+
+            timeText.setText(newString);
+
         }
     }
 

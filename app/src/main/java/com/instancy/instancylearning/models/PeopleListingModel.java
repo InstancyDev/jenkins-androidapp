@@ -30,4 +30,6 @@ public class PeopleListingModel implements Serializable {
     public String tabID = "";
     public String mainSiteUserID = "";
     public String chatConnectionUserId = "Default";
+
+    public String chatUserStatus = "";
 }

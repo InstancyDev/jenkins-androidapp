@@ -44,7 +44,7 @@ public class SignalAService {
 
     String name = "";
 
-    Communicator communicator;
+    public Communicator communicator;
 
     PreferencesManager preferencesManager;
 
@@ -61,12 +61,6 @@ public class SignalAService {
             e.printStackTrace();
         }
 
-//        try {
-//            communicator = (Communicator) context.getApplicationContext();
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(context.getApplicationContext()
-//                    + " must implement Communicator");
-//        }
     }
 
     public static SignalAService newInstance(Context context) {
@@ -88,30 +82,34 @@ public class SignalAService {
 
                 switch (newState.getState()) {
                     case Connected:
-                        Toast.makeText(context, "Connected", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(context, "Connected", Toast.LENGTH_LONG).show();
                         connectionID = con.getConnectionId();
                         loginMethod();
                         break;
                     case Disconnected:
-                        Toast.makeText(context, "Disconnected", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(context, "Disconnected", Toast.LENGTH_LONG).show();
                         break;
                     default:
                         break;
                 }
 
             }
+
         };
 
         hub = con.CreateHubProxy("chat");
-
 
         hub.On("SendPrivateMessage", new HubOnDataCallback() {
             @Override
             public void OnReceived(JSONArray args) {
 
                 Log.d(TAG, "OnReceived: " + args);
+
                 communicator.messageRecieved(args);
+
             }
+
+
         });
     }
 
@@ -180,6 +178,4 @@ public class SignalAService {
 
         hub.Invoke("SendPrivateMessage", args, callback);
     }
-
-
 }

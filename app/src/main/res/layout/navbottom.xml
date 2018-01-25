@@ -32,16 +32,54 @@
             android:layout_toRightOf="@id/back_font"
             android:gravity="center_vertical"
             android:minHeight="?android:attr/listPreferredItemHeightSmall"
-            android:text="Back to Enlightus"
+            android:text="Back to Instancy"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
             android:textColor="@color/colorBlack"
             android:textSize="12sp" />
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/sendmessage_layout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/colorWhite"
+        android:visibility="visible">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorGray" />
+
+        <TextView
+            android:id="@+id/sendmessage_font"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:gravity="center_vertical"
+            android:text="@string/fa_icon_commenting"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/txtbtn_sendmessage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/sendmessage_font"
+            android:gravity="center_vertical"
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+            android:text="SendMessage"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
         android:id="@+id/notification_layout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+
+        android:background="@color/colorWhite"
         android:visibility="gone">
 
         <TextView
@@ -71,10 +109,16 @@
     </RelativeLayout>
 
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:background="@color/colorWhite"
         android:visibility="gone">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorGray" />
 
         <TextView
             android:id="@+id/settings_font"

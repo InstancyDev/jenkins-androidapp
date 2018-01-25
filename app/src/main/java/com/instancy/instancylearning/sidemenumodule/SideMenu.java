@@ -39,6 +39,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
+import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
@@ -105,6 +106,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @BindView(R.id.back_layout)
     RelativeLayout backLayout;
 
+    @BindView(R.id.sendmessage_layout)
+    RelativeLayout sendMessageLayout;
+
+
     @BindView(R.id.subsitelayout)
     LinearLayout subsiteLayout;
 
@@ -153,7 +158,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         preferencesManager = PreferencesManager.getInstance();
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
-//        chatService = ChatService.newInstance(getApplicationContext());
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
         appUserModel.setUserLoginId(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
@@ -169,6 +173,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         FontManager.markAsIconContainer(findViewById(R.id.back_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.settings_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.notification_font), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.sendmessage_font), iconFont);
+
 
         View customNav = LayoutInflater.from(this).inflate(R.layout.homebutton, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
@@ -187,6 +193,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         });
 
         backLayout.setOnClickListener(this);
+        sendMessageLayout.setOnClickListener(this);
 
         ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
 //       imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
@@ -416,9 +423,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             case 10:
                 fragment = new PeopleListing_fragment();
                 break;
+            case 99:
+                fragment = new SendMessage_fragment();
+                break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");
-                fragment = new Catalog_fragment();
+                fragment = new com.instancy.instancylearning.menufragments.Catalog_fragment();
                 break;
         }
 
@@ -426,15 +436,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
             Bundle bundle = new Bundle();
-
-            // send model from her to fragment
-//            bundle.putString(CONTEXT_TITLE, sideMenusModel.get(position).getDisplayName());
-            bundle.putSerializable("sidemenumodel", sideMenusModel);
-            bundle.putBoolean("ISFROMCATEGORIES", false);
-            fragment.setArguments(bundle);
-
-            navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
-            navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
+            if (menuid != 99) {
+                bundle.putSerializable("sidemenumodel", sideMenusModel);
+                bundle.putBoolean("ISFROMCATEGORIES", false);
+                fragment.setArguments(bundle);
+                navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
+                navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
+            }
 
             drawer.closeDrawer(Gravity.LEFT);
         } else {
@@ -605,6 +613,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         switch (view.getId()) {
             case R.id.back_layout:
                 backToMainSite();
+                break;
+            case R.id.sendmessage_layout:
+                selectItem(99, sideMenusModel.get(0));
                 break;
         }
     }

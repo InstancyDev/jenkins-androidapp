@@ -62,6 +62,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.instancy.instancylearning.utils.Utilities.convertStreamToString;
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -71,7 +73,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * https://blog.sendbird.com/android-chat-tutorial-building-a-messaging-ui
  */
 
-public class ChatFragment extends AppCompatActivity implements Communicator {
+public class ChatFragment extends AppCompatActivity {
 
 
     String TAG = ChatFragment.class.getSimpleName();
@@ -106,6 +108,8 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
 
     private List<BaseMessage> mMessageList;
 
+    Communicator communicator;
+
     public ChatFragment() {
 
 
@@ -124,37 +128,24 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
         preferencesManager = PreferencesManager.getInstance();
 
 
-        signalAService = SignalAService.newInstance(getApplicationContext());
-
         peopleListingModel = new PeopleListingModel();
 
         peopleListingModel = (PeopleListingModel) getIntent().getSerializableExtra("peopleListingModel");
 
         btnSent = (Button) findViewById(R.id.button_chatbox_send);
 
+        chatInitilization();
+        btnSent.setEnabled(false);
 
         btnSent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String message = messageEdit.getText().toString().trim();
-//                chatService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
 
                 sendMessageToServer(message, peopleListingModel);
+
             }
         });
-
-//        new CountDownTimer(1000, 1000) {
-//            public void onTick(long millisUntilFinished) {
-//
-//            }
-//
-//            public void onFinish() {
-////                chatService.loginMethod();
-//            }
-//
-//
-//        }.start();
-
 
         Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.button_chatbox_send), iconFont);
@@ -166,6 +157,10 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 peopleListingModel.userDisplayname + "</font>"));
+
+        getSupportActionBar().setSubtitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
+                peopleListingModel.chatUserStatus + "</font>"));
+
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -196,12 +191,53 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
 
         mMessageRecycler.setAdapter(mMessageAdapter);
 
+        linearLayoutManager.setStackFromEnd(true);
+
+//        mMessageAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+//            @Override
+//            public void onItemRangeInserted(int positionStart, int itemCount) {
+//                super.onItemRangeInserted(positionStart, itemCount);
+//                int friendlyMessageCount = mMessageAdapter.getItemCount();
+//                int lastVisiblePosition =
+//                        linearLayoutManager.findLastCompletelyVisibleItemPosition();
+//                // If the recycler view is initially being loaded or the
+//                // user is at the bottom of the list, scroll to the bottom
+//                // of the list to show the newly added message.
+//                if (lastVisiblePosition == -1 ||
+//                        (positionStart >= (friendlyMessageCount - 1) &&
+//                                lastVisiblePosition == (positionStart - 1))) {
+//                    mMessageRecycler.scrollToPosition(positionStart);
+//                }
+//            }
+//        });
+
 
         // chat load methods
 
         refreshPeopleListing(true);
     }
 
+
+    public void chatInitilization() {
+
+        communicator = new Communicator() {
+            @Override
+            public void messageRecieved(JSONArray messageReceived) {
+
+                try {
+                    generateReceiveConversition(messageReceived);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.d(TAG, "messageRecieved: " + messageReceived);
+            }
+        };
+
+        signalAService = SignalAService.newInstance(getApplicationContext());
+        signalAService.communicator = communicator;
+
+    }
 
     public void initilizeView() {
 
@@ -244,8 +280,6 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
             }
 
             String paramsString = "fromuserid=" + peopleListingModel.userID + "&touserid=" + appUserModel.getUserIDValue() + "&msg=&markasread=true";
-
-//            String paramsString = "fromuserid=" + "17" + "&touserid=" + "1" + "&msg=&markasread=true";
 
             vollyService.getJsonObjResponseVolley("CHATHISTORY", appUserModel.getWebAPIUrl() + "/Chat/GetUserChatHistory?" + paramsString, appUserModel.getAuthHeaders());
         } else {
@@ -390,8 +424,9 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
                     baseMessage.profilePic = singleChatObj.getString("ProfPic");
                 }
 
-                if (singleChatObj.has("SentDate")) {
-                    baseMessage.sentDate = singleChatObj.getString("SentDate");
+                if (singleChatObj.has("SendDateTime")) {
+
+                    baseMessage.sentDate = formatDate(singleChatObj.getString("SendDateTime"), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
                 }
 
                 if (appUserModel.getUserIDValue().equalsIgnoreCase(baseMessage.fromUserID)) {
@@ -406,6 +441,40 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
         }
 
 
+    }
+
+    public void generateReceiveConversition(JSONArray jsonArray) throws JSONException {
+
+        if (jsonArray.length() > 0) {
+
+            BaseMessage baseMessage = new BaseMessage();
+
+            baseMessage.chatID = peopleListingModel.chatConnectionUserId;
+
+            baseMessage.fromUserID = appUserModel.getUserIDValue();
+
+            baseMessage.toUserID = peopleListingModel.userID;
+
+            baseMessage.messageChat = jsonArray.getString(2);
+
+            baseMessage.attachemnt = "";
+
+            baseMessage.markAsRead = "true";
+
+            baseMessage.fromUserName = jsonArray.getString(1);
+
+            baseMessage.toUsername = appUserModel.getUserName();
+
+            baseMessage.profilePic = peopleListingModel.memberProfileImage;
+
+            baseMessage.sentDate = jsonArray.getString(6);
+
+            baseMessage.itsMe = false;
+
+            mMessageList.add(baseMessage);
+        }
+        mMessageAdapter.reloadAllContent(mMessageList);
+        mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
     }
 
     public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel) {
@@ -454,6 +523,7 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
 
                     generateNewConversation(peopleListingModel, message);
 
+                    messageEdit.setText("");
                 } else {
 
 
@@ -504,6 +574,8 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
 
     public void generateNewConversation(PeopleListingModel peopleListingModel, String message) {
 
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+
         BaseMessage baseMessage = new BaseMessage();
 
         baseMessage.chatID = peopleListingModel.chatConnectionUserId;
@@ -528,7 +600,7 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
 
         baseMessage.profilePic = peopleListingModel.memberProfileImage;
 
-        baseMessage.sentDate = "";
+        baseMessage.sentDate = dateString;
 
 
         if (appUserModel.getUserIDValue().equalsIgnoreCase(baseMessage.fromUserID)) {
@@ -540,14 +612,8 @@ public class ChatFragment extends AppCompatActivity implements Communicator {
         mMessageList.add(baseMessage);
 
         mMessageAdapter.reloadAllContent(mMessageList);
-
+        mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
     }
 
-    @Override
-    public void messageRecieved(JSONArray messageReceived) {
-
-        Log.d(TAG, "messageRecieved: in CHATfragment " + messageReceived);
-
-    }
 }
 

@@ -3,7 +3,6 @@ package com.instancy.instancylearning.peoplelisting;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,21 +47,18 @@ import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.chatmessanger.ChatFragment;
-import com.instancy.instancylearning.chatmessanger.ChatService;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.ResultListner;
-import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -70,7 +66,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,10 +75,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.hoang8f.android.segmented.SegmentedGroup;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
-import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
-import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -126,7 +118,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     boolean isFromCatogories = false;
 
-    ChatService chatService;
 
     SignalAService signalAService;
 
@@ -148,6 +139,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     String TABBALUE = "Experts";
 
     String recepientID = "default";
+
+    String userStatus = "";
+
+    Communicator communicator;
 
     public PeopleListing_fragment() {
 
@@ -437,6 +432,16 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+
+        communicator = new Communicator() {
+            @Override
+            public void messageRecieved(JSONArray messageReceived) {
+
+                Toast.makeText(context, "Receive in Chat List " + messageReceived, Toast.LENGTH_SHORT).show();
+            }
+        };
+
+
     }
 
     @Override
@@ -708,6 +713,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         try {
                             recepientID = generateUserChatList(peopleListingModel.userID);
                             peopleListingModel.chatConnectionUserId = recepientID;
+                            peopleListingModel.chatUserStatus = userStatus;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -941,9 +947,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "generateUserChatList: " + userJsonOnj);
                 if (userJsonOnj.getString("ChatuserID").equalsIgnoreCase(userID)) {
                     receipent = userJsonOnj.getString("ConnectionId");
+                    userStatus = userJsonOnj.getString("status");
+
                 }
             }
         }
         return receipent;
     }
+
 }

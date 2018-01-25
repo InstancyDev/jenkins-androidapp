@@ -14,4 +14,6 @@ public interface Communicator {
 
     public void messageRecieved(JSONArray messageReceived);
 
+//    public void userOnline(boolean isOnline);
+
 }

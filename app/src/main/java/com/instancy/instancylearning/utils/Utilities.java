@@ -788,10 +788,10 @@ public class Utilities {
     public static String getFirstCaseWords(String sentence) {
         String words[] = sentence.replaceAll("\\s+", " ").trim().split(" ");
         String newSentence = "";
-        int moreThan2=0;
+        int moreThan2 = 0;
         for (String word : words) {
             moreThan2++;
-            if (moreThan2>2)
+            if (moreThan2 > 2)
                 break;
             for (int i = 0; i < word.length(); i++) {
 
@@ -814,5 +814,19 @@ public class Utilities {
         return drawable;
     }
 
+    public static String returnDateIfNotToday(String dateTime) {
+
+        String originalString = dateTime;
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(originalString);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String newString = new SimpleDateFormat("H:mm").format(date);
+
+        return originalString;
+    }
 
 }
