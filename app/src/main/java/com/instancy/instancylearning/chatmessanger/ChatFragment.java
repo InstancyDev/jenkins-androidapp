@@ -525,7 +525,6 @@ public class ChatFragment extends AppCompatActivity {
                     messageEdit.setText("");
                 } else {
 
-
                 }
 
             }

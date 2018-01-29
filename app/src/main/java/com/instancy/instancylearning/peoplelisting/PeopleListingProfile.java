@@ -121,7 +121,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
     ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
 
-
     List<ProfileConfigsModel> profileConfigsModelList = new ArrayList<>();
 
     public PeopleListingProfile() {
@@ -241,7 +240,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
         if (isNetworkConnectionAvailable(this, -1)) {
             swipeRefreshLayout.setRefreshing(true);
-            profileWebCall(appUserModel.getUserIDValue(), true);
+            profileWebCall(peopleListingModel.userID, true);
 
         } else {
 
@@ -263,8 +262,23 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                         Log.d(TAG, "notifySuccess: " + response);
                         try {
 //                            swipeRefreshLayout.setRefreshing(false);
-                            InjectAllProfileDetails(response, appUserModel.getUserIDValue());
+
+                            hmGroupWiseConfigs = new HashMap<String, List<ProfileConfigsModel>>();
+
+                            profileGroupModelList = new ArrayList<>();
+
+                            educationModelArrayList = new ArrayList<>();
+
+                            experienceModelArrayList = new ArrayList<>();
+
+                            profileDetailsModel = new ProfileDetailsModel();
+
+                            profileConfigsModelList = new ArrayList<>();
+
+                            InjectAllProfileDetails(response, peopleListingModel.userID);
                             getOnlinePprofileDetails();
+
+
                             profileDynamicAdapter.refreshList(experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
                             if (profileGroupModelList != null && profileGroupModelList.size() > 0) {
                                 for (int i = 0; i < profileGroupModelList.size(); i++)
@@ -279,7 +293,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
                     }
                 }
-
+                swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
 
@@ -433,16 +447,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
                         UserExperienceModel userExperienceModel = new UserExperienceModel();
 
-//                SQLiteDatabase db = this.getWritableDatabase();
-//                try {
-//                    String strDelete = "DELETE FROM " + USER_EXPERIENCE_DETAILS + " WHERE userid  = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
-//                    db.execSQL(strDelete);
-//
-//                } catch (SQLiteException sqlEx) {
-//
-//                    sqlEx.printStackTrace();
-//                }
-
                         JSONObject experiencObj = jsonExperienceAry.getJSONObject(i);
 
                         if (experiencObj.has("userid")) {
@@ -555,7 +559,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
                     }
 
-
                     try {
                         ProfileGroupModel profileGroupModel = new ProfileGroupModel();
                         profileGroupModel.groupId = groupid;
@@ -643,7 +646,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                         profileModel.imaddress = profileObj.get("imaddress").toString();
                     }
                     if (profileObj.has("dateofbirth")) {
-
 
                         String formattedDate = formatDate(profileObj.get("dateofbirth").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MMM-dd");
 
@@ -739,7 +741,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                         profileModel.userid = profileObj.get("objectid").toString();
                     }
 
-                    profileModel.userid = appUserModel.getUserIDValue();
+//                    profileModel.userid = appUserModel.getUserIDValue();
 
                     Log.d(TAG, "InjectAllProfileDetails: at index " + profileModel);
 
@@ -836,7 +838,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
                         }
 
-
                         try {
                             ProfileConfigsModel profileConfigsModel = new ProfileConfigsModel();
                             profileConfigsModel.aliasname = aliasname;
@@ -846,7 +847,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                             profileConfigsModel.attributeconfigid = attributeconfigid;
                             profileConfigsModel.isrequired = isrequired;
                             profileConfigsModel.iseditable = iseditable;
-
                             profileConfigsModel.enduservisibility = enduservisibility;
                             profileConfigsModel.uicontroltypeid = uicontroltypeid;
                             profileConfigsModel.names = name;
@@ -858,7 +858,6 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
                             exception.printStackTrace();
                         }
-
 
                     }
 
@@ -915,6 +914,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                     profileConfigsModelLists.get(j).valueName = valueName;
 
                     hmGroupWiseConfigs.put(grp.groupname, profileConfigsModelLists);
+
                 }
             }
         }

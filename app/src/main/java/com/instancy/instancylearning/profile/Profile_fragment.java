@@ -585,13 +585,10 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("true")) {
-
                     Toast.makeText(context, "Profile Picture Successfully Updated", Toast.LENGTH_SHORT).show();
                 } else {
-
                     Toast.makeText(context, "Profile Picture failed to Update", Toast.LENGTH_SHORT).show();
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override

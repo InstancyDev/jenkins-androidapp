@@ -72,10 +72,11 @@ public class PeopleProfileExpandAdapter extends BaseExpandableListAdapter {
                     .size();
 
         } else {
+
+
             return this.expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname) == null ? 0 : this.expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname)
                     .size();
         }
-
     }
 
     @Override
@@ -129,6 +130,10 @@ public class PeopleProfileExpandAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(expandableListTitle.get(groupPosition).groupname);
+
+//        if (expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname) == null || expandableHashDetail.get(expandableListTitle.get(groupPosition).groupname).size() == 0) {
+//            pView.setVisibility(View.INVISIBLE);
+//        }
 
         return pView;
 

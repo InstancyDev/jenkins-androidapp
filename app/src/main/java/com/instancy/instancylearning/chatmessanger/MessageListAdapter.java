@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.chatmessanger;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -8,12 +9,14 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -81,11 +84,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (viewType == VIEW_TYPE_MESSAGE_SENT) {
             view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_message_sent, parent, false);
+                    .inflate(R.layout.item_message_sent_withimage, parent, false);
             return new SentMessageHolder(view);
         } else if (viewType == VIEW_TYPE_MESSAGE_RECEIVED) {
             view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_message_received, parent, false);
+                    .inflate(R.layout.item_message_receivedwithimage, parent, false);
             return new ReceivedMessageHolder(view);
         }
 
@@ -108,12 +111,14 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private class SentMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText;
+        ImageView attachmentImage;
 
         SentMessageHolder(View itemView) {
             super(itemView);
 
             messageText = (TextView) itemView.findViewById(R.id.text_message_body);
             timeText = (TextView) itemView.findViewById(R.id.text_message_time);
+            attachmentImage = (ImageView) itemView.findViewById(R.id.imagethumb);
 //            messageText.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
             Drawable tvBackground = (Drawable) messageText.getBackground();
@@ -125,6 +130,27 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             // Format the stored timestamp into a readable String using method.
 
+            if (message.attachemnt.length() > 5) {
+                attachmentImage.setVisibility(View.VISIBLE);
+                final String attachment = appUserModel.getSiteURL() + message.attachemnt;
+                Picasso.with(itemView.getContext()).load(attachment).placeholder(itemView.getResources().getDrawable(R.drawable.cellimage)).into(attachmentImage);
+
+                attachmentImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(attachment));
+                        itemView.getContext().startActivity(intent);
+
+                    }
+                });
+
+
+            } else {
+                attachmentImage.setVisibility(View.GONE);
+            }
+
             String originalString = message.sentDate;
             Date date = null;
             try {
@@ -137,12 +163,13 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             timeText.setText(newString);
 
+
         }
     }
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, nameText;
-        ImageView profileImage;
+        ImageView profileImage, attachmentImage;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
@@ -151,6 +178,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             timeText = (TextView) itemView.findViewById(R.id.text_message_time);
             nameText = (TextView) itemView.findViewById(R.id.text_message_name);
             profileImage = (ImageView) itemView.findViewById(R.id.image_message_profile);
+            attachmentImage = (ImageView) itemView.findViewById(R.id.attachmentthumbnail);
         }
 
         void bind(BaseMessage message) {
@@ -158,10 +186,28 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             nameText.setText(message.fromUserName);
 
-
             String profileIma = appUserModel.getSiteURL() + message.profilePic;
 
             Picasso.with(itemView.getContext()).load(profileIma).placeholder(itemView.getResources().getDrawable(R.drawable.defaulttechguy)).into(profileImage);
+
+            if (message.attachemnt.length() > 5) {
+                attachmentImage.setVisibility(View.VISIBLE);
+                final String attachment = appUserModel.getSiteURL() + message.attachemnt;
+                Picasso.with(itemView.getContext()).load(attachment).placeholder(itemView.getResources().getDrawable(R.drawable.cellimage)).into(attachmentImage);
+
+                attachmentImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(attachment));
+                        itemView.getContext().startActivity(intent);
+
+                    }
+                });
+
+            } else {
+                attachmentImage.setVisibility(View.GONE);
+            }
 
             String originalString = message.sentDate;
             Date date = null;
@@ -174,7 +220,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String newString = new SimpleDateFormat("H:mm").format(date);
 
             timeText.setText(newString);
-
+            
         }
     }
 
