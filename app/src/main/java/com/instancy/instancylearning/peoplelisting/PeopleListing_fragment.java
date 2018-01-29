@@ -116,9 +116,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
-    boolean isFromCatogories = false;
-
-
     SignalAService signalAService;
 
     @BindView(R.id.segmentedswitch)

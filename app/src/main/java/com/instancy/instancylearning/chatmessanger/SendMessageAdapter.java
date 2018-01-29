@@ -50,7 +50,6 @@ public class SendMessageAdapter extends BaseAdapter {
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
-    DatabaseHandler db;
     private String TAG = SendMessageAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<PeopleListingModel> searchList;
@@ -65,7 +64,6 @@ public class SendMessageAdapter extends BaseAdapter {
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(activity);
-        db = new DatabaseHandler(activity);
         appUserModel = AppUserModel.getInstance();
 
     }
@@ -79,7 +77,7 @@ public class SendMessageAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return peopleListingModelList != null ? peopleListingModelList.size() : 10;
+        return peopleListingModelList != null ? peopleListingModelList.size() : 0;
     }
 
     @Override
@@ -104,38 +102,32 @@ public class SendMessageAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-//        holder.txtName.setText(peopleListingModelList.get(position).userDisplayname);
-//        holder.txtPlace.setText(peopleListingModelList.get(position).mainOfficeAddress);
+        holder.txtName.setText(peopleListingModelList.get(position).userDisplayname);
+        holder.txtStatus.setText(peopleListingModelList.get(position).chatUserStatus);
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-//        String connectionState = peopleListingModelList.get(position).connectionState;
+        String imagePath = peopleListingModelList.get(position).memberProfileImage;
 
-//        String imagePath = peopleListingModelList.get(position).memberProfileImage;
+        String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
 
-//        String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
-//
-//        if (imagePath.length() > 2) {
-//            String imgUrl = peopleListingModelList.get(position).siteURL + peopleListingModelList.get(position).memberProfileImage;
-//
-//            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
-//
-//        } else {
-//
-//            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-//// generate random color
-////        int color1 = generator.getRandomColor();
-//// generate color based on a key (same key returns the same color), useful for list/grid views
-//            int color = generator.getColor(displayNameDrawable);
-//
-//            TextDrawable drawable = TextDrawable.builder()
-//                    .buildRound(displayNameDrawable, color);
-//
-//            holder.imgThumb.setBackground(drawable);
-//
-//        }
+        if (imagePath.length() > 2) {
+            String imgUrl = peopleListingModelList.get(position).siteURL + peopleListingModelList.get(position).memberProfileImage;
 
+            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
+
+        } else {
+
+            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+// generate random color 14/ 28400
+//        int color1 = generator.getRandomColor();
+// generate color based on a key (same key returns the same color), useful for list/grid views
+            int color = generator.getColor(displayNameDrawable);
+            TextDrawable drawable = TextDrawable.builder()
+                    .buildRound(displayNameDrawable, color);
+            holder.imgThumb.setBackground(drawable);
+        }
         return convertView;
     }
 
@@ -146,7 +138,7 @@ public class SendMessageAdapter extends BaseAdapter {
             peopleListingModelList.addAll(searchList);
         } else {
             for (PeopleListingModel s : searchList) {
-                if (s.userDisplayname.toLowerCase(Locale.getDefault()).contains(charText) || s.mainOfficeAddress.toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.userDisplayname.toLowerCase(Locale.getDefault()).contains(charText) || s.chatUserStatus.toLowerCase(Locale.getDefault()).contains(charText)) {
                     peopleListingModelList.add(s);
                 }
             }
@@ -175,10 +167,6 @@ public class SendMessageAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.card_view)
         CardView card_view;
-
-        @Nullable
-        @BindView(R.id.txtPlace)
-        TextView txtPlace;
 
         @Nullable
         @BindView(R.id.txtStatus)

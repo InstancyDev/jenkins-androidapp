@@ -91,7 +91,6 @@ public class ChatFragment extends AppCompatActivity {
     UiSettingsModel uiSettingsModel;
     PeopleProfileExpandAdapter profileDynamicAdapter;
 
-
     SignalAService signalAService;
 
     Button btnSent;

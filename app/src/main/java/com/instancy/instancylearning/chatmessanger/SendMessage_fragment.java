@@ -133,7 +133,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
-
         signalAService = SignalAService.newInstance(context);
         signalAService.startSignalA();
     }
@@ -150,13 +149,18 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
         ButterKnife.bind(this, rootView);
 
+
+        peopleListingModelList = new ArrayList<PeopleListingModel>();
+        try {
+            generateUserChatList();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         chatMessageAdapter = new SendMessageAdapter(getActivity(), BIND_ABOVE_CLIENT, peopleListingModelList);
         usersChatListView.setAdapter(chatMessageAdapter);
         usersChatListView.setOnItemClickListener(this);
         usersChatListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-
-        peopleListingModelList = new ArrayList<PeopleListingModel>();
-
         initilizeView();
         return rootView;
     }
@@ -277,10 +281,11 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                     showToast(context, "No Internet");
                 }
                 break;
-            case R.id.btn_contextmenu:
-                View v = usersChatListView.getChildAt(position - usersChatListView.getFirstVisiblePosition());
-                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                peopelContextMenuMethod(position, view, txtBtnDownload, peopleListingModelList.get(position), uiSettingsModel, appUserModel);
+            case R.id.card_view:
+
+                Intent intentDetail = new Intent(context, ChatFragment.class);
+                intentDetail.putExtra("peopleListingModel", peopleListingModelList.get(position));
+                startActivity(intentDetail);
                 break;
             default:
 
@@ -330,56 +335,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
     }
 
-    public void peopelContextMenuMethod(final int position, final View v, ImageButton btnselected, final PeopleListingModel peopleListingModel, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
-
-        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.peoplecontextmenu, popup.getMenu());
-        //registering popup with OnMenuItemClickListene
-
-        Menu menu = popup.getMenu();
-
-        menu.getItem(0).setVisible(false);//view profile
-        menu.getItem(1).setVisible(false);//view content
-        menu.getItem(2).setVisible(false);//accept connection
-        menu.getItem(3).setVisible(false);//remove connection
-        menu.getItem(4).setVisible(false);//ignore enrollment
-        menu.getItem(5).setVisible(true);//send message
-        menu.getItem(6).setVisible(false);//add to my connection
-        menu.getItem(7).setVisible(true);
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-
-                if (item.getTitle().toString().equalsIgnoreCase("Send Message")) {
-
-                    if (isNetworkConnectionAvailable(getContext(), -1)) {
-
-                        try {
-                            recepientID = generateUserChatList(peopleListingModel.userID);
-                            peopleListingModel.chatConnectionUserId = recepientID;
-                            peopleListingModel.chatUserStatus = userStatus;
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        Intent intentDetail = new Intent(context, ChatFragment.class);
-                        intentDetail.putExtra("peopleListingModel", peopleListingModel);
-                        startActivity(intentDetail);
-
-                    } else {
-                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-
-
-                return true;
-            }
-        });
-        popup.show();//showing popup menu
-
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -393,8 +348,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         super.onDetach();
     }
 
-    public String generateUserChatList(String userID) throws JSONException {
-        String receipent = "default";
+    public void generateUserChatList() throws JSONException {
 
         String chatListStr = preferencesManager.getStringValue(StaticValues.CHAT_LIST);
         if (chatListStr.length() > 10) {
@@ -403,14 +357,21 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject userJsonOnj = jsonArray.getJSONObject(i);
                 Log.d(TAG, "generateUserChatList: " + userJsonOnj);
-                if (userJsonOnj.getString("ChatuserID").equalsIgnoreCase(userID)) {
-                    receipent = userJsonOnj.getString("ConnectionId");
-                    userStatus = userJsonOnj.getString("status");
 
-                }
+                PeopleListingModel peopleListingModel = new PeopleListingModel();
+                peopleListingModel.chatConnectionUserId = userJsonOnj.getString("ConnectionId");
+                peopleListingModel.userID = userJsonOnj.getString("ChatuserID");
+                peopleListingModel.chatUserStatus = userJsonOnj.getString("status");
+                peopleListingModel.userDisplayname = userJsonOnj.getString("Username");
+                peopleListingModel.siteID = userJsonOnj.getString("UserChatSiteID");
+                peopleListingModel.memberProfileImage = userJsonOnj.getString("ChatProfileImagepath");
+                peopleListingModel.siteURL = appUserModel.getSiteURL();
+                peopleListingModel.siteID = appUserModel.getSiteIDValue();
+                peopleListingModelList.add(peopleListingModel);
+
             }
+
         }
-        return receipent;
     }
 
 }
