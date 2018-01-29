@@ -1,12 +1,17 @@
 package com.instancy.instancylearning.chatmessanger;
 
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +61,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,6 +72,7 @@ import java.util.Map;
 import static com.instancy.instancylearning.utils.Utilities.convertStreamToString;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -93,7 +101,7 @@ public class ChatFragment extends AppCompatActivity {
 
     SignalAService signalAService;
 
-    Button btnSent;
+    Button btnSent, btnAttachment;
 
     EditText messageEdit;
 
@@ -108,6 +116,11 @@ public class ChatFragment extends AppCompatActivity {
     private List<BaseMessage> mMessageList;
 
     Communicator communicator;
+
+
+    private int GALLERY = 1;
+    Bitmap bitmapAttachment = null;
+    String endocedImageStr = "";
 
     public ChatFragment() {
 
@@ -132,6 +145,7 @@ public class ChatFragment extends AppCompatActivity {
         peopleListingModel = (PeopleListingModel) getIntent().getSerializableExtra("peopleListingModel");
 
         btnSent = (Button) findViewById(R.id.button_chatbox_send);
+        btnAttachment = (Button) findViewById(R.id.button_attachment);
 
         chatInitilization();
         btnSent.setEnabled(false);
@@ -146,8 +160,19 @@ public class ChatFragment extends AppCompatActivity {
             }
         });
 
+        btnAttachment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                choosePhotoFromGallary();
+            }
+        });
+
+
         Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.button_chatbox_send), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.button_attachment), iconFont);
+
 
         initilizeView();
         initVolleyCallback();
@@ -439,7 +464,6 @@ public class ChatFragment extends AppCompatActivity {
             mMessageAdapter.reloadAllContent(mMessageList);
         }
 
-
     }
 
     public void generateReceiveConversition(JSONArray jsonArray) throws JSONException {
@@ -613,5 +637,37 @@ public class ChatFragment extends AppCompatActivity {
         mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
     }
 
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, GALLERY);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult first: ");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GALLERY) {
+            if (data != null) {
+                Uri contentURI = data.getData();
+                try {
+                    final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+
+                    String fileName = getFileNameFromPath(contentURI, this);
+                    Log.d(TAG, "onActivityResult: " + fileName);
+                    bitmapAttachment = bitmap;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(ChatFragment.this, "Failed!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+        }
+
+    }
+//    https://www.survivingwithandroid.com/2013/05/android-http-downlod-upload-multipart.html
 }
 

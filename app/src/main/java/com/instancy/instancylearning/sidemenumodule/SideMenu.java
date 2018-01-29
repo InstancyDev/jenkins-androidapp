@@ -254,6 +254,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     IS_MENUS_FIRST_TIME = false;
                 }
             }
+
+            if (menu.getContextMenuId().equals("10")) {
+                sendMessageLayout.setVisibility(View.VISIBLE);
+            }
+
+
             i++;
         }
 

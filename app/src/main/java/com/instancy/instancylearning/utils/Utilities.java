@@ -3,13 +3,16 @@ package com.instancy.instancylearning.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.support.annotation.ColorRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
@@ -827,6 +830,33 @@ public class Utilities {
         String newString = new SimpleDateFormat("H:mm").format(date);
 
         return originalString;
+    }
+
+    public static String getFileNameFromPath(Uri contentURI, Context context) {
+
+        String fileName = "";
+        if (contentURI.getScheme().equals("file")) {
+            fileName = contentURI.getLastPathSegment();
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver().query(contentURI, new String[]{
+                        MediaStore.Images.ImageColumns.DISPLAY_NAME
+                }, null, null, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+                    Log.d("UTILS", "name is " + fileName);
+                }
+            } finally {
+
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+
+        return fileName;
     }
 
 }

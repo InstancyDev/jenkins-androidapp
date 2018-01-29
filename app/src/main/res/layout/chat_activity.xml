@@ -10,8 +10,7 @@
         android:id="@+id/reyclerview_message_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:layout_above="@+id/line"> </android.support.v7.widget.RecyclerView>
+        android:layout_above="@+id/line"></android.support.v7.widget.RecyclerView>
 
     <!-- A horizontal line between the chatbox and RecyclerView -->
     <View
@@ -30,6 +29,20 @@
         android:background="#ffffff"
         android:minHeight="48dp"
         android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_attachment"
+            android:layout_width="44dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:gravity="center"
+            android:text="@string/fa_icon_paperclip"
+            android:textColor="@color/colorDarkGrey"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
 
         <EditText
             android:id="@+id/edittext_chatbox"

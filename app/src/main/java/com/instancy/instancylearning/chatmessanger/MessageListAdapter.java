@@ -220,7 +220,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             String newString = new SimpleDateFormat("H:mm").format(date);
 
             timeText.setText(newString);
-            
+
         }
     }
 

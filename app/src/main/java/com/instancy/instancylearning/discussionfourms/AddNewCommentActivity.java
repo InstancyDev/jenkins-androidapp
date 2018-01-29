@@ -159,9 +159,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-
         svProgressHUD = new SVProgressHUD(context);
-
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
