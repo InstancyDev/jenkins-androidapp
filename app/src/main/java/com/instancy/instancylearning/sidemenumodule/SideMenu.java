@@ -256,13 +256,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             if (menu.getContextMenuId().equals("10")) {
-                sendMessageLayout.setVisibility(View.VISIBLE);
+                sendMessageLayout.setVisibility(View.GONE);
             }
-
 
             i++;
         }
-
 
         if (sideMenusModel != null) {
             menuDynamicAdapter = new MenuDrawerDynamicAdapter(

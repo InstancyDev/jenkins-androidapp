@@ -21,6 +21,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -859,4 +860,18 @@ public class Utilities {
         return fileName;
     }
 
+
+    public static String getMimeTypeFromUri(Uri selectedUri) {
+
+        String mimeType = "";
+        if (selectedUri != null) {
+            String fileExtension
+                    = MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+            mimeType
+                    = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+
+        }
+
+        return mimeType;
+    }
 }

@@ -28,6 +28,7 @@ import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,8 +137,8 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-//            String imgUrl = discussionTopicModels.get(position).imagedata;
-//            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+        String imgUrl = appUserModel.getSiteURL() + discussionTopicModelList.get(position).imagedata;
+        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 
         return convertView;
     }

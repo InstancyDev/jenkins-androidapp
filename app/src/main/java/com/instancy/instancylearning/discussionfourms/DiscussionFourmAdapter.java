@@ -138,8 +138,8 @@ public class DiscussionFourmAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-//            String imgUrl = discussionTopicModels.get(position).imagedata;
-//            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+        String imgUrl = appUserModel.getSiteURL() + discussionForumModelList.get(position).imagedata;
+        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 
 
         return convertView;

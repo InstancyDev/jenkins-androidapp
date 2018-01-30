@@ -122,7 +122,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 Log.d("TAG", "onClick: ");
             }
         });
-
+        moreOptions.setVisibility(View.GONE);
         TextView listTitleTextView = (TextView) pView
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);

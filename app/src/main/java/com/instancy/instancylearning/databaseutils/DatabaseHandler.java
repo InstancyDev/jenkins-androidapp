@@ -1497,7 +1497,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
 //
 ////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8")))
                         continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
@@ -11390,14 +11390,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         DiscussionForumModel discussionForumModel = new DiscussionForumModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_FORUMS + " WHERE siteid = " + siteID + "  ORDER BY forumid  DESC";
+//        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_FORUMS + " WHERE siteid = " + siteID + "  ORDER BY forumid  DESC";
 
 //        let rs = try database.executeQuery("SELECT DF.*, UI.profileimagepath from \(DBTables.DiscussionForumTable.rawValue) DF LEFT OUTER JOIN USERSINFO UI ON DF.createduserid = UI.userid WHERE DF.siteid = ? ORDER BY forumid DESC", values: ["\(siteIDValue)"])
 
-        Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
+        String strSelQuerys = "SELECT DF.*, UI.profileimagepath from " + TBL_FORUMS + " DF LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON DF.createduserid = UI.userid WHERE DF.siteid = " + siteID + " ORDER BY forumid DESC";
+
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
         try {
             Cursor cursor = null;
-            cursor = db.rawQuery(strSelQuery, null);
+            cursor = db.rawQuery(strSelQuerys, null);
 
             if (cursor != null && cursor.moveToFirst()) {
                 discussionForumModelList = new ArrayList<DiscussionForumModel>();
@@ -11478,9 +11481,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     discussionForumModel.moderation = cursor.getString(cursor
                             .getColumnIndex("moderation"));
-// uncomment for discussion once completed the peoplelisting
-//                    discussionForumModel.imagedata = cursor.getString(cursor
-//                            .getColumnIndex("profileimagepath"));
+
+                    discussionForumModel.imagedata = cursor.getString(cursor
+                            .getColumnIndex("profileimagepath"));
 
                     discussionForumModel.forumid = cursor.getInt(cursor
                             .getColumnIndex("forumid"));
@@ -11642,12 +11645,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         DiscussionTopicModel discussionTopicModel = new DiscussionTopicModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_FORUMTOPICS + " WHERE siteid = " + siteID + " AND forumid =" + fourmID + "  ORDER BY createddate DESC";
+//        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_FORUMTOPICS + " WHERE siteid = " + siteID + " AND forumid =" + fourmID + "  ORDER BY createddate DESC";
 
-        Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
+        String strSqlQuery = "SELECT FT.*, UI.profileimagepath, UI.displayname from " + TBL_FORUMTOPICS + " FT LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON FT.createduserid = UI.userid WHERE FT.forumid = '" + fourmID + "' AND FT.siteid = " + siteID + " ORDER BY FT.createddate DESC";
+
+        Log.d(TAG, "fetchCatalogModel: " + strSqlQuery);
         try {
             Cursor cursor = null;
-            cursor = db.rawQuery(strSelQuery, null);
+            cursor = db.rawQuery(strSqlQuery, null);
 
             if (cursor != null && cursor.moveToFirst()) {
                 discussionTopicModelList = new ArrayList<DiscussionTopicModel>();
@@ -11697,13 +11702,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("createduserid"));
 
 
-                    discussionTopicModel.imagedata = cursor.getString(cursor
-                            .getColumnIndex("imagedata"));
-
+//                    discussionTopicModel.imagedata = cursor.getString(cursor
+//                            .getColumnIndex("imagedata"));
 
                     discussionTopicModel.attachment = cursor.getString(cursor
                             .getColumnIndex("attachment"));
 
+                    discussionTopicModel.imagedata = cursor.getString(cursor
+                            .getColumnIndex("profileimagepath"));
+
+                    discussionTopicModel.displayName = cursor.getString(cursor
+                            .getColumnIndex("displayname"));
 
                     discussionTopicModelList.add(discussionTopicModel);
                 } while (cursor.moveToNext());
@@ -11870,8 +11879,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         DiscussionCommentsModel discussionCommentsModel = new DiscussionCommentsModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_TOPICCOMMENTS + " WHERE siteid = " + siteID + " AND forumid ='" + topicModel.forumid + "' AND topicid ='" + topicModel.topicid +
-                "' ORDER BY commentid  DESC";
+//        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_TOPICCOMMENTS + " WHERE siteid = " + siteID + " AND forumid ='" + topicModel.forumid + "' AND topicid ='" + topicModel.topicid +
+//                "' ORDER BY commentid  DESC";
+
+        String strSelQuery = "SELECT TC.*, UI.profileimagepath, UI.displayname from " + TBL_TOPICCOMMENTS + " TC LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON TC.postedby = UI.userid WHERE TC.forumid = " + topicModel.forumid + " AND TC.topicid = '" + topicModel.topicid + "' AND TC.siteid = " + siteID + " ORDER BY TC.commentid DESC";
 
         Log.d(TAG, "fetchDiscussionCommentsModelList: " + strSelQuery);
         try {
@@ -11911,6 +11922,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     discussionCommentsModel.attachment = cursor.getString(cursor
                             .getColumnIndex("attachment"));
+
+                    discussionCommentsModel.imagedata = cursor.getString(cursor
+                            .getColumnIndex("profileimagepath"));
+
+                    discussionCommentsModel.displayName = cursor.getString(cursor
+                            .getColumnIndex("displayname"));
 
 
                     discussionTopicModelList.add(discussionCommentsModel);

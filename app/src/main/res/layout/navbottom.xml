@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/colorWhite"
-        android:visibility="visible">
+        android:visibility="gone">
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -69,7 +69,7 @@
             android:layout_toRightOf="@id/sendmessage_font"
             android:gravity="center_vertical"
             android:minHeight="?android:attr/listPreferredItemHeightSmall"
-            android:text="SendMessage"
+            android:text="Messaging"
             android:textAppearance="?android:attr/textAppearanceListItemSmall" />
     </RelativeLayout>
 
@@ -159,7 +159,7 @@
         android:background="@color/colorWhite"
         android:padding="3dp"
         android:scaleType="centerInside"
-        android:src="@drawable/cvcta_bottom"
+        android:src="@drawable/bottom_marketplace"
         android:visibility="visible" />
 
 </LinearLayout>

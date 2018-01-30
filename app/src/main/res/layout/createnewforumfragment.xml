@@ -69,10 +69,10 @@
                 android:weightSum="3">
 
                 <Switch
-                    android:checked="true"
                     android:id="@+id/swtchnewtopic"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:padding="10dp"
                     android:switchPadding="10dp"
                     android:text="Allow users to create new topic" />
@@ -85,9 +85,9 @@
 
                 <Switch
                     android:id="@+id/switchattachfiles"
-                    android:checked="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:padding="10dp"
                     android:switchPadding="10dp"
                     android:text="Allow users to attach files with posts" />
@@ -103,8 +103,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:padding="10dp"
                     android:checked="true"
+                    android:padding="10dp"
                     android:switchPadding="10dp"
                     android:text="Send email notification to users for new topics " />
 
@@ -151,10 +151,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="actionsBottomBtns"
-            android:text="Save"
+            android:text="Create"
             android:textAlignment="center"
             android:textColor="@color/colorWhite" />
-
 
     </LinearLayout>
 

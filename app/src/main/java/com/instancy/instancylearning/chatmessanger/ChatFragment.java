@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import android.view.View;
+import android.webkit.CookieManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -45,6 +47,8 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.MultipartRequest;
+import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -53,26 +57,32 @@ import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.peoplelisting.PeopleProfileExpandAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.instancy.instancylearning.utils.StaticValues;
-import com.squareup.picasso.Picasso;
 
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpCookie;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.instancy.instancylearning.utils.Utilities.convertStreamToString;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
+import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -121,6 +131,10 @@ public class ChatFragment extends AppCompatActivity {
     private int GALLERY = 1;
     Bitmap bitmapAttachment = null;
     String endocedImageStr = "";
+
+    private final String twoHyphens = "--";
+    private final String lineEnd = "\r\n";
+    private final String boundary = "apiclient-" + System.currentTimeMillis();
 
     public ChatFragment() {
 
@@ -654,9 +668,21 @@ public class ChatFragment extends AppCompatActivity {
                 try {
                     final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
 
-                    String fileName = getFileNameFromPath(contentURI, this);
+                    final String fileName = getFileNameFromPath(contentURI, this);
+                    final String mimeType = getMimeTypeFromUri(contentURI);
                     Log.d(TAG, "onActivityResult: " + fileName);
                     bitmapAttachment = bitmap;
+
+                    new CountDownTimer(1000, 1000) {
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+//                            endocedImageStr = convertToBase64(bitmapAttachment);
+//                            uploadAttachmentToServer(fileName, bitmap, mimeType);
+
+                        }
+                    }.start();
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -669,5 +695,106 @@ public class ChatFragment extends AppCompatActivity {
 
     }
 //    https://www.survivingwithandroid.com/2013/05/android-http-downlod-upload-multipart.html
+
+    private String convertToBase64(Bitmap bitmap) {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        byte[] byteArrayImage = baos.toByteArray();
+
+        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
+
+        return encodedImage;
+    }
+
+
+    public void uploadAttachmentToServer(String fileName, Bitmap bitmapAttachments, String mimeType) {
+        byte[] multipartBody = new byte[0];
+        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+        try {
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            if (bitmapAttachments != null) {
+                bitmapAttachments.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+            }
+
+            byte[] fileByteArray = byteArrayOutputStream.toByteArray();
+
+            ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
+            DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream2);
+            try {
+                // the first file
+                buildPart(dataOutputStream, fileByteArray, fileName);
+                // send multipart form data necesssary after file data
+                dataOutputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+                Map<String, String> params = new HashMap<>();
+                params.put("filename", fileName);
+                params.put("strSiteID", appUserModel.getSiteIDValue());
+                params.put("strfromUserId", appUserModel.getUserIDValue());
+                params.put("strtoUserId", peopleListingModel.userID);
+//                params.put("fileData", fileByteArray.toString());
+                dataOutputStream.writeBytes(params.toString());
+                // pass to multipart body
+                multipartBody = byteArrayOutputStream2.toByteArray();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String url = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadSendMessageAttachment";
+            MultipartRequest multipartRequest = new MultipartRequest(url, base64EncodedCredentials, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
+                @Override
+                public void onResponse(NetworkResponse response) {
+                    Toast.makeText(ChatFragment.this, "completed", Toast.LENGTH_SHORT).show();
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    try {
+                        Toast.makeText(ChatFragment.this, "Error", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            VolleySingleton.getInstance(ChatFragment.this).addToRequestQueue(multipartRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void buildPart(DataOutputStream dataOutputStream, byte[] fileData, String fileName) throws IOException {
+        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+//        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\""
+//                + fileName + "\"" + lineEnd);
+        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; fileData=\""
+                + fileName + "\"" + lineEnd);
+
+        dataOutputStream.writeBytes(lineEnd);
+
+        ByteArrayInputStream fileInputStream = new ByteArrayInputStream(fileData);
+        int bytesAvailable = fileInputStream.available();
+
+        int maxBufferSize = 1024 * 1024;
+        int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+        byte[] buffer = new byte[bufferSize];
+
+        // read file and write it into form...
+        int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+        while (bytesRead > 0) {
+            dataOutputStream.write(buffer, 0, bufferSize);
+            bytesAvailable = fileInputStream.available();
+            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+        }
+
+        dataOutputStream.writeBytes(lineEnd);
+    }
 }
 

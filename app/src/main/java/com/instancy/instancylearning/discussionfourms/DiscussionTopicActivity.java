@@ -50,6 +50,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -237,6 +238,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        String imgUrl = appUserModel.getSiteURL() + discussionForumModel.imagedata;
+        Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
     }
 
     public void refreshMyLearning(Boolean isRefreshed) {

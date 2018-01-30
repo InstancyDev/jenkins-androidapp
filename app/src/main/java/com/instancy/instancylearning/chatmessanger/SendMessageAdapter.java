@@ -132,18 +132,18 @@ public class SendMessageAdapter extends BaseAdapter {
     }
 
     public void filter(String charText) {
-        charText = charText.toLowerCase(Locale.getDefault());
-        peopleListingModelList.clear();
-        if (charText.length() == 0) {
-            peopleListingModelList.addAll(searchList);
-        } else {
-            for (PeopleListingModel s : searchList) {
-                if (s.userDisplayname.toLowerCase(Locale.getDefault()).contains(charText) || s.chatUserStatus.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    peopleListingModelList.add(s);
-                }
-            }
-        }
-        notifyDataSetChanged();
+//        charText = charText.toLowerCase(Locale.getDefault());
+//        peopleListingModelList.clear();
+//        if (charText.length() == 0) {
+//            peopleListingModelList.addAll(searchList);
+//        } else {
+//            for (PeopleListingModel s : searchList) {
+//                if (s.userDisplayname.toLowerCase(Locale.getDefault()).contains(charText) || s.chatUserStatus.toLowerCase(Locale.getDefault()).contains(charText)) {
+//                    peopleListingModelList.add(s);
+//                }
+//            }
+//        }
+//        notifyDataSetChanged();
     }
 
     class ViewHolder {

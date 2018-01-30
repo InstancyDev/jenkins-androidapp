@@ -61,6 +61,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -260,6 +261,9 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         } else {
             txtShortDisc.setVisibility(View.VISIBLE);
         }
+
+        String imgUrl = appUserModel.getSiteURL() + discussionTopicModel.imagedata;
+        Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
 
     }
 

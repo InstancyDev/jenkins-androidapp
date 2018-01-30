@@ -27,6 +27,7 @@ import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,14 +115,16 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtName.setText(discussionCommentsModels.get(position).displayName + "" + discussionCommentsModels.get(position).postedDate);
+        holder.txtName.setText(discussionCommentsModels.get(position).displayName + " : " + discussionCommentsModels.get(position).postedDate);
         holder.txtShortDisc.setText(discussionCommentsModels.get(position).message);
         holder.txtShortDisc.setMaxLines(200);
 
+        String imgUrl = appUserModel.getSiteURL() + discussionCommentsModels.get(position).imagedata;
+        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+
         if (discussionCommentsModels.get(position).attachment.length() == 0) {
             holder.txtCommentsAttachment.setVisibility(View.INVISIBLE);
-        }
-        else {
+        } else {
             holder.txtCommentsAttachment.setVisibility(View.VISIBLE);
         }
 
@@ -138,6 +141,8 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.txtCommentsCount.setVisibility(View.GONE);
         holder.txtAuthor.setVisibility(View.GONE);
         holder.view.setVisibility(View.INVISIBLE);
+
+
         convertView.setTag(holder);
         return convertView;
     }
@@ -213,7 +218,7 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         View view;
 
 
-        @OnClick({R.id.btn_contextmenu, R.id.card_view,R.id.btn_attachment})
+        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.btn_attachment})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

@@ -178,7 +178,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "New Forum" + "</font>"));
+                "Add Forum" + "</font>"));
 
 //        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
 //        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
