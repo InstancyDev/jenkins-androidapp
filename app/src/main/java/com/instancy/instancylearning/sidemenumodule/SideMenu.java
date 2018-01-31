@@ -40,6 +40,7 @@ import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
+import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
@@ -138,7 +139,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     public DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
     UiSettingsModel uiSettingsModel;
-
+    SignalAService signalAService;
     public Toolbar toolbar;
 
     SideMenusModel homeModel;
@@ -256,7 +257,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             if (menu.getContextMenuId().equals("10")) {
-                sendMessageLayout.setVisibility(View.GONE);
+                sendMessageLayout.setVisibility(View.VISIBLE);
             }
 
             i++;
@@ -365,6 +366,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             navDrawerExpandableView.expandGroup(lastClicked);
         }
+
+        signalAService = SignalAService.newInstance(this);
+        signalAService.startSignalA();
     }
 
     public void homeControllClicked() {

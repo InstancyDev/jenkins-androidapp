@@ -16,7 +16,7 @@
         android:layout_marginTop="99dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/marketplacelogo" />
+        android:src="@drawable/playground" />
     <!--android:scaleType="fitcenter"-->
 
     <Button

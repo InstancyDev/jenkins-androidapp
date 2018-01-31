@@ -160,7 +160,7 @@ public class ChatFragment extends AppCompatActivity {
 
         btnSent = (Button) findViewById(R.id.button_chatbox_send);
         btnAttachment = (Button) findViewById(R.id.button_attachment);
-
+//        btnAttachment.setVisibility(View.GONE);
         chatInitilization();
         btnSent.setEnabled(false);
 
@@ -231,25 +231,6 @@ public class ChatFragment extends AppCompatActivity {
 
         linearLayoutManager.setStackFromEnd(true);
 
-//        mMessageAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//            @Override
-//            public void onItemRangeInserted(int positionStart, int itemCount) {
-//                super.onItemRangeInserted(positionStart, itemCount);
-//                int friendlyMessageCount = mMessageAdapter.getItemCount();
-//                int lastVisiblePosition =
-//                        linearLayoutManager.findLastCompletelyVisibleItemPosition();
-//                // If the recycler view is initially being loaded or the
-//                // user is at the bottom of the list, scroll to the bottom
-//                // of the list to show the newly added message.
-//                if (lastVisiblePosition == -1 ||
-//                        (positionStart >= (friendlyMessageCount - 1) &&
-//                                lastVisiblePosition == (positionStart - 1))) {
-//                    mMessageRecycler.scrollToPosition(positionStart);
-//                }
-//            }
-//        });
-
-
         // chat load methods
 
         refreshPeopleListing(true);
@@ -268,7 +249,7 @@ public class ChatFragment extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                Log.d(TAG, "messageRecieved: " + messageReceived);
+                // Log.d(TAG, "messageRecieved: " + messageReceived);
             }
         };
 
@@ -317,9 +298,15 @@ public class ChatFragment extends AppCompatActivity {
 
             }
 
-            String paramsString = "fromuserid=" + peopleListingModel.userID + "&touserid=" + appUserModel.getUserIDValue() + "&msg=&markasread=true";
+            String countBool = "true";
+            if (peopleListingModel.chatCount == 0) {
+                countBool = "false";
+            } else {
+                countBool = "true";
+            }
+            String paramsString = "fromuserid=" + appUserModel.getUserIDValue() + "&touserid=" + peopleListingModel.userID + "&msg=&markasread=" + countBool;
 
-            vollyService.getJsonObjResponseVolley("CHATHISTORY", appUserModel.getWebAPIUrl() + "/Chat/GetUserChatHistory?" + paramsString, appUserModel.getAuthHeaders());
+            vollyService.getJsonObjResponseVolley("CHATHISTORY", appUserModel.getWebAPIUrl() + "Chat/GetUserChatHistory?" + paramsString, appUserModel.getAuthHeaders());
         } else {
 
         }
@@ -678,7 +665,12 @@ public class ChatFragment extends AppCompatActivity {
                         }
 
                         public void onFinish() {
-//                            endocedImageStr = convertToBase64(bitmapAttachment);
+                            endocedImageStr = convertToBase64(bitmapAttachment);
+                            try {
+                                encodeAttachment(appUserModel.getUserIDValue(), peopleListingModel.userID, fileName);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
 //                            uploadAttachmentToServer(fileName, bitmap, mimeType);
 
                         }
@@ -710,7 +702,7 @@ public class ChatFragment extends AppCompatActivity {
     }
 
 
-    public void uploadAttachmentToServer(String fileName, Bitmap bitmapAttachments, String mimeType) {
+    public void uploadAttachmentToServerMultipart(String fileName, Bitmap bitmapAttachments, String mimeType) {
         byte[] multipartBody = new byte[0];
         String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
         try {
@@ -796,5 +788,100 @@ public class ChatFragment extends AppCompatActivity {
 
         dataOutputStream.writeBytes(lineEnd);
     }
+
+    public void encodeAttachment(String fromUserId, String toUserID, String fileName) throws JSONException {
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        });
+        if (bitmapAttachment != null) {
+            endocedImageStr = convertToBase64(bitmapAttachment);
+        }
+
+        if (endocedImageStr.length() < 10) {
+            Toast.makeText(ChatFragment.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
+        } else {
+
+            Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
+
+            if (isNetworkConnectionAvailable(this, -1)) {
+
+                String replaceDataString = endocedImageStr.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+                sendChatAttachmentDataToServer(addQuotes, fromUserId, toUserID, fileName);
+
+            } else {
+                Toast.makeText(ChatFragment.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void sendChatAttachmentDataToServer(final String postData, String fromUserId, String toUserID, String fileName) {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadMessageAttachmentAndroid?fileName=" + fileName + "&strSiteID=" + appUserModel.getSiteIDValue() + "&strfromUserId=" + fromUserId + "&strtoUserId=" + toUserID;
+
+        StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    Toast.makeText(ChatFragment.this, "Success! \nYour attachment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    //write send message method
+                } else {
+
+                    Toast.makeText(ChatFragment.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(ChatFragment.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(ChatFragment.this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
 }
 

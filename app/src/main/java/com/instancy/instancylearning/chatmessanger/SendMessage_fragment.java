@@ -133,13 +133,38 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
-        signalAService = SignalAService.newInstance(context);
-        signalAService.startSignalA();
+    }
+
+    public void addMessageCountToUserList(JSONArray messageReceived) throws JSONException {
+
+        if (peopleListingModelList.size() > 0) {
+            for (int i = 0; i < peopleListingModelList.size(); i++) {
+                String userID = messageReceived.getString(4);
+                if (peopleListingModelList.get(i).userID.equalsIgnoreCase(userID)) {
+                    peopleListingModelList.get(i).chatCount = peopleListingModelList.get(i).chatCount + 1;
+                }
+            }
+        }
+        chatMessageAdapter.refreshList(peopleListingModelList);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        communicator = new Communicator() {
+            @Override
+            public void messageRecieved(JSONArray messageReceived) {
+
+                Log.d(TAG, "messageRecieved: in userslist chat " + messageReceived);
+                try {
+                    addMessageCountToUserList(messageReceived);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        signalAService = SignalAService.newInstance(context);
+        signalAService.communicator = communicator;
     }
 
     @Override
@@ -174,15 +199,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Messaging" + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        communicator = new Communicator() {
-            @Override
-            public void messageRecieved(JSONArray messageReceived) {
-
-
-            }
-        };
-
     }
 
     @Override
@@ -282,15 +298,19 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 }
                 break;
             case R.id.card_view:
-
                 Intent intentDetail = new Intent(context, ChatFragment.class);
                 intentDetail.putExtra("peopleListingModel", peopleListingModelList.get(position));
+                peopleListingModelList.get(position).chatCount = 0;
                 startActivity(intentDetail);
                 break;
             default:
-
         }
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        chatMessageAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -365,6 +385,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 peopleListingModel.userDisplayname = userJsonOnj.getString("Username");
                 peopleListingModel.siteID = userJsonOnj.getString("UserChatSiteID");
                 peopleListingModel.memberProfileImage = userJsonOnj.getString("ChatProfileImagepath");
+                peopleListingModel.chatCount = userJsonOnj.getInt("UnReadCount");
                 peopleListingModel.siteURL = appUserModel.getSiteURL();
                 peopleListingModel.siteID = appUserModel.getSiteIDValue();
                 peopleListingModelList.add(peopleListingModel);

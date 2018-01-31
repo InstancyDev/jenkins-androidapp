@@ -19,10 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.DateUtils;
+import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -125,7 +127,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             tvBackground.setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderColor()), PorterDuff.Mode.SRC_ATOP);
         }
 
-        void bind(BaseMessage message) {
+        void bind(final BaseMessage message) {
             messageText.setText(message.messageChat);
 
             // Format the stored timestamp into a readable String using method.
@@ -139,9 +141,17 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     @Override
                     public void onClick(View view) {
 
-                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(attachment));
-                        itemView.getContext().startActivity(intent);
+                        if (attachment.endsWith(".pdf")) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(attachment));
+                            itemView.getContext().startActivity(intent);
+                        } else {
+                            Intent intentSocial = new Intent(itemView.getContext(), SocialWebLoginsActivity.class);
+                            intentSocial.putExtra("ATTACHMENT", true);
+                            intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, attachment);
+                            intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, message.toUsername);
+                            itemView.getContext().startActivity(intentSocial);
+                        }
 
                     }
                 });
@@ -181,7 +191,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             attachmentImage = (ImageView) itemView.findViewById(R.id.attachmentthumbnail);
         }
 
-        void bind(BaseMessage message) {
+        void bind(final BaseMessage message) {
             messageText.setText(message.messageChat);
 
             nameText.setText(message.fromUserName);
@@ -198,9 +208,19 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 attachmentImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(attachment));
-                        itemView.getContext().startActivity(intent);
+
+
+                        if (attachment.endsWith(".pdf")) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(attachment));
+                            itemView.getContext().startActivity(intent);
+                        } else {
+                            Intent intentSocial = new Intent(itemView.getContext(), SocialWebLoginsActivity.class);
+                            intentSocial.putExtra("ATTACHMENT", true);
+                            intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, attachment);
+                            intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, message.toUsername);
+                            itemView.getContext().startActivity(intentSocial);
+                        }
 
                     }
                 });

@@ -406,6 +406,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Intent intentSocial = new Intent(this, SocialWebLoginsActivity.class);
+
         switch (view.getId()) {
             case R.id.btn_contextmenu:
 //                View v = discussionFourmlistView.getChildAt(i - discussionFourmlistView.getFirstVisiblePosition());

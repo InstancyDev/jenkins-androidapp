@@ -110,6 +110,22 @@ public class SendMessageAdapter extends BaseAdapter {
 
         String imagePath = peopleListingModelList.get(position).memberProfileImage;
 
+        int unreadCount = peopleListingModelList.get(position).chatCount;
+
+        if (unreadCount == 0) {
+            holder.unreadCountTxt.setVisibility(View.GONE);
+        } else {
+            holder.unreadCountTxt.setVisibility(View.VISIBLE);
+            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+// generate random color 14/ 28400
+//        int color1 = generator.getRandomColor();
+// generate color based on a key (same key returns the same color), useful for list/grid views
+            int color = generator.getColor(unreadCount);
+            TextDrawable drawable = TextDrawable.builder()
+                    .buildRound("" + unreadCount, color);
+            holder.unreadCountTxt.setBackground(drawable);
+        }
+
         String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
 
         if (imagePath.length() > 2) {
@@ -171,6 +187,10 @@ public class SendMessageAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.txtStatus)
         TextView txtStatus;
+
+        @Nullable
+        @BindView(R.id.unreadCountTxt)
+        ImageView unreadCountTxt;
 
 
         @OnClick({R.id.card_view})

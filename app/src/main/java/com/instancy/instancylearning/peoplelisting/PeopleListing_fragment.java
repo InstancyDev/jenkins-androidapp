@@ -398,14 +398,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshPeopleListing(false);
-//            peopleListingTabsEitherFromDatabaseOrAPI();
         } else {
             injectFromDbtoModel();
         }
 
         initilizeView();
 
-        return rootView; // 31732298673 //
+        return rootView;
     }
 
 

@@ -115,7 +115,6 @@ public class PeopleListingAdapter extends BaseAdapter {
         holder.txtName.setText(peopleListingModelList.get(position).userDisplayname);
         holder.txtPlace.setText(peopleListingModelList.get(position).mainOfficeAddress);
 
-
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtPlace.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

@@ -32,4 +32,5 @@ public class PeopleListingModel implements Serializable {
     public String chatConnectionUserId = "Default";
 
     public String chatUserStatus = "";
+    public int chatCount = 0;
 }
