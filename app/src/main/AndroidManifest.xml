@@ -140,7 +140,7 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name=".chatmessanger.ChatFragment"
+            android:name=".chatmessanger.ChatActivity"
             android:screenOrientation="portrait"></activity>
 
         <!-- INAPP BILLING ACTIVITY -->

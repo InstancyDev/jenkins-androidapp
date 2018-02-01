@@ -1,23 +1,32 @@
-package com.instancy.instancylearning.chatmessanger;
+package com.instancy.instancylearning.notifications;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -31,40 +40,46 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
-
+import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.discussionfourms.CreateNewForumActivity;
+import com.instancy.instancylearning.discussionfourms.DiscussionFourmAdapter;
+import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-
-import com.instancy.instancylearning.models.PeopleListingModel;
+import com.instancy.instancylearning.models.DiscussionForumModel;
+import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.NotificationModel;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.instancy.instancylearning.utils.StaticValues;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
-
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 
 /**
@@ -72,39 +87,39 @@ import static com.instancy.instancylearning.utils.Utilities.showToast;
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class SendMessage_fragment extends Fragment implements AdapterView.OnItemClickListener {
+public class Notifications_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
-    String TAG = SendMessage_fragment.class.getSimpleName();
+    String TAG = Notifications_fragment.class.getSimpleName();
     AppUserModel appUserModel;
-
+    VollyService vollyService;
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
+    @BindView(R.id.swipemylearning)
+    SwipeRefreshLayout swipeRefreshLayout;
 
-    @BindView(R.id.userschatlist)
-    ListView usersChatListView;
+    @BindView(R.id.notificationlist)
+    ListView discussionFourmlistView;
 
-    SendMessageAdapter chatMessageAdapter;
-    List<PeopleListingModel> peopleListingModelList = null;
+    NotificationAdapter notificationAdapter;
+
+    List<NotificationModel> notificationModelList = null;
+
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
     Menu search_menu;
     MenuItem item_search;
+    SideMenusModel sideMenusModel = null;
     ResultListner resultListner = null;
-
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
-    SignalAService signalAService;
+    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
+    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
+    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
-    String recepientID = "default";
-
-    String userStatus = "";
-
-    Communicator communicator;
-
-    public SendMessage_fragment() {
+    public Notifications_fragment() {
 
 
     }
@@ -115,66 +130,125 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         this.context = context;
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(context);
-
+        db = new DatabaseHandler(context);
+        initVolleyCallback();
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
-    }
+        vollyService = new VollyService(resultCallback, context);
 
-    public void addMessageCountToUserList(JSONArray messageReceived) throws JSONException {
-
-        if (peopleListingModelList.size() > 0) {
-            for (int i = 0; i < peopleListingModelList.size(); i++) {
-                String userID = messageReceived.getString(4);
-                if (peopleListingModelList.get(i).userID.equalsIgnoreCase(userID)) {
-                    peopleListingModelList.get(i).chatCount = peopleListingModelList.get(i).chatCount + 1;
-                }
-            }
+        sideMenusModel = null;
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
         }
-        chatMessageAdapter.refreshList(peopleListingModelList);
     }
+
+    public void refreshCatalog(Boolean isRefreshed) {
+        if (!isRefreshed) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
+
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+                if (requestType.equalsIgnoreCase("NOTIFICATIODATA")) {
+                    if (response != null) {
+//                        try {
+//                            db.injectNotifications(response);
+//                            injectFromDbtoModel();
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
+                svProgressHUD.dismiss();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                swipeRefreshLayout.setRefreshing(false);
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+                swipeRefreshLayout.setRefreshing(false);
+                svProgressHUD.dismiss();
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+                svProgressHUD.dismiss();
+            }
+        };
+    }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        communicator = new Communicator() {
-            @Override
-            public void messageRecieved(JSONArray messageReceived) {
-
-                Log.d(TAG, "messageRecieved: in userslist chat " + messageReceived);
-                try {
-                    addMessageCountToUserList(messageReceived);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        signalAService = SignalAService.newInstance(context);
-        signalAService.communicator = communicator;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.sendmessage_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.notification_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
+        notificationAdapter = new NotificationAdapter(getActivity(), BIND_ABOVE_CLIENT, notificationModelList);
+        discussionFourmlistView.setAdapter(notificationAdapter);
+        discussionFourmlistView.setOnItemClickListener(this);
+        discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        peopleListingModelList = new ArrayList<PeopleListingModel>();
-        try {
-            generateUserChatList();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        notificationModelList = new ArrayList<NotificationModel>();
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            refreshCatalog(false);
+        } else {
+            injectFromDbtoModel();
         }
 
-        chatMessageAdapter = new SendMessageAdapter(getActivity(), BIND_ABOVE_CLIENT, peopleListingModelList);
-        usersChatListView.setAdapter(chatMessageAdapter);
-        usersChatListView.setOnItemClickListener(this);
-        usersChatListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
         initilizeView();
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
+        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+
+
         return rootView;
+    }
+
+
+    public void injectFromDbtoModel() {
+//        discussionForumModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
+//        if (discussionForumModelList != null) {
+//            discussionFourmAdapter.refreshList(discussionForumModelList);
+//        } else {
+//            discussionForumModelList = new ArrayList<DiscussionForumModel>();
+//            discussionFourmAdapter.refreshList(discussionForumModelList);
+//        }
+
     }
 
     public void initilizeView() {
@@ -183,9 +257,10 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Messaging" + "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Notifications" + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
+
     }
 
     @Override
@@ -222,7 +297,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-                    chatMessageAdapter.filter(newText.toLowerCase(Locale.getDefault()));
+                    notificationAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
                     return true;
                 }
@@ -230,7 +305,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             });
 
         }
-
     }
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
@@ -274,35 +348,35 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        switch (view.getId()) {
-            case R.id.btntxt_download:
-                if (isNetworkConnectionAvailable(context, -1)) {
-                } else {
-                    showToast(context, "No Internet");
-                }
-                break;
-            case R.id.card_view:
-                Intent intentDetail = new Intent(context, ChatActivity.class);
-                intentDetail.putExtra("peopleListingModel", peopleListingModelList.get(position));
-                startActivity(intentDetail);
-                peopleListingModelList.get(position).chatCount = 0;
-                break;
-            default:
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(false);
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            refreshCatalog(true);
+            MenuItemCompat.collapseActionView(item_search);
+        } else {
+            swipeRefreshLayout.setRefreshing(false);
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        chatMessageAdapter.notifyDataSetChanged();
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        switch (view.getId()) {
+            case R.id.card_view:
+                break;
+
+        }
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy: in Mylearning fragment");
+
     }
 
 
@@ -340,46 +414,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         // start the animation
         anim.start();
 
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-
-    @Override
-    public void onDetach() {
-
-        super.onDetach();
-    }
-
-    public void generateUserChatList() throws JSONException {
-
-        String chatListStr = preferencesManager.getStringValue(StaticValues.CHAT_LIST);
-        if (chatListStr.length() > 10) {
-//            Log.d(TAG, "log: ConnectionId users List jsonObject  -------------- " + jsonObject);
-            JSONArray jsonArray = new JSONArray(chatListStr);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject userJsonOnj = jsonArray.getJSONObject(i);
-                Log.d(TAG, "generateUserChatList: " + userJsonOnj);
-
-                PeopleListingModel peopleListingModel = new PeopleListingModel();
-                peopleListingModel.chatConnectionUserId = userJsonOnj.getString("ConnectionId");
-                peopleListingModel.userID = userJsonOnj.getString("ChatuserID");
-                peopleListingModel.chatUserStatus = userJsonOnj.getString("status");
-                peopleListingModel.userDisplayname = userJsonOnj.getString("Username");
-                peopleListingModel.siteID = userJsonOnj.getString("UserChatSiteID");
-                peopleListingModel.memberProfileImage = userJsonOnj.getString("ChatProfileImagepath");
-                peopleListingModel.chatCount = userJsonOnj.getInt("UnReadCount");
-                peopleListingModel.siteURL = appUserModel.getSiteURL();
-                peopleListingModel.siteID = appUserModel.getSiteIDValue();
-                peopleListingModelList.add(peopleListingModel);
-
-            }
-
-        }
     }
 
 }

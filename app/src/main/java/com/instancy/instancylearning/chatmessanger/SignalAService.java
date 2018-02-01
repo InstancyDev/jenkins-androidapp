@@ -154,7 +154,7 @@ public class SignalAService {
             con.Stop();
     }
 
-    public void sendMessage(String buddyID, String messageStr) {
+    public void sendMessage(String buddyID, String messageStr,String attachemnt) {
 
         HubInvokeCallback callback = new HubInvokeCallback() {
             @Override
@@ -174,7 +174,7 @@ public class SignalAService {
         args.add(buddyID);
         args.add(messageStr);
         args.add("true");
-        args.add("");
+        args.add(attachemnt);
 
         hub.Invoke("SendPrivateMessage", args, callback);
     }

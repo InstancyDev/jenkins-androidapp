@@ -36,7 +36,7 @@ import java.util.List;
  * Created by Upendranath on 1/17/2018.
  */
 
-public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
@@ -46,7 +46,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     AppUserModel appUserModel;
     UiSettingsModel uiSettingsModel;
 
-    public MessageListAdapter(Context context, List<BaseMessage> messageList) {
+    public ChatListAdapter(Context context, List<BaseMessage> messageList) {
         this.mContext = context;
         this.mMessageList = messageList;
         appUserModel = AppUserModel.getInstance();

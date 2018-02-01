@@ -1,7 +1,6 @@
 package com.instancy.instancylearning.chatmessanger;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -22,20 +21,16 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import android.view.View;
-import android.webkit.CookieManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,15 +42,12 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.MultipartRequest;
-import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.peoplelisting.PeopleProfileExpandAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -64,21 +56,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.HttpCookie;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import static com.instancy.instancylearning.utils.Utilities.convertStreamToString;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
@@ -91,10 +76,10 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * https://blog.sendbird.com/android-chat-tutorial-building-a-messaging-ui
  */
 
-public class ChatFragment extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity {
 
 
-    String TAG = ChatFragment.class.getSimpleName();
+    String TAG = ChatActivity.class.getSimpleName();
 
     AppUserModel appUserModel;
     VollyService vollyService;
@@ -120,22 +105,17 @@ public class ChatFragment extends AppCompatActivity {
 
     private RecyclerView mMessageRecycler;
 
-    private MessageListAdapter mMessageAdapter;
+    private ChatListAdapter chatListAdapter;
 
     private List<BaseMessage> mMessageList;
 
     Communicator communicator;
 
-
     private int GALLERY = 1;
     Bitmap bitmapAttachment = null;
     String endocedImageStr = "";
 
-    private final String twoHyphens = "--";
-    private final String lineEnd = "\r\n";
-    private final String boundary = "apiclient-" + System.currentTimeMillis();
-
-    public ChatFragment() {
+    public ChatActivity() {
 
 
     }
@@ -151,7 +131,6 @@ public class ChatFragment extends AppCompatActivity {
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
 
         peopleListingModel = new PeopleListingModel();
 
@@ -222,11 +201,11 @@ public class ChatFragment extends AppCompatActivity {
         mMessageList = new ArrayList<>();
 
         mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
-        mMessageAdapter = new MessageListAdapter(this, mMessageList);
+        chatListAdapter = new ChatListAdapter(this, mMessageList);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mMessageRecycler.setLayoutManager(linearLayoutManager);
 
-        mMessageRecycler.setAdapter(mMessageAdapter);
+        mMessageRecycler.setAdapter(chatListAdapter);
 
         linearLayoutManager.setStackFromEnd(true);
 
@@ -461,7 +440,7 @@ public class ChatFragment extends AppCompatActivity {
 
                 mMessageList.add(baseMessage);
             }
-            mMessageAdapter.reloadAllContent(mMessageList);
+            chatListAdapter.reloadAllContent(mMessageList);
         }
 
     }
@@ -480,7 +459,7 @@ public class ChatFragment extends AppCompatActivity {
 
             baseMessage.messageChat = jsonArray.getString(2);
 
-            baseMessage.attachemnt = "";
+            baseMessage.attachemnt = jsonArray.getString(5);
 
             baseMessage.markAsRead = "true";
 
@@ -496,8 +475,8 @@ public class ChatFragment extends AppCompatActivity {
 
             mMessageList.add(baseMessage);
         }
-        mMessageAdapter.reloadAllContent(mMessageList);
-        mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        chatListAdapter.reloadAllContent(mMessageList);
+        mMessageRecycler.scrollToPosition(chatListAdapter.getItemCount() - 1);
     }
 
     public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel, String attachment) {
@@ -541,11 +520,8 @@ public class ChatFragment extends AppCompatActivity {
 //                Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("1")) {
-
-                    signalAService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
-
+                    signalAService.sendMessage("" + peopleListingModel.chatConnectionUserId, message, attachment);
                     generateNewConversation(peopleListingModel, message, attachment);
-
                     messageEdit.setText("");
                 } else {
 
@@ -633,8 +609,8 @@ public class ChatFragment extends AppCompatActivity {
 
         mMessageList.add(baseMessage);
 
-        mMessageAdapter.reloadAllContent(mMessageList);
-        mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        chatListAdapter.reloadAllContent(mMessageList);
+        mMessageRecycler.scrollToPosition(chatListAdapter.getItemCount() - 1);
     }
 
     public void choosePhotoFromGallary() {
@@ -677,7 +653,7 @@ public class ChatFragment extends AppCompatActivity {
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(ChatFragment.this, "Failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -738,21 +714,21 @@ public class ChatFragment extends AppCompatActivity {
 //            MultipartRequest multipartRequest = new MultipartRequest(url, base64EncodedCredentials, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
 //                @Override
 //                public void onResponse(NetworkResponse response) {
-//                    Toast.makeText(ChatFragment.this, "completed", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ChatActivity.this, "completed", Toast.LENGTH_SHORT).show();
 //
 //                }
 //            }, new Response.ErrorListener() {
 //                @Override
 //                public void onErrorResponse(VolleyError error) {
 //                    try {
-//                        Toast.makeText(ChatFragment.this, "Error", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
 //                    } catch (Exception e) {
 //                        e.printStackTrace();
 //                    }
 //                }
 //            });
 //
-//            VolleySingleton.getInstance(ChatFragment.this).addToRequestQueue(multipartRequest);
+//            VolleySingleton.getInstance(ChatActivity.this).addToRequestQueue(multipartRequest);
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
@@ -801,7 +777,7 @@ public class ChatFragment extends AppCompatActivity {
         }
 
         if (endocedImageStr.length() < 10) {
-            Toast.makeText(ChatFragment.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ChatActivity.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
         } else {
 
             Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
@@ -813,7 +789,7 @@ public class ChatFragment extends AppCompatActivity {
                 sendChatAttachmentDataToServer(addQuotes, fromUserId, toUserID, fileName);
 
             } else {
-                Toast.makeText(ChatFragment.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -836,14 +812,14 @@ public class ChatFragment extends AppCompatActivity {
 
                 } else {
 
-                    Toast.makeText(ChatFragment.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(ChatFragment.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(ChatActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -875,7 +851,7 @@ public class ChatFragment extends AppCompatActivity {
 
         };
 
-        RequestQueue rQueue = Volley.newRequestQueue(ChatFragment.this);
+        RequestQueue rQueue = Volley.newRequestQueue(ChatActivity.this);
         rQueue.add(request);
         request.setRetryPolicy(new DefaultRetryPolicy(
                 5000,

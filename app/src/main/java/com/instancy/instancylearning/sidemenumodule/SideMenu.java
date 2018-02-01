@@ -1,7 +1,6 @@
 package com.instancy.instancylearning.sidemenumodule;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -13,7 +12,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -33,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
@@ -46,7 +43,6 @@ import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
-import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -54,6 +50,7 @@ import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.notifications.Notifications_fragment;
 import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -109,6 +106,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     @BindView(R.id.sendmessage_layout)
     RelativeLayout sendMessageLayout;
+
+    @BindView(R.id.notification_layout)
+    RelativeLayout notificationLayout;
 
 
     @BindView(R.id.subsitelayout)
@@ -195,6 +195,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
+        notificationLayout.setOnClickListener(this);
 
         ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
 //       imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
@@ -378,7 +379,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         lastClicked = 0;
     }
 
-
     private Bitmap createBitmapFromView(Context context, View view) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -433,6 +433,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case 99:
                 fragment = new SendMessage_fragment();
+                break;
+            case 100:
+                fragment = new Notifications_fragment();
                 break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");
@@ -624,6 +627,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case R.id.sendmessage_layout:
                 selectItem(99, sideMenusModel.get(0));
+                break;
+            case R.id.notification_layout:
+                selectItem(100, sideMenusModel.get(0));
                 break;
         }
     }

@@ -46,7 +46,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.chatmessanger.ChatFragment;
+import com.instancy.instancylearning.chatmessanger.ChatActivity;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -714,7 +714,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                             e.printStackTrace();
                         }
 
-                        Intent intentDetail = new Intent(context, ChatFragment.class);
+                        Intent intentDetail = new Intent(context, ChatActivity.class);
                         intentDetail.putExtra("peopleListingModel", peopleListingModel);
                         startActivity(intentDetail);
 
@@ -757,7 +757,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Cancel")) {
 
-//                    Intent intentDetail = new Intent(context, ChatFragment.class);
+//                    Intent intentDetail = new Intent(context, ChatActivity.class);
 //                    intentDetail.putExtra("peopleListingModel", peopleListingModel);
 //                    startActivity(intentDetail);
 

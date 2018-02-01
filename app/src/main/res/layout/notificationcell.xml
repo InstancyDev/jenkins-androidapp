@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
+    android:layout_marginTop="3dp"
+    android:focusable="true"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="1dp"
+    app:contentPadding="4dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <RelativeLayout
+                android:layout_width="32dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="1dp">
+
+                <TextView
+                    android:id="@+id/txtBolt"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="@string/fa_icon_bolt"
+                    android:textColor="@color/colorStatusOther"
+                    android:textSize="24sp" />
+
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"></View>
+
+            <RelativeLayout
+                android:id="@+id/relattitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="4.0"
+                android:paddingLeft="3dp">
+
+                <TextView
+                    android:id="@+id/txtTitle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="0dp"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical|fill_horizontal"
+                    android:maxLines="2"
+                    android:padding="1dp"
+                    android:text="New Connection Request"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="18sp"
+                    android:typeface="sans" />
+
+
+                <TextView
+                    android:id="@+id/txtDescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtTitle"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="Request for Connection"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/txtDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtDescription"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="08-06-2013"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="14sp" />
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

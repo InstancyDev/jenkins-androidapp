@@ -44,6 +44,7 @@
         android:layout_height="40dp"
         android:background="@color/colorWhite"
         android:visibility="gone">
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -78,9 +79,13 @@
         android:id="@+id/notification_layout"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-
         android:background="@color/colorWhite"
-        android:visibility="gone">
+        android:visibility="visible">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorGray" />
 
         <TextView
             android:id="@+id/notification_font"
@@ -92,7 +97,7 @@
             android:gravity="center_vertical"
             android:text="@string/fa_icon_bell"
             android:textAlignment="center"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/txtbtn_notification"
@@ -102,12 +107,10 @@
             android:layout_toRightOf="@id/notification_font"
             android:gravity="center_vertical"
             android:minHeight="?android:attr/listPreferredItemHeightSmall"
-            android:text="Notifications (26)"
+            android:text="Notifications"
             android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:textColor="@color/colorBlack"
-            android:textSize="12sp" />
+            android:textColor="@color/colorBlack" />
     </RelativeLayout>
-
 
 
     <RelativeLayout
@@ -115,6 +118,7 @@
         android:layout_height="40dp"
         android:background="@color/colorWhite"
         android:visibility="gone">
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
