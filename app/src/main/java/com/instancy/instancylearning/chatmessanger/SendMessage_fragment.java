@@ -300,8 +300,8 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             case R.id.card_view:
                 Intent intentDetail = new Intent(context, ChatFragment.class);
                 intentDetail.putExtra("peopleListingModel", peopleListingModelList.get(position));
-                peopleListingModelList.get(position).chatCount = 0;
                 startActivity(intentDetail);
+                peopleListingModelList.get(position).chatCount = 0;
                 break;
             default:
         }

@@ -59,7 +59,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
-
     @Override
     public int getItemCount() {
         return mMessageList.size();

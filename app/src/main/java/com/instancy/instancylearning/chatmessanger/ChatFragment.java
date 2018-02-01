@@ -107,7 +107,6 @@ public class ChatFragment extends AppCompatActivity {
 
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-    PeopleProfileExpandAdapter profileDynamicAdapter;
 
     SignalAService signalAService;
 
@@ -169,7 +168,7 @@ public class ChatFragment extends AppCompatActivity {
             public void onClick(View view) {
                 String message = messageEdit.getText().toString().trim();
 
-                sendMessageToServer(message, peopleListingModel);
+                sendMessageToServer(message, peopleListingModel, "");
 
             }
         });
@@ -501,7 +500,7 @@ public class ChatFragment extends AppCompatActivity {
         mMessageRecycler.scrollToPosition(mMessageAdapter.getItemCount() - 1);
     }
 
-    public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel) {
+    public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel, String attachment) {
 
         String dateString = getCurrentDateTime("dd/MM/yyyy HH:mm:ss.SSS");
         JSONObject jsonObject = new JSONObject();
@@ -510,7 +509,7 @@ public class ChatFragment extends AppCompatActivity {
             jsonObject.put("FromUserID", appUserModel.getUserIDValue());
             jsonObject.put("ToUserID", peopleListingModel.userID);
             jsonObject.put("Message", messageStr);
-            jsonObject.put("Attachment", "");
+            jsonObject.put("Attachment", attachment);
             jsonObject.put("SendDateTime", dateString);
             jsonObject.put("MarkAsRead", "false");
         } catch (JSONException e) {
@@ -524,14 +523,14 @@ public class ChatFragment extends AppCompatActivity {
             String replaceDataString = parameterString.replace("\"", "\\\"");
             String addQuotes = ('"' + replaceDataString + '"');
 
-            sendNewChatDataToServer(jsonObject.toString(), messageStr);
+            sendNewChatDataToServer(jsonObject.toString(), messageStr, attachment);
         } else {
             Toast.makeText(this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    public void sendNewChatDataToServer(final String postData, final String message) {
+    public void sendNewChatDataToServer(final String postData, final String message, final String attachment) {
 
         String urlString = appUserModel.getWebAPIUrl() + "/Chat/InsertChatObjectDetails";
 
@@ -545,7 +544,7 @@ public class ChatFragment extends AppCompatActivity {
 
                     signalAService.sendMessage("" + peopleListingModel.chatConnectionUserId, message);
 
-                    generateNewConversation(peopleListingModel, message);
+                    generateNewConversation(peopleListingModel, message, attachment);
 
                     messageEdit.setText("");
                 } else {
@@ -595,7 +594,7 @@ public class ChatFragment extends AppCompatActivity {
 
     }
 
-    public void generateNewConversation(PeopleListingModel peopleListingModel, String message) {
+    public void generateNewConversation(PeopleListingModel peopleListingModel, String message, String attachment) {
 
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
@@ -609,7 +608,7 @@ public class ChatFragment extends AppCompatActivity {
 
         baseMessage.messageChat = message;
 
-        baseMessage.attachemnt = "";
+        baseMessage.attachemnt = attachment;
 
         baseMessage.markAsRead = "false";
 
@@ -702,92 +701,92 @@ public class ChatFragment extends AppCompatActivity {
     }
 
 
-    public void uploadAttachmentToServerMultipart(String fileName, Bitmap bitmapAttachments, String mimeType) {
-        byte[] multipartBody = new byte[0];
-        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-        try {
+//    public void uploadAttachmentToServerMultipart(String fileName, Bitmap bitmapAttachments, String mimeType) {
+//        byte[] multipartBody = new byte[0];
+//        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+//        try {
+//
+//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            if (bitmapAttachments != null) {
+//                bitmapAttachments.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
+//            }
+//
+//            byte[] fileByteArray = byteArrayOutputStream.toByteArray();
+//
+//            ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
+//            DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream2);
+//            try {
+//                // the first file
+//                buildPart(dataOutputStream, fileByteArray, fileName);
+//                // send multipart form data necesssary after file data
+//                dataOutputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+//                Map<String, String> params = new HashMap<>();
+//                params.put("filename", fileName);
+//                params.put("strSiteID", appUserModel.getSiteIDValue());
+//                params.put("strfromUserId", appUserModel.getUserIDValue());
+//                params.put("strtoUserId", peopleListingModel.userID);
+////                params.put("fileData", fileByteArray.toString());
+//                dataOutputStream.writeBytes(params.toString());
+//                // pass to multipart body
+//                multipartBody = byteArrayOutputStream2.toByteArray();
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            String url = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadSendMessageAttachment";
+//            MultipartRequest multipartRequest = new MultipartRequest(url, base64EncodedCredentials, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
+//                @Override
+//                public void onResponse(NetworkResponse response) {
+//                    Toast.makeText(ChatFragment.this, "completed", Toast.LENGTH_SHORT).show();
+//
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    try {
+//                        Toast.makeText(ChatFragment.this, "Error", Toast.LENGTH_SHORT).show();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
+//
+//            VolleySingleton.getInstance(ChatFragment.this).addToRequestQueue(multipartRequest);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            if (bitmapAttachments != null) {
-                bitmapAttachments.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-            }
-
-            byte[] fileByteArray = byteArrayOutputStream.toByteArray();
-
-            ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
-            DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream2);
-            try {
-                // the first file
-                buildPart(dataOutputStream, fileByteArray, fileName);
-                // send multipart form data necesssary after file data
-                dataOutputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-                Map<String, String> params = new HashMap<>();
-                params.put("filename", fileName);
-                params.put("strSiteID", appUserModel.getSiteIDValue());
-                params.put("strfromUserId", appUserModel.getUserIDValue());
-                params.put("strtoUserId", peopleListingModel.userID);
-//                params.put("fileData", fileByteArray.toString());
-                dataOutputStream.writeBytes(params.toString());
-                // pass to multipart body
-                multipartBody = byteArrayOutputStream2.toByteArray();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            String url = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadSendMessageAttachment";
-            MultipartRequest multipartRequest = new MultipartRequest(url, base64EncodedCredentials, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
-                @Override
-                public void onResponse(NetworkResponse response) {
-                    Toast.makeText(ChatFragment.this, "completed", Toast.LENGTH_SHORT).show();
-
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    try {
-                        Toast.makeText(ChatFragment.this, "Error", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            VolleySingleton.getInstance(ChatFragment.this).addToRequestQueue(multipartRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void buildPart(DataOutputStream dataOutputStream, byte[] fileData, String fileName) throws IOException {
-        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-//        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\""
+//    private void buildPart(DataOutputStream dataOutputStream, byte[] fileData, String fileName) throws IOException {
+//        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+////        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\""
+////                + fileName + "\"" + lineEnd);
+//        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; fileData=\""
 //                + fileName + "\"" + lineEnd);
-        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; fileData=\""
-                + fileName + "\"" + lineEnd);
-
-        dataOutputStream.writeBytes(lineEnd);
-
-        ByteArrayInputStream fileInputStream = new ByteArrayInputStream(fileData);
-        int bytesAvailable = fileInputStream.available();
-
-        int maxBufferSize = 1024 * 1024;
-        int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-        byte[] buffer = new byte[bufferSize];
-
-        // read file and write it into form...
-        int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-        while (bytesRead > 0) {
-            dataOutputStream.write(buffer, 0, bufferSize);
-            bytesAvailable = fileInputStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-        }
-
-        dataOutputStream.writeBytes(lineEnd);
-    }
+//
+//        dataOutputStream.writeBytes(lineEnd);
+//
+//        ByteArrayInputStream fileInputStream = new ByteArrayInputStream(fileData);
+//        int bytesAvailable = fileInputStream.available();
+//
+//        int maxBufferSize = 1024 * 1024;
+//        int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+//        byte[] buffer = new byte[bufferSize];
+//
+//        // read file and write it into form...
+//        int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+//
+//        while (bytesRead > 0) {
+//            dataOutputStream.write(buffer, 0, bufferSize);
+//            bytesAvailable = fileInputStream.available();
+//            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+//            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+//        }
+//
+//        dataOutputStream.writeBytes(lineEnd);
+//    }
 
     public void encodeAttachment(String fromUserId, String toUserID, String fileName) throws JSONException {
 
@@ -819,7 +818,7 @@ public class ChatFragment extends AppCompatActivity {
         }
     }
 
-    public void sendChatAttachmentDataToServer(final String postData, String fromUserId, String toUserID, String fileName) {
+    public void sendChatAttachmentDataToServer(final String postData, String fromUserId, String toUserID, final String fileName) {
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadMessageAttachmentAndroid?fileName=" + fileName + "&strSiteID=" + appUserModel.getSiteIDValue() + "&strfromUserId=" + fromUserId + "&strtoUserId=" + toUserID;
 
@@ -829,10 +828,12 @@ public class ChatFragment extends AppCompatActivity {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 
-                if (s.contains("success")) {
+                if (s.contains("ChatAttachments")) {
 
-                    Toast.makeText(ChatFragment.this, "Success! \nYour attachment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-                    //write send message method
+                    String attachmentStr = s.replaceAll("^\"|\"$", "");
+
+                    sendMessageToServer(fileName, peopleListingModel, attachmentStr);
+
                 } else {
 
                     Toast.makeText(ChatFragment.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
