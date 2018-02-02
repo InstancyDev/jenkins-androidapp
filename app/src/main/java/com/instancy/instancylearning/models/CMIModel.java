@@ -3,6 +3,7 @@ package com.instancy.instancylearning.models;
 import java.io.Serializable;
 
 public class CMIModel implements Serializable {
+
     private int _Id;
     private String _siteId="";
     private int _scoId;

@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class NotificationModel implements Serializable {
 
     public int usernotificationid = -1;
-    public int fromuserid = -1;
+    public String fromuserid = "-1";
     public String fromusername = "";
     public String fromuseremail = "";
     public String touserid = "";

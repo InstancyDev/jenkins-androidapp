@@ -12586,185 +12586,231 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
 //            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
-            DiscussionForumModel notificationModel = new DiscussionForumModel();
+            NotificationModel notificationModel = new NotificationModel();
 
-            //active
-            if (jsonMyLearningColumnObj.has("active")) {
+            //usernotificationid
+            if (jsonMyLearningColumnObj.has("usernotificationid")) {
 
-                notificationModel.active = jsonMyLearningColumnObj.get("active").toString();
+                notificationModel.usernotificationid = jsonMyLearningColumnObj.getInt("usernotificationid");
             }
-            // attachfile
-            if (jsonMyLearningColumnObj.has("attachfile")) {
+            // username
+            if (jsonMyLearningColumnObj.has("username")) {
 
-                notificationModel.attachfile = jsonMyLearningColumnObj.get("attachfile").toString();
-
-            }
-            // author
-            if (jsonMyLearningColumnObj.has("author")) {
-
-                notificationModel.author = jsonMyLearningColumnObj.get("author").toString();
+                notificationModel.username = jsonMyLearningColumnObj.get("username").toString();
 
             }
-            // createduserid
-            if (jsonMyLearningColumnObj.has("createduserid")) {
+            // touserid
+            if (jsonMyLearningColumnObj.has("touserid")) {
 
-                notificationModel.createduserid = jsonMyLearningColumnObj.get("createduserid").toString();
-
-            }
-            // createnewtopic
-
-            if (jsonMyLearningColumnObj.has("createnewtopic")) {
-
-                notificationModel.createnewtopic = jsonMyLearningColumnObj.get("createnewtopic").toString();
+                notificationModel.touserid = jsonMyLearningColumnObj.get("touserid").toString();
 
             }
+            // subject
+            if (jsonMyLearningColumnObj.has("subject")) {
 
-            // description
-            if (jsonMyLearningColumnObj.has("description")) {
+                notificationModel.subject = jsonMyLearningColumnObj.get("subject").toString();
 
-                Spanned result = fromHtml(jsonMyLearningColumnObj.get("description").toString());
+            }
+            // publisheddate
 
-                notificationModel.descriptionValue = result.toString();
+            if (jsonMyLearningColumnObj.has("publisheddate")) {
+
+                notificationModel.publisheddate = jsonMyLearningColumnObj.get("publisheddate").toString();
 
             }
 
-            if (jsonMyLearningColumnObj.has("displayorder")) {
-                notificationModel.displayorder = jsonMyLearningColumnObj.get("displayorder").toString();
+            // passwordexpirtydays
+            if (jsonMyLearningColumnObj.has("passwordexpirtydays")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("passwordexpirtydays").toString());
+
+                notificationModel.passwordexpirtydays = result.toString();
 
             }
 
-            // existing
-            if (jsonMyLearningColumnObj.has("existing")) {
+            // ounotificationid
+            if (jsonMyLearningColumnObj.has("ounotificationid")) {
 
-                notificationModel.existing = jsonMyLearningColumnObj.get("existing").toString();
+                notificationModel.ounotificationid = jsonMyLearningColumnObj.get("ounotificationid").toString();
+
+            }
+
+            // notificationtitle
+            if (jsonMyLearningColumnObj.has("notificationtitle")) {
+
+                notificationModel.notificationtitle = jsonMyLearningColumnObj.get("notificationtitle").toString();
+
+            }
+            // notificationsubject
+            if (jsonMyLearningColumnObj.has("notificationsubject")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("notificationsubject").toString());
+
+                notificationModel.notificationsubject = result.toString();
+
+            }
+
+            // notificationid
+            if (jsonMyLearningColumnObj.has("notificationid")) {
+
+                notificationModel.notificationid = jsonMyLearningColumnObj.get("notificationid").toString();
+
+            }
+            // message
+            if (jsonMyLearningColumnObj.has("message")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("message").toString());
+
+
+                notificationModel.message = result.toString();
+
+            }
+            // membershipexpirydate
+            if (jsonMyLearningColumnObj.has("membershipexpirydate")) {
+
+                notificationModel.membershipexpirydate = jsonMyLearningColumnObj.get("membershipexpirydate").toString();
+
+            }
+            // name
+            if (jsonMyLearningColumnObj.has("markasread")) {
+
+                notificationModel.markasread = jsonMyLearningColumnObj.get("markasread").toString();
+            }
+            // groupid
+            if (jsonMyLearningColumnObj.has("groupid")) {
+
+                notificationModel.groupid = jsonMyLearningColumnObj.get("groupid").toString();
+
+            }
+            // fromusername
+            if (jsonMyLearningColumnObj.has("fromusername")) {
+
+                notificationModel.fromusername = jsonMyLearningColumnObj.get("fromusername").toString();
+
+            }
+            // fromuserid
+            if (jsonMyLearningColumnObj.has("fromuserid")) {
+
+                notificationModel.fromuserid = jsonMyLearningColumnObj.getString("fromuserid");
+
+            }
+            // fromuseremail
+            if (jsonMyLearningColumnObj.has("fromuseremail")) {
+
+                notificationModel.fromuseremail = jsonMyLearningColumnObj.get("fromuseremail").toString();
 
             }
             // forumname
             if (jsonMyLearningColumnObj.has("forumname")) {
 
-
-                Spanned result = fromHtml(jsonMyLearningColumnObj.get("forumname").toString());
-
-                notificationModel.forumname = result.toString();
+                notificationModel.forumname = jsonMyLearningColumnObj.get("forumname").toString();
 
             }
-
-            // isprivate
-            if (jsonMyLearningColumnObj.has("isprivate")) {
-
-                notificationModel.isprivate = jsonMyLearningColumnObj.get("isprivate").toString();
-
-            }
-            // likeposts
-            if (jsonMyLearningColumnObj.has("likeposts")) {
-
-                notificationModel.likeposts = jsonMyLearningColumnObj.get("likeposts").toString();
-
-            }
-            // moderation
-            if (jsonMyLearningColumnObj.has("moderation")) {
-
-                notificationModel.moderation = jsonMyLearningColumnObj.get("moderation").toString();
-
-            }
-            // name
-            if (jsonMyLearningColumnObj.has("name")) {
-
-                notificationModel.name = jsonMyLearningColumnObj.get("name").toString();
-            }
-            // nooftopics
-            if (jsonMyLearningColumnObj.has("nooftopics")) {
-
-                notificationModel.nooftopics = jsonMyLearningColumnObj.get("nooftopics").toString();
-
-            }
-            // parentforumid
-            if (jsonMyLearningColumnObj.has("parentforumid")) {
-
-                notificationModel.parentforumid = jsonMyLearningColumnObj.get("parentforumid").toString();
-
-            }
-            // requiressubscription
-            if (jsonMyLearningColumnObj.has("requiressubscription")) {
-
-                notificationModel.requiressubscription = jsonMyLearningColumnObj.get("requiressubscription").toString();
-
-            }
-            // sendemail
-            if (jsonMyLearningColumnObj.has("sendemail")) {
-
-                notificationModel.sendemail = jsonMyLearningColumnObj.get("sendemail").toString();
-
-            }
-            // siteid
-            if (jsonMyLearningColumnObj.has("siteid")) {
-
-                notificationModel.siteid = jsonMyLearningColumnObj.get("siteid").toString();
-
-            }
-            // totalposts
-            if (jsonMyLearningColumnObj.has("totalposts")) {
-
-                notificationModel.totalposts = jsonMyLearningColumnObj.get("totalposts").toString();
-
-            }
-
             // forumid
             if (jsonMyLearningColumnObj.has("forumid")) {
 
-                int fourmID = Integer.parseInt(jsonMyLearningColumnObj.get("forumid").toString());
+                notificationModel.fromuserid = jsonMyLearningColumnObj.getString("forumid");
 
-                notificationModel.forumid = fourmID;
 
             }
 
-            // publishedDate
-            if (jsonMyLearningColumnObj.has("createddate")) {
+            // durationenddate
+            if (jsonMyLearningColumnObj.has("durationenddate")) {
+
+                notificationModel.durationenddate = jsonMyLearningColumnObj.getString("durationenddate");
+
+            }
+
+            // contenttitle
+            if (jsonMyLearningColumnObj.has("contenttitle")) {
+
+                notificationModel.contenttitle = jsonMyLearningColumnObj.getString("contenttitle");
+
+            }
+
+            // contentid
+            if (jsonMyLearningColumnObj.has("contentid")) {
+
+                notificationModel.contentid = jsonMyLearningColumnObj.getString("contentid");
+
+            }
+
+            // assigneddate
+            if (jsonMyLearningColumnObj.has("assigneddate")) {
+
+                notificationModel.durationenddate = jsonMyLearningColumnObj.getString("assigneddate");
+
+            }
+
+            // notificationstartdate
+            if (jsonMyLearningColumnObj.has("notificationstartdate")) {
 
 
-                String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("notificationstartdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
                 Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                notificationModel.createddate = formattedDate;
-
+                notificationModel.notificationstartdate = formattedDate;
 
             }
 
+            // notificationenddate
+            if (jsonMyLearningColumnObj.has("notificationenddate")) {
+
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("notificationenddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                Log.d(TAG, "notificationenddate: " + formattedDate);
+                notificationModel.notificationenddate = formattedDate;
+
+            }
+
+            notificationModel.siteid=appUserModel.getSiteIDValue();
+            notificationModel.userid=appUserModel.getUserIDValue();
+            notificationModel.siteurl=appUserModel.getSiteURL();
+
+            //
             injectNotificationDataIntoTable(notificationModel);
         }
 
     }
 
 
-    public void injectNotificationDataIntoTable(DiscussionForumModel discussionForumModel) {
+    public void injectNotificationDataIntoTable(NotificationModel notificationModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
         try {
 
             contentValues = new ContentValues();
+            contentValues.put("usernotificationid", notificationModel.usernotificationid);
+            contentValues.put("fromuserid", notificationModel.fromuserid);
+            contentValues.put("fromusername", notificationModel.fromusername);
+            contentValues.put("fromuseremail", notificationModel.fromuseremail);
+            contentValues.put("touserid", notificationModel.touserid);
+            contentValues.put("subject", notificationModel.subject);
+            contentValues.put("message", notificationModel.message);
+            contentValues.put("notificationstartdate", notificationModel.notificationstartdate);
+            contentValues.put("notificationenddate", notificationModel.notificationenddate);
+            contentValues.put("notificationid", notificationModel.notificationid);
+            contentValues.put("ounotificationid", notificationModel.ounotificationid);
+            contentValues.put("contentid", notificationModel.contentid);
+            contentValues.put("markasread", notificationModel.markasread);
+            contentValues.put("notificationtitle", notificationModel.notificationtitle);
+            contentValues.put("groupid", notificationModel.groupid);
+            contentValues.put("contenttitle", notificationModel.contenttitle);
+            contentValues.put("forumname", notificationModel.forumname);
+            contentValues.put("forumid", notificationModel.fromuserid);
+            contentValues.put("username", notificationModel.username);
+            contentValues.put("notificationsubject", notificationModel.notificationsubject);
+            contentValues.put("membershipexpirydate", notificationModel.membershipexpirydate);
+            contentValues.put("passwordexpirtydays", notificationModel.passwordexpirtydays);
+            contentValues.put("durationenddate", notificationModel.durationenddate);
+            contentValues.put("publisheddate", notificationModel.publisheddate);
+            contentValues.put("assigneddate", notificationModel.assigneddate);
+            contentValues.put("siteid", notificationModel.siteid);
+            contentValues.put("userid", notificationModel.userid);
+            contentValues.put("siteurl", notificationModel.siteurl);
 
-            contentValues.put("forumname", discussionForumModel.forumname);
-            contentValues.put("forumid", discussionForumModel.forumid);
-            contentValues.put("name", discussionForumModel.name);
-            contentValues.put("createddate", discussionForumModel.createddate);
-            contentValues.put("author", discussionForumModel.author);
-            contentValues.put("nooftopics", discussionForumModel.nooftopics);
-            contentValues.put("totalposts", discussionForumModel.totalposts);
-            contentValues.put("existing", discussionForumModel.existing);
-            contentValues.put("description", discussionForumModel.descriptionValue);
-            contentValues.put("isprivate", discussionForumModel.isprivate);
-            contentValues.put("active", discussionForumModel.active);
-            contentValues.put("siteid", discussionForumModel.siteid);
-            contentValues.put("createduserid", discussionForumModel.createduserid);
-            contentValues.put("parentforumid", discussionForumModel.parentforumid);
-            contentValues.put("displayorder", discussionForumModel.displayorder);
-            contentValues.put("requiressubscription", discussionForumModel.requiressubscription);
-
-            contentValues.put("createnewtopic", discussionForumModel.createnewtopic);
-            contentValues.put("attachfile", discussionForumModel.attachfile);
-            contentValues.put("likeposts", discussionForumModel.likeposts);
-            contentValues.put("sendemail", discussionForumModel.sendemail);
-            contentValues.put("moderation", discussionForumModel.moderation);
             db.insert(TBL_NOTIFICATIONS, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -12773,107 +12819,109 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-
-    public List<DiscussionForumModel> fetchNOtificationModel(String siteID) {
-        List<DiscussionForumModel> discussionForumModelList = null;
-        DiscussionForumModel discussionForumModel = new DiscussionForumModel();
+    public List<NotificationModel> fetchNotificationModel(String siteID) {
+        List<NotificationModel> notificationModelList = null;
+        NotificationModel notificationModel = new NotificationModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuerys = "SELECT DF.*, UI.profileimagepath from " + TBL_FORUMS + " DF LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON DF.createduserid = UI.userid WHERE DF.siteid = " + siteID + " ORDER BY forumid DESC";
 
-        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        String strSelQuerys = "SELECT * from " + TBL_NOTIFICATIONS + " WHERE siteid = " + siteID + " AND userid =" + appUserModel.getUserIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' ORDER BY usernotificationid DESC";
+
+
+        Log.d(TAG, "fetchNotificationModel: " + strSelQuerys);
         try {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuerys, null);
 
             if (cursor != null && cursor.moveToFirst()) {
-                discussionForumModelList = new ArrayList<DiscussionForumModel>();
+                notificationModelList = new ArrayList<NotificationModel>();
                 do {
 
-                    discussionForumModel = new DiscussionForumModel();
+                    notificationModel = new NotificationModel();
 
-                    discussionForumModel.siteid = cursor.getString(cursor
+                    notificationModel.usernotificationid = cursor.getInt(cursor
+                            .getColumnIndex("usernotificationid"));
+
+                    notificationModel.fromuserid = cursor.getString(cursor
+                            .getColumnIndex("fromuserid"));
+
+                    notificationModel.username = cursor.getString(cursor
+                            .getColumnIndex("username"));
+
+                    notificationModel.touserid = cursor.getString(cursor
+                            .getColumnIndex("touserid"));
+
+                    notificationModel.subject = cursor.getString(cursor
+                            .getColumnIndex("subject"));
+
+                    notificationModel.publisheddate = cursor.getString(cursor
+                            .getColumnIndex("publisheddate"));
+
+                    notificationModel.passwordexpirtydays = cursor.getString(cursor
+                            .getColumnIndex("passwordexpirtydays"));
+
+
+                    notificationModel.ounotificationid = cursor.getString(cursor
+                            .getColumnIndex("ounotificationid"));
+
+
+                    notificationModel.notificationtitle = cursor.getString(cursor
+                            .getColumnIndex("notificationtitle"));
+
+
+                    notificationModel.notificationsubject = cursor.getString(cursor
+                            .getColumnIndex("notificationsubject"));
+
+
+                    notificationModel.notificationstartdate = cursor.getString(cursor
+                            .getColumnIndex("notificationstartdate"));
+
+
+                    notificationModel.notificationid = cursor.getString(cursor
+                            .getColumnIndex("notificationid"));
+
+
+                    notificationModel.notificationenddate = cursor.getString(cursor
+                            .getColumnIndex("notificationenddate"));
+
+
+                    notificationModel.message = cursor.getString(cursor
+                            .getColumnIndex("message"));
+
+
+                    notificationModel.membershipexpirydate = cursor.getString(cursor
+                            .getColumnIndex("membershipexpirydate"));
+
+
+                    notificationModel.markasread = cursor.getString(cursor
+                            .getColumnIndex("markasread"));
+
+
+                    notificationModel.groupid = cursor.getString(cursor
+                            .getColumnIndex("groupid"));
+
+                    notificationModel.fromusername = cursor.getString(cursor
+                            .getColumnIndex("fromusername"));
+
+                    notificationModel.fromuseremail = cursor.getString(cursor
+                            .getColumnIndex("fromuseremail"));
+
+                    notificationModel.forumname = cursor.getString(cursor
                             .getColumnIndex("forumname"));
 
-                    discussionForumModel.name = cursor.getString(cursor
-                            .getColumnIndex("name"));
+                    notificationModel.durationenddate = cursor.getString(cursor
+                            .getColumnIndex("durationenddate"));
 
-                    discussionForumModel.createddate = cursor.getString(cursor
-                            .getColumnIndex("createddate"));
+                    notificationModel.contenttitle = cursor.getString(cursor
+                            .getColumnIndex("contenttitle"));
 
-                    discussionForumModel.author = cursor.getString(cursor
-                            .getColumnIndex("author"));
+                    notificationModel.contentid = cursor.getString(cursor
+                            .getColumnIndex("contentid"));
 
-                    discussionForumModel.nooftopics = cursor.getString(cursor
-                            .getColumnIndex("nooftopics"));
+                    notificationModel.assigneddate = cursor.getString(cursor
+                            .getColumnIndex("assigneddate"));
 
-                    discussionForumModel.totalposts = cursor.getString(cursor
-                            .getColumnIndex("totalposts"));
-
-                    discussionForumModel.existing = cursor.getString(cursor
-                            .getColumnIndex("existing"));
-
-
-                    discussionForumModel.descriptionValue = cursor.getString(cursor
-                            .getColumnIndex("description"));
-
-
-                    discussionForumModel.isprivate = cursor.getString(cursor
-                            .getColumnIndex("isprivate"));
-
-
-                    discussionForumModel.active = cursor.getString(cursor
-                            .getColumnIndex("active"));
-
-
-                    discussionForumModel.siteid = cursor.getString(cursor
-                            .getColumnIndex("siteid"));
-
-
-                    discussionForumModel.createduserid = cursor.getString(cursor
-                            .getColumnIndex("createduserid"));
-
-
-                    discussionForumModel.createduserid = cursor.getString(cursor
-                            .getColumnIndex("createduserid"));
-
-
-                    discussionForumModel.parentforumid = cursor.getString(cursor
-                            .getColumnIndex("parentforumid"));
-
-
-                    discussionForumModel.displayorder = cursor.getString(cursor
-                            .getColumnIndex("displayorder"));
-
-
-                    discussionForumModel.requiressubscription = cursor.getString(cursor
-                            .getColumnIndex("requiressubscription"));
-
-
-                    discussionForumModel.createnewtopic = cursor.getString(cursor
-                            .getColumnIndex("createnewtopic"));
-
-                    discussionForumModel.attachfile = cursor.getString(cursor
-                            .getColumnIndex("attachfile"));
-
-                    discussionForumModel.likeposts = cursor.getString(cursor
-                            .getColumnIndex("likeposts"));
-
-
-                    discussionForumModel.sendemail = cursor.getString(cursor
-                            .getColumnIndex("sendemail"));
-
-                    discussionForumModel.moderation = cursor.getString(cursor
-                            .getColumnIndex("moderation"));
-
-                    discussionForumModel.imagedata = cursor.getString(cursor
-                            .getColumnIndex("profileimagepath"));
-
-                    discussionForumModel.forumid = cursor.getInt(cursor
-                            .getColumnIndex("forumid"));
-
-
-                    discussionForumModelList.add(discussionForumModel);
+                    notificationModelList.add(notificationModel);
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -12883,15 +12931,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (db.isOpen()) {
                 db.close();
             }
-            Log.d("fetchmylearningfrom db",
+            Log.d("notificationModelList db",
                     e.getMessage() != null ? e.getMessage()
                             : "Error getting menus");
 
         }
 
-        return discussionForumModelList;
+        return notificationModelList;
     }
-
 
 
     // uncomment for pagenotes

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
@@ -59,9 +61,11 @@ import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.NotificationEnumModel;
 import com.instancy.instancylearning.models.NotificationModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -162,12 +166,12 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (requestType.equalsIgnoreCase("NOTIFICATIODATA")) {
                     if (response != null) {
-//                        try {
-//                            db.injectNotifications(response);
-//                            injectFromDbtoModel();
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
+                        try {
+                            db.injectNotifications(response);
+                            injectFromDbtoModel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -241,13 +245,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
 
     public void injectFromDbtoModel() {
-//        discussionForumModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
-//        if (discussionForumModelList != null) {
-//            discussionFourmAdapter.refreshList(discussionForumModelList);
-//        } else {
-//            discussionForumModelList = new ArrayList<DiscussionForumModel>();
-//            discussionFourmAdapter.refreshList(discussionForumModelList);
-//        }
+        notificationModelList = db.fetchNotificationModel(appUserModel.getSiteIDValue());
+        if (notificationModelList != null) {
+            notificationAdapter.refreshList(notificationModelList);
+        } else {
+            notificationModelList = new ArrayList<NotificationModel>();
+            notificationAdapter.refreshList(notificationModelList);
+        }
 
     }
 
@@ -366,16 +370,51 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
         switch (view.getId()) {
             case R.id.card_view:
+                requiredFunctionalityForTheSelectedCell(notificationModelList.get(position));
                 break;
-
         }
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
+
+    }
+
+
+    public void requiredFunctionalityForTheSelectedCell(NotificationModel notificationModel) {
+
+        NotificationEnumModel notificationEnumModel = new NotificationEnumModel();
+        boolean isMyLearningExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("1");
+        boolean isCatalogExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("2");
+
+        if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.equalsIgnoreCase("null")) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage(notificationModel.message).setTitle(notificationModel.notificationtitle)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+       else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.length()>4) {
+
+
+
+        }
+        else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length()==4) {
+
+
+        }
+
+
+//        ((SideMenu) getActivity()).homeControllClicked();
+
 
     }
 

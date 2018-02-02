@@ -45,7 +45,7 @@ public class NotificationAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<NotificationModel> discussionForumModelList = null;
+    private List<NotificationModel> notificationModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -56,9 +56,9 @@ public class NotificationAdapter extends BaseAdapter {
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<NotificationModel> searchList;
 
-    public NotificationAdapter(Activity activity, int resource, List<NotificationModel> discussionForumModelList) {
+    public NotificationAdapter(Activity activity, int resource, List<NotificationModel> notificationModelList) {
         this.activity = activity;
-        this.discussionForumModelList = discussionForumModelList;
+        this.notificationModelList = notificationModelList;
         this.searchList = new ArrayList<NotificationModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
@@ -72,7 +72,7 @@ public class NotificationAdapter extends BaseAdapter {
     }
 
     public void refreshList(List<NotificationModel> myLearningModel) {
-        this.discussionForumModelList = myLearningModel;
+        this.notificationModelList = myLearningModel;
         this.searchList = new ArrayList<NotificationModel>();
         this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
@@ -80,12 +80,12 @@ public class NotificationAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return discussionForumModelList != null ? discussionForumModelList.size() : 10;
+        return notificationModelList != null ? notificationModelList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return discussionForumModelList.get(position);
+        return notificationModelList.get(position);
     }
 
     @Override
@@ -106,24 +106,31 @@ public class NotificationAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-//        holder.txtTitle.setText("");
-//        holder.txtDescription.setText(");
-//        holder.txtDate.setText("08-06-2018:");
+        if (notificationModelList.get(position).contentid.length() > 5) {
 
+            holder.txtTitle.setText(notificationModelList.get(position).contenttitle);
+            holder.txtDescription.setText(notificationModelList.get(position).message);
 
+        } else {
+
+            holder.txtTitle.setText(notificationModelList.get(position).notificationtitle);
+            holder.txtDescription.setText(notificationModelList.get(position).subject);
+        }
+
+        holder.txtDate.setText(notificationModelList.get(position).notificationstartdate);
 
         return convertView;
     }
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        discussionForumModelList.clear();
+        notificationModelList.clear();
         if (charText.length() == 0) {
-            discussionForumModelList.addAll(searchList);
+            notificationModelList.addAll(searchList);
         } else {
             for (NotificationModel s : searchList) {
                 if (s.fromusername.toLowerCase(Locale.getDefault()).contains(charText) || s.forumname.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    discussionForumModelList.add(s);
+                    notificationModelList.add(s);
                 }
             }
         }

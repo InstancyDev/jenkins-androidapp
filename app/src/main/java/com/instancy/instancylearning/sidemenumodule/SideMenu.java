@@ -713,4 +713,18 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     public void onDrawerStateChanged(int newState) {
 
     }
+
+
+    public boolean respectiveMenuExistsOrNot(String contextMenuId) {
+        boolean exists = false;
+
+        for (int i = 0; i < sideMenusModel.size(); i++) {
+
+            if (contextMenuId.equalsIgnoreCase(sideMenusModel.get(i).contextMenuId)) {
+                exists = true;
+            }
+
+        }
+        return exists;
+    }
 }
