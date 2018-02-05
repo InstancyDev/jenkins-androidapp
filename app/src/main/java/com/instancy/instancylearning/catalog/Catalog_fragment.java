@@ -832,13 +832,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             db.updateContenToCatalog(catalogModelsList.get(position));
                             catalogAdapter.notifyDataSetChanged();
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
-//                            Toast toast = Toast.makeText(
-//                                    context,
-//                                    context.getString(R.string.cat_add_success),
-//                                    Toast.LENGTH_SHORT);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-
                             if (!isAutoAdd) {
                                 String succesMessage = "Content Added to My Learning";
                                 if (isJoinedCommunity) {

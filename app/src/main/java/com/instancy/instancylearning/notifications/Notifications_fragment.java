@@ -84,6 +84,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.returnDateIfNotToday;
 
 
 /**
@@ -382,12 +383,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
-
+    //
     public void requiredFunctionalityForTheSelectedCell(NotificationModel notificationModel) {
 
         NotificationEnumModel notificationEnumModel = new NotificationEnumModel();
-        boolean isMyLearningExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("1");
-        boolean isCatalogExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("2");
 
         if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.equalsIgnoreCase("null")) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -397,25 +396,67 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                         public void onClick(DialogInterface dialog, int id) {
                             //do things
                             dialog.dismiss();
+
                         }
                     });
             AlertDialog alert = builder.create();
             alert.show();
+        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.length() > 4) {
+
+            boolean myLearningExists = myLearningAction(notificationModel.contentid);
+            boolean myCatalogExists = false;
+            if (!myLearningExists)
+                myCatalogExists = myCatalogAction(notificationModel.contentid);
+
+            if (myLearningExists) {
+                ((SideMenu) getActivity()).homeControllClicked(true, 1);
+            } else if (myCatalogExists) {
+                ((SideMenu) getActivity()).homeControllClicked(true, 2);
+            } else {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(notificationModel.message).setTitle(notificationModel.notificationtitle)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //do things
+                                dialog.dismiss();
+
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+            }
+        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
+
+            ((SideMenu) getActivity()).homeControllClicked(true, 4);
+        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
+
+            ((SideMenu) getActivity()).homeControllClicked(true, 10);
+
+
         }
-       else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.length()>4) {
+
+    }
 
 
-
+    public boolean myLearningAction(String contentID) {
+        boolean isMyLearningContetExists = false;
+        boolean isMyLearningMenuExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("1");
+        if (isMyLearningMenuExit) {
+            isMyLearningContetExists = db.isContentIDExistsInMyLearning(contentID);
         }
-        else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length()==4) {
+        return isMyLearningContetExists;
+    }
 
-
+    public boolean myCatalogAction(String contentID) {
+        boolean isCatalogContentExists = false;
+        boolean isCatalogMenuExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("2");
+        if (isCatalogMenuExit) {
+            isCatalogContentExists = db.isContentIDExistsInCatalog(contentID);
         }
-
-
-//        ((SideMenu) getActivity()).homeControllClicked();
-
-
+        return isCatalogContentExists;
     }
 
 

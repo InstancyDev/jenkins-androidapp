@@ -3,6 +3,7 @@ package com.instancy.instancylearning.databaseutils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.InstrumentationInfo;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -12938,6 +12939,80 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return notificationModelList;
+    }
+
+    public boolean  isContentIDExistsInMyLearning(String contentID) {
+
+        boolean isAlreadyExists = false;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String executedStr = "SELECT contentid FROM " + TBL_DOWNLOADDATA + " WHERE siteid = " + appUserModel.getSiteIDValue() + " and contentid = '" + contentID + "'";
+
+        Log.d(TAG, "isContentIDExistsInMyLearning: " + executedStr);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(executedStr, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+
+                do {
+
+                    isAlreadyExists = true;
+
+                }while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("notificationModelList db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return isAlreadyExists;
+    }
+
+    public boolean  isContentIDExistsInCatalog(String contentID){
+
+        boolean isAlreadyExists = false;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String executedStr = "SELECT contentid FROM " + TBL_CATALOGDATA + " WHERE siteid = " + appUserModel.getSiteIDValue() + " and contentid = '" + contentID+ "'";
+
+        Log.d(TAG, "isContentIDExistsInCatalog: " + executedStr);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(executedStr, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+
+                do {
+
+                    isAlreadyExists = true;
+
+                }while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("notificationModelList db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return isAlreadyExists;
     }
 
 

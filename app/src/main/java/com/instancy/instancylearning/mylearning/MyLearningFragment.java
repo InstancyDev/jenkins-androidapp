@@ -150,18 +150,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
+
         if (isViewed.equalsIgnoreCase("true")) {
             appcontroller.setAlreadyViewd(true);
         } else {
             appcontroller.setAlreadyViewd(false);
         }
         vollyService = new VollyService(resultCallback, context);
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
         sideMenusModel = null;
         webAPIClient = new WebAPIClient(context);
         HashMap<String, String> responMap = null;
@@ -335,6 +331,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //            myLearninglistView.setVisibility(View.GONE);
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
+
         triggerActionForFirstItem();
     }
 
@@ -354,6 +351,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
 
+        }else {
+
+            myLearninglistView.setSelection(20);
         }
 
     }

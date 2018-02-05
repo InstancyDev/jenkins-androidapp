@@ -253,7 +253,7 @@ public class HomeCategories_Fragment extends Fragment {
                     String indexed = homeMenuList.get(position).getContextMenuId();
                     ((SideMenu) getActivity()).selectItem(Integer.parseInt(indexed), homeMenuList.get(position));
                 }
-
+//
             }
         }));
     }

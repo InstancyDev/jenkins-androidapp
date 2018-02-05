@@ -80,7 +80,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     public String TAG = SideMenu.class.getSimpleName();
 
-    private List<SideMenusModel> sideMenusModel;
+    private List<SideMenusModel> sideMenumodelList;
     DatabaseHandler db;
 
     @BindView(R.id.expanded_menu_drawer)
@@ -187,7 +187,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void onClick(View v) {
                 //logo clicked
-                homeControllClicked();
+                homeControllClicked(false, 0);
 
 
             }
@@ -239,12 +239,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         txtAddress.setText(upperCaseWords(strAry[1]));
 
-        sideMenusModel = db.getNativeMainMenusData();
+        sideMenumodelList = db.getNativeMainMenusData();
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
         int i = 0;
-        for (SideMenusModel menu : sideMenusModel) {
+        for (SideMenusModel menu : sideMenumodelList) {
             int parentMenuId = menu.getMenuId();
             subMenuList = db.getNativeSubMenusData(parentMenuId);
             if (subMenuList != null && subMenuList.size() > 0) {
@@ -264,30 +264,30 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             i++;
         }
 
-        if (sideMenusModel != null) {
+        if (sideMenumodelList != null) {
             menuDynamicAdapter = new MenuDrawerDynamicAdapter(
-                    getApplicationContext(), hmSubMenuList, sideMenusModel);
+                    getApplicationContext(), hmSubMenuList, sideMenumodelList);
 
             SideMenusModel model = new SideMenusModel();
             if (savedInstanceState == null) {
                 String indexed = "0";
-                for (int j = 0; j < sideMenusModel.size(); j++) {
+                for (int j = 0; j < sideMenumodelList.size(); j++) {
 
-                    if (sideMenusModel.get(j).getDisplayOrder() == 1) {
-                        indexed = sideMenusModel.get(j).getContextMenuId();
-                        model = sideMenusModel.get(j);
+                    if (sideMenumodelList.get(j).getDisplayOrder() == 1) {
+                        indexed = sideMenumodelList.get(j).getContextMenuId();
+                        model = sideMenumodelList.get(j);
 
                     } else {
 
-                        indexed = sideMenusModel.get(0).getContextMenuId();
-                        model = sideMenusModel.get(0);
+                        indexed = sideMenumodelList.get(0).getContextMenuId();
+                        model = sideMenumodelList.get(0);
 
                     }
 
                 }
 
                 // on first time to display view for first navigation item based on the number
-                selectItem(Integer.parseInt(indexed), model); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(Integer.parseInt(indexed), model,false); // 2 is your fragment's number for "CollectionFragment"
                 homeModel = model;
                 homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
@@ -313,9 +313,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 //                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
-                    int logoutPos = sideMenusModel.size() - 1;
+                    int logoutPos = sideMenumodelList.size() - 1;
 
-//                    String filterCondition = sideMenusModel.get(groupPosition).getConditions();
+//                    String filterCondition = sideMenumodelList.get(groupPosition).getConditions();
                     if (logoutPos == groupPosition) {
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -327,17 +327,17 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     } else {
                         if (lastClicked != groupPosition) {
 
-                            if (sideMenusModel != null && hmSubMenuList != null) {
-                                if (hmSubMenuList.containsKey(sideMenusModel.get(groupPosition).getMenuId())) {
+                            if (sideMenumodelList != null && hmSubMenuList != null) {
+                                if (hmSubMenuList.containsKey(sideMenumodelList.get(groupPosition).getMenuId())) {
                                     return false;
                                 } else {
 
                                     try {
-                                        selectItem(Integer.parseInt(sideMenusModel.get(groupPosition).getContextMenuId()), sideMenusModel.get(groupPosition));
+                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition),false);
 
                                     } catch (NumberFormatException numEx) {
                                         numEx.printStackTrace();
-                                        selectItem(1, sideMenusModel.get(groupPosition));
+                                        selectItem(1, sideMenumodelList.get(groupPosition),false);
                                     }
                                 }
                             }
@@ -372,11 +372,30 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         signalAService.startSignalA();
     }
 
-    public void homeControllClicked() {
+    public void homeControllClicked(boolean isFromNotification, int menuId) {
 
-        selectItem(homeIndex, homeModel);
+        if (!isFromNotification)
+            selectItem(homeIndex, homeModel,false);
+        else {
+            selectItem(menuId, getMenuModelForNotification(menuId),true);
+        }
+
         navDrawerExpandableView.expandGroup(0);
         lastClicked = 0;
+    }
+
+    public SideMenusModel getMenuModelForNotification(int menuId) {
+        SideMenusModel sideMenusModel = new SideMenusModel();
+
+        for (int i = 0; i < sideMenumodelList.size(); i++) {
+
+            if (sideMenumodelList.get(i).getContextMenuId().equalsIgnoreCase("" + menuId)) {
+                sideMenusModel = sideMenumodelList.get(i);
+            }
+
+        }
+
+        return sideMenusModel;
     }
 
     private Bitmap createBitmapFromView(Context context, View view) {
@@ -395,9 +414,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         return bitmap;
     }
 
-    public void selectItem(int menuid, SideMenusModel sideMenusModel) {
+    public void selectItem(int menuid, SideMenusModel sideMenusModel,boolean isFromNotification) {
 
-        Fragment fragment = null;
+        Fragment fragment = null; //
 
         switch (menuid) {
             case 1:
@@ -450,6 +469,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             if (menuid != 99) {
                 bundle.putSerializable("sidemenumodel", sideMenusModel);
                 bundle.putBoolean("ISFROMCATEGORIES", false);
+                bundle.putBoolean("ISFROMNOTIFICATIONS", isFromNotification);
                 fragment.setArguments(bundle);
                 navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
                 navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
@@ -499,13 +519,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         if (!(MAIN_MENU_POSITION == groupPosition && SUB_MENU_POSITION == childPosition)) {
             MAIN_MENU_POSITION = groupPosition;
             SUB_MENU_POSITION = childPosition;
-            List<SideMenusModel> mList = hmSubMenuList.get(sideMenusModel.get(MAIN_MENU_POSITION).getMenuId());
+            List<SideMenusModel> mList = hmSubMenuList.get(sideMenumodelList.get(MAIN_MENU_POSITION).getMenuId());
             SideMenusModel m = mList.get(childPosition);
 
             if (m.getIsOfflineMenu().equals("true")) {
                 navDrawerExpandableView.setSelectedGroup(groupPosition);
                 navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-                selectItem(Integer.parseInt(m.getContextMenuId()), m);
+                selectItem(Integer.parseInt(m.getContextMenuId()), m,false);
             } else {
 
             }
@@ -531,13 +551,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-        sideMenusModel = new ArrayList<SideMenusModel>();
-        sideMenusModel = db.getNativeMainMenusData();
+        sideMenumodelList = new ArrayList<SideMenusModel>();
+        sideMenumodelList = db.getNativeMainMenusData();
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
         int i = 0;
-        for (SideMenusModel menu : sideMenusModel) {
+        for (SideMenusModel menu : sideMenumodelList) {
             int parentMenuId = menu.getMenuId();
             subMenuList = db.getNativeSubMenusData(parentMenuId);
             if (subMenuList != null && subMenuList.size() > 0) {
@@ -552,11 +572,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             i++;
         }
 
-        menuDynamicAdapter.refreshList(sideMenusModel, hmSubMenuList);
+        menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
 
         backLayout.setVisibility(View.GONE);
 
-        homeControllClicked();
+        homeControllClicked(false, 0);
     }
 
 
@@ -626,10 +646,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 backToMainSite();
                 break;
             case R.id.sendmessage_layout:
-                selectItem(99, sideMenusModel.get(0));
+                selectItem(99, sideMenumodelList.get(0),false);
                 break;
             case R.id.notification_layout:
-                selectItem(100, sideMenusModel.get(0));
+                selectItem(100, sideMenumodelList.get(0),false);
                 break;
         }
     }
@@ -675,13 +695,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-            sideMenusModel = new ArrayList<SideMenusModel>();
-            sideMenusModel = db.getNativeMainMenusData();
+            sideMenumodelList = new ArrayList<SideMenusModel>();
+            sideMenumodelList = db.getNativeMainMenusData();
 
             hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
             int i = 0;
-            for (SideMenusModel menu : sideMenusModel) {
+            for (SideMenusModel menu : sideMenumodelList) {
                 int parentMenuId = menu.getMenuId();
                 subMenuList = db.getNativeSubMenusData(parentMenuId);
                 if (subMenuList != null && subMenuList.size() > 0) {
@@ -696,7 +716,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 i++;
             }
 
-            menuDynamicAdapter.refreshList(sideMenusModel, hmSubMenuList);
+            menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
         } else {
             backLayout.setVisibility(View.GONE);
             subsiteLayout.setVisibility(View.GONE);
@@ -718,9 +738,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     public boolean respectiveMenuExistsOrNot(String contextMenuId) {
         boolean exists = false;
 
-        for (int i = 0; i < sideMenusModel.size(); i++) {
+        for (int i = 0; i < sideMenumodelList.size(); i++) {
 
-            if (contextMenuId.equalsIgnoreCase(sideMenusModel.get(i).contextMenuId)) {
+            if (contextMenuId.equalsIgnoreCase(sideMenumodelList.get(i).contextMenuId)) {
                 exists = true;
             }
 
