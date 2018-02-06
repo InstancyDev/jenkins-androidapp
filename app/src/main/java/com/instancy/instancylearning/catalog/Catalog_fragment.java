@@ -110,6 +110,7 @@ import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
@@ -162,6 +163,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     TextView nodata_Label;
 
     Communicator communicator;
+
+
+    boolean isFromNotification = false;
+
+    String contentIDFromNotification = "";
 
     public Catalog_fragment() {
 
@@ -216,6 +222,15 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
+
+
+            isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
+
+            if (isFromNotification) {
+
+                contentIDFromNotification = bundle.getString("CONTENTID");
+            }
+
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
 
             isFromCatogories = bundle.getBoolean("ISFROMCATEGORIES");
@@ -424,7 +439,38 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             catalogAdapter.refreshList(catalogModelsList);
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
+
+        triggerActionForFirstItem();
     }
+
+    public void triggerActionForFirstItem() {
+
+        if (isFromNotification) {
+            int selectedPostion = getPositionForNotification(contentIDFromNotification);
+            myLearninglistView.setSelection(selectedPostion);
+            Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
+            intentDetail.putExtra("IFROMCATALOG", true);
+            intentDetail.putExtra("myLearningDetalData", catalogModelsList.get(selectedPostion));
+            startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+            isFromNotification = false;
+        }
+
+    }
+
+    public int getPositionForNotification(String contentID) {
+        int position = 0;
+
+        for (int k = 0; k < catalogModelsList.size(); k++) {
+            if (catalogModelsList.get(k).getContentID().equalsIgnoreCase(contentID)) {
+                position = k;
+                break;
+            }
+
+        }
+
+        return position;
+    }
+
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();

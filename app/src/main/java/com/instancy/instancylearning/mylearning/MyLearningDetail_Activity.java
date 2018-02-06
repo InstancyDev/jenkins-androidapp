@@ -1066,7 +1066,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 if (isInApp) {
                     inAppActivityCall(myLearningDetalData);
                 } else {
-                    addToMyLearning(myLearningDetalData, true);
+                    addToMyLearning(myLearningDetalData, false);
                 }
 
             }
@@ -1088,17 +1088,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 String requestURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileAddtoMyCatalog?"
                         + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
                         + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
-
                 requestURL = requestURL.replaceAll(" ", "%20");
                 Log.d(TAG, "inside catalog login : " + requestURL);
-
                 StringRequest strReq = new StringRequest(Request.Method.GET,
                         requestURL, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
-
                             getMobileGetMobileContentMetaData(myLearningDetalData, isJoinedCommunity);
                             myLearningModel.setAddedToMylearning(1);
                             refreshCatalogContent = true;
@@ -1108,9 +1105,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                     Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
-
                         }
-
                     }
                 }, new Response.ErrorListener() {
 
@@ -1204,7 +1199,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                             addToMyLearning(learningModel, true);
                                         } else {
 
-
                                             inAppActivityCall(learningModel);
                                         }
                                     }
@@ -1261,20 +1255,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                     txtBtnView.setText("View");
                                     txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
                                     refreshCatalogContent = true;
-//                                    Toast toast = Toast.makeText(
-//                                            MyLearningDetail_Activity.this,
-//                                            MyLearningDetail_Activity.this.getString(R.string.cat_add_success),
-//                                            Toast.LENGTH_SHORT);
-//                                    toast.setGravity(Gravity.CENTER, 0, 0);
-//                                    toast.show();
 
-                                    if (!isFromCatalog) {
+                                    if (isFromCatalog) {
 
                                         String succesMessage = "Content Added to My Learning";
                                         if (isJoinedCommunity) {
                                             succesMessage = "This content item has been added to My Learning page. You have successfully joined the Learning Community: " + learningModel.getSiteName();
                                         }
-
                                         final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
                                         builder.setMessage(succesMessage)
                                                 .setCancelable(false)

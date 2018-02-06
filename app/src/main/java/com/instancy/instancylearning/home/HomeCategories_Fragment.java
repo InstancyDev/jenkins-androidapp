@@ -251,7 +251,7 @@ public class HomeCategories_Fragment extends Fragment {
 
                 } else {
                     String indexed = homeMenuList.get(position).getContextMenuId();
-                    ((SideMenu) getActivity()).selectItem(Integer.parseInt(indexed), homeMenuList.get(position));
+                    ((SideMenu) getActivity()).selectItem(Integer.parseInt(indexed), homeMenuList.get(position),false,"");
                 }
 //
             }

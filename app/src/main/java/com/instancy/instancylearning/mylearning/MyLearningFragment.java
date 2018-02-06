@@ -133,6 +133,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
 
+    boolean isFromNotification = false;
+
+    String contentIDFromNotification = "";
+
     public MyLearningFragment() {
 
     }
@@ -164,6 +168,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
+            isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
+
+            if (isFromNotification) {
+
+                contentIDFromNotification = bundle.getString("CONTENTID");
+            }
+
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
         }
         if (responMap != null && responMap.containsKey("showconsolidatedlearning")) {
@@ -197,9 +208,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         Log.d(TAG, "onCreate: ");
 
         setHasOptionsMenu(true);
-
     }
-
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
@@ -351,11 +360,32 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
 
-        }else {
+        } else {
+            if (isFromNotification) {
+                int selectedPostion=getPositionForNotification(contentIDFromNotification);
+                myLearninglistView.setSelection(selectedPostion);
 
-            myLearninglistView.setSelection(20);
+                Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
+                intentDetail.putExtra("IFROMCATALOG", false);
+                intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
+                startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                isFromNotification=false;
+            }
+        }
+    }
+
+    public int getPositionForNotification(String contentID) {
+        int position = 0;
+
+        for (int k = 0; k < myLearningModelsList.size(); k++) {
+            if (myLearningModelsList.get(k).getContentID().equalsIgnoreCase(contentID)) {
+                position = k;
+                break;
+            }
+
         }
 
+        return position;
     }
 
     @Override

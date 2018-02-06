@@ -1,11 +1,10 @@
-package com.instancy.instancylearning.notifications;
+package com.instancy.instancylearning.askexpert;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -26,7 +25,6 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
@@ -59,13 +57,11 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
-import com.instancy.instancylearning.models.NotificationEnumModel;
-import com.instancy.instancylearning.models.NotificationModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -84,7 +80,6 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.returnDateIfNotToday;
 
 
 /**
@@ -92,9 +87,9 @@ import static com.instancy.instancylearning.utils.Utilities.returnDateIfNotToday
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class Notifications_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
-    String TAG = Notifications_fragment.class.getSimpleName();
+    String TAG = AskExpertFragment.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
@@ -102,13 +97,11 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
     DatabaseHandler db;
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.discussionfourmlist)
+    ListView askexpertListView;
 
-    @BindView(R.id.notificationlist)
-    ListView discussionFourmlistView;
-
-    NotificationAdapter notificationAdapter;
-
-    List<NotificationModel> notificationModelList = null;
+    AskExpertAdapter askExpertAdapter;
+    List<AskExpertQuestionModel> askExpertQuestionModelList = null;
 
     PreferencesManager preferencesManager;
     Context context;
@@ -120,11 +113,15 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
+    @Nullable
+    @BindView(R.id.fab_fourm_button)
+    FloatingActionButton floatingActionButton;
+
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
-    public Notifications_fragment() {
+    public AskExpertFragment() {
 
 
     }
@@ -154,7 +151,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         if (!isRefreshed) {
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
-        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
+
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQandA?userid="+appUserModel.getUserIDValue()+"&SiteID=" + appUserModel.getSiteIDValue()+ "&QuestionID=0&QuestionTypeID=1&SkillID=-1&RecordCount=0&SearchText=" ;
+
+        vollyService.getJsonObjResponseVolley("ASKQS", parmStringUrl, appUserModel.getAuthHeaders());
 
     }
 
@@ -165,10 +165,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("NOTIFICATIODATA")) {
+                if (requestType.equalsIgnoreCase("ASKQS")) {
                     if (response != null) {
                         try {
-                            db.injectNotifications(response);
+                            db.injectAsktheExpertQuestionDataTable(response);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -215,18 +215,17 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.notification_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.discussionfourm_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        notificationAdapter = new NotificationAdapter(getActivity(), BIND_ABOVE_CLIENT, notificationModelList);
-        discussionFourmlistView.setAdapter(notificationAdapter);
-        discussionFourmlistView.setOnItemClickListener(this);
-        discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+        askExpertAdapter = new AskExpertAdapter(getActivity(), BIND_ABOVE_CLIENT, askExpertQuestionModelList);
+        askexpertListView.setAdapter(askExpertAdapter);
+        askexpertListView.setOnItemClickListener(this);
+        askexpertListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        notificationModelList = new ArrayList<NotificationModel>();
-
+        askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
@@ -240,19 +239,32 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
 
+        floatingActionButton.setImageDrawable(d);
+
+//        floatingActionButton.(getResources().getColor(R.color.colorWhite));
+        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
+                intentDetail.putExtra("isfromedit", false);
+                intentDetail.putExtra("forumModel", "");
+                startActivity(intentDetail);
+            }
+        });
 
         return rootView;
     }
 
-
     public void injectFromDbtoModel() {
-        notificationModelList = db.fetchNotificationModel(appUserModel.getSiteIDValue());
-        if (notificationModelList != null) {
-            notificationAdapter.refreshList(notificationModelList);
-        } else {
-            notificationModelList = new ArrayList<NotificationModel>();
-            notificationAdapter.refreshList(notificationModelList);
-        }
+//        askExpertQuestionModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
+//        if (askExpertQuestionModelList != null) {
+//            askExpertAdapter.refreshList(askExpertQuestionModelList);
+//        } else {
+//            askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
+//            askExpertAdapter.refreshList(askExpertQuestionModelList);
+//        }
 
     }
 
@@ -262,7 +274,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Notifications" + "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -302,7 +314,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-                    notificationAdapter.filter(newText.toLowerCase(Locale.getDefault()));
+                    askExpertAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
                     return true;
                 }
@@ -345,6 +357,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                     toolbar.setVisibility(View.VISIBLE);
                 item_search.expandActionView();
                 break;
+            case R.id.mylearning_info_help:
+
+                break;
             case R.id.mylearning_filter:
                 break;
 
@@ -371,9 +386,17 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
         switch (view.getId()) {
             case R.id.card_view:
-                requiredFunctionalityForTheSelectedCell(notificationModelList.get(position));
+//                attachFragment(askExpertQuestionModelList.get(position));
                 break;
+            case R.id.btn_contextmenu:
+                View v = askexpertListView.getChildAt(position - askexpertListView.getFirstVisiblePosition());
+                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+                catalogContextMenuMethod(position, view, txtBtnDownload, askExpertQuestionModelList.get(position));
+                break;
+            default:
+
         }
+
     }
 
     @Override
@@ -381,82 +404,6 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
 
-    }
-
-    //
-    public void requiredFunctionalityForTheSelectedCell(NotificationModel notificationModel) {
-
-        NotificationEnumModel notificationEnumModel = new NotificationEnumModel();
-
-        if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.equalsIgnoreCase("null")) {
-            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setMessage(notificationModel.message).setTitle(notificationModel.notificationtitle)
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //do things
-                            dialog.dismiss();
-
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
-        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.length() > 4) {
-
-            boolean myLearningExists = myLearningAction(notificationModel.contentid);
-            boolean myCatalogExists = false;
-            if (!myLearningExists)
-                myCatalogExists = myCatalogAction(notificationModel.contentid);
-
-            if (myLearningExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 1,notificationModel.contentid);
-            } else if (myCatalogExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 2,notificationModel.contentid);
-            } else {
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(notificationModel.message).setTitle(notificationModel.notificationtitle)
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                //do things
-                                dialog.dismiss();
-
-                            }
-                        });
-                AlertDialog alert = builder.create();
-                alert.show();
-
-            }
-        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
-
-            ((SideMenu) getActivity()).homeControllClicked(true, 4,"");
-        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
-
-            ((SideMenu) getActivity()).homeControllClicked(true, 10,"");
-
-
-        }
-
-    }
-
-
-    public boolean myLearningAction(String contentID) {
-        boolean isMyLearningContetExists = false;
-        boolean isMyLearningMenuExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("1");
-        if (isMyLearningMenuExit) {
-            isMyLearningContetExists = db.isContentIDExistsInMyLearning(contentID);
-        }
-        return isMyLearningContetExists;
-    }
-
-    public boolean myCatalogAction(String contentID) {
-        boolean isCatalogContentExists = false;
-        boolean isCatalogMenuExit = ((SideMenu) getActivity()).respectiveMenuExistsOrNot("2");
-        if (isCatalogMenuExit) {
-            isCatalogContentExists = db.isContentIDExistsInCatalog(contentID);
-        }
-        return isCatalogContentExists;
     }
 
 
@@ -494,6 +441,62 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         // start the animation
         anim.start();
 
+    }
+
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, AskExpertQuestionModel discussionForumModel) {
+
+        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.discussonforum, popup.getMenu());
+        //registering popup with OnMenuItemClickListene
+
+        Menu menu = popup.getMenu();
+
+        menu.getItem(0).setVisible(true);//view
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
+                    Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
+                    intentDetail.putExtra("isfromedit", true);
+                    intentDetail.putExtra("forumModel", askExpertQuestionModelList.get(position));
+                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+
+                }
+                return true;
+            }
+        });
+        popup.show();//showing popup menu
+
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
+
+            if (data != null) {
+                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
+                if (refresh) {
+                    refreshCatalog(false);
+                }
+            }
+        }
+    }
+
+    public void attachFragment(DiscussionForumModel forumModel) {
+        Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
+        intentDetail.putExtra("forumModel", forumModel);
+        ((Activity) context).startActivity(intentDetail);
+    }
+
+    @Override
+    public void onDetach() {
+
+        super.onDetach();
     }
 
 }

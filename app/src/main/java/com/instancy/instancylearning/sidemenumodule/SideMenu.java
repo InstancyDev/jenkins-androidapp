@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
+import com.instancy.instancylearning.askexpert.AskExpertFragment;
 import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
@@ -187,7 +188,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void onClick(View v) {
                 //logo clicked
-                homeControllClicked(false, 0);
+                homeControllClicked(false, 0, "");
 
 
             }
@@ -287,7 +288,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
 
                 // on first time to display view for first navigation item based on the number
-                selectItem(Integer.parseInt(indexed), model,false); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(Integer.parseInt(indexed), model, false,""); // 2 is your fragment's number for "CollectionFragment"
                 homeModel = model;
                 homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
@@ -333,11 +334,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                     try {
-                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition),false);
+                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false,"");
 
                                     } catch (NumberFormatException numEx) {
                                         numEx.printStackTrace();
-                                        selectItem(1, sideMenumodelList.get(groupPosition),false);
+                                        selectItem(1, sideMenumodelList.get(groupPosition), false,"");
                                     }
                                 }
                             }
@@ -372,12 +373,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         signalAService.startSignalA();
     }
 
-    public void homeControllClicked(boolean isFromNotification, int menuId) {
+    public void homeControllClicked(boolean isFromNotification, int menuId, String contentID) {
 
         if (!isFromNotification)
-            selectItem(homeIndex, homeModel,false);
+            selectItem(homeIndex, homeModel, false,contentID);
         else {
-            selectItem(menuId, getMenuModelForNotification(menuId),true);
+            selectItem(menuId, getMenuModelForNotification(menuId), true,contentID);
         }
 
         navDrawerExpandableView.expandGroup(0);
@@ -414,7 +415,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         return bitmap;
     }
 
-    public void selectItem(int menuid, SideMenusModel sideMenusModel,boolean isFromNotification) {
+    public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID) {
 
         Fragment fragment = null; //
 
@@ -444,6 +445,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             case 4:
                 fragment = new DiscussionFourm_fragment();
                 break;
+            case 5:
+                fragment = new AskExpertFragment();
+                break;
             case 9:
                 fragment = new LearningCommunities_fragment();
                 break;
@@ -470,6 +474,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 bundle.putSerializable("sidemenumodel", sideMenusModel);
                 bundle.putBoolean("ISFROMCATEGORIES", false);
                 bundle.putBoolean("ISFROMNOTIFICATIONS", isFromNotification);
+                bundle.putString("CONTENTID", contentID);
                 fragment.setArguments(bundle);
                 navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
                 navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
@@ -525,7 +530,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             if (m.getIsOfflineMenu().equals("true")) {
                 navDrawerExpandableView.setSelectedGroup(groupPosition);
                 navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-                selectItem(Integer.parseInt(m.getContextMenuId()), m,false);
+                selectItem(Integer.parseInt(m.getContextMenuId()), m, false,"");
             } else {
 
             }
@@ -576,7 +581,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         backLayout.setVisibility(View.GONE);
 
-        homeControllClicked(false, 0);
+        homeControllClicked(false, 0, "");
     }
 
 
@@ -646,10 +651,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 backToMainSite();
                 break;
             case R.id.sendmessage_layout:
-                selectItem(99, sideMenumodelList.get(0),false);
+                selectItem(99, sideMenumodelList.get(0), false,"");
                 break;
             case R.id.notification_layout:
-                selectItem(100, sideMenumodelList.get(0),false);
+                selectItem(100, sideMenumodelList.get(0), false,"");
                 break;
         }
     }

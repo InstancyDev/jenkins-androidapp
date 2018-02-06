@@ -23,6 +23,8 @@ import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.AskExpertAnswerModel;
+import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
 import com.instancy.instancylearning.models.CommunitiesModel;
@@ -460,21 +462,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_USERPRIVILEGES
                 + "(userid TEXT,privilegeid TEXT,componentid TEXT,parentprivilegeid TEXT, objecttypeid TEXT, roleid TEXT,siteid TEXT, siteurl TEXT, PRIMARY KEY(userid, privilegeid, roleid, siteurl))");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_ASKQUESTIONS
-                + "(questionid INTEGER, userid TEXT, username TEXT, userquestion TEXT, posteddate TEXT, createddate TEXT, answers TEXT, questioncategories TEXT, siteid TEXT,siteurl TEXT, PRIMARY KEY(questionid, userid, siteurl))");
-        db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_ASKRESPONSES
-                + "(questionid INTEGER, response TEXT, respondeduserid TEXT, respondedusername TEXT, respondeddate TEXT, responsedate TEXT, responseid INTEGER, siteid TEXT,siteurl TEXT, PRIMARY KEY(questionid, responseid, siteurl))");
-        db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_ASKQUESTIONCATEGORIES
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, categoryid INTEGER, category TEXT, siteid TEXT)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_ASKQUESTIONCATEGORYMAPPING
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, categoryid INTEGER, siteid TEXT)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_ASKQUESTIONSKILLS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, orgunitid TEXT, preferrenceid INTEGER, preferrencetitle TEXT, shortskillname TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONS +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, userid TEXT, username TEXT, userquestion TEXT, posteddate TEXT, createddate TEXT, answers TEXT, questioncategories TEXT, siteid TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKRESPONSES + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, responseid TEXT, response TEXT, respondeduserid TEXT, respondedusername, respondeddate TEXT, responsedate TEXT, siteid TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONSKILLS + " (ID INTEGER PRIMARY KEY AUTOINCREMENT,orgunitid TEXT, preferrenceid TEXT, preferrencetitle TEXT, shortskillname, siteid TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONCATEGORIES + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, categoryid TEXT, category TEXT, siteid TEXT)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+TBL_ASKQUESTIONCATEGORYMAPPING + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, categoryid TEXT, siteid TEXT)");
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATEGORIES
@@ -1503,7 +1502,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
 //
 ////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8")|| contextMenuID.equalsIgnoreCase("5")))
                         continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
@@ -13014,6 +13013,197 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return isAlreadyExists;
     }
+
+
+    // ask experts tables
+
+    public void injectAsktheExpertQuestionDataTable(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_ASKQUESTIONS);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
+
+            //questionid
+            if (jsonMyLearningColumnObj.has("questionid")) {
+
+                askExpertQuestionModel.questionID = jsonMyLearningColumnObj.getInt("questionid");
+            }
+            // username
+            if (jsonMyLearningColumnObj.has("username")) {
+
+                askExpertQuestionModel.username = jsonMyLearningColumnObj.get("username").toString();
+
+            }
+            // userquestion
+            if (jsonMyLearningColumnObj.has("userquestion")) {
+
+                askExpertQuestionModel.userQuestion = jsonMyLearningColumnObj.get("userquestion").toString();
+
+            }
+            // answers
+            if (jsonMyLearningColumnObj.has("answers")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("answers").toString());
+
+                askExpertQuestionModel.answers  = result.toString();
+
+            }
+            // questioncategories
+
+            if (jsonMyLearningColumnObj.has("questioncategories")) {
+
+                askExpertQuestionModel.questionCategories = jsonMyLearningColumnObj.get("questioncategories").toString();
+            }
+            // publishedDate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                askExpertQuestionModel.createdDate = formattedDate;
+            }
+
+            // posteddate
+            if (jsonMyLearningColumnObj.has("posteddate")) {
+
+                askExpertQuestionModel.postedDate = jsonMyLearningColumnObj.get("posteddate").toString();
+
+            }
+
+            askExpertQuestionModel.userID=appUserModel.getUserIDValue();
+            askExpertQuestionModel.siteID=appUserModel.getSiteIDValue();
+
+            injectAsktheExpertQuestionDataIntoSqLite(askExpertQuestionModel);
+        }
+
+    }
+
+
+    public void injectAsktheExpertQuestionDataIntoSqLite(AskExpertQuestionModel askExpertQuestionModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("questionid", askExpertQuestionModel.questionID);
+            contentValues.put("userid", askExpertQuestionModel.userID);
+            contentValues.put("username", askExpertQuestionModel.username);
+            contentValues.put("userquestion", askExpertQuestionModel.userQuestion);
+            contentValues.put("posteddate", askExpertQuestionModel.postedDate);
+            contentValues.put("createddate", askExpertQuestionModel.createdDate);
+            contentValues.put("answers", askExpertQuestionModel.answers);
+            contentValues.put("questioncategories", askExpertQuestionModel.questionCategories);
+            contentValues.put("siteid", askExpertQuestionModel.siteID);
+
+            db.insert(TBL_ASKQUESTIONS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+// ask expert answers
+
+    // ask experts tables
+
+    public void injectAsktheExpertAnswersDataTable(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_ASKQUESTIONS);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            AskExpertAnswerModel askExpertQuestionModel = new AskExpertAnswerModel();
+
+            //questionid
+            if (jsonMyLearningColumnObj.has("questionid")) {
+
+                askExpertQuestionModel.questionID = jsonMyLearningColumnObj.getInt("questionid");
+            }
+            // response
+            if (jsonMyLearningColumnObj.has("response")) {
+
+                askExpertQuestionModel.response = jsonMyLearningColumnObj.get("response").toString();
+
+            }
+            // responseid
+            if (jsonMyLearningColumnObj.has("responseid")) {
+
+                askExpertQuestionModel.responseid = jsonMyLearningColumnObj.get("responseid").toString();
+
+            }
+            // respondeduserid
+            if (jsonMyLearningColumnObj.has("respondeduserid")) {
+
+                askExpertQuestionModel.respondeduserid = jsonMyLearningColumnObj.get("respondeduserid").toString();
+
+            }
+
+            // respondedusername
+            if (jsonMyLearningColumnObj.has("respondedusername")) {
+
+                askExpertQuestionModel.respondedusername = jsonMyLearningColumnObj.get("respondedusername").toString();
+            }
+            // respondeddate
+            if (jsonMyLearningColumnObj.has("respondeddate")) {
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("respondeddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                askExpertQuestionModel.respondeddate = formattedDate;
+            }
+
+            // posteddate
+            if (jsonMyLearningColumnObj.has("posteddate")) {
+
+                askExpertQuestionModel.postedDate = jsonMyLearningColumnObj.get("posteddate").toString();
+
+            }
+
+            askExpertQuestionModel.userID=appUserModel.getUserIDValue();
+            askExpertQuestionModel.siteID=appUserModel.getSiteIDValue();
+
+            injectAsktheExpertAnswersDataIntoSqLite(askExpertQuestionModel);
+        }
+
+    }
+
+
+    public void injectAsktheExpertAnswersDataIntoSqLite(AskExpertQuestionModel askExpertQuestionModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("questionid", askExpertQuestionModel.questionID);
+            contentValues.put("userid", askExpertQuestionModel.userID);
+            contentValues.put("username", askExpertQuestionModel.username);
+            contentValues.put("userquestion", askExpertQuestionModel.userQuestion);
+            contentValues.put("posteddate", askExpertQuestionModel.postedDate);
+            contentValues.put("createddate", askExpertQuestionModel.createdDate);
+            contentValues.put("answers", askExpertQuestionModel.answers);
+            contentValues.put("questioncategories", askExpertQuestionModel.questionCategories);
+            contentValues.put("siteid", askExpertQuestionModel.siteID);
+
+            db.insert(TBL_ASKQUESTIONS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+
 
 
     // uncomment for pagenotes

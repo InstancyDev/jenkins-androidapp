@@ -1,9 +1,8 @@
-package com.instancy.instancylearning.notifications;
+package com.instancy.instancylearning.askexpert;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -21,10 +20,9 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
-import com.instancy.instancylearning.models.NotificationModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
@@ -41,25 +39,27 @@ import butterknife.OnClick;
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
  */
 
-public class NotificationAdapter extends BaseAdapter {
+public class AskExpertAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<NotificationModel> notificationModelList = null;
+    private List<AskExpertQuestionModel> discussionForumModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
     PreferencesManager preferencesManager;
-    private String TAG = NotificationAdapter.class.getSimpleName();
+    private String TAG = AskExpertAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<NotificationModel> searchList;
+    private List<AskExpertQuestionModel> searchList;
+    AppController appcontroller;
 
-    public NotificationAdapter(Activity activity, int resource, List<NotificationModel> notificationModelList) {
+
+    public AskExpertAdapter(Activity activity, int resource, List<AskExpertQuestionModel> discussionForumModelList) {
         this.activity = activity;
-        this.notificationModelList = notificationModelList;
-        this.searchList = new ArrayList<NotificationModel>();
+        this.discussionForumModelList = discussionForumModelList;
+        this.searchList = new ArrayList<AskExpertQuestionModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -69,23 +69,25 @@ public class NotificationAdapter extends BaseAdapter {
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
 
+        appcontroller = AppController.getInstance();
+
     }
 
-    public void refreshList(List<NotificationModel> myLearningModel) {
-        this.notificationModelList = myLearningModel;
-        this.searchList = new ArrayList<NotificationModel>();
+    public void refreshList(List<AskExpertQuestionModel> myLearningModel) {
+        this.discussionForumModelList = myLearningModel;
+        this.searchList = new ArrayList<AskExpertQuestionModel>();
         this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return notificationModelList != null ? notificationModelList.size() : 0;
+        return discussionForumModelList != null ? discussionForumModelList.size() : 10;
     }
 
     @Override
     public Object getItem(int position) {
-        return notificationModelList.get(position);
+        return discussionForumModelList.get(position);
     }
 
     @Override
@@ -100,37 +102,36 @@ public class NotificationAdapter extends BaseAdapter {
         ViewHolder holder;
 
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.notificationcell, null);
+        convertView = inflater.inflate(R.layout.askexpertcell, null);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        if (notificationModelList.get(position).contentid.length() > 5) {
+//        holder.txtName.setText(discussionForumModelList.get(position).name);
+//        holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
+//        holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
+//        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
+//        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
+//        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
 
-            holder.txtTitle.setText(notificationModelList.get(position).contenttitle);
-            holder.txtDescription.setText(notificationModelList.get(position).message);
-
-        } else {
-
-            holder.txtTitle.setText(notificationModelList.get(position).notificationtitle);
-            holder.txtDescription.setText(notificationModelList.get(position).subject);
-        }
-
-        holder.txtDate.setText(notificationModelList.get(position).notificationstartdate);
+        holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAskedBy.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAskedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtNoAnswers.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         return convertView;
     }
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
-        notificationModelList.clear();
+        discussionForumModelList.clear();
         if (charText.length() == 0) {
-            notificationModelList.addAll(searchList);
+            discussionForumModelList.addAll(searchList);
         } else {
-            for (NotificationModel s : searchList) {
-                if (s.contenttitle.toLowerCase(Locale.getDefault()).contains(charText) || s.message.toLowerCase(Locale.getDefault()).contains(charText)  || s.notificationtitle.toLowerCase(Locale.getDefault()).contains(charText)  || s.subject.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    notificationModelList.add(s);
+            for (AskExpertQuestionModel s : searchList) {
+                if (s.userQuestion.toLowerCase(Locale.getDefault()).contains(charText) || s.username.toLowerCase(Locale.getDefault()).contains(charText)) {
+                    discussionForumModelList.add(s);
                 }
             }
         }
@@ -144,31 +145,36 @@ public class NotificationAdapter extends BaseAdapter {
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
-            Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
-            FontManager.markAsIconContainer(view.findViewById(R.id.txtBolt), iconFont);
+
         }
 
         @Nullable
-        @BindView(R.id.txtBolt)
-        TextView txtBolt;
+        @BindView(R.id.txt_question)
+        TextView txtQuestion;
 
         @Nullable
         @BindView(R.id.card_view)
         CardView card_view;
 
         @Nullable
-        @BindView(R.id.txtTitle)
-        TextView txtTitle;
+        @BindView(R.id.txt_askedby)
+        TextView txtAskedBy;
 
         @Nullable
-        @BindView(R.id.txtDescription)
-        TextView txtDescription;
+        @BindView(R.id.txt_askedon)
+        TextView txtAskedOn;
 
         @Nullable
-        @BindView(R.id.txtDate)
-        TextView txtDate;
+        @BindView(R.id.txtno_answers)
+        TextView txtNoAnswers;
 
-        @OnClick({R.id.card_view})
+
+        @Nullable
+        @BindView(R.id.btn_contextmenu)
+        ImageButton btnContextMenu;
+
+
+        @OnClick({R.id.btn_contextmenu, R.id.card_view})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);
