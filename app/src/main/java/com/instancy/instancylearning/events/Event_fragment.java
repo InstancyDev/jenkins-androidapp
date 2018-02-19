@@ -182,7 +182,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public Event_fragment() {
 
-
+// added new comment from github
     }
 
 
