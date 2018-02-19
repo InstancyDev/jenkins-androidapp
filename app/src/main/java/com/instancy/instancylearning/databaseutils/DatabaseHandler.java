@@ -25,6 +25,7 @@ import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
+import com.instancy.instancylearning.models.AskExpertSkillsModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
 import com.instancy.instancylearning.models.CommunitiesModel;
@@ -290,7 +291,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
             appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
             appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
-            appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+            appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
             appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
         } else {
             appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.SUB_KEY_WEBAPIURL));
@@ -298,7 +299,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.SUB_KEY_SITEID));
             appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.SUB_KEY_SITEURL));
             appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.SUB_KEY_AUTHENTICATION));
-            appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+            appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
             appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
 
 
@@ -463,7 +464,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + "(userid TEXT,privilegeid TEXT,componentid TEXT,parentprivilegeid TEXT, objecttypeid TEXT, roleid TEXT,siteid TEXT, siteurl TEXT, PRIMARY KEY(userid, privilegeid, roleid, siteurl))");
 
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONS +" (ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, userid TEXT, username TEXT, userquestion TEXT, posteddate TEXT, createddate TEXT, answers TEXT, questioncategories TEXT, siteid TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONS + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, userid TEXT, username TEXT, userquestion TEXT, posteddate TEXT, createddate TEXT, answers TEXT, questioncategories TEXT, siteid TEXT, posteduserid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKRESPONSES + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, responseid TEXT, response TEXT, respondeduserid TEXT, respondedusername, respondeddate TEXT, responsedate TEXT, siteid TEXT)");
 
@@ -472,7 +473,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONCATEGORIES + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, categoryid TEXT, category TEXT, siteid TEXT)");
 
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS "+TBL_ASKQUESTIONCATEGORYMAPPING + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, categoryid TEXT, siteid TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONCATEGORYMAPPING + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, categoryid TEXT, siteid TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -1480,29 +1481,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + ") THEN 1 ELSE 0 END AS issubmenuexists FROM "
                 + TBL_NATIVEMENUS
                 + " WHERE" +
-//                " siteurl= '"
-//                + appUserModel.getSiteURL()
-                " isenabled='true'"
+                " siteurl= '"
+                + appUserModel.getSiteURL() +
+                "' AND isenabled='true'"
                 + " AND siteid='" + appUserModel.getSiteIDValue() +
                 "' AND parentmenuid='0' ORDER BY displayorder";
 
-
         Log.d(TAG, "getNativeMainMenusData: strSelQuery " + strSelQuery);
-
         try {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
             menuList = new ArrayList<SideMenusModel>();
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-
                     String contextMenuID = cursor.getString(cursor
                             .getColumnIndex("contextmenuid"));
-
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
 //
 ////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8")|| contextMenuID.equalsIgnoreCase("5")))
+                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8") || contextMenuID.equalsIgnoreCase("5")))
                         continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
@@ -1649,11 +1646,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("parentmenuid")));
                     menu.setParameterStrings(cursor.getString(cursor
                             .getColumnIndex("parameterstrings")));
-                    if (!menu.getContextMenuId().equalsIgnoreCase("5")) {
-                        menuList.add(menu);
-                    }
 
-//                    menuList.add(menu);
+                    menuList.add(menu);
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -3145,7 +3139,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
             }
-
 
             // contentID
             if (jsonMyLearningColumnObj.has("contentid")) {
@@ -12765,9 +12758,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            notificationModel.siteid=appUserModel.getSiteIDValue();
-            notificationModel.userid=appUserModel.getUserIDValue();
-            notificationModel.siteurl=appUserModel.getSiteURL();
+            notificationModel.siteid = appUserModel.getSiteIDValue();
+            notificationModel.userid = appUserModel.getUserIDValue();
+            notificationModel.siteurl = appUserModel.getSiteURL();
 
             //
             injectNotificationDataIntoTable(notificationModel);
@@ -12873,7 +12866,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("notificationsubject"));
 
 
-                    notificationModel.notificationstartdate = cursor.getString(cursor
+                    notificationModel.notificationenddate = cursor.getString(cursor
                             .getColumnIndex("notificationstartdate"));
 
 
@@ -12881,13 +12874,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("notificationid"));
 
 
-                    notificationModel.notificationenddate = cursor.getString(cursor
+                    String dateWGot = cursor.getString(cursor
                             .getColumnIndex("notificationenddate"));
 
+                    String dateNew = formatDate(dateWGot, "yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd");
+
+                    notificationModel.notificationstartdate = dateNew;
 
                     notificationModel.message = cursor.getString(cursor
                             .getColumnIndex("message"));
-
 
                     notificationModel.membershipexpirydate = cursor.getString(cursor
                             .getColumnIndex("membershipexpirydate"));
@@ -12940,7 +12935,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return notificationModelList;
     }
 
-    public boolean  isContentIDExistsInMyLearning(String contentID) {
+    public boolean isContentIDExistsInMyLearning(String contentID) {
 
         boolean isAlreadyExists = false;
 
@@ -12959,7 +12954,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     isAlreadyExists = true;
 
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             db.close();
@@ -12977,13 +12972,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return isAlreadyExists;
     }
 
-    public boolean  isContentIDExistsInCatalog(String contentID){
+    public boolean isContentIDExistsInCatalog(String contentID) {
 
         boolean isAlreadyExists = false;
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String executedStr = "SELECT contentid FROM " + TBL_CATALOGDATA + " WHERE siteid = " + appUserModel.getSiteIDValue() + " and contentid = '" + contentID+ "'";
+        String executedStr = "SELECT contentid FROM " + TBL_CATALOGDATA + " WHERE siteid = " + appUserModel.getSiteIDValue() + " and contentid = '" + contentID + "'";
 
         Log.d(TAG, "isContentIDExistsInCatalog: " + executedStr);
         try {
@@ -12996,7 +12991,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     isAlreadyExists = true;
 
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             db.close();
@@ -13020,6 +13015,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void injectAsktheExpertQuestionDataTable(JSONObject jsonObject) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+
         // for deleting records in table for respective table
         ejectRecordsinTable(TBL_ASKQUESTIONS);
 
@@ -13051,7 +13047,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 Spanned result = fromHtml(jsonMyLearningColumnObj.get("answers").toString());
 
-                askExpertQuestionModel.answers  = result.toString();
+                askExpertQuestionModel.answers = result.toString();
 
             }
             // questioncategories
@@ -13075,8 +13071,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            askExpertQuestionModel.userID=appUserModel.getUserIDValue();
-            askExpertQuestionModel.siteID=appUserModel.getSiteIDValue();
+            // posteddate
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                askExpertQuestionModel.postedUserId = jsonMyLearningColumnObj.get("userid").toString();
+
+            }
+
+
+            askExpertQuestionModel.userID = appUserModel.getUserIDValue();
+            askExpertQuestionModel.siteID = appUserModel.getSiteIDValue();
 
             injectAsktheExpertQuestionDataIntoSqLite(askExpertQuestionModel);
         }
@@ -13100,6 +13104,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("answers", askExpertQuestionModel.answers);
             contentValues.put("questioncategories", askExpertQuestionModel.questionCategories);
             contentValues.put("siteid", askExpertQuestionModel.siteID);
+            contentValues.put("posteduserid", askExpertQuestionModel.postedUserId);
+
 
             db.insert(TBL_ASKQUESTIONS, null, contentValues);
         } catch (SQLiteException exception) {
@@ -13111,91 +13117,88 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 // ask expert answers
 
-    // ask experts tables
-
     public void injectAsktheExpertAnswersDataTable(JSONObject jsonObject) throws JSONException {
 
-        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table1");
         // for deleting records in table for respective table
-        ejectRecordsinTable(TBL_ASKQUESTIONS);
+        ejectRecordsinTable(TBL_ASKRESPONSES);
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
-            AskExpertAnswerModel askExpertQuestionModel = new AskExpertAnswerModel();
-
+            AskExpertAnswerModel askExpertAnswerModel = new AskExpertAnswerModel();
             //questionid
             if (jsonMyLearningColumnObj.has("questionid")) {
 
-                askExpertQuestionModel.questionID = jsonMyLearningColumnObj.getInt("questionid");
+                askExpertAnswerModel.questionID = jsonMyLearningColumnObj.getInt("questionid");
             }
             // response
             if (jsonMyLearningColumnObj.has("response")) {
 
-                askExpertQuestionModel.response = jsonMyLearningColumnObj.get("response").toString();
+                askExpertAnswerModel.response = jsonMyLearningColumnObj.get("response").toString();
 
             }
             // responseid
             if (jsonMyLearningColumnObj.has("responseid")) {
 
-                askExpertQuestionModel.responseid = jsonMyLearningColumnObj.get("responseid").toString();
+                askExpertAnswerModel.responseid = jsonMyLearningColumnObj.get("responseid").toString();
 
             }
             // respondeduserid
             if (jsonMyLearningColumnObj.has("respondeduserid")) {
 
-                askExpertQuestionModel.respondeduserid = jsonMyLearningColumnObj.get("respondeduserid").toString();
+                askExpertAnswerModel.respondeduserid = jsonMyLearningColumnObj.get("respondeduserid").toString();
 
             }
 
             // respondedusername
             if (jsonMyLearningColumnObj.has("respondedusername")) {
 
-                askExpertQuestionModel.respondedusername = jsonMyLearningColumnObj.get("respondedusername").toString();
+                askExpertAnswerModel.respondedusername = jsonMyLearningColumnObj.get("respondedusername").toString();
             }
             // respondeddate
             if (jsonMyLearningColumnObj.has("respondeddate")) {
 
-                String formattedDate = formatDate(jsonMyLearningColumnObj.get("respondeddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-                Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                askExpertQuestionModel.respondeddate = formattedDate;
+                askExpertAnswerModel.respondeddate = jsonMyLearningColumnObj.get("respondeddate").toString();
+
             }
 
             // posteddate
-            if (jsonMyLearningColumnObj.has("posteddate")) {
+            if (jsonMyLearningColumnObj.has("responsedate")) {
 
-                askExpertQuestionModel.postedDate = jsonMyLearningColumnObj.get("posteddate").toString();
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("responsedate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+//                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                askExpertAnswerModel.responsedate = formattedDate;
 
             }
 
-            askExpertQuestionModel.userID=appUserModel.getUserIDValue();
-            askExpertQuestionModel.siteID=appUserModel.getSiteIDValue();
+            askExpertAnswerModel.userID = appUserModel.getUserIDValue();
+            askExpertAnswerModel.siteID = appUserModel.getSiteIDValue();
 
-            injectAsktheExpertAnswersDataIntoSqLite(askExpertQuestionModel);
+            injectAsktheExpertAnswersDataIntoSqLite(askExpertAnswerModel);
         }
 
     }
 
 
-    public void injectAsktheExpertAnswersDataIntoSqLite(AskExpertQuestionModel askExpertQuestionModel) {
+    public void injectAsktheExpertAnswersDataIntoSqLite(AskExpertAnswerModel askExpertAnswerModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
         try {
 
             contentValues = new ContentValues();
 
-            contentValues.put("questionid", askExpertQuestionModel.questionID);
-            contentValues.put("userid", askExpertQuestionModel.userID);
-            contentValues.put("username", askExpertQuestionModel.username);
-            contentValues.put("userquestion", askExpertQuestionModel.userQuestion);
-            contentValues.put("posteddate", askExpertQuestionModel.postedDate);
-            contentValues.put("createddate", askExpertQuestionModel.createdDate);
-            contentValues.put("answers", askExpertQuestionModel.answers);
-            contentValues.put("questioncategories", askExpertQuestionModel.questionCategories);
-            contentValues.put("siteid", askExpertQuestionModel.siteID);
+            contentValues.put("questionid", askExpertAnswerModel.questionID);
+            contentValues.put("responseid", askExpertAnswerModel.responseid);
+            contentValues.put("response", askExpertAnswerModel.response);
+            contentValues.put("respondeduserid", askExpertAnswerModel.respondeduserid);
+            contentValues.put("respondedusername", askExpertAnswerModel.respondedusername);
+            contentValues.put("respondeddate", askExpertAnswerModel.respondeddate);
+            contentValues.put("responsedate", askExpertAnswerModel.responsedate);
 
-            db.insert(TBL_ASKQUESTIONS, null, contentValues);
+            contentValues.put("siteid", askExpertAnswerModel.siteID);
+
+            db.insert(TBL_ASKRESPONSES, null, contentValues);
         } catch (SQLiteException exception) {
 
             exception.printStackTrace();
@@ -13203,7 +13206,263 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    public List<AskExpertQuestionModel> fetchAskExpertModelList(String categoryID) {
+        List<AskExpertQuestionModel> askExpertQuestionModelList = null;
+        AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        String strSelQuerys = "";
+        if (categoryID.length() == 0) {
+            strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONS + " WHERE USERID = " + appUserModel.getUserIDValue() + " AND SITEID = " + appUserModel.getSiteIDValue() + " ORDER BY QUESTIONID DESC";
+        } else {
+            strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONS + " AQ LEFT OUTER JOIN " + TBL_ASKQUESTIONCATEGORYMAPPING + " AQC ON AQ.QUESTIONID = AQC.QUESTIONID WHERE AQ.USERID = ? AND AQ.SITEID = ? AND AQC.CATEGORYID = ? ORDER BY AQ.QUESTIONID DESC";
+        }
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
+                do {
+
+                    askExpertQuestionModel = new AskExpertQuestionModel();
+
+                    askExpertQuestionModel.questionID = cursor.getInt(cursor
+                            .getColumnIndex("questionid"));
+
+                    askExpertQuestionModel.userID = appUserModel.getUserIDValue();
+
+                    askExpertQuestionModel.username = cursor.getString(cursor
+                            .getColumnIndex("username"));
+
+                    askExpertQuestionModel.userQuestion = cursor.getString(cursor
+                            .getColumnIndex("userquestion"));
+
+                    askExpertQuestionModel.postedDate = cursor.getString(cursor
+                            .getColumnIndex("posteddate"));
+
+                    askExpertQuestionModel.createdDate = cursor.getString(cursor
+                            .getColumnIndex("createddate"));
+
+                    askExpertQuestionModel.answers = cursor.getString(cursor
+                            .getColumnIndex("answers"));
+
+                    askExpertQuestionModel.questionCategories = cursor.getString(cursor
+                            .getColumnIndex("questioncategories"));
+
+                    askExpertQuestionModel.postedUserId = cursor.getString(cursor
+                            .getColumnIndex("posteduserid"));
+
+                    askExpertQuestionModel.siteID = appUserModel.getSiteIDValue();
+
+
+                    askExpertQuestionModelList.add(askExpertQuestionModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return askExpertQuestionModelList;
+    }
+
+// fetch answers from localdb
+
+    public List<AskExpertAnswerModel> fetchAskExpertAnswersModelList(String questionID) {
+        List<AskExpertAnswerModel> askExpertAnswerModelList = null;
+        AskExpertAnswerModel askExpertAnswerModel = new AskExpertAnswerModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuerys = "";
+
+        strSelQuerys = "SELECT TA.*, UI.profileimagepath FROM " + TBL_ASKRESPONSES + " TA LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON TA.RESPONDEDUSERID = UI.USERID WHERE TA.QUESTIONID = " + questionID + " AND TA.SITEID = " + appUserModel.getSiteIDValue() + " ORDER BY TA.RESPONSEDATE DESC";
+
+        Log.d(TAG, "fetchAskExpertAnswersModelList: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
+                do {
+
+                    askExpertAnswerModel = new AskExpertAnswerModel();
+
+                    askExpertAnswerModel.questionID = cursor.getInt(cursor
+                            .getColumnIndex("questionid"));
+
+                    askExpertAnswerModel.userID = appUserModel.getUserIDValue();
+
+                    askExpertAnswerModel.responseid = cursor.getString(cursor
+                            .getColumnIndex("responseid"));
+
+                    askExpertAnswerModel.response = cursor.getString(cursor
+                            .getColumnIndex("response"));
+
+                    askExpertAnswerModel.respondeduserid = cursor.getString(cursor
+                            .getColumnIndex("respondeduserid"));
+
+                    askExpertAnswerModel.respondedusername = cursor.getString(cursor
+                            .getColumnIndex("respondedusername"));
+
+                    askExpertAnswerModel.respondeddate = cursor.getString(cursor
+                            .getColumnIndex("respondeddate"));
+
+                    askExpertAnswerModel.responsedate = cursor.getString(cursor
+                            .getColumnIndex("responsedate"));
+
+                    askExpertAnswerModel.imageData = cursor.getString(cursor
+                            .getColumnIndex("profileimagepath"));
+
+                    askExpertAnswerModel.siteID = appUserModel.getSiteIDValue();
+
+                    askExpertAnswerModelList.add(askExpertAnswerModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return askExpertAnswerModelList;
+    }
+
+
+// ask experts category skills
+
+    public void injectAsktheExpertCategoryDataTable(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("askskills");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_ASKQUESTIONSKILLS);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            AskExpertSkillsModel askExpertSkillsModel = new AskExpertSkillsModel();
+            //questionid
+            if (jsonMyLearningColumnObj.has("orgunitid")) {
+
+                askExpertSkillsModel.orgUnitID = jsonMyLearningColumnObj.getString("orgunitid");
+            }
+            // response
+            if (jsonMyLearningColumnObj.has("preferrenceid")) {
+
+                askExpertSkillsModel.preferrenceID = jsonMyLearningColumnObj.get("preferrenceid").toString();
+
+            }
+            // responseid
+            if (jsonMyLearningColumnObj.has("preferrencetitle")) {
+
+                askExpertSkillsModel.preferrenceTitle = jsonMyLearningColumnObj.get("preferrencetitle").toString();
+
+            }
+            // respondeduserid
+            if (jsonMyLearningColumnObj.has("shortskillname")) {
+
+                askExpertSkillsModel.shortSkillName = jsonMyLearningColumnObj.get("shortskillname").toString();
+
+            }
+
+            askExpertSkillsModel.siteID = appUserModel.getSiteIDValue();
+
+            injectAsktheExpertSkillsDataIntoSqLite(askExpertSkillsModel);
+        }
+
+    }
+
+
+    public void injectAsktheExpertSkillsDataIntoSqLite(AskExpertSkillsModel askExpertSkillsModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("orgunitid", askExpertSkillsModel.orgUnitID);
+            contentValues.put("preferrenceid", askExpertSkillsModel.preferrenceID);
+            contentValues.put("preferrencetitle", askExpertSkillsModel.preferrenceTitle);
+            contentValues.put("shortskillname", askExpertSkillsModel.shortSkillName);
+            contentValues.put("siteid", askExpertSkillsModel.siteID);
+
+            db.insert(TBL_ASKQUESTIONSKILLS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+    public List<AskExpertSkillsModel> fetchAskExpertSkillsModelList() {
+        List<AskExpertSkillsModel> askExpertQuestionModelList = null;
+        AskExpertSkillsModel askExpertSkillsModel = new AskExpertSkillsModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONSKILLS + " WHERE siteid  = " + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                askExpertQuestionModelList = new ArrayList<AskExpertSkillsModel>();
+                do {
+
+                    askExpertSkillsModel = new AskExpertSkillsModel();
+
+                    askExpertSkillsModel.orgUnitID = cursor.getString(cursor
+                            .getColumnIndex("orgunitid"));
+
+                    askExpertSkillsModel.preferrenceID = cursor.getString(cursor
+                            .getColumnIndex("preferrenceid"));
+
+                    askExpertSkillsModel.preferrenceTitle = cursor.getString(cursor
+                            .getColumnIndex("preferrencetitle"));
+
+                    askExpertSkillsModel.shortSkillName = cursor.getString(cursor
+                            .getColumnIndex("shortskillname"));
+
+                    askExpertSkillsModel.siteID = cursor.getString(cursor
+                            .getColumnIndex("siteid"));
+
+                    askExpertQuestionModelList.add(askExpertSkillsModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return askExpertQuestionModelList;
+    }
 
 
     // uncomment for pagenotes

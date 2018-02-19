@@ -11,6 +11,16 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 public class MyLearningModel implements Serializable {
 
 
+    public boolean isCompletedEvent() {
+        return completedEvent;
+    }
+
+    public void setCompletedEvent(boolean completedEvent) {
+        this.completedEvent = completedEvent;
+    }
+
+    boolean completedEvent=false;
+
     String progress = "";
     String userName = "";
     String siteID = "";

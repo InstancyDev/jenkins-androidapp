@@ -27,6 +27,8 @@ import com.instancy.instancylearning.utils.DateUtils;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -144,6 +146,18 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             Intent intent = new Intent(Intent.ACTION_VIEW,
                                     Uri.parse(attachment));
                             itemView.getContext().startActivity(intent);
+                        } else if (attachment.endsWith(".xlsx") || attachment.endsWith(".doc") || attachment.endsWith(".docx") || attachment.endsWith(".pptx")) {
+                            String encodedString = "";
+                            encodedString = attachment.replace(" ", "%20");
+
+//                            Intent intentSocial = new Intent(itemView.getContext(), SocialWebLoginsActivity.class);
+//                            intentSocial.putExtra("ATTACHMENT", true);
+//                            intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://docs.google.com/gview?embedded=true&url=" + encodedString);
+
+                            Intent intent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(encodedString));
+                            itemView.getContext().startActivity(intent);
+
                         } else {
                             Intent intentSocial = new Intent(itemView.getContext(), SocialWebLoginsActivity.class);
                             intentSocial.putExtra("ATTACHMENT", true);
@@ -154,7 +168,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                     }
                 });
-
 
             } else {
                 attachmentImage.setVisibility(View.GONE);
@@ -171,7 +184,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             String newString = new SimpleDateFormat("H:mm").format(date);
 
             timeText.setText(newString);
-
 
         }
     }
@@ -213,6 +225,21 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             Intent intent = new Intent(Intent.ACTION_VIEW,
                                     Uri.parse(attachment));
                             itemView.getContext().startActivity(intent);
+                        } else if (attachment.endsWith(".xlsx") || attachment.endsWith(".doc") || attachment.endsWith(".docx") || attachment.endsWith(".pptx")) {
+
+                            String encodedString = "";
+
+                            encodedString = attachment.replace(" ", "%20");
+//
+//                            Intent intentSocial = new Intent(itemView.getContext(), SocialWebLoginsActivity.class);
+//                            intentSocial.putExtra("ATTACHMENT", true);
+//                            intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://docs.google.com/gview?embedded=true&url=" + encodedString);
+//                            intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, message.toUsername);
+//                            itemView.getContext().startActivity(intentSocial);
+                            Intent intent = new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(encodedString));
+                            itemView.getContext().startActivity(intent);
+
                         } else {
                             Intent intentSocial = new Intent(itemView.getContext(), SocialWebLoginsActivity.class);
                             intentSocial.putExtra("ATTACHMENT", true);
@@ -220,7 +247,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, message.toUsername);
                             itemView.getContext().startActivity(intentSocial);
                         }
-
                     }
                 });
 

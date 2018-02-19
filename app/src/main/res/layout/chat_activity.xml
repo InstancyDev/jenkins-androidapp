@@ -53,7 +53,7 @@
             android:layout_marginRight="16dp"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:hint="Enter message"
+            android:hint="Type your message here"
             android:maxLines="6" />
 
         <Button

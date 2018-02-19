@@ -122,6 +122,7 @@ import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTimeInDate;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
@@ -139,10 +140,13 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
+
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
+
     @BindView(R.id.mylearninglistview)
     ListView myLearninglistView;
+
     CatalogAdapter catalogAdapter;
     List<MyLearningModel> catalogModelsList = null;
     PreferencesManager preferencesManager;
@@ -208,12 +212,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         billingProcessor = new BillingProcessor(context, apiKey, this);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = null;
         HashMap<String, String> responMap = null;
         Bundle bundle = getArguments();
@@ -253,7 +251,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
@@ -272,15 +270,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     if (response != null) {
                         try {
                             db.injectEventCatalog(response);
-                            injectFromDbtoModel();
+                            injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     } else {
-                        swipeRefreshLayout.setRefreshing(false);
+
                     }
                 }
-
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -320,6 +317,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     }
                 }
+                swipeRefreshLayout.setRefreshing(false);
 
                 svProgressHUD.dismiss();
             }
@@ -338,7 +336,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         View rootView = inflater.inflate(R.layout.event_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
-//        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setEnabled(false);
 
         catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
         myLearninglistView.setAdapter(catalogAdapter);
@@ -346,6 +345,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
         upBtn = (RadioButton) rootView.findViewById(R.id.upcomingbtn);
+        upBtn.setChecked(true);
+
         calenderBtn = (RadioButton) rootView.findViewById(R.id.calanderbtn);
         pastBtn = (RadioButton) rootView.findViewById(R.id.pastbtn);
 
@@ -357,9 +358,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         catalogModelsList = new ArrayList<MyLearningModel>();
         if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
-            refreshCatalog(true);
+            refreshCatalog(false);
         } else {
-            injectFromDbtoModel();
+            injectFromDbtoModel(true);
         }
 
         initilizeView();
@@ -369,7 +370,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
 
-    public void injectFromDbtoModel() {
+    public void injectFromDbtoModel(boolean sortToUpcoming) {
         catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId());
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
@@ -377,6 +378,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
         }
+
+        if (sortToUpcoming) {
+            sortByDate("before");
+        }
+
         addEvents();
     }
 
@@ -494,7 +500,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     @Override
     public void onRefresh() {
-        swipeRefreshLayout.setRefreshing(false);
+
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
@@ -595,7 +601,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         Menu menu = popup.getMenu();
 
         menu.getItem(0).setVisible(false);//view
-        menu.getItem(1).setVisible(false);//add
+        menu.getItem(1).setVisible(false);//enroll
         menu.getItem(2).setVisible(false);//buy
         menu.getItem(3).setVisible(false);//detail
         menu.getItem(4).setVisible(false);//cancel enrollment
@@ -603,12 +609,15 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
         if (myLearningDetalData.getAddedToMylearning() == 1) {
-            menu.getItem(0).setVisible(true);
+
+            if (!myLearningDetalData.getRelatedContentCount().equalsIgnoreCase("0")) {
+                menu.getItem(0).setVisible(true);
+            }
+
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
             menu.getItem(4).setVisible(true);
-
 
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
@@ -650,7 +659,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 menu.getItem(3).setVisible(true);
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
-
                     if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                         menu.getItem(4).setVisible(false);
                     }
@@ -659,6 +667,12 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                         menu.getItem(4).setVisible(true);
                     }
                 }
+
+//                if (myLearningDetalData.isCompletedEvent()){
+//                    menu.getItem(1).setVisible(false);
+//                    menu.getItem(4).setVisible(false);
+//                }
+
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
                 menu.getItem(0).setVisible(false);
                 menu.getItem(2).setVisible(true);
@@ -1148,7 +1162,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (data != null) {
                 boolean refresh = data.getBooleanExtra("REFRESH", false);
                 if (refresh) {
-                    injectFromDbtoModel();
+                    injectFromDbtoModel(false);
                 }
             }
         }
@@ -1186,7 +1200,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 }
 
-                injectFromDbtoModel();
+                injectFromDbtoModel(false);
             }
 
         }
@@ -1248,7 +1262,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                         i = db.updateContentStatus(myLearningModel, status, progress);
                         if (i == 1) {
 
-                            injectFromDbtoModel();
+                            injectFromDbtoModel(false);
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 
                         } else {
@@ -1293,6 +1307,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 compactCalendarView.setVisibility(View.VISIBLE);
                 YearTitle.setVisibility(View.VISIBLE);
                 catalogAdapter.refreshList(catalogModelsList);
+                String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+                onDayClick(getCurrentDateTimeInDate(todayD));
                 break;
             case R.id.pastbtn:
                 upBtn.setTypeface(null, Typeface.NORMAL);
@@ -1325,11 +1341,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
 
                 if (new Date().before(strDate)) {
+                    catalogModelsList.get(i).setCompletedEvent(true);
                     myLearningModelList.add(catalogModelsList.get(i));
                     catalogAdapter.refreshList(myLearningModelList);
 //                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
                 }
-
 
             }
 
@@ -1346,6 +1362,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
 
                 if (new Date().after(strDate)) {
+                    catalogModelsList.get(i).setCompletedEvent(false);
                     myLearningModelList.add(catalogModelsList.get(i));
                     catalogAdapter.refreshList(myLearningModelList);
 //                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
@@ -1513,7 +1530,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             //do things
                                             dialog.dismiss();
                                             // remove event from android calander
-                                            injectFromDbtoModel();
+                                            injectFromDbtoModel(false);
                                             db.ejectEventsFromDownloadData(eventModel);
                                         }
                                     });

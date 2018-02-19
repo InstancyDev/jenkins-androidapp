@@ -3,10 +3,12 @@ package com.instancy.instancylearning.askexpert;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
+
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -19,17 +21,19 @@ import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,23 +46,32 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.CreateNewForumActivity;
-import com.instancy.instancylearning.discussionfourms.DiscussionFourmAdapter;
-import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
+
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
+
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -69,16 +82,21 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_ASKQUESTIONS;
+
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 
@@ -87,7 +105,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, View.OnClickListener {
 
     String TAG = AskExpertFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -99,6 +117,15 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.discussionfourmlist)
     ListView askexpertListView;
+
+    @BindView(R.id.askexpertMenu)
+    FloatingActionMenu askexpertMenu;
+
+    @BindView(R.id.fabFilter)
+    FloatingActionButton fabFilter;
+
+    @BindView(R.id.fabAsk)
+    FloatingActionButton fabAskeQuestion;
 
     AskExpertAdapter askExpertAdapter;
     List<AskExpertQuestionModel> askExpertQuestionModelList = null;
@@ -113,9 +140,6 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
-    @Nullable
-    @BindView(R.id.fab_fourm_button)
-    FloatingActionButton floatingActionButton;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -152,11 +176,21 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQandA?userid="+appUserModel.getUserIDValue()+"&SiteID=" + appUserModel.getSiteIDValue()+ "&QuestionID=0&QuestionTypeID=1&SkillID=-1&RecordCount=0&SearchText=" ;
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQandA?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&QuestionID=0&QuestionTypeID=1&SkillID=-1&RecordCount=0&SearchText=";
 
         vollyService.getJsonObjResponseVolley("ASKQS", parmStringUrl, appUserModel.getAuthHeaders());
 
     }
+
+    public void getSkillsCalatalogFrom() {
+
+
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected";
+
+        vollyService.getJsonObjResponseVolley("ASKQSCAT", parmStringUrl, appUserModel.getAuthHeaders());
+
+    }
+
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -169,7 +203,9 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                     if (response != null) {
                         try {
                             db.injectAsktheExpertQuestionDataTable(response);
+                            db.injectAsktheExpertAnswersDataTable(response);
                             injectFromDbtoModel();
+                            getSkillsCalatalogFrom();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -178,6 +214,19 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                     }
                 }
 
+                if (requestType.equalsIgnoreCase("ASKQSCAT")) {
+                    if (response != null) {
+                        Log.d(TAG, "notifySuccess: ASKQSCAT  " + response);
+                        try {
+                            db.injectAsktheExpertCategoryDataTable(response);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -233,39 +282,35 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         }
 
         initilizeView();
-
-        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
-        View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
-        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
-        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
-
-        floatingActionButton.setImageDrawable(d);
-
-//        floatingActionButton.(getResources().getColor(R.color.colorWhite));
-        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                intentDetail.putExtra("isfromedit", false);
-                intentDetail.putExtra("forumModel", "");
-                startActivity(intentDetail);
-            }
-        });
+        fabActionMenusInitilization();
+//        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+//        View customNav = LayoutInflater.from(context).inflate(R.layout.iconaskquestion, null);
+//        FontManager.markAsIconContainer(customNav.findViewById(R.id.askquestion), iconFont);
+//        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+//
+//        floatingActionButton.setImageDrawable(d);
+//
+//        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+//
+//        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intentDetail = new Intent(context, AskQuestionActivity.class);
+//                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+//            }
+//        });
 
         return rootView;
     }
 
     public void injectFromDbtoModel() {
-//        askExpertQuestionModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
-//        if (askExpertQuestionModelList != null) {
-//            askExpertAdapter.refreshList(askExpertQuestionModelList);
-//        } else {
-//            askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
-//            askExpertAdapter.refreshList(askExpertQuestionModelList);
-//        }
-
+        askExpertQuestionModelList = db.fetchAskExpertModelList("");
+        if (askExpertQuestionModelList != null) {
+            askExpertAdapter.refreshList(askExpertQuestionModelList);
+        } else {
+            askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
+            askExpertAdapter.refreshList(askExpertQuestionModelList);
+        }
     }
 
     public void initilizeView() {
@@ -278,6 +323,38 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+    }
+
+
+    public void fabActionMenusInitilization() {
+        askexpertMenu.setVisibility(View.VISIBLE);
+        askexpertMenu.setClosedOnTouchOutside(true);
+        askexpertMenu.setMenuButtonColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        fabAskeQuestion.setOnClickListener(this);
+        fabFilter.setOnClickListener(this);
+
+        fabAskeQuestion.setImageDrawable(getDrawableFromString(R.string.fa_icon_question));
+        fabFilter.setImageDrawable(getDrawableFromString(R.string.fa_icon_filter));
+
+        fabAskeQuestion.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        fabFilter.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        fabAskeQuestion.setLabelText(getResources().getString(R.string.askaquestion));
+        fabFilter.setLabelText(getResources().getString(R.string.filter));
+
+    }
+
+    public Drawable getDrawableFromString(int resourceID) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconimage, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.imageicon);
+        iconText.setText(resourceID);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.imageicon), iconFont);
+        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+
+        return d;
     }
 
     @Override
@@ -386,7 +463,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         switch (view.getId()) {
             case R.id.card_view:
-//                attachFragment(askExpertQuestionModelList.get(position));
+                attachFragment(askExpertQuestionModelList.get(position));
                 break;
             case R.id.btn_contextmenu:
                 View v = askexpertListView.getChildAt(position - askexpertListView.getFirstVisiblePosition());
@@ -443,26 +520,33 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, AskExpertQuestionModel discussionForumModel) {
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final AskExpertQuestionModel askExpertQuestionModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.discussonforum, popup.getMenu());
+        popup.getMenuInflater().inflate(R.menu.askexpertmenu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
-
         Menu menu = popup.getMenu();
-
-        menu.getItem(0).setVisible(true);//view
-
+        menu.getItem(0).setVisible(true);//delete
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
+                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                    alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the question :")
+                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                public void onClick(final DialogInterface dialogBox, int id) {
+                                    // ToDo get user input here
+                                    deleteQuestionFromServer(askExpertQuestionModel);
+                                }
+                            }).setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogBox, int id) {
+                                    dialogBox.cancel();
+                                }
+                            });
 
-                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
-                    Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                    intentDetail.putExtra("isfromedit", true);
-                    intentDetail.putExtra("forumModel", askExpertQuestionModelList.get(position));
-                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-
+                    AlertDialog alertDialogAndroid = alertDialog.create();
+                    alertDialogAndroid.show();
                 }
                 return true;
             }
@@ -471,6 +555,56 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     }
 
+    public void deleteQuestionFromServer(final AskExpertQuestionModel questionModel) {
+
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteAskQuestion?QuestionID=" + questionModel.questionID;
+
+        final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    Toast.makeText(context, " Success! \nQuestion has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+
+                    deleteQuestionFromLocalDB(questionModel);
+                } else {
+
+                    Toast.makeText(context, "Question cannot be deleted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+
+                return headers;
+            }
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -479,24 +613,66 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
 
             if (data != null) {
-                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
+                boolean refresh = data.getBooleanExtra("NEWQS", false);
                 if (refresh) {
-                    refreshCatalog(false);
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        refreshCatalog(true);
+                    } else {
+                        injectFromDbtoModel();
+                    }
+
+
                 }
             }
         }
     }
 
-    public void attachFragment(DiscussionForumModel forumModel) {
-        Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
-        intentDetail.putExtra("forumModel", forumModel);
-        ((Activity) context).startActivity(intentDetail);
+    public void attachFragment(AskExpertQuestionModel askExpertQuestionModel) {
+
+        List<AskExpertAnswerModel> askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
+
+        Intent intentDetail = new Intent(context, AskExpertsAnswersActivity.class);
+        intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);
+
+        startActivity(intentDetail);
+
     }
 
     @Override
     public void onDetach() {
 
         super.onDetach();
+    }
+
+    public void deleteQuestionFromLocalDB(AskExpertQuestionModel askExpertQuestionModel) {
+
+        try {
+            String strDelete = "DELETE FROM " + TBL_ASKQUESTIONS + " WHERE  siteID ='"
+                    + appUserModel.getSiteIDValue() + "' AND questionid ='" + askExpertQuestionModel.questionID + "' AND userid  ='" + askExpertQuestionModel.userID + "'";
+            db.executeQuery(strDelete);
+            injectFromDbtoModel();
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.fabFilter:
+                Toast.makeText(context, " Filters not configured ", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.fabAsk:
+                Intent intentDetail = new Intent(context, AskQuestionActivity.class);
+                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+                break;
+
+        }
     }
 
 }

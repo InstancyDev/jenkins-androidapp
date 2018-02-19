@@ -11,6 +11,10 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
 
+    <uses-feature
+        android:name="android.hardware.wifi.direct"
+        android:required="true" />
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -143,6 +147,24 @@
             android:name=".chatmessanger.ChatActivity"
             android:screenOrientation="portrait"></activity>
 
+
+        <activity
+            android:name=".askexpert.AskExpertsAnswersActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".askexpert.AskQuestionActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".wifisharing.WiFiDirectActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".wifisharing.WiFiDirectNewActivity"
+            android:screenOrientation="portrait"></activity>
+
+
         <!-- INAPP BILLING ACTIVITY -->
 
         <activity
@@ -150,6 +172,14 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Translucent"></activity>
 
+
+        <!-- Used for transferring files  after a successful connection -->
+        <service
+            android:name=".wifisharing.FileTransferService"
+            android:enabled="true" />
+        <service
+            android:name=".wifisharing.WiFiClientIPTransferService"
+            android:enabled="true" />
 
         <receiver android:name=".helper.NetworkChangeReceiver">
             <intent-filter>

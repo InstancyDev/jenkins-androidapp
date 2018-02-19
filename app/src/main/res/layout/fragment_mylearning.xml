@@ -49,53 +49,65 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/catalog_recycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorDarkGrey"
-            android:visibility="gone"></android.support.v7.widget.RecyclerView>
-
     </FrameLayout>
 
     <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/menu_red"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/uploadfloatmenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:visibility="gone"
-        fab:menu_backgroundColor="#ccffffff"
-        fab:menu_fab_label="Menu label"
-        fab:menu_labels_ellipsize="end"
-        fab:menu_labels_singleLine="true">
+        app:menu_colorNormal="@color/colorPrimary"
+        app:menu_colorPressed="@color/colorDarkGrey"
+        app:menu_fab_size="normal">
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fab1"
-            android:layout_width="wrap_content"
+            android:id="@+id/fabImage"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher"
-            fab:fab_label="Disabled"
-            fab:fab_size="mini" />
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Image"
+            app:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fab2"
-            android:layout_width="wrap_content"
+            android:id="@+id/fabVideo"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher"
-            fab:fab_label="Remove button"
-            fab:fab_size="mini" />
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Video"
+            app:fab_size="mini" />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fab3"
-            android:layout_width="wrap_content"
+            android:id="@+id/fabAudio"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher"
-            fab:fab_label="Restore Button"
-            fab:fab_size="mini" />
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Audio"
+
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabDocument"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Document"
+            app:fab_size="mini" />
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabWebsiteURL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Website URL"
+            app:fab_size="mini" />
 
     </com.github.clans.fab.FloatingActionMenu>
 

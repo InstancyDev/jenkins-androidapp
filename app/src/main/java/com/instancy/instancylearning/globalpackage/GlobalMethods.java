@@ -775,6 +775,10 @@ public class GlobalMethods {
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", false);
             ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
+        } else {
+
+            Toast.makeText(context, "No Content found for this event", Toast.LENGTH_SHORT).show();
+
         }
     }
 

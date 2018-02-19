@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -32,6 +33,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,7 +48,14 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -73,14 +82,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_NOTIFICATIONS;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -206,7 +218,6 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         };
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -224,8 +235,20 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         discussionFourmlistView.setAdapter(notificationAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
         discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-
         notificationModelList = new ArrayList<NotificationModel>();
+
+//        discussionFourmlistView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                // TODO Auto-generated method stub
+//
+//                Toast.makeText(context, "Item Deleted", Toast.LENGTH_LONG).show();
+//
+//                return true;
+//            }
+//
+//        });
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
@@ -239,7 +262,6 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
-
 
         return rootView;
     }
@@ -371,7 +393,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
         switch (view.getId()) {
             case R.id.card_view:
-                requiredFunctionalityForTheSelectedCell(notificationModelList.get(position));
+                markAsReadWebCall(notificationModelList.get(position), position);
+                break;
+            case R.id.txtDelete:
+                deleteAlert(notificationModelList.get(position));
                 break;
         }
     }
@@ -381,6 +406,16 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
 
+    }
+
+    public void markAsReadWebCall(NotificationModel notificationModel, int position) {
+
+        requiredFunctionalityForTheSelectedCell(notificationModel);
+
+//        markAsReadNotification(notificationModel, position);
+
+        notificationModelList.get(position).markasread = "true";
+        notificationAdapter.notifyDataSetChanged();
     }
 
     //
@@ -409,9 +444,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 myCatalogExists = myCatalogAction(notificationModel.contentid);
 
             if (myLearningExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 1,notificationModel.contentid);
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid);
             } else if (myCatalogExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 2,notificationModel.contentid);
+                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid);
             } else {
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -430,16 +465,14 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             }
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 4,"");
+            ((SideMenu) getActivity()).homeControllClicked(true, 4, "");
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 10,"");
-
+            ((SideMenu) getActivity()).homeControllClicked(true, 10, "");
 
         }
 
     }
-
 
     public boolean myLearningAction(String contentID) {
         boolean isMyLearningContetExists = false;
@@ -495,5 +528,151 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         anim.start();
 
     }
+
+    public void deleteAlert(final NotificationModel notificationModel) {
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the notification ?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialogBox, int id) {
+                        // ToDo get user input here
+                        deleteAnswerFromServer(notificationModel);
+                    }
+                }).setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+                        dialogBox.cancel();
+                    }
+                });
+
+        AlertDialog alertDialogAndroid = alertDialog.create();
+        alertDialogAndroid.show();
+
+    }
+
+    public void deleteAnswerFromServer(final NotificationModel notificationModel) {
+
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteUserNotification?userNotificationId=" + notificationModel.usernotificationid;
+
+        final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+//                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("true")) {
+
+                    Toast.makeText(context, " Success! \nNotification has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+
+                    deleteAnswerFromLocalDB(notificationModel);
+                } else {
+
+                    Toast.makeText(context, "Notification cannot be deleted from server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+//                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void deleteAnswerFromLocalDB(NotificationModel notificationModel) {
+
+        try {
+            String strDelete = "DELETE FROM " + TBL_NOTIFICATIONS + " WHERE  siteID ='"
+                    + appUserModel.getSiteIDValue() + "' AND usernotificationid   ='" + notificationModel.usernotificationid + "'";
+            db.executeQuery(strDelete);
+
+            injectFromDbtoModel();
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+    }
+
+
+    public void markAsReadNotification(final NotificationModel notificationModel, final int position) {
+
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UpdateNotificationMarkAsRead?NotificationId=" + notificationModel.usernotificationid + "&userID=" + notificationModel.touserid;
+
+        final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+//                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("true")) {
+
+                    Toast.makeText(context, " Success! \nNotification has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+
+                    notificationModelList.get(position).markasread = "true";
+                    notificationAdapter.notifyDataSetChanged();
+
+//                    deleteAnswerFromLocalDB(notificationModel);
+                } else {
+
+                    Toast.makeText(context, "Notification cannot be deleted from server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+//                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+//                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
 
 }

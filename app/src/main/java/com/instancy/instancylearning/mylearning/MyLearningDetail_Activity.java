@@ -22,6 +22,8 @@ import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -61,6 +63,8 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.wifisharing.WiFiDirectActivity;
+import com.instancy.instancylearning.wifisharing.WiFiDirectNewActivity;
 import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -646,6 +650,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         super.onBackPressed();
     }
 
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.action_items, menu);
+//        return true;
+//    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -663,10 +674,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 finish();
                 return true;
+            case R.id.atn_direct_enable:
+                startActivity(new Intent(this, WiFiDirectNewActivity.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
     @OnClick({R.id.view_btn_txt, R.id.report_btn_txt, R.id.btntxt_download_detail, R.id.viewtypeLayout})
     public void actionsforDetail(View view) {

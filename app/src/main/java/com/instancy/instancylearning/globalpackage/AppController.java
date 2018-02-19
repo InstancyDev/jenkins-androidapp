@@ -1,5 +1,7 @@
 package com.instancy.instancylearning.globalpackage;
 
+import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
@@ -52,6 +54,11 @@ public class AppController extends MultiDexApplication {
         super.onCreate();
 
         // initialize the singleton
+
+        if (AppController.context == null) {
+            AppController.context = getApplicationContext();
+        }
+
         sInstance = this;
     }
 
@@ -60,5 +67,19 @@ public class AppController extends MultiDexApplication {
      */
     public static synchronized AppController getInstance() {
         return sInstance;
+    }
+
+
+    private static Context context;
+
+    public static synchronized Context getGlobalContext() {
+        return context;
+    }
+
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

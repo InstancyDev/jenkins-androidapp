@@ -1,0 +1,84 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/segmentedswitch">
+
+
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:id="@+id/linearLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:orientation="vertical">
+
+                <fragment
+                    android:id="@+id/frag_list"
+                    class="com.instancy.instancylearning.wifisharing.DeviceListFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!-- Preview: layout=@layout/row_devices -->
+                </fragment>
+
+                <fragment
+                    android:id="@+id/frag_detail"
+                    class="com.instancy.instancylearning.wifisharing.DeviceDetailFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!-- Preview: layout=@layout/device_detail -->
+                </fragment>
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/segmentedswitch"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        segmentedgroup:backgroundTint="@color/colorPrimary"
+        segmentedgroup:sc_border_width="0dp"
+        segmentedgroup:sc_checked_text_color="@color/colorPrimary"
+        segmentedgroup:sc_tint_color="@color/colorPrimary">
+
+        <RadioButton
+            android:id="@+id/sendBtn"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="Send"
+            android:textColor="@color/colorWhite"
+            android:textSize="18dp" />
+
+        <RadioButton
+            android:id="@+id/recBtn"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Recieve"
+            android:textColor="@color/colorWhite"
+            android:textSize="18dp" />
+
+    </info.hoang8f.android.segmented.SegmentedGroup>
+
+</RelativeLayout>

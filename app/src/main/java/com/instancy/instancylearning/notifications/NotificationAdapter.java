@@ -37,6 +37,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
+
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
  */
@@ -117,6 +119,17 @@ public class NotificationAdapter extends BaseAdapter {
             holder.txtDescription.setText(notificationModelList.get(position).subject);
         }
 
+//        if (notificationModelList.get(position).markasread.equalsIgnoreCase("false")) {
+//
+//            holder.card_view.setBackgroundColor(convertView.getResources().getColor(R.color.colorGray));
+//
+//        } else {
+//
+//            holder.card_view.setBackgroundColor(convertView.getResources().getColor(R.color.colorWhite));
+//        }
+
+//        String dateNew = formatDate(notificationModelList.get(position).notificationstartdate, "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
+
         holder.txtDate.setText(notificationModelList.get(position).notificationstartdate);
 
         return convertView;
@@ -129,7 +142,7 @@ public class NotificationAdapter extends BaseAdapter {
             notificationModelList.addAll(searchList);
         } else {
             for (NotificationModel s : searchList) {
-                if (s.contenttitle.toLowerCase(Locale.getDefault()).contains(charText) || s.message.toLowerCase(Locale.getDefault()).contains(charText)  || s.notificationtitle.toLowerCase(Locale.getDefault()).contains(charText)  || s.subject.toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.contenttitle.toLowerCase(Locale.getDefault()).contains(charText) || s.message.toLowerCase(Locale.getDefault()).contains(charText) || s.notificationtitle.toLowerCase(Locale.getDefault()).contains(charText) || s.subject.toLowerCase(Locale.getDefault()).contains(charText)) {
                     notificationModelList.add(s);
                 }
             }
@@ -146,11 +159,17 @@ public class NotificationAdapter extends BaseAdapter {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(view.findViewById(R.id.txtBolt), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txtDelete), iconFont);
+
         }
 
         @Nullable
         @BindView(R.id.txtBolt)
         TextView txtBolt;
+
+        @Nullable
+        @BindView(R.id.txtDelete)
+        TextView txtDelete;
 
         @Nullable
         @BindView(R.id.card_view)
@@ -168,7 +187,7 @@ public class NotificationAdapter extends BaseAdapter {
         @BindView(R.id.txtDate)
         TextView txtDate;
 
-        @OnClick({R.id.card_view})
+        @OnClick({R.id.card_view, R.id.txtDelete})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

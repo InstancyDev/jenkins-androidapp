@@ -3,22 +3,28 @@ package com.instancy.instancylearning.catalog;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -47,6 +53,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,10 +67,14 @@ import com.android.volley.toolbox.StringRequest;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.blankj.utilcode.util.ImageUtils;
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -106,6 +117,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
@@ -123,7 +135,7 @@ import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
  * Created by Upendranath on 5/19/2017.
  */
 
-public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler {
+public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler, View.OnClickListener {
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -140,7 +152,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     Menu search_menu;
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", allowAddContentType = "";
     ResultListner resultListner = null;
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
@@ -164,6 +176,23 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     Communicator communicator;
 
+    @BindView(R.id.uploadfloatmenu)
+    FloatingActionMenu uploadFloatMenu;
+
+    @BindView(R.id.fabAudio)
+    FloatingActionButton fabAudio;
+
+    @BindView(R.id.fabDocument)
+    FloatingActionButton fabDocument;
+
+    @BindView(R.id.fabImage)
+    FloatingActionButton fabImage;
+
+    @BindView(R.id.fabWebsiteURL)
+    FloatingActionButton fabWebsiteURL;
+
+    @BindView(R.id.fabVideo)
+    FloatingActionButton fabVideo;
 
     boolean isFromNotification = false;
 
@@ -223,7 +252,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
 
-
             isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
 
             if (isFromNotification) {
@@ -267,6 +295,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             // No such key
             filterContentType = "";
         }
+
+        if (responMap != null && responMap.containsKey("AllowAddContentType")) {
+            allowAddContentType = responMap.get("AllowAddContentType");
+
+        }
+
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -426,9 +460,56 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         initilizeView();
 
+        if (allowAddContentType.length() > 0) {
+            fabActionMenusInitilization();
+        }
+
         return rootView;
     }
 
+
+    public void fabActionMenusInitilization() {
+        uploadFloatMenu.setVisibility(View.VISIBLE);
+        uploadFloatMenu.setClosedOnTouchOutside(true);
+        uploadFloatMenu.setMenuButtonColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        fabAudio.setOnClickListener(this);
+        fabImage.setOnClickListener(this);
+        fabDocument.setOnClickListener(this);
+        fabWebsiteURL.setOnClickListener(this);
+        fabVideo.setOnClickListener(this);
+
+        fabAudio.setImageDrawable(getDrawableFromString(R.string.fa_icon_file_audio_o));
+        fabImage.setImageDrawable(getDrawableFromString(R.string.fa_icon_image));
+        fabVideo.setImageDrawable(getDrawableFromString(R.string.fa_icon_file_video_o));
+        fabDocument.setImageDrawable(getDrawableFromString(R.string.fa_icon_file));
+        fabWebsiteURL.setImageDrawable(getDrawableFromString(R.string.fa_icon_link));
+
+        fabAudio.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        fabImage.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        fabVideo.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        fabDocument.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        fabWebsiteURL.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        fabAudio.setLabelText(getResources().getString(R.string.audio));
+        fabImage.setLabelText(getResources().getString(R.string.image));
+        fabVideo.setLabelText(getResources().getString(R.string.video));
+        fabDocument.setLabelText(getResources().getString(R.string.document));
+        fabWebsiteURL.setLabelText(getResources().getString(R.string.website_url));
+
+    }
+
+    public Drawable getDrawableFromString(int resourceID) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconimage, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.imageicon);
+        iconText.setText(resourceID);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.imageicon), iconFont);
+        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
 
     public void injectFromDbtoModel() {
         catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId());
@@ -568,7 +649,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (item.getItemId()) {
 
             case R.id.mylearning_search:
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
@@ -1763,4 +1843,75 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
     }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.fabVideo:
+                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=3",1);
+                break;
+            case R.id.fabAudio:
+                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=4",1);
+                break;
+            case R.id.fabDocument:
+                wikiFileUploadButtonClicked("ContentTypeID=14",1);
+                break;
+            case R.id.fabImage:
+                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=1",1);
+                break;
+            case R.id.fabWebsiteURL:
+                wikiFileUploadButtonClicked("ContentTypeID=28&MediaTypeID=13",1);
+                break;
+
+        }
+    }
+
+    public void wikiFileUploadButtonClicked(String contentMediaTypeID,int intsr) {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+            String android_Id = Settings.Secure.getString(getContext().getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+
+            String urlString = appUserModel.getSiteURL() + "/PublicModules/UserLoginVerify.aspx?Fileupload=true&ComponentID=1&CMSGroupID=3&" + contentMediaTypeID + "&userid=" + appUserModel.getUserIDValue() + "&deviceid=" + android_Id + "&devicetype=ios";
+
+            if (intsr==1){
+            openChromeTabsInAndroid(urlString);
+            }
+            else {
+
+                Intent intentSocial = new Intent(context, SocialWebLoginsActivity.class);
+                intentSocial.putExtra("ATTACHMENT", true);
+                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, urlString);
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "");
+                Log.d(TAG, "wikiFileUploadButtonClicked: " + urlString);
+                startActivity(intentSocial);
+            }
+        } else {
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void openChromeTabsInAndroid(String urlStr) {
+
+        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
+                .setToolbarColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()))
+                .setShowTitle(false).enableUrlBarHiding()
+                .build();
+
+        customTabsIntent.launchUrl(context, Uri.parse(urlStr));
+    }
+
+//    // Main action: create notification 12500+30000+50000+50000+100000+15868=258368 257280
+//    MIRC VASCON DISH TV18 GENIUS 171370 85910
+//    1000 1200    400  1000 1000
+    private static PendingIntent createPendingMainActionNotifyIntent(
+            @NonNull final Context context,
+            @NonNull final CustomTabsIntent action) {
+
+        Intent actionIntent = new Intent(context, Catalog_fragment.class);
+        return PendingIntent.getService(context, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
 }

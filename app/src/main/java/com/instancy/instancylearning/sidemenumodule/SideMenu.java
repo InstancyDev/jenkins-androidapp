@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.askexpert.AskExpertFragment;
@@ -43,10 +44,13 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
 import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -58,6 +62,10 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +83,7 @@ import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_
 import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
 import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
@@ -128,6 +137,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @BindView(R.id.txtbtn_notification)
     TextView txtBtnNotification;
 
+    VollyService vollyService;
+    IResult resultCallback = null;
+
     private static int lastClicked = 0;
 
     AppUserModel appUserModel;
@@ -146,6 +158,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     SideMenusModel homeModel;
     int homeIndex = 0;
 
+    int notificationCount = 0;
+
     RelativeLayout drawerHeaderView;
     public View logoView;
 
@@ -160,6 +174,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         preferencesManager = PreferencesManager.getInstance();
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
+
+        initVolleyCallback();
+        vollyService = new VollyService(resultCallback, this);
+
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
         appUserModel.setUserLoginId(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
@@ -193,6 +211,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             }
         });
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+            refreshCatalog();
+        } else {
+
+        }
+
 
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
@@ -288,7 +313,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
 
                 // on first time to display view for first navigation item based on the number
-                selectItem(Integer.parseInt(indexed), model, false,""); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(Integer.parseInt(indexed), model, false, ""); // 2 is your fragment's number for "CollectionFragment"
                 homeModel = model;
                 homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
@@ -334,11 +359,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                     try {
-                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false,"");
+                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false, "");
 
                                     } catch (NumberFormatException numEx) {
                                         numEx.printStackTrace();
-                                        selectItem(1, sideMenumodelList.get(groupPosition), false,"");
+                                        selectItem(1, sideMenumodelList.get(groupPosition), false, "");
                                     }
                                 }
                             }
@@ -376,9 +401,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     public void homeControllClicked(boolean isFromNotification, int menuId, String contentID) {
 
         if (!isFromNotification)
-            selectItem(homeIndex, homeModel, false,contentID);
+            selectItem(homeIndex, homeModel, false, contentID);
         else {
-            selectItem(menuId, getMenuModelForNotification(menuId), true,contentID);
+            selectItem(menuId, getMenuModelForNotification(menuId), true, contentID);
         }
 
         navDrawerExpandableView.expandGroup(0);
@@ -530,14 +555,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             if (m.getIsOfflineMenu().equals("true")) {
                 navDrawerExpandableView.setSelectedGroup(groupPosition);
                 navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-                selectItem(Integer.parseInt(m.getContextMenuId()), m, false,"");
+                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "");
             } else {
 
             }
 
         }
     }
-
 
     public void backToMainSite() {
         BACKTOMAINSITE = 2;
@@ -551,7 +575,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
+        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
@@ -651,10 +675,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 backToMainSite();
                 break;
             case R.id.sendmessage_layout:
-                selectItem(99, sideMenumodelList.get(0), false,"");
+                selectItem(99, sideMenumodelList.get(0), false, "");
                 break;
             case R.id.notification_layout:
-                selectItem(100, sideMenumodelList.get(0), false,"");
+                selectItem(100, sideMenumodelList.get(0), false, "");
                 break;
         }
     }
@@ -720,7 +744,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
                 i++;
             }
-
             menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
         } else {
             backLayout.setVisibility(View.GONE);
@@ -739,7 +762,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     }
 
-
     public boolean respectiveMenuExistsOrNot(String contextMenuId) {
         boolean exists = false;
 
@@ -752,4 +774,59 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         }
         return exists;
     }
+
+    public void refreshCatalog() {
+
+        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
+
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+                if (requestType.equalsIgnoreCase("NOTIFICATIODATA")) {
+                    if (response != null) {
+                        try {
+
+                            JSONArray jsonTableAry = response.getJSONArray("notificationsdata");
+
+                            if (jsonTableAry.length() > 0) {
+                                txtBtnNotification.setText("Notifications(" + jsonTableAry.length() + ")");
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+
+            }
+        };
+    }
+
 }

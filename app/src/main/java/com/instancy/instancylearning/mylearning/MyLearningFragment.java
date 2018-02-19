@@ -847,9 +847,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                         }
 
-
                         // write jw content method download
-
 
                     }
 

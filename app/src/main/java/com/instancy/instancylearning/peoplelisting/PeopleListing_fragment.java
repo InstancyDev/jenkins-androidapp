@@ -76,7 +76,6 @@ import butterknife.ButterKnife;
 import info.hoang8f.android.segmented.SegmentedGroup;
 
 import static android.content.Context.BIND_ABOVE_CLIENT;
-import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
@@ -586,8 +585,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
-        EVENT_FRAGMENT_OPENED_FIRSTTIME = 2;
-//        chatService.destroy();
     }
 
 

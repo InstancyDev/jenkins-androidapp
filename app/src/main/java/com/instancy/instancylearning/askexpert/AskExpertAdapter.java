@@ -82,7 +82,7 @@ public class AskExpertAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return discussionForumModelList != null ? discussionForumModelList.size() : 10;
+        return discussionForumModelList != null ? discussionForumModelList.size() : 0;
     }
 
     @Override
@@ -108,17 +108,23 @@ public class AskExpertAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-//        holder.txtName.setText(discussionForumModelList.get(position).name);
-//        holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
-//        holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
-//        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
-//        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
-//        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
+        holder.txtQuestion.setText(discussionForumModelList.get(position).userQuestion);
+        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " ");
+        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " ");
+        holder.txtNoAnswers.setText(discussionForumModelList.get(position).answers + " Answer(s)");
 
         holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAskedBy.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAskedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtNoAnswers.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        if (discussionForumModelList.get(position).userID.equalsIgnoreCase(discussionForumModelList.get(position).postedUserId)) {
+
+            holder.btnContextMenu.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+        }
 
         return convertView;
     }

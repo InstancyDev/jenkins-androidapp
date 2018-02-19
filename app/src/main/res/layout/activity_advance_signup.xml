@@ -4,8 +4,14 @@
     android:layout_height="fill_parent">
 
     <im.delight.android.webview.AdvancedWebView
-        android:id="@+id/advanced_signupview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    android:id="@+id/advanced_signupview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+
+    <!--<WebView-->
+        <!--android:id="@+id/advanced_signupview"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" />-->
+
 
 </RelativeLayout>

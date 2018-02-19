@@ -35,5 +35,6 @@ public class NotificationModel implements Serializable {
     public String userid = "";
     public String siteid = "";
     public String siteurl = "";
+    public boolean isViewd = false;
 
 }

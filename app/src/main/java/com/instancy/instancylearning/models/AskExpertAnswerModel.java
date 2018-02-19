@@ -16,5 +16,6 @@ public class AskExpertAnswerModel implements Serializable {
     public String respondeddate = "";
     public String responsedate = "";
     public String siteID = "";
+    public String imageData = "";
 
 }

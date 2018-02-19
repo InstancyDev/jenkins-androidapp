@@ -9,6 +9,7 @@
     android:layout_marginLeft="0dp"
     android:layout_marginRight="0dp"
     android:layout_marginTop="3dp"
+    android:descendantFocusability="blocksDescendants"
     android:focusable="true"
     app:cardCornerRadius="0dp"
     app:cardElevation="1dp"
@@ -52,7 +53,7 @@
             <View
                 android:layout_width="3dp"
                 android:layout_height="match_parent"
-                android:background="@android:color/transparent"> </View>
+                android:background="@android:color/transparent"></View>
 
             <RelativeLayout
                 android:id="@+id/relattitle"
@@ -109,6 +110,31 @@
 
 
             </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="32dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="1dp">
+
+                <TextView
+                    android:id="@+id/txtDelete"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="@string/fa_icon_trash"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="24sp" />
+
+
+            </RelativeLayout>
+
 
         </LinearLayout>
 

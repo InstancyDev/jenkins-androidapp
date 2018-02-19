@@ -116,4 +116,5 @@ dependencies {
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'com.github.erizet.signala:signala-longpolling:0.20'
+    compile 'com.android.support:customtabs:26.1.0'
 }

@@ -16,4 +16,5 @@ public class AskExpertQuestionModel implements Serializable {
     public String answers = "";
     public String questionCategories = "";
     public String siteID = "";
+    public String postedUserId = "";
 }

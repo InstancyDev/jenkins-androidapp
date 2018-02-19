@@ -173,6 +173,20 @@ public class Utilities {
         return df.format(c.getTime());
     }
 
+    public static Date getCurrentDateTimeInDate(String dateStr) {
+
+        Date date = null;
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            date = format.parse(dateStr);
+            System.out.println(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
     /**
      * To format Date time string from {@code currentFormat} to {@code newFormat}.
      *
@@ -874,4 +888,26 @@ public class Utilities {
 
         return mimeType;
     }
+
+    public static String toStringS(Object[] a) {
+        if (a == null)
+            return "";
+
+        int iMax = a.length - 1;
+        if (iMax == -1)
+            return "[]";
+
+        StringBuilder b = new StringBuilder();
+
+        String value = "";
+
+        b.append('[');
+        for (int i = 0; ; i++) {
+            b.append(String.valueOf(a[i]));
+            if (i == iMax)
+                return b.append(']').toString();
+            b.append(", ");
+        }
+    }
+
 }

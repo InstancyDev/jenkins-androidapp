@@ -246,9 +246,9 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
 
+        floatingActionButton.setVisibility(View.VISIBLE);
         floatingActionButton.setImageDrawable(d);
 
-//        floatingActionButton.(getResources().getColor(R.color.colorWhite));
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
