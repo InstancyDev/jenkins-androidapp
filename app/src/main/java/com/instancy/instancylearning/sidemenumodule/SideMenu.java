@@ -1,10 +1,16 @@
 package com.instancy.instancylearning.sidemenumodule;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,93 +20,148 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.android.volley.VolleyError;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
+import com.instancy.instancylearning.askexpert.AskExpertFragment;
+import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
+import com.instancy.instancylearning.catalog.Catalog_fragment;
+import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
+import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
+import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
-import com.instancy.instancylearning.menufragments.Catalog_fragment;
+import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.home.HomeCategories_Fragment;
+import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
+import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.notifications.Notifications_fragment;
+import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
+import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.instancy.instancylearning.webpage.Webpage_fragment;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.instancy.instancylearning.utils.StaticValues.CONTEXT_TITLE;
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
+import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
+import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
+import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
-public class SideMenu extends AppCompatActivity {
+public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
 
     public String TAG = SideMenu.class.getSimpleName();
 
-    private List<SideMenusModel> sideMenusModel;
+    private List<SideMenusModel> sideMenumodelList;
     DatabaseHandler db;
 
-    @Bind(R.id.expanded_menu_drawer)
+    @BindView(R.id.expanded_menu_drawer)
     ExpandableListView navDrawerExpandableView;
 
-    @Bind(R.id.profile_thumbs)
+    @BindView(R.id.profile_thumbs)
     ImageView profileImage;
 
-    @Bind(R.id.id_username)
+    @BindView(R.id.id_username)
     TextView txtUsername;
 
-    @Bind(R.id.id_user_address)
+    @BindView(R.id.id_user_address)
     TextView txtAddress;
 
-    @Bind(R.id.txtbtn_settings)
+    @BindView(R.id.txtbtn_settings)
     TextView txtBtnSettings;
 
-    @Bind(R.id.txtbtn_back)
+    @BindView(R.id.txtbtn_back)
     TextView textBtnBack;
 
-    @Bind(R.id.back_font)
+    @BindView(R.id.back_layout)
+    RelativeLayout backLayout;
+
+    @BindView(R.id.sendmessage_layout)
+    RelativeLayout sendMessageLayout;
+
+    @BindView(R.id.notification_layout)
+    RelativeLayout notificationLayout;
+
+
+    @BindView(R.id.subsitelayout)
+    LinearLayout subsiteLayout;
+
+
+    @BindView(R.id.back_font)
     TextView fontBack;
 
-    @Bind(R.id.settings_font)
+    @BindView(R.id.settings_font)
     TextView fontSettings;
 
-    @Bind(R.id.notification_font)
+    @BindView(R.id.notification_font)
     TextView fontNotification;
 
-    @Bind(R.id.txtbtn_notification)
+    @BindView(R.id.txtbtn_notification)
     TextView txtBtnNotification;
+
+    VollyService vollyService;
+    IResult resultCallback = null;
 
     private static int lastClicked = 0;
 
     AppUserModel appUserModel;
-
-    String filtedConditions = "";
-
     MenuDrawerDynamicAdapter menuDynamicAdapter;
     PreferencesManager preferencesManager;
-    // protected List<Menus> menus = null;
-    protected List<SideMenusModel> mainMenuList = null;
+    //    protected List<SideMenusModel> mainMenuList = null;
     protected List<SideMenusModel> subMenuList = null;
-    // int mainMenuPosition = -1;
-    // int subMenuPosition = -1;
+
     HashMap<Integer, List<SideMenusModel>> hmSubMenuList = null;
-    DrawerLayout drawer;
+    public DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
     UiSettingsModel uiSettingsModel;
-
+    SignalAService signalAService;
     public Toolbar toolbar;
+
+    SideMenusModel homeModel;
+    int homeIndex = 0;
+
+    int notificationCount = 0;
+
+    RelativeLayout drawerHeaderView;
+    public View logoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,102 +169,325 @@ public class SideMenu extends AppCompatActivity {
         setContentView(R.layout.activity_side_menu);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
-//        LayoutInflaterCompat.setFactory(getLayoutInflater(), new IconicsLayoutInflater(getDelegate()));
+
+        initVolleyCallback();
+        vollyService = new VollyService(resultCallback, this);
+
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
+        appUserModel.setUserLoginId(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
         ButterKnife.bind(this);
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         uiSettingsModel = UiSettingsModel.getInstance();
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>My Learning</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderTextColor() + "'>My Learning</font>"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.back_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.settings_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.notification_font), iconFont);
+        FontManager.markAsIconContainer(findViewById(R.id.sendmessage_font), iconFont);
+
+
+        View customNav = LayoutInflater.from(this).inflate(R.layout.homebutton, null);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
+        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
+        toolbar.setLogo(d);
+        toolbar.setContentInsetStartWithNavigation(0);
+        logoView = getToolbarLogoIcon(toolbar);
+        logoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //logo clicked
+                homeControllClicked(false, 0, "");
+
+
+            }
+        });
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+            refreshCatalog();
+        } else {
+
+        }
+
+
+        backLayout.setOnClickListener(this);
+        sendMessageLayout.setOnClickListener(this);
+        notificationLayout.setOnClickListener(this);
+
+        ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
+//       imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
+            logoView.setVisibility(View.GONE);
+        }
+
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+//        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(this);
         toggle.getDrawerArrowDrawable().setColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
         toggle.syncState();
 
+        drawerHeaderView = (RelativeLayout) findViewById(R.id.drawerheaderview);
+        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-        RelativeLayout rl = (RelativeLayout) findViewById(R.id.drawerheaderview);
-        rl.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-        ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
-        imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
 
-        // navdrawer Top layout initilization
+        profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+        String[] strAry = new String[2];
+
+        strAry = extractProfileNameAndLocation(profileDetailsModel);
 
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
 
-        Glide.with(this).load(profileIma).placeholder(getResources().getDrawable(R.drawable.user_placeholder))
-                .thumbnail(0.5f)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(profileImage);
+        Picasso.with(this).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
+        String name = strAry[0];
 
-        txtUsername.setText(appUserModel.getUserName());
-        txtAddress.setText(appUserModel.getDisplayName());
+        if (name.contains("Anonymous") || name.contains("null")) {
 
-        sideMenusModel = db.getNativeMainMenusData();
+            name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
+        }
+        txtUsername.setText(upperCaseWords(name));
 
-        if (sideMenusModel != null) {
+        txtAddress.setText(upperCaseWords(strAry[1]));
+
+        sideMenumodelList = db.getNativeMainMenusData();
+
+        hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+
+        int i = 0;
+        for (SideMenusModel menu : sideMenumodelList) {
+            int parentMenuId = menu.getMenuId();
+            subMenuList = db.getNativeSubMenusData(parentMenuId);
+            if (subMenuList != null && subMenuList.size() > 0) {
+                hmSubMenuList.put(parentMenuId, subMenuList);
+            }
+
+            if (menu.getContextMenuId().equals("1")) {
+                if (IS_MENUS_FIRST_TIME) {
+                    IS_MENUS_FIRST_TIME = false;
+                }
+            }
+
+            if (menu.getContextMenuId().equals("10")) {
+                sendMessageLayout.setVisibility(View.VISIBLE);
+            }
+
+            i++;
+        }
+
+        if (sideMenumodelList != null) {
             menuDynamicAdapter = new MenuDrawerDynamicAdapter(
-                    getApplicationContext(), hmSubMenuList, sideMenusModel);
+                    getApplicationContext(), hmSubMenuList, sideMenumodelList);
 
+            SideMenusModel model = new SideMenusModel();
             if (savedInstanceState == null) {
+                String indexed = "0";
+                for (int j = 0; j < sideMenumodelList.size(); j++) {
+
+                    if (sideMenumodelList.get(j).getDisplayOrder() == 1) {
+                        indexed = sideMenumodelList.get(j).getContextMenuId();
+                        model = sideMenumodelList.get(j);
+
+                    } else {
+
+                        indexed = sideMenumodelList.get(0).getContextMenuId();
+                        model = sideMenumodelList.get(0);
+
+                    }
+
+                }
+
                 // on first time to display view for first navigation item based on the number
-                selectItem(0); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(Integer.parseInt(indexed), model, false, ""); // 2 is your fragment's number for "CollectionFragment"
+                homeModel = model;
+                homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
+
+
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
+            navDrawerExpandableView.setOnGroupExpandListener((new ExpandableListView.OnGroupExpandListener() {
+                @Override
+                public void onGroupExpand(int groupPosition) {
+                    int len = menuDynamicAdapter.getGroupCount();
+
+                    for (int i = 0; i < len; i++) {
+                        if (i != groupPosition) {
+                            navDrawerExpandableView.collapseGroup(i);
+                        }
+                    }
+                }
+
+            }));
+
             navDrawerExpandableView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
-                    int logoutPos = sideMenusModel.size() - 1;
-                    String filterCOndition = sideMenusModel.get(groupPosition).getConditions();
+//                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
+                    int logoutPos = sideMenumodelList.size() - 1;
+
+//                    String filterCondition = sideMenumodelList.get(groupPosition).getConditions();
                     if (logoutPos == groupPosition) {
+                        Intent intent = new Intent(SideMenu.this, Login_activity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        preferencesManager.setStringValue("", StaticValues.KEY_USERLOGINID);
+                        preferencesManager.setStringValue("", StaticValues.KEY_USERPASSWORD);
+                        startActivity(intent);
                         finish();
                         preferencesManager.setStringValue("", StaticValues.KEY_USERID);
+                    } else {
+                        if (lastClicked != groupPosition) {
 
-                    }
-                    if (lastClicked != groupPosition) {
-                        selectItem(groupPosition);
+                            if (sideMenumodelList != null && hmSubMenuList != null) {
+                                if (hmSubMenuList.containsKey(sideMenumodelList.get(groupPosition).getMenuId())) {
+                                    return false;
+                                } else {
+
+                                    try {
+                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false, "");
+
+                                    } catch (NumberFormatException numEx) {
+                                        numEx.printStackTrace();
+                                        selectItem(1, sideMenumodelList.get(groupPosition), false, "");
+                                    }
+                                }
+                            }
+                        }
                     }
                     drawer.closeDrawer(Gravity.LEFT);
                     lastClicked = groupPosition;
+
                     return false;
                 }
+
+
             });
+
+
+            navDrawerExpandableView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+                @Override
+                public boolean onChildClick(ExpandableListView parent, View v,
+                                            int groupPosition, int childPosition, long id) {
+                    subMenuItemClickListener(parent, groupPosition, childPosition);
+                    return true;
+                }
+
+            });
+
+
+            navDrawerExpandableView.expandGroup(lastClicked);
         }
+
+        signalAService = SignalAService.newInstance(this);
+        signalAService.startSignalA();
     }
 
-    private void selectItem(int position) {
+    public void homeControllClicked(boolean isFromNotification, int menuId, String contentID) {
 
-        Fragment fragment = null;
+        if (!isFromNotification)
+            selectItem(homeIndex, homeModel, false, contentID);
+        else {
+            selectItem(menuId, getMenuModelForNotification(menuId), true, contentID);
+        }
 
-        switch (position) {
-            case 0:
+        navDrawerExpandableView.expandGroup(0);
+        lastClicked = 0;
+    }
+
+    public SideMenusModel getMenuModelForNotification(int menuId) {
+        SideMenusModel sideMenusModel = new SideMenusModel();
+
+        for (int i = 0; i < sideMenumodelList.size(); i++) {
+
+            if (sideMenumodelList.get(i).getContextMenuId().equalsIgnoreCase("" + menuId)) {
+                sideMenusModel = sideMenumodelList.get(i);
+            }
+
+        }
+
+        return sideMenusModel;
+    }
+
+    private Bitmap createBitmapFromView(Context context, View view) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
+    }
+
+    public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID) {
+
+        Fragment fragment = null; //
+
+        switch (menuid) {
+            case 1:
                 fragment = new MyLearningFragment();
                 break;
-            case 1:
-                fragment = new Catalog_fragment();
+            case 2:
+                if (sideMenusModel.getLandingPageType().equalsIgnoreCase("1")) {
+                    fragment = new CatalogCategories_Fragment();
+                } else {
+                    fragment = new Catalog_fragment();
+                }
                 break;
             case 3:
-                fragment = new Catalog_fragment();
+                fragment = new Profile_fragment();
+                break;
+            case 7:
+                fragment = new Webpage_fragment();
+                break;
+            case 6:
+                fragment = new HomeCategories_Fragment();
+                break;
+            case 8:
+                fragment = new Event_fragment();
+                break;
+            case 4:
+                fragment = new DiscussionFourm_fragment();
+                break;
+            case 5:
+                fragment = new AskExpertFragment();
+                break;
+            case 9:
+                fragment = new LearningCommunities_fragment();
+                break;
+            case 10:
+                fragment = new PeopleListing_fragment();
+                break;
+            case 99:
+                fragment = new SendMessage_fragment();
+                break;
+            case 100:
+                fragment = new Notifications_fragment();
                 break;
             default:
-                fragment = new Catalog_fragment();
+                Log.d(TAG, "selectItem: default contextmenu");
+                fragment = new com.instancy.instancylearning.menufragments.Catalog_fragment();
                 break;
         }
 
@@ -211,19 +495,23 @@ public class SideMenu extends AppCompatActivity {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container_body, fragment).commit();
             Bundle bundle = new Bundle();
+            if (menuid != 99) {
+                bundle.putSerializable("sidemenumodel", sideMenusModel);
+                bundle.putBoolean("ISFROMCATEGORIES", false);
+                bundle.putBoolean("ISFROMNOTIFICATIONS", isFromNotification);
+                bundle.putString("CONTENTID", contentID);
+                fragment.setArguments(bundle);
+                navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
+                navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
+            }
 
-            // send model from her to fragment
-            bundle.putString(CONTEXT_TITLE, sideMenusModel.get(position).getDisplayName());
-            bundle.putSerializable("sidemenumodel", sideMenusModel.get(position));
-            fragment.setArguments(bundle);
-
-            navDrawerExpandableView.setItemChecked(position, true);
-            navDrawerExpandableView.setSelection(position);
             drawer.closeDrawer(Gravity.LEFT);
         } else {
             Log.e("MainActivity", "Error in creating fragment");
         }
     }
+
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     public void onBackPressed() {
@@ -231,41 +519,95 @@ public class SideMenu extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+
+//            if (getFragmentManager().getBackStackEntryCount() > 0) {
+//                getFragmentManager().popBackStack();
+//                return;
+//            }
+//            if (!doubleBackToExitPressedOnce) {
+//                this.doubleBackToExitPressedOnce = true;
+//                Toast.makeText(this, "Please click BACK again to exit.", Toast.LENGTH_SHORT).show();
+//
+//                new Handler().postDelayed(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        doubleBackToExitPressedOnce = false;
+//                    }
+//                }, 2000);
+//            } else {
             super.onBackPressed();
+//                return;
+//            }
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main_menu, menu);
-//
-//        MenuItem menuItem = menu.findItem(R.id.action_search);
-//
-//        if (menuItem != null) {
-//            tintMenuIcon(SideMenu.this, menuItem, R.color.colorWhite);
-//        }
-//
-//
-//
-//        return true;
-//    }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//        if (id == R.id.action_search) {
-////            Intent intentSettings = new Intent(this, Settings_activity.class);
-////            intentSettings.putExtra(StaticValues.KEY_ISLOGIN, true);
-////            startActivity(intentSettings);
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    private void subMenuItemClickListener(ExpandableListView parent,
+                                          int groupPosition, int childPosition) {
+
+        if (!(MAIN_MENU_POSITION == groupPosition && SUB_MENU_POSITION == childPosition)) {
+            MAIN_MENU_POSITION = groupPosition;
+            SUB_MENU_POSITION = childPosition;
+            List<SideMenusModel> mList = hmSubMenuList.get(sideMenumodelList.get(MAIN_MENU_POSITION).getMenuId());
+            SideMenusModel m = mList.get(childPosition);
+
+            if (m.getIsOfflineMenu().equals("true")) {
+                navDrawerExpandableView.setSelectedGroup(groupPosition);
+                navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
+                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "");
+            } else {
+
+            }
+
+        }
+    }
+
+    public void backToMainSite() {
+        BACKTOMAINSITE = 2;
+        SIDEMENUOPENED_FIRSTTIME = 0;
+        CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+        PROFILE_FRAGMENT_OPENED_FIRSTTIME = 0;
+        preferencesManager.setStringValue("false", StaticValues.SUB_SITE_ENTERED);
+        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
+        appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        sideMenumodelList = new ArrayList<SideMenusModel>();
+        sideMenumodelList = db.getNativeMainMenusData();
+
+        hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+
+        int i = 0;
+        for (SideMenusModel menu : sideMenumodelList) {
+            int parentMenuId = menu.getMenuId();
+            subMenuList = db.getNativeSubMenusData(parentMenuId);
+            if (subMenuList != null && subMenuList.size() > 0) {
+                hmSubMenuList.put(parentMenuId, subMenuList);
+            }
+
+            if (menu.getContextMenuId().equals("1")) {
+                if (IS_MENUS_FIRST_TIME) {
+                    IS_MENUS_FIRST_TIME = false;
+                }
+            }
+            i++;
+        }
+
+        menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
+
+        backLayout.setVisibility(View.GONE);
+
+        homeControllClicked(false, 0, "");
+    }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -273,18 +615,218 @@ public class SideMenu extends AppCompatActivity {
         toggle.onConfigurationChanged(newConfig);
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         if (fragments != null) {
             for (Fragment fragment : fragments) {
-
-                if (data != null) {
-                    fragment.onActivityResult(requestCode, resultCode, data);
+                if (fragment != null) {
+                    if (data != null) {
+                        fragment.onActivityResult(requestCode, resultCode, data);
+                    }
                 }
             }
         }
+    }
+
+    public String[] extractProfileNameAndLocation(ProfileDetailsModel detailsModel) {
+
+        String[] strAry = new String[2];
+
+        String name = "";
+        String location = "";
+
+
+        if (!detailsModel.displayname.equalsIgnoreCase("")) {
+            name = detailsModel.displayname;
+        } else if (!detailsModel.firstname.equalsIgnoreCase("")) {
+            name = detailsModel.firstname + " " + detailsModel.lastname;
+        } else {
+            name = "Anonymous";
+        }
+
+        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("na")) {
+            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+                location = detailsModel.addresscity + ", " + detailsModel.addressstate;
+            } else {
+                location = detailsModel.addresscity;
+            }
+        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+            location = detailsModel.addressstate;
+        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("na")) {
+            location = detailsModel.addresscountry;
+        } else {
+            location = "";
+        }
+
+        strAry[0] = name;
+        strAry[1] = location;
+
+        return strAry;
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.back_layout:
+                backToMainSite();
+                break;
+            case R.id.sendmessage_layout:
+                selectItem(99, sideMenumodelList.get(0), false, "");
+                break;
+            case R.id.notification_layout:
+                selectItem(100, sideMenumodelList.get(0), false, "");
+                break;
+        }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        Log.d(TAG, "onPostResume: sidemenu");
+    }
+
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+//        Log.d(TAG, "onDrawerSlide: sidemenu");
+//        if (SIDEMENUOPENED_FIRSTTIME == 0) {
+//            enteredSubsiteMethods();
+//        }
+    }
+
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        Log.d(TAG, "onDrawerOpened: sidemenu");
+        if (SIDEMENUOPENED_FIRSTTIME == 0) {
+            enteredSubsiteMethods();
+        }
+    }
+
+    public void enteredSubsiteMethods() {
+        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+        if (isSubSiteEntered.equalsIgnoreCase("true")) {
+            backLayout.setVisibility(View.VISIBLE);
+            subsiteLayout.setVisibility(View.VISIBLE);
+            SIDEMENUOPENED_FIRSTTIME = 1;
+            BACKTOMAINSITE = 1;
+            TextView mainSiteName = (TextView) backLayout.findViewById(R.id.txtbtn_back);
+            TextView subsiteName = (TextView) subsiteLayout.findViewById(R.id.subsitename);
+            LinearLayout subsiteLa = (LinearLayout) subsiteLayout.findViewById(R.id.subsitelays);
+            subsiteName.setText(appUserModel.getSiteName());
+            mainSiteName.setText(appUserModel.getMainSiteName());
+            subsiteLa.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            subsiteLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            subsiteLa.setAlpha(.9f);
+//            subsiteLayout.setAlpha(.7f);
+
+            drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+            sideMenumodelList = new ArrayList<SideMenusModel>();
+            sideMenumodelList = db.getNativeMainMenusData();
+
+            hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+
+            int i = 0;
+            for (SideMenusModel menu : sideMenumodelList) {
+                int parentMenuId = menu.getMenuId();
+                subMenuList = db.getNativeSubMenusData(parentMenuId);
+                if (subMenuList != null && subMenuList.size() > 0) {
+                    hmSubMenuList.put(parentMenuId, subMenuList);
+                }
+
+                if (menu.getContextMenuId().equals("1")) {
+                    if (IS_MENUS_FIRST_TIME) {
+                        IS_MENUS_FIRST_TIME = false;
+                    }
+                }
+                i++;
+            }
+            menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
+        } else {
+            backLayout.setVisibility(View.GONE);
+            subsiteLayout.setVisibility(View.GONE);
+            SIDEMENUOPENED_FIRSTTIME = 0;
+        }
+    }
+
+    @Override
+    public void onDrawerClosed(View drawerView) {
+        Log.d(TAG, "onDrawerClosed: sidemenu");
+    }
+
+    @Override
+    public void onDrawerStateChanged(int newState) {
 
     }
+
+    public boolean respectiveMenuExistsOrNot(String contextMenuId) {
+        boolean exists = false;
+
+        for (int i = 0; i < sideMenumodelList.size(); i++) {
+
+            if (contextMenuId.equalsIgnoreCase(sideMenumodelList.get(i).contextMenuId)) {
+                exists = true;
+            }
+
+        }
+        return exists;
+    }
+
+    public void refreshCatalog() {
+
+        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
+
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+                if (requestType.equalsIgnoreCase("NOTIFICATIODATA")) {
+                    if (response != null) {
+                        try {
+
+                            JSONArray jsonTableAry = response.getJSONArray("notificationsdata");
+
+                            if (jsonTableAry.length() > 0) {
+                                txtBtnNotification.setText("Notifications(" + jsonTableAry.length() + ")");
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+
+            }
+        };
+    }
+
 }

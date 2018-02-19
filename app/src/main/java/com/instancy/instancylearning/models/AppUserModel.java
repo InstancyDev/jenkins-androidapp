@@ -28,7 +28,7 @@ public class AppUserModel {
     }
 
     public String getDisplayName() {
-        return displayName.isEmpty() ? "Playground" : displayName;
+        return displayName.isEmpty() ? "" : displayName;
     }
 
     public void setDisplayName(String displayName) {
@@ -68,7 +68,8 @@ public class AppUserModel {
     }
 
     public String getWebAPIUrl() {
-        return webAPIUrl;
+        return webAPIUrl.isEmpty() ? "" + R.string.app_default_webapi_url : webAPIUrl;
+
     }
 
     public void setWebAPIUrl(String webAPIUrl) {
@@ -91,14 +92,6 @@ public class AppUserModel {
         this.authHeaders = authHeaders;
     }
 
-    public String getAuthSubsiteHeaders() {
-        return authSubsiteHeaders;
-    }
-
-    public void setAuthSubsiteHeaders(String authSubsiteHeaders) {
-        this.authSubsiteHeaders = authSubsiteHeaders;
-    }
-
     private String password = "";
     private String displayName = "";
     private String userIDValue = "";
@@ -108,7 +101,27 @@ public class AppUserModel {
     private String webAPIUrl = "";
     private String base64Credentials = "";
     private String authHeaders = "";
-    private String authSubsiteHeaders = "";
+
+    public String getMainSiteName() {
+        return mainSiteName;
+    }
+
+    public void setMainSiteName(String mainSiteName) {
+        this.mainSiteName = mainSiteName;
+    }
+
+    private String mainSiteName = "";
+
+
+    public String getUserLoginId() {
+        return userLoginId;
+    }
+
+    public void setUserLoginId(String userLoginId) {
+        this.userLoginId = userLoginId;
+    }
+
+    private String userLoginId = "";
 
     public String getProfileImage() {
         return profileImage;

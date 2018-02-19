@@ -1,6 +1,8 @@
 package com.instancy.instancylearning.globalpackage;
 
-import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 
@@ -9,48 +11,30 @@ import com.android.volley.RequestQueue;
  * http://arnab.ch/blog/2013/08/asynchronous-http-requests-in-android-using-volley/
  */
 
-public class AppController extends Application {
+public class AppController extends MultiDexApplication {
 
 
-
-    private String webApiUrl;
-
-    public String getSiteId() {
-        return siteId;
+    public boolean isAlreadyViewd() {
+        return isAlreadyViewd;
     }
 
-    public void setSiteId(String siteId) {
-        this.siteId = siteId;
+    public void setAlreadyViewd(boolean alreadyViewd) {
+        isAlreadyViewd = alreadyViewd;
     }
 
-    private String siteId = "";
-
-    public String getWebApiUrl() {
-        return webApiUrl;
+    public boolean isAlreadyViewdTrack() {
+        return isAlreadyViewdTrack;
     }
 
-    public void setWebApiUrl(String webApiUrl) {
-        this.webApiUrl = webApiUrl;
+    public void setAlreadyViewdTrack(boolean alreadyViewdTrack) {
+        isAlreadyViewdTrack = alreadyViewdTrack;
     }
 
-    public String getSiteUrl() {
-        return siteUrl;
-    }
+    public boolean isAlreadyViewdTrack;
 
-    public void setSiteUrl(String siteUrl) {
-        this.siteUrl = siteUrl;
-    }
 
-    public String getAuthentication() {
-        return authentication;
-    }
+    private boolean isAlreadyViewd = false;
 
-    public void setAuthentication(String authentication) {
-        this.authentication = authentication;
-    }
-
-    private String siteUrl;
-    private String authentication;
 
     public static final String TAG = AppController.class
             .getSimpleName();
@@ -70,6 +54,11 @@ public class AppController extends Application {
         super.onCreate();
 
         // initialize the singleton
+
+        if (AppController.context == null) {
+            AppController.context = getApplicationContext();
+        }
+
         sInstance = this;
     }
 
@@ -78,5 +67,19 @@ public class AppController extends Application {
      */
     public static synchronized AppController getInstance() {
         return sInstance;
+    }
+
+
+    private static Context context;
+
+    public static synchronized Context getGlobalContext() {
+        return context;
+    }
+
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

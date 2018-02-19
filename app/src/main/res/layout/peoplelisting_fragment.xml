@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/nodata_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text="@string/no_data"
+        android:textSize="24sp" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipemylearning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/segmentedswitch"
+        android:layout_below="@+id/compactcalendar_view">
+
+        <ListView
+            android:id="@+id/peoplelsitview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="2dp"
+            android:padding="2dp"
+            android:scrollbars="none"> </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <info.hoang8f.android.segmented.SegmentedGroup xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/segmentedswitch"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        segmentedgroup:backgroundTint="@color/colorPrimary"
+        segmentedgroup:sc_border_width="0dp"
+        segmentedgroup:sc_checked_text_color="@color/colorPrimary"
+        segmentedgroup:sc_tint_color="@color/colorPrimary">
+
+        <RadioButton
+            android:id="@+id/expertsbtn"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".8"
+            android:checked="true"
+            android:text="Experts"
+            android:textColor="@color/colorWhite"
+            android:textSize="14dp" />
+
+        <RadioButton
+            android:id="@+id/allPeoplebtn"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight=".8"
+            android:text="All People"
+            android:textColor="@color/colorWhite"
+            android:textSize="14dp" />
+
+        <RadioButton
+
+            android:id="@+id/myconnectionbtn"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:text="My Connections"
+
+            android:textSize="14dp" />
+
+        <RadioButton
+
+            android:id="@+id/pendingbtn"
+            style="@style/RadioButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
+            android:text="Pending Requests"
+            android:textSize="14dp" />
+
+
+    </info.hoang8f.android.segmented.SegmentedGroup>
+
+</RelativeLayout>

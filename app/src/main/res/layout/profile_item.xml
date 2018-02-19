@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="#ffff">
+
+    <TextView
+        android:padding="3dp"
+        android:id="@+id/profile_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="Name"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="10sp" />
+
+    <TextView
+        android:padding="3dp"
+        android:layout_below="@id/profile_label"
+        android:id="@+id/profile_value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="Upendra Nath Reddy"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/colorBlack"
+        android:textSize="12sp" />
+</RelativeLayout>

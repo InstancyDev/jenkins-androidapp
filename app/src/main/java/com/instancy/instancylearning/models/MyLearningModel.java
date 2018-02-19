@@ -11,6 +11,16 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 public class MyLearningModel implements Serializable {
 
 
+    public boolean isCompletedEvent() {
+        return completedEvent;
+    }
+
+    public void setCompletedEvent(boolean completedEvent) {
+        this.completedEvent = completedEvent;
+    }
+
+    boolean completedEvent=false;
+
     String progress = "";
     String userName = "";
     String siteID = "";
@@ -73,6 +83,104 @@ public class MyLearningModel implements Serializable {
     String parentID = "";
     String trackScoid = "";
     String showStatus = "";
+
+    public String getTrackOrRelatedContentID() {
+        return trackOrRelatedContentID;
+    }
+
+    public void setTrackOrRelatedContentID(String trackOrRelatedContentID) {
+        this.trackOrRelatedContentID = trackOrRelatedContentID;
+    }
+
+    String trackOrRelatedContentID = "";
+
+    // Exclusive For Catalog Model start
+
+    String googleProductID = "";
+
+    String componentId = "";
+
+    String price = "";
+
+    int addedToMylearning = 0;
+
+    String itemType = "";
+
+    String viewType = "";
+
+    String currency = "";
+
+
+    public String getAviliableSeats() {
+        return aviliableSeats;
+    }
+
+    public void setAviliableSeats(String aviliableSeats) {
+        this.aviliableSeats = aviliableSeats;
+    }
+
+    String aviliableSeats = "";
+
+    public int getAddedToMylearning() {
+
+
+        return addedToMylearning;
+    }
+
+    public void setAddedToMylearning(int addedToMylearning) {
+        this.addedToMylearning = addedToMylearning;
+    }
+
+    public String getItemType() {
+
+        return isValidString(itemType) ? itemType : "";
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+
+    public String getViewType() {
+
+        return isValidString(viewType) ? viewType : "";
+    }
+
+    public void setViewType(String viewType) {
+        this.viewType = viewType;
+    }
+
+    public String getCurrency() {
+        return isValidString(currency) ? currency : "";
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getComponentId() {
+        return componentId;
+    }
+
+    public void setComponentId(String componentId) {
+        this.componentId = componentId;
+    }
+
+    public String getPrice() {
+        return isValidString(price) ? price : "";
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getGoogleProductID() {
+
+        return isValidString(googleProductID) ? googleProductID : "";
+    }
+
+    public void setGoogleProductID(String googleProductID) {
+        this.googleProductID = googleProductID;
+    }
 
     public String getEventID() {
         return isValidString(eventID) ? eventID : "";
@@ -152,7 +260,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public String getShowStatus() {
-        return showStatus;
+        return isValidString(showStatus) ? showStatus : "";
     }
 
     public void setShowStatus(String showStatus) {
@@ -228,7 +336,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public String getAuthor() {
-        return author;
+        return isValidString(author) ? author : "";
     }
 
     public void setAuthor(String author) {
@@ -429,7 +537,7 @@ public class MyLearningModel implements Serializable {
     }
 
     public Boolean getEventAddedToCalender() {
-        return eventAddedToCalender!=null?eventAddedToCalender:false;
+        return eventAddedToCalender != null ? eventAddedToCalender : false;
     }
 
     public void setEventAddedToCalender(Boolean eventAddedToCalender) {

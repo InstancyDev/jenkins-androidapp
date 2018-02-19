@@ -27,6 +27,9 @@ public class StaticValues {
 
 
     public static final String INSTANCYPREFS_NAME = "instancyprefs";
+
+
+    //Main Site
     public static final String KEY_USERLOGINID = "KEY_USERLOGINID";
     public static final String KEY_USERPASSWORD = "KEY_USERPASSWORD";
     public static final String KEY_USERID = "KEY_USERID";
@@ -34,12 +37,29 @@ public class StaticValues {
     public static final String KEY_SITEURL = "KEY_SITEURL";
     public static final String KEY_AUTHENTICATION = "KEY_AUTHENTICATION";
     public static final String KEY_USERNAME = "KEY_USERNAME";
+    public static final String KEY_SITEID = "KEY_SITEID";
 
     public static final String KEY_USERSTATUS = "KEY_USERSTATUS";
 
     public static final String KEY_USERPROFILEIMAGE = "KEY_USERIMAGE";
 
-    public static final String KEY_SITEID = "KEY_SITEID";
+    // SubSite
+
+    public static final String SUB_SITE_ENTERED = "SUB_SITE_ENTERED";
+
+    public static final String SUB_KEY_USERLOGINID = "SUB_KEY_USERLOGINID";
+    public static final String SUB_KEY_USERPASSWORD = "SUB_KEY_USERPASSWORD";
+    public static final String SUB_KEY_USERID = "SUB_KEY_USERID";
+    public static final String SUB_KEY_WEBAPIURL = "SUB_KEY_WEBAPIURL";
+    public static final String SUB_KEY_SITEURL = "SUB_KEY_SITEURL";
+    public static final String SUB_KEY_AUTHENTICATION = "SUB_KEY_AUTHENTICATION";
+    public static final String SUB_KEY_USERNAME = "SUB_KEY_USERNAME";
+    public static final String SUB_KEY_SITEID = "SUB_KEY_SITEID";
+    public static final String SUB_SITE_NAME = "SUB_SITE_NAME";
+
+    public static final String SUB_KEY_USERSTATUS = "SUB_KEY_USERSTATUS";
+
+    public static final String SUB_KEY_USERPROFILEIMAGE = "SUB_KEY_USERPROFILEIMAGE";
 
     public static final String KEY_SITENAME = "KEY_SITENAME";
 
@@ -51,13 +71,18 @@ public class StaticValues {
 
     public static final String KEY_ACTIONBARTITLE = "KEY_ACTIONBARTITLE";
 
-
     public static final String BUNDLE_USERNAME = "BUNDLE_USERNAME";
 
     public static final String BUNDLE_PASSWORD = "BUNDLE_PASSWORD";
 
+    public static final String KEY_HIDE_ANNOTATION = "KEY_HIDE_ANNOTATION";
 
     public static final String CONTEXT_TITLE = "COONTEXT_TITLE";
+
+
+    public static final String CHAT_LIST = "CHAT_LIST";
+
+    public static final String BACK_STACK_ROOT_TAG = "root_fragment";
     /**
      * To get the FontAwsome font .ttf asset path
      *
@@ -79,10 +104,19 @@ public class StaticValues {
      *
      * @author Venu
      */
+
+    public static final int DETAIL_CATALOG_CODE = 1212;
+
     public static final int COURSE_CLOSE_CODE = 9595;
 
 
     public static final int DETAIL_CLOSE_CODE = 9191;
+
+    public static final int FILTER_CLOSE_CODE = 1234;
+
+    public static final int FORUM_CREATE_NEW_FORUM = 2111;
+
+    public static final int INNER_FILTER_CLOSE = 2121;
 
     public static final int COURSE_CLOSE_FROM_WEBSCREEN_CODE = 8888;
 
@@ -239,5 +273,24 @@ public class StaticValues {
      */
     public static int SUB_MENU_POSITION = -1;
 
+
+    public static int MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+    public static int CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+
+    public static int EVENT_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+    public static int SIDEMENUOPENED_FIRSTTIME = 0;
+
+
+    public static int PROFILE_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+    public static int BACKTOMAINSITE = 0;
+
+    public static final String ACTION_INTENT_TEXT_MESSAGE_INCOMING = "ACTION_INTENT_TEXT_MESSAGE_INCOMING";
+
+
+    /// all app configurations
 
 }

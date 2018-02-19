@@ -3,12 +3,16 @@ package com.instancy.instancylearning.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.support.annotation.ColorRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
@@ -17,8 +21,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.instancy.instancylearning.BuildConfig;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
 
@@ -30,9 +36,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Random;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -164,6 +173,20 @@ public class Utilities {
         return df.format(c.getTime());
     }
 
+    public static Date getCurrentDateTimeInDate(String dateStr) {
+
+        Date date = null;
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            date = format.parse(dateStr);
+            System.out.println(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
     /**
      * To format Date time string from {@code currentFormat} to {@code newFormat}.
      *
@@ -173,10 +196,7 @@ public class Utilities {
      * @author Venu
      */
     public static String formatDate(String dateTime, String currentFormat, String newFormat) {
-//		SimpleDateFormat curFormater = new SimpleDateFormat(
-//				"yyyy-MM-dd'T'HH:mm:ss");
-//		SimpleDateFormat postFormater = new SimpleDateFormat(
-//				"dd-MM-yyyy h:mm:ss a");
+
         SimpleDateFormat preFormat = new SimpleDateFormat(currentFormat);
         SimpleDateFormat postFormater = new SimpleDateFormat(newFormat);
         String newDate = null;
@@ -218,12 +238,13 @@ public class Utilities {
      */
     public static boolean isValidString(String str) {
         try {
-            if (str == null || str.equals("") || str.equals("null") || str.equals("undefined")) {
+            if (str == null || str.equals("") || str.equals("null") || str.equals("undefined") || str.equals("null\n")) {
                 return false;
             } else {
                 return true;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -547,10 +568,6 @@ public class Utilities {
      */
 
 
-
-
-
-
 //	public static void highlightSearchText(Context ctx, TextView textView, String text,
 //			String spanText) {
 //		String wholeText = text.toLowerCase();
@@ -730,9 +747,9 @@ public class Utilities {
             for (int i = 0; i < conditionsArray.length; i++) {
                 String[] filterArray = conditionsArray[i].split("=");
 
-                System.out.println(" forvalue " + filterArray);
+//                System.out.println(" forvalue " + filterArray);
 
-                if(filterArray.length>1)
+                if (filterArray.length > 1)
                     map.put(filterArray[0], filterArray[1]);
             }
 
@@ -745,6 +762,152 @@ public class Utilities {
         }
 
         return map;
+    }
+
+    public static Date ConvertToDate(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date convertedDate = new Date();
+        try {
+            convertedDate = dateFormat.parse(dateString);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return convertedDate;
+    }
+
+    public static Date GetZeroTimeDate(Date fecha) {
+        Date res = fecha;
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTime(fecha);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        res = calendar.getTime();
+
+        return res;
+    }
+
+    public static String upperCaseWords(String sentence) {
+        String words[] = sentence.replaceAll("\\s+", " ").trim().split(" ");
+        String newSentence = "";
+        for (String word : words) {
+            for (int i = 0; i < word.length(); i++)
+                newSentence = newSentence + ((i == 0) ? word.substring(i, i + 1).toUpperCase() :
+                        (i != word.length() - 1) ? word.substring(i, i + 1).toLowerCase() : word.substring(i, i + 1).toLowerCase().toLowerCase() + " ");
+        }
+
+        return newSentence;
+    }
+
+    public static String getFirstCaseWords(String sentence) {
+        String words[] = sentence.replaceAll("\\s+", " ").trim().split(" ");
+        String newSentence = "";
+        int moreThan2 = 0;
+        for (String word : words) {
+            moreThan2++;
+            if (moreThan2 > 2)
+                break;
+            for (int i = 0; i < word.length(); i++) {
+
+                newSentence = newSentence + ((i == 0) ? word.substring(i, i + 1).toUpperCase() : "");
+            }
+        }
+
+        return newSentence;
+    }
+
+    public Drawable generateDrawableFromString(String nameStr) {
+
+
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+        TextDrawable drawable = TextDrawable.builder()
+                .buildRound(nameStr, color);
+
+        return drawable;
+    }
+
+    public static String returnDateIfNotToday(String dateTime) {
+
+        String originalString = dateTime;
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(originalString);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String newString = new SimpleDateFormat("H:mm").format(date);
+
+        return originalString;
+    }
+
+    public static String getFileNameFromPath(Uri contentURI, Context context) {
+
+        String fileName = "";
+        if (contentURI.getScheme().equals("file")) {
+            fileName = contentURI.getLastPathSegment();
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = context.getContentResolver().query(contentURI, new String[]{
+                        MediaStore.Images.ImageColumns.DISPLAY_NAME
+                }, null, null, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+                    Log.d("UTILS", "name is " + fileName);
+                }
+            } finally {
+
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+
+        return fileName;
+    }
+
+
+    public static String getMimeTypeFromUri(Uri selectedUri) {
+
+        String mimeType = "";
+        if (selectedUri != null) {
+            String fileExtension
+                    = MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+            mimeType
+                    = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+
+        }
+
+        return mimeType;
+    }
+
+    public static String toStringS(Object[] a) {
+        if (a == null)
+            return "";
+
+        int iMax = a.length - 1;
+        if (iMax == -1)
+            return "[]";
+
+        StringBuilder b = new StringBuilder();
+
+        String value = "";
+
+        b.append('[');
+        for (int i = 0; ; i++) {
+            b.append(String.valueOf(a[i]));
+            if (i == iMax)
+                return b.append(']').toString();
+            b.append(", ");
+        }
     }
 
 }

@@ -1,31 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <TextView
         android:id="@+id/nodata_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="@string/no_data"
-        android:textSize="24sp"
-        />
+        android:text=""
+        android:textSize="24sp" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipemylearning"
+    <LinearLayout
+        android:id="@+id/llCatalogGridCatageory"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorWhite"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <include layout="@layout/catalog_categories_list_breadcrumb" />
+    </LinearLayout>
+
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_below="@id/llCatalogGridCatageory">
 
-        <ListView
-            android:id="@+id/mylearninglistview"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipemylearning"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            > </ListView>
+            android:layout_height="wrap_content">
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+            <ListView
+                android:id="@+id/mylearninglistview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="10dp"
+                android:padding="6dp"
+                android:scrollbars="none"></ListView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </FrameLayout>
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/uploadfloatmenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:visibility="gone"
+        app:menu_colorNormal="@color/colorPrimary"
+        app:menu_colorPressed="@color/colorDarkGrey"
+        app:menu_fab_size="normal">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Image"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Video"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabAudio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Audio"
+
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabDocument"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Document"
+            app:fab_size="mini" />
+
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fabWebsiteURL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:fab_colorPressed="@color/colorDarkGrey"
+            app:fab_label="Website URL"
+            app:fab_size="mini" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
 
 </RelativeLayout>

@@ -6,12 +6,118 @@ package com.instancy.instancylearning.models;
 
 public class UiSettingsModel {
 
+    // for acclife
+    private String brandingColor = "#003d77";
+
+    private String appBackGroundColor = "#ffffff";
+
+    private String defaultTextColor = "#000000";
+
+// for trackton_accilife for all buttons
+//    private String brandingColor = "#0062a6";
+
+
+    // for instancy for all buttons
+//    private String brandingColor = "#1c4585";
+//    private String appBackGroundColor = "#ffffff";
+//    private String defaultTextColor = "#000000";
+    // for instancy for all buttons
+//    private String appBackGroundColor = "#8dc73f";
+
+
+// // for instancy for all buttons
+
+//    private String appBackGroundColor = "#8dc73f";
+//
+//    private String brandingColor = "#8dc73f";
+//
+//    private String defaultTextColor = "#ffffff";
+
+
+// for cle app
+
+//    private String appBackGroundColor = "#4A2D1F";
+//
+//    private String brandingColor = "#4A2D1F";
+//
+//    private String defaultTextColor = "#ffffff";
+
+    public String getAutoLaunchMyLearningFirst() {
+        return autoLaunchMyLearningFirst;
+    }
+
+    public void setAutoLaunchMyLearningFirst(String autoLaunchMyLearningFirst) {
+        this.autoLaunchMyLearningFirst = autoLaunchMyLearningFirst;
+    }
+
+    private String autoLaunchMyLearningFirst = "false";
+
 
     private String menuTextColor = "";
-    private String defaultTextColor = "";
+
+    public String getSignUpName() {
+        return signUpName;
+    }
+
+    public void setSignUpName(String signUpName) {
+        this.signUpName = signUpName;
+    }
+
+    private String signUpName = "";
+
+    public String getEnableAppLogin() {
+        return enableAppLogin;
+    }
+
+    public void setEnableAppLogin(String enableAppLogin) {
+        this.enableAppLogin = enableAppLogin;
+    }
+
+    private String enableAppLogin = "";
+
+    private String nativeAppLoginLogo = "";
+
+    public String getNativeAppLoginLogo() {
+        return nativeAppLoginLogo;
+    }
+
+    public void setNativeAppLoginLogo(String nativeAppLoginLogo) {
+        this.nativeAppLoginLogo = nativeAppLoginLogo;
+    }
+
+    public String getEnableBranding() {
+        return enableBranding;
+    }
+
+    public void setEnableBranding(String enableBranding) {
+        this.enableBranding = enableBranding;
+    }
+
+    private String enableBranding = "";
+
+    public String getAppLoginBGColor() {
+        return appLoginBGColor.isEmpty() ? appBackGroundColor : appLoginBGColor;
+    }
+
+    public void setAppLoginBGColor(String appLoginBGColor) {
+        this.appLoginBGColor = appLoginBGColor;
+    }
+
+    private String appLoginBGColor = "";
+
+    public String getAppLoginTextolor() {
+
+        return appLoginTextolor.isEmpty() ? defaultTextColor : appLoginTextolor;
+    }
+
+    public void setAppLoginTextolor(String appLoginTextolor) {
+        this.appLoginTextolor = appLoginTextolor;
+    }
+
+    private String appLoginTextolor = "";
 
     public String getAppTextColor() {
-        return appTextColor.isEmpty() ? "" : appTextColor;
+        return appTextColor.isEmpty() ? "#000000" : appTextColor;
     }
 
     public void setAppTextColor(String appTextColor) {
@@ -19,7 +125,7 @@ public class UiSettingsModel {
     }
 
     public String getAppBGColor() {
-        return appBGColor.isEmpty() ? "" : appBGColor;
+        return appBGColor.isEmpty() ? "#ffffff" : appBGColor;
     }
 
     public void setAppBGColor(String appBGColor) {
@@ -58,6 +164,24 @@ public class UiSettingsModel {
         this.isLinkedIn = isLinkedIn;
     }
 
+
+    public void setAppButtonBgColor(String appButtonBgColor) {
+        this.appButtonBgColor = appButtonBgColor;
+    }
+
+    public String getAppButtonTextColor() {
+
+        return appButtonTextColor.isEmpty() ? defaultTextColor : appButtonTextColor;
+
+    }
+
+    public void setAppButtonTextColor(String appButtonTextColor) {
+        this.appButtonTextColor = appButtonTextColor;
+    }
+
+    private String appButtonBgColor = "";
+    private String appButtonTextColor = "";
+
     private String appTextColor = "";
     private String appBGColor = "";
 
@@ -71,7 +195,14 @@ public class UiSettingsModel {
     private String selectedMenuTextColor = "";
 
     private String selectedMenuBGColor = "";
-    private String headerTextColor = "";
+
+
+    public void setAppHeaderTextColor(String appHeaderTextColor) {
+        this.appHeaderTextColor = appHeaderTextColor;
+
+    }
+
+    private String appHeaderTextColor = "";
 
     private String headerBGColor = "";
     private String listBGColor = "";
@@ -83,18 +214,7 @@ public class UiSettingsModel {
     private String menuBGAlternativeColor = "";
 
     private String menuBGSelectTextColor = "";
-    private String viewButtonColor = "";
 
-    private String viewButtonTextColor = "";
-    private String detailButtonColor = "";
-
-    private String detailButtonTextColor = "";
-    private String reportButtonColor = "";
-
-    private String reportButtonTextColor = "";
-    private String setCompleteButtonColor = "";
-
-    private String setCompleteTextColor = "";
     private String fileUploadButtonColor = "";
 
     private String appHeaderColor = "";
@@ -120,6 +240,7 @@ public class UiSettingsModel {
     private String contentUnassigned = "";
     private String firstEvent = "";
 
+
     public String getMenuTextColor() {
         return menuTextColor.isEmpty() ? "#000000" : menuTextColor;
     }
@@ -128,16 +249,6 @@ public class UiSettingsModel {
         this.menuTextColor = menuTextColor;
     }
 
-    public String getDefaultTextColor() {
-
-        return defaultTextColor.isEmpty() ? "#000000" : defaultTextColor;
-    }
-
-    public void setDefaultTextColor(String defaultTextColor) {
-
-        this.defaultTextColor = defaultTextColor;
-        ;
-    }
 
     public String getMenuBGColor() {
         return menuBGColor.isEmpty() ? "#ffffff" : menuBGColor;
@@ -155,25 +266,17 @@ public class UiSettingsModel {
         this.selectedMenuTextColor = selectedMenuTextColor;
     }
 
-    public String getSelectedMenuBGColor() {
-        return selectedMenuBGColor.isEmpty() ? "#8dc73f" : selectedMenuBGColor;
-    }
 
     public void setSelectedMenuBGColor(String selectedMenuBGColor) {
         this.selectedMenuBGColor = selectedMenuBGColor;
     }
 
     public String getHeaderTextColor() {
-        return headerTextColor.isEmpty() ? "#ffffff" : headerTextColor;
+//        return headerTextColor.isEmpty() ? "#ffffff" : headerTextColor;
+        return "#ffffff";
+
     }
 
-    public void setHeaderTextColor(String headerTextColor) {
-        this.headerTextColor = headerTextColor;
-    }
-
-    public String getHeaderBGColor() {
-        return headerBGColor.isEmpty() ? "#8dc73f" : headerBGColor;
-    }
 
     public void setHeaderBGColor(String headerBGColor) {
         this.headerBGColor = headerBGColor;
@@ -195,100 +298,32 @@ public class UiSettingsModel {
         this.listBorderColor = listBorderColor;
     }
 
-    public String getMenuHeaderBGColor() {
-        return menuHeaderBGColor.isEmpty() ? "#8dc73f" : menuHeaderBGColor;
-    }
 
     public void setMenuHeaderBGColor(String menuHeaderBGColor) {
         this.menuHeaderBGColor = menuHeaderBGColor;
     }
 
     public String getMenuHeaderTextColor() {
-        return menuHeaderTextColor;
+//        return menuHeaderTextColor.isEmpty() ? "#FFFFFF" : menuHeaderTextColor;\
+        return "#FFFFFF";
     }
 
     public void setMenuHeaderTextColor(String menuHeaderTextColor) {
         this.menuHeaderTextColor = menuHeaderTextColor;
     }
 
-    public String getMenuBGAlternativeColor() {
-        return menuBGAlternativeColor.isEmpty() ? "#8dc73f" : menuBGAlternativeColor;
-    }
 
     public void setMenuBGAlternativeColor(String menuBGAlternativeColor) {
         this.menuBGAlternativeColor = menuBGAlternativeColor;
     }
 
     public String getMenuBGSelectTextColor() {
-        return menuBGSelectTextColor;
+
+        return menuBGSelectTextColor.isEmpty() ? "#FFFFFF" : menuBGSelectTextColor;
     }
 
     public void setMenuBGSelectTextColor(String menuBGSelectTextColor) {
         this.menuBGSelectTextColor = menuBGSelectTextColor;
-    }
-
-    public String getViewButtonColor() {
-        return viewButtonColor;
-    }
-
-    public void setViewButtonColor(String viewButtonColor) {
-        this.viewButtonColor = viewButtonColor;
-    }
-
-    public String getViewButtonTextColor() {
-        return viewButtonTextColor;
-    }
-
-    public void setViewButtonTextColor(String viewButtonTextColor) {
-        this.viewButtonTextColor = viewButtonTextColor;
-    }
-
-    public String getDetailButtonColor() {
-        return detailButtonColor;
-    }
-
-    public void setDetailButtonColor(String detailButtonColor) {
-        this.detailButtonColor = detailButtonColor;
-    }
-
-    public String getDetailButtonTextColor() {
-        return detailButtonTextColor;
-    }
-
-    public void setDetailButtonTextColor(String detailButtonTextColor) {
-        this.detailButtonTextColor = detailButtonTextColor;
-    }
-
-    public String getReportButtonColor() {
-        return reportButtonColor;
-    }
-
-    public void setReportButtonColor(String reportButtonColor) {
-        this.reportButtonColor = reportButtonColor;
-    }
-
-    public String getReportButtonTextColor() {
-        return reportButtonTextColor;
-    }
-
-    public void setReportButtonTextColor(String reportButtonTextColor) {
-        this.reportButtonTextColor = reportButtonTextColor;
-    }
-
-    public String getSetCompleteButtonColor() {
-        return setCompleteButtonColor;
-    }
-
-    public void setSetCompleteButtonColor(String setCompleteButtonColor) {
-        this.setCompleteButtonColor = setCompleteButtonColor;
-    }
-
-    public String getSetCompleteTextColor() {
-        return setCompleteTextColor;
-    }
-
-    public void setSetCompleteTextColor(String setCompleteTextColor) {
-        this.setCompleteTextColor = setCompleteTextColor;
     }
 
     public String getFileUploadButtonColor() {
@@ -297,10 +332,6 @@ public class UiSettingsModel {
 
     public void setFileUploadButtonColor(String fileUploadButtonColor) {
         this.fileUploadButtonColor = fileUploadButtonColor;
-    }
-
-    public String getAppHeaderColor() {
-        return appHeaderColor.isEmpty() ? "#8dc73f" : appHeaderColor;
     }
 
     public void setAppHeaderColor(String appHeaderColor) {
@@ -435,4 +466,37 @@ public class UiSettingsModel {
         }
         return instance;
     }
+
+
+    public String getAppButtonBgColor() {
+        return appButtonBgColor.isEmpty() ? brandingColor : appButtonBgColor;
+    }
+
+    public String getAppHeaderTextColor() {
+
+        return appHeaderTextColor.isEmpty() ? brandingColor : appHeaderTextColor;
+
+    }
+
+    public String getSelectedMenuBGColor() {
+        return selectedMenuBGColor.isEmpty() ? brandingColor : selectedMenuBGColor;
+    }
+
+    public String getHeaderBGColor() {
+        return headerBGColor.isEmpty() ? brandingColor : headerBGColor;
+    }
+
+
+    public String getMenuHeaderBGColor() {
+        return menuHeaderBGColor.isEmpty() ? brandingColor : menuHeaderBGColor;
+    }
+
+    public String getMenuBGAlternativeColor() {
+        return menuBGAlternativeColor.isEmpty() ? brandingColor : menuBGAlternativeColor;
+    }
+
+    public String getAppHeaderColor() {
+        return appHeaderColor.isEmpty() ? brandingColor : appHeaderColor;
+    }
+
 }

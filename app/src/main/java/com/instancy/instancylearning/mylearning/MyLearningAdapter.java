@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,27 +26,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
-import com.instancy.instancylearning.globalpackage.SynchData;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,12 +55,14 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -80,6 +86,7 @@ public class MyLearningAdapter extends BaseAdapter {
     private String TAG = MyLearningAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
+    AppController appcontroller;
 
 
     public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel) {
@@ -95,7 +102,8 @@ public class MyLearningAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel.getWebAPIUrl();
-
+          /* setup enter and exit animation */
+        appcontroller = AppController.getInstance();
     }
 
     public void refreshList(List<MyLearningModel> myLearningModel) {
@@ -104,6 +112,83 @@ public class MyLearningAdapter extends BaseAdapter {
         this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
     }
+
+    public void applyFilter(String typeSort, final boolean isAscn, String configid) {
+
+//        Collections.sort(myLearningModel, Collections.reverseOrder());
+
+        switch (configid) {
+
+            case "81":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        if (isAscn) {
+                            return obj1.getCourseName().compareToIgnoreCase(obj2.getCourseName());
+
+                        } else {
+                            return obj2.getCourseName().compareToIgnoreCase(obj1.getCourseName());
+                        }
+                    }
+                });
+                break;
+            case "211":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        if (isAscn) {
+                            return obj1.getAuthor().compareToIgnoreCase(obj2.getAuthor());
+
+                        } else {
+                            return obj2.getAuthor().compareToIgnoreCase(obj1.getAuthor());
+                        }
+
+                    }
+                });
+                break;
+            case "191":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+
+                        if (isAscn) {
+                            return obj1.getStatus().compareToIgnoreCase(obj2.getStatus());
+
+                        } else {
+                            return obj2.getStatus().compareToIgnoreCase(obj1.getStatus());
+                        }
+                    }
+                });
+                break;
+            case "181":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+
+                        if (isAscn) {
+                            return obj1.getDateAssigned().compareToIgnoreCase(obj2.getDateAssigned());
+
+                        } else {
+                            return obj2.getDateAssigned().compareToIgnoreCase(obj1.getDateAssigned());
+                        }
+                    }
+                });
+                break;
+            case "43":
+                break;
+
+        }
+
+        this.notifyDataSetChanged();
+    }
+
 
     @Override
     public int getCount() {
@@ -132,17 +217,18 @@ public class MyLearningAdapter extends BaseAdapter {
         holder = new ViewHolder(vi);
         holder.parent = parent;
         holder.getPosition = position;
+        holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor());
+        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
             holder.consolidateLine.setVisibility(View.GONE);
 
         } else {
-
             holder.consolidateLine.setVisibility(View.VISIBLE);
         }
         holder.txtSiteName.setText(myLearningModel.get(position).getSiteName());
@@ -155,13 +241,23 @@ public class MyLearningAdapter extends BaseAdapter {
         }
         holder.ratingBar.setRating(ratingValue);
 
+
+        if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
+            holder.ratingBar.setVisibility(View.INVISIBLE);
+        }
+
         // apply colors
 
-        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getDefaultTextColor()));
-        holder.btnDownload.setTag(position);
+        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+
+        LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+
 //        initVolleyCallback(myLearningModel.get(position), position);
 
         if (myLearningModel.get(position).getShortDes().isEmpty()) {
@@ -178,7 +274,7 @@ public class MyLearningAdapter extends BaseAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688")) {
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
 
@@ -196,130 +292,225 @@ public class MyLearningAdapter extends BaseAdapter {
                 } else {
                     holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
                     holder.btnDownload.setEnabled(true);
+
                 }
             }
 
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
             String courseStatus = "";
+            int progressPercentage = 1;
 
-            if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed"))) {
+            try {
+                progressPercentage = Integer.parseInt(myLearningModel.get(position).getProgress());
+            } catch (NumberFormatException ex) {
+                progressPercentage = 0;
+                ex.printStackTrace();
+            }
+
+            if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed")) || myLearningModel.get(position).getStatus().equalsIgnoreCase("completed")) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
+                holder.progressBar.setProgress(100);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = myLearningModel.get(position).getStatus() + " " + myLearningModel.get(position).getProgress();
+                courseStatus = myLearningModel.get(position).getStatus() + " (" + 100;
             } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Not Started")) {
 
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
-                holder.progressBar.setProgress(0);
+                holder.progressBar.setProgress(1);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = myLearningModel.get(position).getStatus() + "  0";
+                courseStatus = myLearningModel.get(position).getStatus() + "  (0";
 
-            } else {
+            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete") || (myLearningModel.get(position).getStatus().toLowerCase().contains("inprogress")) || (myLearningModel.get(position).getStatus().toLowerCase().contains("in progress"))) {
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
-                holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getProgress()));
+                String status = "";
+
+                if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete")) {
+                    status = "In Progress";
+                } else if (myLearningModel.get(position).getStatus().length() == 0) {
+                    status = "In Progress";
+
+                } else {
+                    status = myLearningModel.get(position).getStatus();
+
+                }
+
+                holder.progressBar.setProgress(50);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = myLearningModel.get(position).getStatus() + " " + myLearningModel.get(position).getProgress();
+                courseStatus = status + "(" + 50;
+
+            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("pending review") || (myLearningModel.get(position).getStatus().toLowerCase().contains("pendingreview"))) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+                String status = "";
+
+                status = myLearningModel.get(position).getStatus();
+
+                holder.progressBar.setProgress(100);
+                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+                courseStatus = status + "(" + 100;
+            } else {
+
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
+                holder.progressBar.setProgress(0);
+                String status = "";
+                status = myLearningModel.get(position).getStatus();
+                courseStatus = status + "(" + 0;
 
             }
-            holder.txtCourseStatus.setText(courseStatus + "%");
+            holder.txtCourseStatus.setText(courseStatus + "%)");
         }
-
         String imgUrl = myLearningModel.get(position).getImageData();
-        Glide.with(vi.getContext()).load(imgUrl)
-                .thumbnail(0.5f)
-                .crossFade()
-                .placeholder(R.drawable.cellimage)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.imgThumb);
+
+        Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+
         final float oldRating = ratingValue;
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 // TODO Auto-generated method stub
-                int ratingInt = Math.round(rating);
-                svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-                String paramsString = appUserModel.getWebAPIUrl() +
-                        ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
-                        "&ContentID=" + myLearningModel.get(position).getContentID()
-                        + "&Title=" +
-                        "&Description=From%20Android%20Native%20App" +
-                        "&RatingID=" + ratingInt;
-                if (isNetworkConnectionAvailable(activity, -1)) {
-                    try {
 
-                        Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
-                        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    Log.d("logr  response =", "response " + response.get("table1"));
-                                    JSONArray jsonArray = response.getJSONArray("table1");
-                                    String status = jsonArray.getJSONObject(0).get("status").toString();
-                                    String rating = jsonArray.getJSONObject(0).get("rating").toString();
-                                    if (status.equalsIgnoreCase("Success")) {
-                                        db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
-                                        Toast.makeText(
-                                                activity,
-                                                activity.getString(R.string.rating_update_success),
-                                                Toast.LENGTH_SHORT)
-                                                .show();
-                                        myLearningModel.get(position).setRatingId(rating);
+                if (fromUser) {
+                    int ratingInt = Math.round(rating);
+                    svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+                    String paramsString = appUserModel.getWebAPIUrl() +
+                            ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
+                            "&ContentID=" + myLearningModel.get(position).getContentID()
+                            + "&Title=" +
+                            "&Description=From%20Android%20Native%20App" +
+                            "&RatingID=" + ratingInt;
+                    if (isNetworkConnectionAvailable(activity, -1)) {
+                        try {
+
+                            Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
+                            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    try {
+                                        Log.d("logr  response =", "response " + response.get("table1"));
+                                        JSONArray jsonArray = response.getJSONArray("table1");
+                                        String status = jsonArray.getJSONObject(0).get("status").toString();
+                                        String rating = jsonArray.getJSONObject(0).get("rating").toString();
+                                        if (status.contains("Success")) {
+                                            db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
+                                            Toast.makeText(
+                                                    activity,
+                                                    activity.getString(R.string.rating_update_success),
+                                                    Toast.LENGTH_SHORT)
+                                                    .show();
+                                            myLearningModel.get(position).setRatingId(rating);
 //                                        notifyDataSetChanged();
-                                    } else {
-                                        Toast.makeText(
-                                                activity,
-                                                activity.getString(R.string.rating_update_fail),
-                                                Toast.LENGTH_SHORT)
-                                                .show();
+                                        } else {
+                                            Toast.makeText(
+                                                    activity,
+                                                    activity.getString(R.string.rating_update_fail),
+                                                    Toast.LENGTH_SHORT)
+                                                    .show();
+                                            holder.ratingBar.setRating(oldRating);
+                                        }
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                         holder.ratingBar.setRating(oldRating);
                                     }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    holder.ratingBar.setRating(oldRating);
+                                    svProgressHUD.dismiss();
                                 }
-                                svProgressHUD.dismiss();
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                holder.ratingBar.setRating(oldRating);
-                                svProgressHUD.dismiss();
-                                Toast.makeText(
-                                        activity,
-                                        activity.getString(R.string.rating_update_fail),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        }) {
-                            @Override
-                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                final Map<String, String> headers = new HashMap<>();
-                                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                                return headers;
-                            }
-                        };
-                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
-                                0,
-                                -1,
-                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                        VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    holder.ratingBar.setRating(oldRating);
+                                    svProgressHUD.dismiss();
+                                    Toast.makeText(
+                                            activity,
+                                            activity.getString(R.string.rating_update_fail),
+                                            Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            }) {
+                                @Override
+                                public Map<String, String> getHeaders() throws AuthFailureError {
+                                    final Map<String, String> headers = new HashMap<>();
+                                    String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                                    return headers;
+                                }
+                            };
+//                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+//                                0,
+//                                -1,
+//                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                            VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
 
-                    } catch (Exception e) {
+                        } catch (Exception e) {
 
-                        e.printStackTrace();
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
                     }
-
-                } else {
-                    Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        // do something for phones running an SDK before lollipop
+
+// uncomment for crop life
+
+        if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
+
+            String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
+            if (position == 0 && isViewd.equalsIgnoreCase("false")) {
+
+                ViewTooltip
+                        .on(holder.btnDownload)
+                        .autoHide(true, 5000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.LEFT).onHide(new ViewTooltip.ListenerHide() {
+                    @Override
+                    public void onHide(View view) {
+                        appcontroller.setAlreadyViewd(true);
+                        preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    }
+                })
+                        .text("Click to download the content").clickToHide(true)
+                        .show();
+
+                ViewTooltip
+                        .on(holder.btnContextMenu)
+                        .autoHide(true, 5000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
+                        .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
+                    @Override
+                    public void onHide(View view) {
+                        appcontroller.setAlreadyViewd(true);
+                        preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    }
+                })
+                        .show();
+
+                ViewTooltip
+                        .on(holder.imgThumb)
+                        .autoHide(true, 5000)
+                        .corner(30)
+                        .position(ViewTooltip.Position.BOTTOM)
+                        .clickToHide(true)
+                        .animation(new ViewTooltip.FadeTooltipAnimation(500))
+                        .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
+                    @Override
+                    public void onHide(View view) {
+                        appcontroller.setAlreadyViewd(true);
+                        preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    }
+                })
+                        .show();
+
+            }
+        }
+
+
         return vi;
     }
 
@@ -330,7 +521,24 @@ public class MyLearningAdapter extends BaseAdapter {
             myLearningModel.addAll(searchList);
         } else {
             for (MyLearningModel s : searchList) {
-                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) || s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText)) {
+                    myLearningModel.add(s);
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+
+    public void filterByCategoryId(String charText) {
+//        charText = charText.toLowerCase(Locale.getDefault());
+        myLearningModel.clear();
+        if (charText.length() == 0) {
+            myLearningModel.addAll(searchList);
+        } else {
+            for (MyLearningModel s : searchList) {
+                Log.d(TAG, "filterByCategoryId: " + s.getObjecttypeId());
+                if (s.getObjecttypeId().equalsIgnoreCase(charText)) {
                     myLearningModel.add(s);
                 }
             }
@@ -344,56 +552,61 @@ public class MyLearningAdapter extends BaseAdapter {
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
         public DownloadInterface downloadInterface;
+        public SetCompleteListner setCompleteListner;
         @Nullable
-        @Bind(R.id.txt_title_name)
+        @BindView(R.id.txt_title_name)
         TextView txtTitle;
 
         @Nullable
-        @Bind(R.id.txtShortDesc)
+        @BindView(R.id.card_view)
+        CardView card_view;
+
+        @Nullable
+        @BindView(R.id.txtShortDesc)
         TextView txtShortDisc;
 
         @Nullable
-        @Bind(R.id.imagethumb)
+        @BindView(R.id.imagethumb)
         ImageView imgThumb;
 
         @Nullable
-        @Bind(R.id.txt_coursename)
+        @BindView(R.id.txt_coursename)
         TextView txtCourseName;
 
         @Nullable
-        @Bind(R.id.rat_adapt_ratingbar)
+        @BindView(R.id.rat_adapt_ratingbar)
         RatingBar ratingBar;
 
         @Nullable
-        @Bind(R.id.txt_course_progress)
+        @BindView(R.id.txt_course_progress)
         TextView txtCourseStatus;
 
         @Nullable
-        @Bind(R.id.course_progress_bar)
+        @BindView(R.id.course_progress_bar)
         ProgressBar progressBar;
 
         @Nullable
-        @Bind(R.id.txt_author)
+        @BindView(R.id.txt_author)
         TextView txtAuthor;
 
         @Nullable
-        @Bind(R.id.txt_site_name)
+        @BindView(R.id.txt_site_name)
         TextView txtSiteName;
 
         @Nullable
-        @Bind(R.id.consolidateline)
+        @BindView(R.id.consolidateline)
         View consolidateLine;
 
         @Nullable
-        @Bind(R.id.btn_contextmenu)
+        @BindView(R.id.btn_contextmenu)
         ImageButton btnContextMenu;
 
         @Nullable
-        @Bind(R.id.btntxt_download)
+        @BindView(R.id.btntxt_download)
         TextView btnDownload;
 
         @Nullable
-        @Bind(R.id.circle_progress)
+        @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
 
@@ -408,25 +621,33 @@ public class MyLearningAdapter extends BaseAdapter {
                     deleteMetaDataFromDB(myLearningDetalData);
                 }
             };
+
+            setCompleteListner = new SetCompleteListner() {
+                @Override
+                public void completedStatus() {
+                    myLearningDetalData.setStatus("Completed");
+                    myLearningDetalData.setProgress("100");
+                    notifyDataSetChanged();
+                }
+            };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name})
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.contextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
             } else {
                 ((ListView) parent).performItemClick(view, getPosition, 0);
             }
-
         }
     }
-
 
     private void deleteMetaDataFromDB(MyLearningModel learningModel) {
 
     }
+
 }
 
 

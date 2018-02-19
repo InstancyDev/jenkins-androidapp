@@ -52,17 +52,39 @@
             <include layout="@layout/nav_header_side_menu" />
         </RelativeLayout>
 
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="0.3dp"
+            android:layout_below="@+id/rl_profile"
+            android:background="@color/colorGray" />
+
+        <LinearLayout
+            android:visibility="gone"
+
+            android:id="@+id/subsitelayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/line">
+
+            <include layout="@layout/subsitename" />
+
+        </LinearLayout>
+
+
         <ExpandableListView
             android:id="@+id/expanded_menu_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/layout_sing_in"
-            android:layout_below="@+id/rl_profile"
-            android:background="#ffff"
+            android:layout_below="@+id/subsitelayout"
+            android:background="@color/colorWhite"
+            android:childIndicator="@null"
             android:choiceMode="singleChoice"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:groupIndicator="@null" />
+            android:divider="@color/colorWhite"
+            android:dividerHeight="0.5dp"
+            android:groupIndicator="@null"
+            android:overScrollMode="never" />
 
         <LinearLayout
             android:id="@+id/layout_sing_in"

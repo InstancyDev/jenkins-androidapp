@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/detail_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@android:color/transparent"
-    android:padding="1dp">
+    android:background="@android:color/transparent">
 
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_button_layout"
         android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
         android:padding="3dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
 
             <ImageView
+
                 android:id="@+id/imagethumb"
                 android:layout_width="fill_parent"
                 android:layout_height="200dp"
                 android:adjustViewBounds="true"
-                android:background="@color/colorWhite"
+                android:background="@android:color/transparent"
                 android:padding="2dp"
-                android:scaleType="center"
                 android:src="@drawable/cellimage" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/imagethumb"
+                android:background="@android:color/transparent"
                 android:orientation="horizontal"
                 android:padding="5dp"
                 android:weightSum="3">
@@ -140,7 +143,7 @@
                             android:maxLines="1"
                             android:text="In Progress 25%"
                             android:textColor="@color/colorStatusInProgress"
-                            android:textSize="10sp" />
+                            android:textSize="14sp" />
 
                         <ProgressBar
                             android:id="@+id/course_progress_bar"
@@ -161,7 +164,7 @@
                         android:layout_below="@+id/txtLongDesc"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:padding="4dp"
+                        android:padding="1dp"
                         android:weightSum="2">
 
                         <TextView
@@ -175,9 +178,10 @@
                             android:padding="2dp"
                             android:text="By Upendra"
                             android:textColor="@color/colorGray"
-                            android:textSize="12sp" />
+                            android:textSize="14sp" />
 
                         <View
+                            android:id="@+id/consolidateline"
                             android:layout_width="1dp"
                             android:layout_height="12dp"
                             android:background="@color/colorGray"
@@ -195,7 +199,7 @@
                             android:paddingLeft="6dp"
                             android:text="Playground"
                             android:textColor="@color/colorSiteName"
-                            android:textSize="12sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
 
 
@@ -203,24 +207,25 @@
 
                 <RelativeLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="75dp"
                     android:layout_weight=".4"
                     android:padding="4dp">
 
                     <!--<TextView-->
-                        <!--android:id="@+id/btntxt_download_detail"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="30dp"-->
-                        <!--android:layout_alignParentBottom="true"-->
-                        <!--android:layout_alignParentRight="true"-->
-                        <!--android:background="@android:color/transparent"-->
-                        <!--android:clickable="true"-->
-                        <!--android:gravity="center"-->
-                        <!--android:text="@string/fa_icon_cloud_download"-->
-                        <!--android:textColor="@color/text_color"-->
-                        <!--android:textSize="30sp"-->
-                        <!--android:visibility="invisible" />-->
+                    <!--android:id="@+id/btntxt_download_detail"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="30dp"-->
+                    <!--android:layout_alignParentBottom="true"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:background="@android:color/transparent"-->
+                    <!--android:clickable="true"-->
+                    <!--android:gravity="center"-->
+                    <!--android:text="@string/fa_icon_cloud_download"-->
+                    <!--android:textColor="@color/text_color"-->
+                    <!--android:textSize="30sp"-->
+                    <!--android:visibility="invisible" />-->
                     <RelativeLayout
+                        android:id="@+id/downloadlayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
@@ -246,6 +251,19 @@
                             android:text="@string/fa_icon_cloud_download"
                             android:textColor="@color/text_color"
                             android:textSize="24sp" />
+
+                        <TextView
+                            android:id="@+id/btn_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="5dp"
+                            android:background="@android:color/transparent"
+                            android:gravity="center"
+                            android:text=""
+                            android:textColor="@color/colorStatusOther"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
                     </RelativeLayout>
 
                     <!--<ImageButton-->
@@ -265,16 +283,17 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/colorDefault"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="1">
 
         <RelativeLayout
+            android:id="@+id/viewtypeLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-
-            android:layout_weight="1">
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center">
 
             <TextView
                 android:id="@+id/view_fa_icon"
@@ -283,9 +302,8 @@
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical"
                 android:text="@string/fa_icon_eye"
-                android:textAlignment="textStart"
+                android:textAlignment="center"
                 android:textColor="@color/colorWhite"
-
                 android:textSize="20sp" />
 
             <TextView
@@ -293,27 +311,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
                 android:layout_centerVertical="true"
-                android:textAlignment="textStart"
-
                 android:layout_toRightOf="@id/view_fa_icon"
                 android:gravity="center_vertical"
                 android:minHeight="?android:attr/listPreferredItemHeightSmall"
                 android:text="View"
+                android:textAlignment="textStart"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp" />
         </RelativeLayout>
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/colorWhite" />
-
         <RelativeLayout
+            android:id="@+id/reportLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:gravity="center"
-            android:layout_weight="1">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/report_fa_icon"
@@ -329,28 +344,53 @@
             <TextView
                 android:id="@+id/report_btn_txt"
                 android:layout_width="wrap_content"
-                android:textAlignment="textStart"
-
                 android:layout_height="44dp"
+
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/report_fa_icon"
                 android:gravity="center_vertical"
                 android:minHeight="?android:attr/listPreferredItemHeightSmall"
                 android:text="Report"
+                android:textAlignment="textStart"
                 android:textAppearance="?android:attr/textAppearanceListItemSmall"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp" />
         </RelativeLayout>
+
+        <!--<RelativeLayout-->
+        <!--android:id="@+id/addLayout"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="center"-->
+        <!--android:visibility="gone">-->
+        <!--<TextView-->
+        <!--android:id="@+id/report_fa_icon"-->
+        <!--android:layout_width="44dp"-->
+        <!--android:layout_height="44dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:text="@string/fa_icon_line_chart"-->
+        <!--android:textAlignment="textStart"-->
+        <!--android:textColor="@color/colorWhite"-->
+        <!--android:textSize="20sp" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/report_btn_txt"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="44dp"-->
+
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toRightOf="@id/report_fa_icon"-->
+        <!--android:gravity="center_vertical"-->
+        <!--android:minHeight="?android:attr/listPreferredItemHeightSmall"-->
+        <!--android:text="Report"-->
+        <!--android:textAlignment="textStart"-->
+        <!--android:textAppearance="?android:attr/textAppearanceListItemSmall"-->
+        <!--android:textColor="@color/colorWhite"-->
+        <!--android:textSize="16sp" />-->
+        <!--</RelativeLayout>-->
+
     </LinearLayout>
-
-    <!--<RelativeLayout-->
-    <!--android:id="@+id/bottomlayout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="44dp"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:orientation="horizontal">-->
-    <!--<include layout="@layout/bottombuttons" />-->
-    <!--</RelativeLayout>-->
-
 
 </RelativeLayout>

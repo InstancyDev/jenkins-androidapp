@@ -22,7 +22,7 @@ import com.instancy.instancylearning.mainactivities.Settings_activity;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.StaticValues;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.utils.StaticValues.CONTEXT_TITLE;
@@ -35,7 +35,7 @@ import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 public class Catalog_fragment extends Fragment {
 
 
-    @Bind(R.id.lable_catalog)
+    @BindView(R.id.lable_catalog)
     TextView frqagmentName;
 
     public Catalog_fragment() {

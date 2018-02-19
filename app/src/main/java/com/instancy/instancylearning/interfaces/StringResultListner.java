@@ -8,4 +8,6 @@ public interface StringResultListner<String> {
 
     public void getResult(String results);
 
+
+    public void getError(String error);
 }

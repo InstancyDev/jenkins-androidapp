@@ -7,7 +7,6 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.interfaces.SiteConfigInterface;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
-import com.instancy.instancylearning.utils.StaticValues;
 
 /**
  * Created by Upendranath on 5/22/2017.
@@ -37,28 +36,34 @@ public class GetSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> {
     protected Void doInBackground(String... params) {
         int i = 10;
         publishProgress(i);
-        String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0]);
-        i = i + 10;
-        publishProgress(i);
-        webAPIClient.getAPIAuthDetails(params[0], tempWebApiUrl);
-        i = i + 10;
-        publishProgress(i);
-        db.getSiteSettingsServer(tempWebApiUrl, params[0]);
-        i = i + 10;
-        publishProgress(i);
-        db.getNativeMenusFromServer(tempWebApiUrl, params[0]);
-        i = i + 10;
-        publishProgress(i);
-        db.getSiteTinCanDetails(tempWebApiUrl, params[0]);
-        i = i + 10;
-        publishProgress(i);
-        db.downloadSplashImages(params[0]);
-        i = i + 10;
-        publishProgress(i);
-        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        uiSettingsModel = db.getAppSettingsFromLocal(params[0], "374");
-        i = i + 10;
-        publishProgress(i);
+        String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0],true);
+
+        if (tempWebApiUrl.length() != 0) {
+            i = i + 10;
+            publishProgress(i);
+            webAPIClient.getAPIAuthDetails(params[0], tempWebApiUrl,true);
+            i = i + 10;
+            publishProgress(i);
+            db.getSiteSettingsServer(tempWebApiUrl, params[0],true);
+            i = i + 10;
+            publishProgress(i);
+            db.getNativeMenusFromServer(tempWebApiUrl, params[0]);
+            i = i + 10;
+            publishProgress(i);
+            db.getSiteTinCanDetails(tempWebApiUrl, params[0]);
+            i = i + 10;
+            publishProgress(i);
+            db.downloadSplashImages(params[0]);
+            i = i + 10;
+            publishProgress(i);
+            UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+            uiSettingsModel = db.getAppSettingsFromLocal(params[0], "374");
+            i = i + 10;
+            publishProgress(i);
+        } else {
+
+
+        }
         return null;
     }
 

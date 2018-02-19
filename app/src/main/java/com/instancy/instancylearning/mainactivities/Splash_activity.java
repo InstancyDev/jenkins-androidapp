@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -39,11 +40,13 @@ import com.instancy.instancylearning.utils.StaticValues;
 import java.io.File;
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -55,7 +58,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     DatabaseHandler db;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    AppController appController;
     WebAPIClient webAPIClient;
     GetSiteConfigsAsycTask getSiteConfigsAsycTask;
     private static final String TAG = Splash_activity.class.getSimpleName();
@@ -63,37 +65,52 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     Context context;
     NetworkUtils networkUtils;
     UiSettingsModel uiSettingsModel;
-    @Bind(R.id.progressBarSplash)
+    @BindView(R.id.progressBarSplash)
     ProgressBar progressBar;
     private int progressStatus = 0;
     AppUserModel appUserModel;
     PreferencesManager preferencesManager;
+    AppController appController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_activity);
         ButterKnife.bind(this);
-        initilizeView();
-        requestPermission();
+        context = this;
+        imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
+
         db = new DatabaseHandler(context);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
-        preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
-//        editor = sharedPreferences.edit();
-//        editor.putString(StaticValues.KEY_SITEURL, getResources().getString(R.string.app_default_url));
-//        editor.putString(StaticValues.KEY_USERID, "-1");
-//        editor.commit();
+        appController = AppController.getInstance();
+        String siteUrl = preferencesManager.getStringValue(StaticValues.KEY_SITEURL);
+        String siteID = preferencesManager.getStringValue(StaticValues.KEY_SITEID);
+        preferencesManager.setStringValue("false", StaticValues.SUB_SITE_ENTERED);
+        if (siteUrl.length() == 0) {
+            preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+
+        }
+        if (siteID.length() == 0) {
+
+            preferencesManager.setStringValue("374", StaticValues.KEY_SITEID);
+        }
         webAPIClient = new WebAPIClient(this);
         getSiteConfigsAsycTask = new GetSiteConfigsAsycTask(this);
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        callWebMethods();
 
+        if (Build.VERSION.SDK_INT > 22) {
+            requestPermission();
+
+        } else {
+            callWebMethods();
+
+        }
     }
 
     /*
@@ -101,59 +118,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     * all view are initilize here like binding views to class
     *
     * */
-    public void initilizeView() {
-
-        context = this;
-        imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
-//      animation
-        zoomin = AnimationUtils.loadAnimation(this, R.anim.zoomin);
-        zoomout = AnimationUtils.loadAnimation(this, R.anim.zoomout);
-
-//        imageBrandLogo.setAnimation(zoomin);
-//        imageBrandLogo.setAnimation(zoomout);
-
-        zoomin.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation arg0) {
-                imageBrandLogo.startAnimation(zoomout);
-
-            }
-        });
-
-        zoomout.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation arg0) {
-                imageBrandLogo.startAnimation(zoomin);
-
-            }
-        });
-    }
 
     public void callWebMethods() {
 
@@ -182,17 +146,20 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             } else {
 
-                if (!appUserModel.getUserIDValue().equalsIgnoreCase("-1")) {
 
-//                    Intent intent = new Intent(this, SideMenu.class);
-//                    startActivity(intent);
-                    Intent i = new Intent(context, Branding_activity.class);
-                    startActivity(i);
+                String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
+
+                if (userID != null && !userID.equalsIgnoreCase("")) {
+                    appController.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    Intent intent = new Intent(this, SideMenu.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
 
                 } else {
-
-                    Intent i = new Intent(context, Branding_activity.class);
-                    startActivity(i);
+                    Intent intent = new Intent(this, Login_activity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
 
                 }
 
@@ -231,13 +198,15 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         int CAMERA = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA);
         int READSTORAGE = ContextCompat.checkSelfPermission(getApplicationContext(), READ_EXTERNAL_STORAGE);
         int WRITESTORAGE = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
-        return READSTORAGE == PackageManager.PERMISSION_GRANTED && WRITESTORAGE == PackageManager.PERMISSION_GRANTED && CAMERA == PackageManager.PERMISSION_GRANTED;
+        int WRITECALENDAR = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_CALENDAR);
+        int READCALENDAR = ContextCompat.checkSelfPermission(getApplicationContext(), READ_CALENDAR);
+        return READSTORAGE == PackageManager.PERMISSION_GRANTED && WRITESTORAGE == PackageManager.PERMISSION_GRANTED && CAMERA == PackageManager.PERMISSION_GRANTED && WRITECALENDAR == PackageManager.PERMISSION_GRANTED && READCALENDAR == PackageManager.PERMISSION_GRANTED;
 
     }
 
     private void requestPermission() {
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, WRITE_CALENDAR, READ_CALENDAR}, PERMISSION_REQUEST_CODE);
 
 
     }
@@ -250,8 +219,12 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                 if (grantResults.length > 0) {
                     boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                     boolean storageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    if (storageAccepted && cameraAccepted) {
+                    boolean writeCalenderAccepted = grantResults[2] == PackageManager.PERMISSION_GRANTED;
+                    boolean readCalendarAccepted = grantResults[3] == PackageManager.PERMISSION_GRANTED;
+                    if (storageAccepted && cameraAccepted && writeCalenderAccepted && readCalendarAccepted) {
 //                        Toast.makeText(Splash_activity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                        callWebMethods();
+
 
                     } else {
 
@@ -292,9 +265,14 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     @Override
     public void postExecuteIn(String results) {
 
+        if (isNetworkConnectionAvailable(context, -1)) {
+
+            CmiSynchTask cmiSynchTask = new CmiSynchTask(context);
+            cmiSynchTask.execute();
+        }
         progressStatus = 100;
         progressBar.setProgress(progressStatus);
-        imageBrandLogo.clearAnimation();
+//        imageBrandLogo.clearAnimation();
         final ArrayList<String> imagesArray = new ArrayList<String>();
         String splashImagesPath = getExternalFilesDir(null) + "/Mydownloads/"
                 + "SplashImages" + "";

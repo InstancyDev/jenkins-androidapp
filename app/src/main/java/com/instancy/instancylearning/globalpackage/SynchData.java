@@ -15,9 +15,10 @@ import com.instancy.instancylearning.utils.Utilities;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Upendranath on 8/10/2017 Working on InstancyLearning.
@@ -37,27 +38,40 @@ public class SynchData {
         dbh = new DatabaseHandler(context);
         appUserModel = AppUserModel.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
+//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
+//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
+//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
+//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         webAPIClient = new WebAPIClient(_context);
     }
 
     public void SyncData() {
         String bundlevalue1 = null;
-        String cmsiteid = null;
-        String cmiscoid = null;
-        List<String> scoList = new ArrayList<String>();
-        String errorMessage = "";
-        List<CMIModel> cmiList = dbh.getAllCmiDetails();
+        List<CMIModel> cmiList = new ArrayList<CMIModel>();
+        Set<CMIModel> hs = new HashSet<>();
+
+        List<CMIModel> cmiMylearningList = dbh.getAllCmiDownloadDataDetails();
+//        cmiList.addAll(cmiMylearningList);
+        hs.addAll(cmiMylearningList);
+        List<CMIModel> cmitrackList = dbh.getAllCmiTrackListDetails();
+        cmiList.addAll(cmitrackList);
+//        hs.addAll(cmiMylearningList);
+        List<CMIModel> cmiEventRelated = dbh.getAllCmiRelatedContentDetails();
+//        cmiList.addAll(cmiEventRelated);
+        hs.addAll(cmiMylearningList);
+        cmiList.addAll(hs);
+
+//        List<String> al = new ArrayList<>();
+//// add elements to al, including duplicates
+//        Set<String> hs = new HashSet<>();
+//        hs.addAll(cmiList);
+//        al.clear();
+//        al.addAll(hs);
 
         for (CMIModel tempCmi : cmiList) {
             bundlevalue1 = String.valueOf(tempCmi.get_userId());
-            cmsiteid = String.valueOf(tempCmi.get_siteId());
-            cmiscoid = String.valueOf(tempCmi.get_scoId());
             StringBuilder sb = new StringBuilder();
             sb.append("<TrackedData><CMI>");
             sb.append("<ID>" + String.valueOf(tempCmi.get_Id()) + "</ID>");
@@ -93,6 +107,37 @@ public class SynchData {
             }
 
             try {
+                if (tempCmi.get_datecompleted().equals("")
+                        || tempCmi.get_datecompleted() == null
+                        || tempCmi.get_datecompleted().equals("null")) {
+                    sb.append("<DateCompleted></DateCompleted>");
+
+                } else {
+//                    Calendar c = Calendar.getInstance();
+//                    SimpleDateFormat nowtime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssss");
+//                    String presentDate = nowtime.format(c.getTime());
+                    sb.append("<DateCompleted>" + tempCmi.get_datecompleted()
+                            + "</DateCompleted>");
+                }
+            } catch (Exception ex) {
+                sb.append("<DateCompleted></DateCompleted>");
+            }
+
+            sb.append("<NoOfAttempts>" + tempCmi.get_noofattempts()
+                    + "</NoOfAttempts>");
+
+            // need to send data  parentcontentid and parentscoid
+            sb.append("<TrackScoID>" + String.valueOf(tempCmi.get_scoId()) + "</TrackScoID>");
+            sb.append("<TrackContentID></TrackContentID>");
+
+
+            // need to send parent obj type id
+            sb.append("<TrackObjectTypeID>" + tempCmi.get_objecttypeid() + "</TrackObjectTypeID>");
+
+
+            sb.append("<OrgUnitID>" + tempCmi.get_siteId() + "</OrgUnitID>");
+
+            try {
                 if (tempCmi.get_score().equals("")
                         || tempCmi.get_score() == null
                         || tempCmi.get_score().equals("null")) {
@@ -106,19 +151,7 @@ public class SynchData {
             sb.append("<ObjectTypeId>" + tempCmi.get_objecttypeid()
                     + "</ObjectTypeId>");
 
-            try {
-                if (tempCmi.get_datecompleted().equals("")
-                        || tempCmi.get_datecompleted() == null
-                        || tempCmi.get_datecompleted().equals("null")) {
-                    sb.append("<DateCompleted></DateCompleted>");
 
-                } else {
-                    sb.append("<DateCompleted>" + tempCmi.get_datecompleted()
-                            + "</DateCompleted>");
-                }
-            } catch (Exception ex) {
-                sb.append("<DateCompleted></DateCompleted>");
-            }
             try {
                 if (tempCmi.get_seqNum().equals("")
                         || tempCmi.get_seqNum() == null
@@ -131,15 +164,6 @@ public class SynchData {
             } catch (Exception ex) {
                 sb.append("<SequenceNumber>0</SequenceNumber>");
             }
-
-            sb.append("<NoOfAttempts>" + tempCmi.get_noofattempts()
-                    + "</NoOfAttempts>");
-
-            sb.append("<TrackScoID></TrackScoID>");
-            sb.append("<TrackContentID></TrackContentID>");
-            sb.append("<TrackObjectTypeID></TrackObjectTypeID>");
-            sb.append("<OrgUnitID>" + tempCmi.get_siteId() + "</OrgUnitID>");
-
 
             try {
                 if (tempCmi.get_attemptsleft().equals("")
@@ -306,9 +330,9 @@ public class SynchData {
                     sb.append("<SCOID>"
                             + String.valueOf(tempResponse.get_scoId())
                             + "</SCOID>");
-                    sb.append("<QuestionId>"
+                    sb.append("<QuestionID>"
                             + String.valueOf(tempResponse.get_questionid())
-                            + "</QuestionId>");
+                            + "</QuestionID>");
                     sb.append("<AssessmentAttempt>"
                             + String.valueOf(tempResponse
                             .get_assessmentattempt())
@@ -387,36 +411,28 @@ public class SynchData {
             }
             sb.append("</TrackedData>");
 
-            Log.d("MobileUpdateOfflineTracked", sb.toString());
+            Log.d("SynchUpdateOffline", sb.toString());
 
-
-//            try {
             String requestURL = appUserModel.getWebAPIUrl()
                     + "/MobileLMS/MobileUpdateOfflineTrackedData"
                     + "?_studId=" + String.valueOf(tempCmi.get_userId())
                     + "&_scoId=" + String.valueOf(tempCmi.get_scoId())
                     + "&_siteURL=" + tempCmi.get_sitrurl()
                     + "&_siteID=" + tempCmi.get_siteId();
-            HttpURLConnection urlConnection = null;
             InputStream inputStream = null;
-
-
             inputStream = webAPIClient.synchronousPostMethod(requestURL, appUserModel.getAuthHeaders(), sb.toString());
-
-
             if (inputStream != null) {
 
                 String result = Utilities.convertStreamToString(inputStream);
-
+                dbh.insertCMiIsViewd(tempCmi);
                 Log.d("TAG", "SyncData: " + result);
             }
 //            dbh.finishSynch(tempCmi);
-            dbh.insertCMiIsViewd(tempCmi);
 //            dbh.sendOfflineUserPagenotes();
         }
 
         // if (errorMessage.equals("")) {
-        // // dbh.FinishSynch();
+//          dbh.finishSynch();
         // }
     }
 

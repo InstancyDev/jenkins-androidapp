@@ -1,11 +1,13 @@
 package com.instancy.instancylearning.mainactivities;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -27,13 +29,15 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import im.delight.android.webview.AdvancedWebView;
+
 /**
  * Created by Upendranath on 4/11/2017.
  */
 
 public class SocialWebLoginsActivity extends AppCompatActivity {
 
-    WebView webView;
+    AdvancedWebView webView;
     String url = "";
     PreferencesManager preferencesManager;
     SVProgressHUD svProgressHUD;
@@ -43,7 +47,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.socialweblogins);
-        webView = (WebView) findViewById(R.id.webloginactivity);
+        webView = (AdvancedWebView) findViewById(R.id.webloginactivity);
         svProgressHUD = new SVProgressHUD(this);
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
@@ -51,15 +55,21 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
 
         Bundle bundle = getIntent().getExtras();
-        String actionBaritle="Login";
+        String actionBaritle = "Login";
+        boolean isFromAttachment = false;
         if (bundle != null) {
+            isFromAttachment = bundle.getBoolean("ATTACHMENT", false);
+            if (isFromAttachment) {
+                url = bundle.getString(StaticValues.KEY_SOCIALLOGIN);
+            } else {
+                url = appUserModel.getSiteURL().concat(bundle.getString(StaticValues.KEY_SOCIALLOGIN));
+            }
 
-            url = appUserModel.getSiteURL().concat(bundle.getString(StaticValues.KEY_SOCIALLOGIN));
-            actionBaritle=bundle.getString(StaticValues.KEY_ACTIONBARTITLE);
+            actionBaritle = bundle.getString(StaticValues.KEY_ACTIONBARTITLE);
+
         }
-
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>"+actionBaritle+"</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + actionBaritle + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -70,20 +80,50 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
 
             ex.printStackTrace();
         }
-        webView.getSettings().setLoadWithOverviewMode(true);
-        webView.getSettings().setUseWideViewPort(true);
+//        webView.getSettings().setLoadWithOverviewMode(true);
+//        webView.getSettings().setUseWideViewPort(true);
+//        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+//        webView.setScrollbarFadingEnabled(false);
+//        webView.getSettings().setSupportZoom(true);
+//        webView.getSettings().setPluginState(WebSettings.PluginState.ON);
+//        webView.getSettings()
+//                .setRenderPriority(WebSettings.RenderPriority.HIGH);
+//        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+//        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+//        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.getSettings().setDomStorageEnabled(true);
+
+        WebSettings webSettings = this.webView.getSettings();
+
+        webSettings.setJavaScriptEnabled(true);
+//        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setUseWideViewPort(true);
+        webSettings.setAppCacheEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        webSettings.getUseWideViewPort();
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setSaveFormData(true);
         webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         webView.setScrollbarFadingEnabled(false);
-        webView.getSettings().setSupportZoom(true);
-        webView.getSettings().setPluginState(WebSettings.PluginState.ON);
-        webView.getSettings()
-                .setRenderPriority(WebSettings.RenderPriority.HIGH);
-        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
+        webSettings.setAllowFileAccessFromFileURLs(true);
+        webSettings.setAllowContentAccess(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setPluginState(WebSettings.PluginState.ON);
+        webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+        webView.getSettings().setLoadsImagesAutomatically(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)) {
+                WebView.setWebContentsDebuggingEnabled(true);
+            }
+        }
         webView.loadUrl(url);
-
 
         webView.setWebChromeClient(new WebChromeClient() {
 
@@ -179,7 +219,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
 
-                    svProgressHUD.dismiss();
+                svProgressHUD.dismiss();
             }
 
             @Override

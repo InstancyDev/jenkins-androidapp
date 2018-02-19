@@ -5,16 +5,19 @@
     android:background="@color/colorDefaultBackGround"
     android:orientation="vertical">
 
+    <!--android:background="@drawable/bg"-->
+
     <ImageView
         android:id="@+id/brandlogo"
         android:layout_width="300dp"
         android:layout_height="170dp"
         android:layout_below="@+id/splashbtn"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="82dp"
+        android:layout_marginTop="99dp"
         android:background="@android:color/transparent"
-        android:scaleType="fitXY"
-        android:src="@drawable/playground" />
+        android:scaleType="centerInside"
+        android:src="@drawable/cvctabanner" />
+    <!--android:scaleType="fitcenter"-->
 
     <Button
         android:id="@+id/splashbtn"

@@ -36,7 +36,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -49,13 +49,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
 
-    @Bind(R.id.edit_email_reset)
+    @BindView(R.id.edit_email_reset)
     EditText editResetMail;
 
-    @Bind(R.id.btn_submit)
+    @BindView(R.id.btn_submit)
     Button btnSubmit;
 
-    @Bind(R.id.btn_cancel)
+    @BindView(R.id.btn_cancel)
     Button btnCancel;
 
     AppUserModel appUserModel;

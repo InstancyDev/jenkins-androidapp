@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/login_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/colorDefaultBackGround">
@@ -16,20 +17,22 @@
         android:text="@string/fa_icon_ellipsis_v"
         android:textAlignment="center"
         android:textColor="@color/colorWhite"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        android:visibility="visible" />
 
     <ScrollView
         android:id="@+id/scroll1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_marginTop="15dp">
+        android:layout_below="@+id/id_settings_txt"
+        android:layout_marginTop="10dp">
 
         <RelativeLayout
             android:id="@+id/llLogin"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="5dp"
             android:gravity="center">
 
             <ImageView
@@ -39,8 +42,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
-                android:scaleType="fitXY"
-                android:src="@drawable/playground" />
+                android:scaleType="centerInside"
+                android:src="@drawable/cvctabanner" />
+            <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout
                 android:id="@+id/rlUsername"
@@ -55,7 +59,7 @@
                     android:id="@+id/id_useredit"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:backgroundTint="@color/colorWhite"
+                    android:backgroundTint="@color/colorBlack"
                     android:hint="Username"
                     android:inputType="textEmailAddress"
                     android:maxLength="80"
@@ -64,10 +68,12 @@
                     android:paddingLeft="25dp"
                     android:paddingRight="10dp"
                     android:text=""
-                    android:textColor="@color/colorWhite"
-                    android:textColorHint="#ccffffff"
-                    android:textSize="14sp" />
+                    android:fontFamily="sans-serif"
 
+                    android:textColor="@color/colorBlack"
+                    android:textColorHint="@color/colorBlack"
+                    android:textCursorDrawable="@null"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/txt_user"
@@ -79,7 +85,7 @@
                     android:padding="2dp"
                     android:text="@string/fa_icon_user"
                     android:textAlignment="viewStart"
-                    android:textColor="@color/colorWhite"
+                    android:textColor="@color/colorBlack"
                     android:textSize="18sp" />
 
             </RelativeLayout>
@@ -96,16 +102,18 @@
                     android:id="@+id/id_passwordedit"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:backgroundTint="@color/colorWhite"
+                    android:backgroundTint="@color/colorBlack"
                     android:hint="Password"
+                    android:fontFamily="sans-serif"
                     android:inputType="textPassword"
                     android:maxLength="50"
                     android:maxLines="1"
                     android:paddingLeft="25dp"
                     android:paddingRight="10dp"
                     android:text=""
-                    android:textColor="@color/colorWhite"
-                    android:textColorHint="#ccffffff"
+                    android:textColor="@color/colorBlack"
+                    android:textColorHint="@color/colorBlack"
+                    android:textCursorDrawable="@null"
                     android:textSize="14sp" />
 
                 <TextView
@@ -118,7 +126,7 @@
                     android:padding="2dp"
                     android:text="@string/fa_icon_key"
                     android:textAlignment="viewStart"
-                    android:textColor="@color/colorWhite"
+                    android:textColor="@color/colorBlack"
                     android:textSize="18sp" />
 
                 <TextView
@@ -144,8 +152,21 @@
                 android:background="@color/colorDefault"
                 android:text="@string/label_signin"
                 android:textAllCaps="false"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorInstancyMarket"
                 android:textSize="16sp" />
+
+            <!--<Button-->
+            <!--android:id="@+id/btnewuser"-->
+            <!--android:layout_width="300dp"-->
+            <!--android:layout_height="45dp"-->
+            <!--android:layout_below="@+id/id_loginbtn"-->
+            <!--android:background="@color/colorDefault"-->
+            <!--android:gravity="center"-->
+            <!--android:text="Subscribe Now"-->
+            <!--android:textAllCaps="false"-->
+            <!--android:textColor="@color/colorWhite"-->
+            <!--android:textSize="16sp" />-->
+
 
             <LinearLayout
                 android:id="@+id/linearviewforgot"
@@ -179,14 +200,14 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:gravity="center"
-                    android:text="@string/label_newuser"
+                    android:text="@string/btn_txt_signup"
                     android:textAlignment="textEnd"
                     android:textAllCaps="false"
+                    android:visibility="invisible"
                     android:textColor="@color/colorWhite"
-                    android:textSize="14sp" />
+                    android:textSize="15sp" />
 
             </LinearLayout>
-
 
         </RelativeLayout>
     </ScrollView>
@@ -239,7 +260,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="27dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="5dp">

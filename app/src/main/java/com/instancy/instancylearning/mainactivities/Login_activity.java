@@ -3,7 +3,11 @@ package com.instancy.instancylearning.mainactivities;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -24,12 +28,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
+import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.ApiConstants;
@@ -48,10 +57,12 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.copyFile;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
@@ -62,55 +73,55 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 public class Login_activity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
-    @Bind(R.id.id_settings_txt)
+    @BindView(R.id.id_settings_txt)
     TextView settingTxt;
 
-    @Bind(R.id.txt_pass)
+    @BindView(R.id.txt_pass)
     TextView imgPassword;
 
-    @Bind(R.id.txtalert)
+    @BindView(R.id.txtalert)
     TextView alertText;
 
-    @Bind(R.id.txt_user)
+    @BindView(R.id.txt_user)
     TextView imgUser;
 
-    @Bind(R.id.id_loginbtn)
+    @BindView(R.id.id_loginbtn)
     Button btnLogin;
 
-    @Bind(R.id.btnewuser)
+    @BindView(R.id.btnewuser)
     Button btnSignup;
 
-    @Bind(R.id.btnforgot)
+    @BindView(R.id.btnforgot)
     Button btnForgot;
 
-    @Bind(R.id.id_useredit)
+    @BindView(R.id.id_useredit)
     EditText editUserName;
 
-    @Bind(R.id.id_passwordedit)
+    @BindView(R.id.id_passwordedit)
     EditText editPassword;
 
-    @Bind(R.id.btntxt_facebook)
+    @BindView(R.id.btntxt_facebook)
     TextView btnFacebook;
 
-    @Bind(R.id.btntxt_twitter)
+    @BindView(R.id.btntxt_twitter)
     TextView btnTwitter;
 
-    @Bind(R.id.btntxt_google)
+    @BindView(R.id.btntxt_google)
     TextView btnGoogle;
 
-    @Bind(R.id.btntxt_linkedin)
+    @BindView(R.id.btntxt_linkedin)
     TextView btnLinkedin;
 
-    @Bind(R.id.txt_orsocialmedia)
+    @BindView(R.id.txt_orsocialmedia)
     TextView txtOrSocialmedia;
 
-    @Bind(R.id.rlSocialLogin)
+    @BindView(R.id.rlSocialLogin)
     LinearLayout linearLayoutOr;
 
-    @Bind(R.id.lineview1)
+    @BindView(R.id.lineview1)
     View lineView1;
 
-    @Bind(R.id.lineview2)
+    @BindView(R.id.lineview2)
     View lineView2;
 
     AppUserModel appUserModel;
@@ -121,14 +132,24 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     String autoSignInUserName = "";
     String autoSignInPassword = "";
     boolean isAutoSignIn = false;
-
+    DatabaseHandler db;
+    AppController appController;
+    VollyService vollyService;
+    IResult resultCallback = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+        db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+        initVolleyCallback();
+
+        vollyService = new VollyService(resultCallback, getApplicationContext());
+
+        appController = AppController.getInstance();
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
         VolleySingleton.getInstance(this);
@@ -152,7 +173,56 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        btnLogin.setBackgroundResource(R.drawable.round_corners);
 //        GradientDrawable drawable = (GradientDrawable) btnLogin.getBackground();
 //        drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-//        btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
+        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+
+        imgPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        editPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        editUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        editPassword.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        editUserName.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
+
+//       uncomment for backgroundcolor purpose
+//        View someView = findViewById(R.id.login_layout);
+
+        // Find the root view
+//        View root = someView.getRootView();
+
+        // Set the color comment for cle
+
+//        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+
+
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))) {
+            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+            settingTxt.setVisibility(View.INVISIBLE);
+        }
+        settingTxt.setVisibility(View.INVISIBLE);
+
+
+        Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
+        drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
+
+        Drawable drawableUser = editUserName.getBackground(); // get current EditText drawable
+        drawableUser.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP);
+
+        if (Build.VERSION.SDK_INT > 16) {
+            editPassword.setBackground(drawablePass); // set the new drawable to EditText
+            editUserName.setBackground(drawableUser); // set the new drawable to EditText
+
+        } else {
+            editPassword.setBackgroundDrawable(drawablePass); // use setBackgroundDrawable because setBackground r
+            editUserName.setBackgroundDrawable(drawableUser); // use setBackgroundDrawable because setBackground requ
+        }
 
         appUserModel = AppUserModel.getInstance();
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
@@ -172,13 +242,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         editUserName.setText(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
         editPassword.setText(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
 
+//        editUserName.setText("admin@Instancy.com");
+//        editPassword.setText("abc");
 
-        editUserName.setText("admin@Instancy.com");
-        editPassword.setText("abc");
-
-        LogUtils.d("DBG", "KEY_WEBAPIURL " + appUserModel.getWebAPIUrl());
-        LogUtils.d("KEY_SITEURL :" + appUserModel.getSiteURL());
-        LogUtils.d("Authorization: " + appUserModel.getAuthHeaders());
         getMyCatalogData();
     }
 
@@ -186,7 +252,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     public void socialLoginBtns(View view) {
         switch (view.getId()) {
             case R.id.id_loginbtn:
-                loginMethod();
+                try {
+                    loginMethod();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.btntxt_google:
                 if (isNetworkConnectionAvailable(this, -1)) {
@@ -240,6 +310,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     public void methodCallByTag(int tag) {
 
         Intent intentSocial = new Intent(this, SocialWebLoginsActivity.class);
+        intentSocial.putExtra("ATTACHMENT", true);
 
         switch (tag) {
 
@@ -260,7 +331,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 break;
             case 4:
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, ApiConstants.linkedInUrl);
-                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Linkedin");
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Linkedin");//9963014569
                 startActivity(intentSocial);
                 break;
             case 5:
@@ -277,25 +348,62 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     }
 
-    public void loginMethod() {
+    public void loginMethod() throws JSONException {
 
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
 
+
         if (userName.length() < 1) {
-            Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "  Enter Username  ", Toast.LENGTH_SHORT).show();
         } else if (passWord.length() < 1) {
-            Toast.makeText(this, "Enter Password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "  Enter Password  ", Toast.LENGTH_SHORT).show();
         } else {
 
             if (isNetworkConnectionAvailable(this, -1)) {
-
                 svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
                 loginVollyWebCall(userName, passWord);
             } else {
 
-                SweetAlert.sweetAlertNoNet(Login_activity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("username", userName);
+                    jsonObject.put("password", passWord);
+                    jsonObject.put("siteid", "374");
+                    jsonObject.put("siteurl", preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                JSONObject jsonReturn = null;
+                try {
+                    jsonReturn = db.checkOfflineUserCredintials(jsonObject);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (jsonReturn.length() != 0) {
+
+                    appController.setAlreadyViewd(true);
+                    preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+                    preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
+                    preferencesManager.setStringValue(passWord, StaticValues.KEY_USERPASSWORD);
+                    preferencesManager.setStringValue(jsonReturn.get("userid").toString(), StaticValues.KEY_USERID);
+                    preferencesManager.setStringValue(jsonReturn.get("displayname").toString(), StaticValues.KEY_USERNAME);
+                    preferencesManager.setStringValue(jsonReturn.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
+                    MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                    CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intentSideMenu);
+
+                } else {
+                    appController.setAlreadyViewd(false);
+                    preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
+                    SweetAlert.sweetAlertNoNet(Login_activity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
+                }
             }
 
         }
@@ -303,35 +411,46 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void loginVollyWebCall(final String userName, final String password) {
 
-
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + userName + "&Password=" + password + "&MobileSiteURL="
                 + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
 
-        LogUtils.d("here  " + urlStr);
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         svProgressHUD.dismiss();
-
                         Log.d("Response: ", " " + response.has("faileduserlogin"));
-
                         if (response.has("faileduserlogin")) {
-
-                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
+//                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
                             alertText.setVisibility(View.VISIBLE);
-
 
                         } else if (response.has("successfulluserlogin")) {
                             alertText.setVisibility(View.GONE);
                             try {
                                 JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
-
                                 if (loginResponseAry.length() != 0) {
 
+
                                     JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+                                    JSONObject jsonObject = new JSONObject();
+                                    String userId = jsonobj.get("userid").toString();
+                                    profileWebCall(userId);
+                                    jsonObject.put("userid", jsonobj.get("userid").toString());
+                                    jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
+                                    jsonObject.put("userstatus", jsonobj.get("userstatus"));
+                                    jsonObject.put("displayname", jsonobj.get("username"));
+                                    jsonObject.put("siteid", jsonobj.get("siteid"));
+                                    jsonObject.put("username", userName);
+                                    jsonObject.put("password", password);
+                                    jsonObject.put("siteurl", appUserModel.getSiteURL());
+
+                                    db.insertUserCredentialsForOfflineLogin(jsonObject);
+
                                     Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
                                     preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
                                     preferencesManager.setStringValue(password, StaticValues.KEY_USERPASSWORD);
@@ -340,16 +459,19 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                                     preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
 
-                                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
-                                    startActivity(intentSideMenu);
 
+                                    appUserModel.setUserIDValue(userId);
+                                    MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+                                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intentSideMenu);
                                 }
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
-//                            SweetAlert.sweetAlertSuccess(Login_activity.this, "Great...", "Success Login ");
                         }
 
                     }
@@ -365,7 +487,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             public Map<String, String> getHeaders() throws AuthFailureError {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
                 return headers;
             }
@@ -374,6 +495,17 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
+    private void profileWebCall(String userId) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        Log.d(TAG, "profileWebCall: " + urlStr);
+
+        vollyService.getJsonObjResponseVolley("PROFILEDATA", urlStr, appUserModel.getAuthHeaders());
+
+    }
 
     void getMyCatalogData() {
         File tepfile = new File(getExternalFilesDir(null)
@@ -412,8 +544,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void hideOrShowBtns() {
-
-        btnSignup.setVisibility(View.INVISIBLE);
+        settingTxt.setVisibility(View.INVISIBLE);
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
@@ -446,6 +577,18 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             lineView2.setVisibility(View.VISIBLE);
             lineView1.setVisibility(View.VISIBLE);
         }
+
+        if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
+
+            btnSignup.setVisibility(View.VISIBLE);
+
+        } else {
+            btnSignup.setVisibility(View.INVISIBLE);
+
+        }
+
+        btnForgot.setVisibility(View.INVISIBLE);
+
     }
 
     @Override
@@ -455,7 +598,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             editUserName.setText(autoSignInUserName);
             editPassword.setText(autoSignInPassword);
             isAutoSignIn = false;
-            loginMethod();
+            try {
+                loginMethod();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -493,14 +640,64 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.id_settings:
-//                Intent intentSettings = new Intent(this, NativeSettings.class);
-//                intentSettings.putExtra(StaticValues.KEY_ISLOGIN, false);
-//                startActivity(intentSettings);
+                Intent intentSettings = new Intent(this, NativeSettings.class);
+                intentSettings.putExtra(StaticValues.KEY_ISLOGIN, false);
+                startActivity(intentSettings);
                 return true;
         }
         return false;
     }
 
+    void initVolleyCallback() {
+
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+
+                if (requestType.equalsIgnoreCase("PROFILEDATA")) {
+                    if (response != null) {
+
+                        try {
+
+                            db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                    }
+
+//                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+//                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(intentSideMenu);
+                }
+
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+
+                svProgressHUD.dismiss();
+            }
+        };
+    }
 
 }
 

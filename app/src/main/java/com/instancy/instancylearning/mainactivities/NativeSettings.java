@@ -3,6 +3,7 @@ package com.instancy.instancylearning.mainactivities;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -20,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.NativeSettingsAdapter;
@@ -29,14 +31,15 @@ import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+import com.instancy.instancylearning.utils.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
+import static android.webkit.URLUtil.isValidUrl;
 import static com.instancy.instancylearning.utils.Utilities.formatURL;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 5/29/2017.
@@ -50,6 +53,7 @@ public class NativeSettings extends AppCompatActivity {
     HashMap<String, List<String>> expandableListDetail;
     PreferencesManager preferencesManager;
     Boolean isLogin;
+    private SVProgressHUD svProgressHUD;
     final Context context = this;
     String TAG = NativeSettings.class.getSimpleName();
 
@@ -57,6 +61,7 @@ public class NativeSettings extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
+        svProgressHUD = new SVProgressHUD(this);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
 
@@ -64,7 +69,7 @@ public class NativeSettings extends AppCompatActivity {
         }
         PreferencesManager.initializeInstance(context);
         preferencesManager = PreferencesManager.getInstance();
-        preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+//        preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
 
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
@@ -99,28 +104,66 @@ public class NativeSettings extends AppCompatActivity {
 
                 if (childPosition == 0 && !isLogin) {
 
-                    new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-                            .setTitleText("Are you sure?")
-                            .setContentText("Do you want to reset the site URL!")
-                            .setConfirmText("Yes,reset it!")
-                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
-                                    preferencesManager.setStringValue(StaticValues.KEY_SITEURL, getString(R.string.app_default_url));
-                                    sDialog.dismissWithAnimation();
-                                    Toast.makeText(context, "Default url set", Toast.LENGTH_LONG).show();
+//                    new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
+//                            .setTitleText("Are you sure?")
+//                            .setContentText("Do you want to reset the site URL!")
+//                            .setConfirmText("Yes,reset it!")
+//                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                                @Override
+//                                public void onClick(SweetAlertDialog sDialog) {
+//                                    if (isNetworkConnectionAvailable(context, -1)) {
+//                                        preferencesManager.setStringValue(getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+//                                        Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+//                                        intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                        startActivity(intentBranding);
+//                                        Toast.makeText(context, "Default url set " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
+//                                    } else {
+//                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//                                    }
+//
+//
+//                                    sDialog.dismissWithAnimation();
+//
+//                                }
+//                            }).setCancelText("Cancel").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+//
+//                            sweetAlertDialog.dismissWithAnimation();
+//
+//                        }
+//                    })
+//                            .show();
+
+                    final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(NativeSettings.this);
+                    builder.setMessage("Do you want to reset the site URL!").setTitle("Are you sure?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes,reset it!", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+
+                                    if (isNetworkConnectionAvailable(context, -1)) {
+                                        preferencesManager.setStringValue(getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
+                                        Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+                                        intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intentBranding);
+                                        Toast.makeText(context, "Default url set " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    dialog.dismiss();
                                 }
-                            }).setCancelText("Cancel").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-
-                            sweetAlertDialog.dismissWithAnimation();
-
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                         }
-                    })
-                            .show();
-                } else {
+                    });
+                    android.support.v7.app.AlertDialog alert = builder.create();
+                    alert.show();
 
+                } else {
 
                     resetUrlEditDialog();
                 }
@@ -152,7 +195,7 @@ public class NativeSettings extends AppCompatActivity {
 
         final EditText userInput = (EditText) promptsView
                 .findViewById(R.id.reseturledit);
-
+        userInput.setText(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)
@@ -162,22 +205,24 @@ public class NativeSettings extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 // get user input and set it to result
                                 // edit text
-//                            result.setText(userInput.getText());
                                 String newUrl = userInput.getText().toString().trim();
                                 newUrl = formatURL(newUrl);
 
-                                Toast.makeText(context, "" + newUrl, Toast.LENGTH_SHORT).show();
-
-                                VolleySingleton.stringRequests(newUrl + "/PublicModules/SiteAPIDetails.aspx", new StringResultListner<String>() {
-                                    @Override
-                                    public void getResult(String result) {
-                                        if (!result.isEmpty()) {
-                                            //do what you need with the result...
-                                            LogUtils.d(TAG, "" + result);
-                                        }
+                                if (isValidUrl(newUrl)) {
+                                    if (isNetworkConnectionAvailable(context, -1)) {
+                                        resetUrlWebCall(newUrl);
+                                    } else {
+                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                                     }
-                                });
+
+                                } else {
+                                    Toast.makeText(context, "Invalid Url " + newUrl, Toast.LENGTH_SHORT).show();
+
+                                }
+
                             }
+
+
                         })
                 .setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
@@ -192,6 +237,70 @@ public class NativeSettings extends AppCompatActivity {
         // show it
         alertDialog.show();
 
+    }
+
+    public void resetUrlWebCall(final String newUrl) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        VolleySingleton.stringRequests(newUrl + "/PublicModules/SiteAPIDetails.aspx", new StringResultListner<String>() {
+            @Override
+            public void getResult(String result) {
+                if (!result.isEmpty()) {
+                    //do what you need with the result...
+
+                    String webApiUrl = getSiteAPIDetails(result);
+
+                    LogUtils.d(TAG, "Result web api " + webApiUrl);
+
+                    if (isValidUrl(webApiUrl)) {
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            preferencesManager.setStringValue(newUrl, StaticValues.KEY_SITEURL);
+                            Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+                            intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intentBranding);
+
+                        } else {
+                            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        Toast.makeText(context, "Invalid Url " + webApiUrl, Toast.LENGTH_SHORT).show();
+
+                    }
+
+                    svProgressHUD.dismiss();
+                }
+            }
+
+            @Override
+            public void getError(String error) {
+                LogUtils.e(TAG, "Result error " + error);
+                Toast.makeText(context, "Invalid Request ", Toast.LENGTH_SHORT).show();
+                svProgressHUD.dismiss();
+            }
+        });
+    }
+
+    public String getSiteAPIDetails(String result) {
+
+        String strAPIURL = "";
+
+        if (result.indexOf("<!DOCTYPE html>") > -1) {
+            strAPIURL = result.split("<!DOCTYPE html>")[0]
+                    .toString().trim();
+
+            if (!Utilities.isValidString(strAPIURL)) {
+                strAPIURL = "";
+            } else {
+
+                Log.d("webapiurl", strAPIURL);
+                preferencesManager.setStringValue(strAPIURL, StaticValues.KEY_WEBAPIURL);
+
+            }
+        }
+
+        return strAPIURL;
     }
 
     @Override

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="PROFILE_ATTRIBUTE_TAG" />
+    <item type="id" name="PROFILE_FIELD_NAME_TAG" />
+    <item type="id" name="PROFILE_FIELD_UI_TYPE_TAG" />
+    <item type="id" name="PROFILE_REQUIRED_TAG" />
+    
+    <item type="id" name="BTN_GROUP" />
+    <item type="id" name="BTN_VIEW" />
+    <item type="id" name="BTN_DETAILS" />
+    <item type="id" name="BTN_REPORT" />
+    <item type="id" name="BTN_SETCOMPLETE" />
+    <item type="id" name="BTN_DOWNLOAD" />
+    <item type="id" name="BTN_ADD" />
+    <item type="id" name="BTN_BUY" />
+    <item type="id" name="BTN_PLAY" />
+    <item type="id" name="BTN_ADDTOCALENDER" />
+    <item type="id" name="BTN_CANCEL" />
+    <item type="id" name="BTN_RELATEDCONTENT" />
+    
+    <item type="id" name="CATALOG_CATEGORY_ID_TAG" />
+    <item type="id" name="CATALOG_CATEGORY_LEVEL_TAG" />
+</resources>

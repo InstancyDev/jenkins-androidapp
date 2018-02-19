@@ -1,0 +1,45 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/ctx_play"
+        android:orderInCategory="100"
+        android:title="View Profile" />
+
+    <item
+        android:id="@+id/ctx_view"
+        android:orderInCategory="100"
+        android:title="View Content" />
+    <item
+        android:id="@+id/ctx_detail"
+        android:orderInCategory="100"
+        android:title="Accept Connection" />
+
+    <item
+        android:id="@+id/ctx_join"
+        android:orderInCategory="100"
+        android:title="Remove Connection" />
+
+    <item
+        android:id="@+id/ctx_download"
+        android:orderInCategory="100"
+        android:title="Ignore Connection" />
+
+    <item
+        android:id="@+id/ctx_report"
+        android:orderInCategory="100"
+        android:title="Send Message" />
+
+    <item
+        android:id="@+id/ctx_addtocalender"
+        android:orderInCategory="100"
+        android:title="Add to My Connections" />
+
+    <item
+        android:id="@+id/ctxcancel"
+        android:orderInCategory="100"
+        android:title="Cancel" />
+
+</menu>
+

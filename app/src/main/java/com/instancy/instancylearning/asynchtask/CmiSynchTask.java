@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.instancy.instancylearning.globalpackage.SynchData;
-import com.instancy.instancylearning.synchtasks.WebAPIClient;
 
 /**
  * Created by Upendranath on 5/22/2017.
@@ -13,15 +12,12 @@ import com.instancy.instancylearning.synchtasks.WebAPIClient;
 public class CmiSynchTask extends AsyncTask<String, Integer, Void> {
 
 
-    WebAPIClient webAPIClient;
     Context context;
     SynchData synchData;
 
     public CmiSynchTask(Context context) {
         this.context = context;
-        webAPIClient = new WebAPIClient(context);
         synchData = new SynchData(context);
-
     }
 
     @Override

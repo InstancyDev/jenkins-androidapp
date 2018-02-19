@@ -43,15 +43,16 @@ public class WebAPIClient {
     }
 
 
-    public String getSiteAPIDetails(String siteurl) {
+    public String getSiteAPIDetails(String siteurl, boolean isMainSite) {
         String requestURL = siteurl + "/PublicModules/SiteAPIDetails.aspx";
+        Log.d("TAG", "getSiteAPIDetails: " + requestURL);
         String strAPIURL = "";
         inputStream = null;
         httpURLConnection = null;
 
-
         try {
             URL url = new URL(requestURL);
+
 
             httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -69,9 +70,13 @@ public class WebAPIClient {
                     if (!Utilities.isValidString(strAPIURL)) {
                         strAPIURL = "";
                     } else {
-
                         Log.d("webapiurl", strAPIURL);
-                        preferencesManager.setStringValue(strAPIURL, StaticValues.KEY_WEBAPIURL);
+                        if (isMainSite) {
+                            preferencesManager.setStringValue(strAPIURL, StaticValues.KEY_WEBAPIURL);
+                        } else {
+                            preferencesManager.setStringValue(strAPIURL, StaticValues.SUB_KEY_WEBAPIURL);
+                        }
+
                     }
                 }
             } else {
@@ -92,13 +97,12 @@ public class WebAPIClient {
      *
      * @author Venu
      */
-    public void getAPIAuthDetails(String siteUrl, String strAPIURL) {
+    public void getAPIAuthDetails(String siteUrl, String strAPIURL, boolean isMainSite) {
 
         String requestURL = strAPIURL + "/MobileLMS/GetAPIAuthDetails"
                 + "?AppURL=" + siteUrl;
         inputStream = null;
         httpURLConnection = null;
-
 
         try {
             URL url = new URL(requestURL);
@@ -115,9 +119,13 @@ public class WebAPIClient {
                 String result = Utilities.convertStreamToString(inputStream);
                 result = result.substring(1, result.lastIndexOf(","));
                 result = result.replaceAll(",", ":");
-                Log.d("Auth details", result);
+                Log.d("Auth details " + isMainSite, result);
 
-                preferencesManager.setStringValue(result, StaticValues.KEY_AUTHENTICATION);
+                if (isMainSite) {
+                    preferencesManager.setStringValue(result, StaticValues.KEY_AUTHENTICATION);
+                } else {
+                    preferencesManager.setStringValue(result, StaticValues.SUB_KEY_AUTHENTICATION);
+                }
 
             } else {
                 Log.e("getAuthDetails",
@@ -209,15 +217,16 @@ public class WebAPIClient {
 //        requestURL = requestURL.replace(" ", "%20");
 
         String encodedPostData = "";
+        String tempData = "\"" + postData + "\"";
         try {
-            String tempData = "\"" + postData + "\"";
+
             encodedPostData = URLEncoder.encode(tempData, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         try {
-
+            Log.d("TAG", "SYNC URL " + requestURL);
             Log.d("TAG", "HERE " + encodedPostData);
 
             URL url = new URL(requestURL);
@@ -241,7 +250,7 @@ public class WebAPIClient {
             OutputStream os = httpURLConnection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
-            writer.write(encodedPostData);
+            writer.write(tempData);
 
             writer.flush();
             writer.close();
