@@ -327,9 +327,9 @@ public class MyLearningAdapter extends BaseAdapter {
                 String status = "";
 
                 if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete")) {
-                    status = "In Progress";
+                    status = "In Progress ";
                 } else if (myLearningModel.get(position).getStatus().length() == 0) {
-                    status = "In Progress";
+                    status = "In Progress ";
 
                 } else {
                     status = myLearningModel.get(position).getStatus();
@@ -338,7 +338,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 holder.progressBar.setProgress(50);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = status + "(" + 50;
+                courseStatus = status + " (" + 50;
 
             } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("pending review") || (myLearningModel.get(position).getStatus().toLowerCase().contains("pendingreview"))) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));

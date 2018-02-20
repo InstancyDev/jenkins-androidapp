@@ -55,12 +55,12 @@
         <View
             android:id="@+id/line"
             android:layout_width="match_parent"
-            android:layout_height="0.3dp"
+            android:layout_height="1dp"
             android:layout_below="@+id/rl_profile"
             android:background="@color/colorGray" />
 
         <LinearLayout
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_below="@id/line"
             android:id="@+id/subsitelayout"
             android:layout_width="match_parent"

@@ -118,7 +118,7 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtName.setText(discussionForumModelList.get(position).name);
         holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
-        holder.txtAuthor.setText("Moderator:" + discussionForumModelList.get(position).author + " ");
+        holder.txtAuthor.setText("Moderator: " + discussionForumModelList.get(position).author + " ");
         holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
 
         holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");

@@ -359,7 +359,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -1578,7 +1578,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         menu = new SideMenusModel();
         menu.setMenuId(5555);
-        menu.setDisplayName("Sign out");
+        menu.setDisplayName("Sign Out");
         menu.setDisplayOrder(9999);
         menu.setImage("");
         menu.setMenuImageResId(R.drawable.ic_info_black_24dp);
@@ -4838,6 +4838,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         trackListModel.setRelatedContentCount(cursor.getString(cursor
                                 .getColumnIndex("relatedcontentcount")));
 
+                        trackListModel.setShowStatus(cursor.getString(cursor
+                                .getColumnIndex("showstatus")));
+
 
                     }
 
@@ -4922,7 +4925,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-
     public void injectIntoEventRelatedContentTable(MyLearningModel trackListModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
@@ -4965,7 +4967,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("joinurl", trackListModel.getJoinurl());
             contentValues.put("blockname", trackListModel.getBlockName());
             contentValues.put("wresult", trackListModel.getWresult());
-            contentValues.put("wmessage", trackListModel.getWmessage());
             contentValues.put("durationenddate", trackListModel.getDurationEndDate());
             contentValues.put("ratingid", trackListModel.getRatingId());
             contentValues.put("publisheddate", trackListModel.getPublishedDate());
@@ -4973,6 +4974,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("keywords", trackListModel.getKeywords());
             contentValues.put("offlinepath", trackListModel.getOfflinepath());
             contentValues.put("trackContentId", trackListModel.getOfflinepath());
+            contentValues.put("showstatus", trackListModel.getShowStatus());
+            contentValues.put("ruleid", "0");
+            contentValues.put("stepid", "0");
+            contentValues.put("wmessage", "");
 
             db.insert(TBL_RELATEDCONTENTDATA, null, contentValues);
 
@@ -7340,6 +7345,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void updateEventTrackListItemShowstatus(MyLearningModel cmiNew) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strExeQuery = "";
+        strExeQuery = "UPDATE " + TBL_RELATEDCONTENTDATA + " SET showstatus='"
+                + cmiNew.getShowStatus() + "' WHERE siteid='"
+                + cmiNew.getSiteID() + "' AND userid='" + cmiNew.getUserID()
+                + "' AND scoid='" + cmiNew.getScoId() + "'";
+
+        try {
+            db.execSQL(strExeQuery);
+        } catch (SQLException e) {
+            Log.e("updateTrackList: ", strExeQuery);
+        }
+        db.close();
+    }
+
+
     public String getTrackTimedelay(MyLearningModel learningModel) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -8338,6 +8361,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return timeDelay;
     }
+
+
+    public String getTrackTimedelayEvent(String userId, String tackScoId,
+                                    String sitrId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strExeQuery = "";
+        Cursor cursor = null;
+        String timeDelay = "0";
+        strExeQuery = "SELECT timedelay FROM " + TBL_RELATEDCONTENTDATA
+                + " WHERE userid='" + userId + "' AND scoid='" + tackScoId
+                + "' AND siteid='" + sitrId + "'";
+        try {
+            cursor = db.rawQuery(strExeQuery, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                if (cursor.moveToFirst()) {
+                    timeDelay = cursor.getString(cursor
+                            .getColumnIndex("timedelay"));
+                    if (!isValidString(timeDelay)) {
+                        timeDelay = "0";
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            Log.d("getTrackTimedelay", e.getMessage());
+        }
+        db.close();
+        return timeDelay;
+    }
+
 
 
     public String getTrackTemplateWorkflowResults(String trackID, MyLearningModel learningModel) {

@@ -164,6 +164,10 @@
             android:name=".wifisharing.WiFiDirectNewActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".mylearning.EventTrackList_Activity"
+            android:screenOrientation="portrait"></activity>
+
 
         <!-- INAPP BILLING ACTIVITY -->
 

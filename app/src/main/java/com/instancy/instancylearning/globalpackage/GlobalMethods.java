@@ -30,6 +30,7 @@ import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
 import com.instancy.instancylearning.mylearning.TrackList_Activity;
@@ -378,7 +379,6 @@ public class GlobalMethods {
 
             /// ONLINE
         } else {
-
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
                 Intent intentDetail = new Intent(context, TrackList_Activity.class);
@@ -771,7 +771,8 @@ public class GlobalMethods {
     public static void relatedContentView(MyLearningModel myLearningModel, Context context) {
         Integer relatedCount = Integer.parseInt(myLearningModel.getRelatedContentCount());
         if (relatedCount > 0) {
-            Intent intentDetail = new Intent(context, TrackList_Activity.class);
+//            Intent intentDetail = new Intent(context, TrackList_Activity.class);
+            Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", false);
             ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);

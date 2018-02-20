@@ -67,7 +67,6 @@
             android:textSize="14dp" />
 
         <RadioButton
-
             android:id="@+id/myconnectionbtn"
             style="@style/RadioButton"
             android:layout_width="0dp"

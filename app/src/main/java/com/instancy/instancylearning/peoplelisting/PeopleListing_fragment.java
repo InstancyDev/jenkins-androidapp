@@ -386,12 +386,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         segmentedSwitch.setOnCheckedChangeListener(this);
 
-        segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-        pendingBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        expertsBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        allPBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        pendingBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        expertsBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        allPBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
         peopleListingModelList = new ArrayList<PeopleListingModel>();
 

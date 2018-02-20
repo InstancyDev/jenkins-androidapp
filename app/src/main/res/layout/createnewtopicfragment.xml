@@ -66,17 +66,20 @@
                 android:id="@+id/edit_attachment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2.2"
+                android:layout_weight="2.0"
                 android:background="@drawable/edittext_border"
                 android:enabled="false"
                 android:padding="10dp" />
 
-            <TextView
+            <Button
                 android:id="@+id/txtbrowse"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight=".8"
-                android:text="Browse"
+                android:layout_weight="1.0"
+                android:textSize="@dimen/standard_12"
+                android:textColor="@color/colorBlack"
+                android:textAllCaps="false"
+                android:text="Attach File"
                 android:textAlignment="center" />
         </LinearLayout>
     </LinearLayout>

@@ -21,9 +21,9 @@ android {
 //        versionName "1.9"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
-//           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 12
-//           versionName "2.1"
+           applicationId "com.instancy.enterpriselearninglite"
+           versionCode 12
+           versionName "2.1"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"
@@ -55,9 +55,9 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-        applicationId "com.instancy.development"
-        versionCode 1
-        versionName "1.0"
+//        applicationId "com.instancy.development"
+//        versionCode 1
+//        versionName "1.0"
 
         minSdkVersion 21
         targetSdkVersion 26

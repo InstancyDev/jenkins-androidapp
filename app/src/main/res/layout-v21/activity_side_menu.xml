@@ -48,7 +48,6 @@
             android:layout_height="90dp"
             android:layout_alignParentTop="true"
             android:background="@color/colorPrimary">
-
             <include layout="@layout/nav_header_side_menu" />
         </RelativeLayout>
 

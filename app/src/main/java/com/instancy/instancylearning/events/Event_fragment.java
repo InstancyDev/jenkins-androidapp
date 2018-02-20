@@ -182,9 +182,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public Event_fragment() {
 
-// added new comment from github
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -245,8 +243,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             // No such key
             filterContentType = "";
         }
-
-
     }
 
     public void refreshCatalog(Boolean isRefreshed) {

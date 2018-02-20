@@ -198,6 +198,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     String contentIDFromNotification = "";
 
+    public static int REFRESH = 0;
+
     public Catalog_fragment() {
 
 
@@ -1849,25 +1851,25 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         switch (view.getId()) {
             case R.id.fabVideo:
-                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=3",1);
+                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=3", 1);
                 break;
             case R.id.fabAudio:
-                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=4",1);
+                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=4", 1);
                 break;
             case R.id.fabDocument:
-                wikiFileUploadButtonClicked("ContentTypeID=14",1);
+                wikiFileUploadButtonClicked("ContentTypeID=14", 1);
                 break;
             case R.id.fabImage:
-                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=1",1);
+                wikiFileUploadButtonClicked("ContentTypeID=11&MediaTypeID=1", 1);
                 break;
             case R.id.fabWebsiteURL:
-                wikiFileUploadButtonClicked("ContentTypeID=28&MediaTypeID=13",1);
+                wikiFileUploadButtonClicked("ContentTypeID=28&MediaTypeID=13", 1);
                 break;
 
         }
     }
 
-    public void wikiFileUploadButtonClicked(String contentMediaTypeID,int intsr) {
+    public void wikiFileUploadButtonClicked(String contentMediaTypeID, int intsr) {
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
 
@@ -1876,10 +1878,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             String urlString = appUserModel.getSiteURL() + "/PublicModules/UserLoginVerify.aspx?Fileupload=true&ComponentID=1&CMSGroupID=3&" + contentMediaTypeID + "&userid=" + appUserModel.getUserIDValue() + "&deviceid=" + android_Id + "&devicetype=ios";
 
-            if (intsr==1){
-            openChromeTabsInAndroid(urlString);
-            }
-            else {
+            if (intsr == 1) {
+                openChromeTabsInAndroid(urlString);
+            } else {
 
                 Intent intentSocial = new Intent(context, SocialWebLoginsActivity.class);
                 intentSocial.putExtra("ATTACHMENT", true);
@@ -1899,13 +1900,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 .setToolbarColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()))
                 .setShowTitle(false).enableUrlBarHiding()
                 .build();
-
+        REFRESH = 1;
         customTabsIntent.launchUrl(context, Uri.parse(urlStr));
     }
 
-//    // Main action: create notification 12500+30000+50000+50000+100000+15868=258368 257280
-//    MIRC VASCON DISH TV18 GENIUS 171370 85910
-//    1000 1200    400  1000 1000
+    //    // Main action: create notification 12500+30000+50000+50000+100000+15868=258368 257280
+
     private static PendingIntent createPendingMainActionNotifyIntent(
             @NonNull final Context context,
             @NonNull final CustomTabsIntent action) {
@@ -1914,4 +1914,17 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         return PendingIntent.getService(context, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (REFRESH == 1) {
+            if (isNetworkConnectionAvailable(getContext(), -1)) {
+                refreshCatalog(false);
+            } else {
+                injectFromDbtoModel();
+            }
+        }
+        REFRESH = 0;
+    }
 }
