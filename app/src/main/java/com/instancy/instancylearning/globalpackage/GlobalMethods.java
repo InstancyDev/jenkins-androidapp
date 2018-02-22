@@ -278,7 +278,7 @@ public class GlobalMethods {
 
             } else if (offlinePathEncode.toLowerCase().contains(".xlsx")
                     || offlinePathEncode.toLowerCase().contains(".xls")) {
-                offlinePathEncode = offlinePathEncode.replace(" content://", "");
+                offlinePathEncode = offlinePathEncode.replace(" file://", "");
 
                 File file = new File(offlinePathEncode);
                 Intent intent4 = new Intent();

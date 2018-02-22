@@ -406,7 +406,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         return rootView;
     }
 
-
     public void injectFromDbtoModel() {
         peopleListingModelList = db.fetchPeopleListModelList(TABBALUE);
         if (peopleListingModelList != null) {

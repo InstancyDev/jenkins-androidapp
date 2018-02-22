@@ -353,7 +353,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         segmentedSwitch.setOnCheckedChangeListener(this);
 
         catalogModelsList = new ArrayList<MyLearningModel>();
-        if (isNetworkConnectionAvailable(getContext(), -1) && EVENT_FRAGMENT_OPENED_FIRSTTIME == 0) {
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
             injectFromDbtoModel(true);
@@ -784,6 +784,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             dialog.dismiss();
                                             // add event to android calander
                                             addEventToAndroidDevice(myLearningDetalData);
+                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModelsList.get(position), 1);
+                                            injectFromDbtoModel(false);
                                         }
                                     });
                             AlertDialog alert = builder.create();
@@ -960,6 +962,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //do things
                                                     dialog.dismiss();
+
                                                 }
                                             });
 
@@ -1450,6 +1453,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
+        if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+            GlobalMethods.relatedContentView(eventModel, context);
+        }
+
         try {
             String eventUriString = "content://com.android.calendar/events";
             ContentValues eventValues = new ContentValues();
@@ -1526,8 +1533,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             //do things
                                             dialog.dismiss();
                                             // remove event from android calander
-                                            injectFromDbtoModel(false);
+
                                             db.ejectEventsFromDownloadData(eventModel);
+                                            db.updateEventAddedToMyLearningInEventCatalog(eventModel, 0);
+                                            injectFromDbtoModel(false);
                                         }
                                     });
                             AlertDialog alert = builder.create();

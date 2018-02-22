@@ -8364,7 +8364,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     public String getTrackTimedelayEvent(String userId, String tackScoId,
-                                    String sitrId) {
+                                         String sitrId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String strExeQuery = "";
@@ -8390,7 +8390,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return timeDelay;
     }
-
 
 
     public String getTrackTemplateWorkflowResults(String trackID, MyLearningModel learningModel) {
@@ -11235,8 +11234,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             sqlEx.printStackTrace();
         }
 
-
     }
+
+    public void updateEventAddedToMyLearningInEventCatalog(MyLearningModel myLearningModel, int statusValue) {
+        String strUpdateML = "UPDATE " + TBL_EVENTCONTENTDATA + " SET isaddedtomylearning='"
+                + statusValue + "' WHERE siteid ='" + myLearningModel.getSiteID() + "' AND userid ='"
+                + myLearningModel.getUserID() + "' AND siteurl='" + myLearningModel.getSiteURL() + "' AND contentid='" + myLearningModel.getContentID() + "'";
+
+        try {
+            executeQuery(strUpdateML);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void injectDiscussionFourmList(JSONObject jsonObject) throws JSONException {
 

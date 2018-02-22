@@ -96,11 +96,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     DownloadXmlAsynchTask downloadXmlAsynchTask;
     List<MyLearningModel> trackListModelList;
     Boolean iscondition = true;
-    String workFlowType, strlaunch;
+    String workFlowType = "", strlaunch;
     PreferencesManager preferencesManager;
     LinearLayout linearLayout;
     AppController appController;
     UiSettingsModel uiSettingsModel;
+    boolean firstTimeVisible = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -112,13 +113,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         appController = AppController.getInstance();
         db = new DatabaseHandler(this);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
-
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         linearLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         expandableListView = (ExpandableListView) findViewById(R.id.trackexpandablelist);
@@ -129,7 +123,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         blockNames = new ArrayList<String>();
 
         webAPIClient = new WebAPIClient(this);
-        workFlowType = "onlaunch";
         strlaunch = "0";
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -168,11 +161,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         }
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshMyLearning(false);
-//            executeXmlWorkFlowFile();
         } else {
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-//            injectFromDbtoModel();
-//            executeXmlWorkFlowFile();
 
             if (isTraxkList) {
                 workFlowType = "onlaunch";
@@ -291,6 +281,17 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 for (int i = 0; i < blockNames.size(); i++)
                     expandableListView.expandGroup(i);
             }
+            if (!isTraxkList && trackListModelList.size() > 0) {
+
+                if (trackListModelList.get(0).getShowStatus().toLowerCase().contains("autolaunch") && firstTimeVisible) {
+
+                    if (expandableListView != null) {
+                        expandableListView.performItemClick(expandableListView, 0, R.id.title_text);
+                    }
+                    firstTimeVisible = false;
+                }
+            }
+
         }
     }
 
@@ -1592,16 +1593,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     }
                 }
 
-//                if (workFlowType.equals("onexit")) {
-//                    workFlowType = "";
-//                    if (isNetworkConnectionAvailable(context, -1)
-//                            ) {
-//
-////                        SyncData();
-//                    } else {
-//                        finish();
-//                    }
-//                } else
                 if (workFlowType.equals("onlaunch")) {
 
                     workFlowType = "onitemChange";
@@ -2380,7 +2371,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                             String showStatus = "";
                                             switch (actmap.get("actiontype")) {
                                                 case "disabled":
-
                                                     showStatus = "disabled";
                                                     trackListModelList.get(it)
                                                             .setShowStatus(
@@ -2395,6 +2385,11 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                     showStatus = "hide";
                                                     trackListModelList.get(it)
                                                             .setShowStatus("hide");
+                                                    break;
+                                                case "autolaunch":
+                                                    showStatus = "autolaunch";
+                                                    trackListModelList.get(it)
+                                                            .setShowStatus("autolaunch");
                                                     break;
 
                                                 default:
@@ -2534,6 +2529,11 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                         trackListModelList.get(it)
                                                                 .setShowStatus(
                                                                         "hide");
+                                                        break;
+                                                    case "autolaunch":
+                                                        showStatus = "autolaunch";
+                                                        trackListModelList.get(it)
+                                                                .setShowStatus("autolaunch");
                                                         break;
                                                     default:
                                                         break;

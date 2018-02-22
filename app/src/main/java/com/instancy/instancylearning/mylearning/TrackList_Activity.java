@@ -288,6 +288,9 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 for (int i = 0; i < blockNames.size(); i++)
                     expandableListView.expandGroup(i);
             }
+
+
+
         }
     }
 
