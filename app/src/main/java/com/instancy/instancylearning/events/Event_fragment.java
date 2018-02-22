@@ -7,14 +7,12 @@ import android.app.Activity;
 
 import com.github.sundeepk.compactcalendarview.domain.Event;
 
-import android.app.usage.UsageEvents;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -243,12 +241,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             // No such key
             filterContentType = "";
         }
+
+
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
+        filterContentType = " C.ObjectTypeID = 70 And C.bit4 Is null ";
+        sortBy = "c.name asc";
 
         String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
 
@@ -335,7 +337,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setEnabled(false);
 
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList,true);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -346,12 +348,17 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         calenderBtn = (RadioButton) rootView.findViewById(R.id.calanderbtn);
         pastBtn = (RadioButton) rootView.findViewById(R.id.pastbtn);
 
-        upBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        calenderBtn.setTextColor(getResources().getColor(R.color.colorWhite));
-        pastBtn.setTextColor(getResources().getColor(R.color.colorWhite));
+        upBtn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        calenderBtn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        pastBtn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
+        upBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        calenderBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        pastBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
         upBtn.setTypeface(null, Typeface.BOLD);
         segmentedSwitch.setOnCheckedChangeListener(this);
-
+        segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         catalogModelsList = new ArrayList<MyLearningModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
@@ -416,11 +423,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
-//            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
-//            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
@@ -676,7 +681,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 menu.getItem(1).setVisible(false);
             }
 
-
         }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -710,13 +714,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //                    addToMyLearning(myLearningDetalData);
                     addToMyLearningCheckUser(myLearningDetalData, position, false);
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
-
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
 //                    addToMyLearningCheckUser(myLearningDetalData, position, true);
 //
 //                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
-
                 }
                 return true;
             }
@@ -1549,7 +1551,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("Error: ", error.getMessage());
+//                        Log.e("Error: ", error.getMessage());
 //                        svProgressHUD.dismiss();
                     }
                 }) {

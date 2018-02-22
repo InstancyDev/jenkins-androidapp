@@ -63,6 +63,8 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
 
+import static com.instancy.instancylearning.utils.Utilities.*;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -195,11 +197,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         FontManager.markAsIconContainer(findViewById(R.id.notification_font), iconFont);
         FontManager.markAsIconContainer(findViewById(R.id.sendmessage_font), iconFont);
 
-
-        View customNav = LayoutInflater.from(this).inflate(R.layout.homebutton, null);
-        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
-        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
-        toolbar.setLogo(d);
+        Drawable bd = getDrawableFromStringHOmeMethod(R.string.fa_icon_home, this, uiSettingsModel.getAppHeaderTextColor());
+        toolbar.setLogo(bd);
         toolbar.setContentInsetStartWithNavigation(0);
         logoView = getToolbarLogoIcon(toolbar);
         logoView.setOnClickListener(new View.OnClickListener() {
@@ -223,9 +222,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
 
-        ImageView imgBottom = (ImageView) findViewById(R.id.bottom_logo);
-//       imgBottom.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
         }
@@ -242,7 +238,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         drawerHeaderView = (RelativeLayout) findViewById(R.id.drawerheaderview);
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-
 
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
 
@@ -262,9 +257,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         }
         txtUsername.setText(upperCaseWords(name));
+        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 
         txtAddress.setText(upperCaseWords(strAry[1]));
-
+        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
         sideMenumodelList = db.getNativeMainMenusData();
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
@@ -501,6 +497,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 bundle.putBoolean("ISFROMNOTIFICATIONS", isFromNotification);
                 bundle.putString("CONTENTID", contentID);
                 fragment.setArguments(bundle);
+
                 navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
                 navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
             }
@@ -637,7 +634,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         String name = "";
         String location = "";
-
 
         if (!detailsModel.displayname.equalsIgnoreCase("")) {
             name = detailsModel.displayname;

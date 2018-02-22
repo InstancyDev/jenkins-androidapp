@@ -280,7 +280,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 txtCourseStatus.setVisibility(View.GONE);
             } else {
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
                     btnDownload.setVisibility(View.GONE);
                     circleProgressBar.setVisibility(View.GONE);
                 } else {

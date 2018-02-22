@@ -91,6 +91,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     private Activity activity;
     AppController appController;
     PreferencesManager preferencesManager;
+    boolean autoLaunch = true;
 
     public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView) {
         this._context = context;
@@ -216,7 +217,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28")) {
+            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
             } else {
@@ -377,6 +378,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.txtTitle.setEnabled(false);
         } else if (trackChildList.getShowStatus().equalsIgnoreCase("hide")) {
             childView.setVisibility(View.GONE);
+        } else if (trackChildList.getShowStatus().equalsIgnoreCase("autolaunch")) {
+                holder.imgThumb.performClick();
+
         } else {
             childView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 //            childView.setBackgroundColor(Color.WHITE);

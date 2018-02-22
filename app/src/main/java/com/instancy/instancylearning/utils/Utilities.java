@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -20,12 +21,17 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.instancy.instancylearning.BuildConfig;
+import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
 
 import org.json.JSONObject;
@@ -44,6 +50,8 @@ import java.util.HashMap;
 import java.util.Random;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 
 public class Utilities {
 
@@ -909,5 +917,34 @@ public class Utilities {
             b.append(", ");
         }
     }
+
+
+    public static Drawable getDrawableFromStringMethod(int resourceID, Context context, String colorString) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconimage, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.imageicon);
+        iconText.setTextColor(Color.parseColor(colorString));
+        iconText.setText(resourceID);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.imageicon), iconFont);
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
+
+    public static Drawable getDrawableFromStringHOmeMethod(int resourceID, Context context, String colorString) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.homebutton, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.homeicon);
+        iconText.setTextColor(Color.parseColor(colorString));
+        iconText.setText(resourceID);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
+
+
 
 }

@@ -173,7 +173,14 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        btnLogin.setBackgroundResource(R.drawable.round_corners);
 //        GradientDrawable drawable = (GradientDrawable) btnLogin.getBackground();
 //        drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+
+
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+
+        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
         imgPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
@@ -191,15 +198,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 
 //       uncomment for backgroundcolor purpose
-//        View someView = findViewById(R.id.login_layout);
 
-        // Find the root view
-//        View root = someView.getRootView();
-
-        // Set the color comment for cle
-
-//        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
-
+        View someView = findViewById(R.id.login_layout);
+        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))) {
             btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));

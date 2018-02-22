@@ -127,6 +127,8 @@ import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -437,7 +439,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (isFromCatogories) {
             breadCrumbPlusButtonInit(rootView);
         }
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList);
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList,false);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -468,12 +470,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         return rootView;
     }
-
-
     public void fabActionMenusInitilization() {
         uploadFloatMenu.setVisibility(View.VISIBLE);
         uploadFloatMenu.setClosedOnTouchOutside(true);
         uploadFloatMenu.setMenuButtonColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        uploadFloatMenu.getMenuIconView().setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+//        uploadFloatMenu.getMenuIconView().setImageDrawable(getDrawableFromStringHOmeMethod(R.string.fa_icon_cloud_upload, context, uiSettingsModel.getAppHeaderTextColor()));
+
 
         fabAudio.setOnClickListener(this);
         fabImage.setOnClickListener(this);
@@ -481,11 +485,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         fabWebsiteURL.setOnClickListener(this);
         fabVideo.setOnClickListener(this);
 
-        fabAudio.setImageDrawable(getDrawableFromString(R.string.fa_icon_file_audio_o));
-        fabImage.setImageDrawable(getDrawableFromString(R.string.fa_icon_image));
-        fabVideo.setImageDrawable(getDrawableFromString(R.string.fa_icon_file_video_o));
-        fabDocument.setImageDrawable(getDrawableFromString(R.string.fa_icon_file));
-        fabWebsiteURL.setImageDrawable(getDrawableFromString(R.string.fa_icon_link));
+        fabAudio.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_file_audio_o, context, uiSettingsModel.getAppHeaderTextColor()));
+        fabImage.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_image, context, uiSettingsModel.getAppHeaderTextColor()));
+        fabVideo.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_file_video_o, context, uiSettingsModel.getAppHeaderTextColor()));
+        fabDocument.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_file, context, uiSettingsModel.getAppHeaderTextColor()));
+        fabWebsiteURL.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_link, context, uiSettingsModel.getAppHeaderTextColor()));
 
         fabAudio.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         fabImage.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
@@ -498,19 +502,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         fabVideo.setLabelText(getResources().getString(R.string.video));
         fabDocument.setLabelText(getResources().getString(R.string.document));
         fabWebsiteURL.setLabelText(getResources().getString(R.string.website_url));
-
-    }
-
-    public Drawable getDrawableFromString(int resourceID) {
-
-        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
-        View customNav = LayoutInflater.from(context).inflate(R.layout.iconimage, null);
-        TextView iconText = (TextView) customNav.findViewById(R.id.imageicon);
-        iconText.setText(resourceID);
-        FontManager.markAsIconContainer(customNav.findViewById(R.id.imageicon), iconFont);
-        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
-
-        return d;
     }
 
     public void injectFromDbtoModel() {
@@ -522,7 +513,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             catalogAdapter.refreshList(catalogModelsList);
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
-
         triggerActionForFirstItem();
     }
 
@@ -582,8 +572,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
-//            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
+//            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);

@@ -254,7 +254,6 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
@@ -270,13 +269,12 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);
-            holder.txtCourseStatus.setVisibility(View.GONE);
-//            holder.btnPreview.setVisibility(View.GONE);
 
-        } else {
+        }
             if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
+                holder.progressBar.setVisibility(View.GONE);
 
             } else {
                 holder.btnDownload.setVisibility(View.VISIBLE);
@@ -295,8 +293,14 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 }
             }
-
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+            holder.progressBar.setVisibility(View.GONE);
+        }
+        else {
             holder.progressBar.setVisibility(View.VISIBLE);
+        }
+
+
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
             String courseStatus = "";
             int progressPercentage = 1;
@@ -308,43 +312,45 @@ public class MyLearningAdapter extends BaseAdapter {
                 ex.printStackTrace();
             }
 
-            if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Completed") || (myLearningModel.get(position).getStatus().toLowerCase().contains("passed") || myLearningModel.get(position).getStatus().toLowerCase().contains("failed")) || myLearningModel.get(position).getStatus().equalsIgnoreCase("completed")) {
+            String statusFromModel=myLearningModel.get(position).getStatus();
+
+            Log.d(TAG, "getView: statusFromModel "+statusFromModel);
+
+            if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
                 holder.progressBar.setProgress(100);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = myLearningModel.get(position).getStatus() + " (" + 100;
-            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("Not Started")) {
+                courseStatus = statusFromModel + " (" + 100;
+            } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
 
-//                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
                 holder.progressBar.setProgress(1);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = myLearningModel.get(position).getStatus() + "  (0";
+                courseStatus = statusFromModel + "  (0";
 
-            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete") || (myLearningModel.get(position).getStatus().toLowerCase().contains("inprogress")) || (myLearningModel.get(position).getStatus().toLowerCase().contains("in progress"))) {
+            } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
 
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
                 String status = "";
 
-                if (myLearningModel.get(position).getStatus().equalsIgnoreCase("incomplete")) {
+                if (statusFromModel.equalsIgnoreCase("incomplete")) {
                     status = "In Progress ";
-                } else if (myLearningModel.get(position).getStatus().length() == 0) {
+                } else if (statusFromModel.length() == 0) {
                     status = "In Progress ";
 
                 } else {
-                    status = myLearningModel.get(position).getStatus();
+                    status = statusFromModel;
 
                 }
-
                 holder.progressBar.setProgress(50);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
                 courseStatus = status + " (" + 50;
 
-            } else if (myLearningModel.get(position).getStatus().equalsIgnoreCase("pending review") || (myLearningModel.get(position).getStatus().toLowerCase().contains("pendingreview"))) {
+            } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
                 String status = "";
 
-                status = myLearningModel.get(position).getStatus();
+                status = statusFromModel;
 
                 holder.progressBar.setProgress(100);
                 holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
@@ -354,12 +360,12 @@ public class MyLearningAdapter extends BaseAdapter {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
                 holder.progressBar.setProgress(0);
                 String status = "";
-                status = myLearningModel.get(position).getStatus();
+                status = statusFromModel;
                 courseStatus = status + "(" + 0;
 
             }
             holder.txtCourseStatus.setText(courseStatus + "%)");
-        }
+
         String imgUrl = myLearningModel.get(position).getImageData();
 
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);

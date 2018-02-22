@@ -344,7 +344,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         triggerActionForFirstItem();
     }
 
-
     public void triggerActionForFirstItem() {
 
         if (uiSettingsModel.getAutoLaunchMyLearningFirst().equalsIgnoreCase("true")) {
@@ -362,14 +361,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         } else {
             if (isFromNotification) {
-                int selectedPostion=getPositionForNotification(contentIDFromNotification);
+                int selectedPostion = getPositionForNotification(contentIDFromNotification);
                 myLearninglistView.setSelection(selectedPostion);
 
                 Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
                 intentDetail.putExtra("IFROMCATALOG", false);
                 intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
                 startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
-                isFromNotification=false;
+                isFromNotification = false;
             }
         }
     }
@@ -472,7 +471,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();

@@ -162,9 +162,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-
         svProgressHUD = new SVProgressHUD(context);
-
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -186,9 +184,6 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 "       Add Topic" + "</font>"));
 
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -212,7 +207,6 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
 
         SpannableString styledTitle
                 = new SpannableString("*Tittle");

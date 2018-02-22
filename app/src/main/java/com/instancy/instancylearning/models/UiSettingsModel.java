@@ -272,8 +272,8 @@ public class UiSettingsModel {
     }
 
     public String getHeaderTextColor() {
-//        return headerTextColor.isEmpty() ? "#ffffff" : headerTextColor;
-        return "#ffffff";
+        return appHeaderTextColor.isEmpty() ? "#ffffff" : appHeaderTextColor;
+//        return "#ffffff";
 
     }
 

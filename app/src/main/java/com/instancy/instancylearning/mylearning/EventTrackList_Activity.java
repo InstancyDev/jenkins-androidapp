@@ -18,6 +18,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -62,6 +63,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import static com.blankj.utilcode.util.ToastUtils.getView;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
@@ -286,7 +288,13 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 if (trackListModelList.get(0).getShowStatus().toLowerCase().contains("autolaunch") && firstTimeVisible) {
 
                     if (expandableListView != null) {
-                        expandableListView.performItemClick(expandableListView, 0, R.id.title_text);
+
+//                        View wantedView = expandableListView.getChildAt(0 - expandableListView.getFirstVisiblePosition() + 1);
+//
+//                        long id = trackListExpandableAdapter.getGroupId(0);
+//
+//                        expandableListView.performItemClick(wantedView, 0, id);
+
                     }
                     firstTimeVisible = false;
                 }
@@ -2391,7 +2399,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                     trackListModelList.get(it)
                                                             .setShowStatus("autolaunch");
                                                     break;
-
                                                 default:
                                                     break;
                                             }

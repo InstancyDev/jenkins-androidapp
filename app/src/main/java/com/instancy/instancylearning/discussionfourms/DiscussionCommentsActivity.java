@@ -339,7 +339,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         getMenuInflater().inflate(R.menu.tracklistmenu, menu);
         MenuItem itemInfo = menu.findItem(R.id.tracklist_help);
         Drawable myIcon = getResources().getDrawable(R.drawable.help);
-        itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+        itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
         itemInfo.setVisible(false);
         return true;
     }

@@ -80,9 +80,10 @@ public class CatalogAdapter extends BaseAdapter {
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
     AppController appcontroller;
+    boolean isEvent=false;
 
 
-    public CatalogAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel) {
+    public CatalogAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, boolean isEvent) {
         this.activity = activity;
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
@@ -95,12 +96,7 @@ public class CatalogAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+        this.isEvent=isEvent;
         appcontroller = AppController.getInstance();
 
     }
@@ -144,7 +140,15 @@ public class CatalogAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
+
+        if (isEvent){
+            holder.txtAuthor.setText("By " + myLearningModel.get(position).getPresenter() + " ");
+        }
+        else {
+            holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
+        }
+
+
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
