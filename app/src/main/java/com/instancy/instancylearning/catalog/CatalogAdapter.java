@@ -432,6 +432,12 @@ public class CatalogAdapter extends BaseAdapter {
                 public void deletedTheContent(int updateProgress) {
                     notifyDataSetChanged();
                 }
+
+                @Override
+                public void cancelEnrollment(boolean cancelIt) {
+
+                }
+
             };
         }
 

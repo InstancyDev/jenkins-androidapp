@@ -8,6 +8,5 @@ public interface DownloadInterface {
 
     void deletedTheContent(int updateProgress);
 
-
-
+    void cancelEnrollment(boolean cancelIt);
 }

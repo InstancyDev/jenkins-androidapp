@@ -2,13 +2,16 @@ package com.instancy.instancylearning.mylearning;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +22,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -43,6 +47,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
@@ -55,6 +60,8 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -74,7 +81,9 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -136,6 +145,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     boolean isFromNotification = false;
 
     String contentIDFromNotification = "";
+
+    EventInterface eventInterface = null;
 
     public MyLearningFragment() {
 
@@ -395,7 +406,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         myLearningModelsList = new ArrayList<MyLearningModel>();
-        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList);
+        initilizeInterface();
+        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface);
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -432,6 +444,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         return rootView;
+    }
+
+    public void initilizeInterface() {
+        eventInterface = new EventInterface() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void cancelEnrollment(MyLearningModel learningModel) {
+                cancelEnrollmentMethod(learningModel);
+
+//                addEventToAndroidDevice(learningModel);
+            }
+        };
     }
 
     @Override
@@ -1103,6 +1127,112 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
 
+        }
+    }
+
+    public void cancelEnrollmentMethod(final MyLearningModel eventModel) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/CancelEnrolledEvent?EventContentId="
+                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        StringRequest jsonObjectRequest = new StringRequest(urlStr,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        svProgressHUD.dismiss();
+                        Log.d("Response: ", " " + response);
+
+                        if (response.contains("true")) {
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(context.getString(R.string.event_cancelled))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                            // remove event from android calander
+
+                                            db.ejectEventsFromDownloadData(eventModel);
+                                            db.updateEventAddedToMyLearningInEventCatalog(eventModel, 0);
+                                            injectFromDbtoModel();
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void addEventToAndroidDevice(MyLearningModel eventModel) {
+
+
+        try {
+            String eventUriString = "content://com.android.calendar/events";
+            ContentValues eventValues = new ContentValues();
+            eventValues.put("calendar_id", 1); // id, We need to choose from
+            // our mobile for primary its 1
+            eventValues.put("title", eventModel.getCourseName());
+            eventValues.put("description", eventModel.getShortDes());
+            eventValues.put("eventLocation", eventModel.getLocationName());
+
+
+            long startMillis = 0;
+            long endMillis = 0;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date startDate = null, endDate = null;
+            try {
+                startDate = simpleDateFormat.parse(eventModel.getEventstartTime());
+                startMillis = startDate.getTime();
+                endDate = simpleDateFormat.parse(eventModel.getEventendTime());
+                endMillis = endDate.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            long endDates = startMillis + 1000 * 10 * 10; // For next 10min
+            eventValues.put("dtstart", startMillis);
+            eventValues.put("dtend", endDates);
+
+
+            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
+
+            eventValues.put("eventTimezone", "UTC/GMT +5:30");
+
+
+            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
+
+            Uri eventUri = context.getApplicationContext()
+                    .getContentResolver()
+                    .insert(Uri.parse(eventUriString), eventValues);
+//           String eventID = Long.parseLong(eventUri.getLastPathSegment());
+        } catch (Exception ex) {
+            Log.e(TAG, "addEventToAndroidDevice: " + ex.getMessage());
         }
     }
 

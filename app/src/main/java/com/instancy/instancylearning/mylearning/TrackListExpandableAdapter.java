@@ -478,6 +478,11 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
                     notifyDataSetChanged();
                 }
+
+                @Override
+                public void cancelEnrollment(boolean cancelIt) {
+
+                }
             };
 
             setCompleteListner = new SetCompleteListner() {

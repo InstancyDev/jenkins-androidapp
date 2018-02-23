@@ -137,11 +137,11 @@
                             android:id="@+id/txt_course_progress"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight=".8"
+                            android:layout_weight="1.0"
                             android:ellipsize="end"
                             android:gravity="left"
-                            android:maxLines="1"
-                            android:text="In Progress 25%"
+                            android:maxLines="2"
+                            android:text="In Progress Progress 25%"
                             android:textColor="@color/colorStatusInProgress"
                             android:textSize="14sp" />
 
@@ -151,7 +151,7 @@
                             android:layout_width="0dp"
                             android:layout_height="5dp"
                             android:layout_gravity="center|left"
-                            android:layout_weight="1.2"
+                            android:layout_weight="1.0"
                             android:paddingLeft="5dp"
                             android:progress="0"
                             android:progressTint="@color/colorStatusInProgress" />

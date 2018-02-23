@@ -2092,7 +2092,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         } else if (myLearningModel.getTypeofevent() == 1) {
                             medianame = "Event (Face to Face)";
-
                         }
                     }
 
@@ -2198,8 +2197,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // joinurl
                 if (jsonMyLearningColumnObj.has("joinurl")) {
 
-                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+                    if (myLearningModel.getTypeofevent() == 2) {
 
+
+                        String joinUrl = jsonMyLearningColumnObj.get("joinurl").toString();
+
+                        if (isValidString(joinUrl)) {
+                            myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+                        }
+
+                    } else if (myLearningModel.getTypeofevent() == 1) {
+                        myLearningModel.setJoinurl("");
+                    }
                 }
 
                 // offlinepath

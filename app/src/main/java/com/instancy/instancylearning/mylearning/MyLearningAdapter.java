@@ -40,6 +40,7 @@ import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -87,9 +88,11 @@ public class MyLearningAdapter extends BaseAdapter {
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
     AppController appcontroller;
+    EventInterface eventInterface;
 
 
-    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel) {
+    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel,EventInterface eventInterface) {
+        this.eventInterface = eventInterface;
         this.activity = activity;
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
@@ -271,101 +274,136 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.progressBar.setVisibility(View.GONE);
 
         }
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")) {
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")) {
+            holder.btnDownload.setVisibility(View.GONE);
+            holder.circleProgressBar.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);
+
+        } else {
+
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+                holder.progressBar.setVisibility(View.GONE);
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
-                holder.progressBar.setVisibility(View.GONE);
-
             } else {
+                holder.progressBar.setVisibility(View.VISIBLE);
                 holder.btnDownload.setVisibility(View.VISIBLE);
                 holder.circleProgressBar.setVisibility(View.GONE);
+            }
+
 
 //              File extStore = Environment.getExternalStorageDirectory();
-                File myFile = new File(myLearningModel.get(position).getOfflinepath());
+            File myFile = new File(myLearningModel.get(position).getOfflinepath());
 
-                if (myFile.exists()) {
-                    holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                    holder.btnDownload.setEnabled(false);
+            if (myFile.exists()) {
+                holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
+                holder.btnDownload.setEnabled(false);
 
-                } else {
-                    holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
-                    holder.btnDownload.setEnabled(true);
+            } else {
+                holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
+                holder.btnDownload.setEnabled(true);
 
-                }
             }
-        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
-            holder.progressBar.setVisibility(View.GONE);
+        }
+
+        holder.txtCourseStatus.setVisibility(View.VISIBLE);
+        String courseStatus = "";
+//            int progressPercentage = 1;
+//
+//            try {
+//                progressPercentage = Integer.parseInt(myLearningModel.get(position).getProgress());
+//            } catch (NumberFormatException ex) {
+//                progressPercentage = 0;
+//                ex.printStackTrace();
+//            }
+
+        String statusFromModel = myLearningModel.get(position).getStatus();
+
+        Log.d(TAG, "getView: statusFromModel " + statusFromModel);
+
+        if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
+            holder.progressBar.setProgress(100);
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
+            courseStatus = statusFromModel + " (" + 100;
+        } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
+
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
+            holder.progressBar.setProgress(1);
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
+            courseStatus = statusFromModel + "  (0";
+
+        } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
+
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
+            String status = "";
+
+            if (statusFromModel.equalsIgnoreCase("incomplete")) {
+                status = "In Progress ";
+            } else if (statusFromModel.length() == 0) {
+                status = "In Progress ";
+
+            } else {
+                status = statusFromModel;
+
+            }
+            holder.progressBar.setProgress(50);
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
+            courseStatus = status + " (" + 50;
+
+        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+            String status = "";
+
+            status = statusFromModel;
+
+            holder.progressBar.setProgress(100);
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+            courseStatus = status + "(" + 100;
+        } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
+            String status = "";
+
+            status = statusFromModel;
+
+            holder.progressBar.setProgress(100);
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorGray));
+            courseStatus = status ;
+        }
+        else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+            String status = "";
+
+            status = statusFromModel;
+
+
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+            courseStatus = status ;
+        }
+        else if (statusFromModel.toLowerCase().contains("Expired")) {
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+            String status = "";
+
+            status = statusFromModel;
+
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+            courseStatus = status ;
         }
         else {
-            holder.progressBar.setVisibility(View.VISIBLE);
+
+            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
+            holder.progressBar.setProgress(0);
+            String status = "";
+            status = statusFromModel;
+            courseStatus = status + "(" + 0;
+
         }
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+            holder.txtCourseStatus.setText(courseStatus);
+        } else {
 
-
-            holder.txtCourseStatus.setVisibility(View.VISIBLE);
-            String courseStatus = "";
-            int progressPercentage = 1;
-
-            try {
-                progressPercentage = Integer.parseInt(myLearningModel.get(position).getProgress());
-            } catch (NumberFormatException ex) {
-                progressPercentage = 0;
-                ex.printStackTrace();
-            }
-
-            String statusFromModel=myLearningModel.get(position).getStatus();
-
-            Log.d(TAG, "getView: statusFromModel "+statusFromModel);
-
-            if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(100);
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                courseStatus = statusFromModel + " (" + 100;
-            } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
-                holder.progressBar.setProgress(1);
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = statusFromModel + "  (0";
-
-            } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
-                String status = "";
-
-                if (statusFromModel.equalsIgnoreCase("incomplete")) {
-                    status = "In Progress ";
-                } else if (statusFromModel.length() == 0) {
-                    status = "In Progress ";
-
-                } else {
-                    status = statusFromModel;
-
-                }
-                holder.progressBar.setProgress(50);
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = status + " (" + 50;
-
-            } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
-                String status = "";
-
-                status = statusFromModel;
-
-                holder.progressBar.setProgress(100);
-                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
-                courseStatus = status + "(" + 100;
-            } else {
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
-                holder.progressBar.setProgress(0);
-                String status = "";
-                status = statusFromModel;
-                courseStatus = status + "(" + 0;
-
-            }
             holder.txtCourseStatus.setText(courseStatus + "%)");
-
+        }
         String imgUrl = myLearningModel.get(position).getImageData();
 
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
@@ -624,7 +662,15 @@ public class MyLearningAdapter extends BaseAdapter {
                 @Override
                 public void deletedTheContent(int updateProgress) {
                     notifyDataSetChanged();
-                    deleteMetaDataFromDB(myLearningDetalData);
+
+                }
+
+                @Override
+                public void cancelEnrollment(boolean position) {
+                    notifyDataSetChanged();
+                    Log.d(TAG, "cancelEnrollment:  in adapter method " );
+
+                    eventInterface.cancelEnrollment(myLearningDetalData);
                 }
             };
 
@@ -650,9 +696,7 @@ public class MyLearningAdapter extends BaseAdapter {
         }
     }
 
-    private void deleteMetaDataFromDB(MyLearningModel learningModel) {
 
-    }
 
 }
 

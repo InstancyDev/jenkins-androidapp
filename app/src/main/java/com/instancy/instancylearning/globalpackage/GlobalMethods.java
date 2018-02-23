@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -32,6 +33,7 @@ import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
+import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
 import com.instancy.instancylearning.mylearning.TrackList_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -839,13 +841,28 @@ public class GlobalMethods {
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
             }
+
+            if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
+
+                menu.getItem(6).setVisible(true);
+
+                menu.getItem(9).setVisible(true);
+
+            }
+
+            if (myLearningDetalData.getTypeofevent() == 2) {
+                menu.getItem(3).setVisible(true);
+            } else if (myLearningDetalData.getTypeofevent() == 1) {
+                menu.getItem(3).setVisible(false);
+            }
+
         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")) {
 
             menu.getItem(1).setVisible(false);
 
         } else {
             menu.getItem(2).setVisible(true);
-//            menu.getItem(5).setVisible(true);
+//            menu.getItem(5).setVisible(true);  uncomment for report
             menu.getItem(5).setVisible(false);
             menu.getItem(1).setVisible(true);
         }
@@ -879,7 +896,6 @@ public class GlobalMethods {
 
                 if (item.getTitle().toString().equalsIgnoreCase("Related Content")) {
                     relatedContentView(myLearningDetalData, v.getContext());
-//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -898,6 +914,29 @@ public class GlobalMethods {
                 if (item.getTitle().toString().equalsIgnoreCase("Play")) {
 //                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Join")) {
+
+                    String joinUrl = myLearningDetalData.getJoinurl();
+
+                    if (joinUrl.length() > 0) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(myLearningDetalData.getJoinurl()));
+                        v.getContext().startActivity(browserIntent);
+                    } else {
+                        Toast.makeText(v.getContext(), "No Url Found", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Add to Calender")) {
+
+                    downloadInterface.cancelEnrollment(false);
+                }
+                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrollment")) {
+
+                    downloadInterface.cancelEnrollment(true);
+
                 }
 
                 return true;

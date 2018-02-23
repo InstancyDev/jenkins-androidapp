@@ -237,7 +237,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
 
             if (myLearningModel.getSiteName().equalsIgnoreCase("")) {
-                consolidateLine.setVisibility(View.GONE);
+                consolidateLine.setVisibility(View.INVISIBLE);
 
             } else {
                 consolidateLine.setVisibility(View.VISIBLE);
@@ -276,8 +276,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
                 btnDownload.setVisibility(View.GONE);
                 circleProgressBar.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                txtCourseStatus.setVisibility(View.GONE);
+                progressBar.setVisibility(View.INVISIBLE);
+
             } else {
 
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
@@ -559,7 +559,39 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             progressBar.setProgress(100);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = status + "(" + 100;
-        } else {
+        }
+
+        else if (courseStatus.equalsIgnoreCase("Registered") || (courseStatus.toLowerCase().contains("registered"))) {
+            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
+            String status = "";
+
+            status = courseStatus;
+
+           progressBar.setProgress(100);
+           txtCourseStatus.setTextColor(getResources().getColor(R.color.colorGray));
+            courseStatus = status ;
+        }
+        else if (courseStatus.toLowerCase().contains("attended") || (courseStatus.toLowerCase().contains("registered"))) {
+            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
+            String status = "";
+
+            status = courseStatus;
+
+
+            txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+            courseStatus = status ;
+        }
+        else if (courseStatus.toLowerCase().contains("Expired")) {
+            progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
+            String status = "";
+
+            status = courseStatus;
+
+            txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+            courseStatus = status ;
+        }
+
+        else {
 
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
             progressBar.setProgress(0);
@@ -568,7 +600,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             displayStatus = status + "(" + 0;
 
         }
-        txtCourseStatus.setText(displayStatus + "%)");
+
+        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+            txtCourseStatus.setText(courseStatus);
+        } else {
+
+            txtCourseStatus.setText(courseStatus + "%)");
+        }
+
+
     }
 
     void initVolleyCallback() {

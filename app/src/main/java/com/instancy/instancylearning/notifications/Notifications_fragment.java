@@ -90,13 +90,13 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.app.Activity.RESULT_OK;
+
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_NOTIFICATIONS;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.returnDateIfNotToday;
+
 
 
 /**
