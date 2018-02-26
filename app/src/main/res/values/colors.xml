@@ -4,8 +4,8 @@
     <!--// cvcta color-->
     <!--<color name="colorPrimary">#006da5</color>-->
 
-    <color name="colorPrimary">#5db100</color>
-    <!--<color name="colorPrimary">#BBA284</color>-->
+    <!--<color name="colorPrimary">#5db100</color>-->
+    <color name="colorPrimary">#C6A553</color>
     <color name="colorPrimaryDark">#36454f</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorGray">#D3D3D3</color>
@@ -28,10 +28,10 @@
     <!--<color name="colorDefaultBackGround">#5DB100</color>-->
 
     <!--White Background-->
-    <!--<color name="colorDefaultBackGround">#ffff</color>-->
+    <color name="colorDefaultBackGround">#ffff</color>
 
     <!--Instancy Market Background-->
-    <color name="colorDefaultBackGround">#4d4d4d</color>
+    <!--<color name="colorDefaultBackGround">#4d4d4d</color>-->
 
     <!--Cle_drakbrown_color-->
     <!--<color name="colorDefaultBackGround">#4A2D1F</color>-->

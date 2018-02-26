@@ -666,11 +666,12 @@ public class MyLearningAdapter extends BaseAdapter {
                 }
 
                 @Override
-                public void cancelEnrollment(boolean position) {
-                    notifyDataSetChanged();
+                public void cancelEnrollment(boolean isCancel) {
+
                     Log.d(TAG, "cancelEnrollment:  in adapter method " );
 
-                    eventInterface.cancelEnrollment(myLearningDetalData);
+                    eventInterface.cancelEnrollment(myLearningDetalData, isCancel);
+                    notifyDataSetChanged();
                 }
             };
 

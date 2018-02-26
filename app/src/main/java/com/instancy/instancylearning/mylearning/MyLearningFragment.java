@@ -15,6 +15,7 @@ import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -83,6 +84,7 @@ import org.w3c.dom.Text;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -450,10 +452,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         eventInterface = new EventInterface() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void cancelEnrollment(MyLearningModel learningModel) {
-                cancelEnrollmentMethod(learningModel);
+            public void cancelEnrollment(MyLearningModel learningModel, boolean isCancel) {
+                if (isCancel){
+                    cancelEnrollmentMethod(learningModel);
+                }
+                else {
+                    addEventToAndroidDevice(learningModel);
 
-//                addEventToAndroidDevice(learningModel);
+                }
+
+
             }
         };
     }
@@ -1192,6 +1200,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
 
+
+
+
+
         try {
             String eventUriString = "content://com.android.calendar/events";
             ContentValues eventValues = new ContentValues();
@@ -1224,13 +1236,27 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             eventValues.put("eventTimezone", "UTC/GMT +5:30");
 
-
             eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
 
-            Uri eventUri = context.getApplicationContext()
-                    .getContentResolver()
-                    .insert(Uri.parse(eventUriString), eventValues);
-//           String eventID = Long.parseLong(eventUri.getLastPathSegment());
+//            Uri eventUri = context.getApplicationContext()
+//                    .getContentResolver()
+//                    .insert(Uri.parse(eventUriString), eventValues);
+//            Toast.makeText(context, context.getResources().getString(R.string.event_addedto_calender), Toast.LENGTH_SHORT).show();
+
+
+            Calendar cal = Calendar.getInstance();
+            Intent intent = new Intent(Intent.ACTION_EDIT);
+            intent.setType("vnd.android.cursor.item/event");
+            intent.putExtra("beginTime", startMillis);
+            intent.putExtra("allDay", true);
+            intent.putExtra("rrule", "FREQ=YEARLY");
+            intent.putExtra("endTime", cal.getTimeInMillis()+60*60*1000);
+            intent.putExtra(CalendarContract.Events.DESCRIPTION,eventModel.getShortDes());
+            intent.putExtra(CalendarContract.Events.TITLE,eventModel.getCourseName());
+            intent.putExtra(CalendarContract.Events.EVENT_LOCATION,eventModel.getLocationName());
+            startActivity(intent);
+
+
         } catch (Exception ex) {
             Log.e(TAG, "addEventToAndroidDevice: " + ex.getMessage());
         }

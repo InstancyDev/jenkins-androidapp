@@ -598,9 +598,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         //Inflating the Popup using xml file
         popup.getMenuInflater().inflate(R.menu.event_contextmenu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
-
         Menu menu = popup.getMenu();
-
         menu.getItem(0).setVisible(false);//view
         menu.getItem(1).setVisible(false);//enroll
         menu.getItem(2).setVisible(false);//buy
@@ -682,6 +680,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
 
         }
+
+        if (myLearningDetalData.isCompletedEvent()) {
+
+            menu.getItem(0).setVisible(true);//view
+            menu.getItem(1).setVisible(false);//enroll
+            menu.getItem(2).setVisible(false);//buy
+            menu.getItem(3).setVisible(true);//detail
+            menu.getItem(4).setVisible(false);//cancel enrollment
+        }
+
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -1307,7 +1315,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 pastBtn.setTypeface(null, Typeface.NORMAL);
                 compactCalendarView.setVisibility(View.VISIBLE);
                 YearTitle.setVisibility(View.VISIBLE);
-                catalogAdapter.refreshList(catalogModelsList);
+                sortByDate("before");
+//                catalogAdapter.refreshList(catalogModelsList);
                 String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
                 onDayClick(getCurrentDateTimeInDate(todayD));
                 break;
@@ -1342,14 +1351,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
 
                 if (new Date().before(strDate)) {
-                    catalogModelsList.get(i).setCompletedEvent(true);
+                    catalogModelsList.get(i).setCompletedEvent(false);
                     myLearningModelList.add(catalogModelsList.get(i));
-                    catalogAdapter.refreshList(myLearningModelList);
+
 //                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
                 }
 
             }
-
+            catalogAdapter.refreshList(myLearningModelList);
         } else {
 
             for (int i = 0; i < catalogModelsList.size(); i++) {
@@ -1363,19 +1372,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
 
                 if (new Date().after(strDate)) {
-                    catalogModelsList.get(i).setCompletedEvent(false);
+                    catalogModelsList.get(i).setCompletedEvent(true);
                     myLearningModelList.add(catalogModelsList.get(i));
-                    catalogAdapter.refreshList(myLearningModelList);
-//                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
-                } else {
 
-                    catalogAdapter.refreshList(myLearningModelList);
                 }
-
 
             }
 
-
+            catalogAdapter.refreshList(myLearningModelList);
         }
 
     }

@@ -16,9 +16,9 @@ android {
 //        versionName "4.0.2.48"
 
 // ----------------------------------for instancy lite app-------------------------
-        applicationId "com.instancy.instancy_lite"
-        versionCode 11
-        versionName "2.0"
+//        applicationId "com.instancy.instancy_lite"
+//        versionCode 11
+//        versionName "2.0"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
@@ -55,7 +55,11 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-//        applicationId "com.instancy.development"
+        applicationId "com.instancy.development"
+        versionCode 1
+        versionName "1.0"
+
+//        applicationId "com.instancy.ppdlife"
 //        versionCode 1
 //        versionName "1.0"
 

@@ -13,18 +13,13 @@
     <!--  <string name="app_default_url">http://qacle.instancy.net/</string>
           <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
-
-
     <!--&lt;!&ndash;&lt;!&ndash;for app  development place&ndash;&gt;&ndash;&gt;-->
     <!--<string name="app_default_url">http://app.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
-    <!--<string name="app_default_url">http://mobileapp.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
-
-    <!--<string name="app_default_url">http://mobilelocal.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+    <string name="app_default_url">http://mobileapp.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
 
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
@@ -54,8 +49,8 @@
 
 
     <!--for instancy market place-->
-    <string name="app_default_url">https://learning.instancy.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!-- SCROM testing qalearning -->
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
@@ -93,5 +88,9 @@
 
     <!--<string name="app_default_url">http://learntoflyair.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
+
+    <!--  PPD APP -->
+    <!--<string name="app_default_url">https://ppdlife.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
 </resources>

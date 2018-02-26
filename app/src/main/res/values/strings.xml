@@ -3,13 +3,14 @@
     <!--<string name="app_name">Online Lifeskills</string>-->
     <!--<string name="app_name">Enterprise Learning </string>-->
     <!--<string name="app_name">CropLife Online Dealer Training</string>-->
-    <string name="app_name">Instancy </string>
+    <!--<string name="app_name">Instancy </string>-->
     <!--<string name="app_name">Learn Up - Learn on your phone</string>-->
     <!--<string name="app_name">Tracktech lifeskills</string>-->
     <!--<string name="app_name">Training Company</string>-->
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
-    <!--<string name="app_name"> Development </string>-->
+    <string name="app_name"> Development </string>
+    <!--<string name="app_name">PPD Life</string>-->
 
     <string name="date_today">Today</string>
     <string name="date_yesterday">Yesterday</string>
@@ -46,8 +47,6 @@
 
     <string name="filter">Filter</string>
     <string name="askaquestion">Ask a Question</string>
-
-
 
     <string name="get_file_button">Choose File</string>
     <string name="empty"></string>
@@ -133,7 +132,8 @@
     <string name="btn_label_existing_user">Existing User</string>
     <string name="btn_label_new_user">New User</string>
     <string name="btn_txt_play">Play</string>
-    <string name="forgot_lable_hint">Enter your registered e-mail address below to reset password.</string>
+    <string name="forgot_lable_hint">Enter the email associated with your account and will send you a link to reset your password </string>
+    <string name="forgot_title">Reset Password</string>
     <string name="metadata_label_status">Status:</string>
     <string name="metadata_label_author">Author:</string>
     <string name="metadata_label_moderator">Moderator:</string>
@@ -159,6 +159,7 @@
     <string name="cat_add_success">Content Added to My Learning</string>
     <string name="event_add_success">This Event item has been added to "My Learning" page</string>
     <string name="event_cancelled">Your have successfully cancelled the enrolled event</string>
+    <string name="event_addedto_calender">This Event item has been added to Calendar</string>
     <string name="cat_add_failed">Failed to add content to My Learning</string>
     <string name="cat_add_already">Content already in My Learning</string>
     <string name="event_cancel">Event removed from My Learning</string>
@@ -178,7 +179,7 @@
     <string name="alert_btntext_OK">OK</string>
     <string name="alert_btntext_Yes">Yes</string>
     <string name="alert_btntext_No">No</string>
-    <string name="alert_btntext_Submit">Submit</string>
+    <string name="alert_btntext_Submit"> Reset Password </string>
     <string name="alert_btntext_Save">Save</string>
     <string name="alert_btntext_Cancel">Cancel</string>
     <string name="alert_headtext_success">Success</string>

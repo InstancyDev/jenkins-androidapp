@@ -7,7 +7,7 @@ package com.instancy.instancylearning.models;
 public class UiSettingsModel {
 
     // for acclife
-    private String brandingColor = "#003d77";
+    private String brandingColor = "#C6A553";
 
     private String appBackGroundColor = "#ffffff";
 

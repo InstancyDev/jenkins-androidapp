@@ -2112,13 +2112,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // eventstarttime
                 if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
 
-                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+//                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartTime(formattedDate);
+
 
                 }
                 // eventendtime
                 if (jsonMyLearningColumnObj.has("eventenddatetime")) {
 
-                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+//                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendTime(formattedDate);
 
                 }
 
@@ -2132,6 +2141,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("dateassigned")) {
 
                     myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+
+
 
                 }
                 // keywords
@@ -3158,7 +3169,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // createddate
             if (jsonMyLearningColumnObj.has("createddate")) {
 
-                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+//                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                myLearningModel.setCreatedDate(formattedDate);
 
             }
             // displayNam
@@ -3167,7 +3182,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // durationEndDate
             if (jsonMyLearningColumnObj.has("durationenddate")) {
 
-                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
+//                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("durationenddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                myLearningModel.setDurationEndDate(formattedDate);
 
             }
             // objectID

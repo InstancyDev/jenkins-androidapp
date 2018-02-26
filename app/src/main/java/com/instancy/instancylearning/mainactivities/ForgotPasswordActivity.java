@@ -2,6 +2,7 @@ package com.instancy.instancylearning.mainactivities;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -15,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Response;
@@ -23,11 +26,12 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.instancy.instancylearning.utils.SweetAlert;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,8 +59,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     @BindView(R.id.btn_submit)
     Button btnSubmit;
 
-    @BindView(R.id.btn_cancel)
-    Button btnCancel;
+    @BindView(R.id.txt_user)
+    TextView imgUser;
 
     AppUserModel appUserModel;
     private SVProgressHUD svProgressHUD;
@@ -89,28 +93,23 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     public void initilizeView(UiSettingsModel uiSettingsModel) {
 
+        Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
+        FontManager.markAsIconContainer(findViewById(R.id.txt_user), iconFont);
         btnSubmit.setBackgroundResource(R.drawable.round_corners);
         GradientDrawable drawable = (GradientDrawable) btnSubmit.getBackground();
         drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
-
-        btnCancel.setBackgroundResource(R.drawable.round_corners);
-        GradientDrawable drawableone = (GradientDrawable) btnCancel.getBackground();
-        drawableone.setColor(getResources().getColor(R.color.colorPrimaryDark));
-        btnCancel.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
-
+        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
     }
 
 
-    @OnClick({R.id.btn_cancel, R.id.btn_submit})
+    @OnClick({ R.id.btn_submit})
     public void socialLoginBtns(View view) {
         switch (view.getId()) {
             case R.id.btn_submit:
                 submitPasswordReset();
                 break;
-            case R.id.btn_cancel:
-                finish();
-                break;
+
         }
     }
 
@@ -121,13 +120,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 resetPasswordVollyCall(editResetMail.getText().toString().trim());
             } else {
 
-                SweetAlert.sweetAlertNoNet(ForgotPasswordActivity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
-
+                Toast.makeText(this, getResources().getString(R.string.alert_text_check_connection), Toast.LENGTH_SHORT).show();
             }
 
         } else {
 
-            SweetAlert.sweetErrorAlert(ForgotPasswordActivity.this, getString(R.string.alert_headtext_email_notvalid), getString(R.string.alert_text_need_valid_email));
+            Toast.makeText(this, getResources().getString(R.string.alert_headtext_email_notvalid), Toast.LENGTH_SHORT).show();
+
+
         }
 
 
@@ -162,7 +162,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                 jsonobj.get("siteid").toString();
                                 jsonobj.get("active").toString();
                                 jsonobj.get("userstatus").toString();
-
 
                             }
 

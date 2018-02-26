@@ -9,5 +9,5 @@ import com.instancy.instancylearning.models.MyLearningModel;
 public interface EventInterface {
 
 
-    void cancelEnrollment(MyLearningModel learningModel);
+    void cancelEnrollment(MyLearningModel learningModel, boolean isCancelEnrollment);
 }

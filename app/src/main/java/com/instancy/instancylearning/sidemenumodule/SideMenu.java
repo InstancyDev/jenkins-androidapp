@@ -221,6 +221,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
+        notificationLayout.setVisibility(View.GONE);
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
@@ -247,7 +248,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         strAry = extractProfileNameAndLocation(profileDetailsModel);
 
-        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
+//        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
+
+        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
 
         Picasso.with(this).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
         String name = strAry[0];

@@ -194,7 +194,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        btnForgot.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
 
 //       uncomment for backgroundcolor purpose
@@ -202,12 +203,12 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         View someView = findViewById(R.id.login_layout);
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
-        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))) {
-            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))|| (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife)))) {
+//            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
         }
-        settingTxt.setVisibility(View.VISIBLE);
+//        settingTxt.setVisibility(View.VISIBLE);
 
 
         Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
@@ -545,7 +546,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void hideOrShowBtns() {
-        settingTxt.setVisibility(View.VISIBLE);
+        settingTxt.setVisibility(View.INVISIBLE);
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
@@ -588,7 +589,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         }
 
-        btnForgot.setVisibility(View.INVISIBLE);
+        btnForgot.setVisibility(View.VISIBLE);
 
     }
 
