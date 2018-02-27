@@ -453,15 +453,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void cancelEnrollment(MyLearningModel learningModel, boolean isCancel) {
-                if (isCancel){
+                if (isCancel) {
                     cancelEnrollmentMethod(learningModel);
+                } else {
+//                    addEventToAndroidDevice(learningModel);
+                    GlobalMethods.addToDeviceCalendar(learningModel, context);
                 }
-                else {
-                    addEventToAndroidDevice(learningModel);
-
-                }
-
-
             }
         };
     }
@@ -1196,70 +1193,63 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public void addEventToAndroidDevice(MyLearningModel eventModel) {
-
-
-
-
-
-
-        try {
-            String eventUriString = "content://com.android.calendar/events";
-            ContentValues eventValues = new ContentValues();
-            eventValues.put("calendar_id", 1); // id, We need to choose from
-            // our mobile for primary its 1
-            eventValues.put("title", eventModel.getCourseName());
-            eventValues.put("description", eventModel.getShortDes());
-            eventValues.put("eventLocation", eventModel.getLocationName());
-
-
-            long startMillis = 0;
-            long endMillis = 0;
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date startDate = null, endDate = null;
-            try {
-                startDate = simpleDateFormat.parse(eventModel.getEventstartTime());
-                startMillis = startDate.getTime();
-                endDate = simpleDateFormat.parse(eventModel.getEventendTime());
-                endMillis = endDate.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            long endDates = startMillis + 1000 * 10 * 10; // For next 10min
-            eventValues.put("dtstart", startMillis);
-            eventValues.put("dtend", endDates);
-
-
-            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
-
-            eventValues.put("eventTimezone", "UTC/GMT +5:30");
-
-            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
-
-//            Uri eventUri = context.getApplicationContext()
-//                    .getContentResolver()
-//                    .insert(Uri.parse(eventUriString), eventValues);
-//            Toast.makeText(context, context.getResources().getString(R.string.event_addedto_calender), Toast.LENGTH_SHORT).show();
-
-
-            Calendar cal = Calendar.getInstance();
-            Intent intent = new Intent(Intent.ACTION_EDIT);
-            intent.setType("vnd.android.cursor.item/event");
-            intent.putExtra("beginTime", startMillis);
-            intent.putExtra("allDay", true);
-            intent.putExtra("rrule", "FREQ=YEARLY");
-            intent.putExtra("endTime", cal.getTimeInMillis()+60*60*1000);
-            intent.putExtra(CalendarContract.Events.DESCRIPTION,eventModel.getShortDes());
-            intent.putExtra(CalendarContract.Events.TITLE,eventModel.getCourseName());
-            intent.putExtra(CalendarContract.Events.EVENT_LOCATION,eventModel.getLocationName());
-            startActivity(intent);
-
-
-        } catch (Exception ex) {
-            Log.e(TAG, "addEventToAndroidDevice: " + ex.getMessage());
-        }
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    public void addEventToAndroidDevice(MyLearningModel eventModel) {
+//
+//        try {
+//            String eventUriString = "content://com.android.calendar/events";
+//            ContentValues eventValues = new ContentValues();
+//            eventValues.put("calendar_id", 1); // id, We need to choose from
+//            // our mobile for primary its 1
+//            eventValues.put("title", eventModel.getCourseName());
+//            eventValues.put("description", eventModel.getShortDes());
+//            eventValues.put("eventLocation", eventModel.getLocationName());
+//
+//
+//            long startMillis = 0;
+//            long endMillis = 0;
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            Date startDate = null, endDate = null;
+//            try {
+//                startDate = simpleDateFormat.parse(eventModel.getEventstartTime());
+//                startMillis = startDate.getTime();
+//                endDate = simpleDateFormat.parse(eventModel.getEventendTime());
+//                endMillis = endDate.getTime();
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
+//
+//            long endDates = startMillis + 1000 * 10 * 10; // For next 10min
+//            eventValues.put("dtstart", startMillis);
+//            eventValues.put("dtend", endDates);
+//
+//
+//            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
+//
+//            eventValues.put("eventTimezone", "UTC/GMT +5:30");
+//
+//            eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
+//
+////            Uri eventUri = context.getApplicationContext()
+////                    .getContentResolver()
+////                    .insert(Uri.parse(eventUriString), eventValues);
+////            Toast.makeText(context, context.getResources().getString(R.string.event_addedto_calender), Toast.LENGTH_SHORT).show();
+//
+//            Calendar cal = Calendar.getInstance();
+//            Intent intent = new Intent(Intent.ACTION_EDIT);
+//            intent.setType("vnd.android.cursor.item/event");
+//            intent.putExtra("beginTime", startMillis);
+//            intent.putExtra("allDay", true);
+//            intent.putExtra("rrule", "FREQ=YEARLY");
+//            intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
+//            intent.putExtra(CalendarContract.Events.DESCRIPTION, eventModel.getShortDes());
+//            intent.putExtra(CalendarContract.Events.TITLE, eventModel.getCourseName());
+//            intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventModel.getLocationName());
+//            startActivity(intent);
+//
+//        } catch (Exception ex) {
+//            Log.e(TAG, "addEventToAndroidDevice: " + ex.getMessage());
+//        }
+//    }
 
 }

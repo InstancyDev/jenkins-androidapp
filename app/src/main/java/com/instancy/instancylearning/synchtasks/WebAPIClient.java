@@ -101,6 +101,7 @@ public class WebAPIClient {
 
         String requestURL = strAPIURL + "/MobileLMS/GetAPIAuthDetails"
                 + "?AppURL=" + siteUrl;
+        Log.d("AUTH", "getAPIAuthDetails: "+requestURL);
         inputStream = null;
         httpURLConnection = null;
 

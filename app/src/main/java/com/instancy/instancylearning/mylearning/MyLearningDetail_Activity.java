@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.mylearning;
 
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -22,10 +23,11 @@ import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
+
+
 import android.view.MenuItem;
 import android.view.View;
+
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -47,6 +49,7 @@ import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
@@ -56,6 +59,7 @@ import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.mainactivities.NativeSettings;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -83,7 +87,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -135,30 +141,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @BindView(R.id.consolidateline)
     View consolidateLine;
 
-    @Nullable
-    @BindView(R.id.bottom_button_layout)
-    LinearLayout bottomLayout;
-
-    @Nullable
-    @BindView(R.id.viewtypeLayout)
-    RelativeLayout bottomViewLayout;
-
-    @Nullable
-    @BindView(R.id.reportLayout)
-    RelativeLayout bottomReportLayout;
-
-    @BindView(R.id.view_btn_txt)
-    TextView txtBtnView;
-
-    @BindView(R.id.report_btn_txt)
-    TextView txtBtnReport;
-
-    @BindView(R.id.report_fa_icon)
-    TextView txtFontReport;
-
-    @BindView(R.id.view_fa_icon)
-    TextView txtFontView;
-
     @BindView(R.id.downloadlayout)
     RelativeLayout downloadlayout;
 
@@ -169,6 +151,28 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @BindView(R.id.btn_price)
     TextView txtPrice;
 
+    @BindView(R.id.event_bottom)
+    LinearLayout btnsLayout;
+
+    @BindView(R.id.textSecond)
+    TextView buttonSecond;
+
+    @BindView(R.id.textFirst)
+    TextView buttonFirst;
+
+    @BindView(R.id.icon_first)
+    ImageView iconFirst;
+
+    @BindView(R.id.icon_second)
+    ImageView iconSecond;
+
+    @Nullable
+    @BindView(R.id.relativeone)
+    RelativeLayout relativeOne;
+
+    @Nullable
+    @BindView(R.id.relativesecond)
+    RelativeLayout relativeSecond;
 
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
@@ -185,6 +189,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     AppController appController;
     boolean isFromCatalog = false;
     boolean refreshCatalogContent = false;
+    UiSettingsModel uiSettingsModel;
+
+    public SetCompleteListner setCompleteListner;
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -194,7 +202,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         ButterKnife.bind(this);
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
-        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+        uiSettingsModel = UiSettingsModel.getInstance();
 
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -452,61 +460,99 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void typeLayout(boolean isCatalog, UiSettingsModel uiSettingsModel) {
 
-        Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        bottomViewLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-
-
-        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-//            relatedContentView(myLearningModel, context);
-            bottomLayout.setVisibility(View.GONE);
-        }
+        btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        relativeSecond.setVisibility(View.GONE);
+        Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
 
         FontManager.markAsIconContainer(findViewById(R.id.btntxt_download_detail), iconFont);
-        FontManager.markAsIconContainer(findViewById(R.id.report_fa_icon), iconFont);
-        FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
-
         if (isCatalog) {
 
-//            downloadlayout.setVisibility(View.GONE);
-            bottomReportLayout.setVisibility(View.GONE);
-            txtBtnView.setText("Add");
-            FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
-            txtFontView.setText(getResources().getString(R.string.fa_icon_plus_circle));
+            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
-            if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
-                FontManager.markAsIconContainer(findViewById(R.id.view_fa_icon), iconFont);
-                txtFontView.setText(getResources().getString(R.string.fa_icon_cart_plus));
-                txtBtnView.setText("Buy");
-                txtPrice.setText("$" + myLearningModel.getPrice());
-                txtPrice.setVisibility(View.VISIBLE);
-                btnDownload.setVisibility(View.GONE);
+                buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+                Drawable reportImg = getButtonDrawable(R.string.fa_icon_filter, this, uiSettingsModel.getAppHeaderTextColor());
+                iconFirst.setBackground(calendarImg);
+                iconSecond.setBackground(reportImg);
+                buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+
             } else {
 
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                buttonFirst.setText("Add");
+                Drawable addPlusIcon = getButtonDrawable(R.string.fa_icon_plus_circle, this, uiSettingsModel.getAppHeaderTextColor());
+                iconFirst.setBackground(addPlusIcon);
+                if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
+                    Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconFirst.setBackground(cartIcon);
+                    buttonFirst.setText("Buy");
+                    txtPrice.setText("$" + myLearningModel.getPrice());
+                    txtPrice.setVisibility(View.VISIBLE);
                     btnDownload.setVisibility(View.GONE);
                 } else {
-                    btnDownload.setVisibility(View.VISIBLE);
+                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                        btnDownload.setVisibility(View.GONE);
+                    } else {
+                        btnDownload.setVisibility(View.VISIBLE);
+                    }
+                    txtPrice.setVisibility(View.GONE);
+                    txtPrice.setText("");
                 }
+                if (myLearningModel.getAddedToMylearning() == 1) {
+                    buttonFirst.setText("View");
+                    txtPrice.setVisibility(View.GONE);
+                    txtPrice.setText("");
+                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconFirst.setBackground(viewIcon);
 
-                txtPrice.setVisibility(View.GONE);
-                txtPrice.setText("");
-            }
-            if (myLearningModel.getAddedToMylearning() == 1) {
-                txtBtnView.setText("View");
-                txtPrice.setVisibility(View.GONE);
-                txtPrice.setText("");
-                txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
+                }
             }
         } else {
-            txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
-            bottomReportLayout.setVisibility(View.INVISIBLE);
-            txtBtnView.setText("View");
-            txtPrice.setVisibility(View.GONE);
-            txtPrice.setText("");
-            btnDownload.setVisibility(View.VISIBLE);
+            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+                iconFirst.setBackground(calendarImg);
+
+                buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+
+                if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+                    relativeSecond.setVisibility(View.VISIBLE);
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconSecond.setBackground(relatedContent);
+                    buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
+                }
+
+            } else {
+
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && !myLearningModel.getStatus().toLowerCase().contains("completed")) {
+                    relativeSecond.setVisibility(View.VISIBLE);
+                    buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_battery_full, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconSecond.setBackground(relatedContent);
+                }
+
+                Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
+                iconFirst.setBackground(viewIcon);
+                buttonFirst.setText("View");
+                txtPrice.setVisibility(View.GONE);
+                txtPrice.setText("");
+                btnDownload.setVisibility(View.VISIBLE);
+            }
         }
+
+        setCompleteListner = new SetCompleteListner() {
+            @Override
+            public void completedStatus() {
+
+                relativeSecond.setVisibility(View.GONE);
+                statusUpdate("Completed");
+
+            }
+        };
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -559,19 +605,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             progressBar.setProgress(100);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = status + "(" + 100;
-        }
-
-        else if (courseStatus.equalsIgnoreCase("Registered") || (courseStatus.toLowerCase().contains("registered"))) {
+        } else if (courseStatus.equalsIgnoreCase("Registered") || (courseStatus.toLowerCase().contains("registered"))) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
             String status = "";
 
             status = courseStatus;
 
-           progressBar.setProgress(100);
-           txtCourseStatus.setTextColor(getResources().getColor(R.color.colorGray));
-            courseStatus = status ;
-        }
-        else if (courseStatus.toLowerCase().contains("attended") || (courseStatus.toLowerCase().contains("registered"))) {
+            progressBar.setProgress(100);
+            txtCourseStatus.setTextColor(getResources().getColor(R.color.colorGray));
+            courseStatus = status;
+        } else if (courseStatus.toLowerCase().contains("attended") || (courseStatus.toLowerCase().contains("registered"))) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 
@@ -579,19 +622,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
 
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status ;
-        }
-        else if (courseStatus.toLowerCase().contains("Expired")) {
+            courseStatus = status;
+        } else if (courseStatus.toLowerCase().contains("Expired")) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 
             status = courseStatus;
 
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status ;
-        }
-
-        else {
+            courseStatus = status;
+        } else {
 
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
             progressBar.setProgress(0);
@@ -607,7 +647,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             txtCourseStatus.setText(courseStatus + "%)");
         }
-
 
     }
 
@@ -723,36 +762,42 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     }
 
 
-    @OnClick({R.id.view_btn_txt, R.id.report_btn_txt, R.id.btntxt_download_detail, R.id.viewtypeLayout})
+    @OnClick({R.id.relativeone, R.id.relativesecond, R.id.btntxt_download_detail})
     public void actionsforDetail(View view) {
         switch (view.getId()) {
             case R.id.view_btn_txt:
-            case R.id.viewtypeLayout:
-                if (txtBtnView.getText().toString().equalsIgnoreCase("View")) {
+            case R.id.relativeone:
+                if (buttonFirst.getText().toString().equalsIgnoreCase("View")) {
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
-                } else if (txtBtnView.getText().toString().equalsIgnoreCase("Add")) {
+                } else if (buttonFirst.getText().toString().equalsIgnoreCase("Add")) {
 //                    Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show();
                     addToMyLearningCheckUser(myLearningModel, false); // false for
 
-                } else if (txtBtnView.getText().toString().equalsIgnoreCase("Buy")) {
+                } else if (buttonFirst.getText().toString().equalsIgnoreCase("Buy")) {
 //                    Toast.makeText(this, "Buy button", Toast.LENGTH_SHORT).show();
 
                     addToMyLearningCheckUser(myLearningModel, true);
+                } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_add_to_calendar))) {
+                    GlobalMethods.addToDeviceCalendar(myLearningModel, this);
                 }
-                break;
-            case R.id.report_btn_txt:
-                Toast.makeText(this, "here selected", Toast.LENGTH_SHORT).show();
-                Intent intentReports = new Intent(MyLearningDetail_Activity.this, Reports_Activity.class);
-                intentReports.putExtra("myLearningDetalData", myLearningModel);
-                startActivity(intentReports);
                 break;
             case R.id.btntxt_download_detail:
                 downloadTheCourse(myLearningModel, view);
                 break;
+            case R.id.relativesecond:
+
+                if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
+                    new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
+
+                } else {
+                    openReportsActivity();
+                }
+
+
+                break;
         }
 
     }
-
 
     public void inAppActivityCall(MyLearningModel learningModel) {
 
@@ -1307,8 +1352,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                 if (isInserted) {
                                     myLearningModel.setAddedToMylearning(1);
                                     db.updateContenToCatalog(myLearningModel);
-                                    txtBtnView.setText("View");
-                                    txtFontView.setText(getResources().getString(R.string.fa_icon_eye));
+                                    buttonFirst.setText("View");
+                                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, MyLearningDetail_Activity.this, uiSettingsModel.getAppHeaderTextColor());
+
+                                    iconFirst.setImageDrawable(viewIcon);
                                     refreshCatalogContent = true;
 
                                     if (isFromCatalog) {
@@ -1413,4 +1460,17 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         return status;
     }
+
+    public void openRelatedContent() {
+        GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
+    }
+
+    public void openReportsActivity() {
+
+        Intent intentReports = new Intent(MyLearningDetail_Activity.this, Reports_Activity.class);
+        intentReports.putExtra("myLearningDetalData", myLearningModel);
+        startActivity(intentReports);
+
+    }
+
 }

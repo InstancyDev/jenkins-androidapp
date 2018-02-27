@@ -30,8 +30,6 @@
         android:textColor="@color/colorBlack"
         android:textSize="14sp" />
 
-
-
     <TextView
         android:id="@+id/expIcon"
         android:layout_width="50dp"

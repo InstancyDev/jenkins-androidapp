@@ -67,4 +67,11 @@
             android:textColor="@color/colorWhite"
             android:textSize="16sp" />
     </RelativeLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
+        android:text="Report"
+        android:padding="3dp"
+        android:drawableLeft="@drawable/user_placeholder"/>
 </LinearLayout>

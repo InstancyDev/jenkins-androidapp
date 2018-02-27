@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
+import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
@@ -1025,7 +1026,22 @@ public class GlobalMethods {
         return encImage;
     }
 
+    public static void addToDeviceCalendar(MyLearningModel myLearningModel, Context context) {
 
+        long startMillis = 0;
+        Calendar cal = Calendar.getInstance();
+        Intent intent = new Intent(Intent.ACTION_EDIT);
+        intent.setType("vnd.android.cursor.item/event");
+        intent.putExtra("beginTime", startMillis);
+        intent.putExtra("allDay", true);
+        intent.putExtra("rrule", "FREQ=YEARLY");
+        intent.putExtra("endTime", cal.getTimeInMillis()+60*60*1000);
+        intent.putExtra(CalendarContract.Events.DESCRIPTION,myLearningModel.getShortDes());
+        intent.putExtra(CalendarContract.Events.TITLE,myLearningModel.getCourseName());
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION,myLearningModel.getLocationName());
+        context.startActivity(intent);
+
+    }
 //    public static void catalogContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 //
 //        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);

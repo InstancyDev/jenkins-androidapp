@@ -337,7 +337,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setEnabled(false);
 
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList,true);
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -386,7 +386,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             sortByDate("before");
         }
 
-        addEvents();
+
     }
 
     public void initilizeCalander() {
@@ -1316,6 +1316,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 compactCalendarView.setVisibility(View.VISIBLE);
                 YearTitle.setVisibility(View.VISIBLE);
                 sortByDate("before");
+
 //                catalogAdapter.refreshList(catalogModelsList);
                 String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
                 onDayClick(getCurrentDateTimeInDate(todayD));
@@ -1382,6 +1383,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             catalogAdapter.refreshList(myLearningModelList);
         }
 
+        addEvents(myLearningModelList);
+
     }
 
     @Override
@@ -1419,18 +1422,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
 
-    private void addEvents() {
+    private void addEvents(List<MyLearningModel> myLearningModelList) {
 
-        for (int i = 0; i < catalogModelsList.size(); i++) {
+        for (int i = 0; i < myLearningModelList.size(); i++) {
 
-            Date date = ConvertToDate(catalogModelsList.get(i).getEventstartTime());
+            Date date = ConvertToDate(myLearningModelList.get(i).getEventstartTime());
             currentCalender.setTime(date);
-
-            currentCalender.add(Calendar.DATE, i);
-            setToMidnight(currentCalender);
+//            currentCalender.add(Calendar.DATE, i);
+//            setToMidnight(currentCalender);
             long timeInMillis = currentCalender.getTimeInMillis();
             List<Event> events = getEvents(timeInMillis, i);
-
             compactCalendarView.addEvents(events);
         }
     }

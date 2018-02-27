@@ -89,7 +89,7 @@ public class SignUp_Activity extends AppCompatActivity {
                 view.loadUrl(url);
 
                 if (url.toLowerCase().contains("home")) {
-                    view.loadUrl(appDefaultUrl + "nativemobile/Sign%20Up/nativesignup/true");
+                    view.loadUrl(appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true");
                 } else if (url.toLowerCase().contains("autosignupnativeapp.aspx")) {
                     if (url.contains("?")) {
                         Toast.makeText(SignUp_Activity.this, "Sign up success..!!", Toast.LENGTH_SHORT).show();

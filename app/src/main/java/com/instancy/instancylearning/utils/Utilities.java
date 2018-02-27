@@ -945,6 +945,18 @@ public class Utilities {
         return d;
     }
 
+    public static Drawable getButtonDrawable(int resourceID, Context context, String colorString) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.buttondrawable, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.buttondrawables);
+        iconText.setTextColor(Color.parseColor(colorString));
+        iconText.setText(resourceID);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.buttondrawables), iconFont);
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
 
 
 }

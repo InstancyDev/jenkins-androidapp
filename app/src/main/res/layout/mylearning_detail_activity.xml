@@ -282,6 +282,7 @@
         android:id="@+id/bottom_button_layout"
         android:layout_width="match_parent"
         android:layout_height="44dp"
+        android:visibility="gone"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:weightSum="1">
@@ -345,7 +346,6 @@
                 android:id="@+id/report_btn_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="44dp"
-
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/report_fa_icon"
                 android:gravity="center_vertical"
@@ -393,4 +393,9 @@
 
     </LinearLayout>
 
+    <include
+        layout="@layout/event_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>

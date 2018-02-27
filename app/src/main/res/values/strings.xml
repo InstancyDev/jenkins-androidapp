@@ -118,6 +118,7 @@
     <string name="btn_txt_enroll">Enroll</string>
     <string name="btn_txt_add">Add</string>
     <string name="btn_txt_add_to_calendar">Add To Calendar</string>
+
     <string name="btn_txt_added_to_calendar">Added To Calendar</string>
     <string name="btn_txt_details">Details</string>
     <string name="btn_txt_cancel">Cancel</string>
