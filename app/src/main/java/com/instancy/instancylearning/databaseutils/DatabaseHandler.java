@@ -2388,6 +2388,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("coursename")));
                     myLearningModel.setAuthor(cursor.getString(cursor
                             .getColumnIndex("author")));
+                    myLearningModel.setPresenter(cursor.getString(cursor
+                            .getColumnIndex("presenter")));
                     myLearningModel.setShortDes(cursor.getString(cursor
                             .getColumnIndex("shortdes")));
                     myLearningModel.setLongDes(cursor.getString(cursor
@@ -5042,14 +5044,54 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public int updateContentStatusInTrackList(MyLearningModel myLearningModel,
-                                              String updatedStatus, String progress) {
+    public int updateEventStatus(MyLearningModel myLearningModel, JSONObject jsonObject) throws JSONException {
         SQLiteDatabase db = this.getWritableDatabase();
         int status = -1;
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
+        JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(0);
+        if (jsonTableAry.length()>0){
+            try {
+
+                String strUpdate = "UPDATE " + TBL_DOWNLOADDATA + " SET status = '"
+                        + jsonMyLearningColumnObj.get("corelessonstatus") + "', progress = '" + "0"
+                        + "' WHERE siteid ='"
+                        + myLearningModel.getSiteID() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + myLearningModel.getScoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + myLearningModel.getUserID() + "'";
+                Log.d(TAG, "updateContentStatus: " + strUpdate);
+                db.execSQL(strUpdate);
+                status = 1;
+            } catch (Exception e) {
+                status = -1;
+                Log.e("updateContentStatus", e.toString());
+            }
+        }
+        db.close();
+
+        return status;
+
+    }
+
+
+
+    public int updateContentStatusInTrackList(MyLearningModel myLearningModel,
+                                              String updatedStatus, String progress,boolean isEventList) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int status = -1;
+        String TBL_TYPE ="TRACKLISTDATA";
+
+        if (isEventList){
+            TBL_TYPE ="RELATEDCONTENTDATA";
+        }
+        else {
+            TBL_TYPE ="TRACKLISTDATA";
+        }
 
         try {
 
-            String strUpdate = "UPDATE " + TBL_TRACKLISTDATA + " SET status = '"
+            String strUpdate = "UPDATE " + TBL_TYPE + " SET status = '"
                     + updatedStatus + "', progress = '" + progress
                     + "' WHERE siteid ='"
                     + myLearningModel.getSiteID() + "'"
@@ -8860,7 +8902,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             MyLearningModel myLearningModel = new MyLearningModel();
             ContentValues contentValues = null;
 
-
             //sitename
             if (jsonMyLearningColumnObj.has("sitename")) {
 
@@ -11423,12 +11464,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // publishedDate
             if (jsonMyLearningColumnObj.has("createddate")) {
 
-
                 String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
                 Log.d(TAG, "injectEventCatalog: " + formattedDate);
                 discussionForumModel.createddate = formattedDate;
-
 
             }
 

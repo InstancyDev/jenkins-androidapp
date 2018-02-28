@@ -461,20 +461,28 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK) {
             if (data != null) {
-                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
-                Log.d(TAG, "onActivityResult if getCourseName :" + myLearningModel.getCourseName());
-                File myFile = new File(myLearningModel.getOfflinepath());
+                MyLearningModel myLearningModelLocal = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+                Log.d(TAG, "onActivityResult if getCourseName :" + myLearningModelLocal.getCourseName());
+                File myFile = new File(myLearningModelLocal.getOfflinepath());
 
                 if (!myFile.exists()) {
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                    if (myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("8") || myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("9") || myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("10")) {
 
-                        getStatusFromServer(myLearningModel);
+                        getStatusFromServer(myLearningModelLocal);
 
                     } else {
 
-                        if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
                             int i = -1;
-                            i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
+
+                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",true);
+
+                            }
+                            else {
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",false);
+                            }
+
                             if (i == 1) {
                                 injectFromDbtoModel();
 //                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
@@ -487,15 +495,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                     }
                 } else {
 
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
                         int i = -1;
-                        i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
-                        if (i == 1) {
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",true);
 
-//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-                        } else {
-//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
+                        else {
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",false);
+                        }
+
                     }
 //               remove if not required
                     injectFromDbtoModel();
@@ -555,7 +564,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatusInTrackList(myLearningModel, status, progress);
+
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
+                            i = db.updateContentStatusInTrackList(myLearningModel, status, progress,true);
+
+                        }
+                        else {
+                            i = db.updateContentStatusInTrackList(myLearningModel, status, progress,false);
+                        }
+
+
                         if (i == 1) {
                             injectFromDbtoModel();
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();

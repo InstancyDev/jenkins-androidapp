@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,8 +60,19 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     @BindView(R.id.btn_submit)
     Button btnSubmit;
 
+    @BindView(R.id.txtTitle)
+    TextView txtTitle;
+
+    @BindView(R.id.txtBody)
+    TextView txtBody;
+
     @BindView(R.id.txt_user)
     TextView imgUser;
+
+
+    @BindView(R.id.llForgot)
+    LinearLayout llForgot;
+
 
     AppUserModel appUserModel;
     private SVProgressHUD svProgressHUD;
@@ -97,13 +109,18 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         FontManager.markAsIconContainer(findViewById(R.id.txt_user), iconFont);
         btnSubmit.setBackgroundResource(R.drawable.round_corners);
         GradientDrawable drawable = (GradientDrawable) btnSubmit.getBackground();
-        drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-        btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
-        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        drawable.setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        llForgot.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+        txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtBody.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
     }
 
 
-    @OnClick({ R.id.btn_submit})
+    @OnClick({R.id.btn_submit})
     public void socialLoginBtns(View view) {
         switch (view.getId()) {
             case R.id.btn_submit:

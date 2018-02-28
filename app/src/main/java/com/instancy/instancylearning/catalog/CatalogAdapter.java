@@ -148,7 +148,6 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
         }
 
-
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {

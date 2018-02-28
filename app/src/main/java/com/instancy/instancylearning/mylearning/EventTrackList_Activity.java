@@ -7,9 +7,11 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -52,6 +54,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -76,7 +79,7 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
  */
 
 public class EventTrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, XmlDownloadListner {
-    //eclipse line 8351
+
     ExpandableListView expandableListView;
     TrackListExpandableAdapter trackListExpandableAdapter;
     final Context context = this;
@@ -171,11 +174,38 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 executeWorkFlowRules(workFlowType);
             } else {
 
-                workFlowType = "onenroll";
-                executeWorkFlowRulesForEvents(workFlowType);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    if (isEventCompleted()){
+                        workFlowType = "onenroll";
+                        executeWorkFlowRulesForEvents(workFlowType);
+                    }
+                }
+
             }
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public boolean isEventCompleted() {
+        android.icu.text.SimpleDateFormat sdf = new android.icu.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date strDate = null;
+        String checkDate = myLearningModel.getEventendTime();
+        try {
+            strDate = sdf.parse(checkDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (new Date().before(strDate)) {
+
+            return true;
+
+        } else
+            return false;
+
+    }
+
 
     public void executeXmlWorkFlowFile() {
 
@@ -340,7 +370,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             db.updateCMIstatus(myLearningModel, "Completed");
             myLearningModel.setStatus("Completed");
         }
-        myLearningModel.setStatus("waste");
+//        myLearningModel.setStatus("waste");
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
@@ -469,20 +499,25 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK) {
             if (data != null) {
-                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
-                Log.d(TAG, "onActivityResult if getCourseName :" + myLearningModel.getCourseName());
-                File myFile = new File(myLearningModel.getOfflinepath());
+                MyLearningModel myLearningModelLocal = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+                Log.d(TAG, "onActivityResult if getCourseName :" + myLearningModelLocal.getCourseName());
+                File myFile = new File(myLearningModelLocal.getOfflinepath());
 
                 if (!myFile.exists()) {
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                    if (myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("8") || myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("9") || myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("10")) {
 
-                        getStatusFromServer(myLearningModel);
+                        getStatusFromServer(myLearningModelLocal);
 
                     } else {
 
-                        if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
                             int i = -1;
-                            i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
+                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true);
+
+                            } else {
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false);
+                            }
                             if (i == 1) {
                                 injectFromDbtoModel();
 //                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
@@ -495,15 +530,16 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     }
                 } else {
 
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
                         int i = -1;
-                        i = db.updateContentStatusInTrackList(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
-                        if (i == 1) {
 
-//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true);
+
                         } else {
-//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false);
                         }
+
                     }
 //               remove if not required
                     injectFromDbtoModel();
@@ -514,8 +550,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         executeWorkFlowRules(workFlowType);
                     } else {
 
-                        workFlowType = "onattendance";
-                        executeWorkFlowRulesForEvents(workFlowType);
+//                        workFlowType = "onattendance";
+//                        executeWorkFlowRulesForEvents(workFlowType);
                     }
 
 
@@ -536,18 +572,18 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         }
     }
 
-    public void getStatusFromServer(final MyLearningModel myLearningModel) {
+    public void getStatusFromServer(final MyLearningModel myLearningModelLocal) {
         String paramsString = "userId="
-                + myLearningModel.getUserID()
+                + myLearningModelLocal.getUserID()
                 + "&scoId="
-                + myLearningModel.getScoId()
+                + myLearningModelLocal.getScoId()
                 + "&TrackObjectTypeID="
-                + myLearningModel.getObjecttypeId()
+                + myLearningModelLocal.getObjecttypeId()
                 + "&TrackContentID="
-                + myLearningModel.getContentID()
-                + "&TrackScoID=" + myLearningModel.getScoId()
-                + "&SiteID=" + myLearningModel.getSiteID()
-                + "&OrgUnitID=" + myLearningModel.getSiteID()
+                + myLearningModelLocal.getContentID()
+                + "&TrackScoID=" + myLearningModelLocal.getScoId()
+                + "&SiteID=" + myLearningModelLocal.getSiteID()
+                + "&OrgUnitID=" + myLearningModelLocal.getSiteID()
                 + "&isonexist=onexit";
 
         vollyService.getJsonObjResponseVolley("UPDATESTATUS", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentStatus?" + paramsString, appUserModel.getAuthHeaders());
@@ -571,7 +607,14 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatusInTrackList(myLearningModel, status, progress);
+
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, status, progress, true);
+
+                        } else {
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, status, progress, false);
+                        }
+
                         if (i == 1) {
                             injectFromDbtoModel();
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
@@ -582,8 +625,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                 executeWorkFlowRules(workFlowType);
                             } else {
 
-                                workFlowType = "onattendance";
-                                executeWorkFlowRulesForEvents(workFlowType);
+//                                workFlowType = "onattendance";
+//                                executeWorkFlowRulesForEvents(workFlowType);
                             }
 
                         } else {
@@ -623,8 +666,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     strlaunch = "1";
                 } else if (strlaunch.equals("1")) {
                     injectFromDbtoModel();
-                    workFlowType = "onattendance";
-                    executeWorkFlowRulesForEvents(workFlowType);
+//                    workFlowType = "onattendance";
+//                    executeWorkFlowRulesForEvents(workFlowType);
                 }
             } catch (Exception ex) {
                 Log.d("Onresume", ex.getMessage());
@@ -1655,7 +1698,13 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         if (isTraxkList) {
             executeWorkFlowRules("onlaunch");
         } else {
-            executeWorkFlowRulesForEvents("onenroll");
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (isEventCompleted()){
+                    workFlowType = "onenroll";
+                    executeWorkFlowRulesForEvents(workFlowType);
+                }
+            }
         }
 
 
@@ -2646,8 +2695,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 //                } else
                 if (workFlowType.equals("onenroll")) {
 
-                    workFlowType = "onattendance";
-                    executeWorkFlowRulesForEvents(workFlowType);
+//                    workFlowType = "onattendance";
+//                    executeWorkFlowRulesForEvents(workFlowType);
 
                 } else {
                     List<MyLearningModel> tempTrackListItems = new ArrayList<MyLearningModel>();

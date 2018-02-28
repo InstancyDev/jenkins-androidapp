@@ -116,6 +116,7 @@ import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OP
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
@@ -147,6 +148,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     CatalogAdapter catalogAdapter;
     List<MyLearningModel> catalogModelsList = null;
+    List<MyLearningModel> contextMenuModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -360,6 +362,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         segmentedSwitch.setOnCheckedChangeListener(this);
         segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         catalogModelsList = new ArrayList<MyLearningModel>();
+        contextMenuModelList = new ArrayList<MyLearningModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
@@ -381,19 +384,17 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
         }
-
+        contextMenuModelList = new ArrayList<>();
+        contextMenuModelList.addAll(catalogModelsList);
         if (sortToUpcoming) {
             sortByDate("before");
         }
 
-
     }
 
     public void initilizeCalander() {
-
         compactCalendarView.setListener(this);
         YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
-
     }
 
     public void initilizeView() {
@@ -540,7 +541,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             case R.id.btn_contextmenu:
                 View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
+                catalogContextMenuMethod(position, view, txtBtnDownload, contextMenuModelList.get(position), uiSettingsModel, appUserModel);
                 break;
             default:
 
@@ -781,8 +782,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     public void onResponse(String response) {
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
-                            catalogModelsList.get(position).setAddedToMylearning(1);
-                            catalogAdapter.notifyDataSetChanged();
+//                            contextMenuModelList.get(position).setAddedToMylearning(1);
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -794,8 +794,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             dialog.dismiss();
                                             // add event to android calander
                                             addEventToAndroidDevice(myLearningDetalData);
-                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModelsList.get(position), 1);
-                                            injectFromDbtoModel(false);
+                                            db.updateEventAddedToMyLearningInEventCatalog(contextMenuModelList.get(position), 1);
+                                            injectFromDbtoModel(true);
+
                                         }
                                     });
                             AlertDialog alert = builder.create();
@@ -941,7 +942,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
-                + appUserModel.getUserIDValue() + "&DelivoryMode=1";
+                + appUserModel.getUserIDValue() + "&DelivoryMode=1&IsDownload=0";
 
         urlStr = urlStr.replaceAll(" ", "%20");
         Log.d(TAG, "getMobileGetMobileContentMetaData : " + urlStr);
@@ -955,16 +956,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                             boolean isInserted = false;
                             try {
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
+                                db.updateEventStatus(learningModel, jsonObj);
                                 if (isInserted) {
-                                    catalogModelsList.get(position).setAddedToMylearning(1);
-                                    catalogAdapter.notifyDataSetChanged();
-//                                    Toast toast = Toast.makeText(
-//                                            context,
-//                                            context.getString(R.string.cat_add_success),
-//                                            Toast.LENGTH_SHORT);
-//                                    toast.setGravity(Gravity.CENTER, 0, 0);
-//                                    toast.show();
-
+                                    contextMenuModelList.get(position).setAddedToMylearning(1);
+                                    MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                                    injectFromDbtoModel(true);
                                     final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setMessage(context.getString(R.string.cat_add_success))
                                             .setCancelable(false)
@@ -1171,7 +1167,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (data != null) {
                 boolean refresh = data.getBooleanExtra("REFRESH", false);
                 if (refresh) {
-                    injectFromDbtoModel(false);
+                    injectFromDbtoModel(true);
                 }
             }
         }
@@ -1194,8 +1190,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 File myFile = new File(myLearningModel.getOfflinepath());
 
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
-                    cmiSynchTask = new CmiSynchTask(context);
-                    cmiSynchTask.execute();
+//                    cmiSynchTask = new CmiSynchTask(context);
+//                    cmiSynchTask.execute();
                 }
 
                 if (!myFile.exists()) {
@@ -1209,7 +1205,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 }
 
-                injectFromDbtoModel(false);
+//                injectFromDbtoModel(false);
             }
 
         }
@@ -1344,7 +1340,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             for (int i = 0; i < catalogModelsList.size(); i++) {
                 Date strDate = null;
                 String checkDate = catalogModelsList.get(i).getEventstartTime();
-
                 try {
                     strDate = sdf.parse(checkDate);
                 } catch (ParseException e) {
@@ -1360,6 +1355,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
             }
             catalogAdapter.refreshList(myLearningModelList);
+            contextMenuModelList.clear();
+            contextMenuModelList.addAll(myLearningModelList);
         } else {
 
             for (int i = 0; i < catalogModelsList.size(); i++) {
@@ -1381,6 +1378,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
 
             catalogAdapter.refreshList(myLearningModelList);
+            contextMenuModelList.clear();
+            contextMenuModelList.addAll(myLearningModelList);
         }
 
         addEvents(myLearningModelList);
@@ -1408,9 +1407,13 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 calanderEventList.add(catalogModelsList.get(i));
                 catalogAdapter.refreshList(calanderEventList);
+                contextMenuModelList.clear();
+                contextMenuModelList.addAll(calanderEventList);
             } else {
 
                 catalogAdapter.refreshList(calanderEventList);
+                contextMenuModelList.clear();
+                contextMenuModelList.addAll(calanderEventList);
             }
         }
     }
@@ -1460,9 +1463,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
-        if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
-            GlobalMethods.relatedContentView(eventModel, context);
-        }
+//        if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+//            GlobalMethods.relatedContentView(eventModel, context);
+//        }
 
         try {
             String eventUriString = "content://com.android.calendar/events";
@@ -1543,7 +1546,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                                             db.ejectEventsFromDownloadData(eventModel);
                                             db.updateEventAddedToMyLearningInEventCatalog(eventModel, 0);
-                                            injectFromDbtoModel(false);
+                                            injectFromDbtoModel(true);
                                         }
                                     });
                             AlertDialog alert = builder.create();

@@ -802,13 +802,13 @@ public class GlobalMethods {
         menu.getItem(5).setVisible(false);
         menu.getItem(6).setVisible(false);
         menu.getItem(7).setVisible(false);
-        menu.getItem(8).setVisible(false);
-        menu.getItem(9).setVisible(false);
+        menu.getItem(8).setVisible(false); // related content
+        menu.getItem(9).setVisible(false); // cancel
         menu.getItem(10).setVisible(false);
 
         File myFile = new File(myLearningDetalData.getOfflinepath());
 
-        if (myFile.exists()) {
+        if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
 
             menu.getItem(10).setVisible(true);
 
@@ -837,7 +837,7 @@ public class GlobalMethods {
             }
 
         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
-
+            menu.getItem(10).setVisible(false);
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
@@ -847,8 +847,6 @@ public class GlobalMethods {
 
                 menu.getItem(6).setVisible(true);
 
-                menu.getItem(9).setVisible(true);
-
             }
 
             if (myLearningDetalData.getTypeofevent() == 2) {
@@ -856,7 +854,7 @@ public class GlobalMethods {
             } else if (myLearningDetalData.getTypeofevent() == 1) {
                 menu.getItem(3).setVisible(false);
             }
-
+            menu.getItem(9).setVisible(true);
         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")) {
 
             menu.getItem(1).setVisible(false);
@@ -881,7 +879,7 @@ public class GlobalMethods {
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("VIew")) {
+                if (item.getTitle().toString().equalsIgnoreCase("View")) {
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Report")) {
@@ -934,7 +932,7 @@ public class GlobalMethods {
 
                     downloadInterface.cancelEnrollment(false);
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrollment")) {
+                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrolment")) {
 
                     downloadInterface.cancelEnrollment(true);
 
@@ -944,7 +942,6 @@ public class GlobalMethods {
             }
         });
         popup.show();//showing popup menu
-
     }
 
     public static void deleteDownloadedFile(View v, MyLearningModel myLearningModel, DownloadInterface downloadInterface) {
@@ -1035,10 +1032,10 @@ public class GlobalMethods {
         intent.putExtra("beginTime", startMillis);
         intent.putExtra("allDay", true);
         intent.putExtra("rrule", "FREQ=YEARLY");
-        intent.putExtra("endTime", cal.getTimeInMillis()+60*60*1000);
-        intent.putExtra(CalendarContract.Events.DESCRIPTION,myLearningModel.getShortDes());
-        intent.putExtra(CalendarContract.Events.TITLE,myLearningModel.getCourseName());
-        intent.putExtra(CalendarContract.Events.EVENT_LOCATION,myLearningModel.getLocationName());
+        intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
+        intent.putExtra(CalendarContract.Events.DESCRIPTION, myLearningModel.getShortDes());
+        intent.putExtra(CalendarContract.Events.TITLE, myLearningModel.getCourseName());
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, myLearningModel.getLocationName());
         context.startActivity(intent);
 
     }

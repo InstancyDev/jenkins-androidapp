@@ -639,7 +639,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         menu.getItem(4).setVisible(false);//ignore enrollment
         menu.getItem(5).setVisible(false);//send message
         menu.getItem(6).setVisible(false);//add to my connection
-        menu.getItem(7).setVisible(true);
+        menu.getItem(7).setVisible(false);
 
         if (peopleListingModel.viewProfileAction) {
             menu.getItem(0).setVisible(true);
@@ -753,9 +753,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Cancel")) {
 
-//                    Intent intentDetail = new Intent(context, ChatActivity.class);
-//                    intentDetail.putExtra("peopleListingModel", peopleListingModel);
-//                    startActivity(intentDetail);
 
                 }
 

@@ -24,7 +24,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 
-
 import android.view.MenuItem;
 import android.view.View;
 
@@ -87,6 +86,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
@@ -230,7 +230,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         if (myLearningModel != null) {
             txtTitle.setText(myLearningModel.getCourseName());
             txtCourseName.setText(myLearningModel.getMediaName());
-            txtAuthor.setText("By " + myLearningModel.getAuthor());
+
+            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+
+                txtAuthor.setText("By " + myLearningModel.getPresenter() + " ");
+            } else {
+
+                txtAuthor.setText("By " + myLearningModel.getAuthor() + " ");
+            }
+
             txtSiteName.setText(myLearningModel.getSiteName());
             txtLongDisx.setText(myLearningModel.getShortDes());
             // apply colors
@@ -473,11 +481,22 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_plus, this, uiSettingsModel.getAppHeaderTextColor());
                 Drawable reportImg = getButtonDrawable(R.string.fa_icon_filter, this, uiSettingsModel.getAppHeaderTextColor());
-                iconFirst.setBackground(calendarImg);
-                iconSecond.setBackground(reportImg);
-                buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+
+                if (myLearningModel.getAddedToMylearning() == 1) {
+                    buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                    btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                    iconFirst.setBackground(calendarImg);
+                    buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+
+                } else {
+
+                    iconFirst.setBackground(calendarImg);
+
+                    buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+                }
+
 
             } else {
 
@@ -516,7 +535,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
                 iconFirst.setBackground(calendarImg);
-
                 buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
 
                 if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
@@ -531,7 +549,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && !myLearningModel.getStatus().toLowerCase().contains("completed")) {
                     relativeSecond.setVisibility(View.VISIBLE);
                     buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
-                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_battery_full, this, uiSettingsModel.getAppHeaderTextColor());
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppHeaderTextColor());
                     iconSecond.setBackground(relatedContent);
                 }
 
@@ -553,6 +571,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             }
         };
+    }
+
+    public void updateEnrolledEvent() {
+        Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+        iconFirst.setBackground(calendarImg);
+        buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+        db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
+        refreshCatalogContent = true;
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME=0;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -645,7 +672,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             txtCourseStatus.setText(courseStatus);
         } else {
 
-            txtCourseStatus.setText(courseStatus + "%)");
+            txtCourseStatus.setText(displayStatus + "%)");
         }
 
     }
@@ -770,15 +797,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 if (buttonFirst.getText().toString().equalsIgnoreCase("View")) {
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase("Add")) {
-//                    Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show();
                     addToMyLearningCheckUser(myLearningModel, false); // false for
-
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase("Buy")) {
-//                    Toast.makeText(this, "Buy button", Toast.LENGTH_SHORT).show();
-
                     addToMyLearningCheckUser(myLearningModel, true);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_add_to_calendar))) {
                     GlobalMethods.addToDeviceCalendar(myLearningModel, this);
+                } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
+
+                    addToMyLearningCheckUser(myLearningModel, false);
                 }
                 break;
             case R.id.btntxt_download_detail:
@@ -788,15 +814,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
                     new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
-
                 } else {
                     openReportsActivity();
                 }
-
-
                 break;
         }
-
     }
 
     public void inAppActivityCall(MyLearningModel learningModel) {
@@ -1349,6 +1371,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             boolean isInserted = false;
                             try {
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
+                                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
+                                    db.updateEventStatus(learningModel,jsonObj);
+                                }
                                 if (isInserted) {
                                     myLearningModel.setAddedToMylearning(1);
                                     db.updateContenToCatalog(myLearningModel);
@@ -1363,6 +1388,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                         String succesMessage = "Content Added to My Learning";
                                         if (isJoinedCommunity) {
                                             succesMessage = "This content item has been added to My Learning page. You have successfully joined the Learning Community: " + learningModel.getSiteName();
+                                        }
+
+                                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                                            succesMessage = getResources().getString(R.string.event_add_success);
+                                            db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
+                                            updateEnrolledEvent();
+
                                         }
                                         final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
                                         builder.setMessage(succesMessage)

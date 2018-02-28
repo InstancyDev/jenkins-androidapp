@@ -49,7 +49,7 @@
     <item
         android:id="@+id/ctx_cancelenrollment"
         android:orderInCategory="100"
-        android:title="Cancel Enrollment" />
+        android:title="Cancel Enrolment" />
 
     <item
         android:id="@+id/ctx_delete"

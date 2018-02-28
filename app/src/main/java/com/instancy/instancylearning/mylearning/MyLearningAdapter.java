@@ -91,7 +91,7 @@ public class MyLearningAdapter extends BaseAdapter {
     EventInterface eventInterface;
 
 
-    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel,EventInterface eventInterface) {
+    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface) {
         this.eventInterface = eventInterface;
         this.activity = activity;
         this.myLearningModel = myLearningModel;
@@ -225,7 +225,15 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
+
+
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+            holder.txtAuthor.setText("By " + myLearningModel.get(position).getPresenter() + " ");
+        } else {
+            holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
+        }
+
+
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
@@ -368,9 +376,8 @@ public class MyLearningAdapter extends BaseAdapter {
 
             holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorGray));
-            courseStatus = status ;
-        }
-        else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+            courseStatus = status;
+        } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 
@@ -378,18 +385,16 @@ public class MyLearningAdapter extends BaseAdapter {
 
 
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status ;
-        }
-        else if (statusFromModel.toLowerCase().contains("Expired")) {
+            courseStatus = status;
+        } else if (statusFromModel.toLowerCase().contains("Expired")) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 
             status = statusFromModel;
 
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status ;
-        }
-        else {
+            courseStatus = status;
+        } else {
 
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
             holder.progressBar.setProgress(0);
@@ -668,7 +673,7 @@ public class MyLearningAdapter extends BaseAdapter {
                 @Override
                 public void cancelEnrollment(boolean isCancel) {
 
-                    Log.d(TAG, "cancelEnrollment:  in adapter method " );
+                    Log.d(TAG, "cancelEnrollment:  in adapter method ");
 
                     eventInterface.cancelEnrollment(myLearningDetalData, isCancel);
                     notifyDataSetChanged();
@@ -692,11 +697,14 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
             } else {
-                ((ListView) parent).performItemClick(view, getPosition, 0);
+                if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")){
+                    ((ListView) parent).performItemClick(view, getPosition, 0);
+                }
+
+
             }
         }
     }
-
 
 
 }

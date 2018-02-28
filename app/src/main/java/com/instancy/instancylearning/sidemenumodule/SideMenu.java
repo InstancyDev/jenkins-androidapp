@@ -284,6 +284,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             if (menu.getContextMenuId().equals("10")) {
                 sendMessageLayout.setVisibility(View.VISIBLE);
+                signalAService = SignalAService.newInstance(this);
+                signalAService.startSignalA();
             }
 
             i++;
@@ -393,8 +395,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             navDrawerExpandableView.expandGroup(lastClicked);
         }
 
-        signalAService = SignalAService.newInstance(this);
-        signalAService.startSignalA();
+
     }
 
     public void homeControllClicked(boolean isFromNotification, int menuId, String contentID) {
