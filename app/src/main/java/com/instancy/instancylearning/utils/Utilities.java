@@ -195,6 +195,7 @@ public class Utilities {
         return date;
     }
 
+
     /**
      * To format Date time string from {@code currentFormat} to {@code newFormat}.
      *

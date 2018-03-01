@@ -378,8 +378,12 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.txtTitle.setEnabled(false);
         } else if (trackChildList.getShowStatus().equalsIgnoreCase("hide")) {
             childView.setVisibility(View.GONE);
-        } else if (trackChildList.getShowStatus().equalsIgnoreCase("autolaunch") && autoLaunch) {
-            holder.imgThumb.performClick();
+        }
+        else if (trackChildList.getShowStatus().equalsIgnoreCase("autolaunch") && autoLaunch) {
+            if (trackChildList.getStatus().equalsIgnoreCase("Not Started")){
+                holder.imgThumb.performClick();
+                Log.d("AUTO", "getChildView: autolaunch "+trackChildList.getCourseName());
+            }
             autoLaunch = false;
         } else {
             childView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));

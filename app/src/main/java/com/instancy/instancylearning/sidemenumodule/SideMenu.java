@@ -230,6 +230,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        navDrawerExpandableView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
 //        drawer.setDrawerListener(toggle);

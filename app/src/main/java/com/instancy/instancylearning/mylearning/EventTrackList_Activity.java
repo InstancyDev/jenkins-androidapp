@@ -69,6 +69,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import static com.blankj.utilcode.util.ToastUtils.getView;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
@@ -165,7 +166,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             ex.printStackTrace();
         }
         if (isNetworkConnectionAvailable(this, -1)) {
-            refreshMyLearning(false);
+            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                refreshMyLearning(false, true);
+            } else {
+                refreshMyLearning(false, false);
+            }
+
         } else {
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
 
@@ -174,36 +180,30 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 executeWorkFlowRules(workFlowType);
             } else {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    if (isEventCompleted()){
-                        workFlowType = "onenroll";
-                        executeWorkFlowRulesForEvents(workFlowType);
-                    }
+                boolean isEventRules = isEventCompleted();
+                if (!isEventRules) {
+                    workFlowType = "onenroll";
+                    executeWorkFlowRulesForEvents(workFlowType);
                 }
-
             }
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public boolean isEventCompleted() {
-        android.icu.text.SimpleDateFormat sdf = new android.icu.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        Date strDate = null;
-        String checkDate = myLearningModel.getEventendTime();
-        try {
-            strDate = sdf.parse(checkDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        boolean isCompleted = true;
+        String endDate = myLearningModel.getEventendTime();
+        Date strDate = ConvertToDate(endDate);
+
+        if (new Date().after(strDate)) {
+// today is after date 2
+            isCompleted = true;
+
+        } else {
+            isCompleted = false;
         }
 
-        if (new Date().before(strDate)) {
-
-            return true;
-
-        } else
-            return false;
-
+        return isCompleted;
     }
 
 
@@ -214,16 +214,28 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         downloadXmlAsynchTask.execute();
     }
 
-    public void refreshMyLearning(Boolean isRefreshed) {
+    public void refreshMyLearning(Boolean isRefreshed, boolean isEvent) {
         if (!isRefreshed) {
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
-        String paramsString = "SiteURL=" + appUserModel.getSiteURL()
-                + "&ContentID=" + myLearningModel.getContentID()
-                + "&userid=" + appUserModel.getUserIDValue()
-                + "&DelivoryMode=1&IsDownload=0";
-        vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString, appUserModel.getAuthHeaders());
-        swipeRefreshLayout.setRefreshing(false);
+
+        if (isEvent) {
+            String paramsString = "contentId=" + myLearningModel.getContentID()
+                    + "&userId=" + myLearningModel.getUserID()
+                    + "&locale=en-us&siteid=" + appUserModel.getSiteIDValue()
+                    + "&parentcomponentid=1&categoryid=-1";
+            vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileEventRelatedContentMetadata?" + paramsString, appUserModel.getAuthHeaders());
+            swipeRefreshLayout.setRefreshing(false);
+
+        } else {
+            String paramsString = "SiteURL=" + appUserModel.getSiteURL()
+                    + "&ContentID=" + myLearningModel.getContentID()
+                    + "&userid=" + appUserModel.getUserIDValue()
+                    + "&DelivoryMode=1&IsDownload=0";
+            vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString, appUserModel.getAuthHeaders());
+            swipeRefreshLayout.setRefreshing(false);
+
+        }
     }
 
     void initVolleyCallback() {
@@ -232,7 +244,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             public void notifySuccess(String requestType, JSONObject response) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
-
 
                 if (requestType.equalsIgnoreCase("GETCALL")) {
 
@@ -313,22 +324,22 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 for (int i = 0; i < blockNames.size(); i++)
                     expandableListView.expandGroup(i);
             }
-            if (!isTraxkList && trackListModelList.size() > 0) {
-
-                if (trackListModelList.get(0).getShowStatus().toLowerCase().contains("autolaunch") && firstTimeVisible) {
-
-                    if (expandableListView != null) {
-
-//                        View wantedView = expandableListView.getChildAt(0 - expandableListView.getFirstVisiblePosition() + 1);
+//            if (!isTraxkList && trackListModelList.size() > 0) {
 //
-//                        long id = trackListExpandableAdapter.getGroupId(0);
+//                if (trackListModelList.get(0).getShowStatus().toLowerCase().contains("autolaunch") && firstTimeVisible) {
 //
-//                        expandableListView.performItemClick(wantedView, 0, id);
-
-                    }
-                    firstTimeVisible = false;
-                }
-            }
+//                    if (expandableListView != null) {
+//
+////                        View wantedView = expandableListView.getChildAt(0 - expandableListView.getFirstVisiblePosition() + 1);
+////
+////                        long id = trackListExpandableAdapter.getGroupId(0);
+////
+////                        expandableListView.performItemClick(wantedView, 0, id);
+//
+//                    }
+//                    firstTimeVisible = false;
+//                }
+//            }
 
         }
     }
@@ -539,11 +550,9 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         } else {
                             i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false);
                         }
-
                     }
 //               remove if not required
                     injectFromDbtoModel();
-
 
                     if (isTraxkList) {
                         workFlowType = "onitemChange";
@@ -1698,15 +1707,13 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         if (isTraxkList) {
             executeWorkFlowRules("onlaunch");
         } else {
+            boolean isEventRules = isEventCompleted();
+            if (!isEventRules) {
+                workFlowType = "onenroll";
+                executeWorkFlowRulesForEvents(workFlowType);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                if (isEventCompleted()){
-                    workFlowType = "onenroll";
-                    executeWorkFlowRulesForEvents(workFlowType);
-                }
             }
         }
-
 
     }
 
@@ -2721,7 +2728,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             e.printStackTrace();
             defaultActionOnNoWorkflowRules();
         }
-//        injectFromDbtoModel();
+        injectFromDbtoModel();
     }
 
 

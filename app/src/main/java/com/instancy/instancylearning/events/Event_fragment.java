@@ -1352,7 +1352,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 //                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
                 }
-
             }
             catalogAdapter.refreshList(myLearningModelList);
             contextMenuModelList.clear();
@@ -1463,9 +1462,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
-//        if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
-//            GlobalMethods.relatedContentView(eventModel, context);
-//        }
+        if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+            GlobalMethods.relatedContentView(eventModel, context);
+        }
 
         try {
             String eventUriString = "content://com.android.calendar/events";
