@@ -74,7 +74,7 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
- * http://www.mysamplecode.com/2012/11/android-expandablelistview-search.html
+ *
  */
 
 public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, XmlDownloadListner {
@@ -116,12 +116,6 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         appController = AppController.getInstance();
         db = new DatabaseHandler(this);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         linearLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));

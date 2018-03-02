@@ -3,12 +3,14 @@ package com.instancy.instancylearning.globalpackage;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -928,13 +930,30 @@ public class GlobalMethods {
 
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Add to Calender")) {
+                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_add_to_calendar))) {
 
                     downloadInterface.cancelEnrollment(false);
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrolment")) {
+                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_cancel_enrolment))) {
 
-                    downloadInterface.cancelEnrollment(true);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(v.getResources().getString(R.string.eventalert))
+                            .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                            dialog.dismiss();
+                            downloadInterface.cancelEnrollment(true);
+
+                        }
+                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
 
                 }
 

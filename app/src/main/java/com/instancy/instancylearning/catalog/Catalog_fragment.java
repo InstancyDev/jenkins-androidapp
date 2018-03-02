@@ -75,6 +75,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
+import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -106,6 +107,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -125,6 +127,7 @@ import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CO
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
+import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
@@ -162,6 +165,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     BillingProcessor billingProcessor;
     boolean isFromCatogories = false;
     WebAPIClient webAPIClient;
+
+    MembershipModel membershipModel = null;
 
     CustomFlowLayout category_breadcrumb = null;
 
@@ -220,7 +225,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
+        membershipModel = new MembershipModel();
 //        try {
 //            communicator = (Communicator) context;
 //        } catch (ClassCastException e) {
@@ -242,12 +247,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         billingProcessor = new BillingProcessor(context, apiKey, this);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         webAPIClient = new WebAPIClient(context);
 
         sideMenusModel = null;
@@ -439,7 +438,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (isFromCatogories) {
             breadCrumbPlusButtonInit(rootView);
         }
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList,false);
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, false);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -470,6 +469,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         return rootView;
     }
+
     public void fabActionMenusInitilization() {
         uploadFloatMenu.setVisibility(View.VISIBLE);
         uploadFloatMenu.setClosedOnTouchOutside(true);
@@ -477,7 +477,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         uploadFloatMenu.getMenuIconView().setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 //        uploadFloatMenu.getMenuIconView().setImageDrawable(getDrawableFromStringHOmeMethod(R.string.fa_icon_cloud_upload, context, uiSettingsModel.getAppHeaderTextColor()));
-
 
         fabAudio.setOnClickListener(this);
         fabImage.setOnClickListener(this);
@@ -514,6 +513,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
         triggerActionForFirstItem();
+
+        membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
     }
 
     public void triggerActionForFirstItem() {
@@ -763,6 +765,27 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
+    public boolean isMemberyExpry(String memberExpiryDate) {
+        boolean isCompleted = true;
+
+        if (memberExpiryDate.length()==0)
+            return isCompleted =true;
+
+        String endDate = memberExpiryDate;
+        Date strDate = ConvertToDate(endDate);
+
+        if (new Date().after(strDate)) {
+// today is after date 2
+            isCompleted = true;
+
+        } else {
+            isCompleted = false;
+        }
+
+        return isCompleted;
+    }
+
+
     public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
@@ -779,7 +802,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         menu.getItem(4).setVisible(false);//delete
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
-
 
         if (myLearningDetalData.getAddedToMylearning() == 1) {
             menu.getItem(0).setVisible(true);
@@ -847,13 +869,20 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                    }
                 }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
-                menu.getItem(0).setVisible(false);
-                menu.getItem(2).setVisible(true);
-                menu.getItem(3).setVisible(true);
-                menu.getItem(1).setVisible(false);
+                boolean isMemberExpired=isMemberyExpry(membershipModel.expirydate);
+                if (isMemberExpired){
+                    menu.getItem(0).setVisible(false);
+                    menu.getItem(2).setVisible(true);
+                    menu.getItem(3).setVisible(true);
+                    menu.getItem(1).setVisible(false);
+                }
+                else {
+                    menu.getItem(0).setVisible(false);
+                    menu.getItem(1).setVisible(true);
+                    menu.getItem(2).setVisible(false);
+                    menu.getItem(3).setVisible(true);
+                }
             }
-
-
         }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

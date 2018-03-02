@@ -3,7 +3,6 @@ package com.instancy.instancylearning.databaseutils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.InstrumentationInfo;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -68,10 +67,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.instancy.instancylearning.utils.StaticValues.DATABASE_NAME;
@@ -513,6 +509,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_EXPERIENCE_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,  title TEXT, location TEXT, companyname TEXT, fromdate TEXT, todate TEXT, userid TEXT, description TEXT, difference TEXT, tilldate INTEGER, displayno TEXT, isupdated TEXT, siteid TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_MEMBERSHIP_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, status TEXT, expirydate TEXT, renewaltype TEXT, usermembership TEXT, expirystatus TEXT, startdate TEXT,membershiplevel INTEGER,siteid INTEGER, userid INTEGER, siteurl TEXT)");
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_SUBSITESETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, siteurl TEXT, authid TEXT, authpwd TEXT, userid TEXT, sitename TEXT, parentsiteid TEXT, parentsiteurl TEXT)");
 
@@ -523,8 +521,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NOTIFICATIONS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, usernotificationid INTEGER, fromuserid INTEGER, fromusername TEXT, fromuseremail TEXT, touserid INTEGER, subject TEXT, message TEXT, notificationstartdate TEXT, notificationenddate TEXT, notificationid INTEGER, ounotificationid INTEGER, contentid TEXT, markasread TEXT, notificationtitle TEXT, groupid INTEGER, contenttitle TEXT, forumname TEXT, forumid TEXT, username TEXT, notificationsubject TEXT, membershipexpirydate TEXT, passwordexpirtydays TEXT, durationenddate TEXT, publisheddate TEXT, assigneddate TEXT, siteid INTEGER, userid INTEGER, siteurl TEXT)");
 
-
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + USER_MEMBERSHIP_DETAILS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, status TEXT, expirydate TEXT, renewaltype TEXT, usermembership TEXT, expirystatus TEXT, startdate TEXT,membershiplevel INTEGER,siteid INTEGER, userid INTEGER, siteurl TEXT)");
 
         Log.d(TAG, "onCreate:  TABLES CREATED");
 
@@ -2139,7 +2135,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("dateassigned")) {
 
                     myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
-
 
 
                 }
@@ -3837,15 +3832,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            //showstatus
-            if (jsonMyLearningColumnObj.has("showstatus")) {
+            if (!isTrackList) {
+                //showstatus
+                if (jsonMyLearningColumnObj.has("wresult")) {
 
-                trackLearningModel.setShowStatus(jsonMyLearningColumnObj.get("showstatus").toString());
+                    trackLearningModel.setShowStatus(jsonMyLearningColumnObj.get("wresult").toString());
+
+                    String wresult = jsonMyLearningColumnObj.getString("wresult");
+
+                    if (isValidString(wresult)) {
+
+                        trackLearningModel.setShowStatus(wresult);
+                    } else {
+                        trackLearningModel.setShowStatus("show");
+                    }
+
+                } else {
+
+                    trackLearningModel.setShowStatus("show");
+
+                }
             } else {
 
-                trackLearningModel.setShowStatus("show");
+                //showstatus
+                if (jsonMyLearningColumnObj.has("showstatus")) {
+
+                    trackLearningModel.setShowStatus(jsonMyLearningColumnObj.get("showstatus").toString());
+                } else {
+
+                    trackLearningModel.setShowStatus("show");
+
+                }
 
             }
+
             //timedelay
             if (jsonMyLearningColumnObj.has("timedelay")) {
 
@@ -4039,6 +4059,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     trackLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
 
                 }
+
                 // status
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
@@ -4190,24 +4211,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     trackLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
                 }
 //   uncomment for event
-                if (isTrackList){
-                for (int j = 0; j < jsonTableBlocks.length(); j++) {
-                    JSONObject jsonBlockColumn = jsonTableBlocks.getJSONObject(j);
-                    //blockname
-                    if (jsonBlockColumn.has("blockname")) {
-                        if (jsonBlockColumn.get("blockid").toString().equalsIgnoreCase(jsonMyLearningColumnObj.get("parentid").toString()))
-                            trackLearningModel.setBlockName(jsonBlockColumn.get("blockname").toString());
+                if (isTrackList) {
+                    for (int j = 0; j < jsonTableBlocks.length(); j++) {
+                        JSONObject jsonBlockColumn = jsonTableBlocks.getJSONObject(j);
+                        //blockname
+                        if (jsonBlockColumn.has("blockname")) {
+                            if (jsonBlockColumn.get("blockid").toString().equalsIgnoreCase(jsonMyLearningColumnObj.get("parentid").toString()))
+                                trackLearningModel.setBlockName(jsonBlockColumn.get("blockname").toString());
 
-                    } else {
-                        trackLearningModel.setBlockName("");
+                        } else {
+                            trackLearningModel.setBlockName("");
+                        }
                     }
-                }
                 }
                 trackLearningModel.setTrackOrRelatedContentID(parentModel.getContentID());
                 if (isTrackList) {
                     injectIntoTrackTable(trackLearningModel);
                 } else {
-
 
 
                     injectIntoEventRelatedContentTable(trackLearningModel);
@@ -5056,7 +5076,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         int status = -1;
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(0);
-        if (jsonTableAry.length()>0){
+        if (jsonTableAry.length() > 0) {
             try {
 
                 String strUpdate = "UPDATE " + TBL_DOWNLOADDATA + " SET status = '"
@@ -5082,18 +5102,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-
     public int updateContentStatusInTrackList(MyLearningModel myLearningModel,
-                                              String updatedStatus, String progress,boolean isEventList) {
+                                              String updatedStatus, String progress, boolean isEventList) {
         SQLiteDatabase db = this.getWritableDatabase();
         int status = -1;
-        String TBL_TYPE ="TRACKLISTDATA";
+        String TBL_TYPE = "TRACKLISTDATA";
 
-        if (isEventList){
-            TBL_TYPE ="RELATEDCONTENTDATA";
-        }
-        else {
-            TBL_TYPE ="TRACKLISTDATA";
+        if (isEventList) {
+            TBL_TYPE = "RELATEDCONTENTDATA";
+        } else {
+            TBL_TYPE = "TRACKLISTDATA";
         }
 
         try {
@@ -9441,9 +9459,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonObject.has("usermembershipdetails")) {
                 jsonMembershipAry = jsonObject.getJSONArray("usermembershipdetails");
 
-                if (jsonMembershipAry.length()>0){
+                if (jsonMembershipAry.length() > 0) {
 
-                    injectMembershipDetails(jsonMembershipAry,userID);
+                    injectMembershipDetails(jsonMembershipAry, userID);
                 }
 
             }
@@ -10350,10 +10368,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     membershipModel.status = experiencObj.get("status").toString();
                 }
                 if (experiencObj.has("startdate")) {
-                    membershipModel.startdate = experiencObj.get("startdate").toString();
+
+                    String formattedDate = formatDate(experiencObj.get("startdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+
+                    if (isValidString(formattedDate)) {
+                        membershipModel.startdate = formattedDate;
+                    } else {
+                        membershipModel.startdate = "";
+                    }
+
+
                 }
                 if (experiencObj.has("expirydate")) {
-                    membershipModel.expirydate = experiencObj.get("expirydate").toString();
+
+                    String formattedDate = formatDate(experiencObj.get("expirydate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    if (isValidString(formattedDate)) {
+                        membershipModel.expirydate = formattedDate;
+                    } else {
+                        membershipModel.expirydate = "";
+                    }
+
                 }
 
                 if (experiencObj.has("renewaltype")) {
@@ -10416,7 +10451,48 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+    public MembershipModel fetchMembership(String siteId, String userID) {
 
+        MembershipModel membershipModel = new MembershipModel();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + USER_MEMBERSHIP_DETAILS + " WHERE userid =" + userID + " AND siteid = " + siteId;
+
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    membershipModel = new MembershipModel();
+                    membershipModel.userid = (cursor.getString(cursor.getColumnIndex("userid")));
+                    membershipModel.usermembership = (cursor.getString(cursor.getColumnIndex("usermembership")));
+                    membershipModel.membershiplevel = (cursor.getInt(cursor.getColumnIndex("membershiplevel")));
+                    membershipModel.status = (cursor.getString(cursor.getColumnIndex("status")));
+                    membershipModel.startdate = (cursor.getString(cursor.getColumnIndex("startdate")));
+                    membershipModel.expirydate = (cursor.getString(cursor.getColumnIndex("expirydate")));
+                    membershipModel.siteID = (cursor.getString(cursor.getColumnIndex("siteid")));
+                    membershipModel.renewaltype = (cursor.getString(cursor.getColumnIndex("renewaltype")));
+                    membershipModel.expirystatus = (cursor.getString(cursor.getColumnIndex("expirystatus")));
+                    membershipModel.siteUrl = (cursor.getString(cursor.getColumnIndex("siteurl")));
+
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return membershipModel;
+    }
 
 
     public List<ProfileGroupModel> fetchProfileGroupNames(String siteId, String userID) {

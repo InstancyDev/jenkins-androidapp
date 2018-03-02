@@ -711,16 +711,33 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Cancel Enrollment")) {
-//                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-                    cancelEnrollment(myLearningDetalData);
+                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_cancel_enrolment))) {
+
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(v.getResources().getString(R.string.eventalert))
+                            .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                            dialog.dismiss();
+                            cancelEnrollment(myLearningDetalData);
+
+                        }
+                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+
+
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
 
-//                    addToMyLearning(myLearningDetalData);
                     addToMyLearningCheckUser(myLearningDetalData, position, false);
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
                 }

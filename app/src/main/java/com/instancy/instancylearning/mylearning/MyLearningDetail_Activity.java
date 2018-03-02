@@ -579,7 +579,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
         db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
         refreshCatalogContent = true;
-        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME=0;
+        MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -1371,8 +1371,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             boolean isInserted = false;
                             try {
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
-                                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
-                                    db.updateEventStatus(learningModel,jsonObj);
+                                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                                    db.updateEventStatus(learningModel, jsonObj);
                                 }
                                 if (isInserted) {
                                     myLearningModel.setAddedToMylearning(1);

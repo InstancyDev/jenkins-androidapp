@@ -34,7 +34,7 @@
     <item
         android:id="@+id/ctx_addtocalender"
         android:orderInCategory="100"
-        android:title="Add to Calender" />
+        android:title="@string/btn_txt_add_to_calendar" />
 
     <item
         android:id="@+id/ctx_complete"
@@ -49,7 +49,7 @@
     <item
         android:id="@+id/ctx_cancelenrollment"
         android:orderInCategory="100"
-        android:title="Cancel Enrolment" />
+        android:title="@string/btn_txt_cancel_enrolment" />
 
     <item
         android:id="@+id/ctx_delete"

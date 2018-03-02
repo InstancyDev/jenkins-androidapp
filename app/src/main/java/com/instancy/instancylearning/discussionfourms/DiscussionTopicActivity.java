@@ -82,9 +82,6 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     DatabaseHandler db;
     List<DiscussionTopicModel> discussionTopicModels = null;
 
-
-    ResultListner resultListner = null;
-
     ListView discussionFourmlistView;
     DiscussionForumModel discussionForumModel;
     PreferencesManager preferencesManager;
@@ -149,12 +146,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         db = new DatabaseHandler(this);
         ButterKnife.bind(this);
         swipeRefreshLayout.setOnRefreshListener(this);
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
