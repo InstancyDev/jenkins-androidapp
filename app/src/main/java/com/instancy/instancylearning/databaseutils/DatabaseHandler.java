@@ -40,6 +40,8 @@ import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.ProfileGroupModel;
+import com.instancy.instancylearning.models.ReportDetail;
+import com.instancy.instancylearning.models.ReportDetailsForQuestions;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.StudentResponseModel;
 import com.instancy.instancylearning.models.TrackObjectsModel;
@@ -7037,12 +7039,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 try {
                     db.execSQL(strExeQuery);
                 } catch (Exception e) {
-                    Log.d("Insertstudentresponses", e.getMessage());
+                    Log.d("Insertstudentresponse s", e.getMessage());
 
                 }
             }
         } catch (Exception e) {
-            Log.d("Insertstudentresponses ", e.getMessage());
+            Log.d("Insertstudentresponse s ", e.getMessage());
         }
 
         cursor.close();
@@ -13783,6 +13785,870 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         return askExpertQuestionModelList;
+    }
+
+// inject  all trackobjects data into table
+
+    public void insertTrackObjectsForReports(JSONObject jsonObject, MyLearningModel learningModel) throws JSONException {
+
+        JSONArray jsonTrackObjects = null;
+        JSONArray jsonQuestionTable = null;
+
+        if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+            jsonTrackObjects = jsonObject.getJSONArray("table3");
+
+            if (jsonTrackObjects.length() > 0) {
+                ejectRecordsinTrackObjDb(learningModel);
+
+                TrackObjectsModel trackObjectsModel = new TrackObjectsModel();
+                for (int i = 0; i < jsonTrackObjects.length(); i++) {
+                    JSONObject jsonTrackObj = jsonTrackObjects.getJSONObject(i);
+                    Log.d(TAG, "insertTrackObjects: " + jsonTrackObj);
+
+                    if (jsonTrackObj.has("name")) {
+
+                        trackObjectsModel.setName(jsonTrackObj.getString("name"));
+                    }
+                    if (jsonTrackObj.has("objecttypeid")) {
+
+                        trackObjectsModel.setObjTypeId(jsonTrackObj.getString("objecttypeid"));
+                    }
+                    if (jsonTrackObj.has("scoid")) {
+
+                        trackObjectsModel.setScoId(jsonTrackObj.getString("scoid"));
+                    }
+
+                    if (jsonTrackObj.has("sequencenumber")) {
+
+                        trackObjectsModel.setSequenceNumber(jsonTrackObj.getString("sequencenumber"));
+                    }
+
+                    if (jsonTrackObj.has("trackscoid")) {
+
+                        trackObjectsModel.setTrackSoId(jsonTrackObj.getString("trackscoid"));
+                    }
+                    trackObjectsModel.setUserID(learningModel.getUserID());
+                    trackObjectsModel.setSiteID(learningModel.getSiteID());
+
+                    injectIntoTrackObjectsTable(trackObjectsModel);
+                }
+            }
+        }
+
+        jsonQuestionTable = jsonObject.getJSONArray("table4");
+
+        if (jsonQuestionTable.length() > 0) {
+
+
+            for (int i = 0; i < jsonQuestionTable.length(); i++) {
+                JSONObject jsonQuestionObj = jsonQuestionTable.getJSONObject(i);
+                Log.d(TAG, "insertTrackObjects: " + jsonQuestionObj);
+
+                String questionID = "";
+                String quesName = "";
+                String scoid = "";
+
+                if (jsonQuestionObj.has("questionid")) {
+
+                    questionID = jsonQuestionObj.getString("questionid");
+                    ejectRecordsinQestionDb(learningModel, questionID);
+                }
+
+                if (isValidString(questionID)) {
+
+                    if (jsonQuestionObj.has("scoid")) {
+
+                        scoid = jsonQuestionObj.getString("scoid");
+                    }
+
+                    if (jsonQuestionObj.has("description")) {
+
+                        quesName = jsonQuestionObj.getString("description");
+                    }
+                }
+
+                injectQuestionsTable(quesName, questionID, scoid, learningModel);
+            }
+        }
+
+
+    }
+
+    public void ejectRecordsinQestionDb(MyLearningModel learningModel, String questionID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            String strDelete = "DELETE FROM " + TBL_QUESTIONS + " WHERE siteid= '" + learningModel.getSiteID() +
+                    "' AND scoid= '" + learningModel.getTrackScoid() +
+                    "' AND userid= '" + learningModel.getUserID() + "' AND questionid = '" + questionID + "'";
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+    }
+
+
+    public void injectQuestionsTable(String quesName, String questionID, String scoid, MyLearningModel learningModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+
+        try {
+            contentValues = new ContentValues();
+            contentValues.put("siteid", learningModel.getSiteID());
+            contentValues.put("scoid", scoid);
+            contentValues.put("userid", learningModel.getUserID());
+            contentValues.put("questionid", questionID);
+            contentValues.put("quesname", quesName);
+
+            db.insert(TBL_QUESTIONS, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+    }
+
+// insert user sessions into table for reports
+
+    public void insertUserSessionsForReports(JSONObject jsonObject, MyLearningModel learningModel) throws JSONException {
+
+        JSONArray jsonStudentResAry = null;
+        JSONArray jsonlearnerSessionAry = null;
+        JSONArray jsonCMIAry = null;
+        int noOfAttemptes = 0;
+
+
+        if (jsonObject.has("cmi")) {
+            jsonCMIAry = jsonObject.getJSONArray("cmi");
+        }
+
+        if (jsonObject.has("learnersession")) {
+            jsonlearnerSessionAry = jsonObject.getJSONArray("learnersession");
+        }
+
+        if (jsonObject.has("studentresponse")) {
+            jsonStudentResAry = jsonObject.getJSONArray("studentresponse");
+        }
+
+
+        if (jsonCMIAry.length() > 0) {
+//                ejectRecordsinTrackObjDb(learningModel);
+
+            for (int i = 0; i < jsonCMIAry.length(); i++) {
+                JSONObject jsoCmiObj = jsonCMIAry.getJSONObject(i);
+                Log.d(TAG, "jsoCmiObj: " + jsoCmiObj);
+                String statusCoreStatus = "";
+                if (jsoCmiObj.has("corelessonstatus")) {
+
+                    statusCoreStatus = jsoCmiObj.getString("corelessonstatus");
+                }
+                CMIModel cmiModel = new CMIModel();
+
+                if (isValidString(statusCoreStatus)) {
+
+                    cmiModel.set_status(statusCoreStatus);
+
+                    if (jsoCmiObj.has("statusdisplayname")) {
+
+                        cmiModel.set_status(jsoCmiObj.getString("statusdisplayname"));
+                    }
+                    if (jsoCmiObj.has("scoid")) {
+
+                        cmiModel.set_scoId(jsoCmiObj.getInt("scoid"));
+                    }
+
+                    if (jsoCmiObj.has("corelessonlocation")) {
+
+                        cmiModel.set_location(jsoCmiObj.getString("corelessonlocation"));
+                    }
+
+                    if (jsoCmiObj.has("totalsessiontime")) {
+
+                        cmiModel.set_timespent(jsoCmiObj.getString("totalsessiontime"));
+                    }
+                    if (jsoCmiObj.has("scoreraw")) {
+
+                        String scoreraw = jsoCmiObj.getString("scoreraw");
+                        if (isValidString(scoreraw)) {
+                            cmiModel.set_score(scoreraw);
+                        } else {
+                            cmiModel.set_score("0");
+
+                        }
+                    }
+                    if (jsoCmiObj.has("sequencenumber")) {
+
+                        cmiModel.set_seqNum(jsoCmiObj.getString("sequencenumber"));
+                    }
+                    if (jsoCmiObj.has("corelessonmode")) {
+
+                        cmiModel.set_coursemode(jsoCmiObj.getString("corelessonmode"));
+                    }
+                    if (jsoCmiObj.has("scoremin")) {
+
+                        cmiModel.set_scoremin(jsoCmiObj.getString("scoremin"));
+                    }
+                    if (jsoCmiObj.has("scoremax")) {
+
+                        cmiModel.set_scoremax(jsoCmiObj.getString("scoremax"));
+                    }
+                    if (jsoCmiObj.has("startdate")) {
+
+                        cmiModel.set_datecompleted(jsoCmiObj.getString("startdate"));
+
+                        String formattedDate = formatDate(jsoCmiObj.get("startdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                        cmiModel.set_startdate(formattedDate);
+
+
+                    }
+
+                    if (jsoCmiObj.has("datecompleted")) {
+
+                        cmiModel.set_datecompleted(jsoCmiObj.getString("datecompleted"));
+
+                        String formattedDate = formatDate(jsoCmiObj.get("datecompleted").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                        cmiModel.set_datecompleted(formattedDate);
+
+
+                    }
+                    if (jsoCmiObj.has("suspenddata")) {
+
+                        cmiModel.set_suspenddata(jsoCmiObj.getString("suspenddata"));
+                    }
+
+                    if (jsoCmiObj.has("textresponses")) {
+
+                        cmiModel.set_textResponses(jsoCmiObj.getString("textresponses"));
+                    }
+                    cmiModel.set_isupdate("true");
+                    cmiModel.set_sitrurl(learningModel.getSiteURL());
+                    cmiModel.set_siteId(learningModel.getSiteID());
+
+                    if (jsoCmiObj.has("userid")) {
+
+                        cmiModel.set_userId(jsoCmiObj.getInt("userid"));
+                    }
+                    if (jsoCmiObj.has("noofattempts")) {
+
+
+                        String numberStr = jsoCmiObj.getString("noofattempts");
+
+                        if (isValidString(numberStr)) {
+                            cmiModel.set_noofattempts(jsoCmiObj.getInt("noofattempts"));
+                            noOfAttemptes = cmiModel.get_noofattempts();
+                        } else {
+                            cmiModel.set_noofattempts(0);
+                        }
+
+                    }
+
+                    insertCMI(cmiModel, true);
+
+                }
+
+            }
+        }
+
+
+//        if (jsonlearnerSessionAry.length() > 0) { this one need to be updated
+//
+//            if (noOfAttemptes>0){
+//                for (int i = 0; i < jsonlearnerSessionAry.length(); i++) {
+//                    JSONObject jsonSessionObj = jsonlearnerSessionAry.getJSONObject(i);
+//                    Log.d(TAG, "jsonSessionObj: " + jsonSessionObj);
+//
+//                    String questionID = "";
+//                    String quesName = "";
+//                    String scoid = "";
+//
+//                    if (jsonSessionObj.has("questionid")) {
+//
+//                        questionID = jsonSessionObj.getString("questionid");
+//                        ejectRecordsinQestionDb(learningModel, questionID);
+//                    }
+//
+//                    if (isValidString(questionID)) {
+//
+//                        if (jsonSessionObj.has("scoid")) {
+//
+//                            scoid = jsonSessionObj.getString("scoid");
+//                        }
+//
+//                        if (jsonSessionObj.has("description")) {
+//
+//                            quesName = jsonSessionObj.getString("description");
+//                        }
+//                    }
+//
+//                        }
+//                    }
+//
+//
+//        }
+
+        if (jsonStudentResAry.length() > 0) {
+//                ejectRecordsinTrackObjDb(learningModel);
+
+            for (int i = 0; i < jsonStudentResAry.length(); i++) {
+                JSONObject jsoCmiObj = jsonStudentResAry.getJSONObject(i);
+                Log.d(TAG, "jsoCmiObj: " + jsoCmiObj);
+                int assessmentAttempt = 0;
+                if (jsoCmiObj.has("assessmentattempt")) {
+
+                    assessmentAttempt = jsoCmiObj.getInt("assessmentattempt");
+                }
+                StudentResponseModel studentResponseModel = new StudentResponseModel();
+
+                if (assessmentAttempt > 0) {
+
+                    studentResponseModel.set_assessmentattempt(assessmentAttempt);
+
+                    if (jsoCmiObj.has("studentresponses")) {
+
+                        studentResponseModel.set_studentresponses(jsoCmiObj.getString("studentresponses"));
+                    }
+                    if (jsoCmiObj.has("scoid")) {
+
+                        studentResponseModel.set_scoId(jsoCmiObj.getInt("scoid"));
+                    }
+
+                    if (jsoCmiObj.has("questionid")) {
+
+                        studentResponseModel.set_questionid(jsoCmiObj.getInt("questionid"));
+                    }
+                    studentResponseModel.set_siteId(learningModel.getSiteID());
+                    studentResponseModel.set_userId(Integer.parseInt(learningModel.getUserID()));
+
+
+                    if (jsoCmiObj.has("index")) {
+
+                        studentResponseModel.set_rindex(jsoCmiObj.getInt("index"));
+                    }
+                    if (jsoCmiObj.has("result")) {
+
+                        String scoreraw = jsoCmiObj.getString("result");
+                        if (isValidString(scoreraw)) {
+                            studentResponseModel.set_result(scoreraw);
+                        } else {
+                            studentResponseModel.set_result("");
+
+                        }
+                    }
+                    if (jsoCmiObj.has("questionattempt")) {
+
+                        studentResponseModel.set_questionid(jsoCmiObj.getInt("questionattempt"));
+                    }
+                    if (jsoCmiObj.has("attemptdate")) {
+
+
+                        String formattedDate = formatDate(jsoCmiObj.get("attemptdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                        studentResponseModel.set_attemptdate(formattedDate);
+
+                    }
+                    if (jsoCmiObj.has("attachfilename")) {
+
+                        studentResponseModel.set_attachfilename(jsoCmiObj.getString("attachfilename"));
+                    }
+                    if (jsoCmiObj.has("attachfileid")) {
+
+                        studentResponseModel.set_attachfileid(jsoCmiObj.getString("attachfileid"));
+                    }
+                    if (jsoCmiObj.has("optionalnotes")) {
+
+                        studentResponseModel.set_optionalNotes(jsoCmiObj.getString("optionalnotes"));
+                    }
+
+                    if (jsoCmiObj.has("capturedvidfilename")) {
+
+                        studentResponseModel.set_capturedVidFileName(jsoCmiObj.getString("capturedvidfilename"));
+                    }
+                    if (jsoCmiObj.has("capturedvidid")) {
+
+                        studentResponseModel.set_capturedVidId(jsoCmiObj.getString("capturedvidid"));
+                    }
+
+                    if (jsoCmiObj.has("capturedimgfilename")) {
+
+                        studentResponseModel.set_capturedImgFileName(jsoCmiObj.getString("capturedimgfilename"));
+                    }
+
+                    if (jsoCmiObj.has("capturedimgid")) {
+
+                        studentResponseModel.set_capturedImgId(jsoCmiObj.getString("capturedimgid"));
+                    }
+
+                    insertStudentResponses(studentResponseModel);
+
+                }
+
+            }
+        }
+
+    }
+
+
+    public void updateCMIData(CMIModel cmiModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (cmiModel.get_datecompleted().equalsIgnoreCase("")) {
+
+            try {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET location = '" + cmiModel.get_location() + "',status = '"
+                        + cmiModel.get_status() + "',suspenddata='" + cmiModel.get_suspenddata() + "',isupdate='" + cmiModel.get_isupdate() + "',score='" + cmiModel.get_score() + "',noofattempts='" + cmiModel.get_noofattempts() + "',sequenceNumber='" + cmiModel.get_seqNum() + "',timespent='" + cmiModel.get_timespent()
+                        + "' WHERE siteid ='"
+                        + cmiModel.get_siteId() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + cmiModel.get_scoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + cmiModel.get_userId() + "'";
+                db.execSQL(strUpdate);
+            } catch (SQLiteException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+
+            try {
+                String strUpdate = "UPDATE " + TBL_CMI + " SET location = '" + cmiModel.get_location() + "',status = '"
+                        + cmiModel.get_status() + "', suspenddata = '" + cmiModel.get_suspenddata() + "', isupdate= '" + cmiModel.get_isupdate() + "', dateCompleted= '" + cmiModel.get_datecompleted() + "', score= '" + cmiModel.get_score() + "',noofattempts='" + cmiModel.get_noofattempts() + "', sequenceNumber='" + cmiModel.get_seqNum() + "',timespent='" + cmiModel.get_timespent()
+                        + "' WHERE siteid ='"
+                        + cmiModel.get_siteId() + "'"
+                        + " AND " + " scoid=" + "'"
+                        + cmiModel.get_scoId() + "'" + " AND "
+                        + " userid=" + "'"
+                        + cmiModel.get_userId() + "'";
+                db.execSQL(strUpdate);
+            } catch (SQLiteException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+
+    public List<ReportDetailsForQuestions> fetchReportOfQuestions(MyLearningModel learningModel) {
+        List<ReportDetailsForQuestions> reportDetailList = null;
+        ReportDetailsForQuestions reportDetail = new ReportDetailsForQuestions();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuerys = "SELECT sr.questionid, q.quesname, sr.quesresult  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + appUserModel.getSiteIDValue() + " ORDER by sr.questionid";
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                reportDetailList = new ArrayList<ReportDetailsForQuestions>();
+                do {
+
+                    reportDetail = new ReportDetailsForQuestions();
+
+                    reportDetail.questionID = cursor.getInt(cursor
+                            .getColumnIndex("questionid"));
+
+                    reportDetail.questionName = cursor.getString(cursor
+                            .getColumnIndex("quesname"));
+
+                    reportDetail.questionAnswer = cursor.getString(cursor
+                            .getColumnIndex("quesresult"));
+
+                    reportDetailList.add(reportDetail);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return reportDetailList;
+    }
+
+    public ReportDetail getReportForContent(MyLearningModel learningModel, boolean isRelatedContent) {
+
+        ReportDetail reportDetail = new ReportDetail();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (!isRelatedContent) {
+
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+
+            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+
+            try {
+                Cursor cursor = null;
+                cursor = db.rawQuery(strSelQuerys, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    do {
+
+                        reportDetail = new ReportDetail();
+
+                        reportDetail.dateCompleted = cursor.getString(cursor
+                                .getColumnIndex("datecompleted"));
+
+                        reportDetail.dateStarted = cursor.getString(cursor
+                                .getColumnIndex("startdate"));
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.timeSpent = cursor.getString(cursor
+                                .getColumnIndex("timespent"));
+
+                        reportDetail.score = cursor.getString(cursor
+                                .getColumnIndex("score"));
+
+                        reportDetail.courseName = cursor.getString(cursor
+                                .getColumnIndex("coursename"));
+
+                        reportDetail.status = cursor.getString(cursor
+                                .getColumnIndex("ObjStatus"));
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (db.isOpen()) {
+                    db.close();
+                }
+                Log.d("fetchmylearningfrom db",
+                        e.getMessage() != null ? e.getMessage()
+                                : "Error getting menus");
+
+            }
+
+        } else if (isRelatedContent) {
+
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_RELATEDCONTENTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+
+            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+
+            try {
+                Cursor cursor = null;
+                cursor = db.rawQuery(strSelQuerys, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    do {
+
+                        reportDetail = new ReportDetail();
+
+                        reportDetail.dateCompleted = cursor.getString(cursor
+                                .getColumnIndex("datecompleted"));
+
+                        reportDetail.dateStarted = cursor.getString(cursor
+                                .getColumnIndex("startdate"));
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.timeSpent = cursor.getString(cursor
+                                .getColumnIndex("timespent"));
+
+                        reportDetail.score = cursor.getString(cursor
+                                .getColumnIndex("score"));
+
+                        reportDetail.courseName = cursor.getString(cursor
+                                .getColumnIndex("coursename"));
+
+                        reportDetail.status = cursor.getString(cursor
+                                .getColumnIndex("ObjStatus"));
+
+                        reportDetail.isListView = cursor.getString(cursor
+                                .getColumnIndex("islistview"));
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (db.isOpen()) {
+                    db.close();
+                }
+                Log.d("fetchmylearningfrom db",
+                        e.getMessage() != null ? e.getMessage()
+                                : "Error getting menus");
+
+            }
+
+
+        } else {
+
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+
+            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+
+            try {
+                Cursor cursor = null;
+                cursor = db.rawQuery(strSelQuerys, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    do {
+
+                        reportDetail = new ReportDetail();
+
+                        reportDetail.dateCompleted = cursor.getString(cursor
+                                .getColumnIndex("datecompleted"));
+
+                        reportDetail.dateStarted = cursor.getString(cursor
+                                .getColumnIndex("startdate"));
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.timeSpent = cursor.getString(cursor
+                                .getColumnIndex("timespent"));
+
+                        reportDetail.score = cursor.getString(cursor
+                                .getColumnIndex("score"));
+
+                        reportDetail.courseName = cursor.getString(cursor
+                                .getColumnIndex("coursename"));
+
+                        reportDetail.status = cursor.getString(cursor
+                                .getColumnIndex("ObjStatus"));
+
+                        reportDetail.isListView = cursor.getString(cursor
+                                .getColumnIndex("islistview"));
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (db.isOpen()) {
+                    db.close();
+                }
+                Log.d("fetchmylearningfrom db",
+                        e.getMessage() != null ? e.getMessage()
+                                : "Error getting menus");
+
+            }
+
+
+        }
+
+        return reportDetail;
+    }
+
+    public ReportDetail getReportTrack(MyLearningModel learningModel) {
+
+        boolean istrackList = false;
+        if (!learningModel.getIsListView().equalsIgnoreCase("true")) {
+            istrackList = true;
+        } else {
+            istrackList = false;
+        }
+
+        ReportDetail reportDetail = new ReportDetail();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (istrackList) {
+
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename,d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+
+            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+
+            try {
+                Cursor cursor = null;
+                cursor = db.rawQuery(strSelQuerys, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    do {
+
+                        reportDetail = new ReportDetail();
+
+                        reportDetail.dateCompleted = cursor.getString(cursor
+                                .getColumnIndex("datecompleted"));
+
+                        reportDetail.dateStarted = cursor.getString(cursor
+                                .getColumnIndex("startdate"));
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.timeSpent = cursor.getString(cursor
+                                .getColumnIndex("timespent"));
+
+                        reportDetail.score = cursor.getString(cursor
+                                .getColumnIndex("score"));
+
+                        reportDetail.courseName = cursor.getString(cursor
+                                .getColumnIndex("coursename"));
+
+                        reportDetail.status = cursor.getString(cursor
+                                .getColumnIndex("ObjStatus"));
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (db.isOpen()) {
+                    db.close();
+                }
+                Log.d("fetchmylearningfrom db",
+                        e.getMessage() != null ? e.getMessage()
+                                : "Error getting menus");
+
+            }
+
+        } else {
+
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+
+            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+
+            try {
+                Cursor cursor = null;
+                cursor = db.rawQuery(strSelQuerys, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    do {
+
+                        reportDetail = new ReportDetail();
+
+                        reportDetail.dateCompleted = cursor.getString(cursor
+                                .getColumnIndex("datecompleted"));
+
+                        reportDetail.dateStarted = cursor.getString(cursor
+                                .getColumnIndex("startdate"));
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.timeSpent = cursor.getString(cursor
+                                .getColumnIndex("timespent"));
+
+                        reportDetail.score = cursor.getString(cursor
+                                .getColumnIndex("score"));
+
+                        reportDetail.courseName = cursor.getString(cursor
+                                .getColumnIndex("coursename"));
+
+                        reportDetail.status = cursor.getString(cursor
+                                .getColumnIndex("ObjStatus"));
+
+                        reportDetail.isListView = cursor.getString(cursor
+                                .getColumnIndex("islistview"));
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (db.isOpen()) {
+                    db.close();
+                }
+                Log.d("fetchmylearningfrom db",
+                        e.getMessage() != null ? e.getMessage()
+                                : "Error getting menus");
+
+            }
+
+
+        }
+
+        return reportDetail;
+    }
+
+    public List<ReportDetail> getReportForTrackListItems(MyLearningModel learningModel) {
+        List<ReportDetail> reportDetailList = null;
+        ReportDetail reportDetail = new ReportDetail();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuerys = "SELECT distinct C.datecompleted, C.status, C.score, C.startdate,T.objecttypeid,C.timespent,T.name  from  " + TBL_TRACKOBJECTS + " T left outer join " + TBL_CMI + " C On C.scoid =T.scoid AND C.userid = T.userid AND C.siteid = T.siteid WHERE T.trackscoid = " + learningModel.getScoId() + " AND T.userid = " + learningModel.getUserID() + " AND T.siteid =  " + appUserModel.getSiteIDValue() + " ORDER BY T.sequencenumber";
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                reportDetailList = new ArrayList<ReportDetail>();
+                do {
+
+                    reportDetail = new ReportDetail();
+
+                    reportDetail.dateCompleted = cursor.getString(cursor
+                            .getColumnIndex("datecompleted"));
+
+                    reportDetail.dateStarted = cursor.getString(cursor
+                            .getColumnIndex("startdate"));
+
+                    reportDetail.status = cursor.getString(cursor
+                            .getColumnIndex("status"));
+
+                    reportDetail.objectTypeID = cursor.getString(cursor
+                            .getColumnIndex("objecttypeid"));
+
+                    reportDetail.timeSpent = cursor.getString(cursor
+                            .getColumnIndex("timespent"));
+
+                    reportDetail.status = cursor.getString(cursor
+                            .getColumnIndex("status"));
+
+                    reportDetail.courseName = cursor.getString(cursor
+                            .getColumnIndex("name"));
+
+                    reportDetail.score = cursor.getString(cursor
+                            .getColumnIndex("score"));
+
+
+                    reportDetailList.add(reportDetail);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return reportDetailList;
     }
 
 

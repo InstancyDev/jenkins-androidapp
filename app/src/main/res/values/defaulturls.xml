@@ -18,8 +18,8 @@
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
-    <!--<string name="app_default_url">http://mobileapp.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
+    <string name="app_default_url">http://mobileapp.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
 
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
@@ -83,8 +83,8 @@
     <!--<string name="app_default_url">http://qa-newui.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-    <string name="app_default_url">http://qamci.instancysoft.com/</string>
-    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
+    <!--<string name="app_default_url">http://qamci.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
     <!--<string name="app_default_url">http://learntoflyair.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->

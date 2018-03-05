@@ -34,7 +34,7 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
         android:padding="8dp"
-        android:scrollbars="none"></ListView>
+        android:scrollbars="none"> </ListView>
 
 
 </RelativeLayout>
