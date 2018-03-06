@@ -206,7 +206,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         return isCompleted;
     }
 
-
     public void executeXmlWorkFlowFile() {
 
         downloadXmlAsynchTask = new DownloadXmlAsynchTask(context, isTraxkList, myLearningModel, appUserModel.getSiteURL());

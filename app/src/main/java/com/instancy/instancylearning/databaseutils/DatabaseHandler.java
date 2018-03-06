@@ -79,6 +79,7 @@ import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -1969,6 +1970,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
 
+                String scoreraw = jsonMyLearningColumnObj.getString("durationenddate");
+                if (isValidString(scoreraw)) {
+                    myLearningModel.setDurationEndDate(scoreraw); // upendranath
+
+//                    myLearningModel.setIsExpiry("false");
+                    boolean isCompleted = false;
+                    isCompleted = isCourseEndDateCompleted(scoreraw);
+
+                    if (isCompleted) {
+                        myLearningModel.setIsExpiry("true");
+                    } else {
+                        myLearningModel.setIsExpiry("false");
+                    }
+
+                } else {
+                    myLearningModel.setDurationEndDate("");
+                    myLearningModel.setIsExpiry("false");
+                }
+
             }
             // objectID
             if (jsonMyLearningColumnObj.has("objectid")) {
@@ -2165,7 +2185,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                }
 //            }
                 // isExpiry
-                myLearningModel.setIsExpiry("false");
+
 //            if (jsonMyLearningColumnObj.has("startdate")) {
 //
 //                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
@@ -13950,11 +13970,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (isValidString(statusCoreStatus)) {
 
                     cmiModel.set_status(statusCoreStatus);
-
                     if (jsoCmiObj.has("statusdisplayname")) {
 
                         cmiModel.set_status(jsoCmiObj.getString("statusdisplayname"));
                     }
+
                     if (jsoCmiObj.has("scoid")) {
 
                         cmiModel.set_scoId(jsoCmiObj.getInt("scoid"));
@@ -13962,12 +13982,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (jsoCmiObj.has("corelessonlocation")) {
 
-                        cmiModel.set_location(jsoCmiObj.getString("corelessonlocation"));
+                        String someString = jsoCmiObj.getString("corelessonlocation");
+
+                        if (isValidString(someString)) {
+                            cmiModel.set_location(someString);
+                        } else {
+                            cmiModel.set_location("");
+                        }
+
                     }
 
                     if (jsoCmiObj.has("totalsessiontime")) {
 
                         cmiModel.set_timespent(jsoCmiObj.getString("totalsessiontime"));
+
+                        String scoreraw = jsoCmiObj.getString("totalsessiontime");
+                        if (isValidString(scoreraw)) {
+                            cmiModel.set_timespent(scoreraw);
+                        } else {
+                            cmiModel.set_timespent("00:00:00");
+
+                        }
+
                     }
                     if (jsoCmiObj.has("scoreraw")) {
 
@@ -13997,61 +14033,69 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                     if (jsoCmiObj.has("startdate")) {
 
-                        cmiModel.set_datecompleted(jsoCmiObj.getString("startdate"));
 
                         String formattedDate = formatDate(jsoCmiObj.get("startdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
-                        cmiModel.set_startdate(formattedDate);
 
+                        if (isValidString(formattedDate)) {
+                            cmiModel.set_startdate(formattedDate);
+                        } else {
+                            cmiModel.set_startdate("");
+
+                        }
 
                     }
 
                     if (jsoCmiObj.has("datecompleted")) {
 
-                        cmiModel.set_datecompleted(jsoCmiObj.getString("datecompleted"));
 
                         String formattedDate = formatDate(jsoCmiObj.get("datecompleted").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
-                        cmiModel.set_datecompleted(formattedDate);
 
-
-                    }
-                    if (jsoCmiObj.has("suspenddata")) {
-
-                        cmiModel.set_suspenddata(jsoCmiObj.getString("suspenddata"));
-                    }
-
-                    if (jsoCmiObj.has("textresponses")) {
-
-                        cmiModel.set_textResponses(jsoCmiObj.getString("textresponses"));
-                    }
-                    cmiModel.set_isupdate("true");
-                    cmiModel.set_sitrurl(learningModel.getSiteURL());
-                    cmiModel.set_siteId(learningModel.getSiteID());
-
-                    if (jsoCmiObj.has("userid")) {
-
-                        cmiModel.set_userId(jsoCmiObj.getInt("userid"));
-                    }
-                    if (jsoCmiObj.has("noofattempts")) {
-
-
-                        String numberStr = jsoCmiObj.getString("noofattempts");
-
-                        if (isValidString(numberStr)) {
-                            cmiModel.set_noofattempts(jsoCmiObj.getInt("noofattempts"));
-                            noOfAttemptes = cmiModel.get_noofattempts();
-                        } else {
-                            cmiModel.set_noofattempts(0);
-                        }
+                        if (isValidString(formattedDate))
+                            cmiModel.set_datecompleted(formattedDate);
+                    } else {
+                        cmiModel.set_datecompleted("");
 
                     }
 
-                    insertCMI(cmiModel, true);
+
+                }
+                if (jsoCmiObj.has("suspenddata")) {
+
+                    cmiModel.set_suspenddata(jsoCmiObj.getString("suspenddata"));
+                }
+
+                if (jsoCmiObj.has("textresponses")) {
+
+                    cmiModel.set_textResponses(jsoCmiObj.getString("textresponses"));
+                }
+                cmiModel.set_isupdate("true");
+                cmiModel.set_sitrurl(learningModel.getSiteURL());
+                cmiModel.set_siteId(learningModel.getSiteID());
+
+                if (jsoCmiObj.has("userid")) {
+
+                    cmiModel.set_userId(jsoCmiObj.getInt("userid"));
+                }
+                if (jsoCmiObj.has("noofattempts")) {
+
+
+                    String numberStr = jsoCmiObj.getString("noofattempts");
+
+                    if (isValidString(numberStr)) {
+                        cmiModel.set_noofattempts(jsoCmiObj.getInt("noofattempts"));
+                        noOfAttemptes = cmiModel.get_noofattempts();
+                    } else {
+                        cmiModel.set_noofattempts(0);
+                    }
 
                 }
 
+                insertCMI(cmiModel, true);
+
             }
+
         }
 
 
@@ -14150,6 +14194,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         studentResponseModel.set_attemptdate(formattedDate);
 
+
                     }
                     if (jsoCmiObj.has("attachfilename")) {
 
@@ -14236,7 +14281,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ReportDetailsForQuestions reportDetail = new ReportDetailsForQuestions();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuerys = "SELECT sr.questionid, q.quesname, sr.quesresult  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + appUserModel.getSiteIDValue() + " ORDER by sr.questionid";
+        String strSelQuerys = "SELECT distinct sr.questionid, q.quesname, sr.result  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + appUserModel.getSiteIDValue() + " ORDER by sr.questionid";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
         try {
@@ -14256,7 +14301,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("quesname"));
 
                     reportDetail.questionAnswer = cursor.getString(cursor
-                            .getColumnIndex("quesresult"));
+                            .getColumnIndex("result"));
 
                     reportDetailList.add(reportDetail);
                 } while (cursor.moveToNext());
@@ -14281,67 +14326,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         ReportDetail reportDetail = new ReportDetail();
         SQLiteDatabase db = this.getWritableDatabase();
+        String pageTypeContent = "";
 
-        if (!isRelatedContent) {
+        if (isRelatedContent) {
+            pageTypeContent = "event";
+        } else {
+            pageTypeContent = "track";
+        }
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+        if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {
+            pageTypeContent = "";
+        }
+        if (pageTypeContent.equalsIgnoreCase("event")) {
 
-            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
-
-            try {
-                Cursor cursor = null;
-                cursor = db.rawQuery(strSelQuerys, null);
-
-                if (cursor != null && cursor.moveToFirst()) {
-
-                    do {
-
-                        reportDetail = new ReportDetail();
-
-                        reportDetail.dateCompleted = cursor.getString(cursor
-                                .getColumnIndex("datecompleted"));
-
-                        reportDetail.dateStarted = cursor.getString(cursor
-                                .getColumnIndex("startdate"));
-
-                        reportDetail.objectTypeID = cursor.getString(cursor
-                                .getColumnIndex("objecttypeid"));
-
-
-                        reportDetail.objectTypeID = cursor.getString(cursor
-                                .getColumnIndex("objecttypeid"));
-
-
-                        reportDetail.timeSpent = cursor.getString(cursor
-                                .getColumnIndex("timespent"));
-
-                        reportDetail.score = cursor.getString(cursor
-                                .getColumnIndex("score"));
-
-                        reportDetail.courseName = cursor.getString(cursor
-                                .getColumnIndex("coursename"));
-
-                        reportDetail.status = cursor.getString(cursor
-                                .getColumnIndex("ObjStatus"));
-
-                    } while (cursor.moveToNext());
-                }
-                cursor.close();
-                db.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (db.isOpen()) {
-                    db.close();
-                }
-                Log.d("fetchmylearningfrom db",
-                        e.getMessage() != null ? e.getMessage()
-                                : "Error getting menus");
-
-            }
-
-        } else if (isRelatedContent) {
-
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_RELATEDCONTENTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_RELATEDCONTENTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -14396,9 +14394,66 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
 
+        } else if (pageTypeContent.equalsIgnoreCase("track")) {
+
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+
+            Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+
+            try {
+                Cursor cursor = null;
+                cursor = db.rawQuery(strSelQuerys, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    do {
+
+                        reportDetail = new ReportDetail();
+
+                        reportDetail.dateCompleted = cursor.getString(cursor
+                                .getColumnIndex("datecompleted"));
+
+                        reportDetail.dateStarted = cursor.getString(cursor
+                                .getColumnIndex("startdate"));
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.objectTypeID = cursor.getString(cursor
+                                .getColumnIndex("objecttypeid"));
+
+
+                        reportDetail.timeSpent = cursor.getString(cursor
+                                .getColumnIndex("timespent"));
+
+                        reportDetail.score = cursor.getString(cursor
+                                .getColumnIndex("score"));
+
+                        reportDetail.courseName = cursor.getString(cursor
+                                .getColumnIndex("coursename"));
+
+                        reportDetail.status = cursor.getString(cursor
+                                .getColumnIndex("ObjStatus"));
+
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+                db.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (db.isOpen()) {
+                    db.close();
+                }
+                Log.d("fetchmylearningfrom db",
+                        e.getMessage() != null ? e.getMessage()
+                                : "Error getting menus");
+
+            }
+
         } else {
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -14472,7 +14527,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (istrackList) {
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename,d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -14529,7 +14584,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         } else {
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, c.timespent, c.score, d.coursename, d.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -14647,7 +14702,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             : "Error getting menus");
 
         }
-
         return reportDetailList;
     }
 

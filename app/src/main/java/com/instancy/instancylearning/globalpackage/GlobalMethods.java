@@ -801,7 +801,7 @@ public class GlobalMethods {
         menu.getItem(1).setVisible(false);
         menu.getItem(3).setVisible(false);
         menu.getItem(4).setVisible(false);
-        menu.getItem(5).setVisible(false);
+        menu.getItem(5).setVisible(false);// reports
         menu.getItem(6).setVisible(false);
         menu.getItem(7).setVisible(false);
         menu.getItem(8).setVisible(false); // related content
@@ -843,6 +843,7 @@ public class GlobalMethods {
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
+                menu.getItem(5).setVisible(true);
             }
 
             if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
@@ -863,8 +864,8 @@ public class GlobalMethods {
 
         } else {
             menu.getItem(2).setVisible(true);
-//            menu.getItem(5).setVisible(true);  uncomment for report
-            menu.getItem(5).setVisible(false);
+            menu.getItem(5).setVisible(true); // uncomment for report
+//
             menu.getItem(1).setVisible(true);
         }
 

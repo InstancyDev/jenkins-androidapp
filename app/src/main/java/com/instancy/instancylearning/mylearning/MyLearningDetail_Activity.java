@@ -476,7 +476,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 Drawable calendarImg = getButtonDrawable(R.string.fa_icon_plus, this, uiSettingsModel.getAppHeaderTextColor());
-                Drawable reportImg = getButtonDrawable(R.string.fa_icon_filter, this, uiSettingsModel.getAppHeaderTextColor());
+
 
                 if (myLearningModel.getAddedToMylearning() == 1) {
                     buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));

@@ -33,6 +33,7 @@ import com.instancy.instancylearning.BuildConfig;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
+import com.instancy.instancylearning.models.MyLearningModel;
 
 import org.json.JSONObject;
 
@@ -957,6 +958,23 @@ public class Utilities {
         Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
 
         return d;
+    }
+
+    public static boolean isCourseEndDateCompleted(String endDate) {
+
+        boolean isCompleted = true;
+
+        Date strDate = ConvertToDate(endDate);
+
+        if (new Date().after(strDate)) {
+// today is after date 2
+            isCompleted = true;
+
+        } else {
+            isCompleted = false;
+        }
+
+        return isCompleted;
     }
 
 

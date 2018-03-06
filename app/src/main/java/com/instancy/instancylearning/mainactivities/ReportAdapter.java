@@ -2,6 +2,7 @@ package com.instancy.instancylearning.mainactivities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.ReportDetail;
+import com.instancy.instancylearning.models.ReportDetailsForQuestions;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
@@ -35,6 +37,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
+
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
  */
@@ -46,39 +50,50 @@ public class ReportAdapter extends BaseAdapter {
     private List<ReportDetail> reportDetailList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
-
+    List<ReportDetailsForQuestions> reportDetailsForQuestionsList;
 
     private String TAG = ReportAdapter.class.getSimpleName();
 
     private List<ReportDetail> searchList;
+    boolean isAssesment = false;
 
-
-    public ReportAdapter(Activity activity, int resource, List<ReportDetail> reportDetailList ) {
+    public ReportAdapter(Activity activity, int resource, List<ReportDetail> reportDetailList, List<ReportDetailsForQuestions> reportDetailsForQuestionsList, boolean isAssesment) {
         this.activity = activity;
+        this.reportDetailsForQuestionsList = reportDetailsForQuestionsList;
         this.reportDetailList = reportDetailList;
         this.searchList = new ArrayList<ReportDetail>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
-
-
+        this.isAssesment = isAssesment;
     }
 
-    public void refreshList(List<ReportDetail> reportDetailList) {
+    public void refreshList(List<ReportDetail> reportDetailList, List<ReportDetailsForQuestions> reportDetailsForQuestionsList, boolean isAssesment) {
         this.reportDetailList = reportDetailList;
+        this.reportDetailsForQuestionsList = reportDetailsForQuestionsList;
         this.searchList = new ArrayList<ReportDetail>();
         this.searchList.addAll(reportDetailList);
+        this.isAssesment = isAssesment;
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return reportDetailList != null ? reportDetailList.size() : 0;
+        if (isAssesment) {
+            return reportDetailsForQuestionsList != null ? reportDetailsForQuestionsList.size() : 0;
+        } else {
+            return reportDetailList != null ? reportDetailList.size() : 0;
+        }
     }
 
     @Override
     public Object getItem(int position) {
-        return reportDetailList.get(position);
+        if (isAssesment) {
+            return reportDetailsForQuestionsList.get(position);
+        } else {
+            return reportDetailList.get(position);
+        }
+
     }
 
     @Override
@@ -100,20 +115,107 @@ public class ReportAdapter extends BaseAdapter {
 
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        holder.txtName.setText(reportDetailList.get(position).courseName);
-        holder.txtDateCompleted.setText("Date Completed:" + reportDetailList.get(position).dateCompleted);
-        holder.txtScore.setText("Score:" + reportDetailList.get(position).score + " ");
-        holder.txtStartDate.setText("Date Started :" + reportDetailList.get(position).dateStarted + " ");
-        holder.txtStatus.setText("Status:" + reportDetailList.get(position).status);
-        holder.txtTimeSpent.setText("Time Spent:" + reportDetailList.get(position).timeSpent);
+
+        if (isAssesment) {
+            holder.txtName.setText(reportDetailsForQuestionsList.get(position).questionID + ". " + reportDetailsForQuestionsList.get(position).questionName);
+            holder.txtDateCompleted.setText(" " + reportDetailsForQuestionsList.get(position).questionAnswer);
+
+            holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+            holder.txtDateCompleted.setTextSize(16);
+            holder.txtScore.setVisibility(View.GONE);
+            holder.txtStartDate.setVisibility(View.GONE);
+            holder.txtStatus.setVisibility(View.GONE);
+            holder.txtTimeSpent.setVisibility(View.GONE);
+            holder.txtStatusTitle.setVisibility(View.GONE);
+
+        } else {
+
+            holder.txtName.setText(reportDetailList.get(position).courseName);
+
+            String dateCompleted = reportDetailList.get(position).dateCompleted;
+
+            String status = reportDetailList.get(position).status;
+
+            String dateStarted = reportDetailList.get(position).dateCompleted;
+
+            if (isValidString(dateCompleted)) {
+                holder.txtDateCompleted.setText("Date Completed: " + dateCompleted);
+            } else {
+                holder.txtDateCompleted.setText("Date Completed: ");
+            }
+
+            if (isValidString(status)) {
+
+                holder.txtStatus.setText(status);
+            } else {
+                holder.txtStatus.setText("");
+            }
+
+            if (isValidString(dateStarted)) {
+
+                holder.txtStartDate.setText("Date Started: " + dateStarted + " ");
+            } else {
+                holder.txtStartDate.setText("Date Started: " + " ");
+            }
+
+
+            holder.txtScore.setText("Score: " + reportDetailList.get(position).score + " ");
+
+            holder.txtTimeSpent.setText("Time Spent: " + reportDetailList.get(position).timeSpent);
+
+            String statusFromModel = reportDetailList.get(position).status;
+
+            if (isValidString(statusFromModel)) {
+                if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+
+                } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusNotStarted));
+
+                } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusInProgress));
+
+                } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
+
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
+
+
+                } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
+
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
+
+
+                } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
+
+                } else if (statusFromModel.toLowerCase().contains("Expired")) {
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
+
+                } else {
+
+                    holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
+                }
+
+
+            } else {
+                holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
+            }
+        }
 
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtDateCompleted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtStartDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtTimeSpent.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+///   from here
 
 
         return convertView;
@@ -157,6 +259,10 @@ public class ReportAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.txt_score)
         TextView txtScore;
+
+        @Nullable
+        @BindView(R.id.txt_statustitle)
+        TextView txtStatusTitle;
 
 
     }

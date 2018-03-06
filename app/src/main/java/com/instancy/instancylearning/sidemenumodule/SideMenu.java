@@ -285,9 +285,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             if (menu.getContextMenuId().equals("10")) {
-                sendMessageLayout.setVisibility(View.VISIBLE);
-                signalAService = SignalAService.newInstance(this);
-                signalAService.startSignalA();
+//                sendMessageLayout.setVisibility(View.VISIBLE);
+//                signalAService = SignalAService.newInstance(this);
+//                signalAService.startSignalA();
             }
 
             i++;

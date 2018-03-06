@@ -69,6 +69,9 @@ public class Reports_Activity extends AppCompatActivity {
     ReportDetail reportDetail;
     List<ReportDetail> reportDetailList;
 
+
+    List<ReportDetailsForQuestions> reportDetailsForQuestionsArrayList;
+
     @Nullable
     @BindView(R.id.layout_relative)
     RelativeLayout relativeLayout;
@@ -107,6 +110,10 @@ public class Reports_Activity extends AppCompatActivity {
     @BindView(R.id.txt_score)
     TextView txtScore;
 
+    @Nullable
+    @BindView(R.id.nodata_label)
+    TextView nodataLabel;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,7 +132,9 @@ public class Reports_Activity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(context);
 
         reportDetailList = new ArrayList<>();
-        reportAdapter = new ReportAdapter(this, BIND_ABOVE_CLIENT, reportDetailList);
+        reportDetailsForQuestionsArrayList = new ArrayList<>();
+
+        reportAdapter = new ReportAdapter(this, BIND_ABOVE_CLIENT, reportDetailList, reportDetailsForQuestionsArrayList, false);
         reportsListview.setAdapter(reportAdapter);
 
         initVolleyCallback();
@@ -134,8 +143,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                learningModel.getCourseName() + "</font>"));
-
+                "Progress Report" + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -231,11 +239,15 @@ public class Reports_Activity extends AppCompatActivity {
         if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9") || learningModel.getObjecttypeId().equalsIgnoreCase("70") || learningModel.getObjecttypeId().equalsIgnoreCase("26")) {
 
             boolean isEvent = false;
+
             if (!learningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
                 isEvent = true;
+
             } else {
                 isEvent = false;
+
             }
+
             reportDetail = db.getReportForContent(learningModel, isEvent);
 
         } else if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
@@ -247,7 +259,9 @@ public class Reports_Activity extends AppCompatActivity {
 
             List<ReportDetailsForQuestions> reportDetailsForQuestionsArrayList = new ArrayList<>();
             reportDetailsForQuestionsArrayList = db.fetchReportOfQuestions(learningModel);
-
+            if (reportDetailsForQuestionsArrayList != null) {
+                reportAdapter.refreshList(reportDetailList, reportDetailsForQuestionsArrayList, true);
+            }
         }
 
         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
@@ -255,23 +269,68 @@ public class Reports_Activity extends AppCompatActivity {
             reportDetailList = db.getReportForTrackListItems(learningModel);
             if (reportDetailList.size() > 0) {
 
-                reportAdapter.refreshList(reportDetailList);
+                reportAdapter.refreshList(reportDetailList, reportDetailsForQuestionsArrayList, false);
             }
         }
 
-        if (reportDetail!=null){
+        if (reportDetail != null) {
             updateUI(reportDetail);
+
         }
     }
 
     public void updateUI(ReportDetail reportDetail) {
 
-        txtName.setText("" + reportDetail.courseName);
-        txtDateCompleted.setText("Date Completed:" + reportDetail.dateCompleted);
-        txtScore.setText("Score:" + reportDetail.score);
-        txtStartDate.setText("Date Started :" + reportDetail.dateStarted);
-        txtTimeSpent.setText("Time Status:" + reportDetail.timeSpent);
-        txtStatus.setText("Status:" + reportDetail.status);
+        txtName.setText(" " + learningModel.getCourseName());
+        txtDateCompleted.setText("Date Completed: " + reportDetail.dateCompleted);
+        txtScore.setText("Score: " + reportDetail.score);
+        txtStartDate.setText("Date Started  : " + reportDetail.dateStarted);
+        txtTimeSpent.setText("Time Spent: " + reportDetail.timeSpent);
+        txtStatus.setText(learningModel.getStatus());
+        nodataLabel.setText("");
+
+        txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
+//        txtStatus.setTextSize(12);
+
+
+        String statusFromModel = learningModel.getStatus();
+
+        if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
+
+        } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
+
+        } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
+
+        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
+
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+
+
+        } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
+
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
+
+
+        } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+
+        } else if (statusFromModel.toLowerCase().contains("Expired")) {
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+
+        } else {
+
+            txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
+        }
 
     }
 
