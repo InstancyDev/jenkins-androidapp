@@ -84,6 +84,26 @@ public class MyLearningModel implements Serializable {
     String trackScoid = "";
     String showStatus = "";
 
+// membership level
+    int memberShipLevel = 1;
+
+    public int getMemberShipLevel() {
+        return memberShipLevel;
+    }
+
+    public void setMemberShipLevel(int memberShipLevel) {
+        this.memberShipLevel = memberShipLevel;
+    }
+
+    public String getMembershipname() {
+        return membershipname;
+    }
+
+    public void setMembershipname(String membershipname) {
+        this.membershipname = membershipname;
+    }
+
+    String membershipname = "Free";
 
     public String getTrackOrRelatedContentID() {
         return trackOrRelatedContentID;

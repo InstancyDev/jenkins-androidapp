@@ -1154,7 +1154,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         if (response.contains("true")) {
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.event_cancelled))
+                            builder.setMessage(context.getString(R.string.mycatalog_enddurationdate))
                                     .setCancelable(false)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {

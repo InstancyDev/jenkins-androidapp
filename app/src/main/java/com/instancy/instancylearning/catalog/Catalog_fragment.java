@@ -132,6 +132,7 @@ import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
+import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -527,6 +528,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             intentDetail.putExtra("IFROMCATALOG", true);
             intentDetail.putExtra("myLearningDetalData", catalogModelsList.get(selectedPostion));
             startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+
+//            openDetailsPage(catalogModelsList.get(selectedPostion),false);
             isFromNotification = false;
         }
 
@@ -709,6 +712,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
                 catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
                 break;
+            case R.id.imagethumb:
+                openDetailsPage(catalogModelsList.get(position));
+                break;
             default:
 
         }
@@ -765,25 +771,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-    public boolean isMemberyExpry(String memberExpiryDate) {
-        boolean isCompleted = true;
-
-        if (memberExpiryDate.length()==0)
-            return isCompleted =true;
-
-        String endDate = memberExpiryDate;
-        Date strDate = ConvertToDate(endDate);
-
-        if (new Date().after(strDate)) {
-// today is after date 2
-            isCompleted = true;
-
-        } else {
-            isCompleted = false;
-        }
-
-        return isCompleted;
-    }
 
 
     public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
@@ -825,7 +812,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         } else {
             if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
-                menu.getItem(0).setVisible(false);
+
+                if (myLearningDetalData.getAddedToMylearning()==0){
+                    menu.getItem(0).setVisible(true);
+                }else {
+                    menu.getItem(0).setVisible(false);
+                }
                 menu.getItem(1).setVisible(true);
                 menu.getItem(2).setVisible(false);
                 menu.getItem(3).setVisible(true);
@@ -869,17 +861,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                    }
                 }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
-                boolean isMemberExpired=isMemberyExpry(membershipModel.expirydate);
-                if (isMemberExpired){
+                boolean isMemberExpired = isMemberyExpry(membershipModel.expirydate);
+                if (isMemberExpired) {
                     menu.getItem(0).setVisible(false);
                     menu.getItem(2).setVisible(true);
                     menu.getItem(3).setVisible(true);
                     menu.getItem(1).setVisible(false);
-                }
-                else {
+                } else {
+if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
+    menu.getItem(1).setVisible(true); //add
+
+}else {
+    menu.getItem(2).setVisible(true);// buy
+
+}
                     menu.getItem(0).setVisible(false);
-                    menu.getItem(1).setVisible(true);
-                    menu.getItem(2).setVisible(false);
                     menu.getItem(3).setVisible(true);
                 }
             }
@@ -889,13 +885,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onMenuItemClick(MenuItem item) {
 
                 if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+
+//                    openDetailsPage(myLearningDetalData);
+
+                    Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
                     intentDetail.putExtra("IFROMCATALOG", true);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-//                    v.getContext().startActivity(intentDetail);
-//                    v.getContext().startActivity(intentDetail);
-//                   context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+                    ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View")) {
@@ -904,6 +900,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
 //                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
@@ -1946,4 +1943,15 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
         REFRESH = 0;
     }
+
+    public void openDetailsPage(MyLearningModel learningModel){
+
+        if (learningModel.getViewType().equalsIgnoreCase("1") || learningModel.getViewType().equalsIgnoreCase("3")|| learningModel.getViewType().equalsIgnoreCase("2")) {
+            Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
+            intentDetail.putExtra("IFROMCATALOG", true);
+            intentDetail.putExtra("myLearningDetalData", learningModel);
+            ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+
+        }}
+
 }

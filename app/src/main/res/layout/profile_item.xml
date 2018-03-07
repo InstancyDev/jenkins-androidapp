@@ -14,7 +14,7 @@
         android:text="Name"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/colorBlack"
-        android:textSize="10sp" />
+        android:textSize="16sp" />
 
     <TextView
         android:padding="3dp"
@@ -26,5 +26,5 @@
         android:text="Upendra Nath Reddy"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="@color/colorBlack"
-        android:textSize="12sp" />
+        android:textSize="18sp" />
 </RelativeLayout>

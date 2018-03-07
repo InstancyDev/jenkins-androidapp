@@ -316,13 +316,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT)");
 
         //used upto here
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT)");
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERSESSION
@@ -1974,7 +1975,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (isValidString(scoreraw)) {
                     myLearningModel.setDurationEndDate(scoreraw); // upendranath
 
-//                    myLearningModel.setIsExpiry("false");
+                    myLearningModel.setIsExpiry("false");
                     boolean isCompleted = false;
                     isCompleted = isCourseEndDateCompleted(scoreraw);
 
@@ -1988,8 +1989,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setDurationEndDate("");
                     myLearningModel.setIsExpiry("false");
                 }
-
             }
+
+            myLearningModel.setIsExpiry("false");
             // objectID
             if (jsonMyLearningColumnObj.has("objectid")) {
 
@@ -2281,6 +2283,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
+                //membershipname
+                if (jsonMyLearningColumnObj.has("membershipname")) {
+
+                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
+
+                }
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("membershiplevel")) {
+
+                    myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
+
+                }
+
 //            injectIntoRowWise(myLearningModel);
                 injectMyLearningIntoTable(myLearningModel, false);
             }
@@ -2343,6 +2358,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("joinurl", myLearningModel.getJoinurl());
             contentValues.put("typeofevent", myLearningModel.getTypeofevent());
             contentValues.put("progress", myLearningModel.getProgress());
+            contentValues.put("membershiplevel", myLearningModel.getMemberShipLevel());
+            contentValues.put("membershipname", myLearningModel.getMembershipname());
+
 
             if (subscibed) {
 
@@ -2474,6 +2492,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("typeofevent")));
                     myLearningModel.setProgress(cursor.getString(cursor
                             .getColumnIndex("progress")));
+
+                    myLearningModel.setMemberShipLevel(cursor.getInt(cursor
+                            .getColumnIndex("membershiplevel")));
+                    myLearningModel.setMembershipname(cursor.getString(cursor
+                            .getColumnIndex("membershipname")));
+
+
                     myLearningModelList.add(myLearningModel);
 
                 } while (cursor.moveToNext());
@@ -2886,6 +2911,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setAddedToMylearning(Integer.parseInt(jsonMyLearningColumnObj.get("isaddedtomylearning").toString()));
 
                 }
+
+
+                //membershipname
+                if (jsonMyLearningColumnObj.has("membershipname")) {
+
+                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
+
+                }
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("membershiplevel")) {
+
+                    String memberShip=jsonMyLearningColumnObj.getString("membershiplevel");
+                    int memberInt=1;
+                    if (isValidString(memberShip))
+                    {
+                        memberInt=Integer.parseInt(memberShip);
+                    }else {
+                        memberInt=1;
+                    }
+                    myLearningModel.setMemberShipLevel(memberInt);
+
+                }
+
                 injectCatalogDataIntoTable(myLearningModel, isFromCatageories);
             }
 
@@ -2939,6 +2987,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("downloadurl", myLearningModel.getDownloadURL());
             contentValues.put("offlinepath", myLearningModel.getOfflinepath());
             contentValues.put("isaddedtomylearning", myLearningModel.getAddedToMylearning());
+            contentValues.put("membershiplevel", myLearningModel.getMemberShipLevel());
+            contentValues.put("membershipname", myLearningModel.getMembershipname());
 
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -3081,6 +3131,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setAddedToMylearning(cursor.getInt(cursor
                             .getColumnIndex("isaddedtomylearning")));
+
+                    myLearningModel.setMemberShipLevel(cursor.getInt(cursor
+                            .getColumnIndex("membershiplevel")));
+                    myLearningModel.setMembershipname(cursor.getString(cursor
+                            .getColumnIndex("membershipname")));
 
                     myLearningModel.setEventAddedToCalender(false);
 
@@ -9282,6 +9337,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("presenter")) {
 
                     myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+                }
+
+                //membershipname
+                if (jsonMyLearningColumnObj.has("membershipname")) {
+
+                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
+
+                }
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("membershiplevel")) {
+
+//                    myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
+
+                    String memberShip=jsonMyLearningColumnObj.getString("membershiplevel");
+                    int memberInt=1;
+                    if (isValidString(memberShip))
+                    {
+                        memberInt=Integer.parseInt(memberShip);
+                    }else {
+                        memberInt=1;
+                    }
+                    myLearningModel.setMemberShipLevel(memberInt);
+
+
 
                 }
 

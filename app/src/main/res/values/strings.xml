@@ -8,8 +8,8 @@
     <!--<string name="app_name">Tracktech lifeskills</string>-->
     <!--<string name="app_name">Training Company</string>-->
     <!--<string name="app_name">CLE Academy</string>-->
-    <string name="app_name">CVCTA</string>
-    <!--<string name="app_name"> Development </string>-->
+    <!--<string name="app_name">CVCTA</string>-->
+    <string name="app_name"> Development </string>
     <!--<string name="app_name">PPD Life</string>-->
 
     <string name="date_today">Today</string>
@@ -160,6 +160,8 @@
     <string name="download_already">Already Downloaded</string>
     <string name="cat_add_success">Content Added to My Learning</string>
     <string name="event_add_success">This Event item has been added to "My Learning" page</string>
+    <string name="mycatalog_enddurationdate">The content you have selected has been expired</string>
+
     <string name="event_cancelled">Your have successfully cancelled the enrolled event</string>
     <string name="event_addedto_calender">This Event item has been added to Calendar</string>
     <string name="cat_add_failed">Failed to add content to My Learning</string>

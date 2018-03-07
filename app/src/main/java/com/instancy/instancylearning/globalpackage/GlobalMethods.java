@@ -56,7 +56,9 @@ import java.util.Calendar;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.replace;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
@@ -78,6 +80,36 @@ public class GlobalMethods {
         String userLoginId = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERLOGINID);
         String userName = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERNAME);
         String offlinePath = "";
+
+        String endDuarationDate = myLearningModel.getDurationEndDate();
+
+//        String endDuarationDate = "2018-04-15 21:00:00";
+
+        if (isValidString(endDuarationDate)) {
+
+            boolean isCompleted = isCourseEndDateCompleted(endDuarationDate);
+
+            if (isCompleted) {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(context.getString(R.string.mycatalog_enddurationdate))
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //do things
+                                dialog.dismiss();
+                                // remove event from android calander
+
+
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+                return;
+            }
+
+        }
 
         if (myFile.exists()) {
 
@@ -765,6 +797,8 @@ public class GlobalMethods {
                 }
             }
         }
+
+
     }
 
     private static String GetCurrentDateTime() {

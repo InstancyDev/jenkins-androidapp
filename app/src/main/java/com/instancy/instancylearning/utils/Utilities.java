@@ -977,5 +977,25 @@ public class Utilities {
         return isCompleted;
     }
 
+    public static boolean isMemberyExpry(String memberExpiryDate) {
+        boolean isCompleted = true;
+
+        if (memberExpiryDate.length() == 0)
+            return isCompleted = true;
+
+        String endDate = memberExpiryDate;
+        Date strDate = ConvertToDate(endDate);
+
+        if (new Date().after(strDate)) {
+// today is after date 2
+            isCompleted = true;
+
+        } else {
+            isCompleted = false;
+        }
+
+        return isCompleted;
+    }
+
 
 }
