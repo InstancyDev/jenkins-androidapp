@@ -1939,13 +1939,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            if (authorName.length() != 0) {
+            if (isValidString(authorName)) {
                 myLearningModel.setAuthor(authorName);
             } else {
                 // author
-                if (jsonMyLearningColumnObj.has("author")) {
+                if (jsonMyLearningColumnObj.has("authordisplayname")) {
 
-                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("authordisplayname").toString());
 
                 }
             }
@@ -2079,7 +2079,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
 
-                    myLearningModel.setShortDes(result.toString());
+//                    myLearningModel.setShortDes(result.toString());
                     myLearningModel.setLongDes(result.toString());
 
                 }
@@ -2570,15 +2570,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            // shortdes
-            if (jsonMyLearningColumnObj.has("shortdescription")) {
-
-
-                Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
-
-                myLearningModel.setShortDes(result.toString());
-
-            }
 
             String authorName = "";
             if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
@@ -2586,7 +2577,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            if (authorName.length() != 0) {
+            if (isValidString(authorName)) {
                 myLearningModel.setAuthor(authorName);
             } else {
                 // author
@@ -2610,8 +2601,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
 
             }
-            // displayNam
-
 
             // durationEndDate
             if (jsonMyLearningColumnObj.has("durationenddate")) {
@@ -2700,12 +2689,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
 
+                // shortdes
+                if (jsonMyLearningColumnObj.has("shortdescription")) {
+
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
+
+                    myLearningModel.setShortDes(result.toString());
+
+                }
+
                 // longdes
                 if (jsonMyLearningColumnObj.has("longdescription")) {
 
                     Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
 
-                    myLearningModel.setShortDes(result.toString());
+//                    myLearningModel.setShortDes(result.toString());
                     myLearningModel.setLongDes(result.toString());
 
                 }
@@ -3221,7 +3220,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            if (authorName.length() != 0) {
+            if (isValidString(authorName)) {
                 myLearningModel.setAuthor(authorName);
             } else {
                 // author
@@ -3347,7 +3346,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
 
-                    myLearningModel.setShortDes(result.toString());
+//                    myLearningModel.setShortDes(result.toString());
                     myLearningModel.setLongDes(result.toString());
 
                 }
@@ -4023,7 +4022,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
 
-            if (authorName.length() != 0) {
+            if (isValidString(authorName)) {
                 trackLearningModel.setAuthor(authorName);
             } else {
                 // author
@@ -9166,7 +9165,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
 
-                    myLearningModel.setShortDes(result.toString());
+//                    myLearningModel.setShortDes(result.toString());
                     myLearningModel.setLongDes(result.toString());
 
                 }

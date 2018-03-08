@@ -18,8 +18,8 @@
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
-    <!--<string name="app_default_url">http://mobileapp.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
+    <string name="app_default_url">http://mobileapp.instancysoft.com/</string>
+    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
 
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
@@ -47,7 +47,6 @@
     <!--<string name="app_default_url">http://enterprisedemo.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
-
     <!--for instancy market place-->
     <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
@@ -59,8 +58,8 @@
     <!--<string name="app_default_url">http://stagingmontessori.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://stagingmonteapi.instancysoft.com/api/</string>-->
 
-    <string name="app_default_url">http://staging.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">http://staging.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!-- <string name="app_default_url">http://montessoritraining.instancy.net/</string>
     <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>  -->

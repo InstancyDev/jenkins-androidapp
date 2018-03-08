@@ -497,6 +497,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         fabDocument.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         fabWebsiteURL.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
+
         fabAudio.setLabelText(getResources().getString(R.string.audio));
         fabImage.setLabelText(getResources().getString(R.string.image));
         fabVideo.setLabelText(getResources().getString(R.string.video));
@@ -895,7 +896,15 @@ if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View")) {
-                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+
+
+                        if (myLearningDetalData.getAddedToMylearning()==0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")){
+                            GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        }else {
+                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        }
+
+
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
@@ -1892,7 +1901,7 @@ if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
             String android_Id = Settings.Secure.getString(getContext().getContentResolver(),
                     Settings.Secure.ANDROID_ID);
 
-            String urlString = appUserModel.getSiteURL() + "/PublicModules/UserLoginVerify.aspx?Fileupload=true&ComponentID=1&CMSGroupID=3&" + contentMediaTypeID + "&userid=" + appUserModel.getUserIDValue() + "&deviceid=" + android_Id + "&devicetype=ios";
+            String urlString = appUserModel.getSiteURL() + "/PublicModules/UserLoginVerify.aspx?Fileupload=true&ComponentID="+sideMenusModel.getComponentId()+"&CMSGroupID=3&" + contentMediaTypeID + "&userid=" + appUserModel.getUserIDValue() + "&deviceid=" + android_Id + "&devicetype=ios";
 
             if (intsr == 1) {
                 openChromeTabsInAndroid(urlString);

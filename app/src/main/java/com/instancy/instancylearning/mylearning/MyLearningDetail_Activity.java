@@ -282,12 +282,20 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             }
 
             if (myLearningModel.getLongDes().isEmpty()) {
-                txtLongDisx.setVisibility(View.GONE);
+
                 txtDescription.setVisibility(View.GONE);
             } else {
                 txtLongDisx.setVisibility(View.VISIBLE);
+
+            }
+
+            if (myLearningModel.getShortDes().isEmpty()) {
+                txtDescription.setVisibility(View.GONE);
+            } else {
+
                 txtDescription.setVisibility(View.VISIBLE);
             }
+
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
                 btnDownload.setVisibility(View.GONE);
                 circleProgressBar.setVisibility(View.GONE);
@@ -631,91 +639,90 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             buttonFirst.setText("Buy");
 
                         }
-                    }
-                    else {
+                    } else {
 
                         Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppHeaderTextColor());
                         iconFirst.setBackground(cartIcon);
                         buttonFirst.setText("Buy");
                     }
-                        txtPrice.setText("$" + myLearningModel.getPrice());
-                        txtPrice.setVisibility(View.VISIBLE);
+                    txtPrice.setText("$" + myLearningModel.getPrice());
+                    txtPrice.setVisibility(View.VISIBLE);
+                    btnDownload.setVisibility(View.GONE);
+                } else {
+                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                         btnDownload.setVisibility(View.GONE);
                     } else {
-                        if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
-                            btnDownload.setVisibility(View.GONE);
-                        } else {
-                            btnDownload.setVisibility(View.VISIBLE);
-                        }
-                        txtPrice.setVisibility(View.GONE);
-                        txtPrice.setText("");
+                        btnDownload.setVisibility(View.VISIBLE);
                     }
-                    if (myLearningModel.getAddedToMylearning() == 1) {
-                        buttonFirst.setText("View");
-                        txtPrice.setVisibility(View.GONE);
-                        txtPrice.setText("");
-                        Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
-                        iconFirst.setBackground(viewIcon);
-
-                    }
+                    txtPrice.setVisibility(View.GONE);
+                    txtPrice.setText("");
                 }
-            } else{
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                    buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-                    buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-                    btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-                    Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
-                    iconFirst.setBackground(calendarImg);
-                    buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+                if (myLearningModel.getAddedToMylearning() == 1) {
+                    buttonFirst.setText("View");
+                    txtPrice.setVisibility(View.GONE);
+                    txtPrice.setText("");
+                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconFirst.setBackground(viewIcon);
 
-                    if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+                }
+            }
+        } else {
+            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+                iconFirst.setBackground(calendarImg);
+                buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+
+                if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+                    relativeSecond.setVisibility(View.VISIBLE);
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconSecond.setBackground(relatedContent);
+                    buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
+                }
+
+            } else {
+
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("20") | myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
+
+                    if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
+                        buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
                         relativeSecond.setVisibility(View.VISIBLE);
-                        Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
+                        Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppHeaderTextColor());
                         iconSecond.setBackground(relatedContent);
-                        buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
                     }
 
                 } else {
 
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("20") | myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
+                    relativeSecond.setVisibility(View.VISIBLE);
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
+                    iconSecond.setBackground(relatedContent);
 
-                        if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
-                            buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
-                            relativeSecond.setVisibility(View.VISIBLE);
-                            Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppHeaderTextColor());
-                            iconSecond.setBackground(relatedContent);
-                        }
+                    buttonSecond.setText("Report");
 
-                    } else {
-
-                        relativeSecond.setVisibility(View.VISIBLE);
-                        Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
-                        iconSecond.setBackground(relatedContent);
-
-                        buttonSecond.setText("Report");
-
-                    }
-
-                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
-                    iconFirst.setBackground(viewIcon);
-                    buttonFirst.setText("View");
-                    txtPrice.setVisibility(View.GONE);
-                    txtPrice.setText("");
-                    btnDownload.setVisibility(View.VISIBLE);
                 }
 
+                Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
+                iconFirst.setBackground(viewIcon);
+                buttonFirst.setText("View");
+                txtPrice.setVisibility(View.GONE);
+                txtPrice.setText("");
+                btnDownload.setVisibility(View.VISIBLE);
             }
 
-            setCompleteListner = new SetCompleteListner() {
-                @Override
-                public void completedStatus() {
-
-                    relativeSecond.setVisibility(View.GONE);
-                    statusUpdate("Completed");
-
-                }
-            };
         }
+
+        setCompleteListner = new SetCompleteListner() {
+            @Override
+            public void completedStatus() {
+
+                relativeSecond.setVisibility(View.GONE);
+                statusUpdate("Completed");
+
+            }
+        };
+    }
 
 
     public void updateEnrolledEvent() {

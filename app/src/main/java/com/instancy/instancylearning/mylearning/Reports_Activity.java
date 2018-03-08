@@ -161,6 +161,7 @@ public class Reports_Activity extends AppCompatActivity {
         } else {
             injectFromDbtoModel();
         }
+
     }
 
     public void getDownloadedMobileContentMetaData() {

@@ -51,17 +51,17 @@ android {
 //        versionName "1.0"
 
 // ----------------------------------for cvcta life----------------------------------
-        applicationId "com.instancy.cvcta"
+//        applicationId "com.instancy.cvcta"
+//        versionCode 1
+//        versionName "1.0"
+
+        applicationId "com.instancy.development"
         versionCode 1
         versionName "1.0"
 
-//        applicationId "com.instancy.development"
-//        versionCode 1
-//        versionName "1.0"
-
 //        applicationId "com.instancy.ppdlife"
-//        versionCode 1
-//        versionName "1.0"
+//        versionCode 2
+//        versionName "1.1"
 
         minSdkVersion 21
         targetSdkVersion 26
