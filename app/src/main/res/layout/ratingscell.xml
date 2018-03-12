@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginTop="3dp"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="4dp"
+    app:contentPadding="4dp">
+
+    <LinearLayout
+        android:id="@+id/linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <RelativeLayout
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="2dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/imagethumb"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:background="@drawable/user_placeholder"
+                app:civ_border_color="@color/colorWhite"
+                app:civ_border_width="1dp" />
+
+            <TextView
+                android:id="@+id/txtName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imagethumb"
+                android:maxLines="2"
+                android:padding="1dp"
+                android:text="Kelvin Kelvin Kelvin Kelvin Kelvin Kelvin"
+                android:textColor="@color/colorBlack"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relattitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4">
+
+
+            <LinearLayout
+                android:id="@+id/rating_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt_title_name"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center"
+                    android:padding="2dp">
+
+                    <RatingBar
+                        android:id="@+id/rat_adapt_ratingbar"
+                        style="?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorStatusInProgress"
+                        android:clickable="false"
+                        android:isIndicator="true"
+                        android:rating="5.0"
+                        android:stepSize="1.0" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/txt_space"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:text="      "
+                    android:textColor="@color/colorGray"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/txt_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:text="Thursday March 1 2018"
+                    android:textColor="@color/colorGray"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/txtreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/rating_layout"
+                android:ellipsize="end"
+                android:gravity="left"
+                android:maxLines="100"
+                android:padding="2dp"
+                android:text="asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj"
+                android:textColor="@color/colorGray"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

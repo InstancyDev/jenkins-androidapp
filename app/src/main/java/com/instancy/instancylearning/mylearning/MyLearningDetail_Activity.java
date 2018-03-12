@@ -36,18 +36,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.SkuDetails;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -90,7 +94,6 @@ import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
-import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -194,6 +197,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     UiSettingsModel uiSettingsModel;
     MembershipModel membershipModel = null;
     public SetCompleteListner setCompleteListner;
+    CmiSynchTask cmiSynchTask;
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -207,6 +211,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         uiSettingsModel = UiSettingsModel.getInstance();
         membershipModel = new MembershipModel();
         Bundle bundle = getIntent().getExtras();
+
+
         if (bundle != null) {
 
             myLearningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
@@ -238,10 +244,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
-                txtAuthor.setText("By " + myLearningModel.getPresenter() + " ");
+                txtAuthor.setText(myLearningModel.getPresenter() + " ");
             } else {
 
-                txtAuthor.setText("By " + myLearningModel.getAuthor() + " ");
+                txtAuthor.setText(myLearningModel.getAuthor() + " ");
             }
 
             txtSiteName.setText(myLearningModel.getSiteName());
@@ -381,6 +387,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             ex.printStackTrace();
         }
+
+//        try {
+//            getUserRatingsOfTheContent();
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+
         final float oldRating = ratingValue;
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -694,7 +707,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     }
 
                 } else {
-
+// uncomment after reports completed
                     relativeSecond.setVisibility(View.VISIBLE);
                     Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
                     iconSecond.setBackground(relatedContent);
@@ -940,7 +953,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
     }
 
-
     @OnClick({R.id.relativeone, R.id.relativesecond, R.id.btntxt_download_detail})
     public void actionsforDetail(View view) {
         switch (view.getId()) {
@@ -1058,6 +1070,12 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     }
 
                 }
+
+                if (isNetworkConnectionAvailable(this, -1) && !isFromCatalog) {
+                    cmiSynchTask = new CmiSynchTask(this);
+                    cmiSynchTask.execute();
+                }
+
 //                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 //
 //                    if (!isFileExist) {
@@ -1656,5 +1674,79 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         startActivity(intentReports);
 
     }
+
+
+    public void getUserRatingsOfTheContent() throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("ContentID", myLearningModel.getContentID());
+        parameters.put("Locale", "en-us");
+        parameters.put("metadata", "0");
+        parameters.put("intUserID", appUserModel.getUserIDValue());
+        parameters.put("CartID", "");
+        parameters.put("iCMS", "0");
+        parameters.put("ComponentID", "3");
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("DetailsCompID", "107");
+        parameters.put("DetailsCompInsID", "3291");
+        parameters.put("ERitems", "false");
+        parameters.put("SkippedRows", 0);
+        parameters.put("NoofRows", 100);
+
+        final String parameterString = parameters.toString();
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserRatings";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return parameterString.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
 
 }

@@ -2921,13 +2921,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 //membershiplevel
                 if (jsonMyLearningColumnObj.has("membershiplevel")) {
 
-                    String memberShip=jsonMyLearningColumnObj.getString("membershiplevel");
-                    int memberInt=1;
-                    if (isValidString(memberShip))
-                    {
-                        memberInt=Integer.parseInt(memberShip);
-                    }else {
-                        memberInt=1;
+                    String memberShip = jsonMyLearningColumnObj.getString("membershiplevel");
+                    int memberInt = 1;
+                    if (isValidString(memberShip)) {
+                        memberInt = Integer.parseInt(memberShip);
+                    } else {
+                        memberInt = 1;
                     }
                     myLearningModel.setMemberShipLevel(memberInt);
 
@@ -5482,8 +5481,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // statusdisplayname
             if (jsonCMiColumnObj.has("studentresponses")) {
 
-                studentResponseModel.set_studentresponses(jsonCMiColumnObj.get("studentresponses").toString());
+                String checkForNull =jsonCMiColumnObj.getString("studentresponses");
 
+                if (isValidString(checkForNull)){
+                    studentResponseModel.set_studentresponses(checkForNull);
+                }else {
+                    studentResponseModel.set_studentresponses("");
+                }
+
+//                studentResponseModel.set_studentresponses(jsonCMiColumnObj.get("studentresponses").toString());
             }
             // scoid
             if (jsonCMiColumnObj.has("scoid")) {
@@ -5652,7 +5658,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // timespent
             if (jsonCMiColumnObj.has("timespent")) {
 
-                learnerSessionTable.setTimeSpent(jsonCMiColumnObj.get("timespent").toString());
+
+                String checkForNull =jsonCMiColumnObj.getString("timespent");
+
+                if (isValidString(checkForNull)){
+                    learnerSessionTable.setTimeSpent(checkForNull);
+                }else {
+                    learnerSessionTable.setTimeSpent("0:00:00");
+                }
+
+
+//                learnerSessionTable.setTimeSpent(jsonCMiColumnObj.get("timespent").toString());
 
             }
             // sessionid
@@ -5695,15 +5711,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
             // attemptnumber
+
+            int attemptnumber =0;
             if (jsonCMiColumnObj.has("attemptnumber") && !jsonCMiColumnObj.isNull("attemptnumber")) {
 
-                learnerSessionTable.setAttemptNumber(jsonCMiColumnObj.get("attemptnumber").toString());
+                attemptnumber=jsonCMiColumnObj.getInt("attemptnumber");
+
+                learnerSessionTable.setAttemptNumber(""+attemptnumber);
+
+            }
+
+            if (attemptnumber == 1) {
+                String startDate="";
+                if (isValidString(learnerSessionTable.getSessionDateTime())) {
+
+                        startDate=learnerSessionTable.getSessionDateTime();
+
+                }
+                updateCMIStartDate(learnerSessionTable.getScoID(), startDate, learnerSessionTable.getUserID());
             }
             injectIntoLearnerTable(learnerSessionTable);
         }
 
     }
-
 
     public void injectIntoLearnerTable(LearnerSessionModel learnerSessionModel) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -5719,7 +5749,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("attemptnumber", learnerSessionModel.getAttemptNumber());
             contentValues.put("sessiondatetime", learnerSessionModel.getSessionDateTime());
             contentValues.put("timespent", learnerSessionModel.getTimeSpent());
-
 
             db.insert(TBL_USERSESSION, null, contentValues);
         } catch (SQLiteException exception) {
@@ -6955,6 +6984,181 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return objAndScoID;
     }
+
+    public void insertStudentResponsesReports(StudentResponseModel resDetails) {
+
+        if (!isValidString(resDetails.get_attachfilename())) {
+            resDetails.set_attachfileid("");
+            resDetails.set_attachfilename("");
+            resDetails.set_attachedfilepath("");
+        }
+
+        if (!isValidString(resDetails.get_optionalNotes())) {
+            resDetails.set_optionalNotes("");
+        }
+
+        if (!isValidString(resDetails.get_capturedVidFileName())) {
+            resDetails.set_capturedVidFileName("");
+            resDetails.set_capturedVidId("");
+            resDetails.set_capturedVidFilepath("");
+        }
+
+        if (!isValidString(resDetails.get_capturedImgFileName())) {
+            resDetails.set_capturedImgFileName("");
+            resDetails.set_capturedImgId("");
+            resDetails.set_capturedImgFilepath("");
+        }
+
+        int questionAttempt = 0 ;
+
+        Boolean isStudentResExist = false;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = null;
+        try {
+            String strExeQuery1 = "";
+            strExeQuery1 = "SELECT questionattempt  from studentresponses WHERE scoid="
+                    + resDetails.get_scoId()
+                    + " and userid="
+                    + resDetails.get_userId()
+                    + " and questionid="
+                    + resDetails.get_questionid()
+                    + " and siteid="
+                    + resDetails.get_siteId()
+                    + " and assessmentattempt ="
+                    + resDetails.get_assessmentattempt();
+
+            cursor = db.rawQuery(strExeQuery1, null);
+            int assesmentNumber = 1;
+            int quesAttempt = 1;
+            if (cursor != null & cursor.getCount() > 0) {
+                if (cursor.moveToFirst()) {
+
+                    if (cursor.getString(0) != null) {
+
+                        questionAttempt = Integer.parseInt(cursor.getString(0));
+
+                        Log.d("TAG", "Here assesmentNumber " + questionAttempt);
+
+                    }
+
+                }
+
+//                String strExeQuery2 = "";
+//                strExeQuery2 = "SELECT QUESTIONID FROM studentresponses WHERE scoid="
+//                        + resDetails.get_scoId()
+//                        + " and userid="
+//                        + resDetails.get_userId()
+//                        + " and questionid="
+//                        + resDetails.get_questionid()
+//                        + " and siteid="
+//                        + resDetails.get_siteId()
+//                        + " and AssessmentAttempt="
+//                        + assesmentNumber;
+//
+//                cursor = db.rawQuery(strExeQuery2, null);
+//
+//                if (cursor != null & cursor.getCount() > 0) {
+//                    if (cursor.moveToFirst()) {
+//
+//                        isStudentResExist = true;
+//
+//                    }
+//
+//                }
+                String strExeQuery = "";
+                if (questionAttempt!=0) {
+                    strExeQuery = "UPDATE studentresponses SET studentresponses ='"
+                            + resDetails.get_studentresponses()
+                            + "',result='"
+                            + resDetails.get_result()
+                            + "',attachfilename= '"
+                            + resDetails.get_attachfilename()
+                            + "',attachfileid='"
+                            + resDetails.get_attachfileid()
+                            + "' ,attachedfilepath='"
+                            + resDetails.get_attachedfilepath()
+                            + "' ,optionalNotes='"
+                            + resDetails.get_optionalNotes()
+                            + "' ,capturedVidFileName ='"
+                            + resDetails.get_capturedVidFileName()
+                            + "' ,capturedVidId ='"
+                            + resDetails.get_capturedVidId()
+                            + "' ,capturedVidFilepath ='"
+                            + resDetails.get_capturedVidFilepath()
+                            + "' ,capturedImgFileName ='"
+                            + resDetails.get_capturedImgFileName()
+                            + "' ,capturedImgId ='"
+                            + resDetails.get_capturedImgId()
+                            + "' ,capturedImgFilepath ='"
+                            + resDetails.get_capturedImgFilepath()
+                            + "' where scoid="
+                            + resDetails.get_scoId()
+                            + " and userid="
+                            + resDetails.get_userId()
+                            + " and questionid="
+                            + resDetails.get_questionid()
+                            + " and siteid="
+                            + resDetails.get_siteId()
+                            + " and assessmentattempt=" + assesmentNumber;
+
+                } else {
+                    strExeQuery = "INSERT INTO STUDENTRESPONSES(siteid,scoid,userid,questionid,assessmentattempt,questionattempt,attemptdate,studentresponses,result,attachfilename,attachfileid,attachedfilepath,optionalNotes,capturedVidFileName,capturedVidId,capturedVidFilepath,capturedImgFileName,capturedImgId,capturedImgFilepath)"
+                            + " values ("
+                            + resDetails.get_siteId()
+                            + ","
+                            + resDetails.get_scoId()
+                            + ","
+                            + resDetails.get_userId()
+                            + ","
+                            + resDetails.get_questionid()
+                            + ","
+                            + assesmentNumber
+                            + ","
+                            + quesAttempt
+                            + ",'"
+                            + resDetails.get_attemptdate()
+                            + "','"
+                            + resDetails.get_studentresponses()
+                            + "','"
+                            + resDetails.get_result()
+                            + "','"
+                            + resDetails.get_attachfilename()
+                            + "','"
+                            + resDetails.get_attachfileid()
+                            + "','"
+                            + resDetails.get_attachedfilepath()
+                            + "','"
+                            + resDetails.get_optionalNotes()
+                            + "','"
+                            + resDetails.get_capturedVidFileName()
+                            + "','"
+                            + resDetails.get_capturedVidId()
+                            + "','"
+                            + resDetails.get_capturedVidFilepath()
+                            + "','"
+                            + resDetails.get_capturedImgFileName()
+                            + "','"
+                            + resDetails.get_capturedImgId()
+                            + "','"
+                            + resDetails.get_capturedImgFilepath() + "')";
+                }
+
+                try {
+                    db.execSQL(strExeQuery);
+                } catch (Exception e) {
+                    Log.d("Insertstudentresponse s", e.getMessage());
+
+                }
+            }
+        } catch (Exception e) {
+            Log.d("Insertstudentresponse s ", e.getMessage());
+        }
+
+        cursor.close();
+        db.close();
+    }
+
+
 
     public void insertStudentResponses(StudentResponseModel resDetails) {
 
@@ -9350,16 +9554,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 //                    myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
 
-                    String memberShip=jsonMyLearningColumnObj.getString("membershiplevel");
-                    int memberInt=1;
-                    if (isValidString(memberShip))
-                    {
-                        memberInt=Integer.parseInt(memberShip);
-                    }else {
-                        memberInt=1;
+                    String memberShip = jsonMyLearningColumnObj.getString("membershiplevel");
+                    int memberInt = 1;
+                    if (isValidString(memberShip)) {
+                        memberInt = Integer.parseInt(memberShip);
+                    } else {
+                        memberInt = 1;
                     }
                     myLearningModel.setMemberShipLevel(memberInt);
-
 
 
                 }
@@ -13906,25 +14108,70 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (jsonTrackObj.has("name")) {
 
-                        trackObjectsModel.setName(jsonTrackObj.getString("name"));
+                        String checkForNull =jsonTrackObj.getString("name");
+
+                        if (isValidString(checkForNull)){
+                            trackObjectsModel.setName(checkForNull);
+                        }else {
+                            trackObjectsModel.setName("");
+                        }
+
                     }
                     if (jsonTrackObj.has("objecttypeid")) {
 
-                        trackObjectsModel.setObjTypeId(jsonTrackObj.getString("objecttypeid"));
+//                        trackObjectsModel.setObjTypeId(jsonTrackObj.getString("objecttypeid"));
+
+                        String checkForNull =jsonTrackObj.getString("objecttypeid");
+
+                        if (isValidString(checkForNull)){
+                            trackObjectsModel.setObjTypeId(checkForNull);
+                        }else {
+                            trackObjectsModel.setObjTypeId("");
+                        }
+
+
                     }
                     if (jsonTrackObj.has("scoid")) {
 
-                        trackObjectsModel.setScoId(jsonTrackObj.getString("scoid"));
+
+                        String checkForNull =jsonTrackObj.getString("scoid");
+
+                        if (isValidString(checkForNull)){
+                            trackObjectsModel.setScoId(checkForNull);
+                        }else {
+                            trackObjectsModel.setScoId("");
+                        }
+
+
+//                        trackObjectsModel.setScoId(jsonTrackObj.getString("scoid"));
                     }
 
                     if (jsonTrackObj.has("sequencenumber")) {
 
-                        trackObjectsModel.setSequenceNumber(jsonTrackObj.getString("sequencenumber"));
+
+                        String checkForNull =jsonTrackObj.getString("sequencenumber");
+
+                        if (isValidString(checkForNull)){
+                            trackObjectsModel.setSequenceNumber(checkForNull);
+                        }else {
+                            trackObjectsModel.setSequenceNumber("");
+                        }
+
+//                        trackObjectsModel.setSequenceNumber(jsonTrackObj.getString("sequencenumber"));
                     }
 
                     if (jsonTrackObj.has("trackscoid")) {
 
-                        trackObjectsModel.setTrackSoId(jsonTrackObj.getString("trackscoid"));
+                        String checkForNull =jsonTrackObj.getString("trackscoid");
+
+                        if (isValidString(checkForNull)){
+                            trackObjectsModel.setTrackSoId(checkForNull);
+                        }else {
+                            trackObjectsModel.setTrackSoId("");
+                        }
+//                        trackObjectsModel.setTrackSoId(jsonTrackObj.getString("trackscoid"));
+
+
                     }
                     trackObjectsModel.setUserID(learningModel.getUserID());
                     trackObjectsModel.setSiteID(learningModel.getSiteID());
@@ -14031,6 +14278,108 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (jsonObject.has("studentresponse")) {
             jsonStudentResAry = jsonObject.getJSONArray("studentresponse");
         }
+
+
+        if (jsonStudentResAry.length() > 0) {
+//                ejectRecordsinTrackObjDb(learningModel);
+
+            for (int i = 0; i < jsonStudentResAry.length(); i++) {
+                JSONObject jsoCmiObj = jsonStudentResAry.getJSONObject(i);
+                Log.d(TAG, "jsoCmiObj: " + jsoCmiObj);
+                int assessmentAttempt = 0;
+                if (jsoCmiObj.has("assessmentattempt")) {
+
+                    assessmentAttempt = jsoCmiObj.getInt("assessmentattempt");
+                }
+                StudentResponseModel studentResponseModel = new StudentResponseModel();
+
+                if (assessmentAttempt > 0) {
+
+                    studentResponseModel.set_assessmentattempt(assessmentAttempt);
+
+                    if (jsoCmiObj.has("studentresponses")) {
+
+                        studentResponseModel.set_studentresponses(jsoCmiObj.getString("studentresponses"));
+                    }
+                    if (jsoCmiObj.has("scoid")) {
+
+                        studentResponseModel.set_scoId(jsoCmiObj.getInt("scoid"));
+                    }
+
+                    if (jsoCmiObj.has("questionid")) {
+
+                        studentResponseModel.set_questionid(jsoCmiObj.getInt("questionid"));
+                    }
+                    studentResponseModel.set_siteId(learningModel.getSiteID());
+                    studentResponseModel.set_userId(Integer.parseInt(learningModel.getUserID()));
+
+
+                    if (jsoCmiObj.has("index")) {
+
+                        studentResponseModel.set_rindex(jsoCmiObj.getInt("index"));
+                    }
+                    if (jsoCmiObj.has("result")) {
+
+                        String scoreraw = jsoCmiObj.getString("result");
+                        if (isValidString(scoreraw)) {
+                            studentResponseModel.set_result(scoreraw);
+                        } else {
+                            studentResponseModel.set_result("");
+
+                        }
+                    }
+                    if (jsoCmiObj.has("questionattempt")) {
+
+                        studentResponseModel.set_questionid(jsoCmiObj.getInt("questionattempt"));
+                    }
+                    if (jsoCmiObj.has("attemptdate")) {
+
+
+                        String formattedDate = formatDate(jsoCmiObj.get("attemptdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                        studentResponseModel.set_attemptdate(formattedDate);
+
+
+                    }
+                    if (jsoCmiObj.has("attachfilename")) {
+
+                        studentResponseModel.set_attachfilename(jsoCmiObj.getString("attachfilename"));
+                    }
+                    if (jsoCmiObj.has("attachfileid")) {
+
+                        studentResponseModel.set_attachfileid(jsoCmiObj.getString("attachfileid"));
+                    }
+                    if (jsoCmiObj.has("optionalnotes")) {
+
+                        studentResponseModel.set_optionalNotes(jsoCmiObj.getString("optionalnotes"));
+                    }
+
+                    if (jsoCmiObj.has("capturedvidfilename")) {
+
+                        studentResponseModel.set_capturedVidFileName(jsoCmiObj.getString("capturedvidfilename"));
+                    }
+                    if (jsoCmiObj.has("capturedvidid")) {
+
+                        studentResponseModel.set_capturedVidId(jsoCmiObj.getString("capturedvidid"));
+                    }
+
+                    if (jsoCmiObj.has("capturedimgfilename")) {
+
+                        studentResponseModel.set_capturedImgFileName(jsoCmiObj.getString("capturedimgfilename"));
+                    }
+
+                    if (jsoCmiObj.has("capturedimgid")) {
+
+                        studentResponseModel.set_capturedImgId(jsoCmiObj.getString("capturedimgid"));
+                    }
+
+                    insertStudentResponsesReports(studentResponseModel);
+
+                }
+
+            }
+        }
+
 
 
         if (jsonCMIAry.length() > 0) {
@@ -14171,148 +14520,64 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
 
-                insertCMI(cmiModel, true);
+                insertCMIForReports(cmiModel, true);
 
             }
 
         }
 
 
-//        if (jsonlearnerSessionAry.length() > 0) { this one need to be updated
-//
-//            if (noOfAttemptes>0){
-//                for (int i = 0; i < jsonlearnerSessionAry.length(); i++) {
-//                    JSONObject jsonSessionObj = jsonlearnerSessionAry.getJSONObject(i);
-//                    Log.d(TAG, "jsonSessionObj: " + jsonSessionObj);
-//
-//                    String questionID = "";
-//                    String quesName = "";
-//                    String scoid = "";
-//
-//                    if (jsonSessionObj.has("questionid")) {
-//
-//                        questionID = jsonSessionObj.getString("questionid");
-//                        ejectRecordsinQestionDb(learningModel, questionID);
-//                    }
-//
-//                    if (isValidString(questionID)) {
-//
-//                        if (jsonSessionObj.has("scoid")) {
-//
-//                            scoid = jsonSessionObj.getString("scoid");
-//                        }
-//
-//                        if (jsonSessionObj.has("description")) {
-//
-//                            quesName = jsonSessionObj.getString("description");
-//                        }
-//                    }
-//
-//                        }
-//                    }
-//
-//
-//        }
+        if (jsonlearnerSessionAry.length() > 0) {
 
-        if (jsonStudentResAry.length() > 0) {
-//                ejectRecordsinTrackObjDb(learningModel);
+            for (int i = 0; i < jsonlearnerSessionAry.length(); i++) {
+                JSONObject jsonSessionObj = jsonlearnerSessionAry.getJSONObject(i);
+                Log.d(TAG, "jsonSessionObj: " + jsonSessionObj);
 
-            for (int i = 0; i < jsonStudentResAry.length(); i++) {
-                JSONObject jsoCmiObj = jsonStudentResAry.getJSONObject(i);
-                Log.d(TAG, "jsoCmiObj: " + jsoCmiObj);
-                int assessmentAttempt = 0;
-                if (jsoCmiObj.has("assessmentattempt")) {
+                String scoID = "";
+                String userID = "";
+                String startDate = "";
+                int attemptnumber = -1;
 
-                    assessmentAttempt = jsoCmiObj.getInt("assessmentattempt");
+                if (jsonSessionObj.has("attemptnumber")) {
+
+                    attemptnumber = jsonSessionObj.getInt("attemptnumber");
+
                 }
-                StudentResponseModel studentResponseModel = new StudentResponseModel();
+                if (attemptnumber == 1) {
 
-                if (assessmentAttempt > 0) {
+                    if (jsonSessionObj.has("scoid")) {
 
-                    studentResponseModel.set_assessmentattempt(assessmentAttempt);
-
-                    if (jsoCmiObj.has("studentresponses")) {
-
-                        studentResponseModel.set_studentresponses(jsoCmiObj.getString("studentresponses"));
-                    }
-                    if (jsoCmiObj.has("scoid")) {
-
-                        studentResponseModel.set_scoId(jsoCmiObj.getInt("scoid"));
+                        scoID = jsonSessionObj.getString("scoid");
                     }
 
-                    if (jsoCmiObj.has("questionid")) {
+                    if (jsonSessionObj.has("sessiondatetime")) {
 
-                        studentResponseModel.set_questionid(jsoCmiObj.getInt("questionid"));
-                    }
-                    studentResponseModel.set_siteId(learningModel.getSiteID());
-                    studentResponseModel.set_userId(Integer.parseInt(learningModel.getUserID()));
+                        startDate = jsonSessionObj.getString("sessiondatetime");
 
+                        String formattedDate = formatDate(jsonSessionObj.get("sessiondatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                        Log.d(TAG, "injectEventCatalog: " + formattedDate);
 
-                    if (jsoCmiObj.has("index")) {
-
-                        studentResponseModel.set_rindex(jsoCmiObj.getInt("index"));
-                    }
-                    if (jsoCmiObj.has("result")) {
-
-                        String scoreraw = jsoCmiObj.getString("result");
-                        if (isValidString(scoreraw)) {
-                            studentResponseModel.set_result(scoreraw);
-                        } else {
-                            studentResponseModel.set_result("");
-
+                        if (isValidString(formattedDate)) {
+                            startDate = formattedDate;
                         }
-                    }
-                    if (jsoCmiObj.has("questionattempt")) {
-
-                        studentResponseModel.set_questionid(jsoCmiObj.getInt("questionattempt"));
-                    }
-                    if (jsoCmiObj.has("attemptdate")) {
-
-
-                        String formattedDate = formatDate(jsoCmiObj.get("attemptdate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-
-                        studentResponseModel.set_attemptdate(formattedDate);
-
 
                     }
-                    if (jsoCmiObj.has("attachfilename")) {
 
-                        studentResponseModel.set_attachfilename(jsoCmiObj.getString("attachfilename"));
-                    }
-                    if (jsoCmiObj.has("attachfileid")) {
+                    if (jsonSessionObj.has("userid")) {
 
-                        studentResponseModel.set_attachfileid(jsoCmiObj.getString("attachfileid"));
-                    }
-                    if (jsoCmiObj.has("optionalnotes")) {
-
-                        studentResponseModel.set_optionalNotes(jsoCmiObj.getString("optionalnotes"));
+                        userID = jsonSessionObj.getString("userid");
                     }
 
-                    if (jsoCmiObj.has("capturedvidfilename")) {
+                    updateCMIStartDate(scoID, startDate, userID);
 
-                        studentResponseModel.set_capturedVidFileName(jsoCmiObj.getString("capturedvidfilename"));
-                    }
-                    if (jsoCmiObj.has("capturedvidid")) {
-
-                        studentResponseModel.set_capturedVidId(jsoCmiObj.getString("capturedvidid"));
-                    }
-
-                    if (jsoCmiObj.has("capturedimgfilename")) {
-
-                        studentResponseModel.set_capturedImgFileName(jsoCmiObj.getString("capturedimgfilename"));
-                    }
-
-                    if (jsoCmiObj.has("capturedimgid")) {
-
-                        studentResponseModel.set_capturedImgId(jsoCmiObj.getString("capturedimgid"));
-                    }
-
-                    insertStudentResponses(studentResponseModel);
-
+                    break;
                 }
 
+
             }
+
         }
+
 
     }
 
@@ -14409,13 +14674,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (isRelatedContent) {
             pageTypeContent = "event";
+        } else if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {
+            pageTypeContent = "";
         } else {
             pageTypeContent = "track";
         }
 
-        if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {
-            pageTypeContent = "";
-        }
         if (pageTypeContent.equalsIgnoreCase("event")) {
 
             String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_RELATEDCONTENTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
@@ -14784,6 +15048,212 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return reportDetailList;
     }
 
+
+    public int insertCMIForReports(CMIModel cmiNew, boolean isUpdate) {
+        int seqNo = 1;
+        String pretime;
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if (cmiNew.get_isupdate() == null) {
+
+            cmiNew.set_isupdate("false");
+        }
+
+        String strExeQuery = "";
+        try {
+            if (isUpdate) {
+                strExeQuery = "SELECT sequencenumber,noofattempts,timespent FROM "
+                        + TBL_CMI
+                        + " WHERE scoid="
+                        + cmiNew.get_scoId()
+                        + " AND userid="
+                        + cmiNew.get_userId()
+                        + " AND siteid="
+                        + cmiNew.get_siteId();
+                Cursor cursor = null;
+                cursor = db.rawQuery(strExeQuery, null);
+
+                if (cursor != null && cursor.getCount() > 0) {
+                    if (cursor.moveToFirst()) {
+                        seqNo = 0;
+
+                        if (isValidString(cmiNew.get_objecttypeid())) {
+                            if (cmiNew.get_objecttypeid().equals("9")
+                                    || cmiNew.get_objecttypeid().equals("8")) {
+
+                                if (isValidString(cmiNew.get_score())) {
+                                    if (cmiNew.get_noofattempts() == 0) {
+                                        int intNoAtt = Integer
+                                                .parseInt(cursor.getString(cursor
+                                                        .getColumnIndex("noofattempts")));
+                                        cmiNew.set_noofattempts(intNoAtt + 1);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    if (!isValidString(cmiNew.get_seqNum())) {
+                        cmiNew.set_seqNum("0");
+                    }
+
+                    if (!isValidString(cmiNew.get_datecompleted())) {
+                        strExeQuery = "UPDATE " + TBL_CMI + " SET location='"
+                                + cmiNew.get_location() + "',status='"
+                                + cmiNew.get_status() + "',suspenddata='"
+                                + cmiNew.get_suspenddata() + "',isupdate='"
+                                + cmiNew.get_isupdate() + "',score='"
+                                + cmiNew.get_score() + "',noofattempts="
+                                + cmiNew.get_noofattempts() + ",objecttypeid='"
+                                + cmiNew.get_objecttypeid()
+                                + "',sequencenumber=" + cmiNew.get_seqNum()
+                                + ",timespent='" + cmiNew.get_timespent()
+                                + "',coursemode='" + cmiNew.get_coursemode()
+                                + "',scoremin='" + cmiNew.get_scoremin()
+                                + "',scoremax='" + cmiNew.get_scoremax()
+                                + "' WHERE scoid=" + cmiNew.get_scoId()
+                                + " AND siteid=" + cmiNew.get_siteId()
+                                + " AND userid=" + cmiNew.get_userId();
+                    } else {
+                        strExeQuery = "UPDATE " + TBL_CMI
+                                + " SET datecompleted='"
+                                + cmiNew.get_datecompleted() + "',location='"
+                                + cmiNew.get_location() + "',status='"
+                                + cmiNew.get_status() + "',suspenddata='"
+                                + cmiNew.get_suspenddata() + "',isupdate='"
+                                + cmiNew.get_isupdate() + "',score='"
+                                + cmiNew.get_score() + "',noofattempts="
+                                + cmiNew.get_noofattempts() + ",objecttypeid='"
+                                + cmiNew.get_objecttypeid()
+                                + "',sequencenumber=" + cmiNew.get_seqNum()
+                                + ",timespent='" + cmiNew.get_timespent()
+                                + "',coursemode='" + cmiNew.get_coursemode()
+                                + "',scoremin='" + cmiNew.get_scoremin()
+                                + "',scoremax='" + cmiNew.get_scoremax()
+                                + "' WHERE scoid=" + cmiNew.get_scoId()
+                                + " AND siteid=" + cmiNew.get_siteId()
+                                + " AND userid=" + cmiNew.get_userId();
+                    }
+                    db.execSQL(strExeQuery);
+                    cursor.close();
+                } else {
+                    if (isValidString(cmiNew.get_objecttypeid())) {
+                        if (cmiNew.get_objecttypeid().equals("9")
+                                || cmiNew.get_objecttypeid().equals("8")) {
+                            if (isValidString(cmiNew.get_score())) {
+                                if (cmiNew.get_noofattempts() == 0)
+                                    cmiNew.set_noofattempts(1);
+                            }
+                        }
+                    }
+                    strExeQuery = "INSERT INTO "
+                            + TBL_CMI
+                            + "(siteid,scoid,userid,location,status,suspenddata,objecttypeid,datecompleted,noofattempts,score,sequencenumber,isupdate,startdate,timespent,coursemode,scoremin,scoremax,randomquesseq,siteurl,textResponses)"
+                            + " VALUES (" + cmiNew.get_siteId() + ","
+                            + cmiNew.get_scoId() + "," + cmiNew.get_userId()
+                            + ",'" + cmiNew.get_location() + "','"
+                            + cmiNew.get_status() + "','"
+                            + cmiNew.get_suspenddata() + "','"
+                            + cmiNew.get_objecttypeid() + "','"
+                            + cmiNew.get_datecompleted() + "',"
+                            + cmiNew.get_noofattempts() + ",'"
+                            + cmiNew.get_score() + "','" + cmiNew.get_seqNum()
+                            + "','" + cmiNew.get_isupdate() + "','"
+                            + cmiNew.get_startdate() + "','"
+                            + cmiNew.get_timespent() + "','"
+                            + cmiNew.get_coursemode() + "','"
+                            + cmiNew.get_scoremin() + "','"
+                            + cmiNew.get_scoremax() + "','"
+                            + cmiNew.get_qusseq() + "','"
+                            + cmiNew.get_sitrurl() + "','"
+                            + cmiNew.get_textResponses() + "')";
+
+                    db.execSQL(strExeQuery);
+                }
+            } else {
+                strExeQuery = "DELETE FROM CMI WHERE scoid="
+                        + cmiNew.get_scoId() + " AND siteid="
+                        + cmiNew.get_siteId() + " AND userid="
+                        + cmiNew.get_userId();
+
+                db.execSQL(strExeQuery);
+
+                if (cmiNew.get_objecttypeid().equals("9")
+                        || cmiNew.get_objecttypeid().equals("8")) {
+                    if (isValidString(cmiNew.get_score())) {
+                        if (cmiNew.get_noofattempts() == 0)
+                            cmiNew.set_noofattempts(1);
+                    }
+                }
+                strExeQuery = "INSERT INTO CMI(siteid,scoid,userid,location,status,suspenddata,objecttypeid,datecompleted,noofattempts,score,sequencenumber,isupdate,startdate,timespent,coursemode,scoremin,scoremax,randomquesseq,siteurl,textResponses)"
+                        + " VALUES ("
+                        + cmiNew.get_siteId()
+                        + ","
+                        + cmiNew.get_scoId()
+                        + ","
+                        + cmiNew.get_userId()
+                        + ",'"
+                        + cmiNew.get_location()
+                        + "','"
+                        + cmiNew.get_status()
+                        + "','"
+                        + cmiNew.get_suspenddata()
+                        + "',"
+                        + cmiNew.get_objecttypeid()
+                        + ",'"
+                        + cmiNew.get_datecompleted()
+                        + "',"
+                        + cmiNew.get_noofattempts()
+                        + ",'"
+                        + cmiNew.get_score()
+                        + "','"
+                        + cmiNew.get_seqNum()
+                        + "','"
+                        + cmiNew.get_isupdate()
+                        + "','"
+                        + cmiNew.get_startdate()
+                        + "','"
+                        + cmiNew.get_timespent()
+                        + "','"
+                        + cmiNew.get_coursemode()
+                        + "','"
+                        + cmiNew.get_scoremin()
+                        + "','"
+                        + cmiNew.get_scoremax()
+                        + "','"
+                        + cmiNew.get_qusseq()
+                        + "','"
+                        + cmiNew.get_sitrurl()
+                        + "','"
+                        + cmiNew.get_textResponses() + "')";
+
+                db.execSQL(strExeQuery);
+            }
+
+            db.close();
+        } catch (Exception e) {
+            Log.d("insertCMI", e.getMessage() != null ? e.getMessage()
+                    : "Error");
+            if (db.isOpen()) {
+                db.close();
+            }
+        }
+        return seqNo;
+
+    }
+
+    public void updateCMIStartDate(String scoID, String startDate, String userID) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            String strUpdate = "UPDATE " + TBL_CMI + " SET startdate = '" + startDate + "' WHERE scoid = " + scoID + " and userid = " + userID + " and siteid =" + appUserModel.getSiteIDValue();
+            db.execSQL(strUpdate);
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     // uncomment for pagenotes
 //    public void sendOfflineUserPagenotes() {

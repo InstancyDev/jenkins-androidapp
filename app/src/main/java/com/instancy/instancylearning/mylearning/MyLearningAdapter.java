@@ -228,9 +228,9 @@ public class MyLearningAdapter extends BaseAdapter {
 
 
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
-            holder.txtAuthor.setText("By " + myLearningModel.get(position).getPresenter() + " ");
+            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
         } else {
-            holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
+            holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
 
 

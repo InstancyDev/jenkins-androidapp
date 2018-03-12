@@ -877,6 +877,7 @@ public class GlobalMethods {
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
+                // uncomment for reports
                 menu.getItem(5).setVisible(true);
             }
 

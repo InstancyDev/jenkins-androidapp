@@ -9,7 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Html;
@@ -23,10 +22,8 @@ import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.DiscussionCommentsAdapter;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.mainactivities.ReportAdapter;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -50,12 +47,12 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
 /**
  * Created by Upendranath on 7/28/2017 Working on InstancyLearning.
  */
-public class Reports_Activity extends AppCompatActivity {
+public class Ratings_Activity extends AppCompatActivity {
 
 
     final Context context = this;
     SVProgressHUD svProgressHUD;
-    String TAG = Reports_Activity.class.getSimpleName();
+    String TAG = Ratings_Activity.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;

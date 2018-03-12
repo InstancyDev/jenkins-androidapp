@@ -142,10 +142,10 @@ public class CatalogAdapter extends BaseAdapter {
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
 
         if (isEvent){
-            holder.txtAuthor.setText("By " + myLearningModel.get(position).getPresenter() + " ");
+            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
         }
         else {
-            holder.txtAuthor.setText("By " + myLearningModel.get(position).getAuthor() + " ");
+            holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
 
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());

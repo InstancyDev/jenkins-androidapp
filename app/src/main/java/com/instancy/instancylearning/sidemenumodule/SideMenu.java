@@ -254,7 +254,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
 
-        Picasso.with(this).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
+        Picasso.with(this).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
         String name = strAry[0];
 
         if (name.contains("Anonymous") || name.contains("null")) {

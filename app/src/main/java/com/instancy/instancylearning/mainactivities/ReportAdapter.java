@@ -120,7 +120,13 @@ public class ReportAdapter extends BaseAdapter {
             holder.txtName.setText(reportDetailsForQuestionsList.get(position).questionID + ". " + reportDetailsForQuestionsList.get(position).questionName);
             holder.txtDateCompleted.setText(" " + reportDetailsForQuestionsList.get(position).questionAnswer);
 
-            holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+
+            if (reportDetailsForQuestionsList.get(position).questionAnswer.contains("in")){
+                holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorRed));
+            }
+else {
+                holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+            }
             holder.txtDateCompleted.setTextSize(16);
             holder.txtScore.setVisibility(View.GONE);
             holder.txtStartDate.setVisibility(View.GONE);

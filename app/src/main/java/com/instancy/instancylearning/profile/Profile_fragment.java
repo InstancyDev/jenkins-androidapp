@@ -142,12 +142,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         vollyService = new VollyService(resultCallback, context);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = new SideMenusModel();
 
         Bundle bundle = getArguments();
@@ -347,8 +341,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
 
 
-        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileImage);
-        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.user_placeholder).into(profileRound);
+        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
         profileImage.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
         profileImage.setImageAlpha(25);
