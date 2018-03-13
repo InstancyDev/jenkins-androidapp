@@ -1721,7 +1721,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         try {
             String strDelete = "DELETE FROM " + TBL_TRACKOBJECTS + " WHERE siteid= '" + learningModel.getSiteID() +
-                    "' AND trackscoid= '" + learningModel.getTrackScoid() +
+                    "' AND trackscoid= '" + learningModel.getScoId() +
                     "' AND userid= '" + learningModel.getUserID() + "'";
             db.execSQL(strDelete);
 
@@ -5259,6 +5259,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         JSONArray jsonLearnerSessionAry = jsonObjectCMI.getJSONArray("learnersession");
         if (jsonCMiAry != null) {
             ejectRecordsinCmi(learningModel);
+
             insertCMIData(jsonCMiAry, learningModel);
 
         }
@@ -5481,11 +5482,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // statusdisplayname
             if (jsonCMiColumnObj.has("studentresponses")) {
 
-                String checkForNull =jsonCMiColumnObj.getString("studentresponses");
+                String checkForNull = jsonCMiColumnObj.getString("studentresponses");
 
-                if (isValidString(checkForNull)){
+                if (isValidString(checkForNull)) {
                     studentResponseModel.set_studentresponses(checkForNull);
-                }else {
+                } else {
                     studentResponseModel.set_studentresponses("");
                 }
 
@@ -5659,11 +5660,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonCMiColumnObj.has("timespent")) {
 
 
-                String checkForNull =jsonCMiColumnObj.getString("timespent");
+                String checkForNull = jsonCMiColumnObj.getString("timespent");
 
-                if (isValidString(checkForNull)){
+                if (isValidString(checkForNull)) {
                     learnerSessionTable.setTimeSpent(checkForNull);
-                }else {
+                } else {
                     learnerSessionTable.setTimeSpent("0:00:00");
                 }
 
@@ -5712,20 +5713,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             // attemptnumber
 
-            int attemptnumber =0;
+            int attemptnumber = 0;
             if (jsonCMiColumnObj.has("attemptnumber") && !jsonCMiColumnObj.isNull("attemptnumber")) {
 
-                attemptnumber=jsonCMiColumnObj.getInt("attemptnumber");
+                attemptnumber = jsonCMiColumnObj.getInt("attemptnumber");
 
-                learnerSessionTable.setAttemptNumber(""+attemptnumber);
+                learnerSessionTable.setAttemptNumber("" + attemptnumber);
 
             }
 
             if (attemptnumber == 1) {
-                String startDate="";
+                String startDate = "";
                 if (isValidString(learnerSessionTable.getSessionDateTime())) {
 
-                        startDate=learnerSessionTable.getSessionDateTime();
+                    startDate = learnerSessionTable.getSessionDateTime();
 
                 }
                 updateCMIStartDate(learnerSessionTable.getScoID(), startDate, learnerSessionTable.getUserID());
@@ -5761,8 +5762,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
+//            String strDelete = "DELETE FROM " + TBL_CMI + " WHERE siteid= '" + learnerModel.getSiteID() +
+//                    "' AND scoid= '" + learnerModel.getScoId() +
+//                    "' AND userid= '" + learnerModel.getUserID() + "'";
             String strDelete = "DELETE FROM " + TBL_CMI + " WHERE siteid= '" + learnerModel.getSiteID() +
-                    "' AND scoid= '" + learnerModel.getScoId() +
                     "' AND userid= '" + learnerModel.getUserID() + "'";
             db.execSQL(strDelete);
 
@@ -7009,7 +7012,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             resDetails.set_capturedImgFilepath("");
         }
 
-        int questionAttempt = 0 ;
+        int questionAttempt = 0;
 
         Boolean isStudentResExist = false;
         SQLiteDatabase db = this.getWritableDatabase();
@@ -7066,7 +7069,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //
 //                }
                 String strExeQuery = "";
-                if (questionAttempt!=0) {
+                if (questionAttempt != 0) {
                     strExeQuery = "UPDATE studentresponses SET studentresponses ='"
                             + resDetails.get_studentresponses()
                             + "',result='"
@@ -7157,7 +7160,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         cursor.close();
         db.close();
     }
-
 
 
     public void insertStudentResponses(StudentResponseModel resDetails) {
@@ -14108,11 +14110,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (jsonTrackObj.has("name")) {
 
-                        String checkForNull =jsonTrackObj.getString("name");
+                        String checkForNull = jsonTrackObj.getString("name");
 
-                        if (isValidString(checkForNull)){
+                        if (isValidString(checkForNull)) {
                             trackObjectsModel.setName(checkForNull);
-                        }else {
+                        } else {
                             trackObjectsModel.setName("");
                         }
 
@@ -14121,11 +14123,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 //                        trackObjectsModel.setObjTypeId(jsonTrackObj.getString("objecttypeid"));
 
-                        String checkForNull =jsonTrackObj.getString("objecttypeid");
+                        String checkForNull = jsonTrackObj.getString("objecttypeid");
 
-                        if (isValidString(checkForNull)){
+                        if (isValidString(checkForNull)) {
                             trackObjectsModel.setObjTypeId(checkForNull);
-                        }else {
+                        } else {
                             trackObjectsModel.setObjTypeId("");
                         }
 
@@ -14134,11 +14136,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     if (jsonTrackObj.has("scoid")) {
 
 
-                        String checkForNull =jsonTrackObj.getString("scoid");
+                        String checkForNull = jsonTrackObj.getString("scoid");
 
-                        if (isValidString(checkForNull)){
+                        if (isValidString(checkForNull)) {
                             trackObjectsModel.setScoId(checkForNull);
-                        }else {
+                        } else {
                             trackObjectsModel.setScoId("");
                         }
 
@@ -14149,11 +14151,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     if (jsonTrackObj.has("sequencenumber")) {
 
 
-                        String checkForNull =jsonTrackObj.getString("sequencenumber");
+                        String checkForNull = jsonTrackObj.getString("sequencenumber");
 
-                        if (isValidString(checkForNull)){
+                        if (isValidString(checkForNull)) {
                             trackObjectsModel.setSequenceNumber(checkForNull);
-                        }else {
+                        } else {
                             trackObjectsModel.setSequenceNumber("");
                         }
 
@@ -14162,11 +14164,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     if (jsonTrackObj.has("trackscoid")) {
 
-                        String checkForNull =jsonTrackObj.getString("trackscoid");
+                        String checkForNull = jsonTrackObj.getString("trackscoid");
 
-                        if (isValidString(checkForNull)){
+                        if (isValidString(checkForNull)) {
                             trackObjectsModel.setTrackSoId(checkForNull);
-                        }else {
+                        } else {
                             trackObjectsModel.setTrackSoId("");
                         }
 //                        trackObjectsModel.setTrackSoId(jsonTrackObj.getString("trackscoid"));
@@ -14379,7 +14381,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
         }
-
 
 
         if (jsonCMIAry.length() > 0) {
@@ -14943,6 +14944,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         reportDetail.dateCompleted = cursor.getString(cursor
                                 .getColumnIndex("datecompleted"));
+
 
                         reportDetail.dateStarted = cursor.getString(cursor
                                 .getColumnIndex("startdate"));

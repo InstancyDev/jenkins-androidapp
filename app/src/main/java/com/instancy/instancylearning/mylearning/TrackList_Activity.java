@@ -209,7 +209,9 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         try {
                             if (isTraxkList) {
                                 db.injectTracklistData(true, response, myLearningModel);
+                                callMobileGetContentTrackedData(myLearningModel);
                                 injectFromDbtoModel();
+
                                 executeXmlWorkFlowFile();
                             } else {
 //                                Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
@@ -254,6 +256,19 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+                if (requestType.equalsIgnoreCase("MLADP")) {
+
+                    if (response != null) {
+                        try {
+                            db.injectCMIDataInto(response, myLearningModel);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
+
                 svProgressHUD.dismiss();
             }
         };
@@ -287,7 +302,12 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
         }
     }
+    public void callMobileGetContentTrackedData(MyLearningModel learningModel) {
+        String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
 
+        vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
+
+    }
     public HashMap<String, List<MyLearningModel>> prepareHashMap(List<MyLearningModel> trackList, List<String> blockNamesAry) {
 
         HashMap<String, List<MyLearningModel>> hashMaps = new HashMap<String, List<MyLearningModel>>();

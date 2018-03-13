@@ -496,8 +496,12 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     myLearningDetalData.setProgress("100");
                     notifyDataSetChanged();
 //                    db.updateCMIstatus(myLearningDetalData, "Completed");
-                    if (_context instanceof TrackList_Activity) {
-                        ((TrackList_Activity) _context).executeWorkFlowRules("onitemChange");
+//                    if (_context instanceof TrackList_Activity) {
+//                        ((TrackList_Activity) _context).executeWorkFlowRules("onitemChange");
+//                    }
+
+                    if (_context instanceof EventTrackList_Activity) {
+                        ((EventTrackList_Activity) _context).executeWorkFlowRules("onitemChange");
                     }
                 }
             };

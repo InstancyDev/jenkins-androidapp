@@ -388,11 +388,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             ex.printStackTrace();
         }
 
-//        try {
-//            getUserRatingsOfTheContent();
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            getUserRatingsOfTheContent();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         final float oldRating = ratingValue;
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -1702,12 +1702,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
-
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-
 
                 svProgressHUD.dismiss();
             }

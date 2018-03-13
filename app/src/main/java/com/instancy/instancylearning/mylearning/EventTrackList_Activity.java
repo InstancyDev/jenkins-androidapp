@@ -229,8 +229,9 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         } else {
             String paramsString = "SiteURL=" + appUserModel.getSiteURL()
                     + "&ContentID=" + myLearningModel.getContentID()
-                    + "&userid=" + appUserModel.getUserIDValue()
-                    + "&DelivoryMode=1&IsDownload=0";
+                    + "&UserID=" + appUserModel.getUserIDValue()
+                    + "&DelivoryMode=1&IsDownload=0&TrackObjectTypeID=" + myLearningModel.getObjecttypeId() + "&TrackScoID=" + myLearningModel.getScoId() + "&SiteID=" + appUserModel.getSiteIDValue() + "&OrgUnitID=" + appUserModel.getSiteIDValue();
+
             vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString, appUserModel.getAuthHeaders());
             swipeRefreshLayout.setRefreshing(false);
 
@@ -251,6 +252,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                             if (isTraxkList) {
                                 db.injectTracklistData(true, response, myLearningModel);
                                 injectFromDbtoModel();
+                                callMobileGetContentTrackedData(myLearningModel);
                                 executeXmlWorkFlowFile();
                             } else {
 //                                Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
@@ -295,6 +297,19 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+                if (requestType.equalsIgnoreCase("MLADP")) {
+
+                    if (response != null) {
+                        try {
+                            db.injectCMIDataInto(response, myLearningModel);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
+
                 svProgressHUD.dismiss();
             }
         };
@@ -2730,6 +2745,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         injectFromDbtoModel();
     }
 
+    public void callMobileGetContentTrackedData(MyLearningModel learningModel) {
+        String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
+
+        vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
+
+    }
 
 }
 

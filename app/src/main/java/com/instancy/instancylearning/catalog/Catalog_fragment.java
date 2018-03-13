@@ -1813,7 +1813,7 @@ if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
         String paramsString = "SiteURL=" + learningModel.getSiteURL()
                 + "&ContentID=" + learningModel.getContentID()
                 + "&userid=" + learningModel.getUserID()
-                + "&DelivoryMode=" + "1";
+                + "&DelivoryMode=1&IsDownload=1";
 
         String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
 

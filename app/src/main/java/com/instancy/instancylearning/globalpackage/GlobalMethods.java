@@ -38,7 +38,6 @@ import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
-import com.instancy.instancylearning.mylearning.TrackList_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -418,7 +417,7 @@ public class GlobalMethods {
         } else {
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
-                Intent intentDetail = new Intent(context, TrackList_Activity.class);
+                Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
                 intentDetail.putExtra("myLearningDetalData", myLearningModel);
                 intentDetail.putExtra("ISTRACKLIST", true);
                 ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
@@ -1216,7 +1215,7 @@ public static void launchCoursePreviewViewFromGlobalClass(MyLearningModel myLear
 
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
-            Intent intentDetail = new Intent(context, TrackList_Activity.class);
+            Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", true);
             ((Activity) context).startActivity(intentDetail);

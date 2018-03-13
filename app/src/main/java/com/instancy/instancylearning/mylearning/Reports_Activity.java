@@ -45,6 +45,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 /**
@@ -283,9 +284,20 @@ public class Reports_Activity extends AppCompatActivity {
     public void updateUI(ReportDetail reportDetail) {
 
         txtName.setText(" " + learningModel.getCourseName());
-        txtDateCompleted.setText("Date Completed: " + reportDetail.dateCompleted);
-        txtStartDate.setText("Date Started  : " + reportDetail.dateStarted);
-        txtTimeSpent.setText("Time Spent: " + reportDetail.timeSpent);
+
+        if (isValidString(reportDetail.dateCompleted)) {
+            txtDateCompleted.setText("Date Completed: " + reportDetail.dateCompleted);
+        }
+
+        if (isValidString(reportDetail.dateStarted)) {
+            txtStartDate.setText("Date Started  : " + reportDetail.dateStarted);
+        }
+
+        if (isValidString(reportDetail.timeSpent)) {
+            txtTimeSpent.setText("Time Spent: " + reportDetail.timeSpent);
+        } else {
+            txtTimeSpent.setText("Time Spent: 0:00:00");
+        }
 
         nodataLabel.setText("");
 
@@ -300,40 +312,40 @@ public class Reports_Activity extends AppCompatActivity {
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-            reportDetail.score="100";
+            reportDetail.score = "100";
         } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
-            reportDetail.score="0";
+            reportDetail.score = "0";
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
-            displayStatus=learningModel.getStatus();
+            displayStatus = learningModel.getStatus();
         } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            reportDetail.score="50";
-            displayStatus="In Progress";
+            reportDetail.score = "50";
+            displayStatus = "In Progress";
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            reportDetail.score="100";
+            reportDetail.score = "100";
         } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
 
-            displayStatus="Registered";
+            displayStatus = "Registered";
             txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
 
 
         } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            displayStatus=learningModel.getStatus();
+            displayStatus = learningModel.getStatus();
         } else if (statusFromModel.toLowerCase().contains("Expired")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            displayStatus="Expired";
+            displayStatus = "Expired";
         } else {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
         }
 
-        txtScore.setText("Score: " +reportDetail.score);
+        txtScore.setText("Score: " + reportDetail.score);
         txtStatus.setText(displayStatus);
     }
 

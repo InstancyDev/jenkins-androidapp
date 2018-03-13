@@ -285,7 +285,7 @@ public class MyLearningAdapter extends BaseAdapter {
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")) {
             holder.btnDownload.setVisibility(View.GONE);
             holder.circleProgressBar.setVisibility(View.GONE);
-            holder.progressBar.setVisibility(View.GONE);
+//            holder.progressBar.setVisibility(View.GONE);
 
         } else {
 
@@ -697,7 +697,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
             } else {
-                if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")){
+                if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                     ((ListView) parent).performItemClick(view, getPosition, 0);
                 }
 

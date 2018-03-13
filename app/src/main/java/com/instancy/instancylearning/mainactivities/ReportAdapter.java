@@ -142,7 +142,7 @@ else {
 
             String status = reportDetailList.get(position).status;
 
-            String dateStarted = reportDetailList.get(position).dateCompleted;
+            String dateStarted = reportDetailList.get(position).dateStarted;
 
             if (isValidString(dateCompleted)) {
                 holder.txtDateCompleted.setText("Date Completed: " + dateCompleted);
@@ -165,9 +165,16 @@ else {
             }
 
 
-            holder.txtScore.setText("Score: " + reportDetailList.get(position).score + " ");
+//            holder.txtScore.setText("Score: " + reportDetailList.get(position).score + " ");
 
-            holder.txtTimeSpent.setText("Time Spent: " + reportDetailList.get(position).timeSpent);
+
+
+            if (isValidString(reportDetailList.get(position).timeSpent)){
+                holder.txtTimeSpent.setText("Time Spent: " + reportDetailList.get(position).timeSpent);
+            }
+            else {
+                holder.txtTimeSpent.setText("Time Spent: 0:00:00");
+            }
 
             String statusFromModel = reportDetailList.get(position).status;
 
@@ -175,35 +182,36 @@ else {
                 if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-
+                    reportDetailList.get(position).score="100";
                 } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
-
+                    reportDetailList.get(position).score="0";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusNotStarted));
 
+
                 } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
-
+                    reportDetailList.get(position).score="50";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusInProgress));
-
+                    holder.txtStatus.setText("In Progress");
                 } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
-
+                    reportDetailList.get(position).score="50";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
 
                 } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
-
+                    reportDetailList.get(position).score="100";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
 
 
-                } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+                } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {reportDetailList.get(position).score="100";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
                 } else if (statusFromModel.toLowerCase().contains("Expired")) {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
-
+                    reportDetailList.get(position).score="0";
                 } else {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
@@ -212,6 +220,13 @@ else {
 
             } else {
                 holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
+            }
+
+            if (isValidString(reportDetailList.get(position).score)){
+                holder.txtScore.setText("Score: " + reportDetailList.get(position).score);
+            }
+            else {
+                holder.txtScore.setText("Score: 0");
             }
         }
 

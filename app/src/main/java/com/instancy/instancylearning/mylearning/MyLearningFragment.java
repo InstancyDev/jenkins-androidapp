@@ -909,7 +909,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         String paramsString = "SiteURL=" + learningModel.getSiteURL()
                 + "&ContentID=" + learningModel.getContentID()
                 + "&userid=" + learningModel.getUserID()
-                + "&DelivoryMode=" + "1";
+                + "&DelivoryMode=1&IsDownload=1";
+
 
         String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
 
@@ -1048,9 +1049,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         String paramsString = "";
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
 
-            paramsString = "userId="
+            paramsString = "userID="
                     + myLearningModel.getUserID()
-                    + "&scoId="
+                    + "&scoid="
                     + myLearningModel.getScoId()
                     + "&TrackObjectTypeID="
                     + myLearningModel.getObjecttypeId()
@@ -1062,9 +1063,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     + "&isonexist=onexit";
 
         } else {
-            paramsString = "userId="
+            paramsString = "userID="
                     + myLearningModel.getUserID()
-                    + "&scoId="
+                    + "&scoid="
                     + myLearningModel.getScoId();
 
         }
