@@ -250,7 +250,7 @@ public class Ratings_Activity extends AppCompatActivity {
 
         } else if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-            reportDetail = db.getReportTrack(learningModel);
+
         }
 
         if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {

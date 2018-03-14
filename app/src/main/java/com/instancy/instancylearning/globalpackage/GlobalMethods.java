@@ -877,7 +877,7 @@ public class GlobalMethods {
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
                 // uncomment for reports
-                menu.getItem(5).setVisible(true);
+                menu.getItem(5).setVisible(false);
             }
 
             if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
@@ -898,7 +898,7 @@ public class GlobalMethods {
 
         } else {
             menu.getItem(2).setVisible(true);
-            menu.getItem(5).setVisible(true); // uncomment for report
+            menu.getItem(5).setVisible(false); // uncomment for report
 //
             menu.getItem(1).setVisible(true);
         }

@@ -14857,14 +14857,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return reportDetail;
     }
 
-    public ReportDetail getReportTrack(MyLearningModel learningModel) {
+    public ReportDetail getReportTrack(MyLearningModel learningModel,boolean istrackList) {
 
-        boolean istrackList = false;
-        if (!learningModel.getIsListView().equalsIgnoreCase("true")) {
-            istrackList = true;
-        } else {
-            istrackList = false;
-        }
+//        boolean istrackList = false;
+//        if (!learningModel.getIsListView().equalsIgnoreCase("true")) {
+//            istrackList = false;
+//        } else {
+//            istrackList = false;
+//        }
 
         ReportDetail reportDetail = new ReportDetail();
         SQLiteDatabase db = this.getWritableDatabase();

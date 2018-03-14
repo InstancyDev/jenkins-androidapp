@@ -23,6 +23,7 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.ReviewContentModel;
+import com.instancy.instancylearning.models.ReviewRatingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -41,7 +42,7 @@ public class RatingsAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<ReviewContentModel> ratingModelList = null;
+    private List<ReviewRatingModel> ratingModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -50,13 +51,13 @@ public class RatingsAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = RatingsAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<ReviewContentModel> searchList;
+    private List<ReviewRatingModel> searchList;
 
 
-    public RatingsAdapter(Activity activity, int resource, List<ReviewContentModel> ratingModelList) {
+    public RatingsAdapter(Activity activity, int resource, List<ReviewRatingModel> ratingModelList) {
         this.activity = activity;
         this.ratingModelList = ratingModelList;
-        this.searchList = new ArrayList<ReviewContentModel>();
+        this.searchList = new ArrayList<ReviewRatingModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -71,9 +72,9 @@ public class RatingsAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<ReviewContentModel> ratingModelList) {
+    public void refreshList(List<ReviewRatingModel> ratingModelList) {
         this.ratingModelList = ratingModelList;
-        this.searchList = new ArrayList<ReviewContentModel>();
+        this.searchList = new ArrayList<ReviewRatingModel>();
         this.searchList.addAll(ratingModelList);
         this.notifyDataSetChanged();
     }
@@ -159,12 +160,12 @@ public class RatingsAdapter extends BaseAdapter {
         RatingBar ratingBar;
 
 
-        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.btn_attachment})
-        public void actionsForMenu(View view) {
-
-            ((ListView) parent).performItemClick(view, getPosition, 0);
-
-        }
+//        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.btn_attachment})
+//        public void actionsForMenu(View view) {
+//
+//            ((ListView) parent).performItemClick(view, getPosition, 0);
+//
+//        }
 
     }
 }

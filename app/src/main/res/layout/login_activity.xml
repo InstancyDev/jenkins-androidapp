@@ -43,7 +43,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/ppdlifelogo" />
+                android:src="@drawable/cvctabanner" />
             <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout
@@ -60,6 +60,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:backgroundTint="@color/colorBlack"
+                    android:fontFamily="sans-serif"
                     android:hint="Username"
                     android:inputType="textEmailAddress"
                     android:maxLength="80"
@@ -68,7 +69,6 @@
                     android:paddingLeft="25dp"
                     android:paddingRight="10dp"
                     android:text=""
-                    android:fontFamily="sans-serif"
 
                     android:textColor="@color/colorBlack"
                     android:textColorHint="@color/colorBlack"
@@ -103,8 +103,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:backgroundTint="@color/colorBlack"
-                    android:hint="Password"
                     android:fontFamily="sans-serif"
+                    android:hint="Password"
                     android:inputType="textPassword"
                     android:maxLength="50"
                     android:maxLines="1"
@@ -203,9 +203,9 @@
                     android:text="@string/btn_txt_signup"
                     android:textAlignment="textEnd"
                     android:textAllCaps="false"
-                    android:visibility="invisible"
                     android:textColor="@color/colorWhite"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
 
             </LinearLayout>
 
