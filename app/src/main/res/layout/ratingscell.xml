@@ -11,7 +11,7 @@
     android:layout_marginTop="3dp"
     app:cardCornerRadius="0dp"
     app:cardElevation="0dp"
-    app:contentPadding="4dp">
+    app:contentPadding="10dp">
 
     <LinearLayout
         android:id="@+id/linearlayout"
@@ -53,9 +53,8 @@
         <RelativeLayout
             android:id="@+id/relattitle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="4">
-
 
             <LinearLayout
                 android:id="@+id/rating_layout"
@@ -96,11 +95,10 @@
 
                 <TextView
                     android:id="@+id/txt_date"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:ellipsize="end"
-                    android:gravity="left"
+                    android:gravity="end"
                     android:maxLines="1"
                     android:padding="2dp"
                     android:text="Thursday March 1 2018"
@@ -109,13 +107,13 @@
 
             </LinearLayout>
 
-
             <TextView
                 android:id="@+id/txtreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/rating_layout"
+                android:layout_marginTop="8dp"
                 android:ellipsize="end"
                 android:gravity="left"
                 android:maxLines="100"

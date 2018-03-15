@@ -321,7 +321,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
 
-
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
             navDrawerExpandableView.setOnGroupExpandListener((new ExpandableListView.OnGroupExpandListener() {

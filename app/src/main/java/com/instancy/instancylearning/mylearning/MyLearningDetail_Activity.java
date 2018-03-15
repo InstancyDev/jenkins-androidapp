@@ -27,6 +27,8 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -51,6 +53,9 @@ import com.anjlab.android.iab.v3.SkuDetails;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
@@ -85,6 +90,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +101,8 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
@@ -104,12 +112,12 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * Created by Upendranath on 6/27/2017 Working on InstancyLearning.
  */
 
-public class MyLearningDetail_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
+public class MyLearningDetail_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler, AbsListView.OnScrollListener {
 
     BillingProcessor billingProcessor;
     private int MY_SOCKET_TIMEOUT_MS = 5000;
 
-
+    private int preLast;
     // from here to
 //    @BindView(R.id.txt_title_name)
 //    TextView txtTitle;
@@ -177,7 +185,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     TextView txtCourseName;
 
-    RatingBar ratingBar;
+    RatingBar ratingBar, overallRatingbar;
 
     TextView txtCourseStatus;
 
@@ -196,6 +204,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     RelativeLayout relativeLayout;
 
     TextView txtPrice;
+
+    Button btnEditReview;
 
     @BindView(R.id.event_bottom)
     LinearLayout btnsLayout;
@@ -224,7 +234,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @BindView(R.id.ratingslistview)
     ListView ratinsgListview;
 
+    @Nullable
+    @BindView(R.id.whiteline)
+    View whiteLine;
+
+    TextView txtOverallRating, ratedOutOfTxt;
+
     View header;
+
+    RatingsAdapter ratingsAdapter;
 
     PreferencesManager preferencesManager;
     String TAG = NativeSettings.class.getSimpleName();
@@ -326,6 +344,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             ratingBar.setRating(ratingValue);
             LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
             stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+
+
+            LayerDrawable overallRatingbarProgressDrawable = (LayerDrawable) overallRatingbar.getProgressDrawable();
+            overallRatingbarProgressDrawable.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
             if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
                 ratingBar.setVisibility(View.INVISIBLE);
@@ -432,11 +454,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             ex.printStackTrace();
         }
 
-//        try {
-//            getUserRatingsOfTheContent();
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            getUserRatingsOfTheContent(0);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         initilizeRatingsListView();
 
@@ -553,6 +575,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         ratingBar = (RatingBar) header.findViewById(R.id.rat_detail_ratingbar);
 
+        overallRatingbar = (RatingBar) header.findViewById(R.id.overallratingbar);
+
         progressBar = (ProgressBar) header.findViewById(R.id.course_progress_bar);
 
         txtAuthor = (TextView) header.findViewById(R.id.txt_author);
@@ -569,6 +593,12 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         txtPrice = (TextView) header.findViewById(R.id.btn_price);
 
+        txtOverallRating = (TextView) header.findViewById(R.id.txt_overallrating);
+
+        ratedOutOfTxt = (TextView) header.findViewById(R.id.ratedoutofTxt);
+
+        btnEditReview = (Button) header.findViewById(R.id.btnReview);
+
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
@@ -581,13 +611,21 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 downloadTheCourse(myLearningModel, view);
             }
         });
+
+        btnEditReview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openWriteReview();
+            }
+        });
+
     }
 
     public void typeLayout(boolean isCatalog, UiSettingsModel uiSettingsModel) {
 
-
         btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         relativeSecond.setVisibility(View.GONE);
+        whiteLine.setVisibility(View.GONE);
 
         if (isCatalog) {
 
@@ -676,6 +714,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
                     relativeSecond.setVisibility(View.VISIBLE);
+                    whiteLine.setVisibility(View.VISIBLE);
                     Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
                     iconSecond.setBackground(relatedContent);
                     buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
@@ -688,6 +727,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
                         buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
                         relativeSecond.setVisibility(View.VISIBLE);
+                        whiteLine.setVisibility(View.VISIBLE);
                         Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppHeaderTextColor());
                         iconSecond.setBackground(relatedContent);
                     }
@@ -695,6 +735,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 } else {
 // uncomment after reports completed
                     relativeSecond.setVisibility(View.VISIBLE);
+                    whiteLine.setVisibility(View.VISIBLE);
                     Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
                     iconSecond.setBackground(relatedContent);
 
@@ -717,6 +758,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             public void completedStatus() {
 
                 relativeSecond.setVisibility(View.GONE);
+                whiteLine.setVisibility(View.GONE);
                 statusUpdate("Completed");
 
             }
@@ -1661,7 +1703,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     }
 
-    public void getUserRatingsOfTheContent() throws JSONException {
+    public void getUserRatingsOfTheContent(int skippedRows) throws JSONException {
 
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.getContentID());
@@ -1675,8 +1717,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         parameters.put("DetailsCompID", "107");
         parameters.put("DetailsCompInsID", "3291");
         parameters.put("ERitems", "false");
-        parameters.put("SkippedRows", 0);
-        parameters.put("NoofRows", 100);
+        parameters.put("SkippedRows", skippedRows);
+        parameters.put("NoofRows", 3);
 
         final String parameterString = parameters.toString();
 
@@ -1687,7 +1729,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
-                initilizeRatingsListView();
+//                initilizeRatingsListView();
+                if (s != null) {
+                    try {
+                        mapReviewRating(s);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -1735,9 +1785,111 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     public void initilizeRatingsListView() {
 
         List<ReviewRatingModel> reviewRatingModelList = null;
-        RatingsAdapter askExpertAdapter = new RatingsAdapter(this, BIND_ABOVE_CLIENT, reviewRatingModelList);
-        ratinsgListview.setAdapter(askExpertAdapter);
+        ratingsAdapter = new RatingsAdapter(this, BIND_ABOVE_CLIENT, reviewRatingModelList);
+        ratinsgListview.setAdapter(ratingsAdapter);
         ratinsgListview.addHeaderView(header);
+//        ratinsgListview.setOnScrollListener(this);
 
     }
+
+    public void mapReviewRating(String response) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject(response);
+
+        overallRatingbar.setRating(ratingValue);
+
+        int recordCount = 0;
+
+        if (jsonObject.has("RecordCount")) {
+            recordCount = jsonObject.getInt("RecordCount");
+        }
+
+        txtOverallRating.setText("" + ratingValue);
+
+        String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";
+
+        ratedOutOfTxt.setText(ratedStyle);
+        List<ReviewRatingModel> reviewRatingModelList = null;
+
+        if (jsonObject.has("UserRatingDetails")) {
+            JSONArray userRatingJsonAry = jsonObject.getJSONArray("UserRatingDetails");
+            reviewRatingModelList = new ArrayList<>();
+            if (userRatingJsonAry.length() > 0) {
+
+                for (int i = 0; i < userRatingJsonAry.length(); i++) {
+                    ReviewRatingModel reviewRatingModel = new ReviewRatingModel();
+                    JSONObject userObject = userRatingJsonAry.getJSONObject(i);
+
+                    if (userObject.has("UserName")) {
+
+                        reviewRatingModel.userName = userObject.getString("UserName");
+                    }
+
+                    if (userObject.has("RatingID")) {
+
+                        reviewRatingModel.rating = userObject.getInt("RatingID");
+                    }
+
+                    if (userObject.has("Title")) {
+
+                        reviewRatingModel.title = userObject.getString("Title");
+                    }
+
+                    if (userObject.has("Description")) {
+
+                        reviewRatingModel.description = userObject.getString("Description");
+                    }
+
+                    if (userObject.has("ReviewDate")) {
+
+                        String formattedDate = convertDateToDayFormat(userObject.getString("ReviewDate"), "yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+                        Log.d(TAG, "ReviewDate: " + formattedDate);
+                        reviewRatingModel.reviewDate = formattedDate;
+                    }
+
+                    if (userObject.has("picture")) {
+
+                        reviewRatingModel.picture = userObject.getString("picture");
+                    }
+
+                    reviewRatingModelList.add(reviewRatingModel);
+                }
+                ratingsAdapter.refreshList(reviewRatingModelList);
+            }
+
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView absListView, int i) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView absListView, final int firstVisibleItem,
+                         final int visibleItemCount, final int totalItemCount) {
+        final int lastItem = firstVisibleItem + visibleItemCount;
+
+        if (lastItem == totalItemCount) {
+            if (preLast != lastItem) {
+//                //to avoid multiple calls for last item
+                Log.d("Last", "Last");
+//                try {
+//                    getUserRatingsOfTheContent(3);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                preLast = lastItem;
+            }
+        }
+    }
+
+    public void openWriteReview() {
+
+        Intent intentReview = new Intent(MyLearningDetail_Activity.this, WriteReviewAcitiviy.class);
+        startActivity(intentReview);
+
+    }
+
 }

@@ -218,6 +218,20 @@ public class Utilities {
         return newDate;
     }
 
+    public static String convertDateToDayFormat(String dateTime, String currentFormat) {
+
+        SimpleDateFormat preFormat = new SimpleDateFormat(currentFormat);
+        SimpleDateFormat postFormater = new SimpleDateFormat("EEEE, MMM d, yyyy");
+        String newDate = null;
+        try {
+            newDate = postFormater.format(preFormat.parse(dateTime));
+        } catch (Exception e) {
+            Log.d("In getCurrentDateTime", e.getMessage());
+        }
+        return newDate;
+    }
+
+
     /**
      * To copy the data from {@code InputStream} to {@code OutputStream} .
      *

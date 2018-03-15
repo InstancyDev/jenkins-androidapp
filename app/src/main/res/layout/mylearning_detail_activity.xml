@@ -282,7 +282,7 @@
         android:layout_below="@id/scroll1view"
         android:divider="@android:color/transparent"
         android:dividerHeight="10dp"
-        android:padding="8dp"
+        android:padding="2dp"
         android:layout_above="@+id/event_bottom"
         android:scrollbars="none"> </ListView>
 

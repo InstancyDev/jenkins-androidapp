@@ -11,7 +11,7 @@ public class ReviewRatingModel implements Serializable {
 
     public String picture = "";
     public String userName = "";
-    public String rating = "";
+    public int rating = 0;
     public String reviewDate = "";
     public String description = "";
     public String title = "";

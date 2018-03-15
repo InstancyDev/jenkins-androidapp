@@ -40,10 +40,11 @@
             android:textSize="16sp" />
     </RelativeLayout>
 
-    <Space
-        android:layout_width="2dp"
+    <View
+        android:id="@+id/whiteline"
+        android:layout_width="1dp"
         android:layout_height="match_parent"
-        android:background="@color/colorGray" />
+        android:background="@color/colorWhite" />
 
     <RelativeLayout
         android:id="@+id/relativesecond"

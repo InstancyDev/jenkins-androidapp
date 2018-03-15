@@ -46,21 +46,21 @@ public class NativeSetttingsModel {
         HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
 
 
-        List<String> basketball = new ArrayList<String>();
-        basketball.add("Source ");
-        basketball.add("Type ");
-        basketball.add("Content Type ");
-        basketball.add("Category ");
-        basketball.add("Group By ");
-        expandableListDetail.put("Filter By", basketball);
+        List<String> filtersBy = new ArrayList<String>();
+        filtersBy.add("Source ");
+        filtersBy.add("Type ");
+        filtersBy.add("Content Type ");
+        filtersBy.add("Category ");
+        filtersBy.add("Group By ");
+        expandableListDetail.put("Filter By", filtersBy);
 
-        List<String> football = new ArrayList<String>();
-        football.add("Title");
-        football.add("Content Type");
-        football.add("Purchased Date");
-        football.add("Status");
-        football.add("Author");
-        expandableListDetail.put("Sort By", football);
+        List<String> sortBy = new ArrayList<String>();
+        sortBy.add("Title");
+        sortBy.add("Content Type");
+        sortBy.add("Purchased Date");
+        sortBy.add("Status");
+        sortBy.add("Author");
+        expandableListDetail.put("Sort By", sortBy);
         return expandableListDetail;
     }
 
@@ -221,5 +221,7 @@ public class NativeSetttingsModel {
         expandableListDetail.put("Filter By", filterModelListG);
         return expandableListDetail;
     }
+
+
 
 }

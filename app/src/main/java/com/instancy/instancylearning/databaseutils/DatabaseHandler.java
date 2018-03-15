@@ -1497,8 +1497,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
 //
 ////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8") || contextMenuID.equalsIgnoreCase("5")))
-                        continue;
+//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8") || contextMenuID.equalsIgnoreCase("5")))
+//                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -9668,7 +9668,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             JSONArray jsonAllUsersInfoAry = null;
 
-
             JSONArray jsonMembershipAry = null;
 
 
@@ -14854,7 +14853,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         }
 
-        return reportDetail;
+        return reportDetail;//
     }
 
     public ReportDetail getReportTrack(MyLearningModel learningModel,boolean istrackList) {

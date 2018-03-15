@@ -3,7 +3,9 @@ package com.instancy.instancylearning.mylearning;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -26,6 +28,7 @@ import com.instancy.instancylearning.models.ReviewContentModel;
 import com.instancy.instancylearning.models.ReviewRatingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +71,6 @@ public class RatingsAdapter extends BaseAdapter {
         appUserModel = AppUserModel.getInstance();
 
 
-
-
     }
 
     public void refreshList(List<ReviewRatingModel> ratingModelList) {
@@ -106,15 +107,23 @@ public class RatingsAdapter extends BaseAdapter {
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtReview.setMaxLines(10);
-
-//        String imgUrl = appUserModel.getSiteURL() + ratingModelList.get(position).;
-//        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+        holder.txtReview.setMaxLines(100);
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtReview.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        String imgUrl = appUserModel.getSiteURL() + ratingModelList.get(position).picture;
+        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+
+        holder.txtName.setText(ratingModelList.get(position).userName);
+        holder.txtDate.setText(ratingModelList.get(position).reviewDate);
+        holder.txtReview.setText(ratingModelList.get(position).description);
+        holder.ratingBar.setRating(ratingModelList.get(position).rating);
+
+        LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(convertView.getContext().getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
 
         convertView.setTag(holder);

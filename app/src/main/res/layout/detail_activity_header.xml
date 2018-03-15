@@ -251,12 +251,12 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:visibility="gone"
         android:id="@+id/overall_ratingslayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/detaillayoyt"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/txtRating"
@@ -275,9 +275,10 @@
             android:id="@+id/contentratinglayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_below="@+id/txtRating"
+            android:gravity="center"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/txt_overallrating"
                 android:layout_width="wrap_content"
@@ -289,16 +290,19 @@
                 android:text="4.0"
                 android:textColor="@color/colorBlack"
                 android:textSize="34sp" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center"
                     android:padding="2dp">
+
                     <RatingBar
                         android:id="@+id/overallratingbar"
                         style="?android:attr/ratingBarStyleIndicator"
@@ -308,26 +312,38 @@
                         android:rating="3.0"
                         android:stepSize="1.0" />
                 </RelativeLayout>
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
+                    android:paddingStart="6dp"
                     android:text="Average Rating"
                     android:textColor="@color/colorBlack"
                     android:textSize="14sp" />
             </LinearLayout>
+
             <TextView
 
+                android:id="@+id/ratedoutofTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="2"
-                android:padding="2dp"
+                android:padding="4dp"
                 android:text="Rated 4 out of 5 of 10 ratings"
                 android:textColor="@color/colorBlack"
                 android:textSize="14sp" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/btnReview"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/gray_button_background"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_below="@+id/contentratinglayout"
+            android:text="Edit Your Review" />
     </RelativeLayout>
 </RelativeLayout>

@@ -1,8 +1,7 @@
-package com.instancy.instancylearning.mainactivities;
+package com.instancy.instancylearning.mylearning;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -12,30 +11,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.ReportDetail;
 import com.instancy.instancylearning.models.ReportDetailsForQuestions;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.utils.PreferencesManager;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
