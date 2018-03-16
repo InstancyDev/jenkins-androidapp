@@ -77,6 +77,7 @@ import com.instancy.instancylearning.models.ReviewRatingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.ApiConstants;
+import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.wifisharing.WiFiDirectActivity;
 import com.instancy.instancylearning.wifisharing.WiFiDirectNewActivity;
@@ -102,7 +103,6 @@ import butterknife.OnClick;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
-import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
@@ -112,12 +112,11 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  * Created by Upendranath on 6/27/2017 Working on InstancyLearning.
  */
 
-public class MyLearningDetail_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler, AbsListView.OnScrollListener {
+public class MyLearningDetail_Activity extends AppCompatActivity implements BillingProcessor.IBillingHandler {
 
     BillingProcessor billingProcessor;
     private int MY_SOCKET_TIMEOUT_MS = 5000;
 
-    private int preLast;
     // from here to
 //    @BindView(R.id.txt_title_name)
 //    TextView txtTitle;
@@ -263,7 +262,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     MembershipModel membershipModel = null;
     public SetCompleteListner setCompleteListner;
     CmiSynchTask cmiSynchTask;
-
+    int skippedRows = 0;
+    List<ReviewRatingModel> reviewRatingModelList = null;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -1784,11 +1784,32 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void initilizeRatingsListView() {
 
-        List<ReviewRatingModel> reviewRatingModelList = null;
+        if (reviewRatingModelList == null) {
+            reviewRatingModelList = new ArrayList<>();
+        }
+
         ratingsAdapter = new RatingsAdapter(this, BIND_ABOVE_CLIENT, reviewRatingModelList);
         ratinsgListview.setAdapter(ratingsAdapter);
         ratinsgListview.addHeaderView(header);
 //        ratinsgListview.setOnScrollListener(this);
+        ratinsgListview.setOnScrollListener(new EndlessScrollListener() {
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+
+                Log.d(TAG, "onLoadMore: called ");
+                try {
+                    if (skippedRows < totalItemsCount - 3 && totalItemsCount != 0) {
+
+                        skippedRows = skippedRows + 3;
+                        getUserRatingsOfTheContent(skippedRows);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
@@ -1809,11 +1830,28 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";
 
         ratedOutOfTxt.setText(ratedStyle);
-        List<ReviewRatingModel> reviewRatingModelList = null;
+
+
+//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
+
+        if (jsonObject.has("EditRating")) {
+
+            JSONObject userEditRating = jsonObject.getJSONObject("EditRating");
+
+            if (userEditRating.isNull("EditRating")) {
+
+                btnEditReview.setText("Write a Review");
+            }
+
+        }
 
         if (jsonObject.has("UserRatingDetails")) {
             JSONArray userRatingJsonAry = jsonObject.getJSONArray("UserRatingDetails");
-            reviewRatingModelList = new ArrayList<>();
+
+            if (reviewRatingModelList == null) {
+                reviewRatingModelList = new ArrayList<>();
+            }
+
             if (userRatingJsonAry.length() > 0) {
 
                 for (int i = 0; i < userRatingJsonAry.length(); i++) {
@@ -1861,29 +1899,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
     }
 
-    @Override
-    public void onScrollStateChanged(AbsListView absListView, int i) {
-
-    }
-
-    @Override
-    public void onScroll(AbsListView absListView, final int firstVisibleItem,
-                         final int visibleItemCount, final int totalItemCount) {
-        final int lastItem = firstVisibleItem + visibleItemCount;
-
-        if (lastItem == totalItemCount) {
-            if (preLast != lastItem) {
-//                //to avoid multiple calls for last item
-                Log.d("Last", "Last");
-//                try {
-//                    getUserRatingsOfTheContent(3);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-                preLast = lastItem;
-            }
-        }
-    }
 
     public void openWriteReview() {
 

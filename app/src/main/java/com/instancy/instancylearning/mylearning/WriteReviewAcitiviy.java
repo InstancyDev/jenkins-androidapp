@@ -113,7 +113,6 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,15 +157,10 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
     }
 
     public void initilizeHeaderView() {
-
-
         ratingBar.setRating(3);
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
-
-
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-
     }
 
     void initVolleyCallback() {

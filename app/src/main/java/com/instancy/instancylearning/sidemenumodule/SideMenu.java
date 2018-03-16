@@ -157,7 +157,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     SignalAService signalAService;
     public Toolbar toolbar;
 
-    SideMenusModel homeModel;
+    SideMenusModel homeModel, tempHomeModel;
     int homeIndex = 0;
 
     int notificationCount = 0;
@@ -205,7 +205,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void onClick(View v) {
                 //logo clicked
-                homeControllClicked(false, 0, "");
+                homeControllClicked(false, 0, "", false);
 
 
             }
@@ -318,6 +318,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 // on first time to display view for first navigation item based on the number
                 selectItem(Integer.parseInt(indexed), model, false, ""); // 2 is your fragment's number for "CollectionFragment"
                 homeModel = model;
+                tempHomeModel = model;
                 homeIndex = Integer.parseInt(indexed);
                 lastClicked = 0;
 
@@ -392,19 +393,42 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             });
 
-
             navDrawerExpandableView.expandGroup(lastClicked);
         }
 
 
     }
 
-    public void homeControllClicked(boolean isFromNotification, int menuId, String contentID) {
+    public void homeControllClicked(boolean isFromNotification, int menuId, String contentID, boolean isFromCommunityList) {
 
-        if (!isFromNotification)
+        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+        if (isSubSiteEntered.equalsIgnoreCase("true")) {
+            isFromCommunityList = true;
+        } else {
+            isFromCommunityList = false;
+        }
+
+        if (isFromCommunityList) {
+
+            SideMenusModel model = getMenuModelForSubsites();
+
+            int menuID = 0;
+            try {
+                homeModel = model;
+                menuID = Integer.parseInt(model.getContextMenuId());
+            } catch (NumberFormatException excepetion) {
+                excepetion.printStackTrace();
+                menuID = 1;
+
+            }
+
+            selectItem(menuID, model, false, contentID);
+
+        } else if (!isFromNotification) {
             selectItem(homeIndex, homeModel, false, contentID);
-        else {
+        } else {
             selectItem(menuId, getMenuModelForNotification(menuId), true, contentID);
+
         }
 
         navDrawerExpandableView.expandGroup(0);
@@ -425,21 +449,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         return sideMenusModel;
     }
 
-    private Bitmap createBitmapFromView(Context context, View view) {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
-        view.buildDrawingCache();
-        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(bitmap);
-        view.draw(canvas);
-
-        return bitmap;
-    }
 
     public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID) {
 
@@ -565,8 +574,33 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         }
     }
 
+    public SideMenusModel getMenuModelForSubsites() {
+        SideMenusModel sideMenusModel = new SideMenusModel();
+
+        sideMenumodelList = new ArrayList<SideMenusModel>();
+
+        sideMenumodelList = db.getNativeMainMenusData();
+
+        hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
+
+        int i = 0;
+        for (SideMenusModel menu : sideMenumodelList) {
+            int parentMenuId = menu.getMenuId();
+            subMenuList = db.getNativeSubMenusData(parentMenuId);
+            if (subMenuList != null && subMenuList.size() > 0) {
+                hmSubMenuList.put(parentMenuId, subMenuList);
+            }
+            if (i == 0) {
+                sideMenusModel = menu;
+            }
+            i++;
+        }
+        return sideMenusModel;
+    }
+
     public void backToMainSite() {
         BACKTOMAINSITE = 2;
+        homeModel = tempHomeModel;
         SIDEMENUOPENED_FIRSTTIME = 0;
         CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
         MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
@@ -607,7 +641,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         backLayout.setVisibility(View.GONE);
 
-        homeControllClicked(false, 0, "");
+        homeControllClicked(false, 0, "", false);
     }
 
 
@@ -692,10 +726,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     @Override
     public void onDrawerSlide(View drawerView, float slideOffset) {
-//        Log.d(TAG, "onDrawerSlide: sidemenu");
-//        if (SIDEMENUOPENED_FIRSTTIME == 0) {
-//            enteredSubsiteMethods();
-//        }
+
     }
 
     @Override
@@ -713,6 +744,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             subsiteLayout.setVisibility(View.VISIBLE);
             SIDEMENUOPENED_FIRSTTIME = 1;
             BACKTOMAINSITE = 1;
+            lastClicked = -1;
             TextView mainSiteName = (TextView) backLayout.findViewById(R.id.txtbtn_back);
             TextView subsiteName = (TextView) subsiteLayout.findViewById(R.id.subsitename);
             LinearLayout subsiteLa = (LinearLayout) subsiteLayout.findViewById(R.id.subsitelays);

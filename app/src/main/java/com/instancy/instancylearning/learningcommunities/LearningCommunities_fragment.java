@@ -398,6 +398,8 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
         switch (view.getId()) {
             case R.id.card_view:
+            case R.id.imagethumb:
+            case R.id.txt_comminity_name:
                 attachFragment(communitiesModelList.get(position));
                 break;
             case R.id.btn_contextmenu:
@@ -629,8 +631,11 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
     }
 
-    public void attachFragment(CommunitiesModel forumModel) {
+    public void attachFragment(CommunitiesModel communitiesModel) {
 
+        if (communitiesModel.actiongoto == 1) {
+            loginVollyWebCall(communitiesModel);
+        }
 
     }
 
@@ -693,7 +698,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             }
 
             public void onFinish() {
-                ((SideMenu) getActivity()).homeControllClicked(false,0,"");
+                ((SideMenu) getActivity()).homeControllClicked(false, 0, "", true);
             }
         }.start();
 

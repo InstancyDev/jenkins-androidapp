@@ -78,12 +78,11 @@
                             style="?android:attr/ratingBarStyleSmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:isIndicator="false"
+                            android:isIndicator="true"
                             android:rating="3.0"
                             android:stepSize="1.0" />
                     </RelativeLayout>
                 </LinearLayout>
-
 
                 <LinearLayout
                     android:id="@+id/content_progress_layout"
@@ -339,11 +338,11 @@
 
         <Button
             android:id="@+id/btnReview"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/gray_button_background"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_below="@+id/contentratinglayout"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/edittext_border"
             android:text="Edit Your Review" />
     </RelativeLayout>
 </RelativeLayout>

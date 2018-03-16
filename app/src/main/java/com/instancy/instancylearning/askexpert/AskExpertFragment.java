@@ -72,6 +72,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 
+import com.instancy.instancylearning.models.AskExpertSkillsModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -140,6 +141,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
+    List<AskExpertSkillsModel> askExpertSkillsModelList = null;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -219,7 +221,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                         Log.d(TAG, "notifySuccess: ASKQSCAT  " + response);
                         try {
                             db.injectAsktheExpertCategoryDataTable(response);
-
+                            askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -283,22 +285,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         initilizeView();
         fabActionMenusInitilization();
-//        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
-//        View customNav = LayoutInflater.from(context).inflate(R.layout.iconaskquestion, null);
-//        FontManager.markAsIconContainer(customNav.findViewById(R.id.askquestion), iconFont);
-//        Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
-//
-//        floatingActionButton.setImageDrawable(d);
-//
-//        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-//
-//        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intentDetail = new Intent(context, AskQuestionActivity.class);
-//                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-//            }
-//        });
+
 
         return rootView;
     }
@@ -311,6 +298,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
             askExpertAdapter.refreshList(askExpertQuestionModelList);
         }
+
     }
 
     public void initilizeView() {
@@ -665,7 +653,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         switch (view.getId()) {
             case R.id.fabFilter:
-                Toast.makeText(context, " Filters not configured ", Toast.LENGTH_SHORT).show();
+                filterPopUp();
                 break;
             case R.id.fabAsk:
                 Intent intentDetail = new Intent(context, AskQuestionActivity.class);
@@ -674,5 +662,59 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         }
     }
+
+
+    public void filterPopUp() {
+
+        if (askExpertSkillsModelList != null) {
+            final String[] strSplitvalues = new String[askExpertSkillsModelList.size()];
+
+            for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
+                strSplitvalues[s] = askExpertSkillsModelList.get(s).shortSkillName;
+
+            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            //set the title for alert dialog
+            builder.setTitle("Choose a skill in order to filter the above questions");
+
+            //set items to alert dialog. i.e. our array , which will be shown as list view in alert dialog
+            builder.setItems(strSplitvalues, new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    //setting the button text to the selected itenm from the list
+
+//                    Toast.makeText(context, " Selected" + strSplitvalues[item], Toast.LENGTH_SHORT).show();
+
+                }
+            });
+
+            //Creating CANCEL button in alert dialog, to dismiss the dialog box when nothing is selected
+            builder.setCancelable(false)
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            //When clicked on CANCEL button the dalog will be dismissed
+                            dialog.dismiss();
+
+
+                        }
+                    });
+
+            //Creating alert dialog
+            AlertDialog alert = builder.create();
+
+            //Showingalert dialog
+            alert.show();
+
+
+        } else {
+            Toast.makeText(context, " Filters not configured ", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
 
 }

@@ -69,12 +69,7 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
         appcontroller = AppController.getInstance();
 
     }
@@ -196,7 +191,7 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         TextView txtIsMember;
 
 
-        @OnClick({R.id.btn_contextmenu, R.id.card_view})
+        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.imagethumb, R.id.txt_comminity_name})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

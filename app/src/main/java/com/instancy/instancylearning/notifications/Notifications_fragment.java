@@ -444,9 +444,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 myCatalogExists = myCatalogAction(notificationModel.contentid);
 
             if (myLearningExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid);
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid,false);
             } else if (myCatalogExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid);
+                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid,false);
             } else {
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -465,10 +465,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             }
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 4, "");
+            ((SideMenu) getActivity()).homeControllClicked(true, 4, "",false);
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 10, "");
+            ((SideMenu) getActivity()).homeControllClicked(true, 10, "",false);
 
         }
 

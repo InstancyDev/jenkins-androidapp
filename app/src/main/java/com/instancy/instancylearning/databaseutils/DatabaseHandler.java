@@ -650,7 +650,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                         preferencesManager.setStringValue(siteUrl, StaticValues.SUB_KEY_SITEURL);
                                         appUserModel.setSiteIDValue(siteid);
                                         appUserModel.setSiteName(strsitename);
-                                        appUserModel.setSiteURL(platformurl);
+                                        appUserModel.setSiteURL(siteUrl);
                                         appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.SUB_KEY_WEBAPIURL));
                                         appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.SUB_KEY_AUTHENTICATION));
 
