@@ -40,6 +40,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
@@ -47,14 +48,18 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.ReviewContentModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,11 +92,20 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
     DatabaseHandler db;
     ResultListner resultListner = null;
 
-    DiscussionTopicModel discussionTopicModel;
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
     UiSettingsModel uiSettingsModel;
+
+    boolean isEditReview = false;
+
+    float finalRating = 0;
+
+    JSONObject editObj = null;
+
+    MyLearningModel learningModel;
+
+    ReviewContentModel reviewContentModel;
 
     @Nullable
     @BindView(R.id.txtcancel)
@@ -131,11 +145,31 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
-        discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("forumModel");
+
+        reviewContentModel = new ReviewContentModel();
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null) {
+
+            learningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
+            isEditReview = bundle.getBoolean("isEditReview");
+
+            if (isEditReview) {
+
+                try {
+                    editObj = new JSONObject(getIntent().getStringExtra("editObj"));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Write Review" + "</font>"));
+                learningModel.getCourseName() + "</font>"));
 
 
         try {
@@ -147,20 +181,56 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
             ex.printStackTrace();
         }
-        initilizeHeaderView();
-        if (isNetworkConnectionAvailable(this, -1)) {
-
-        } else {
-
+        try {
+            initilizeHeaderView();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }
 
-    public void initilizeHeaderView() {
-        ratingBar.setRating(3);
+    public void initilizeHeaderView() throws JSONException {
+        float ratingValue = 0;
+
+        try {
+            ratingValue = Float.parseFloat(learningModel.getRatingId());
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            ratingValue = 0;
+        }
+
+        ratingBar.setRating(ratingValue);
+        finalRating = ratingValue;
+
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(final RatingBar ratingBar, float rating,
+                                        boolean fromUser) {
+                // TODO Auto-generated method stub
+                if (fromUser) {
+//                    int ratingVa = Math.round(rating);
+                    finalRating = rating;
+                }
+            }
+        });
+
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        if (isEditReview) {
+            editDescription.getText().toString().trim();
+//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
+
+            if (editObj.has("Description")) {
+
+                reviewContentModel.description = editObj.getString("Description");
+
+            }
+
+            editDescription.setText(reviewContentModel.description);
+        }
+
     }
 
     void initVolleyCallback() {
@@ -246,7 +316,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.txtsave:
                 try {
-                    validateNewForumCreation();
+                    validateNewRating();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -259,8 +329,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
     }
 
-
-    public void validateNewForumCreation() throws JSONException {
+    public void validateNewRating() throws JSONException {
 
         String descriptionStr = editDescription.getText().toString().trim();
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
@@ -271,196 +340,76 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
             JSONObject parameters = new JSONObject();
 
-            parameters.put("TopicID", discussionTopicModel.topicid);
-            parameters.put("TopicName", discussionTopicModel.name);
-            parameters.put("ForumID", discussionTopicModel.forumid);
-            parameters.put("Message", descriptionStr);
+            parameters.put("ContentID", learningModel.getContentID());
             parameters.put("UserID", appUserModel.getUserIDValue());
-            parameters.put("SiteID", appUserModel.getSiteIDValue());
-            parameters.put("InvolvedUserIDList", "");
-            parameters.put("LocaleID", "en-us");
-            parameters.put("strAttachFile", "");
+            parameters.put("Title", "");
+            parameters.put("Description", descriptionStr);
+            parameters.put("ReviewDate", dateString);
+            parameters.put("Rating", finalRating);
 
-            String parameterString = parameters.toString();
-            Log.d(TAG, "validateNewForumCreation: " + parameterString);
+            final String parameterString = parameters.toString();
 
-            if (isNetworkConnectionAvailable(this, -1)) {
+            String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/AddRatings";
 
-                String replaceDataString = parameterString.replace("\"", "\\\"");
-                String addQuotes = ('"' + replaceDataString + '"');
-
-                sendNewForumDataToServer(addQuotes);
-            } else {
-                Toast.makeText(WriteReviewAcitiviy.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-            }
-        }
-
-    }
-
-
-    public void sendNewForumDataToServer(final String postData) {
-
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostComment";
-
-        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                svProgressHUD.dismiss();
-                Log.d(TAG, "onResponse: " + s);
-
-                if (s.contains("success")) {
-
-                    String replaceString = s.replace("#$#", "=");
-                    String[] strSplitvalues = replaceString.split("=");
-
-                    String replyID = "";
-                    if (strSplitvalues.length > 1) {
-                        replyID = strSplitvalues[1].replace("\"", "");
-                        Log.d(TAG, "onResponse: " + replyID);
-                    }
-                    String attachmentImg = "";
-
-                    if (attachmentImg.length() > 7) {
-
-
-                    } else {
-                        Toast.makeText(WriteReviewAcitiviy.this, "Success! \nYour comment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-
+            final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String s) {
+                    svProgressHUD.dismiss();
+                    Log.d(TAG, "onResponse: " + s);
+//                initilizeRatingsListView();
+                    if (s != null) {
                         closeForum(true);
-
                     }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
 
-                } else {
+                    svProgressHUD.dismiss();
+                }
+            })
 
-                    Toast.makeText(WriteReviewAcitiviy.this, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+            {
+
+                @Override
+                public String getBodyContentType() {
+                    return "application/json";
+
                 }
 
-            }
-        }, new Response.ErrorListener()
-
-        {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(WriteReviewAcitiviy.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
-                svProgressHUD.dismiss();
-            }
-        })
-
-        {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return postData.getBytes();
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
-
-                return headers;
-            }
-
-        };
-
-        RequestQueue rQueue = Volley.newRequestQueue(context);
-        rQueue.add(request);
-        request.setRetryPolicy(new
-
-                DefaultRetryPolicy(
-                5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-    }
-
-
-    /// photo upload to server
-
-    public void sendAttachmentDataToServer(final String postData, String replayId) {
-
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment?fileName=" + "&TopicID=" + discussionTopicModel.topicid + "&ReplyID=" + replayId + "&isTopic=false&isEdit=false";
-
-        StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                svProgressHUD.dismiss();
-                Log.d(TAG, "onResponse: " + s);
-
-                if (s.contains("success")) {
-
-                    Toast.makeText(WriteReviewAcitiviy.this, "Success! \nYour attachment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-                    closeForum(true);
-                } else {
-
-                    Toast.makeText(WriteReviewAcitiviy.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                @Override
+                public byte[] getBody() throws com.android.volley.AuthFailureError {
+                    return parameterString.getBytes();
                 }
 
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(WriteReviewAcitiviy.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
-                svProgressHUD.dismiss();
-            }
-        })
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    final Map<String, String> headers = new HashMap<>();
+                    String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                    headers.put("Content-Type", "application/json");
+                    headers.put("Accept", "application/json");
 
-        {
+                    return headers;
+                }
 
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
+            };
 
-            }
-
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return postData.getBytes();
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
-
-                return headers;
-            }
-
-        };
-
-        RequestQueue rQueue = Volley.newRequestQueue(WriteReviewAcitiviy.this);
-        rQueue.add(request);
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
+            RequestQueue rQueue = Volley.newRequestQueue(this);
+            rQueue.add(request);
+            request.setRetryPolicy(new DefaultRetryPolicy(
+                    5000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        }
     }
 
-    /// End photo upload to server
     public void closeForum(boolean refresh) {
         Intent intent = getIntent();
-        intent.putExtra("NEWFORUM", refresh);
+        intent.putExtra("NEWREVIEW", refresh);
+        intent.putExtra("myLearningDetalData", learningModel);
         setResult(RESULT_OK, intent);
         finish();
     }
-
-
 }
 

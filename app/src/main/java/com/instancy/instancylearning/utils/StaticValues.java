@@ -120,6 +120,8 @@ public class StaticValues {
 
     public static final int COURSE_CLOSE_FROM_WEBSCREEN_CODE = 8888;
 
+    public static final int REVIEW_REFRESH = 4238;
+
     /**
      * Start course launch activity of media content for result with this code.
      *

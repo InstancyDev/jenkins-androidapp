@@ -257,7 +257,6 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             cView = inflater.inflate(R.layout.drawermenu_sub_item, parentView, false);
         }
 
-
         TextView txtTitle = (TextView) cView.findViewById(R.id.submenuText);
         TextView iconFont = (TextView) cView.findViewById(R.id.fontawasomesubIcon);
         FontManager.markAsIconContainer(cView.findViewById(R.id.fontawasomesubIcon), iconFon);

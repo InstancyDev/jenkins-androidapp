@@ -91,6 +91,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,6 +103,7 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
@@ -264,6 +266,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     CmiSynchTask cmiSynchTask;
     int skippedRows = 0;
     List<ReviewRatingModel> reviewRatingModelList = null;
+    boolean isEditReview = false;
+    JSONObject editObj = null;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -455,7 +459,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
 
         try {
-            getUserRatingsOfTheContent(0);
+            getUserRatingsOfTheContent(0, false);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -553,7 +557,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         });
 
     }
-
 
     public void initilizeHeaderView() {
 
@@ -1131,6 +1134,27 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             super.onActivityResult(requestCode, resultCode, data);
         }
+
+
+        if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK) {
+            if (data != null) {
+                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+
+                boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
+                if (refresh) {
+
+                    try {
+                        skippedRows = 0;
+                        getUserRatingsOfTheContent(0, true);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+        }
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
@@ -1703,7 +1727,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     }
 
-    public void getUserRatingsOfTheContent(int skippedRows) throws JSONException {
+    public void getUserRatingsOfTheContent(int skippedRows, final boolean isFromActivityResult) throws JSONException {
 
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.getContentID());
@@ -1732,12 +1756,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                initilizeRatingsListView();
                 if (s != null) {
                     try {
-                        mapReviewRating(s);
+                        mapReviewRating(s, isFromActivityResult);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -1802,7 +1825,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     if (skippedRows < totalItemsCount - 3 && totalItemsCount != 0) {
 
                         skippedRows = skippedRows + 3;
-                        getUserRatingsOfTheContent(skippedRows);
+                        getUserRatingsOfTheContent(skippedRows, false);
                     }
 
                 } catch (JSONException e) {
@@ -1813,17 +1836,62 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     }
 
-    public void mapReviewRating(String response) throws JSONException {
+    public void mapReviewRating(String response, boolean isFromActivityResult) throws JSONException {
 
         JSONObject jsonObject = new JSONObject(response);
-
-        overallRatingbar.setRating(ratingValue);
 
         int recordCount = 0;
 
         if (jsonObject.has("RecordCount")) {
             recordCount = jsonObject.getInt("RecordCount");
         }
+
+
+//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
+
+        if (jsonObject.has("EditRating")) {
+
+//            JSONObject userEditRating = jsonObject.getJSONObject("EditRating");
+
+            if (jsonObject.isNull("EditRating")) {
+                btnEditReview.setText("Write a Review");
+                isEditReview = false;
+
+            } else {
+                btnEditReview.setText("Edit Your Review");
+                isEditReview = true;
+                editObj = jsonObject.getJSONObject("EditRating");
+            }
+
+        }
+
+
+        if (jsonObject.has("EditRating")) {
+
+//            JSONObject userEditRating = jsonObject.getJSONObject("EditRating");
+
+            if (!jsonObject.isNull("EditRating")) {
+                JSONObject ratinObj = jsonObject.getJSONObject("EditRating");
+
+                if (ratinObj.has("RatingID")) {
+
+                    try {
+                        ratingValue = Float.parseFloat(ratinObj.getString("RatingID"));
+                        ratingBar.setRating(ratingValue);
+                        myLearningModel.setRatingId("" + ratingValue);
+                        db.updateContentRatingToLocalDB(myLearningModel, "" + ratingValue);
+                    } catch (NumberFormatException ex) {
+                        ex.printStackTrace();
+                        ratingValue = 0;
+                    }
+
+                }
+
+            }
+
+        }
+
+        overallRatingbar.setRating(ratingValue);
 
         txtOverallRating.setText("" + ratingValue);
 
@@ -1832,18 +1900,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         ratedOutOfTxt.setText(ratedStyle);
 
 
-//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
-
-        if (jsonObject.has("EditRating")) {
-
-            JSONObject userEditRating = jsonObject.getJSONObject("EditRating");
-
-            if (userEditRating.isNull("EditRating")) {
-
-                btnEditReview.setText("Write a Review");
-            }
-
-        }
+        myLearningModel.setRatingId("" + ratingValue);
+        refreshCatalogContent = true;
 
         if (jsonObject.has("UserRatingDetails")) {
             JSONArray userRatingJsonAry = jsonObject.getJSONArray("UserRatingDetails");
@@ -1851,6 +1909,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             if (reviewRatingModelList == null) {
                 reviewRatingModelList = new ArrayList<>();
             }
+
+            if (isFromActivityResult) {
+                reviewRatingModelList = new ArrayList<>();
+            }
+
 
             if (userRatingJsonAry.length() > 0) {
 
@@ -1903,7 +1966,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     public void openWriteReview() {
 
         Intent intentReview = new Intent(MyLearningDetail_Activity.this, WriteReviewAcitiviy.class);
-        startActivity(intentReview);
+        intentReview.putExtra("myLearningDetalData", myLearningModel);
+        intentReview.putExtra("isEditReview", isEditReview);
+        if (isEditReview) {
+            intentReview.putExtra("editObj", (Serializable) editObj.toString());
+        }
+
+        startActivityForResult(intentReview, REVIEW_REFRESH);
 
     }
 

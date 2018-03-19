@@ -24,7 +24,6 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.ReviewContentModel;
 import com.instancy.instancylearning.models.ReviewRatingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
