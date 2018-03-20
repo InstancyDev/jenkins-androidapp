@@ -377,11 +377,21 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 int selectedPostion = getPositionForNotification(contentIDFromNotification);
                 myLearninglistView.setSelection(selectedPostion);
 
-                Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
-                intentDetail.putExtra("IFROMCATALOG", false);
-                intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
-                startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
-                isFromNotification = false;
+                if (myLearningModelsList != null) {
+
+                    try {
+                        Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
+                        intentDetail.putExtra("IFROMCATALOG", false);
+                        intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
+                        startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                        isFromNotification = false;
+                    } catch (IndexOutOfBoundsException ex) {
+//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

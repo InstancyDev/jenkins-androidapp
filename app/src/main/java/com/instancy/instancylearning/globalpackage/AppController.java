@@ -3,8 +3,14 @@ package com.instancy.instancylearning.globalpackage;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
+import android.util.Log;
 
 import com.android.volley.RequestQueue;
+import com.instancy.instancylearning.utils.ApiConstants;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * Created by Upendranath on 5/11/2017.
@@ -82,4 +88,19 @@ public class AppController extends MultiDexApplication {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
+
+    public void register(final Context context, String userid, String regid, String merchantid) {
+        Log.i(TAG, "registering device (regId = " + regid + ")");
+        /*Map<String, String> params = new HashMap<String, String>();
+        params.put("did", regid);
+		params.put("uid", userid);
+		params.put("type", "1");*/
+
+        String serverUrl = ApiConstants.LOGINURL + "did=" + regid + "&uid=" + userid + "&type=1" + "&mi=" + merchantid;
+        Log.d(TAG, "register serverUrl: " + serverUrl);
+
+    }
+
+
 }

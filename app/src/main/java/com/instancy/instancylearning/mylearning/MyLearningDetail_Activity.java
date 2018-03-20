@@ -119,61 +119,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     BillingProcessor billingProcessor;
     private int MY_SOCKET_TIMEOUT_MS = 5000;
 
-    // from here to
-//    @BindView(R.id.txt_title_name)
-//    TextView txtTitle;
-//
-//    @BindView(R.id.btntxt_download_detail)
-//    TextView btnDownload;
-//
-//    @BindView(R.id.txtDescription)
-//    TextView txtDescription;
-//
-//    @BindView(R.id.txtLongDesc)
-//    TextView txtLongDisx;
-//
-//    @BindView(R.id.imagethumb)
-//    ImageView imgThumb;
-//
-//    @BindView(R.id.txt_coursename)
-//    TextView txtCourseName;
-//
-//    @BindView(R.id.rat_detail_ratingbar)
-//    RatingBar ratingBar;
-//
-//    @BindView(R.id.txt_course_progress)
-//    TextView txtCourseStatus;
-//
-//    @BindView(R.id.course_progress_bar)
-//    ProgressBar progressBar;
-//
-//    @BindView(R.id.txt_author)
-//    TextView txtAuthor;
-//
-//    @BindView(R.id.txt_site_name)
-//    TextView txtSiteName;
-//
-//    @Nullable
-//    @BindView(R.id.circle_progress)
-//    CircleProgressBar circleProgressBar;
-//
-//    @Nullable
-//    @BindView(R.id.consolidateline)
-//    View consolidateLine;
-//
-//    @BindView(R.id.downloadlayout)
-//    RelativeLayout downloadlayout;
-//
-//    @Nullable
-//    @BindView(R.id.detail_layout)
-//    RelativeLayout relativeLayout;
-//
-//    @BindView(R.id.btn_price)
-//    TextView txtPrice;
-
-
-    // toheare
-
     TextView txtTitle;
 
     TextView btnDownload;
@@ -621,6 +566,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 openWriteReview();
             }
         });
+
+        if (isFromCatalog) {
+            btnEditReview.setVisibility(View.GONE);
+        }
 
     }
 
@@ -1144,7 +1093,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 if (refresh) {
 
                     try {
-                        skippedRows = 0;
+//                        initilizeRatingsListView();
                         getUserRatingsOfTheContent(0, true);
 
                     } catch (JSONException e) {
@@ -1814,7 +1763,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         ratingsAdapter = new RatingsAdapter(this, BIND_ABOVE_CLIENT, reviewRatingModelList);
         ratinsgListview.setAdapter(ratingsAdapter);
         ratinsgListview.addHeaderView(header);
-//        ratinsgListview.setOnScrollListener(this);
         ratinsgListview.setOnScrollListener(new EndlessScrollListener() {
 
             @Override

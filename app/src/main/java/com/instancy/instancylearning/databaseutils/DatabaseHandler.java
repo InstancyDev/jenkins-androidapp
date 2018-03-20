@@ -8043,7 +8043,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         } catch (SQLiteException ex) {
             ex.printStackTrace();
         }
-
     }
 
     public int insertCMI(CMIModel cmiNew, boolean isUpdate) {
@@ -14856,7 +14855,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return reportDetail;//
     }
 
-    public ReportDetail getReportTrack(MyLearningModel learningModel,boolean istrackList) {
+    public ReportDetail getReportTrack(MyLearningModel learningModel, boolean istrackList) {
 
 //        boolean istrackList = false;
 //        if (!learningModel.getIsListView().equalsIgnoreCase("true")) {
@@ -14981,8 +14980,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 : "Error getting menus");
 
             }
+            /// need to write
+            if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
 
+            }
         }
 
         return reportDetail;

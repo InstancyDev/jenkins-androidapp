@@ -172,6 +172,25 @@
             android:name=".mylearning.WriteReviewAcitiviy"
             android:screenOrientation="portrait"></activity>
 
+        <!-- Push Notification  Services-->
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service
+            android:name=".fcm.MyFirebaseMessagingService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".fcm.MyFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
 
         <!-- INAPP BILLING ACTIVITY -->
 
@@ -189,11 +208,13 @@
             android:name=".wifisharing.WiFiClientIPTransferService"
             android:enabled="true" />
 
+
         <receiver android:name=".helper.NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
 
         <!--<provider-->
         <!--android:name="android.support.v4.content.FileProvider"-->

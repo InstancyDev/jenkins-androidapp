@@ -95,8 +95,8 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_NOTIFICATIONS;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 
+import static com.instancy.instancylearning.utils.StaticValues.NOTIFICATIONVIWED;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-
 
 
 /**
@@ -394,6 +394,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         switch (view.getId()) {
             case R.id.card_view:
                 markAsReadWebCall(notificationModelList.get(position), position);
+
                 break;
             case R.id.txtDelete:
                 deleteAlert(notificationModelList.get(position));
@@ -444,9 +445,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 myCatalogExists = myCatalogAction(notificationModel.contentid);
 
             if (myLearningExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid,false);
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid, false);
             } else if (myCatalogExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid,false);
+                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid, false);
             } else {
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -465,10 +466,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             }
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 4, "",false);
+            ((SideMenu) getActivity()).homeControllClicked(true, 4, "", false);
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 10, "",false);
+            ((SideMenu) getActivity()).homeControllClicked(true, 10, "", false);
 
         }
 
@@ -565,13 +566,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 if (s.contains("true")) {
 
                     Toast.makeText(context, " Success! \nNotification has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
-
+                    NOTIFICATIONVIWED = 1;
                     deleteAnswerFromLocalDB(notificationModel);
+
                 } else {
 
                     Toast.makeText(context, "Notification cannot be deleted from server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override

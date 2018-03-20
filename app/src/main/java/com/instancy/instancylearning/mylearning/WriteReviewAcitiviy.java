@@ -334,8 +334,8 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         String descriptionStr = editDescription.getText().toString().trim();
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
-        if (descriptionStr.length() < 10) {
-            Toast.makeText(WriteReviewAcitiviy.this, "Enter description", Toast.LENGTH_SHORT).show();
+        if (finalRating < 1) {
+            Toast.makeText(WriteReviewAcitiviy.this, "Please provide rating for the content.", Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();

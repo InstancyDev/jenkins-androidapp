@@ -174,12 +174,10 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
 
             expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_up));
         } else {
-//            pView.setBackgroundColor(Color.WHITE);
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-//            expTxtIcon.setVisibility(View.INVISIBLE);
             expTxtIcon.setVisibility(View.VISIBLE);
             expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
         }

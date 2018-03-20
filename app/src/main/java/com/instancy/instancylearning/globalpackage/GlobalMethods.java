@@ -506,7 +506,6 @@ public class GlobalMethods {
 //                      String basicNewKey=base64.replace("\n","");
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-
                         urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/SiteFiles/"
                                 + myLearningModel.getContentID() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
 
@@ -876,8 +875,8 @@ public class GlobalMethods {
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
-                // uncomment for reports
-                menu.getItem(5).setVisible(false);
+                // uncomment for reports it to false
+                menu.getItem(5).setVisible(true);
             }
 
             if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
@@ -898,7 +897,7 @@ public class GlobalMethods {
 
         } else {
             menu.getItem(2).setVisible(true);
-            menu.getItem(5).setVisible(false); // uncomment for report
+            menu.getItem(5).setVisible(true); // uncomment for report false
 //
             menu.getItem(1).setVisible(true);
         }

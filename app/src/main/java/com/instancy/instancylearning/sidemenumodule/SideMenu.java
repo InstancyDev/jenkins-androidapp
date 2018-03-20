@@ -63,6 +63,7 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
 
+import static com.instancy.instancylearning.utils.StaticValues.NOTIFICATIONVIWED;
 import static com.instancy.instancylearning.utils.Utilities.*;
 
 import org.json.JSONArray;
@@ -160,7 +161,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     SideMenusModel homeModel, tempHomeModel;
     int homeIndex = 0;
 
-    int notificationCount = 0;
 
     RelativeLayout drawerHeaderView;
     public View logoView;
@@ -213,6 +213,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshCatalog();
+            NOTIFICATIONVIWED = 0;
         } else {
 
         }
@@ -225,7 +226,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
+        } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta))) {
+            notificationLayout.setVisibility(View.VISIBLE);
+            sendMessageLayout.setVisibility(View.VISIBLE);
+            signalAService = SignalAService.newInstance(this);
+            signalAService.startSignalA();
         }
+
 
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
@@ -276,6 +283,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             subMenuList = db.getNativeSubMenusData(parentMenuId);
             if (subMenuList != null && subMenuList.size() > 0) {
                 hmSubMenuList.put(parentMenuId, subMenuList);
+
             }
 
             if (menu.getContextMenuId().equals("1")) {
@@ -285,9 +293,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             if (menu.getContextMenuId().equals("10")) {
-//                sendMessageLayout.setVisibility(View.VISIBLE);
-//                signalAService = SignalAService.newInstance(this);
-//                signalAService.startSignalA();
+                sendMessageLayout.setVisibility(View.VISIBLE);
+                signalAService = SignalAService.newInstance(this);
+                signalAService.startSignalA();
             }
 
             i++;
@@ -735,6 +743,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         if (SIDEMENUOPENED_FIRSTTIME == 0) {
             enteredSubsiteMethods();
         }
+
+        if (isNetworkConnectionAvailable(this, -1) && NOTIFICATIONVIWED == 1) {
+            refreshCatalog();
+            NOTIFICATIONVIWED = 0;
+        } else {
+
+        }
     }
 
     public void enteredSubsiteMethods() {
@@ -829,6 +844,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                             if (jsonTableAry.length() > 0) {
                                 txtBtnNotification.setText("Notifications(" + jsonTableAry.length() + ")");
+                            } else {
+                                txtBtnNotification.setText("Notifications");
                             }
 
                         } catch (JSONException e) {

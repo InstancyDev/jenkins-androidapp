@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
+
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
@@ -56,8 +57,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     ImageView imageBrandLogo;
     Animation zoomin, zoomout;
     DatabaseHandler db;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
     WebAPIClient webAPIClient;
     GetSiteConfigsAsycTask getSiteConfigsAsycTask;
     private static final String TAG = Splash_activity.class.getSimpleName();
@@ -81,7 +80,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
 
         db = new DatabaseHandler(context);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
         PreferencesManager.initializeInstance(context);

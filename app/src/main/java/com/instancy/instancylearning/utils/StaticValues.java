@@ -79,8 +79,9 @@ public class StaticValues {
 
     public static final String CONTEXT_TITLE = "COONTEXT_TITLE";
 
-
     public static final String CHAT_LIST = "CHAT_LIST";
+
+    public static final String FCM_KEY = "FCMKEY";
 
     public static final String BACK_STACK_ROOT_TAG = "root_fragment";
     /**
@@ -285,6 +286,7 @@ public class StaticValues {
 
     public static int SIDEMENUOPENED_FIRSTTIME = 0;
 
+    public static int NOTIFICATIONVIWED = 0;
 
     public static int PROFILE_FRAGMENT_OPENED_FIRSTTIME = 0;
 

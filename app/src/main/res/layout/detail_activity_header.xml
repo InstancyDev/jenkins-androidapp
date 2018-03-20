@@ -256,7 +256,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/detaillayoyt"
         android:padding="8dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/txtRating"
