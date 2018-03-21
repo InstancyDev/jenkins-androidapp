@@ -17,6 +17,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -29,6 +30,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.fcm.DeleteTokenService;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.interfaces.SiteConfigInterface;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -107,6 +109,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
             requestPermission();
 
         } else {
+
             callWebMethods();
 
         }
@@ -117,6 +120,16 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     * all view are initilize here like binding views to class
     *
     * */
+
+    public void startService() {
+        startService(new Intent(getBaseContext(), DeleteTokenService.class));
+    }
+
+    // Method to stop the service
+    public void stopService() {
+        stopService(new Intent(getBaseContext(), DeleteTokenService.class));
+    }
+
 
     public void callWebMethods() {
 

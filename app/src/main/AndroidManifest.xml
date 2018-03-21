@@ -30,8 +30,8 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:node="replace">
+        tools:replace="android:icon"
+        android:theme="@style/AppTheme">
         <activity
             android:name=".mainactivities.Splash_activity"
             android:screenOrientation="portrait"
@@ -39,7 +39,6 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -48,19 +47,19 @@
         <activity
             android:name=".mainactivities.Branding_activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
 
         <!-- Login screen -->
         <activity
             android:name=".mainactivities.Login_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustNothing"></activity>
+            android:windowSoftInputMode="adjustNothing"> </activity>
 
         <!-- forgot screen -->
         <activity
             android:name=".mainactivities.ForgotPasswordActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- social screen -->
         <activity
@@ -174,21 +173,25 @@
 
         <!-- Push Notification  Services-->
 
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
 
         <service
-            android:name=".fcm.MyFirebaseMessagingService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            android:name=".fcm.FCMInstanceIDService"
+            android:exported="false">
+            <intent-filter android:priority="1000">
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
-        <service android:name=".fcm.MyFirebaseInstanceIdService">
+        <service
+            android:name=".fcm.DeleteTokenService"
+            android:exported="false">
+
+        </service>
+
+
+        <service android:name=".fcm.FCMMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
@@ -197,7 +200,9 @@
         <activity
             android:name=".inappbilling.InAppBilling_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent"></activity>
+            android:theme="@style/Theme.AppCompat.Translucent">
+
+        </activity>
 
 
         <!-- Used for transferring files  after a successful connection -->
@@ -214,7 +219,6 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-
 
         <!--<provider-->
         <!--android:name="android.support.v4.content.FileProvider"-->

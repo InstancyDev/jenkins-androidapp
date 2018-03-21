@@ -209,7 +209,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             settingTxt.setVisibility(View.INVISIBLE);
         }
         else {
-        settingTxt.setVisibility(View.VISIBLE);}
+
+        settingTxt.setVisibility(View.VISIBLE);
+        }
 
 
         Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
@@ -547,7 +549,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void hideOrShowBtns() {
-        settingTxt.setVisibility(View.INVISIBLE);
+
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.development)))) {
+
+            settingTxt.setVisibility(View.VISIBLE);
+        }
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
