@@ -1794,9 +1794,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             recordCount = jsonObject.getInt("RecordCount");
         }
 
-
-//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
-
         if (jsonObject.has("EditRating")) {
 
 //            JSONObject userEditRating = jsonObject.getJSONObject("EditRating");
@@ -1826,7 +1823,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     try {
                         ratingValue = Float.parseFloat(ratinObj.getString("RatingID"));
                         ratingBar.setRating(ratingValue);
-                        myLearningModel.setRatingId("" + ratingValue);
+//                        myLearningModel.setRatingId("" + ratingValue);
                         db.updateContentRatingToLocalDB(myLearningModel, "" + ratingValue);
                     } catch (NumberFormatException ex) {
                         ex.printStackTrace();
@@ -1839,16 +1836,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         }
 
-        overallRatingbar.setRating(ratingValue);
-
-        txtOverallRating.setText("" + ratingValue);
-
-        String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";
-
-        ratedOutOfTxt.setText(ratedStyle);
 
 
-        myLearningModel.setRatingId("" + ratingValue);
+//        myLearningModel.setRatingId("" + ratingValue);
         refreshCatalogContent = true;
 
         if (jsonObject.has("UserRatingDetails")) {
@@ -1907,7 +1897,23 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 ratingsAdapter.refreshList(reviewRatingModelList);
             }
 
+            if (reviewRatingModelList.size() > 0) {
+
+                int k = 0;
+
+
+                for (int i = 0; i < reviewRatingModelList.size(); i++) {
+                    k = k + reviewRatingModelList.get(i).rating;
+
+                }
+
+                ratingValue = k / reviewRatingModelList.size();
+//                myLearningModel.setRatingId("" + ratingValue);
+            }
+
         }
+
+
     }
 
 

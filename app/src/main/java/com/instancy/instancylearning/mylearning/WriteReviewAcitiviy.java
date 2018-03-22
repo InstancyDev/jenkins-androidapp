@@ -157,6 +157,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
             if (isEditReview) {
 
                 try {
+
                     editObj = new JSONObject(getIntent().getStringExtra("editObj"));
 
                 } catch (JSONException e) {
@@ -356,8 +357,11 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                 public void onResponse(String s) {
                     svProgressHUD.dismiss();
                     Log.d(TAG, "onResponse: " + s);
+
+
 //                initilizeRatingsListView();
                     if (s != null) {
+                        db.updateContentRatingToLocalDB(learningModel, "" + finalRating);
                         closeForum(true);
                     }
                 }

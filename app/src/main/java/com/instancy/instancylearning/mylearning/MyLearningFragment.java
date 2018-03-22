@@ -101,6 +101,7 @@ import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -1052,6 +1053,21 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             myLearningAdapter.applyFilter(sortName, filterAscend, configId);
 
         }
+
+
+        if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK) {
+            if (data != null) {
+                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+                boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
+                if (refresh) {
+//                        initilizeRatingsListView();
+                    injectFromDbtoModel();
+
+                }
+
+            }
+        }
+
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {

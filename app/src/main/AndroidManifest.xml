@@ -173,6 +173,9 @@
 
         <!-- Push Notification  Services-->
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/cle_logo" />
 
         <service
             android:name=".fcm.FCMInstanceIDService"
@@ -180,12 +183,6 @@
             <intent-filter android:priority="1000">
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
-        </service>
-
-        <service
-            android:name=".fcm.DeleteTokenService"
-            android:exported="false">
-
         </service>
 
 
@@ -201,9 +198,7 @@
             android:name=".inappbilling.InAppBilling_Activity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Translucent">
-
         </activity>
-
 
         <!-- Used for transferring files  after a successful connection -->
         <service

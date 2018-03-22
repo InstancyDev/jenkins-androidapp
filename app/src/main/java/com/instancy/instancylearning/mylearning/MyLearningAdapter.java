@@ -2,6 +2,7 @@ package com.instancy.instancylearning.mylearning;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -26,10 +27,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.florent37.viewtooltip.ViewTooltip;
@@ -44,6 +49,7 @@ import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.ReviewRatingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -55,6 +61,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,6 +74,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
+import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -414,6 +423,8 @@ public class MyLearningAdapter extends BaseAdapter {
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
         final float oldRating = ratingValue;
+
+
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
             @Override
@@ -421,84 +432,89 @@ public class MyLearningAdapter extends BaseAdapter {
                 // TODO Auto-generated method stub
 
                 if (fromUser) {
-                    int ratingInt = Math.round(rating);
-                    svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-                    String paramsString = appUserModel.getWebAPIUrl() +
-                            ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
-                            "&ContentID=" + myLearningModel.get(position).getContentID()
-                            + "&Title=" +
-                            "&Description=From%20Android%20Native%20App" +
-                            "&RatingID=" + ratingInt;
-                    if (isNetworkConnectionAvailable(activity, -1)) {
-                        try {
-
-                            Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
-                            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    try {
-                                        Log.d("logr  response =", "response " + response.get("table1"));
-                                        JSONArray jsonArray = response.getJSONArray("table1");
-                                        String status = jsonArray.getJSONObject(0).get("status").toString();
-                                        String rating = jsonArray.getJSONObject(0).get("rating").toString();
-                                        if (status.contains("Success")) {
-                                            db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
-                                            Toast.makeText(
-                                                    activity,
-                                                    activity.getString(R.string.rating_update_success),
-                                                    Toast.LENGTH_SHORT)
-                                                    .show();
-                                            myLearningModel.get(position).setRatingId(rating);
-//                                        notifyDataSetChanged();
-                                        } else {
-                                            Toast.makeText(
-                                                    activity,
-                                                    activity.getString(R.string.rating_update_fail),
-                                                    Toast.LENGTH_SHORT)
-                                                    .show();
-                                            holder.ratingBar.setRating(oldRating);
-                                        }
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                        holder.ratingBar.setRating(oldRating);
-                                    }
-                                    svProgressHUD.dismiss();
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    holder.ratingBar.setRating(oldRating);
-                                    svProgressHUD.dismiss();
-                                    Toast.makeText(
-                                            activity,
-                                            activity.getString(R.string.rating_update_fail),
-                                            Toast.LENGTH_SHORT)
-                                            .show();
-                                }
-                            }) {
-                                @Override
-                                public Map<String, String> getHeaders() throws AuthFailureError {
-                                    final Map<String, String> headers = new HashMap<>();
-                                    String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                                    return headers;
-                                }
-                            };
-//                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
-//                                0,
-//                                -1,
-//                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                            VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
-
-                        } catch (Exception e) {
-
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
+                    try {
+                        getUserRatingsOfTheContent(position);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
+//                    int ratingInt = Math.round(rating);
+//                    svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//                    String paramsString = appUserModel.getWebAPIUrl() +
+//                            ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
+//                            "&ContentID=" + myLearningModel.get(position).getContentID()
+//                            + "&Title=" +
+//                            "&Description=From%20Android%20Native%20App" +
+//                            "&RatingID=" + ratingInt;
+//                    if (isNetworkConnectionAvailable(activity, -1)) {
+//                        try {
+//
+//                            Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
+//                            JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
+//                                @Override
+//                                public void onResponse(JSONObject response) {
+//                                    try {
+//                                        Log.d("logr  response =", "response " + response.get("table1"));
+//                                        JSONArray jsonArray = response.getJSONArray("table1");
+//                                        String status = jsonArray.getJSONObject(0).get("status").toString();
+//                                        String rating = jsonArray.getJSONObject(0).get("rating").toString();
+//                                        if (status.contains("Success")) {
+//                                            db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
+//                                            Toast.makeText(
+//                                                    activity,
+//                                                    activity.getString(R.string.rating_update_success),
+//                                                    Toast.LENGTH_SHORT)
+//                                                    .show();
+//                                            myLearningModel.get(position).setRatingId(rating);
+////                                        notifyDataSetChanged();
+//                                        } else {
+//                                            Toast.makeText(
+//                                                    activity,
+//                                                    activity.getString(R.string.rating_update_fail),
+//                                                    Toast.LENGTH_SHORT)
+//                                                    .show();
+//                                            holder.ratingBar.setRating(oldRating);
+//                                        }
+//
+//                                    } catch (JSONException e) {
+//                                        e.printStackTrace();
+//                                        holder.ratingBar.setRating(oldRating);
+//                                    }
+//                                    svProgressHUD.dismiss();
+//                                }
+//                            }, new Response.ErrorListener() {
+//                                @Override
+//                                public void onErrorResponse(VolleyError error) {
+//                                    holder.ratingBar.setRating(oldRating);
+//                                    svProgressHUD.dismiss();
+//                                    Toast.makeText(
+//                                            activity,
+//                                            activity.getString(R.string.rating_update_fail),
+//                                            Toast.LENGTH_SHORT)
+//                                            .show();
+//                                }
+//                            }) {
+//                                @Override
+//                                public Map<String, String> getHeaders() throws AuthFailureError {
+//                                    final Map<String, String> headers = new HashMap<>();
+//                                    String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+//                                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                                    return headers;
+//                                }
+//                            };
+////                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+////                                0,
+////                                -1,
+////                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//                            VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
+//
+//                        } catch (Exception e) {
+//
+//                            e.printStackTrace();
+//                        }
+//
+//                    } else {
+//                        Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
+//                    }
                 }
             }
         });
@@ -658,7 +674,6 @@ public class MyLearningAdapter extends BaseAdapter {
         @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
-
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
@@ -701,9 +716,116 @@ public class MyLearningAdapter extends BaseAdapter {
                     ((ListView) parent).performItemClick(view, getPosition, 0);
                 }
 
-
             }
         }
+    }
+
+    public void getUserRatingsOfTheContent(final int position) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("ContentID", myLearningModel.get(position).getContentID());
+        parameters.put("Locale", "en-us");
+        parameters.put("metadata", "0");
+        parameters.put("intUserID", appUserModel.getUserIDValue());
+        parameters.put("CartID", "");
+        parameters.put("iCMS", "0");
+        parameters.put("ComponentID", "3");
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("DetailsCompID", "107");
+        parameters.put("DetailsCompInsID", "3291");
+        parameters.put("ERitems", "false");
+        parameters.put("SkippedRows", 0);
+        parameters.put("NoofRows", 3);
+
+        final String parameterString = parameters.toString();
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserRatings";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+//                initilizeRatingsListView();
+                if (s != null) {
+                    try {
+                        mapReviewRating(s, position);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return parameterString.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(activity);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void mapReviewRating(String response, int position) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject(response);
+        JSONObject editObj = null;
+        if (jsonObject.has("EditRating")) {
+
+            boolean isEditReview = false;
+            if (jsonObject.isNull("EditRating")) {
+
+                isEditReview = false;
+
+            } else {
+
+                isEditReview = true;
+                editObj = jsonObject.getJSONObject("EditRating");
+            }
+
+            Intent intentReview = new Intent(activity, WriteReviewAcitiviy.class);
+            intentReview.putExtra("myLearningDetalData", myLearningModel.get(position));
+            intentReview.putExtra("isEditReview", isEditReview);
+            if (isEditReview) {
+                intentReview.putExtra("editObj", (Serializable) editObj.toString());
+            }
+
+            activity.startActivityForResult(intentReview, REVIEW_REFRESH);
+
+        }
+
     }
 
 

@@ -175,7 +175,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
 
-
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -203,14 +202,13 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         View someView = findViewById(R.id.login_layout);
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
-        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life)))|| (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife)))) {
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife)))) {
 //            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
-        }
-        else {
+        } else {
 
-        settingTxt.setVisibility(View.VISIBLE);
+            settingTxt.setVisibility(View.VISIBLE);
         }
 
 
@@ -445,6 +443,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     JSONObject jsonObject = new JSONObject();
                                     String userId = jsonobj.get("userid").toString();
                                     profileWebCall(userId);
+                                    fcmRegister(userId);
                                     jsonObject.put("userid", jsonobj.get("userid").toString());
                                     jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
                                     jsonObject.put("userstatus", jsonobj.get("userstatus"));
@@ -471,6 +470,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intentSideMenu);
+
                                 }
 
                             } catch (JSONException e) {
@@ -677,12 +677,16 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     } else {
 
                     }
-
-//                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
-//                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intentSideMenu);
                 }
+                if (requestType.equalsIgnoreCase("PUSHNOTIFICATION")) {
+                    if (response != null) {
 
+                        Log.d(TAG, "Push Notification: " + response);
+
+                    } else {
+
+                    }
+                }
                 svProgressHUD.dismiss();
             }
 
@@ -702,11 +706,21 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
 
-
                 svProgressHUD.dismiss();
             }
         };
     }
 
+    public void fcmRegister(String userId) {
+
+        String fcmKey = preferencesManager.getStringValue(StaticValues.FCM_KEY);
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobilePushMobileNotifications?userid=" + userId + "&DeviceType=android&DeviceToken=" + fcmKey + "&SiteURL=" + appUserModel.getSiteURL();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "pushNotification: " + urlStr);
+        vollyService.getStringResponseVolley("PUSHNOTIFICATION", urlStr, appUserModel.getAuthHeaders());
+
+    }
 }
 
