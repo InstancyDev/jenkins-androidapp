@@ -10,6 +10,8 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature
         android:name="android.hardware.wifi.direct"
@@ -30,8 +32,8 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        tools:replace="android:icon"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon">
         <activity
             android:name=".mainactivities.Splash_activity"
             android:screenOrientation="portrait"
@@ -47,19 +49,19 @@
         <activity
             android:name=".mainactivities.Branding_activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"> </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <!-- Login screen -->
         <activity
             android:name=".mainactivities.Login_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustNothing"> </activity>
+            android:windowSoftInputMode="adjustNothing"></activity>
 
         <!-- forgot screen -->
         <activity
             android:name=".mainactivities.ForgotPasswordActivity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <!-- social screen -->
         <activity
@@ -85,7 +87,12 @@
         <activity
             android:name=".sidemenumodule.SideMenu"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name=".sidemenumodule.SideMenu" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <!-- MylearningDetail screen -->
         <activity
@@ -177,10 +184,8 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/cle_logo" />
 
-        <service
-            android:name=".fcm.FCMInstanceIDService"
-            android:exported="false">
-            <intent-filter android:priority="1000">
+        <service android:name=".fcm.FCMInstanceIDService">
+            <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
@@ -197,8 +202,7 @@
         <activity
             android:name=".inappbilling.InAppBilling_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent">
-        </activity>
+            android:theme="@style/Theme.AppCompat.Translucent"></activity>
 
         <!-- Used for transferring files  after a successful connection -->
         <service

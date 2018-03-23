@@ -83,6 +83,8 @@ public class StaticValues {
 
     public static final String FCM_KEY = "FCMKEY";
 
+    public static final String FCM_OBJECT = "FCM_OBJECT";
+
     public static final String BACK_STACK_ROOT_TAG = "root_fragment";
     /**
      * To get the FontAwsome font .ttf asset path

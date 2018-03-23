@@ -23,6 +23,7 @@ import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -40,6 +41,8 @@ public class FCMMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
         preferencesManager = PreferencesManager.getInstance();
 
+        Log.d("PUSH", remoteMessage.getData().toString());
+
         Map<String, String> params = remoteMessage.getData();
         if (params != null) {
             JSONObject jsonObject = new JSONObject(params);
@@ -49,7 +52,6 @@ public class FCMMessagingService extends FirebaseMessagingService {
             sendNotification(jsonObject, mTitle, mBody);
 
         }
-
     }
 
     private void sendNotification(JSONObject jsonObject, String mTitle, String mBody) {
@@ -61,7 +63,9 @@ public class FCMMessagingService extends FirebaseMessagingService {
 
         if (userID != null && !userID.equalsIgnoreCase("")) {
             intent = new Intent(this, SideMenu.class);
-//            intent.putExtra(ApiConstants.INTENT_WEBVIEW_LINK, link);
+            intent.putExtra("PUSH", true);
+            intent.putExtra(StaticValues.FCM_OBJECT, (Serializable) jsonObject.toString());
+
         } else {
             intent = new Intent(this, Splash_activity.class);
         }
@@ -71,8 +75,7 @@ public class FCMMessagingService extends FirebaseMessagingService {
                 // followed by SecondActvity itself
                 .addNextIntentWithParentStack(intent)
                 .addParentStack(SideMenu.class)
-                .getPendingIntent(0, PendingIntent.FLAG_ONE_SHOT);
-
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)

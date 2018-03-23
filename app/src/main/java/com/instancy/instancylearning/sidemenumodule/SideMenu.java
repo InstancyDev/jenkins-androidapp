@@ -161,6 +161,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     SideMenusModel homeModel, tempHomeModel;
     int homeIndex = 0;
 
+    boolean isFromPushNotification = false;
 
     RelativeLayout drawerHeaderView;
     public View logoView;
@@ -179,6 +180,26 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
+
+
+        Bundle bundle = getIntent().getExtras();
+
+        if (bundle != null) {
+
+            isFromPushNotification = bundle.getBoolean("PUSH");
+
+            if (isFromPushNotification) {
+                try {
+
+                    JSONObject editObj = new JSONObject(getIntent().getStringExtra(StaticValues.FCM_OBJECT));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
 
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
