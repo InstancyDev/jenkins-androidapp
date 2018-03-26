@@ -40,7 +40,11 @@ import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -52,6 +56,7 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 public class Splash_activity extends Activity implements SiteConfigInterface {
 
@@ -72,6 +77,8 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     AppUserModel appUserModel;
     PreferencesManager preferencesManager;
     AppController appController;
+    boolean isFromPush = false;
+    JSONObject parameters = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +106,87 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             preferencesManager.setStringValue("374", StaticValues.KEY_SITEID);
         }
+
+
+//        Message contextmenuid menuid siteid contentid
+
+        parameters = new JSONObject();
+
+        if (getIntent().getExtras() != null) {
+
+            for (String key : getIntent().getExtras().keySet()) {
+
+                if (key.equals("contextmenuid")) {
+
+                    Log.d(TAG, "onCreate: contextmenuid " + getIntent().getExtras().getString("contextmenuid"));
+
+                    String contextmenuID = getIntent().getExtras().getString("contextmenuid");
+
+                    if (isValidString(contextmenuID)) {
+                        try {
+                            parameters.put("contextmenuid", contextmenuID);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+                if (key.equals("menuid")) {
+
+                    Log.d(TAG, "onCreate: menuid " + getIntent().getExtras().getString("menuid"));
+
+                    String menuID = getIntent().getExtras().getString("menuid");
+
+                    if (isValidString(menuID)) {
+                        try {
+                            parameters.put("menuid", menuID);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+                if (key.equals("contentid")) {
+
+                    Log.d(TAG, "onCreate: contentid " + getIntent().getExtras().getString("contentid"));
+
+                    String contentid = getIntent().getExtras().getString("contentid");
+
+                    if (isValidString(contentid)) {
+                        try {
+                            parameters.put("contentid", contentid);
+                            isFromPush = true;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+                if (key.equals("siteid")) {
+
+                    Log.d(TAG, "onCreate: siteid id " + getIntent().getExtras().getString("siteid"));
+
+                    String siteid = getIntent().getExtras().getString("siteid");
+
+                    if (isValidString(siteid)) {
+                        try {
+                            parameters.put("siteid", siteid);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+        Log.d(TAG, "onCreate: parameters" + parameters);
+
         webAPIClient = new WebAPIClient(this);
         getSiteConfigsAsycTask = new GetSiteConfigsAsycTask(this);
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
@@ -120,6 +208,11 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     * all view are initilize here like binding views to class
     *
     * */
+
+    public void generateNotification() {
+
+
+    }
 
     public void callWebMethods() {
 
@@ -305,6 +398,9 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             Intent intent = new Intent(this, SideMenu.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+// push values
+            intent.putExtra("PUSH", isFromPush);
+            intent.putExtra(StaticValues.FCM_OBJECT, (Serializable) parameters.toString());
             startActivity(intent);
 
         } else {

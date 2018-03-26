@@ -89,7 +89,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name=".sidemenumodule.SideMenu" />
+                <action android:name="SIDEMENU" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

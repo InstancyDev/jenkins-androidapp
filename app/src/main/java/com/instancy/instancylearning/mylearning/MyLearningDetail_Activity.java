@@ -1912,7 +1912,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             }
             txtOverallRating.setText("" + ratingValue);
-
+            overallRatingbar.setRating(ratingValue);
                    String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
 
             ratedOutOfTxt.setText(ratedStyle);

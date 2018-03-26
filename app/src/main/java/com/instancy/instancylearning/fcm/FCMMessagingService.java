@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -21,6 +22,7 @@ import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -58,7 +60,6 @@ public class FCMMessagingService extends FirebaseMessagingService {
 
         String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
-        String link = jsonObject.optString("link");
         Intent intent;
 
         if (userID != null && !userID.equalsIgnoreCase("")) {

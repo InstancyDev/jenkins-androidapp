@@ -181,25 +181,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
 
-
         Bundle bundle = getIntent().getExtras();
-
-        if (bundle != null) {
-
-            isFromPushNotification = bundle.getBoolean("PUSH");
-
-            if (isFromPushNotification) {
-                try {
-
-                    JSONObject editObj = new JSONObject(getIntent().getStringExtra(StaticValues.FCM_OBJECT));
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-        }
 
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
@@ -425,6 +407,24 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             navDrawerExpandableView.expandGroup(lastClicked);
         }
 
+        if (bundle != null) {
+            JSONObject pushObj = new JSONObject();
+            isFromPushNotification = bundle.getBoolean("PUSH");
+
+            if (isFromPushNotification) {
+                try {
+
+                    pushObj = new JSONObject(bundle.getString(StaticValues.FCM_OBJECT));
+                    triggerPushNotification(pushObj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+        }
+
 
     }
 
@@ -477,7 +477,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         return sideMenusModel;
     }
-
 
     public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID) {
 
@@ -899,5 +898,51 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
         };
     }
+
+
+    public void triggerPushNotification(JSONObject jsonObject) {
+
+        int contextMenuID = jsonObject.optInt("contextmenuid", 1);
+        String contentID = jsonObject.optString("contentid");
+
+        switch (contextMenuID) {
+            case 1:
+                homeControllClicked(true, contextMenuID, contentID, false);
+                MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                break;
+            case 2:
+                homeControllClicked(true, contextMenuID, contentID, false);
+                CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+                break;
+            case 3:
+
+                break;
+            case 7:
+
+                break;
+            case 6:
+
+                break;
+            case 8:
+
+                break;
+            case 4:
+
+                break;
+            case 5:
+                break;
+            case 9:
+                break;
+            case 10:
+                break;
+
+            default:
+                Log.d(TAG, "selectItem: default contextmenu");
+                break;
+        }
+
+
+    }
+
 
 }

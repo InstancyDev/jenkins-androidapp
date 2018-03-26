@@ -450,6 +450,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (isNetworkConnectionAvailable(getContext(), -1) && MYLEARNING_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
             refreshMyLearning(false);
+
         } else {
 //            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             injectFromDbtoModel();
@@ -711,7 +712,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onResume() {
         super.onResume();
-        triggerActionForFirstItem();
+//        triggerActionForFirstItem();
     }
 
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
