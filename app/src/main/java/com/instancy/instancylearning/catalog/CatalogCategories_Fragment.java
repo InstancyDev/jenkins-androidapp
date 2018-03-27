@@ -260,8 +260,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         }
 
         return rootView;
-
-
     }
 
     public void initilizeView() {
@@ -329,14 +327,12 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         mAdapter = new ButtonAdapter(categoryButtonModelList1, clicklistener);
 
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            catalogRecycler.setLayoutManager(new GridLayoutManager(context, 3));
+            catalogRecycler.setLayoutManager(new GridLayoutManager(context, 2));
         } else {
             catalogRecycler.setLayoutManager(new GridLayoutManager(context, 5));
         }
 
         catalogRecycler.setAdapter(mAdapter);
-        catalogRecycler.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppBGColor())));
-        ;
         catalogRecycler.setVisibility(View.VISIBLE);
 
         final List<CatalogCategoryButtonModel> finalCategoryButtonModelList = categoryButtonModelList1;

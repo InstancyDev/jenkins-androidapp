@@ -92,6 +92,10 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
     DatabaseHandler db;
     ResultListner resultListner = null;
 
+    float ratedValue = 0;
+
+    boolean fromAdapter = false;
+
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
@@ -151,11 +155,15 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
         if (bundle != null) {
 
+            ratedValue = bundle.getFloat("ratednow", 0);
+
+            fromAdapter = bundle.getBoolean("from", false);
+
             learningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
             isEditReview = bundle.getBoolean("isEditReview");
 
             if (isEditReview) {
-
+                txtCancel.setText("Delete");
                 try {
 
                     editObj = new JSONObject(getIntent().getStringExtra("editObj"));
@@ -200,8 +208,15 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
             ratingValue = 0;
         }
 
-        ratingBar.setRating(ratingValue);
-        finalRating = ratingValue;
+
+        if (fromAdapter) {
+            ratingBar.setRating(ratedValue);
+            finalRating = ratedValue;
+        } else {
+            ratingBar.setRating(ratingValue);
+            finalRating = ratingValue;
+        }
+
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -323,7 +338,17 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                 }
                 break;
             case R.id.txtcancel:
-                finish();
+
+                if (txtCancel.getText().toString().equalsIgnoreCase("Delete")) {
+
+                    try {
+                        deleteRatingFrom();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    finish();
+                }
                 break;
 
         }
@@ -407,6 +432,85 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         }
     }
+
+
+    public void deleteRatingFrom() throws JSONException {
+
+
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+
+        if (finalRating < 1) {
+            Toast.makeText(WriteReviewAcitiviy.this, "Please provide rating for the content.", Toast.LENGTH_SHORT).show();
+        } else {
+
+            JSONObject parameters = new JSONObject();
+
+            parameters.put("ContentID", learningModel.getContentID());
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("Title", "");
+            parameters.put("Description", "");
+            parameters.put("ReviewDate", dateString);
+            parameters.put("Rating", "0");
+
+            final String parameterString = parameters.toString();
+
+            String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteRating";
+
+            final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String s) {
+                    svProgressHUD.dismiss();
+                    Log.d(TAG, "onResponse: " + s);
+
+//                initilizeRatingsListView();
+                    if (s != null) {
+                        db.updateContentRatingToLocalDB(learningModel, "0");
+                        closeForum(true);
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+
+                    svProgressHUD.dismiss();
+                }
+            })
+
+            {
+
+                @Override
+                public String getBodyContentType() {
+                    return "application/json";
+
+                }
+
+                @Override
+                public byte[] getBody() throws com.android.volley.AuthFailureError {
+                    return parameterString.getBytes();
+                }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    final Map<String, String> headers = new HashMap<>();
+                    String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                    headers.put("Content-Type", "application/json");
+                    headers.put("Accept", "application/json");
+
+                    return headers;
+                }
+
+            };
+
+            RequestQueue rQueue = Volley.newRequestQueue(this);
+            rQueue.add(request);
+            request.setRetryPolicy(new DefaultRetryPolicy(
+                    5000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        }
+    }
+
 
     public void closeForum(boolean refresh) {
         Intent intent = getIntent();

@@ -92,6 +92,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -363,6 +364,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 progressBar.setVisibility(View.GONE);
                 txtCourseStatus.setVisibility(View.GONE);
+                ratingBar.setIsIndicator(true);
             }
 
             String imgUrl = myLearningModel.getImageData();
@@ -1837,7 +1839,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
 
 
-
 //        myLearningModel.setRatingId("" + ratingValue);
         refreshCatalogContent = true;
 
@@ -1907,13 +1908,20 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 }
 
-                ratingValue = k / reviewRatingModelList.size();
+                ratingValue = (float) k / recordCount;
+
+                DecimalFormat df = new DecimalFormat();
+                df.setMaximumFractionDigits(1);
+
+                df.format(ratingValue);
+
+//                ratingValue = (float)k / reviewRatingModelList.size();
 //                myLearningModel.setRatingId("" + ratingValue);
 
             }
             txtOverallRating.setText("" + ratingValue);
             overallRatingbar.setRating(ratingValue);
-                   String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
+            String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
 
             ratedOutOfTxt.setText(ratedStyle);
         }

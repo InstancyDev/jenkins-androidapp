@@ -15,7 +15,9 @@
         <item name="actionMenuTextColor">@color/colorWhite</item>
         <item name="android:paddingLeft">0dip</item>
         <item name="android:paddingRight">0dip</item>
+        <item name="android:textSize">14sp</item>
     </style>
+
 
     <style name="NoActionBar" parent="@android:style/Theme.Holo.Light">
         <item name="android:windowActionBar">false</item>

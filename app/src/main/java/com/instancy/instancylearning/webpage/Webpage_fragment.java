@@ -34,6 +34,8 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
+
 /**
  * Created by Upendranath on 5/19/2017.
  */
@@ -189,8 +191,10 @@ public class Webpage_fragment extends Fragment {
     public String getUrlFromParmString(String parmString) {
         String urlStr = "";
 
-        if (parmString == null)
+        if (!isValidString(parmString))
             return "";
+
+
         String splitFirst[] = parmString.split("=");
 
         if (splitFirst.length > 0) {

@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
@@ -51,6 +52,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ReviewRatingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -433,7 +435,20 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 if (fromUser) {
                     try {
-                        getUserRatingsOfTheContent(position);
+                        getUserRatingsOfTheContent(position, rating);
+
+
+                        new CountDownTimer(500, 1000) {
+                            public void onTick(long millisUntilFinished) {
+
+                            }
+
+                            public void onFinish() {
+                                holder.ratingBar.setRating(oldRating);
+                            }
+                        }.start();
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -720,7 +735,7 @@ public class MyLearningAdapter extends BaseAdapter {
         }
     }
 
-    public void getUserRatingsOfTheContent(final int position) throws JSONException {
+    public void getUserRatingsOfTheContent(final int position, final float rating) throws JSONException {
 
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.get(position).getContentID());
@@ -749,7 +764,7 @@ public class MyLearningAdapter extends BaseAdapter {
 //                initilizeRatingsListView();
                 if (s != null) {
                     try {
-                        mapReviewRating(s, position);
+                        mapReviewRating(s, position, rating);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -798,7 +813,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
     }
 
-    public void mapReviewRating(String response, int position) throws JSONException {
+    public void mapReviewRating(String response, int position, float rating) throws JSONException {
 
         JSONObject jsonObject = new JSONObject(response);
         JSONObject editObj = null;
@@ -820,8 +835,10 @@ public class MyLearningAdapter extends BaseAdapter {
             intentReview.putExtra("isEditReview", isEditReview);
             if (isEditReview) {
                 intentReview.putExtra("editObj", (Serializable) editObj.toString());
-            }
 
+            }
+            intentReview.putExtra("ratednow", rating);
+            intentReview.putExtra("from", true);
             activity.startActivityForResult(intentReview, REVIEW_REFRESH);
 
         }

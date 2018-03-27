@@ -941,8 +941,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
         }
 
-
     }
-
 
 }

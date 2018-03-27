@@ -1399,13 +1399,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                 nativeMenuModel.setCategoryStyle(nativeMenuJsonObj.get("categorystyle").getAsString());
 
-
                             } else {
 
                                 nativeMenuModel.setCategoryStyle("");
                             }
-
-
                         }
                         if (nativeMenuJsonObj.has("componentid")) {
 
@@ -1414,7 +1411,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             if (el != null && !el.isJsonNull()) {
 
                                 nativeMenuModel.setComponentId(nativeMenuJsonObj.get("componentid").getAsString());
-
 
                             } else {
 
@@ -1430,7 +1426,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                 nativeMenuModel.setConditions(nativeMenuJsonObj.get("conditions").getAsString());
 
-
                             } else {
 
                                 nativeMenuModel.setConditions("");
@@ -1444,7 +1439,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     ex.printStackTrace();
                 }
-
 
             }
 
