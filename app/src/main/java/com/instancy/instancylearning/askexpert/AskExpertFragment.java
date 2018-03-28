@@ -299,6 +299,12 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             askExpertAdapter.refreshList(askExpertQuestionModelList);
         }
 
+        if (askExpertQuestionModelList.size() > 5) {
+            item_search.setVisible(true);
+        } else {
+            item_search.setVisible(false);
+        }
+
     }
 
     public void initilizeView() {

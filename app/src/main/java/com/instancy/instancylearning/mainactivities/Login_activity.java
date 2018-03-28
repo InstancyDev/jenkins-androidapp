@@ -202,7 +202,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         View someView = findViewById(R.id.login_layout);
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
-        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife)))) {
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife)))|| (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
 //            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
@@ -589,14 +589,14 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
 
-            btnSignup.setVisibility(View.VISIBLE);
+            btnSignup.setVisibility(View.INVISIBLE);
 
         } else {
             btnSignup.setVisibility(View.INVISIBLE);
 
         }
 
-        btnForgot.setVisibility(View.INVISIBLE);
+        btnForgot.setVisibility(View.VISIBLE);
 
     }
 

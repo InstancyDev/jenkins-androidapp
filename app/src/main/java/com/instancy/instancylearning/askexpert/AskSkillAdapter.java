@@ -2,6 +2,7 @@ package com.instancy.instancylearning.askexpert;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -107,10 +108,23 @@ public class AskSkillAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.switchSkill.setText(askExpertSkillsModelList.get(position).shortSkillName);
 
+
         if (askExpertSkillsModelList.get(position).isChecked) {
             holder.switchSkill.setChecked(true);
+            holder.switchSkill.setTextColor(convertView.getResources().getColor(R.color.colorBlack));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                holder.switchSkill.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+                holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            }
+
         } else {
             holder.switchSkill.setChecked(false);
+            holder.switchSkill.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                holder.switchSkill.setThumbTintList(ColorStateList.valueOf(convertView.getResources().getColor(R.color.colorDarkGrey)));
+                holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            }
         }
 
         return convertView;

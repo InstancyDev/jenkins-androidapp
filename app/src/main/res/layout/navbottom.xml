@@ -5,38 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/back_layout"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/colorWhite"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/back_font"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="2dp"
-            android:gravity="center_vertical"
-            android:text="@string/fa_icon_arrow_left"
-            android:textAlignment="center"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/txtbtn_back"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/back_font"
-            android:gravity="center_vertical"
-            android:minHeight="?android:attr/listPreferredItemHeightSmall"
-            android:text="Back to Instancy"
-            android:textAppearance="?android:attr/textAppearanceListItemSmall"
-            android:textColor="@color/colorBlack"
-            android:textSize="12sp" />
-    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/sendmessage_layout"
@@ -113,6 +81,8 @@
     </RelativeLayout>
 
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -150,6 +120,40 @@
             android:textSize="12sp" />
     </RelativeLayout>
 
+
+    <RelativeLayout
+        android:id="@+id/back_layout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/colorWhite"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/back_font"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:gravity="center_vertical"
+            android:text="@string/fa_icon_angle_left"
+            android:textAlignment="center"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtbtn_back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/back_font"
+            android:gravity="center_vertical"
+            android:minHeight="?android:attr/listPreferredItemHeightSmall"
+            android:text="Back to Instancy"
+            android:textAppearance="?android:attr/textAppearanceListItemSmall" />
+    </RelativeLayout>
+
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -163,7 +167,7 @@
         android:background="@color/colorWhite"
         android:padding="3dp"
         android:scaleType="centerInside"
-        android:src="@drawable/cvcta_bottom"
+        android:src="@drawable/bottomhealth"
         android:visibility="visible" />
 
 </LinearLayout>

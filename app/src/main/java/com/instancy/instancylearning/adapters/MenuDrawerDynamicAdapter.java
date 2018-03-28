@@ -197,7 +197,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_user));
                 break;
             case "4":
-                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_comments));
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_list_alt));
                 break;
             case "5":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_question_circle));
@@ -217,11 +217,18 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             case "10":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_connectdevelop));
                 break;
+            case "13":
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_connectdevelop));
+                break;
             case "9999":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_sign_out));
                 break;
             default:
-                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_align_left));
+                if (mainMenu.displayName.equalsIgnoreCase("connect")) {
+                    fontIcon.setText(pView.getResources().getString(R.string.fa_icon_connectdevelop));
+                } else {
+                    fontIcon.setText(pView.getResources().getString(R.string.fa_icon_align_left));
+                }
                 break;
         }
 
@@ -256,44 +263,55 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         }
 
         TextView txtTitle = (TextView) cView.findViewById(R.id.submenuText);
-        TextView iconFont = (TextView) cView.findViewById(R.id.fontawasomesubIcon);
+        TextView fontIcon = (TextView) cView.findViewById(R.id.fontawasomesubIcon);
         FontManager.markAsIconContainer(cView.findViewById(R.id.fontawasomesubIcon), iconFon);
-        iconFont.setText(cView.getResources().getString(R.string.fa_icon_home));
+        fontIcon.setText(cView.getResources().getString(R.string.fa_icon_home));
 
         switch (childMenu.getContextMenuId()) {
 
             case "1":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_leanpub));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_leanpub));
                 break;
             case "2":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_book));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_book));
                 break;
             case "3":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_user));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_user));
                 break;
             case "4":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_comments));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_list_alt));
                 break;
             case "5":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_question_circle));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_question_circle));
                 break;
             case "6":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_home));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_home));
                 break;
             case "7":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_firefox));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_firefox));
                 break;
             case "8":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_calendar));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_calendar));
                 break;
             case "9":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_users));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_users));
+                break;
+            case "10":
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_connectdevelop));
+                break;
+            case "13":
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_connectdevelop));
                 break;
             case "9999":
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_sign_out));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_sign_out));
                 break;
             default:
-                iconFont.setText(cView.getResources().getString(R.string.fa_icon_align_left));
+
+                if (childMenu.displayName.equalsIgnoreCase("connect")) {
+                    fontIcon.setText(cView.getResources().getString(R.string.fa_icon_connectdevelop));
+                } else {
+                    fontIcon.setText(cView.getResources().getString(R.string.fa_icon_align_left));
+                }
                 break;
         }
 
@@ -313,7 +331,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             if (parentPosition == MAIN_MENU_POSITION && childPosition == StaticValues.SUB_MENU_POSITION) {
                 cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
-                iconFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
+                fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             } else {
                 if (parentPosition % 2 == 0) {
                     cView.setBackgroundColor(Color
@@ -323,7 +341,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                             .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
                 }
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-                iconFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+                fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             }
         }
         return cView;

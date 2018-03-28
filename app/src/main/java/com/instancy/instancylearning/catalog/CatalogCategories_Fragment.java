@@ -92,7 +92,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     RecyclerView recyclerView;
 
     PreferencesManager preferencesManager;
-    String filterContentType = "", consolidationType = "all", sortBy = "", ddlsortBy = "publisheddate";
+    String filterContentType = "", consolidationType = "all", sortBy = "", ddlsortBy = "publisheddate", breadcrumbtextcolor = "";
     Context context;
     Toolbar toolbar;
     Menu search_menu;
@@ -134,19 +134,15 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         }
         vollyService = new VollyService(resultCallback, context);
         List<CatalogCategoryButtonModel> categoryButtonModelList;
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
         sideMenusModel = null;
         HashMap<String, String> responMap = null;
+        HashMap<String, String> paramStrings = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
-
+            paramStrings = generateParametersHashmap(sideMenusModel.getParameterStrings());
             Boolean isFromCatogories = bundle.getBoolean("ISFROMCATEGORIES");
 
             if (isFromCatogories) {
@@ -176,6 +172,13 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         } else {
             // No such key
             sortBy = "";
+        }
+
+        if (paramStrings != null && paramStrings.containsKey("breadcrumbtextcolor")) {
+            breadcrumbtextcolor = paramStrings.get("breadcrumbtextcolor");
+        } else {
+            // No such key
+            breadcrumbtextcolor = uiSettingsModel.getAppHeaderColor();
         }
 
         if (responMap != null && responMap.containsKey("ddlSortList")) {
@@ -253,7 +256,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             } else {
 
             }
-
 
             breadCrumbPlusButtonInit(rootView);
 
@@ -498,6 +500,24 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         }
         return responMap;
     }
+
+    public HashMap<String, String> generateParametersHashmap(String conditions) {
+
+        HashMap<String, String> responMap = null;
+        if (conditions != null && !conditions.equals("")) {
+            if (conditions.contains("&")) {
+                String[] conditionsArray = conditions.split("&");
+                int conditionCount = conditionsArray.length;
+                if (conditionCount > 0) {
+                    responMap = generateHashMap(conditionsArray);
+
+                }
+            }
+        }
+        return responMap;
+    }
+
+
 // BreadCrumb code
 
     public void addItemToBreadcrumbList(String categoryId, String categoryName) {
@@ -569,7 +589,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(arrowView, iconFont);
 
-            arrowView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderColor() + "'><medium><b>"
+            arrowView.setText(Html.fromHtml("<font color='" + breadcrumbtextcolor + "'><medium><b>"
                     + getResources().getString(R.string.fa_icon_angle_right) + "</b></big> </font>"));
 
 //            arrowView.setText(getResources().getString(R.string.fa_icon_forward));
@@ -582,7 +602,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             String categoryId = cvBreadcrumbItem.getAsString("categoryid");
             String categoryName = cvBreadcrumbItem.getAsString("categoryname");
 
-            textView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderColor() + "'><big><b><u>"
+            textView.setText(Html.fromHtml("<font color='" + breadcrumbtextcolor + "'><big><b><u>"
                     + categoryName + "</u></b></big>  </font>"));
 
             textView.setGravity(Gravity.BOTTOM | Gravity.BOTTOM);

@@ -514,6 +514,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             catalogAdapter.refreshList(catalogModelsList);
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
+
+        if (catalogModelsList.size() > 5) {
+            item_search.setVisible(true);
+        } else {
+            item_search.setVisible(false);
+        }
+
         triggerActionForFirstItem();
 
         membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());

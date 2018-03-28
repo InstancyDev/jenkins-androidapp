@@ -221,7 +221,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         }
 
-
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
@@ -229,13 +228,15 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
-        } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta))) {
+        } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta)) || getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp))) {
             notificationLayout.setVisibility(View.VISIBLE);
             sendMessageLayout.setVisibility(View.VISIBLE);
             signalAService = SignalAService.newInstance(this);
             signalAService.startSignalA();
         }
 
+
+        Log.d(TAG, "onCreate: appname " + getResources().getString(R.string.app_name));
 
         getSupportActionBar().setDisplayShowCustomEnabled(true);
 
@@ -787,7 +788,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             mainSiteName.setText(appUserModel.getMainSiteName());
             subsiteLa.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
             subsiteLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-            subsiteLa.setAlpha(.9f);
+            subsiteLa.setAlpha(.7f);
 //            subsiteLayout.setAlpha(.7f);
 
             drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));

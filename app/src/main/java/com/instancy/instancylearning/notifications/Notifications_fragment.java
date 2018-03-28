@@ -276,6 +276,12 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             notificationAdapter.refreshList(notificationModelList);
         }
 
+        if (notificationModelList.size() > 5) {
+            item_search.setVisible(true);
+        } else {
+            item_search.setVisible(false);
+        }
+
     }
 
     public void initilizeView() {

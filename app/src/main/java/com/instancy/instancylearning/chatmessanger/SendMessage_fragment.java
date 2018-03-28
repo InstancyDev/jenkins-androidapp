@@ -195,9 +195,11 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.mylearning_menu, menu);
         item_search = menu.findItem(R.id.mylearning_search);
+
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
+        item_search.setVisible(false);
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
 
@@ -380,6 +382,9 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             }
 
         }
+
+
+
     }
 
 }

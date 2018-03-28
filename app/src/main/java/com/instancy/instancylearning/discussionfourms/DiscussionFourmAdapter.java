@@ -72,12 +72,7 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
         appcontroller = AppController.getInstance();
 
     }
@@ -137,6 +132,13 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         } else {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
+
+        if (discussionForumModelList.get(position).createduserid.equalsIgnoreCase(appUserModel.getUserIDValue())) {
+            holder.btnContextMenu.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+        }
+
 
         String imgUrl = appUserModel.getSiteURL() + discussionForumModelList.get(position).imagedata;
         Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);

@@ -274,6 +274,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             discussionFourmAdapter.refreshList(discussionForumModelList);
         }
 
+        if (discussionForumModelList.size() > 5) {
+            item_search.setVisible(true);
+        } else {
+            item_search.setVisible(false);
+        }
+
     }
 
     public void initilizeView() {

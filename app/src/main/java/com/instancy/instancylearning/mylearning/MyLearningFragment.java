@@ -355,6 +355,19 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
+        if (myLearningModelsList.size() > 5) {
+            if (item_search != null) {
+                item_search.setVisible(true);
+            }
+
+        } else {
+
+            if (item_search != null) {
+                item_search.setVisible(false);
+            }
+
+        }
+
         triggerActionForFirstItem();
     }
 

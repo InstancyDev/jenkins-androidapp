@@ -286,6 +286,11 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             learningCommunitiesAdapter.refreshList(communitiesModelList);
         }
 
+        if (communitiesModelList.size() > 5) {
+            item_search.setVisible(true);
+        } else {
+            item_search.setVisible(false);
+        }
     }
 
     public void initilizeView() {
