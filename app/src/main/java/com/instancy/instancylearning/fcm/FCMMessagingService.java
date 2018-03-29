@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.fcm;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,7 +12,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.LocalBroadcastManager;
+
+
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -22,7 +24,6 @@ import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -61,6 +62,8 @@ public class FCMMessagingService extends FirebaseMessagingService {
         String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
         Intent intent;
+// The id of the channel.
+        String channelID = "instancychanel";
 
         if (userID != null && !userID.equalsIgnoreCase("")) {
             intent = new Intent(this, SideMenu.class);
@@ -91,7 +94,14 @@ public class FCMMessagingService extends FirebaseMessagingService {
         notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notificationManager != null;
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = new NotificationChannel(
+                    channelID, mTitle, importance);
+//            notificationManager.createNotificationChannel(mChannel);
+        }
     }
 }

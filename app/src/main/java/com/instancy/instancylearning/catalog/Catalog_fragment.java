@@ -516,9 +516,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
         if (catalogModelsList.size() > 5) {
-            item_search.setVisible(true);
+            if (item_search != null) {
+                item_search.setVisible(true);
+            }
         } else {
-            item_search.setVisible(false);
+            if (item_search != null) {
+                item_search.setVisible(false);
+            }
+
         }
 
         triggerActionForFirstItem();
@@ -780,7 +785,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-
     public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
@@ -821,9 +825,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         } else {
             if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
 
-                if (myLearningDetalData.getAddedToMylearning()==0){
+                if (myLearningDetalData.getAddedToMylearning() == 0) {
                     menu.getItem(0).setVisible(true);
-                }else {
+                } else {
                     menu.getItem(0).setVisible(false);
                 }
                 menu.getItem(1).setVisible(true);
@@ -876,13 +880,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     menu.getItem(3).setVisible(true);
                     menu.getItem(1).setVisible(false);
                 } else {
-if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
-    menu.getItem(1).setVisible(true); //add
+                    if (membershipModel.membershiplevel >= myLearningDetalData.getMemberShipLevel()) {
+                        menu.getItem(1).setVisible(true); //add
 
-}else {
-    menu.getItem(2).setVisible(true);// buy
+                    } else {
+                        menu.getItem(2).setVisible(true);// buy
 
-}
+                    }
                     menu.getItem(0).setVisible(false);
                     menu.getItem(3).setVisible(true);
                 }
@@ -905,11 +909,11 @@ if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
                 if (item.getTitle().toString().equalsIgnoreCase("View")) {
 
 
-                        if (myLearningDetalData.getAddedToMylearning()==0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")){
-                            GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
-                        }else {
-                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                        }
+                    if (myLearningDetalData.getAddedToMylearning() == 0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
+                        GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
+                    } else {
+                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                    }
 
 
                 }
@@ -1908,7 +1912,7 @@ if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
             String android_Id = Settings.Secure.getString(getContext().getContentResolver(),
                     Settings.Secure.ANDROID_ID);
 
-            String urlString = appUserModel.getSiteURL() + "/PublicModules/UserLoginVerify.aspx?Fileupload=true&ComponentID="+sideMenusModel.getComponentId()+"&CMSGroupID=3&" + contentMediaTypeID + "&userid=" + appUserModel.getUserIDValue() + "&deviceid=" + android_Id + "&devicetype=ios";
+            String urlString = appUserModel.getSiteURL() + "/PublicModules/UserLoginVerify.aspx?Fileupload=true&ComponentID=" + sideMenusModel.getComponentId() + "&CMSGroupID=3&" + contentMediaTypeID + "&userid=" + appUserModel.getUserIDValue() + "&deviceid=" + android_Id + "&devicetype=ios";
 
             if (intsr == 1) {
                 openChromeTabsInAndroid(urlString);
@@ -1960,14 +1964,15 @@ if (membershipModel.membershiplevel>=myLearningDetalData.getMemberShipLevel()){
         REFRESH = 0;
     }
 
-    public void openDetailsPage(MyLearningModel learningModel){
+    public void openDetailsPage(MyLearningModel learningModel) {
 
-        if (learningModel.getViewType().equalsIgnoreCase("1") || learningModel.getViewType().equalsIgnoreCase("3")|| learningModel.getViewType().equalsIgnoreCase("2")) {
+        if (learningModel.getViewType().equalsIgnoreCase("1") || learningModel.getViewType().equalsIgnoreCase("3") || learningModel.getViewType().equalsIgnoreCase("2")) {
             Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
             intentDetail.putExtra("IFROMCATALOG", true);
             intentDetail.putExtra("myLearningDetalData", learningModel);
             ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
-        }}
+        }
+    }
 
 }

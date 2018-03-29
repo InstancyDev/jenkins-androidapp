@@ -703,7 +703,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             }
 
             public void onFinish() {
-                ((SideMenu) getActivity()).homeControllClicked(false, 0, "", true);
+                ((SideMenu) getActivity()).homeControllClicked(false, 0, "", true,"");
             }
         }.start();
 

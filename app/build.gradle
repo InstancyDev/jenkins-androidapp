@@ -22,8 +22,8 @@ android {
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 14
-//           versionName "2.2"
+//           versionCode 15
+//           versionName "2.3"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"

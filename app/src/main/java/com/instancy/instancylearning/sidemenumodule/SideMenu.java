@@ -179,6 +179,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         appUserModel = AppUserModel.getInstance();
 
         initVolleyCallback();
+
         vollyService = new VollyService(resultCallback, this);
 
         Bundle bundle = getIntent().getExtras();
@@ -208,7 +209,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void onClick(View v) {
                 //logo clicked
-                homeControllClicked(false, 0, "", false);
+                homeControllClicked(false, 0, "", false, "");
 
 
             }
@@ -328,7 +329,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
 
                 // on first time to display view for first navigation item based on the number
-                selectItem(Integer.parseInt(indexed), model, false, ""); // 2 is your fragment's number for "CollectionFragment"
+                selectItem(Integer.parseInt(indexed), model, false, "", ""); // 2 is your fragment's number for "CollectionFragment"
                 homeModel = model;
                 tempHomeModel = model;
                 homeIndex = Integer.parseInt(indexed);
@@ -374,11 +375,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                     try {
-                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false, "");
+                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false, "", "");
 
                                     } catch (NumberFormatException numEx) {
                                         numEx.printStackTrace();
-                                        selectItem(1, sideMenumodelList.get(groupPosition), false, "");
+                                        selectItem(1, sideMenumodelList.get(groupPosition), false, "", "");
                                     }
                                 }
                             }
@@ -429,7 +430,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     }
 
-    public void homeControllClicked(boolean isFromNotification, int menuId, String contentID, boolean isFromCommunityList) {
+    public void homeControllClicked(boolean isFromNotification, int menuId, String contentID, boolean isFromCommunityList, String fourmID) {
 
         String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
         if (isSubSiteEntered.equalsIgnoreCase("true")) {
@@ -452,12 +453,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             }
 
-            selectItem(menuID, model, false, contentID);
+            selectItem(menuID, model, false, contentID, fourmID);
 
         } else if (!isFromNotification) {
-            selectItem(homeIndex, homeModel, false, contentID);
+            selectItem(homeIndex, homeModel, false, contentID, fourmID);
         } else {
-            selectItem(menuId, getMenuModelForNotification(menuId), true, contentID);
+            selectItem(menuId, getMenuModelForNotification(menuId), true, contentID, fourmID);
 
         }
 
@@ -479,7 +480,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         return sideMenusModel;
     }
 
-    public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID) {
+    public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID, String topicID) {
 
         Fragment fragment = null; //
 
@@ -538,6 +539,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 bundle.putSerializable("sidemenumodel", sideMenusModel);
                 bundle.putBoolean("ISFROMCATEGORIES", false);
                 bundle.putBoolean("ISFROMNOTIFICATIONS", isFromNotification);
+
+                bundle.putString("TOPICID", topicID);
                 bundle.putString("CONTENTID", contentID);
                 fragment.setArguments(bundle);
 
@@ -595,7 +598,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             if (m.getIsOfflineMenu().equals("true")) {
                 navDrawerExpandableView.setSelectedGroup(groupPosition);
                 navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "");
+                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "", "");
             } else {
 
             }
@@ -670,7 +673,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         backLayout.setVisibility(View.GONE);
 
-        homeControllClicked(false, 0, "", false);
+        homeControllClicked(false, 0, "", false, "");
     }
 
 
@@ -739,10 +742,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 backToMainSite();
                 break;
             case R.id.sendmessage_layout:
-                selectItem(99, sideMenumodelList.get(0), false, "");
+                selectItem(99, sideMenumodelList.get(0), false, "", "");
                 break;
             case R.id.notification_layout:
-                selectItem(100, sideMenumodelList.get(0), false, "");
+                selectItem(100, sideMenumodelList.get(0), false, "", "");
                 break;
         }
     }
@@ -905,40 +908,28 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         int contextMenuID = jsonObject.optInt("contextmenuid", 1);
         String contentID = jsonObject.optString("contentid");
+        String fourmID = jsonObject.optString("fourmid");
 
         switch (contextMenuID) {
-            case 1:
-                homeControllClicked(true, contextMenuID, contentID, false);
+            case 1:// mylearning
+                homeControllClicked(true, contextMenuID, contentID, false, fourmID);
                 MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
                 break;
-            case 2:
-                homeControllClicked(true, contextMenuID, contentID, false);
+            case 2:// catalog
+                homeControllClicked(true, contextMenuID, contentID, false, fourmID);
                 CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
                 break;
             case 3:
-
+                homeControllClicked(true, contextMenuID, contentID, false, fourmID);
                 break;
-            case 7:
-
+            case 4://discussion boards
+                homeControllClicked(true, contextMenuID, contentID, false, fourmID);
                 break;
-            case 6:
-
+            case 5:// ask experts
+                homeControllClicked(true, contextMenuID, contentID, false, fourmID);
                 break;
-            case 8:
-
-                break;
-            case 4:
-
-                break;
-            case 5:
-                break;
-            case 9:
-                break;
-            case 10:
-                break;
-
             default:
-                Log.d(TAG, "selectItem: default contextmenu");
+                homeControllClicked(true, 1, contentID, false, fourmID);
                 break;
         }
 

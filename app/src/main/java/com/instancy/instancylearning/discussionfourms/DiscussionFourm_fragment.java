@@ -119,6 +119,11 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     @BindView(R.id.fab_fourm_button)
     FloatingActionButton floatingActionButton;
 
+    boolean isFromNotification = false;
+
+    String contentIDFromNotification = "";
+    String topicID = "";
+
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
@@ -142,16 +147,19 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         vollyService = new VollyService(resultCallback, context);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         sideMenusModel = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
+
+            isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
+
+            if (isFromNotification) {
+
+                contentIDFromNotification = bundle.getString("TOPICID");
+                topicID = bundle.getString("CONTENTID");
+            }
+
         }
     }
 
@@ -275,12 +283,57 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         }
 
         if (discussionForumModelList.size() > 5) {
-            item_search.setVisible(true);
+            if (item_search != null)
+                item_search.setVisible(true);
         } else {
-            item_search.setVisible(false);
+            if (item_search != null)
+                item_search.setVisible(false);
+        }
+        triggerActionForFirstItem();
+    }
+
+    public void triggerActionForFirstItem() {
+
+        if (isFromNotification) {
+            int selectedPostion = getPositionForNotification(contentIDFromNotification);
+//            discussionFourmlistView.setSelection(selectedPostion);
+
+            if (discussionForumModelList != null) {
+
+                try {
+                    attachFragment(discussionForumModelList.get(selectedPostion), isFromNotification);
+                    isFromNotification = false;
+                } catch (IndexOutOfBoundsException ex) {
+//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+            }
         }
 
     }
+
+    public int getPositionForNotification(String contentID) {
+        int position = 0;
+        int contentIntID = 0;
+        try {
+            contentIntID = Integer.parseInt(contentID);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+
+        for (int k = 0; k < discussionForumModelList.size(); k++) {
+            if (discussionForumModelList.get(k).forumid == contentIntID) {
+                position = k;
+                break;
+            }
+
+        }
+
+        return position;
+    }
+
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
@@ -400,7 +453,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         switch (view.getId()) {
             case R.id.card_view:
-                attachFragment(discussionForumModelList.get(position));
+                attachFragment(discussionForumModelList.get(position), isFromNotification);
                 break;
             case R.id.btn_contextmenu:
                 View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
@@ -501,9 +554,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         }
     }
 
-    public void attachFragment(DiscussionForumModel forumModel) {
+    public void attachFragment(DiscussionForumModel forumModel, boolean isFromNotification) {
         Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
         intentDetail.putExtra("forumModel", forumModel);
+        intentDetail.putExtra("NOTIFICATION", isFromNotification);
+        intentDetail.putExtra("TOPICID", topicID);
+
         ((Activity) context).startActivity(intentDetail);
     }
 

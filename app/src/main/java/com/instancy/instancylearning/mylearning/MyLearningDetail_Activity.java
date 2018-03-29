@@ -189,6 +189,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     View header;
 
+    boolean refreshReview = false;
+
     RatingsAdapter ratingsAdapter;
 
     PreferencesManager preferencesManager;
@@ -920,7 +922,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     intent.putExtra("REFRESH", refreshCatalogContent);
                 } else {
 
-                    intent.putExtra("refresh", "refresh");
+                    if (refreshReview) {
+                        intent.putExtra("NEWREVIEW", refreshReview);
+                        intent.putExtra("myLearningDetalData", myLearningModel);
+                        intent.putExtra("refresh", "norefresh");
+                    } else {
+                        intent.putExtra("refresh", "refresh");
+                    }
+
 
                 }
                 setResult(RESULT_OK, intent);
@@ -1093,7 +1102,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
                 if (refresh) {
-
+                    refreshReview = true;
                     try {
 //                        initilizeRatingsListView();
                         getUserRatingsOfTheContent(0, true);
@@ -1897,7 +1906,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 }
                 ratingsAdapter.refreshList(reviewRatingModelList);
             }
-
+            String rating = "" + ratingValue;
             if (reviewRatingModelList.size() > 0) {
 
                 int k = 0;
@@ -1910,25 +1919,23 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 ratingValue = (float) k / recordCount;
 
-                DecimalFormat df = new DecimalFormat();
-                df.setMaximumFractionDigits(1);
-
-                df.format(ratingValue);
+                rating = String.format("%.1f", ratingValue);
 
 //                ratingValue = (float)k / reviewRatingModelList.size();
 //                myLearningModel.setRatingId("" + ratingValue);
 
             }
-            txtOverallRating.setText("" + ratingValue);
+            txtOverallRating.setText(rating);
             overallRatingbar.setRating(ratingValue);
-            String ratedStyle = "Rated " + ratingValue + " out of 5 of " + recordCount + " ratings";//        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
+            String ratedStyle = "Rated " + rating + " out of 5 of " + recordCount + " ratings";//
+
+            //   "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
 
             ratedOutOfTxt.setText(ratedStyle);
         }
 
 
     }
-
 
     public void openWriteReview() {
 

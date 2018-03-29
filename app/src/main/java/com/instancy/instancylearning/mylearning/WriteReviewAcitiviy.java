@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.mylearning;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spannable;
@@ -160,10 +162,12 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
             fromAdapter = bundle.getBoolean("from", false);
 
             learningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
+
             isEditReview = bundle.getBoolean("isEditReview");
 
             if (isEditReview) {
                 txtCancel.setText("Delete");
+                txtSave.setText("Update");
                 try {
 
                     editObj = new JSONObject(getIntent().getStringExtra("editObj"));
@@ -202,7 +206,28 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         float ratingValue = 0;
 
         try {
-            ratingValue = Float.parseFloat(learningModel.getRatingId());
+//            ratingValue = Float.parseFloat(learningModel.getRatingId());
+
+            if (isEditReview) {
+                if (editObj.has("RatingID")) {
+
+                    try {
+                        ratingValue = Float.parseFloat(editObj.getString("RatingID"));
+                        ratingBar.setRating(ratingValue);
+
+                    } catch (NumberFormatException ex) {
+                        ex.printStackTrace();
+                        ratingValue = 0;
+                    }
+
+                }
+
+            } else {
+                ratingBar.setRating(0);
+                ratingValue = 0;
+            }
+
+
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
             ratingValue = 0;
@@ -341,11 +366,30 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
                 if (txtCancel.getText().toString().equalsIgnoreCase("Delete")) {
 
-                    try {
-                        deleteRatingFrom();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                    alertDialog.setCancelable(false).setTitle("Confirmation!").setMessage("Are you sure you want to delete your review?")
+                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                public void onClick(final DialogInterface dialogBox, int id) {
+                                    // ToDo get user input here
+                                    try {
+
+                                        deleteRatingFrom();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }).setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialogBox, int id) {
+                                    dialogBox.cancel();
+                                }
+                            });
+
+                    AlertDialog alertDialogAndroid = alertDialog.create();
+                    alertDialogAndroid.show();
+
+
                 } else {
                     finish();
                 }

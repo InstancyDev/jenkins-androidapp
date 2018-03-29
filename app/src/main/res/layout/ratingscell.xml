@@ -53,7 +53,7 @@
         <RelativeLayout
             android:id="@+id/relattitle"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="4">
 
             <LinearLayout
@@ -118,7 +118,7 @@
                 android:gravity="left"
                 android:maxLines="100"
                 android:padding="2dp"
-                android:text="asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj"
+                android:text="asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj"
                 android:textColor="@color/colorGray"
                 android:textSize="12sp" />
 

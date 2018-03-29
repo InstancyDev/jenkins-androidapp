@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -45,6 +46,7 @@ import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.SweetAlert;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,6 +126,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     @BindView(R.id.lineview2)
     View lineView2;
 
+    @Nullable
+    @BindView(R.id.imglogo)
+    ImageView imglogo;
+
     AppUserModel appUserModel;
     UiSettingsModel uiSettingsModel;
     PreferencesManager preferencesManager;
@@ -197,15 +203,21 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnForgot.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
 
+        if (isValidString(uiSettingsModel.getNativeAppLoginLogo())){
+            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(imglogo);
+
+        }
+
 //       uncomment for backgroundcolor purpose
 
         View someView = findViewById(R.id.login_layout);
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
-        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife)))|| (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
 //            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
+
         } else {
 
             settingTxt.setVisibility(View.VISIBLE);
@@ -550,10 +562,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void hideOrShowBtns() {
 
-        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.development)))) {
-
-            settingTxt.setVisibility(View.VISIBLE);
-        }
+//        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.development)))) {
+//
+//            settingTxt.setVisibility(View.VISIBLE);
+//        }
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
@@ -589,7 +601,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
 
-            btnSignup.setVisibility(View.INVISIBLE);
+            btnSignup.setVisibility(View.VISIBLE);
 
         } else {
             btnSignup.setVisibility(View.INVISIBLE);

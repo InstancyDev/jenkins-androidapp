@@ -181,6 +181,23 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
                 }
 
+                if (key.equals("fourmid")) {
+
+                    Log.d(TAG, "onCreate: fourmid " + getIntent().getExtras().getString("fourmid"));
+
+                    String contextmenuID = getIntent().getExtras().getString("fourmid");
+
+                    if (isValidString(contextmenuID)) {
+                        try {
+                            parameters.put("fourmid", contextmenuID);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
+
             }
 
         }

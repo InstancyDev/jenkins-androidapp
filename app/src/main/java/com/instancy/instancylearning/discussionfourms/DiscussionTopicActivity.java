@@ -55,6 +55,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,6 +136,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    boolean isFromNotification = false;
+
+
+    String topicID = "";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,6 +162,15 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forumModel");
+
+        isFromNotification = getIntent().getBooleanExtra("NOTIFICATION", false);
+
+
+        if (isFromNotification) {
+
+            topicID = getIntent().getStringExtra("TOPICID");
+        }
+
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -292,7 +307,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             discussionTopicModels = new ArrayList<DiscussionTopicModel>();
             fourmAdapter.refreshList(discussionTopicModels);
         }
-
+        triggerActionForFirstItem();
     }
 
 
@@ -346,6 +361,43 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public void triggerActionForFirstItem() {
+
+        if (isFromNotification) {
+            int selectedPostion = getPositionForNotification(topicID);
+//            discussionFourmlistView.setSelection(selectedPostion);
+
+            if (discussionTopicModels != null) {
+
+                try {
+                    attachFragment(discussionTopicModels.get(selectedPostion));
+                    isFromNotification = false;
+                } catch (IndexOutOfBoundsException ex) {
+//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    public int getPositionForNotification(String contentID) {
+        int position = 0;
+
+
+        for (int k = 0; k < discussionTopicModels.size(); k++) {
+            if (discussionTopicModels.get(k).topicid == contentID) {
+                position = k;
+                break;
+            }
+
+        }
+
+        return position;
     }
 
 

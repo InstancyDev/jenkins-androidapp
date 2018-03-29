@@ -180,9 +180,9 @@
 
         <!-- Push Notification  Services-->
 
-        <meta-data
-            android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/cle_logo" />
+        <!--<meta-data-->
+            <!--android:name="com.google.firebase.messaging.default_notification_icon"-->
+            <!--android:resource="@drawable/acclife__login_logo" />-->
 
         <service android:name=".fcm.FCMInstanceIDService">
             <intent-filter>

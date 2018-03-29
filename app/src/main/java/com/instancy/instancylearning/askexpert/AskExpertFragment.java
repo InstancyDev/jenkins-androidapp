@@ -141,6 +141,11 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
+
+    boolean isFromNotification = false;
+
+    String contentIDFromNotification = "";
+
     List<AskExpertSkillsModel> askExpertSkillsModelList = null;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
@@ -170,6 +175,15 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
+
+            isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
+
+            if (isFromNotification) {
+
+                contentIDFromNotification = bundle.getString("CONTENTID");
+            }
+
+
         }
     }
 
@@ -300,12 +314,58 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         }
 
         if (askExpertQuestionModelList.size() > 5) {
-            item_search.setVisible(true);
+            if (item_search != null)
+                item_search.setVisible(true);
         } else {
-            item_search.setVisible(false);
+            if (item_search != null)
+                item_search.setVisible(false);
+        }
+
+        triggerActionForFirstItem();
+    }
+
+    public void triggerActionForFirstItem() {
+
+        if (isFromNotification) {
+            int selectedPostion = getPositionForNotification(contentIDFromNotification);
+            askexpertListView.setSelection(selectedPostion);
+
+            if (askExpertQuestionModelList != null) {
+
+                try {
+                    attachFragment(askExpertQuestionModelList.get(selectedPostion));
+                    isFromNotification = false;
+                } catch (IndexOutOfBoundsException ex) {
+//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+            }
         }
 
     }
+
+    public int getPositionForNotification(String contentID) {
+        int position = 0;
+        int contentIntID = 0;
+        try {
+            contentIntID = Integer.parseInt(contentID);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+
+        for (int k = 0; k < askExpertQuestionModelList.size(); k++) {
+            if (askExpertQuestionModelList.get(k).questionID == contentIntID) {
+                position = k;
+                break;
+            }
+
+        }
+
+        return position;
+    }
+
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();

@@ -893,9 +893,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("NativeAppLoginLogo"))) {
 
                                         String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
-                                        if (appLogo.length() == 0) {
+                                        if (isValidString(appLogo)) {
                                             String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
-                                            uiSettingsModel.setEnableAppLogin(appLogos);
+                                            uiSettingsModel.setNativeAppLoginLogo(appLogos);
                                         }
                                     }
                                 }
@@ -1159,6 +1159,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setFirstEvent(cursor.getString(cursor
                     .getColumnIndex("firstEvent")));
+
+            uiSettingsModel.setNativeAppLoginLogo(cursor.getString(cursor
+                    .getColumnIndex("nativeAppLoginLogo")));
 
             uiSettingsModel.setIsFaceBook(cursor.getString(cursor
                     .getColumnIndex("isFacebook")));
@@ -3817,19 +3820,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     public void updateContentRatingToLocalDB(MyLearningModel myLearningModel, String rating) {
-        String strUpdateML = "UPDATE " + TBL_DOWNLOADDATA + " SET ratingid='"
-                + rating + "' WHERE siteid ='" + myLearningModel.getSiteID() + "' AND userid ='"
-                + myLearningModel.getUserID() + "' AND scoid='" + myLearningModel.getScoId() + "'";
-        String strUpdateCL = "UPDATE " + TBL_CATALOGDATA + " SET ratingid='"
-                + rating + "' WHERE siteid ='" + myLearningModel.getSiteID() + "' AND scoid='"
-                + myLearningModel.getScoId() + "'";
-
-        try {
-            executeQuery(strUpdateML);
-            executeQuery(strUpdateCL);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        String strUpdateML = "UPDATE " + TBL_DOWNLOADDATA + " SET ratingid='"
+//                + rating + "' WHERE siteid ='" + myLearningModel.getSiteID() + "' AND userid ='"
+//                + myLearningModel.getUserID() + "' AND scoid='" + myLearningModel.getScoId() + "'";
+//        String strUpdateCL = "UPDATE " + TBL_CATALOGDATA + " SET ratingid='"
+//                + rating + "' WHERE siteid ='" + myLearningModel.getSiteID() + "' AND scoid='"
+//                + myLearningModel.getScoId() + "'";
+//
+//        try {
+//            executeQuery(strUpdateML);
+//            executeQuery(strUpdateCL);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void executeQuery(String strQuery) {

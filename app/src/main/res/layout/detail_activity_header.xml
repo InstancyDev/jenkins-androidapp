@@ -79,8 +79,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:isIndicator="true"
-                            android:rating="3.0"
-                            android:stepSize=".5"
+                            android:rating="3.5"
+                            android:stepSize="0.5"
                             android:visibility="invisible" />
                     </RelativeLayout>
                 </LinearLayout>
@@ -266,7 +266,7 @@
             android:gravity="center_vertical|fill_horizontal"
             android:maxLines="2"
             android:padding="2dp"
-            android:text="Rating and Review"
+            android:text="Ratings and Reviews"
             android:textColor="@color/colorBlack"
             android:textSize="18sp"
             android:typeface="sans" />
@@ -309,8 +309,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:isIndicator="true"
-                        android:rating="0.0"
-                        android:stepSize="1.0" />
+                        android:rating="3.5"
+                        android:stepSize="0.5"
+                        />
                 </RelativeLayout>
 
                 <TextView
@@ -343,6 +344,7 @@
             android:layout_height="45dp"
             android:layout_below="@+id/contentratinglayout"
             android:layout_marginTop="10dp"
+            android:textAllCaps="false"
             android:background="@drawable/edittext_border"
             android:text="Edit Your Review" />
     </RelativeLayout>
