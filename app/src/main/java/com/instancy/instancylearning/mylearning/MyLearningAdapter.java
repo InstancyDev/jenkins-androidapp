@@ -195,7 +195,23 @@ public class MyLearningAdapter extends BaseAdapter {
                     }
                 });
                 break;
-            case "43":
+            case "171":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+
+                        if (isAscn) {
+                            return obj1.getDateAssigned().compareToIgnoreCase(obj2.getDateAssigned());
+
+                        } else {
+                            return obj2.getDateAssigned().compareToIgnoreCase(obj1.getDateAssigned());
+                        }
+                    }
+                });
+                break;
+            case "default":
                 break;
 
         }

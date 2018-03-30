@@ -726,6 +726,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
                 break;
             case R.id.imagethumb:
+            case R.id.card_view:
                 openDetailsPage(catalogModelsList.get(position));
                 break;
             default:

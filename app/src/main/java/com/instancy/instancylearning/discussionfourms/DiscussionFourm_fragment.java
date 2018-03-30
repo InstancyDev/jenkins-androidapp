@@ -333,8 +333,6 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         return position;
     }
-
-
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

@@ -184,6 +184,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         Bundle bundle = getIntent().getExtras();
 
+        if (bundle != null) {
+            isFromPushNotification = bundle.getBoolean("PUSH");
+
+        }
+
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
         appUserModel.setUserLoginId(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
@@ -225,7 +230,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
-        notificationLayout.setVisibility(View.GONE);
+        notificationLayout.setVisibility(View.VISIBLE);
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
@@ -328,8 +333,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                 }
 
-                // on first time to display view for first navigation item based on the number
-                selectItem(Integer.parseInt(indexed), model, false, "", ""); // 2 is your fragment's number for "CollectionFragment"
+                // on first time to display view for first time navigation item based on the number
+                if (!isFromPushNotification) {
+                    selectItem(Integer.parseInt(indexed), model, false, "", ""); // 2 is your fragment's number for "CollectionFragment"
+                }
                 homeModel = model;
                 tempHomeModel = model;
                 homeIndex = Integer.parseInt(indexed);
@@ -375,11 +382,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                     try {
-                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), false, "", "");
+                                        selectItem(Integer.parseInt(sideMenumodelList.get(groupPosition).getContextMenuId()), sideMenumodelList.get(groupPosition), isFromPushNotification, "", "");
 
                                     } catch (NumberFormatException numEx) {
                                         numEx.printStackTrace();
-                                        selectItem(1, sideMenumodelList.get(groupPosition), false, "", "");
+                                        selectItem(1, sideMenumodelList.get(groupPosition), isFromPushNotification, "", "");
                                     }
                                 }
                             }

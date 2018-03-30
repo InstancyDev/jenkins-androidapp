@@ -441,7 +441,7 @@ public class CatalogAdapter extends BaseAdapter {
             };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.card_view})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

@@ -86,9 +86,9 @@ public class NativeSetttingsModel {
     public static HashMap<String, List<FilterModel>> getFilterData(JSONObject jsonObject) throws JSONException {
         HashMap<String, List<FilterModel>> expandableListDetail = new HashMap<String, List<FilterModel>>();
 
-        if (jsonObject.has("filterbysorttype")) {
+        if (jsonObject.has("filtersortby")) {
 
-            JSONArray jsonArray = jsonObject.getJSONArray("filterbysorttype");
+            JSONArray jsonArray = jsonObject.getJSONArray("filtersortby");
             if (jsonArray.length() > 0) {
                 List<FilterModel> filterModelList = new ArrayList<FilterModel>();
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -104,7 +104,10 @@ public class NativeSetttingsModel {
                 expandableListDetail.put("Sort By", filterModelList);
             }
         }
+
+
         List<FilterModel> filterModelListG = new ArrayList<FilterModel>();
+        int j = 0;
         if (jsonObject.has("filterbycategory")) {
             JSONArray jsonArray = jsonObject.getJSONArray("filterbycategory");
 
@@ -123,7 +126,8 @@ public class NativeSetttingsModel {
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }
-                filterModelListG.add(0, model);
+                filterModelListG.add(j, model);
+                j++;
 //                expandableListDetail.put("Filter By", filterModelList);
             }
 
@@ -141,13 +145,14 @@ public class NativeSetttingsModel {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     FilterInnerModel filterInnerModel = new FilterInnerModel();
                     JSONObject object = jsonArray.getJSONObject(i);
-                    if (object.has("categoryname")) {
-                        filterInnerModel.name = object.getString("categoryname");
+                    if (object.has("datafieldname")) {
+                        filterInnerModel.name = object.getString("datafieldname");
                         filterInnerModel.id = object.getString("categoryid");
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }
-                filterModelListG.add(1, model);
+                filterModelListG.add(j, model);
+                j++;
 //                expandableListDetail.put("Filter By", filterModelList);
             }
         }
@@ -168,7 +173,8 @@ public class NativeSetttingsModel {
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }
-                filterModelListG.add(2, model);
+                filterModelListG.add(j, model);
+                j++;
 //                expandableListDetail.put("Filter By", filterModelList);
             }
 
@@ -185,13 +191,14 @@ public class NativeSetttingsModel {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     FilterInnerModel filterInnerModel = new FilterInnerModel();
                     JSONObject object = jsonArray.getJSONObject(i);
-                    if (object.has("categoryname")) {
-                        filterInnerModel.name = object.getString("categoryname");
+                    if (object.has("datafieldname")) {
+                        filterInnerModel.name = object.getString("datafieldname");
                         filterInnerModel.id = object.getString("categoryid");
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }
-                filterModelListG.add(3, model);
+                filterModelListG.add(j, model);
+                j++;
 //                expandableListDetail.put("Filter By", filterModelList);
             }
 
@@ -207,13 +214,14 @@ public class NativeSetttingsModel {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     FilterInnerModel filterInnerModel = new FilterInnerModel();
                     JSONObject object = jsonArray.getJSONObject(i);
-                    if (object.has("categoryname")) {
-                        filterInnerModel.name = object.getString("categoryname");
+                    if (object.has("datafieldname")) {
+                        filterInnerModel.name = object.getString("datafieldname");
                         filterInnerModel.id = object.getString("categoryid");
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }
-                filterModelListG.add(4, model);
+                filterModelListG.add(j, model);
+
 
             }
 
@@ -221,7 +229,6 @@ public class NativeSetttingsModel {
         expandableListDetail.put("Filter By", filterModelListG);
         return expandableListDetail;
     }
-
 
 
 }

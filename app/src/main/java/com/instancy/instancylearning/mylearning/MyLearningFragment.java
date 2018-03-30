@@ -15,6 +15,7 @@ import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.CalendarContract;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -368,7 +369,15 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         }
 
-        triggerActionForFirstItem();
+        new CountDownTimer(1000, 1000) {
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            public void onFinish() {
+                triggerActionForFirstItem();
+            }
+        }.start();
     }
 
     public void triggerActionForFirstItem() {
@@ -432,6 +441,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         myLearningModelsList = new ArrayList<MyLearningModel>();
+
         initilizeInterface();
         myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface);
         myLearninglistView.setAdapter(myLearningAdapter);
