@@ -101,6 +101,14 @@ public class NativeSetttingsModel {
                         filterModelList.add(i, model);
                     }
                 }
+
+
+                if (FiltersApplyModel.sortSelected > 0 && FiltersApplyModel.sortSelected < filterModelList.size()) {
+
+                    filterModelList.get(FiltersApplyModel.sortSelected).isSelected = true;
+
+                }
+
                 expandableListDetail.put("Sort By", filterModelList);
             }
         }

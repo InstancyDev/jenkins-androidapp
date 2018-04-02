@@ -26,6 +26,8 @@ import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +48,9 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
     Button btnApply;
-    String filterName = "", categoryId = "";
+    String filterName = "",
+            categoryId = "",
+            categoryName = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         filterInnerModelList = new ArrayList<NativeSetttingsModel.FilterInnerModel>();
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             NativeSetttingsModel.FilterModel filterModel = (NativeSetttingsModel.FilterModel) bundle.getSerializable("filtermodel");
@@ -76,6 +81,7 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            applyUiColor(uiSettingsModel);
         } catch (RuntimeException ex) {
 
             ex.printStackTrace();
@@ -85,9 +91,14 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
         filter_inner_adapter = new Filter_Inner_Adapter(this, BIND_ABOVE_CLIENT, filterInnerModelList);
         listView.setAdapter(filter_inner_adapter);
         listView.setOnItemClickListener(this);
+    }
+
+    public void applyUiColor(UiSettingsModel uiSettingsModel) {
 
         btnApply = (Button) findViewById(R.id.btninnerapply);
         btnApply.setOnClickListener(this);
+
+        btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
 
     @Override
@@ -110,6 +121,7 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
         filter_inner_adapter = new Filter_Inner_Adapter(this, BIND_ABOVE_CLIENT, filterInnerModelList);
         listView.setAdapter(filter_inner_adapter);
         categoryId = filterInnerModelList.get(position).id;
+        categoryName = filterInnerModelList.get(position).name;
     }
 
     @Override
@@ -122,6 +134,7 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
         Intent intent = getIntent();
         intent.putExtra("filtername", filterName);
         intent.putExtra("categoryid", categoryId);
+        intent.putExtra("groupname", categoryName);
         setResult(RESULT_OK, intent);
         finish();
     }

@@ -21,6 +21,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.FiltersApplyModel;
 import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -28,6 +29,7 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,12 +53,17 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
     String innerCategoryId = "";
     String innerCategorryName = "";
     boolean typeOrder = false;
+    int sortedPosition = -1;
 
     DatabaseHandler db;
     PreferencesManager preferencesManager;
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
     Button btnApply, btnReset;
+
+    String contentKey = "", groupKey = "";
+
+    JSONObject jsonInnerValues;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +74,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
+        jsonInnerValues = new JSONObject();
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -77,6 +84,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            applyUiColor(uiSettingsModel);
         } catch (RuntimeException ex) {
 
             ex.printStackTrace();
@@ -116,6 +124,13 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
                     NativeSetttingsModel.FilterModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
                     Log.d(TAG, "onChildClick: " + filterModel.name);
 
+
+                    if (filterModel.name.contains("group")) {
+                        groupKey = "groupby";
+                    } else {
+                        contentKey = "contentkey";
+                    }
+
                     Intent intent = new Intent(Filter_activity.this, Filter_Inner_activity.class);
                     intent.putExtra("filtermodel", filterModel);
                     intent.putExtra("filtername", filterModel.name);
@@ -126,6 +141,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
                     if (index == childPosition) {
                         expandableListDetail.get("Sort By").get(childPosition).isSelected = true;
 
+
                         if (expandableListDetail.get("Sort By").get(childPosition).isSorted) {
                             expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
                             typeOrder = false;
@@ -135,6 +151,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
                         } else {
                             expandableListDetail.get("Sort By").get(childPosition).isSorted = true;
                             typeOrder = true;
+                            sortedPosition = childPosition;
                             sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
                             atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
                         }
@@ -146,7 +163,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
                 }
                 if (childPosition == (parent.getSelectedItemPosition())) {
                     // Start your new activity here.
-                    Log.d("TAG", "second push");
+                    Log.d("TAG", "second push"); // 16
                 }
                 return true;
             }
@@ -165,11 +182,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
-        btnApply = (Button) findViewById(R.id.btnfilterapply);
-        btnApply.setOnClickListener(this);
 
-        btnReset = (Button) findViewById(R.id.btnfilterrest);
-        btnReset.setOnClickListener(this);
     }
 
 
@@ -186,26 +199,47 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
+    public void applyUiColor(UiSettingsModel uiSettingsModel) {
+
+        btnApply = (Button) findViewById(R.id.btnfilterapply);
+        btnApply.setOnClickListener(this);
+
+        btnReset = (Button) findViewById(R.id.btnfilterrest);
+        btnReset.setOnClickListener(this);
+
+        btnReset.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+    }
+
+
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
             case R.id.btnfilterapply:
-                insertBundleValues();
+                insertBundleValues(false);
                 break;
             case R.id.btnfilterrest:
-                finish();
+                insertBundleValues(true);
                 break;
         }
     }
 
-    public void insertBundleValues() {
+    public void insertBundleValues(boolean resetFilter) {
 
         Intent intent = getIntent();
         intent.putExtra("coursetype", sortName);
+        intent.putExtra("FILTER", resetFilter);
         intent.putExtra("sortby", typeOrder);
         intent.putExtra("configid", atributeConfigId);
         intent.putExtra("categoryid", innerCategoryId);
+        intent.putExtra("jsonInnerValues", (Serializable) jsonInnerValues.toString());
+
+        FiltersApplyModel.sortSelected = sortedPosition;
+        FiltersApplyModel.sortByasC = typeOrder;
+        FiltersApplyModel.sortConfigID = atributeConfigId;
+
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -218,7 +252,22 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
 
             innerCategoryId = data.getStringExtra("categoryid");
             innerCategorryName = data.getStringExtra("filtername");
+            String selectedGrpBy = data.getStringExtra("groupname");
 
+            if (innerCategorryName.contains("Group By")) {
+                try {
+                    jsonInnerValues.put("group", selectedGrpBy);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    jsonInnerValues.put("contentype", innerCategoryId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }
     }
 }

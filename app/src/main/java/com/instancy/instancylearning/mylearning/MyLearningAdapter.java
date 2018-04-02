@@ -127,7 +127,7 @@ public class MyLearningAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-    public void applyFilter(String typeSort, final boolean isAscn, String configid) {
+    public void applySortBy(final boolean isAscn, String configid) {
 
 //        Collections.sort(myLearningModel, Collections.reverseOrder());
 
@@ -219,6 +219,148 @@ public class MyLearningAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    public void applyGroupBy(JSONObject groupBy) {
+
+        String groupID = groupBy.optString("group").toLowerCase();
+        String objectID = "";
+        if (groupID.length() == 0)
+            return;
+
+        switch (groupID) {
+
+            case "authors":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getAuthor().compareToIgnoreCase(obj2.getAuthor());
+
+                    }
+                });
+                break;
+            case "contenttypes":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
+
+                    }
+                });
+                break;
+            case "skills":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
+
+                    }
+                });
+                break;
+
+            case "job":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
+
+                    }
+                });
+                break;
+            case "categories":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getComponentId().compareToIgnoreCase(obj2.getComponentId());
+
+                    }
+                });
+                break;
+            case "default":
+                break;
+
+        }
+
+        if (myLearningModel.size() > 0) {
+            String groupName = myLearningModel.get(0).getAuthor();
+            for (int i = 0; i < myLearningModel.size(); i++) {
+                Log.d(TAG, "applyGroupBy: author name " + myLearningModel.get(i).getAuthor());
+
+                for (int j = 1; j < myLearningModel.size(); j++) {
+
+                    myLearningModel.get(j).setGroupName(myLearningModel.get(j).getAuthor());
+                    break;
+                }
+            }
+        }
+        this.notifyDataSetChanged();
+    }
+
+
+//    public static Set<Integer> findDuplicates(int[] input) {
+//        Set<Integer> duplicates = new HashSet<Integer>();
+//        for (int i = 0; i < input.length; i++) {
+//            for (int j = 1; j < input.length; j++) {
+//                if (input[i] == input[j] && i != j) {
+// duplicate element found duplicates.add(input[i]); break; } } } return duplicates; }
+
+
+    public void filterByObjTypeId(JSONObject filterBy) {
+
+        String contentType = filterBy.optString("contentype");
+
+        if (contentType.length() == 0)
+            return;
+
+        myLearningModel.clear();
+        if (contentType.length() == 0) {
+            myLearningModel.addAll(searchList);
+        } else {
+            for (MyLearningModel s : searchList) {
+                Log.d(TAG, "filterByCategoryId: " + s.getObjecttypeId());
+                if (s.getObjecttypeId().equalsIgnoreCase(contentType)) {
+                    myLearningModel.add(s);
+                }
+            }
+        }
+        this.notifyDataSetChanged();
+    }
+
+
+//    public String returnGroupID(String groupName) {
+//
+//        String groupID = "";
+//
+//        switch (groupName) {
+//            case "Authors":
+//                groupID = "authors";
+//                break;
+//            case "Job":
+//                groupID = "job";
+//                break;
+//            case "Categories":
+//                groupID = "categories";
+//                break;
+//            case "Skills":
+//                groupID = "skills";
+//                break;
+//            case "ContentTypes":
+//                groupID = "contenttypes";
+//                break;
+//
+//        }
+//
+//        return groupID;
+//    }
+
 
     @Override
     public int getCount() {
@@ -237,7 +379,8 @@ public class MyLearningAdapter extends BaseAdapter {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
+    public View getView(final int position, final View convertView,
+                        final ViewGroup parent) {
 
         final ViewHolder holder;
         View vi = convertView;
@@ -252,6 +395,7 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
+        holder.txtgroupName.setText(myLearningModel.get(position).getGroupName());
 
 
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
@@ -626,29 +770,18 @@ public class MyLearningAdapter extends BaseAdapter {
     }
 
 
-    public void filterByCategoryId(String charText) {
-//        charText = charText.toLowerCase(Locale.getDefault());
-        myLearningModel.clear();
-        if (charText.length() == 0) {
-            myLearningModel.addAll(searchList);
-        } else {
-            for (MyLearningModel s : searchList) {
-                Log.d(TAG, "filterByCategoryId: " + s.getObjecttypeId());
-                if (s.getObjecttypeId().equalsIgnoreCase(charText)) {
-                    myLearningModel.add(s);
-                }
-            }
-        }
-        notifyDataSetChanged();
-    }
-
-
     class ViewHolder {
         public int getPosition;
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
         public DownloadInterface downloadInterface;
         public SetCompleteListner setCompleteListner;
+
+
+        @Nullable
+        @BindView(R.id.txtgroupName)
+        TextView txtgroupName;
+
         @Nullable
         @BindView(R.id.txt_title_name)
         TextView txtTitle;
@@ -749,9 +882,11 @@ public class MyLearningAdapter extends BaseAdapter {
 
             }
         }
+
     }
 
-    public void getUserRatingsOfTheContent(final int position, final float rating) throws JSONException {
+    public void getUserRatingsOfTheContent(final int position, final float rating) throws
+            JSONException {
 
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.get(position).getContentID());
@@ -829,7 +964,8 @@ public class MyLearningAdapter extends BaseAdapter {
 
     }
 
-    public void mapReviewRating(String response, int position, float rating) throws JSONException {
+    public void mapReviewRating(String response, int position, float rating) throws
+            JSONException {
 
         JSONObject jsonObject = new JSONObject(response);
         JSONObject editObj = null;

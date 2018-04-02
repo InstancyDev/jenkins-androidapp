@@ -24,23 +24,26 @@
         <Button
             android:id="@+id/btnfilterapply"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="Apply"
+            android:textAllCaps="false"
+
             android:textColor="@color/colorWhite" />
 
         <android.support.v4.widget.Space
             android:layout_width="1dp"
-            android:layout_height="45dp" />
+            android:layout_height="40dp" />
 
         <Button
             android:id="@+id/btnfilterrest"
             android:layout_width="0dp"
-            android:layout_height="45dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:text="Reset"
+            android:textAllCaps="false"
             android:textColor="@color/colorWhite" />
 
     </LinearLayout>

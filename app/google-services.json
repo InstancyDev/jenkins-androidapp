@@ -39,6 +39,37 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1032432174237:android:b3b5f9dbe9d7487a",
+        "android_client_info": {
+          "package_name": "com.instancy.healthhelp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJCQmdYix-Kxu1Q3a2KZEBPMv_xq4YOG4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1032432174237:android:c3a1e150212e421b",
         "android_client_info": {
           "package_name": "com.instancy.instancy_lite"

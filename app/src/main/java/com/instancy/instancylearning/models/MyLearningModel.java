@@ -74,6 +74,16 @@ public class MyLearningModel implements Serializable {
     String wmessage = "";
     String presenter = "";
 
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    String groupName = "";
+
     // Exclusive For Track List Model start
     String score = "";
     String timeDelay = "";

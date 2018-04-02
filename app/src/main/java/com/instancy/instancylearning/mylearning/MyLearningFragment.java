@@ -66,6 +66,7 @@ import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.FiltersApplyModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -103,6 +104,7 @@ import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
@@ -532,7 +534,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             itemInfo.setVisible(false);
         }
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -568,10 +570,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         if (item_filter != null) {
-            item_filter.setIcon(R.drawable.filter_icon);
-            tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
-            Drawable myIcon = getResources().getDrawable(R.drawable.filter_icon);
-            item_filter.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
+            item_filter.setIcon(filterDrawable);
             item_filter.setTitle("Filter");
 
         }
@@ -1075,15 +1075,40 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
 
-            String sortName = data.getStringExtra("coursetype");
-            boolean filterAscend = data.getBooleanExtra("sortby", false);
-            String configId = data.getStringExtra("configid");
-            String categoryId = data.getStringExtra("categoryid");
-            myLearningAdapter.filterByCategoryId("10");
-            myLearningAdapter.applyFilter(sortName, filterAscend, configId);
+            boolean resetFilter = data.getBooleanExtra("FILTER", false);
+
+            if (resetFilter) {
+
+                injectFromDbtoModel();
+
+            } else {
+                String sortName = data.getStringExtra("coursetype");
+                boolean filterAscend = data.getBooleanExtra("sortby", false);
+                String configId = data.getStringExtra("configid");
+                myLearningAdapter.applySortBy(filterAscend, configId);
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject = new JSONObject(data.getStringExtra("jsonInnerValues"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (jsonObject.length() > 0) {
+                    myLearningAdapter.applyGroupBy(jsonObject);
+                }
+
+                if (jsonObject.length() > 0) {
+                    myLearningAdapter.filterByObjTypeId(jsonObject);
+                }
+
+            }
+
+            if (myLearningModelsList.size() <= 0) {
+                nodata_Label.setText(getResources().getString(R.string.no_data));
+            }
+
 
         }
-
 
         if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK) {
             if (data != null) {

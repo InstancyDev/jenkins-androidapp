@@ -16,7 +16,7 @@
         android:layout_marginTop="99dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/playground" />
+        android:src="@drawable/healthhelp" />
     <!--android:scaleType="fitcenter"-->
 
     <Button
