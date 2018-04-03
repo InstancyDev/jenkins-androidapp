@@ -19,7 +19,7 @@
         android:id="@+id/topview"
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:background="@android:color/transparent"> </View>
+        android:background="@android:color/transparent"></View>
 
     <RelativeLayout
         android:id="@+id/relativelayout"
@@ -49,7 +49,24 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="10dp"
-            android:background="@drawable/ic_more_vert_black_24dp" />
+            android:background="@drawable/ic_more_vert_black_24dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/editoptionicon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/fa_icon_edit"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/colorDarkGrey"
+            android:textSize="20sp" />
+
+
     </RelativeLayout>
 
     <View
@@ -60,7 +77,7 @@
         android:layout_below="@+id/relativelayout"
         android:layout_gravity="center"
         android:background="@color/colorGray"
-        android:padding="5dp"> </View>
+        android:padding="5dp"></View>
 
 
 </RelativeLayout>

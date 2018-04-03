@@ -73,6 +73,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static com.instancy.instancylearning.utils.StaticValues.EDUCATION_ACT;
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
@@ -230,7 +231,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
-        if (educationModelArrayList.size() > 0) {
+        if (educationModelArrayList.size() >= 0) {
 
             ProfileGroupModel profileGroupModel = new ProfileGroupModel();
             profileGroupModel.groupId = "123";
@@ -241,8 +242,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             profileGroupModelList.add(profileGroupModel);
         }
 
-
-        if (experienceModelArrayList.size() > 0) {
+        if (experienceModelArrayList.size() >= 0) {
 
             ProfileGroupModel profileGroupModel = new ProfileGroupModel();
             profileGroupModel.groupId = "124";
@@ -282,6 +282,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
+
+                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+                    editSelectedGroup("EDU", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+                    editSelectedGroup("EXP", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+                    editSelectedGroup("PER", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+                    editSelectedGroup("CNT", groupPosition);
+                }
+
                 return true;
             }
         });
@@ -290,7 +301,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             for (int i = 0; i < profileGroupModelList.size(); i++)
                 profileExpandableList.expandGroup(i);
         }
-
 
         if (isNetworkConnectionAvailable(getContext(), -1) && PROFILE_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
@@ -339,7 +349,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
 
         String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
-
 
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
@@ -654,6 +663,25 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         Log.d(TAG, "onDestroy: in Mylearning fragment");
 
         PROFILE_FRAGMENT_OPENED_FIRSTTIME = 2;
+
+    }
+
+
+    public void editSelectedGroup(String typeString, int groupPosition) {
+
+        if (typeString.equalsIgnoreCase("EXP")) {
+
+
+        } else if (typeString.equalsIgnoreCase("EDU")) {
+            Intent intentDetail = new Intent(context, Education_activity.class);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
+        } else if (typeString.equalsIgnoreCase("PER")) {
+
+
+        } else if (typeString.equalsIgnoreCase("CNT")) {
+
+
+        }
 
     }
 

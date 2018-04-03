@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.ProfileGroupModel;
 import com.instancy.instancylearning.models.UserEducationModel;
@@ -32,6 +33,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
     private List<UserEducationModel> userEducationModelList;
     private List<UserExperienceModel> userExperienceModelList;
     private HashMap<String, List<ProfileConfigsModel>> expandableHashDetail;
+    Typeface iconFon;
 
     public ProfileExpandAdapter(Context context, List<UserExperienceModel> userExperienceModelList, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
         this.context = context;
@@ -40,6 +42,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         this.expandableHashDetail = expandableHashDetail;
         this.expandableListTitle = expandableListTitle;
         this.notifyDataSetChanged();
+        iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
     }
 
 
@@ -115,18 +118,33 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         View view = (View) pView.findViewById(R.id.topview);
 //        }
         ImageView moreOptions = (ImageView) pView.findViewById(R.id.moreoptionsicon);
-        moreOptions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        moreOptions.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                Log.d("TAG", "onClick: ");
+//            }
+//        });
 
-                Log.d("TAG", "onClick: ");
-            }
-        });
-        moreOptions.setVisibility(View.GONE);
+        TextView editIcon = (TextView) pView
+                .findViewById(R.id.editoptionicon);
+
+        FontManager.markAsIconContainer(pView.findViewById(R.id.editoptionicon), iconFon);
+
         TextView listTitleTextView = (TextView) pView
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(expandableListTitle.get(groupPosition).groupname);
+
+        if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
+            editIcon.setText(pView.getResources().getString(R.string.fa_icon_plus_circle));
+        } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Experience")) {
+            editIcon.setText(pView.getResources().getString(R.string.fa_icon_plus_circle));
+        } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+            editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
+        } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+            editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
+        }
 
         return pView;
 

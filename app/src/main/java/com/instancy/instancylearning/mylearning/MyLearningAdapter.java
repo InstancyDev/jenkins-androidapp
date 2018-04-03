@@ -238,6 +238,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
                     }
                 });
+                objectID = "authors";
                 break;
             case "contenttypes":
                 Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
@@ -249,6 +250,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
                     }
                 });
+                objectID = "contenttypes";
                 break;
             case "skills":
                 Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
@@ -260,6 +262,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
                     }
                 });
+                objectID = "skills";
                 break;
 
             case "job":
@@ -272,6 +275,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
                     }
                 });
+                objectID = "job";
                 break;
             case "categories":
                 Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
@@ -283,24 +287,47 @@ public class MyLearningAdapter extends BaseAdapter {
 
                     }
                 });
+                objectID = "categories";
                 break;
             case "default":
                 break;
 
         }
 
-        if (myLearningModel.size() > 0) {
-            String groupName = myLearningModel.get(0).getAuthor();
-            for (int i = 0; i < myLearningModel.size(); i++) {
-                Log.d(TAG, "applyGroupBy: author name " + myLearningModel.get(i).getAuthor());
+        if (objectID.equalsIgnoreCase("authors")) {
+            if (myLearningModel.size() > 0) {
+                String groupName = "";
 
-                for (int j = 1; j < myLearningModel.size(); j++) {
+                for (int i = 0; i < myLearningModel.size(); i++) {
+                    Log.d(TAG, "applyGroupBy: author name " + myLearningModel.get(i).getAuthor());
 
-                    myLearningModel.get(j).setGroupName(myLearningModel.get(j).getAuthor());
-                    break;
+                    if (!myLearningModel.get(i).getAuthor().equalsIgnoreCase(groupName)) {
+                        myLearningModel.get(i).setGroupName(myLearningModel.get(i).getAuthor());
+                        groupName = myLearningModel.get(i).getAuthor();
+                    }
                 }
+
             }
+//        } else if (objectID.equalsIgnoreCase("contenttypes")) {
+        } else {
+            if (myLearningModel.size() > 0) {
+                String groupName = "";
+
+                for (int i = 0; i < myLearningModel.size(); i++) {
+                    Log.d(TAG, "applyGroupBy: author name " + myLearningModel.get(i).getMediaName());
+
+                    if (!myLearningModel.get(i).getObjecttypeId().equalsIgnoreCase(groupName)) {
+                        myLearningModel.get(i).setGroupName(myLearningModel.get(i).getMediaName());
+                        groupName = myLearningModel.get(i).getObjecttypeId();
+                    }
+                }
+
+            }
+
+
         }
+
+
         this.notifyDataSetChanged();
     }
 
@@ -395,7 +422,14 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.txtgroupName.setText(myLearningModel.get(position).getGroupName());
+
+        if (myLearningModel.get(position).getGroupName().length() > 0) {
+
+            holder.txtgroupName.setVisibility(View.VISIBLE);
+            holder.txtgroupName.setText(myLearningModel.get(position).getGroupName());
+        } else {
+            holder.txtgroupName.setVisibility(View.GONE);
+        }
 
 
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {

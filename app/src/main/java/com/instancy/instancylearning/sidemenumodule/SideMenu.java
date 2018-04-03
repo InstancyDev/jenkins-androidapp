@@ -910,7 +910,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         };
     }
 
-
     public void triggerPushNotification(JSONObject jsonObject) {
 
         int contextMenuID = jsonObject.optInt("contextmenuid", 1);

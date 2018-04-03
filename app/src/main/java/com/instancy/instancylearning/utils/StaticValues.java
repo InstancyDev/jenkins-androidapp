@@ -125,6 +125,8 @@ public class StaticValues {
 
     public static final int REVIEW_REFRESH = 4238;
 
+    public static final int EDUCATION_ACT = 1010;
+
     /**
      * Start course launch activity of media content for result with this code.
      *

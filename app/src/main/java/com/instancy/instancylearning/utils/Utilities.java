@@ -45,6 +45,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -1009,6 +1010,17 @@ public class Utilities {
         }
 
         return isCompleted;
+    }
+
+
+    public static ArrayList<String> getFromYearToYear(int fromY, int toYear) {
+
+        ArrayList<String> yearsList = new ArrayList<>();
+
+        for (int i = fromY; i <= toYear; i++)
+            yearsList.add("" + i);
+
+        return yearsList;
     }
 
 
