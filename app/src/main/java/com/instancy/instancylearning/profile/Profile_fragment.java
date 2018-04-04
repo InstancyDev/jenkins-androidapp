@@ -73,7 +73,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static com.instancy.instancylearning.utils.StaticValues.EDUCATION_ACT;
+import static com.instancy.instancylearning.utils.StaticValues.EXPERIENCE_ACT;
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
@@ -302,6 +304,29 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 profileExpandableList.expandGroup(i);
         }
 
+
+        profileExpandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+
+                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+                    educationClicked(groupPosition, childPosition, "EDU");
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+                    educationClicked(groupPosition, childPosition, "EXP");
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+                }
+
+                return true;
+            }
+
+        });
+
+
         if (isNetworkConnectionAvailable(getContext(), -1) && PROFILE_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
             profileWebCall(appUserModel.getUserIDValue(), false);
@@ -447,6 +472,25 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
 
             sendImageTOServer(imageENcode);
+        }
+
+        if (requestCode == EDUCATION_ACT && resultCode == RESULT_OK) {
+            if (data != null) {
+                boolean refresh = data.getBooleanExtra("REFRESH", false);
+                if (refresh) {
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+                        profileWebCall(appUserModel.getUserIDValue(), true);
+                    } else {
+
+                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+
+                    }
+
+
+                }
+            }
         }
 
     }
@@ -670,10 +714,13 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void editSelectedGroup(String typeString, int groupPosition) {
 
         if (typeString.equalsIgnoreCase("EXP")) {
-
+            Intent intentDetail = new Intent(context, Experience_activity.class);
+            intentDetail.putExtra("isfromGroup", true);
+            startActivityForResult(intentDetail, EXPERIENCE_ACT);
 
         } else if (typeString.equalsIgnoreCase("EDU")) {
             Intent intentDetail = new Intent(context, Education_activity.class);
+            intentDetail.putExtra("isfromGroup", true);
             startActivityForResult(intentDetail, EDUCATION_ACT);
         } else if (typeString.equalsIgnoreCase("PER")) {
 
@@ -685,5 +732,29 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
+    private void educationClicked(int groupPosition, int childPosition, String typeSelected) {
+
+        if (typeSelected.equalsIgnoreCase("EDU")) {
+
+            UserEducationModel userEducationModel = educationModelArrayList.get(childPosition);
+
+            Intent intentDetail = new Intent(context, Education_activity.class);
+            intentDetail.putExtra("isfromGroup", false);
+            intentDetail.putExtra("userEducationModel", userEducationModel);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
+
+        } else if (typeSelected.equalsIgnoreCase("EXP")) {
+
+            UserExperienceModel userExperienceModel = experienceModelArrayList.get(childPosition);
+
+            Intent intentDetail = new Intent(context, Experience_activity.class);
+            intentDetail.putExtra("isfromGroup", false);
+            intentDetail.putExtra("userExperienceModel", userExperienceModel);
+            startActivityForResult(intentDetail, EXPERIENCE_ACT);
+
+        }
+
+    }
 }
+
 

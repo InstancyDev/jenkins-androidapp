@@ -36,11 +36,11 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/astrek"
                     android:gravity="center_vertical"
-                    android:text="School/University" />
+                    android:text="Title" />
             </RelativeLayout>
 
             <EditText
-                android:id="@+id/edit_school"
+                android:id="@+id/edit_title"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:maxLength="100"
@@ -68,11 +68,11 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/astrekc"
                     android:gravity="center_vertical"
-                    android:text="Country" />
+                    android:text="Company" />
             </RelativeLayout>
 
             <EditText
-                android:id="@+id/edit_country"
+                android:id="@+id/edit_company"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:maxLength="100"
@@ -95,30 +95,21 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/txt_Title"
+                    android:id="@+id/txt_Location"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/astrekt"
                     android:gravity="center_vertical"
-                    android:text="Title" />
+                    android:text="Location" />
             </RelativeLayout>
 
             <EditText
-                android:id="@+id/edit_edType"
+                android:id="@+id/edit_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLength="100"
                 android:maxLines="1"
-                android:padding="5dp"
-                android:visibility="gone" />
-
-            <Spinner
-                android:id="@+id/spinner_DgreType"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:background="@drawable/bottomline"
-                android:padding="10dp"></Spinner>
-
+                android:padding="5dp" />
 
             <!--       Here  Degree    -->
 
@@ -126,31 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/astrekdeg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="10dp"
-                    android:layout_alignParentTop="true"
-                    android:text="*"
-                    android:textColor="@color/colorRed"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/txt_Degree"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/astrekdeg"
-                    android:gravity="center_vertical"
-                    android:text="Degree" />
             </RelativeLayout>
-
-            <EditText
-                android:id="@+id/edit_Degree"
-                android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:maxLength="100"
-                android:maxLines="1"
-                android:padding="5dp" />
 
             <!--       Here  From Year    -->
 
@@ -180,21 +147,19 @@
                 android:id="@+id/edit_FrmYear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:enabled="false"
+                android:focusable="true"
                 android:maxLength="100"
                 android:maxLines="1"
+                android:text="fromyear"
                 android:padding="5dp"
-                android:visibility="gone" />
-
-            <Spinner
-                android:id="@+id/spinner_FrmYear"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:background="@drawable/bottomline"
-                android:padding="10dp"></Spinner>
+                android:visibility="visible" />
 
             <!--       Here  To Year    -->
 
             <RelativeLayout
+                android:id="@+id/toyearlayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -220,18 +185,21 @@
                 android:id="@+id/edit_ToYear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:focusable="true"
+                android:inputType="date"
                 android:maxLength="100"
                 android:maxLines="1"
                 android:padding="5dp"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
-            <Spinner
-                android:id="@+id/spinner_ToYear"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:background="@drawable/bottomline"
-                android:padding="10dp"></Spinner>
-
+            <CheckBox
+                android:id="@+id/chx_crnthere"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="I currently work here"
+                android:textColor="@color/colorDarkGrey" />
 
             <!-- over  -->
 

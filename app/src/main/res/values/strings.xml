@@ -234,4 +234,6 @@
     <string name="removeconnectionalertmessage">Are you sure you want remove this connection ?</string>
     <string name="canceleventmessage">Do you want to cancel the enrolled event ?</string>
     <string name="eventalert">Are you sure!</string>
+
+    <string name="removeeducationmessage">Are you sure you want to delete this education ?</string>
 </resources>

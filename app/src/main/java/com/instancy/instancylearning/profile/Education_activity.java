@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.profile;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -9,12 +10,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -40,10 +44,9 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DegreeTypeModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
-import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -58,7 +61,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.getFromYearToYear;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -79,9 +82,6 @@ public class Education_activity extends AppCompatActivity {
     DatabaseHandler db;
     ResultListner resultListner = null;
 
-
-    DiscussionTopicModel discussionTopicModel;
-    DiscussionForumModel discussionForumModel;
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
@@ -98,7 +98,7 @@ public class Education_activity extends AppCompatActivity {
 
     @Nullable
     @BindView(R.id.edit_school)
-    EditText editTitle;
+    EditText editSchool;
 
     @Nullable
     @BindView(R.id.edit_country)
@@ -128,7 +128,7 @@ public class Education_activity extends AppCompatActivity {
     @BindView(R.id.spinner_ToYear)
     Spinner spinnerToYear;
 
-    ArrayAdapter<DegreeTypeModel> myAdapter;
+    ArrayAdapter titleAdapter, fromYearAdapter, toYearAdapter;
     @Nullable
     @BindView(R.id.spinner_FrmYear)
     Spinner spinnerFrmYear;
@@ -137,15 +137,19 @@ public class Education_activity extends AppCompatActivity {
     @BindView(R.id.spinner_DgreType)
     Spinner spinnerDgreType;
 
+    boolean isNewRecord = false;
 
     @Nullable
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
 
-    boolean isUpdateForum = false;
+    ArrayList<String> fromYList, toYList, degreeTitleList;
 
-    ArrayList<String> fromYList, toYList;
+    String degreeTypeStr = "", degreeTypeIDStr = "";
 
+    int fromYInt = 0, toYearInt = 0;
+
+    UserEducationModel userEducationModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -161,9 +165,15 @@ public class Education_activity extends AppCompatActivity {
         fromYList = new ArrayList<>();
         toYList = new ArrayList<>();
 
+        degreeTitleList = new ArrayList<>();
+
+        fromYList.add(0, "");
         fromYList = getFromYearToYear(1957, 2018);
 
+        toYList.add(0, "");
         toYList = getFromYearToYear(1957, 2018);
+
+        degreeTitleList.add(0, "");
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
@@ -174,19 +184,18 @@ public class Education_activity extends AppCompatActivity {
         vollyService = new VollyService(resultCallback, context);
         getDegreeTitles();
 
+        userEducationModel = new UserEducationModel();
+        Bundle bundle = getIntent().getExtras();
+        if (getIntent().getBooleanExtra("isfromGroup", false)) {
 
-        if (getIntent().getBooleanExtra("isfromedit", false)) {
+            isNewRecord = true;
 
-            discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("topicModel");
-            isUpdateForum = true;
-            editTitle.setText(discussionTopicModel.name);
-            editDescription.setText(discussionTopicModel.longdescription);
         } else {
 
-            isUpdateForum = false;
-        }
+            userEducationModel = (UserEducationModel) bundle.getSerializable("userEducationModel");
+            isNewRecord = false;
 
-        discussionForumModel = (DiscussionForumModel) getIntent().getSerializableExtra("forummodel");
+        }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -201,28 +210,82 @@ public class Education_activity extends AppCompatActivity {
 
             ex.printStackTrace();
         }
-        initilizeHeaderView();
+        initilizeSpinnersView();
         if (isNetworkConnectionAvailable(this, -1)) {
 
         } else {
 
         }
 
-
     }
 
-    public void initilizeHeaderView() {
+    public void initilizeSpinnersView() {
 
-        ArrayAdapter fromYadapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, fromYList);
+
+        fromYearAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, fromYList);
+
+        toYearAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, toYList);
+
         // attaching data adapter to spinner
-        spinnerFrmYear.setAdapter(fromYadapter);
-        spinnerToYear.setAdapter(fromYadapter);
+        spinnerFrmYear.setAdapter(fromYearAdapter);
+        spinnerToYear.setAdapter(toYearAdapter);
+
         assert bottomLayout != null;
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-        myAdapter = new ArrayAdapter<DegreeTypeModel>(this, android.R.layout.simple_spinner_item, degreeTypeModels);
+        spinnerToYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position,
+                                       long id) {
+                Log.d(TAG, "onItemSelected: " + toYList.get(position));
+                toYearInt = Integer.parseInt(toYList.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
 
 
+        });
+
+        spinnerFrmYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position,
+                                       long id) {
+
+                Log.d(TAG, "onItemSelected: " + fromYList.get(position));
+
+                fromYInt = Integer.parseInt(fromYList.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+
+
+        });
+
+        spinnerDgreType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position,
+                                       long id) {
+
+                Log.d(TAG, "onItemSelected: " + degreeTitleList.get(position));
+                degreeTypeStr = degreeTitleList.get(position);
+                degreeTypeIDStr = returnSelectedId(degreeTypeStr);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+
+            }
+        });
     }
 
     void initVolleyCallback() {
@@ -235,8 +298,8 @@ public class Education_activity extends AppCompatActivity {
                 if (requestType.equalsIgnoreCase("DGRE")) {
                     if (response != null) {
                         try {
-                            degreeTypeModels = getdegreeTypeModelArrayList(response);
-                            spinnerDgreType.setAdapter(myAdapter);
+//                            degreeTypeModels = getdegreeTypeModelArrayList(response);
+                            updateSpinner(response);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -279,6 +342,40 @@ public class Education_activity extends AppCompatActivity {
         };
     }
 
+    public void updateSpinner(JSONObject responseObj) throws JSONException {
+
+        degreeTitleList = new ArrayList<>();
+
+        if (responseObj.has("educationTitleList")) {
+            JSONArray jsonArray = responseObj.getJSONArray("educationTitleList");
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
+                DegreeTypeModel degreeTypeModel = new DegreeTypeModel();
+
+                if (object.has("id")) {
+                    degreeTypeModel.id = object.getString("id");
+                }
+
+                if (object.has("name")) {
+                    degreeTypeModel.name = object.getString("name");
+                    degreeTitleList.add(object.getString("name"));
+                }
+                degreeTypeModels.add(degreeTypeModel);
+            }
+        }
+
+        titleAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, degreeTitleList);
+
+        spinnerDgreType.setAdapter(titleAdapter);
+
+
+        if (!isNewRecord) {
+            updateUiValues(userEducationModel);
+        }
+
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -292,12 +389,52 @@ public class Education_activity extends AppCompatActivity {
                 // app icon in action bar clicked; go home
                 closeForum(false);
                 return true;
+            case R.id.deleteItem:
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(getResources().getString(R.string.removeeducationmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
+                        .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                    }
+                }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //do things
+                        dialog.dismiss();
+                        try {
+                            deleteEducationDetails();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+
             default:
                 return super.onOptionsItemSelected(item);
 
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.profiledelete, menu);
+        MenuItem itemDelete = menu.findItem(R.id.deleteItem);
+
+        Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_trash, context, uiSettingsModel.getAppHeaderTextColor());
+        itemDelete.setIcon(filterDrawable);
+        itemDelete.setTitle("Delete");
+
+        if (isNewRecord) {
+            itemDelete.setVisible(false);
+        } else {
+            itemDelete.setVisible(true);
+        }
+
+        return true;
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -306,7 +443,6 @@ public class Education_activity extends AppCompatActivity {
 
 
     }
-
 
     @Override
     protected void onResume() {
@@ -334,53 +470,50 @@ public class Education_activity extends AppCompatActivity {
 
     public void validateNewForumCreation() throws JSONException {
 
-        String titleStr = editTitle.getText().toString().trim();
+        String schoolStr = editSchool.getText().toString().trim();
+        String countryStr = edit_country.getText().toString().trim();
+        String degreeStr = edit_Degree.getText().toString().trim();
         String descriptionStr = editDescription.getText().toString().trim();
-        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
-        if (titleStr.length() < 4) {
-            Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
-        } else if (descriptionStr.length() < 10) {
-            Toast.makeText(this, "Enter description", Toast.LENGTH_SHORT).show();
+
+        boolean isLEssthan = isGreater(fromYInt, toYearInt);
+
+        if (schoolStr.length() < 4) {
+            Toast.makeText(this, "Enter school", Toast.LENGTH_SHORT).show();
+        } else if (countryStr.length() < 3) {
+            Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
+        } else if (degreeStr.length() < 3) {
+            Toast.makeText(this, "Enter degree", Toast.LENGTH_SHORT).show();
+        } else if (isLEssthan) {
+            Toast.makeText(this, "Your To year can't be earlier or same than your From year ", Toast.LENGTH_SHORT).show();
         } else {
 
+            String totalYs = totalYearStr(fromYInt, toYearInt);
             JSONObject parameters = new JSONObject();
-            if (isUpdateForum) {
 
-                parameters.put("strContentID", discussionTopicModel.topicid);
-                parameters.put("strTitle", titleStr);
-                parameters.put("strDescription", descriptionStr);
-                parameters.put("UserID", appUserModel.getUserIDValue());
-                parameters.put("SiteID", appUserModel.getSiteIDValue());
-                parameters.put("Locale", "en-us");
-                parameters.put("ForumID", discussionForumModel.forumid);
-                parameters.put("ForumName", discussionForumModel.name);
-                parameters.put("strAttachFile", "");
+            parameters.put("oldtitle", degreeTypeIDStr);
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("school", schoolStr);
+            parameters.put("Country", countryStr);
+            parameters.put("title", degreeTypeIDStr);
+            parameters.put("degree", degreeStr);
+            parameters.put("fromyear", fromYInt);
+            parameters.put("toyear", toYearInt);
+            parameters.put("discription", descriptionStr);
+            parameters.put("showfromdate", totalYs);
+            parameters.put("titleEducation", degreeTypeStr);
 
+            if (isNewRecord) {
+                parameters.put("DisplayNo", "");
             } else {
-
-                parameters.put("UserID", appUserModel.getUserIDValue());
-                parameters.put("Title", titleStr);
-                parameters.put("Description", descriptionStr);
-                parameters.put("ForumID", discussionForumModel.forumid);
-                parameters.put("OrgID", appUserModel.getSiteIDValue());
-                parameters.put("InvolvedUsers", "");
-                parameters.put("SiteID", appUserModel.getSiteIDValue());
-                parameters.put("LocaleID", "en-us");
-                parameters.put("ForumName", discussionForumModel.name);
-                parameters.put("strAttachFile", "" + discussionForumModel.createddate);
-
+                parameters.put("DisplayNo", userEducationModel.displayno);
             }
 
             String parameterString = parameters.toString();
             Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
             if (isNetworkConnectionAvailable(this, -1)) {
-
-                String replaceDataString = parameterString.replace("\"", "\\\"");
-                String addQuotes = ('"' + replaceDataString + '"');
-
-                sendNewForumDataToServer(addQuotes);
+                sendNewOrUpdatedEducationDetailsDataToServer(parameterString);
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
@@ -388,25 +521,33 @@ public class Education_activity extends AppCompatActivity {
 
     }
 
-    public void sendNewForumDataToServer(final String postData) {
+    public void sendNewOrUpdatedEducationDetailsDataToServer(final String postData) {
+        String apiURL = "";
+        if (isNewRecord) {
+            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/AddEducationdata";
+        } else {
+            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/UpadteEducationdata";
+        }
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/CreateForumTopic?ForumID=" + discussionForumModel.forumid;
-
-        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 
-                if (s.contains("success")) {
+                if (s.contains("true")) {
 
-                    Toast.makeText(context, "Success! \nYour new topic has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    if (isNewRecord) {
+                        Toast.makeText(context, "Success! \n.You have successfully added the education", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(context, "Success! \n.You have successfully updated the education", Toast.LENGTH_SHORT).show();
+                    }
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -455,7 +596,7 @@ public class Education_activity extends AppCompatActivity {
 
     public void closeForum(boolean refresh) {
         Intent intent = getIntent();
-        intent.putExtra("NEWFORUM", refresh);
+        intent.putExtra("REFRESH", refresh);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -467,6 +608,22 @@ public class Education_activity extends AppCompatActivity {
 
         vollyService.getJsonObjResponseVolley("DGRE", parmStringUrl, appUserModel.getAuthHeaders());
 
+    }
+
+    public String returnSelectedId(String selectedTitle) {
+
+        String id = "1";
+
+        for (int i = 0; i < degreeTypeModels.size(); i++) {
+
+            if (degreeTypeModels.get(i).name.equalsIgnoreCase(selectedTitle)) {
+
+                id = degreeTypeModels.get(i).id;
+            }
+
+        }
+
+        return id;
     }
 
     public ArrayList<DegreeTypeModel> getdegreeTypeModelArrayList(JSONObject responseObj) throws JSONException {
@@ -493,5 +650,137 @@ public class Education_activity extends AppCompatActivity {
 
         return degreeTypeModels;
     }
+
+
+    public String totalYearStr(int FromInt, int toInt) {
+
+        String totalDucation = "";
+
+        int totalYears = toInt - FromInt;
+
+        totalDucation = " " + FromInt + "-" + toInt + " " + totalYears + " yrs";
+
+
+        return totalDucation;
+    }
+
+    public boolean isGreater(int FromInt, int toInt) {
+
+        boolean isG = false;
+
+        if (FromInt > toInt) {
+            isG = true;
+        } else {
+            isG = false;
+        }
+
+        return isG;
+    }
+
+    public void updateUiValues(UserEducationModel educationModel) {
+
+
+        int spinnerPosition = titleAdapter.getPosition(educationModel.titleeducation);
+
+        spinnerDgreType.setSelection(spinnerPosition);
+
+        int toYear = toYearAdapter.getPosition(educationModel.toyear);
+
+        spinnerToYear.setSelection(toYear);
+
+        int fromYear = fromYearAdapter.getPosition(educationModel.fromyear);
+        spinnerFrmYear.setSelection(fromYear);
+        edit_Degree.setText(userEducationModel.degree);
+        editSchool.setText(userEducationModel.school);
+        edit_country.setText(userEducationModel.country);
+        editDescription.setText(userEducationModel.description);
+
+        try {
+            fromYInt = Integer.parseInt(educationModel.fromyear);
+            toYearInt = Integer.parseInt(educationModel.toyear);
+        } catch (NumberFormatException numberFormatEx) {
+            numberFormatEx.printStackTrace();
+            toYearInt = 0;
+            fromYInt = 0;
+        }
+
+
+        degreeTypeStr = educationModel.titleeducation;
+    }
+
+
+    public void deleteEducationDetails() throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("DisplayNo", userEducationModel.displayno);
+
+        final String postdata = parameters.toString();
+
+        String apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteEducationdata";
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("true")) {
+
+                    Toast.makeText(context, "Success! \n.You have successfully deleted the education", Toast.LENGTH_SHORT).show();
+                    closeForum(true);
+                } else {
+
+                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postdata.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
 }
 

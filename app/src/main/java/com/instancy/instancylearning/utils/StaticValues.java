@@ -127,6 +127,8 @@ public class StaticValues {
 
     public static final int EDUCATION_ACT = 1010;
 
+    public static final int EXPERIENCE_ACT = 10101;
+
     /**
      * Start course launch activity of media content for result with this code.
      *

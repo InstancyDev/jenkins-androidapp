@@ -499,8 +499,8 @@ public class ChatActivity extends AppCompatActivity {
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
-            String replaceDataString = parameterString.replace("\"", "\\\"");
-            String addQuotes = ('"' + replaceDataString + '"');
+//            String replaceDataString = parameterString.replace("\"", "\\\"");
+//            String addQuotes = ('"' + replaceDataString + '"');
 
             sendNewChatDataToServer(jsonObject.toString(), messageStr, attachment);
         } else {

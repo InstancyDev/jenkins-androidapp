@@ -56,7 +56,7 @@
             android:name=".mainactivities.Login_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"> </activity>
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
         <!-- forgot screen -->
         <activity
@@ -181,6 +181,12 @@
 
         <activity
             android:name=".profile.Education_activity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
+
+
+        <activity
+            android:name=".profile.Experience_activity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
