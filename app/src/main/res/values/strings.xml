@@ -236,4 +236,6 @@
     <string name="eventalert">Are you sure!</string>
 
     <string name="removeeducationmessage">Are you sure you want to delete this education ?</string>
+
+    <string name="removeexpmessage">Are you sure you want to delete this experience ?</string>
 </resources>

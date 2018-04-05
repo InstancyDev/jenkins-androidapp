@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.profile;
 
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,6 +8,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -18,13 +21,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,24 +40,23 @@ import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.AppController;
+
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.ResultListner;
+
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DegreeTypeModel;
-import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.rackspira.kristiawan.rackmonthpicker.RackMonthPicker;
+import com.rackspira.kristiawan.rackmonthpicker.listener.DateMonthDialogListener;
+import com.rackspira.kristiawan.rackmonthpicker.listener.OnCancelMonthDialogListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -64,7 +64,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
-import static com.instancy.instancylearning.utils.Utilities.getFromYearToYear;
+
+import static com.instancy.instancylearning.utils.Utilities.getMonthFromint;
+import static com.instancy.instancylearning.utils.Utilities.getMonthName;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -104,18 +106,29 @@ public class Experience_activity extends AppCompatActivity {
     EditText edit_company;
 
     @Nullable
-    @BindView(R.id.edit_FrmYear)
-    EditText edit_FrmYear;
-
-    @Nullable
-    @BindView(R.id.edit_ToYear)
-    EditText edit_ToYear;
+    @BindView(R.id.edit_location)
+    EditText editLocation;
 
     @Nullable
     @BindView(R.id.edit_description)
     EditText editDescription;
 
     boolean isNewRecord = false;
+
+
+    @Nullable
+    @BindView(R.id.toYearTextview)
+    TextView txtToYear;
+
+    @Nullable
+    @BindView(R.id.toyearlayout)
+    RelativeLayout txtToYearLayout;
+
+
+    @Nullable
+    @BindView(R.id.fromYearTextview)
+    TextView txtFromYear;
+
 
     @Nullable
     @BindView(R.id.chx_crnthere)
@@ -125,10 +138,13 @@ public class Experience_activity extends AppCompatActivity {
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
 
+    String joinedStr = "", resignedStr = "";
 
-    String degreeTypeStr = "", degreeTypeIDStr = "";
+    int tillDate = 0;
 
     int fromYInt = 0, toYearInt = 0;
+
+    int fromMonthInt = 0, toMonthInt = 0;
 
     UserExperienceModel userExperienceModel;
 
@@ -161,7 +177,9 @@ public class Experience_activity extends AppCompatActivity {
             userExperienceModel = (UserExperienceModel) bundle.getSerializable("userExperienceModel");
             isNewRecord = false;
 
+
         }
+//        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -176,6 +194,13 @@ public class Experience_activity extends AppCompatActivity {
 
             ex.printStackTrace();
         }
+
+        if (!isNewRecord) {
+            updateUiValues(userExperienceModel);
+        }
+
+        assert bottomLayout != null;
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
     }
 
@@ -195,7 +220,7 @@ public class Experience_activity extends AppCompatActivity {
                 return true;
             case R.id.deleteItem:
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getResources().getString(R.string.removeeducationmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
+                builder.setMessage(getResources().getString(R.string.removeexpmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
                         .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
@@ -215,7 +240,6 @@ public class Experience_activity extends AppCompatActivity {
                 });
                 AlertDialog alert = builder.create();
                 alert.show();
-
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -266,45 +290,87 @@ public class Experience_activity extends AppCompatActivity {
                 break;
             case R.id.txtcancel:
                 finish();
-            case R.id.edit_ToYear:
-                Toast.makeText(context, "toyearclicked", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.fromYearTextview:
+                showOnlyYearAndMonth(1);
+                break;
+
+            case R.id.toYearTextview:
+                showOnlyYearAndMonth(2);
+                break;
+            case R.id.chx_crnthere:
+                if (checkCrntHere.isChecked()) {
+                    txtToYearLayout.setVisibility(View.GONE);
+                    txtToYear.setVisibility(View.GONE);
+                    tillDate = 1;
+                } else {
+                    txtToYearLayout.setVisibility(View.VISIBLE);
+                    txtToYear.setVisibility(View.VISIBLE);
+                    tillDate = 0;
+                }
+                break;
+
         }
     }
+
+
     public void validateNewForumCreation() throws JSONException {
 
-        String schoolStr = edit_title.getText().toString().trim();
-        String countryStr = edit_company.getText().toString().trim();
-        String degreeStr = edit_FrmYear.getText().toString().trim();
-        String toYear = edit_ToYear.getText().toString().trim();
+        String jobRoleStr = edit_title.getText().toString().trim();
+        String companyStr = edit_company.getText().toString().trim();
+        String locationStr = editLocation.getText().toString().trim();
         String descriptionStr = editDescription.getText().toString().trim();
 
-        boolean isLEssthan = isGreater(fromYInt, toYearInt);
+        boolean isLEssthaY = isGreaterY(fromYInt, toYearInt);
 
-        if (schoolStr.length() < 4) {
-            Toast.makeText(this, "Enter school", Toast.LENGTH_SHORT).show();
-        } else if (countryStr.length() < 3) {
+        if (!isNewRecord) {
+            isLEssthaY = false;
+        }
+
+        boolean isLEssthaM = isGreaterM(fromMonthInt, toMonthInt);
+
+        if (jobRoleStr.length() < 2) {
+            Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
+        } else if (companyStr.length() < 2) {
             Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
-        } else if (degreeStr.length() < 3) {
-            Toast.makeText(this, "Enter degree", Toast.LENGTH_SHORT).show();
-        } else if (isLEssthan) {
+        } else if (locationStr.length() < 2) {
+            Toast.makeText(this, "Enter location", Toast.LENGTH_SHORT).show();
+        } else if (fromYInt == 0) {
+            Toast.makeText(this, "Select from date", Toast.LENGTH_SHORT).show();
+        } else if (toYearInt == 0) {
+            Toast.makeText(this, "Select to date", Toast.LENGTH_SHORT).show();
+        } else if (isLEssthaY) {
             Toast.makeText(this, "Your To year can't be earlier or same than your From year ", Toast.LENGTH_SHORT).show();
         } else {
 
-            String totalYs = totalYearStr(fromYInt, toYearInt);
-            JSONObject parameters = new JSONObject();
+            String totalYs = totalYearStr(tillDate, fromYInt, toYearInt, fromMonthInt, toMonthInt);
 
-            parameters.put("oldtitle", degreeTypeIDStr);
+            if (tillDate == 1) {
+                resignedStr = getMonthName();
+            }
+
+            if (resignedStr.length() == 0) {
+                resignedStr = userExperienceModel.toDate;
+
+            }
+
+            if (joinedStr.length() == 0) {
+                joinedStr = userExperienceModel.fromDate;
+
+            }
+
+            JSONObject parameters = new JSONObject();
+            parameters.put("oldtitle", jobRoleStr);
             parameters.put("UserID", appUserModel.getUserIDValue());
-            parameters.put("school", schoolStr);
-            parameters.put("Country", countryStr);
-            parameters.put("title", degreeTypeIDStr);
-            parameters.put("degree", degreeStr);
-            parameters.put("fromyear", fromYInt);
-            parameters.put("toyear", toYearInt);
+            parameters.put("title", jobRoleStr);
+            parameters.put("location", locationStr);
+            parameters.put("Company", companyStr);
             parameters.put("discription", descriptionStr);
-            parameters.put("showfromdate", totalYs);
-            parameters.put("titleEducation", degreeTypeStr);
+            parameters.put("fromdate", totalYs); // difference duration
+            parameters.put("todate", resignedStr); // todate
+            parameters.put("showftoate", resignedStr); //  toDate
+            parameters.put("showfromdate", joinedStr); // fromDate
+            parameters.put("Tilldate", tillDate); // checkbox tillDate
 
             if (isNewRecord) {
                 parameters.put("DisplayNo", "");
@@ -326,9 +392,9 @@ public class Experience_activity extends AppCompatActivity {
     public void sendNewOrUpdatedEducationDetailsDataToServer(final String postData) {
         String apiURL = "";
         if (isNewRecord) {
-            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/AddEducationdata";
+            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/AddExperiencedata";
         } else {
-            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/UpadteEducationdata";
+            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/UpadteExperiencedata";
         }
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
@@ -342,14 +408,14 @@ public class Experience_activity extends AppCompatActivity {
                 if (s.contains("true")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \n.You have successfully added the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \n.You have successfully added the experience", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \n.You have successfully updated the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \n.You have successfully updated the experience", Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Experience cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -404,19 +470,27 @@ public class Experience_activity extends AppCompatActivity {
     }
 
 
-    public String totalYearStr(int FromInt, int toInt) {
+    public String totalYearStr(int tillD, int FromInt, int toInt, int fromMint, int toMint) {
 
         String totalDucation = "";
 
         int totalYears = toInt - FromInt;
 
-        totalDucation = " " + FromInt + "-" + toInt + " " + totalYears + " yrs";
+        int totalMonths = toMint - fromMint;
 
+        if (tillD == 1) {
 
+            totalDucation = " " + FromInt + " -Present";
+
+        } else {
+
+            totalDucation = " " + FromInt + " - " + toInt + " " + totalYears + " yrs " + totalMonths + " months";
+
+        }
         return totalDucation;
     }
 
-    public boolean isGreater(int FromInt, int toInt) {
+    public boolean isGreaterY(int FromInt, int toInt) {
 
         boolean isG = false;
 
@@ -429,9 +503,53 @@ public class Experience_activity extends AppCompatActivity {
         return isG;
     }
 
+    public boolean isGreaterM(int fromMnt, int toMnt) {
+
+        boolean isG = false;
+
+        if (fromMnt > toMnt) {
+            isG = true;
+        } else {
+            isG = false;
+        }
+
+        return isG;
+    }
+
+
     public void updateUiValues(UserExperienceModel userExperienceModel) {
 
         editDescription.setText(userExperienceModel.description);
+        edit_company.setText(userExperienceModel.companyName);
+        edit_title.setText(userExperienceModel.title);
+        editDescription.setText(userExperienceModel.description);
+        editLocation.setText(userExperienceModel.location);
+        txtToYear.setText(userExperienceModel.toDate);
+        txtFromYear.setText(userExperienceModel.fromDate);
+
+        if (userExperienceModel.tillDate) {
+            tillDate = 1;
+            checkCrntHere.setChecked(true);
+            txtToYearLayout.setVisibility(View.GONE);
+            txtToYear.setVisibility(View.GONE);
+
+//            String[] fromSplit = userExperienceModel.fromDate.split(" ");
+
+        } else {
+            tillDate = 0;
+            checkCrntHere.setChecked(false);
+
+//            String[] fromSplit = userExperienceModel.fromDate.split(" ");
+//
+//            String[] toSplit = userExperienceModel.toDate.split(" ");
+//
+//            if (fromSplit.length>1){
+//
+//            }
+        }
+
+        fromYInt = 1;
+        toYearInt = 2;
 
     }
 
@@ -444,7 +562,7 @@ public class Experience_activity extends AppCompatActivity {
 
         final String postdata = parameters.toString();
 
-        String apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteEducationdata";
+        String apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteExperiencedata";
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
@@ -506,6 +624,57 @@ public class Experience_activity extends AppCompatActivity {
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
+
+
+    public void showOnlyYearAndMonth(final int fromToInt) {
+
+        final RackMonthPicker rackMonthPicker = new RackMonthPicker(this)
+                .setLocale(Locale.ENGLISH)
+                .setSelectedMonth(4)
+                .setColorTheme(R.color.colorPrimary)
+                .setPositiveButton(new DateMonthDialogListener() {
+                    @Override
+                    public void onDateMonth(int month, int startDate, int endDate, int year, String monthLabel) {
+                        System.out.println(month);
+                        System.out.println(startDate);
+                        System.out.println(endDate);
+                        System.out.println(year);
+                        System.out.println(monthLabel);
+                        if (fromToInt == 1) {
+                            Log.d(TAG, "from onDateMonth: " + month);
+                            fromYInt = year;
+                            fromMonthInt = month;
+                            txtFromYear.setText(userExperienceModel.fromDate);
+
+                            String monthStr = getMonthFromint(month);
+                            joinedStr = monthStr + "  " + year;
+                            txtFromYear.setText(monthStr + " " + year);
+
+                        } else {
+                            Log.d(TAG, "to onDateMonth: " + month);
+                            toYearInt = year;
+                            toMonthInt = month;
+
+                            String monthStr = getMonthFromint(month);
+
+                            txtToYear.setText(monthStr + " " + year);
+
+                            resignedStr = monthStr + "  " + year;
+                        }
+
+                    }
+                })
+                .setNegativeButton(new OnCancelMonthDialogListener() {
+                    @Override
+                    public void onCancel(AlertDialog dialog) {
+                        dialog.dismiss();
+                    }
+                });
+
+        rackMonthPicker.show();
+
+    }
+
 
 }
 

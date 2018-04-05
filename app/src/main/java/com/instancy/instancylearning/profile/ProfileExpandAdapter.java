@@ -181,7 +181,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Experience")) {
             profileSchool.setText(this.userExperienceModelList.get(childPosition).title);
             profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
-            profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate);
+            profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate + " - " + this.userExperienceModelList.get(childPosition).toDate);
             profileDuration.setVisibility(View.VISIBLE);
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("1")) {
             profileSchool.setText(configsModel.attributedisplaytext);

@@ -147,14 +147,22 @@
                 android:id="@+id/edit_FrmYear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:enabled="false"
                 android:focusable="true"
                 android:maxLength="100"
                 android:maxLines="1"
-                android:text="fromyear"
+                android:onClick="actionsBottomBtns"
                 android:padding="5dp"
-                android:visibility="visible" />
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/fromYearTextview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottomline"
+                android:gravity="center_vertical"
+                android:onClick="actionsBottomBtns"
+                android:padding="4dp"
+                android:text="   " />
 
             <!--       Here  To Year    -->
 
@@ -192,12 +200,24 @@
                 android:maxLength="100"
                 android:maxLines="1"
                 android:padding="5dp"
-                android:visibility="visible" />
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/toYearTextview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottomline"
+                android:gravity="center_vertical"
+                android:onClick="actionsBottomBtns"
+                android:padding="4dp"
+                android:text="     " />
+
 
             <CheckBox
                 android:id="@+id/chx_crnthere"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:onClick="actionsBottomBtns"
                 android:text="I currently work here"
                 android:textColor="@color/colorDarkGrey" />
 

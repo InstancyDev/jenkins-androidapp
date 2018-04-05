@@ -10426,6 +10426,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     userExperienceModel.companyName = experiencObj.get("companyname").toString();
                 }
 
+                if (experiencObj.has("tilldate")) {
+                    userExperienceModel.tillDate = experiencObj.getBoolean("tilldate");
+                }
+
 //                userExperienceModel.userID = userID;
 
                 Log.d(TAG, "InjectAllProfileDetails: at index " + userExperienceModel);
@@ -11078,6 +11082,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     userExperienceModel.displayNo = (cursor.getString(cursor.getColumnIndex("displayno")));
                     userExperienceModel.description = (cursor.getString(cursor.getColumnIndex("description")));
                     userExperienceModel.difference = (cursor.getString(cursor.getColumnIndex("difference")));
+
+
+                    int tillDate = cursor.getInt(cursor.getColumnIndex("tilldate"));
+
+                    if (tillDate == 0) {
+                        userExperienceModel.tillDate = false;
+                    } else {
+                        userExperienceModel.tillDate = true;
+                    }
+
+
                     userExperienceModelList.add(userExperienceModel);
                 }
             }

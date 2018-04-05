@@ -493,6 +493,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
+
     }
 
     private String encodeImage(Bitmap bm) {
@@ -716,7 +717,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (typeString.equalsIgnoreCase("EXP")) {
             Intent intentDetail = new Intent(context, Experience_activity.class);
             intentDetail.putExtra("isfromGroup", true);
-            startActivityForResult(intentDetail, EXPERIENCE_ACT);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
 
         } else if (typeString.equalsIgnoreCase("EDU")) {
             Intent intentDetail = new Intent(context, Education_activity.class);
@@ -750,7 +751,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             Intent intentDetail = new Intent(context, Experience_activity.class);
             intentDetail.putExtra("isfromGroup", false);
             intentDetail.putExtra("userExperienceModel", userExperienceModel);
-            startActivityForResult(intentDetail, EXPERIENCE_ACT);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
 
         }
 
