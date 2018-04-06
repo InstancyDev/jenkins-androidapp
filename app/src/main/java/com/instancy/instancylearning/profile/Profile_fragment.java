@@ -62,6 +62,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -113,7 +114,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     ProfileExpandAdapter profileDynamicAdapter;
+
     HashMap<String, List<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, List<ProfileConfigsModel>>();
+
     List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
 
     List<UserEducationModel> educationModelArrayList = new ArrayList<>();
@@ -153,7 +156,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
     }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -725,9 +727,29 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             startActivityForResult(intentDetail, EDUCATION_ACT);
         } else if (typeString.equalsIgnoreCase("PER")) {
 
+//            Log.d(TAG, "onGroupClick: personal" + hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname).get(groupPosition).valueName);
+
+            Log.d(TAG, "onGroupClick: groupid" + hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname).get(groupPosition));
+
+            List<ProfileConfigsModel> profileConfigsModelArrayList = hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname);
+
+            Intent intentDetail = new Intent(context, Personalinfo_activity.class);
+            intentDetail.putExtra("fromWhichGroup", profileGroupModelList.get(groupPosition).groupId);
+            intentDetail.putExtra("profileConfigsModelArrayList", (Serializable) profileConfigsModelArrayList);
+            intentDetail.putExtra("GroupName", profileGroupModelList.get(groupPosition).groupname);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
 
         } else if (typeString.equalsIgnoreCase("CNT")) {
 
+            List<ProfileConfigsModel> profileConfigsModelArrayList = hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname);
+
+            Log.d(TAG, "editSelectedGroup: " + profileConfigsModelArrayList.size());
+
+            Intent intentDetail = new Intent(context, Personalinfo_activity.class);
+            intentDetail.putExtra("fromWhichGroup", profileGroupModelList.get(groupPosition).groupId);
+            intentDetail.putExtra("GroupName", profileGroupModelList.get(groupPosition).groupname);
+            intentDetail.putExtra("profileConfigsModelArrayList", (Serializable) profileConfigsModelArrayList);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
 
         }
 

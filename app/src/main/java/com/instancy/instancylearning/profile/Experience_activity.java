@@ -65,6 +65,7 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 
+import static com.instancy.instancylearning.utils.Utilities.getIntFromMonth;
 import static com.instancy.instancylearning.utils.Utilities.getMonthFromint;
 import static com.instancy.instancylearning.utils.Utilities.getMonthName;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -327,7 +328,7 @@ public class Experience_activity extends AppCompatActivity {
             isLEssthaY = false;
         }
 
-        boolean isLEssthaM = isGreaterM(fromMonthInt, toMonthInt);
+//        boolean isLEssthaM = isGreaterM(fromMonthInt, toMonthInt);
 
         if (jobRoleStr.length() < 2) {
             Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
@@ -348,17 +349,14 @@ public class Experience_activity extends AppCompatActivity {
             if (tillDate == 1) {
                 resignedStr = getMonthName();
             }
-
-            if (resignedStr.length() == 0) {
-                resignedStr = userExperienceModel.toDate;
-
-            }
-
-            if (joinedStr.length() == 0) {
-                joinedStr = userExperienceModel.fromDate;
-
-            }
-
+//            if (resignedStr.length() == 0) {
+//                resignedStr = userExperienceModel.toDate;
+//
+//            }
+//            if (joinedStr.length() == 0) {
+//                joinedStr = userExperienceModel.fromDate;
+//
+//            }
             JSONObject parameters = new JSONObject();
             parameters.put("oldtitle", jobRoleStr);
             parameters.put("UserID", appUserModel.getUserIDValue());
@@ -533,30 +531,40 @@ public class Experience_activity extends AppCompatActivity {
             txtToYearLayout.setVisibility(View.GONE);
             txtToYear.setVisibility(View.GONE);
 
-//            String[] fromSplit = userExperienceModel.fromDate.split(" ");
+            String[] fromSplit = userExperienceModel.fromDate.split(" ");
 
+            if (fromSplit.length > 1) { // 0 month 1 year
+                fromYInt = Integer.parseInt(fromSplit[1]);
+                fromMonthInt = getIntFromMonth(fromSplit[0]);
+            }
+            joinedStr = userExperienceModel.fromDate;
         } else {
             tillDate = 0;
             checkCrntHere.setChecked(false);
 
-//            String[] fromSplit = userExperienceModel.fromDate.split(" ");
-//
-//            String[] toSplit = userExperienceModel.toDate.split(" ");
-//
-//            if (fromSplit.length>1){
-//
-//            }
+            String[] fromSplit = userExperienceModel.fromDate.split(" ");
+
+            String[] toSplit = userExperienceModel.toDate.split(" ");
+
+            if (fromSplit.length > 1) { // 0 month 1 year
+                fromYInt = Integer.parseInt(fromSplit[1]);
+                fromMonthInt = getIntFromMonth(fromSplit[0]);
+            }
+
+            if (toSplit.length > 1) { // 0 month 1 year
+                toYearInt = Integer.parseInt(toSplit[1]);
+                toMonthInt = getIntFromMonth(toSplit[0]);
+            }
+
+            joinedStr = userExperienceModel.fromDate;
+            resignedStr = userExperienceModel.toDate;
         }
 
-        fromYInt = 1;
-        toYearInt = 2;
 
     }
 
     public void deleteEducationDetails() throws JSONException {
-
         JSONObject parameters = new JSONObject();
-
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("DisplayNo", userExperienceModel.displayNo);
 
@@ -647,7 +655,7 @@ public class Experience_activity extends AppCompatActivity {
                             txtFromYear.setText(userExperienceModel.fromDate);
 
                             String monthStr = getMonthFromint(month);
-                            joinedStr = monthStr + "  " + year;
+                            joinedStr = monthStr + " " + year;
                             txtFromYear.setText(monthStr + " " + year);
 
                         } else {
@@ -659,7 +667,7 @@ public class Experience_activity extends AppCompatActivity {
 
                             txtToYear.setText(monthStr + " " + year);
 
-                            resignedStr = monthStr + "  " + year;
+                            resignedStr = monthStr + " " + year;
                         }
 
                     }

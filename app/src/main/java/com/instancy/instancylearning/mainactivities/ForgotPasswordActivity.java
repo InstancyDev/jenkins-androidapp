@@ -111,14 +111,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         GradientDrawable drawable = (GradientDrawable) btnSubmit.getBackground();
         drawable.setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
-        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         llForgot.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
-        txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        txtBody.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
+        txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        txtBody.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        editResetMail.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        editResetMail.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
     }
-
 
     @OnClick({R.id.btn_submit})
     public void socialLoginBtns(View view) {
@@ -126,7 +126,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             case R.id.btn_submit:
                 submitPasswordReset();
                 break;
-
         }
     }
 
@@ -144,9 +143,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
             Toast.makeText(this, getResources().getString(R.string.alert_headtext_email_notvalid), Toast.LENGTH_SHORT).show();
 
-
         }
-
 
     }
 
@@ -170,16 +167,19 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                         try {
                             JSONArray forgotResponseAry = response.getJSONArray("userstatus");
 
-                            if (forgotResponseAry.length() != 0) {
-
+                            if (forgotResponseAry != null && forgotResponseAry.length() != 0) {
                                 JSONObject jsonobj = forgotResponseAry.getJSONObject(0);
                                 Log.d(TAG, "onResponse: " + jsonobj.get("active"));
-
                                 jsonobj.get("userid").toString();
                                 jsonobj.get("siteid").toString();
                                 jsonobj.get("active").toString();
                                 jsonobj.get("userstatus").toString();
+                                finish();
+                                Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.password_reset_link_send_success), Toast.LENGTH_SHORT).show();
 
+                            } else {
+
+                                Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.alert_headtext_email_notvalid), Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {

@@ -191,6 +191,12 @@
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
 
+        <activity
+            android:name=".profile.Personalinfo_activity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
+
+
         <!-- Push Notification  Services-->
 
         <!--<meta-data-->

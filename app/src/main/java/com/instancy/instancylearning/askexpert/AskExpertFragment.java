@@ -284,13 +284,13 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
-
+        askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
         askExpertAdapter = new AskExpertAdapter(getActivity(), BIND_ABOVE_CLIENT, askExpertQuestionModelList);
         askexpertListView.setAdapter(askExpertAdapter);
         askexpertListView.setOnItemClickListener(this);
         askexpertListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
+
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
