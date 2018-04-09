@@ -1050,8 +1050,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
 
+
+        final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
+
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
-                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
+                + userName + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
                 + learningModel.getSiteURL() + "&DownloadContent=&SiteID=" + learningModel.getSiteID();
 
         urlStr = urlStr.replaceAll(" ", "%20");

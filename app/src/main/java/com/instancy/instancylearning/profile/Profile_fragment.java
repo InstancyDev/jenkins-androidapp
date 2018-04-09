@@ -450,7 +450,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
 //                    String path = saveImage(bitmap);
-                    Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
 
                     profileImage.setImageBitmap(bitmap);
                     profileRound.setImageBitmap(bitmap);

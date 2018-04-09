@@ -79,6 +79,7 @@ import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.wifisharing.WiFiDirectActivity;
 import com.instancy.instancylearning.wifisharing.WiFiDirectNewActivity;
 import com.squareup.picasso.Picasso;
@@ -1439,8 +1440,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void checkUserLogin(final MyLearningModel learningModel, final boolean isInApp) {
 
+        final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
+
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
-                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
+                + userName + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
                 + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
 
 

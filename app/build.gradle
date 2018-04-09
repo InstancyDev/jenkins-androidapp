@@ -16,9 +16,9 @@ android {
 //        versionName "4.0.2.48"
 
 // ----------------------------------for instancy lite app-------------------------
-//        applicationId "com.instancy.instancy_lite"
-//        versionCode 12
-//        versionName "2.1"
+        applicationId "com.instancy.instancy_lite"
+        versionCode 12
+        versionName "2.1"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
@@ -36,9 +36,9 @@ android {
 //        versionName "1.0"
 
 //  -------------------------------- for trainingcompany app----------------------------------
-        applicationId "com.instancy.trainingcompany"
-        versionCode 9
-        versionName "1.8"
+//        applicationId "com.instancy.trainingcompany"
+//        versionCode 9
+//        versionName "1.8"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.mobileup"
@@ -63,9 +63,9 @@ android {
 //        versionCode 3
 //        versionName "1.2"
 
-        applicationId "com.instancy.healthhelp"
-        versionCode 1
-        versionName "1.0"
+//        applicationId "com.instancy.healthhelp"
+//        versionCode 1
+//        versionName "1.0"
 
         minSdkVersion 21
         targetSdkVersion 26

@@ -985,7 +985,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + "','"
                     + uiSettingsModel.getMenuBGAlternativeColor()
                     + "','"
-                    + uiSettingsModel.getSelectedMenuTextColor()
+                    + uiSettingsModel.getMenuBGSelectTextColor()
                     + "','"
                     + uiSettingsModel.getAppButtonBgColor()
                     + "','"

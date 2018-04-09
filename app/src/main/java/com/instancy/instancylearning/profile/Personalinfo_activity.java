@@ -112,6 +112,8 @@ public class Personalinfo_activity extends AppCompatActivity {
 
     List<ProfileConfigsModel> profileConfigsModelist;
 
+    ArrayList<String> degreeTitleList;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +128,7 @@ public class Personalinfo_activity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(context);
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
+        countriesWebApiCall(appUserModel.getUserIDValue());
         profileConfigsModelist = new ArrayList<>();
 
         Bundle bundle = getIntent().getExtras();
@@ -133,7 +136,7 @@ public class Personalinfo_activity extends AppCompatActivity {
         profileConfigsModelist = (List<ProfileConfigsModel>) bundle.getSerializable("profileConfigsModelArrayList");
         groupName = bundle.getString("GroupName");
 
-        profileEditAdapter = new ProfileEditAdapter(this, BIND_ABOVE_CLIENT, profileConfigsModelist);
+        profileEditAdapter = new ProfileEditAdapter(this, BIND_ABOVE_CLIENT, profileConfigsModelist, degreeTitleList);
         personalEditList.setAdapter(profileEditAdapter);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -165,8 +168,18 @@ public class Personalinfo_activity extends AppCompatActivity {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("DGRE")) {
+                if (requestType.equalsIgnoreCase("PROFILEDATA")) {
                     if (response != null) {
+
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("table5");
+
+                            Log.d(TAG, "Volley JSON post" + jsonArray.length());
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     } else {
 
@@ -204,7 +217,6 @@ public class Personalinfo_activity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -270,19 +282,30 @@ public class Personalinfo_activity extends AppCompatActivity {
 
     public void validateNewForumCreation() throws JSONException {
 
+        boolean isValidationCompleted = true;
+
+        Log.d(TAG, "validateNewForumCreation: " + profileConfigsModelist);
+
+
+        for (int i = 0; i < profileConfigsModelist.size(); i++) {
+
+            if (profileConfigsModelist.get(i).isrequired.contains("true") && profileConfigsModelist.get(i).valueName.length() == 0) {
+
+                Log.d(TAG, "validateNewForumCreation:  required " + profileConfigsModelist.get(i).valueName);
+
+                Toast.makeText(context, "Enter " + profileConfigsModelist.get(i).attributedisplaytext, Toast.LENGTH_SHORT).show();
+                isValidationCompleted = false;
+                break;
+            }
+        }
+
         String schoolStr = "";
         String countryStr = "";
         String degreeStr = "";
         String descriptionStr = "";
 
 
-        if (schoolStr.length() < 4) {
-            Toast.makeText(this, "Enter school", Toast.LENGTH_SHORT).show();
-        } else if (countryStr.length() < 3) {
-            Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
-        } else if (degreeStr.length() < 3) {
-            Toast.makeText(this, "Enter degree", Toast.LENGTH_SHORT).show();
-        } else {
+        if (isValidationCompleted) {
 
             String totalYs = "";
             JSONObject parameters = new JSONObject();
@@ -313,14 +336,10 @@ public class Personalinfo_activity extends AppCompatActivity {
 
     public void sendNewOrUpdatedEducationDetailsDataToServer(final String postData) {
         String apiURL = "";
-        if (isNewRecord) {
-            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/AddEducationdata";
-        } else {
-            apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/UpadteEducationdata";
-        }
 
+
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileUpdateUserProfile?studId=" + appUserModel.getUserIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-
         final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -390,6 +409,21 @@ public class Personalinfo_activity extends AppCompatActivity {
         setResult(RESULT_OK, intent);
         finish();
     }
+
+    private void countriesWebApiCall(String userId) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        Log.d(TAG, "profileWebCall: " + urlStr);
+
+        vollyService.getJsonObjResponseVolley("PROFILEDATA", urlStr, appUserModel.getAuthHeaders());
+
+    }
+
 
 }
 
