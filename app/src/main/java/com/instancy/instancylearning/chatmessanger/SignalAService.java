@@ -103,7 +103,7 @@ public class SignalAService {
             @Override
             public void OnReceived(JSONArray args) {
 
-                Log.d(TAG, "OnReceived: " + args);
+//                Log.d(TAG, "OnReceived: " + args);
 
                 communicator.messageRecieved(args);
 
@@ -131,14 +131,14 @@ public class SignalAService {
         HubInvokeCallback callback = new HubInvokeCallback() {
             @Override
             public void OnResult(boolean succeeded, String response) {
-                Log.d(TAG, "OnResult: HubInvokeCallback  " + response);
+//                Log.d(TAG, "OnResult: HubInvokeCallback  " + response);
                 preferencesManager.setStringValue(response, StaticValues.CHAT_LIST);
             }
 
             @Override
             public void OnError(Exception ex) {
                 Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "OnError: HubInvokeCallback  " + ex.getMessage());
+//                Log.d(TAG, "OnError: HubInvokeCallback  " + ex.getMessage());
             }
         };
         hub.Invoke("Login", array, callback);
@@ -160,14 +160,14 @@ public class SignalAService {
             @Override
             public void OnResult(boolean succeeded, String response) {
 //                Toast.makeText(context, response, Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "OnResult: HubInvokeCallback sendMessage  " + response);
+//                Log.d(TAG, "OnResult: HubInvokeCallback sendMessage  " + response);
 
             }
 
             @Override
             public void OnError(Exception ex) {
                 Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "OnError: HubInvokeCallback  sendMessage " + ex.getMessage());
+//                Log.d(TAG, "OnError: HubInvokeCallback  sendMessage " + ex.getMessage());
             }
         };
         List<String> args = new ArrayList<String>(2);

@@ -375,7 +375,6 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
     }
 
-
     public void sendNewForumDataToServer(final String postData) {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
@@ -416,7 +415,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
                 } else {
 
-                    Toast.makeText(AddNewCommentActivity.this, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddNewCommentActivity.this, "New comment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

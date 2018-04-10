@@ -190,6 +190,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     View header;
 
+    String refreshOrNo = "norefresh";
+
     boolean refreshReview = false;
 
     RatingsAdapter ratingsAdapter;
@@ -583,6 +585,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         relativeSecond.setVisibility(View.GONE);
         whiteLine.setVisibility(View.GONE);
+        buttonFirst.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        buttonSecond.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
 
         if (isCatalog) {
 
@@ -591,8 +595,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_plus, this, uiSettingsModel.getAppHeaderTextColor());
-                Drawable reportImg = getButtonDrawable(R.string.fa_icon_filter, this, uiSettingsModel.getAppHeaderTextColor());
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_plus, this, uiSettingsModel.getAppButtonTextColor());
+                Drawable reportImg = getButtonDrawable(R.string.fa_icon_filter, this, uiSettingsModel.getAppButtonTextColor());
 
                 if (myLearningModel.getAddedToMylearning() == 1) {
                     buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -611,7 +615,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             } else {
 
                 buttonFirst.setText("Add");
-                Drawable addPlusIcon = getButtonDrawable(R.string.fa_icon_plus_circle, this, uiSettingsModel.getAppHeaderTextColor());
+
+                Drawable addPlusIcon = getButtonDrawable(R.string.fa_icon_plus_circle, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(addPlusIcon);
                 if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
 //                    Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppHeaderTextColor());
@@ -635,7 +640,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         }
                     } else {
 
-                        Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppHeaderTextColor());
+                        Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
                         iconFirst.setBackground(cartIcon);
                         buttonFirst.setText("Buy");
                     }
@@ -655,9 +660,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     buttonFirst.setText("View");
                     txtPrice.setVisibility(View.GONE);
                     txtPrice.setText("");
-                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
-                    iconFirst.setBackground(viewIcon);
+                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
 
+                    iconFirst.setBackground(viewIcon);
                 }
             }
         } else {
@@ -665,14 +670,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                 btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(calendarImg);
                 buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
 
                 if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
                     relativeSecond.setVisibility(View.VISIBLE);
                     whiteLine.setVisibility(View.VISIBLE);
-                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
                     iconSecond.setBackground(relatedContent);
                     buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
                 }
@@ -685,7 +690,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
                         relativeSecond.setVisibility(View.VISIBLE);
                         whiteLine.setVisibility(View.VISIBLE);
-                        Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppHeaderTextColor());
+                        Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppButtonTextColor());
                         iconSecond.setBackground(relatedContent);
                     }
 
@@ -693,14 +698,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 // uncomment after reports completed
                     relativeSecond.setVisibility(View.VISIBLE);
                     whiteLine.setVisibility(View.VISIBLE);
-                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppHeaderTextColor());
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
                     iconSecond.setBackground(relatedContent);
 
                     buttonSecond.setText("Report");
 
                 }
 
-                Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppHeaderTextColor());
+                Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(viewIcon);
                 buttonFirst.setText("View");
                 txtPrice.setVisibility(View.GONE);
@@ -724,7 +729,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
 
     public void updateEnrolledEvent() {
-        Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppHeaderTextColor());
+        Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
         iconFirst.setBackground(calendarImg);
         buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
         db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
@@ -928,7 +933,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         intent.putExtra("myLearningDetalData", myLearningModel);
                         intent.putExtra("refresh", "norefresh");
                     } else {
-                        intent.putExtra("refresh", "refresh");
+                        intent.putExtra("refresh", refreshOrNo);
                     }
 
 
@@ -1116,6 +1121,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             }
         }
+        refreshOrNo = "refresh";
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
@@ -1437,14 +1443,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
     }
 
-
     public void checkUserLogin(final MyLearningModel learningModel, final boolean isInApp) {
 
         final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + userName + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" +  learningModel.getSiteID();
 
 
         urlStr = urlStr.replaceAll(" ", "%20");
@@ -1564,7 +1569,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                     db.updateContenToCatalog(myLearningModel);
                                     buttonFirst.setText("View");
                                     Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, MyLearningDetail_Activity.this, uiSettingsModel.getAppHeaderTextColor());
-
+                                    iconFirst.setImageDrawable(null);
                                     iconFirst.setImageDrawable(viewIcon);
                                     refreshCatalogContent = true;
 

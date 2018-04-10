@@ -165,7 +165,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?SiteURL=" + appUserModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid=" + appUserModel.getUserIDValue() + "&DelivoryMode=1&IsDownload=0&IsDownload=0";
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?SiteURL=" + appUserModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid=" + learningModel.getUserID() + "&DelivoryMode=1&IsDownload=0&IsDownload=0";
 
         vollyService.getJsonObjResponseVolley("DMCD", urlString, appUserModel.getAuthHeaders());
 
@@ -174,7 +174,7 @@ public class Reports_Activity extends AppCompatActivity {
     public void getDownloadedMobileTrackingData() {
 
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?_studid=" + appUserModel.getUserIDValue() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + appUserModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + appUserModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
 
         vollyService.getJsonObjResponseVolley("DMTD", urlString, appUserModel.getAuthHeaders());
 
@@ -251,6 +251,7 @@ public class Reports_Activity extends AppCompatActivity {
         } else if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
             reportDetail = db.getReportTrack(learningModel, false);
+
         }
 
         if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {
@@ -265,9 +266,23 @@ public class Reports_Activity extends AppCompatActivity {
         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
             reportDetailList = db.getReportForTrackListItems(learningModel);
-            if (reportDetailList.size() > 0) {
+            if (reportDetailList != null && reportDetailList.size() > 0) {
 
                 reportAdapter.refreshList(reportDetailList, reportDetailsForQuestionsArrayList, false);
+
+                // here time need to caluculate
+
+                String getTotalTime = "0:00:00";
+
+                if (reportDetailList.size() > 0) {
+                    getTotalTime = returnTotalTime(reportDetailList);
+                    reportDetail.timeSpent = getTotalTime;
+                } else {
+
+                    getTotalTime = "0:00:00";
+                }
+
+
             }
         }
 
@@ -277,9 +292,63 @@ public class Reports_Activity extends AppCompatActivity {
         }
     }
 
+    public String returnTotalTime(List<ReportDetail> reportDetailList) {
+
+        String timeStr = "0:00:00";
+
+        for (int i = 0; i < reportDetailList.size(); i++) {
+
+
+            Log.d(TAG, "returnTotalTime: " + reportDetailList.get(i).timeSpent);
+
+            if (isValidString(reportDetailList.get(i).timeSpent)) {
+                String[] strSplitvalues = timeStr.split(":");
+                String[] strSplitvalues1 = reportDetailList.get(i).timeSpent.split(":");
+                if (strSplitvalues.length == 3
+                        && strSplitvalues1.length == 3) {
+                    try {
+                        int hours1 = (Integer
+                                .parseInt(strSplitvalues[0]) + Integer
+                                .parseInt(strSplitvalues1[0])) * 3600;
+                        int mins1 = (Integer
+                                .parseInt(strSplitvalues[1]) + Integer
+                                .parseInt(strSplitvalues1[1])) * 60;
+                        int secs1 = (int) (Float
+                                .parseFloat(strSplitvalues[2]) + Float
+                                .parseFloat(strSplitvalues1[2]));
+
+                        int totaltime = hours1 + mins1 + secs1;
+                        long longVal = totaltime;
+
+                        int hours = (int) longVal / 3600;
+
+                        int remainder = (int) longVal - hours
+                                * 3600;
+
+                        int mins = remainder / 60;
+
+                        remainder = remainder - mins * 60;
+
+                        int secs = remainder;
+
+                        timeStr = hours + ":" + mins
+                                + ":" + secs;
+
+                    } catch (Exception ex) {
+
+                    }
+                }
+            }
+
+        }
+
+        return timeStr;
+    }
+
+
     public void updateUI(ReportDetail reportDetail) {
 
-        txtName.setText(" " + learningModel.getCourseName());
+        txtName.setText(learningModel.getCourseName());
 
         if (isValidString(reportDetail.dateCompleted)) {
             txtDateCompleted.setText("Date Completed: " + reportDetail.dateCompleted);

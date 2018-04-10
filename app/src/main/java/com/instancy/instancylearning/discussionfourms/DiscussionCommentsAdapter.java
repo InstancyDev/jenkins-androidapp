@@ -57,7 +57,6 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
     private List<DiscussionCommentsModel> searchList;
     AppController appcontroller;
 
-
     public DiscussionCommentsAdapter(Activity activity, int resource, List<DiscussionCommentsModel> discussionTopicModelList) {
         this.activity = activity;
         this.discussionCommentsModels = discussionTopicModelList;
@@ -141,6 +140,14 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.txtCommentsCount.setVisibility(View.GONE);
         holder.txtAuthor.setVisibility(View.GONE);
         holder.view.setVisibility(View.INVISIBLE);
+
+        if (discussionCommentsModels.get(position).replyID.equalsIgnoreCase(appUserModel.getUserIDValue())) {
+
+            holder.btnContextMenu.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+        }
 
 
         convertView.setTag(holder);

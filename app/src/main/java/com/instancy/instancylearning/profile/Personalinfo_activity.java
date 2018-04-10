@@ -114,6 +114,8 @@ public class Personalinfo_activity extends AppCompatActivity {
 
     ArrayList<String> degreeTitleList;
 
+    JSONArray jsonArray;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,7 +174,7 @@ public class Personalinfo_activity extends AppCompatActivity {
                     if (response != null) {
 
                         try {
-                            JSONArray jsonArray = response.getJSONArray("table5");
+                             jsonArray = response.getJSONArray("table5");
 
                             Log.d(TAG, "Volley JSON post" + jsonArray.length());
 

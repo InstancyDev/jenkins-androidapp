@@ -380,6 +380,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 triggerActionForFirstItem();
             }
         }.start();
+
+
     }
 
     public void triggerActionForFirstItem() {
@@ -548,8 +550,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
 
@@ -1050,7 +1052,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     }
-
+                    MenuItemCompat.collapseActionView(item_search);
                     injectFromDbtoModel();
                 }
                 if (isNetworkConnectionAvailable(getContext(), -1)) {

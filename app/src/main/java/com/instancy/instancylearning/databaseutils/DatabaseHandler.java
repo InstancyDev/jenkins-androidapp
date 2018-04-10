@@ -5283,12 +5283,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             //corelessonstatus
             if (jsonCMiColumnObj.has("corelessonstatus")) {
 
-                cmiModel.set_status(jsonCMiColumnObj.get("corelessonstatus").toString());
+                String string = jsonCMiColumnObj.get("corelessonstatus").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_status(string);
+                } else {
+                    cmiModel.set_status("");
+                }
+
             }
 //            // statusdisplayname
 //            if (jsonCMiColumnObj.has("statusdisplayname")) {
 //
-//                cmiModel.set_status(jsonCMiColumnObj.get("statusdisplayname").toString());
+//                cmiModel.set_status(jsonCMiColumnObj.get("statusdisplayname").toString()); 9440136366 jayanchadra vijayndar redd 9177127776 kambigigi
 //
 //            }
             // scoid
@@ -5307,45 +5314,104 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // corelessonlocation
             if (jsonCMiColumnObj.has("corelessonlocation")) {
 
-                cmiModel.set_location(jsonCMiColumnObj.get("corelessonlocation").toString());
+//                cmiModel.set_location(jsonCMiColumnObj.get("corelessonlocation").toString());
+
+
+                String string = jsonCMiColumnObj.get("corelessonlocation").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_location(string);
+                } else {
+                    cmiModel.set_location("");
+                }
+
 
             }
 
             // author
             if (jsonCMiColumnObj.has("totalsessiontime")) {
 
-                cmiModel.set_timespent(jsonCMiColumnObj.get("totalsessiontime").toString());
+//                cmiModel.set_timespent(jsonCMiColumnObj.get("totalsessiontime").toString());
 
+                String string = jsonCMiColumnObj.get("totalsessiontime").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_timespent(string);
+                } else {
+                    cmiModel.set_timespent("0:00:00");
+                }
             }
             // scoreraw
             if (jsonCMiColumnObj.has("scoreraw")) {
 
-                cmiModel.set_score(jsonCMiColumnObj.get("scoreraw").toString());
+//                cmiModel.set_score(jsonCMiColumnObj.get("scoreraw").toString());
+
+                String string = jsonCMiColumnObj.get("scoreraw").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_score(string);
+                } else {
+                    cmiModel.set_score("");
+                }
 
             }
             // sequencenumber
             if (jsonCMiColumnObj.has("sequencenumber")) {
 
-                cmiModel.set_seqNum(jsonCMiColumnObj.get("sequencenumber").toString());
+//                cmiModel.set_seqNum(jsonCMiColumnObj.get("sequencenumber").toString());
+
+                String string = jsonCMiColumnObj.get("sequencenumber").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_seqNum(string);
+                } else {
+                    cmiModel.set_seqNum("");
+                }
+
 
             }
             // durationEndDate
             if (jsonCMiColumnObj.has("corelessonmode")) {
 
-                cmiModel.set_coursemode(jsonCMiColumnObj.get("corelessonmode").toString());
+//                cmiModel.set_coursemode(jsonCMiColumnObj.get("corelessonmode").toString());
+
+
+                String string = jsonCMiColumnObj.get("corelessonmode").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_coursemode(string);
+                } else {
+                    cmiModel.set_coursemode("");
+                }
 
             }
             // scoremin
             if (jsonCMiColumnObj.has("scoremin")) {
 
-                cmiModel.set_scoremin(jsonCMiColumnObj.get("scoremin").toString());
+//                cmiModel.set_scoremin(jsonCMiColumnObj.get("scoremin").toString());
+
+                String string = jsonCMiColumnObj.get("scoremin").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_scoremin(string);
+                } else {
+                    cmiModel.set_scoremin("");
+                }
 
             }
 
             // scoremax
             if (jsonCMiColumnObj.has("scoremax")) {
 
-                cmiModel.set_scoremax(jsonCMiColumnObj.get("scoremax").toString());
+//                cmiModel.set_scoremax(jsonCMiColumnObj.get("scoremax").toString());
+
+                String string = jsonCMiColumnObj.get("scoremax").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_scoremax(string);
+                } else {
+                    cmiModel.set_scoremax("");
+                }
 
             }
 //            // startdate
@@ -5404,7 +5470,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // scoid
             if (jsonCMiColumnObj.has("textresponses")) {
 
-                cmiModel.set_textResponses(jsonCMiColumnObj.get("textresponses").toString());
+//                cmiModel.set_textResponses(jsonCMiColumnObj.get("textresponses").toString());
+
+
+                String string = jsonCMiColumnObj.get("textresponses").toString();
+
+                if (isValidString(string)) {
+                    cmiModel.set_textResponses(string);
+                } else {
+                    cmiModel.set_textResponses("");
+                }
 
             }
             cmiModel.set_siteId(learningModel.getSiteID());
@@ -5640,6 +5715,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void insertLearnerSession(JSONArray jsonArray, MyLearningModel learningModel) throws JSONException {
 
+
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonCMiColumnObj = jsonArray.getJSONObject(i);
             Log.d(TAG, "injectINTCMI: " + jsonCMiColumnObj);
@@ -5659,12 +5735,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String checkForNull = jsonCMiColumnObj.getString("timespent");
 
-                if (isValidString(checkForNull)) {
-                    learnerSessionTable.setTimeSpent(checkForNull);
+//                if (isValidString(checkForNull)) {
+//                    learnerSessionTable.setTimeSpent(checkForNull);
+//                } else {
+//                    learnerSessionTable.setTimeSpent("0:00:00");
+//                }
+
+                String string = jsonCMiColumnObj.get("timespent").toString();
+
+                if (isValidString(string)) {
+                    learnerSessionTable.setTimeSpent(string);
                 } else {
                     learnerSessionTable.setTimeSpent("0:00:00");
                 }
-
 
 //                learnerSessionTable.setTimeSpent(jsonCMiColumnObj.get("timespent").toString());
 
@@ -14636,7 +14719,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ReportDetailsForQuestions reportDetail = new ReportDetailsForQuestions();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuerys = "SELECT distinct sr.questionid, q.quesname, sr.result  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + appUserModel.getSiteIDValue() + " ORDER by sr.questionid";
+        String strSelQuerys = "SELECT distinct sr.questionid, q.quesname, sr.result  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + learningModel.getUserID() + " ORDER by sr.questionid";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
         try {
@@ -14807,7 +14890,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         } else {
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + learningModel.getSiteID();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -14881,7 +14964,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (istrackList) {
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_TRACKLISTDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + learningModel.getSiteID();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -14938,7 +15021,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         } else {
 
-            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + appUserModel.getSiteIDValue();
+            String strSelQuerys = "SELECT distinct C.datecompleted, C.startdate, D.objecttypeid, C.timespent, C.score, D.coursename, D.islistview, case when C.status is NOT NULL then C.status else D.status end as ObjStatus  FROM " + TBL_DOWNLOADDATA + " D left outer join " + TBL_CMI + " C On D.userid=C.userid and D.scoid =C.scoid where D.userid = " + learningModel.getUserID() + " AND D.scoid = " + learningModel.getScoId() + " AND D.siteid =  " + learningModel.getSiteID();
 
             Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
 
@@ -15007,7 +15090,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ReportDetail reportDetail = new ReportDetail();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuerys = "SELECT distinct C.datecompleted, C.status, C.score, C.startdate,T.objecttypeid,C.timespent,T.name  from  " + TBL_TRACKOBJECTS + " T left outer join " + TBL_CMI + " C On C.scoid =T.scoid AND C.userid = T.userid AND C.siteid = T.siteid WHERE T.trackscoid = " + learningModel.getScoId() + " AND T.userid = " + learningModel.getUserID() + " AND T.siteid =  " + appUserModel.getSiteIDValue() + " ORDER BY T.sequencenumber";
+        String strSelQuerys = "SELECT distinct C.datecompleted, C.status, C.score, C.startdate,T.objecttypeid,C.timespent,T.name  from  " + TBL_TRACKOBJECTS + " T left outer join " + TBL_CMI + " C On C.scoid =T.scoid AND C.userid = T.userid AND C.siteid = T.siteid WHERE T.trackscoid = " + learningModel.getScoId() + " AND T.userid = " + learningModel.getUserID() + " AND T.siteid =  " + learningModel.getSiteID() + " ORDER BY T.sequencenumber";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
         try {
@@ -15034,6 +15117,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     reportDetail.timeSpent = cursor.getString(cursor
                             .getColumnIndex("timespent"));
+
+                    String timess = cursor.getString(cursor.getColumnIndex("timespent"));
+
+                    if (isValidString(timess)) {
+                        reportDetail.timeSpent = timess;
+                    } else {
+                        reportDetail.timeSpent = "0:00:00";
+                    }
 
                     reportDetail.status = cursor.getString(cursor
                             .getColumnIndex("status"));

@@ -21,9 +21,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
@@ -40,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -73,6 +76,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     @BindView(R.id.llForgot)
     LinearLayout llForgot;
 
+
+    boolean isEmailiDValid = false;
 
     AppUserModel appUserModel;
     private SVProgressHUD svProgressHUD;
@@ -174,8 +179,8 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                 jsonobj.get("siteid").toString();
                                 jsonobj.get("active").toString();
                                 jsonobj.get("userstatus").toString();
-                                finish();
-                                Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.password_reset_link_send_success), Toast.LENGTH_SHORT).show();
+                                isEmailiDValid = true;
+                                isEmailIdCheck(jsonobj);
 
                             } else {
 
@@ -210,6 +215,133 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
 
+    public void isEmailIdCheck(JSONObject jsonobj) throws JSONException {
+
+
+        Log.d(TAG, "onResponse: " + jsonobj.get("active"));
+        final String userID = jsonobj.get("userid").toString();
+        String siteID = jsonobj.get("siteid").toString();
+        String active = jsonobj.get("active").toString();
+        String userstatus = jsonobj.get("userstatus").toString();
+
+        if (active.equalsIgnoreCase("true") || active.equalsIgnoreCase("1")) {
+
+            String uniqueID = null;
+
+            if (uniqueID == null) {
+                uniqueID = UUID.randomUUID().toString();
+            }
+
+            final String pwdResetLink = appUserModel.getWebAPIUrl() + "/PasswordRecovery/Uid/" + userID + "/Gid/" + uniqueID;
+            String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/UsersPasswordResetDataFromMobile?Userid=" + userID + "&ResetID=" + uniqueID;
+
+            LogUtils.d("here reset url  " + urlStr);
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, urlStr,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String _response) {
+
+                            Log.d("logr  _response =", _response);
+
+                            if (_response.contains("true")) {
+
+                                isResetLinkGenerated(pwdResetLink, userID);
+                            }
+                            else {
+
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    // Error handling
+//                    Log.d("logr  error =", error.getMessage());
+
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    final Map<String, String> headers = new HashMap<>();
+                    String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+
+                    headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                    return headers;
+                }
+
+                @Override
+                protected VolleyError parseNetworkError(VolleyError volleyError) {
+                    if (volleyError.networkResponse != null && volleyError.networkResponse.data != null) {
+                        VolleyError error = new VolleyError(new String(volleyError.networkResponse.data));
+                        volleyError = error;
+                        Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
+
+                    }
+                    return volleyError;
+                }
+            };
+            VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
+        }
+    }
+
+    public void isResetLinkGenerated(String pwdResetLink, String userID) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/SendPasswordResetEmail?SiteID=" + appUserModel.getSiteIDValue() + "&Userid=" + userID + "&ToEmailID=" + editResetMail.getText().toString() + "&PublicContentURL=" + pwdResetLink;
+
+        LogUtils.d("here reset url  " + urlStr);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, urlStr,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String _response) {
+
+                        Log.d("logr  _response =", _response);
+
+                        if (_response.contains("true")) {
+
+                            finish();
+
+                            Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.password_reset_link_send_success), Toast.LENGTH_SHORT).show();
+                        } else {
+
+                            Toast.makeText(ForgotPasswordActivity.this,"Failed to Send Reset Link, Contact Site Admin", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                // Error handling
+//                    Log.d("logr  error =", error.getMessage());
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+
+            @Override
+            protected VolleyError parseNetworkError(VolleyError volleyError) {
+                if (volleyError.networkResponse != null && volleyError.networkResponse.data != null) {
+                    VolleyError error = new VolleyError(new String(volleyError.networkResponse.data));
+                    volleyError = error;
+                    Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
+
+                }
+                return volleyError;
+            }
+        };
+        VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
+    }
+
+
     @Override
     public void onBackPressed() {
 
@@ -230,4 +362,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 }

@@ -39,18 +39,7 @@
             android:padding="5dp"
             android:text="Menu Item"
             android:textColor="@color/colorBlack"
-            android:textSize="14sp" />
-
-        <ImageView
-            android:id="@+id/moreoptionsicon"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/ic_more_vert_black_24dp"
-            android:visibility="gone" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/editoptionicon"

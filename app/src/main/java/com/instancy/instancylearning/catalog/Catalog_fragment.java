@@ -595,10 +595,16 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
+//            EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
+//            txtSearch.setHint("Search..");
+//            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+//            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override

@@ -2,6 +2,7 @@ package com.instancy.instancylearning.sidemenumodule;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -12,11 +13,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -31,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.instancy.instancylearning.R;
@@ -221,7 +225,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         });
 
         if (isNetworkConnectionAvailable(this, -1)) {
-            refreshCatalog();
+            refreshNotification();
             NOTIFICATIONVIWED = 0;
         } else {
 
@@ -570,25 +574,45 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-//            if (getFragmentManager().getBackStackEntryCount() > 0) {
-//                getFragmentManager().popBackStack();
-//                return;
-//            }
-//            if (!doubleBackToExitPressedOnce) {
-//                this.doubleBackToExitPressedOnce = true;
-//                Toast.makeText(this, "Please click BACK again to exit.", Toast.LENGTH_SHORT).show();
-//
-//                new Handler().postDelayed(new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-//                        doubleBackToExitPressedOnce = false;
-//                    }
-//                }, 2000);
-//            } else {
+            if (getFragmentManager().getBackStackEntryCount() > 0) {
+                getFragmentManager().popBackStack();
+                return;
+            }
+            if (!doubleBackToExitPressedOnce) {
+                this.doubleBackToExitPressedOnce = true;
+//                Toast.makeText(this, "      Please click BACK again to exit.      ", Toast.LENGTH_SHORT).show();
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(getResources().getString(R.string.exitapplication))
+                        .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                    }
+                }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //do things
+                        dialog.dismiss();
+                        finish();
+
+                    }
+                });
+                AlertDialog alert = builder.create();
+//                TextView textView = (TextView) alert.findViewById(android.R.id.title);
+//                textView.setTextSize(20);
+                alert.show();
+
+                new Handler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        doubleBackToExitPressedOnce = false;
+                    }
+                }, 2000);
+            } else {
             super.onBackPressed();
-//                return;
-//            }
+                return;
+            }
         }
     }
 
@@ -639,6 +663,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     public void backToMainSite() {
         BACKTOMAINSITE = 2;
+        NOTIFICATIONVIWED = 1;
         homeModel = tempHomeModel;
         SIDEMENUOPENED_FIRSTTIME = 0;
         CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
@@ -773,10 +798,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         Log.d(TAG, "onDrawerOpened: sidemenu");
         if (SIDEMENUOPENED_FIRSTTIME == 0) {
             enteredSubsiteMethods();
+            NOTIFICATIONVIWED = 1;
         }
 
         if (isNetworkConnectionAvailable(this, -1) && NOTIFICATIONVIWED == 1) {
-            refreshCatalog();
+            refreshNotification();
             NOTIFICATIONVIWED = 0;
         } else {
 
@@ -854,7 +880,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         return exists;
     }
 
-    public void refreshCatalog() {
+    public void refreshNotification() {
 
         vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
 

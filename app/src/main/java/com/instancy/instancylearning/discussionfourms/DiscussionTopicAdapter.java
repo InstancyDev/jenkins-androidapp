@@ -137,6 +137,16 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
+
+        if (discussionTopicModelList.get(position).createduserid.equalsIgnoreCase(appUserModel.getUserIDValue())) {
+
+            holder.btnContextMenu.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+        }
+
+
         String imgUrl = appUserModel.getSiteURL() + discussionTopicModelList.get(position).imagedata;
         Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 

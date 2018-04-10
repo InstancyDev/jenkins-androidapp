@@ -115,16 +115,11 @@ public class PeopleProfileExpandAdapter extends BaseExpandableListAdapter {
         pView = inflater.inflate(R.layout.profilesectionview, parent, false);
         View view = (View) pView.findViewById(R.id.topview);
 //        }
-        ImageView moreOptions = (ImageView) pView.findViewById(R.id.moreoptionsicon);
-        moreOptions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                Log.d("TAG", "onClick: ");
-            }
-        });
+        TextView editOptions = (TextView) pView
+                .findViewById(R.id.editoptionicon);
 
-        moreOptions.setVisibility(View.INVISIBLE);
+        editOptions.setVisibility(View.INVISIBLE);
 
         TextView listTitleTextView = (TextView) pView
                 .findViewById(R.id.profilesection);

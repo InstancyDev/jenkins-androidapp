@@ -215,7 +215,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_users));
                 break;
             case "10":
-                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_connectdevelop));
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_user_plus));
                 break;
             case "13":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_connectdevelop));
@@ -297,7 +297,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 fontIcon.setText(cView.getResources().getString(R.string.fa_icon_users));
                 break;
             case "10":
-                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_connectdevelop));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_user_plus));
                 break;
             case "13":
                 fontIcon.setText(cView.getResources().getString(R.string.fa_icon_connectdevelop));

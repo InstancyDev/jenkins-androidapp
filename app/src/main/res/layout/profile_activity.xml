@@ -37,8 +37,8 @@
             android:focusable="true"
             android:groupIndicator="@null"
             android:paddingBottom="5dp"
-            android:paddingEnd="35dp"
-            android:paddingStart="35dp"
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp"
             android:paddingTop="3dp"
             android:scrollbars="none"> </ExpandableListView>
 
