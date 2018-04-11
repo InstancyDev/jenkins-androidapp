@@ -112,11 +112,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.txt_user), iconFont);
-        btnSubmit.setBackgroundResource(R.drawable.round_corners);
-        GradientDrawable drawable = (GradientDrawable) btnSubmit.getBackground();
-        drawable.setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+//        btnSubmit.setBackgroundResource(R.drawable.round_corners);
+//        GradientDrawable drawable = (GradientDrawable) btnSubmit.getBackground();
+//        drawable.setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        btnSubmit.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         llForgot.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
         txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));

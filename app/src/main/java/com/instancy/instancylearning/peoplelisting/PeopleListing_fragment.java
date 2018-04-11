@@ -17,6 +17,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -46,6 +47,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.ChatActivity;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -66,6 +68,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +79,7 @@ import butterknife.ButterKnife;
 import info.hoang8f.android.segmented.SegmentedGroup;
 
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
@@ -692,6 +696,22 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
 //                    Toast.makeText(context, "View Content", Toast.LENGTH_SHORT).show();
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    Bundle bundle = new Bundle();
+
+                    Catalog_fragment nextFrag = new Catalog_fragment();
+                    fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    bundle.putSerializable("sidemenumodel", sideMenusModel);
+
+                    bundle.putBoolean("ISFROMPEOPELLISTING", true);
+
+                    nextFrag.setArguments(bundle);
+                    getActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container_body, nextFrag)
+                            .addToBackStack(BACK_STACK_ROOT_TAG)
+                            .commit();
+
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Accept Connection")) {

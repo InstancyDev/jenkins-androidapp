@@ -9,8 +9,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:textAlignment="textStart"
-    android:background="@color/colorGray"
+    android:background="@color/colorDarkGrey"
     android:textColor="@color/colorWhite"
     android:textSize="18sp"
-    android:text="Notification"/>
+    android:text="Preferences"/>
 </LinearLayout>

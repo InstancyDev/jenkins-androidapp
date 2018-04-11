@@ -557,6 +557,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                 navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
                 navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
+
+            }
+            if (menuid == 99 || menuid == 100) {
+
+                lastClicked = -1;
+                navDrawerExpandableView.setItemChecked(lastClicked,false);
+                menuDynamicAdapter.notifyDataSetChanged();
             }
 
             drawer.closeDrawer(Gravity.LEFT);
@@ -610,7 +617,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     }
                 }, 2000);
             } else {
-            super.onBackPressed();
+                super.onBackPressed();
                 return;
             }
         }

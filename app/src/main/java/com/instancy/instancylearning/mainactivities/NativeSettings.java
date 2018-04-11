@@ -138,7 +138,7 @@ public class NativeSettings extends AppCompatActivity {
                     final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(NativeSettings.this);
                     builder.setMessage("Do you want to reset the site URL!").setTitle("Are you sure?")
                             .setCancelable(false)
-                            .setPositiveButton("Yes,reset it!", new DialogInterface.OnClickListener() {
+                            .setPositiveButton("Yes, reset it!", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     //do things
 
@@ -199,7 +199,7 @@ public class NativeSettings extends AppCompatActivity {
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)
-                .setTitle("RESET SITE URL")
+                .setTitle("SITE URL")
                 .setPositiveButton("SAVE",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {

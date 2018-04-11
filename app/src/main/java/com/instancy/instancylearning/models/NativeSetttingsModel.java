@@ -20,9 +20,9 @@ public class NativeSetttingsModel {
 
         if (!isLogin) {
             List<String> cricket = new ArrayList<String>();
-            cricket.add("Reset URL");
-            cricket.add("Site URL");
-            expandableListDetail.put("SITE SETTINGS", cricket);
+            cricket.add("Reset site URL");
+            cricket.add("Change site URL");
+            expandableListDetail.put("Preferences", cricket);
         } else {
             List<String> football = new ArrayList<String>();
 

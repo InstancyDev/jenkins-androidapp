@@ -165,6 +165,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
     boolean isFromCatogories = false;
+    boolean isFromPeopleListing = false;
     WebAPIClient webAPIClient;
 
     MembershipModel membershipModel = null;
@@ -257,6 +258,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
 
             isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
+
+            isFromPeopleListing = bundle.getBoolean("ISFROMPEOPELLISTING", false);
 
             if (isFromNotification) {
 

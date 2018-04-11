@@ -141,7 +141,7 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.txtAuthor.setVisibility(View.GONE);
         holder.view.setVisibility(View.INVISIBLE);
 
-        if (discussionCommentsModels.get(position).replyID.equalsIgnoreCase(appUserModel.getUserIDValue())) {
+        if (discussionCommentsModels.get(position).postedBy.equalsIgnoreCase(appUserModel.getUserIDValue())) {
 
             holder.btnContextMenu.setVisibility(View.VISIBLE);
         }
