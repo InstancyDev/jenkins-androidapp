@@ -378,11 +378,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.txtTitle.setEnabled(false);
         } else if (trackChildList.getShowStatus().equalsIgnoreCase("hide")) {
             childView.setVisibility(View.GONE);
-        }
-        else if (trackChildList.getShowStatus().equalsIgnoreCase("autolaunch") && autoLaunch) {
-            if (trackChildList.getStatus().equalsIgnoreCase("Not Started")){
+        } else if (trackChildList.getShowStatus().equalsIgnoreCase("autolaunch") && autoLaunch) {
+            if (trackChildList.getStatus().equalsIgnoreCase("Not Started")) {
                 holder.imgThumb.performClick();
-                Log.d("AUTO", "getChildView: autolaunch "+trackChildList.getCourseName());
+                Log.d("AUTO", "getChildView: autolaunch " + trackChildList.getCourseName());
             }
             autoLaunch = false;
         } else {
@@ -550,20 +549,29 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 break;
             case "11":
             case "14":
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getStartPage();
+                if (learningModel.getObjecttypeId().equalsIgnoreCase("11") && learningModel.getJwvideokey().length() > 0 & learningModel.getCloudmediaplayerkey().length() > 0) {
+                    //JW Standalone video content in offline mode.
+
+                    downloadSourcePath[0] = "https://content.jwplatform.com/videos/" + learningModel.getJwvideokey() + ".mp4";
+
+                } else {
+
+                    downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                            + learningModel.getFolderPath() + "/" + learningModel.getStartPage();
+                }
+
                 isZipFile = false;
                 break;
             case "8":
             case "9":
             case "10":
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                        + learningModel.getFolderPath() + "/" + learningModel.getContentID() + ".zip";
                 isZipFile = true;
                 break;
             default:
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID()
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                        + learningModel.getFolderPath() + "/" + learningModel.getContentID()
                         + ".zip";
                 isZipFile = true;
                 break;
@@ -586,8 +594,8 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                         downloadThin(downloadSourcePath[0], learningModel, position, view, Gposition);
 
                     } else {
-                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                                + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                                + learningModel.getFolderPath() + "/" + learningModel.getContentID() + ".zip";
                         downloadThin(downloadSourcePath[0], learningModel, position, view, Gposition);
 
                     }

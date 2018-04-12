@@ -115,6 +115,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @BindView(R.id.txtbtn_settings)
     TextView txtBtnSettings;
 
+    @BindView(R.id.txtbtn_sendmessage)
+    TextView txtBtnsendMessage;
+
     @BindView(R.id.txtbtn_back)
     TextView textBtnBack;
 
@@ -127,13 +130,14 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @BindView(R.id.notification_layout)
     RelativeLayout notificationLayout;
 
-
     @BindView(R.id.subsitelayout)
     LinearLayout subsiteLayout;
 
-
     @BindView(R.id.back_font)
     TextView fontBack;
+
+    @BindView(R.id.sendmessage_font)
+    TextView sendMessagFont;
 
     @BindView(R.id.settings_font)
     TextView fontSettings;
@@ -143,6 +147,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     @BindView(R.id.txtbtn_notification)
     TextView txtBtnNotification;
+
+    @BindView(R.id.subsitename)
+    TextView subsiteName;
+
 
     VollyService vollyService;
     IResult resultCallback = null;
@@ -235,6 +243,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
         notificationLayout.setVisibility(View.VISIBLE);
+
+        updateBottomButtonColor();
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
@@ -538,7 +548,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");
-                fragment = new com.instancy.instancylearning.menufragments.Catalog_fragment();
+
                 break;
         }
 
@@ -562,7 +572,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             if (menuid == 99 || menuid == 100) {
 
                 lastClicked = -1;
-                navDrawerExpandableView.setItemChecked(lastClicked,false);
+                navDrawerExpandableView.setItemChecked(lastClicked, false);
                 menuDynamicAdapter.notifyDataSetChanged();
             }
 
@@ -573,6 +583,23 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     }
 
     boolean doubleBackToExitPressedOnce = false;
+
+    public void updateBottomButtonColor() {
+
+        backLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+        sendMessageLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+        notificationLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+        txtBtnNotification.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+        txtBtnSettings.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+        txtBtnsendMessage.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+        fontSettings.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+        fontBack.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+        fontNotification.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+        textBtnBack.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+        sendMessagFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -608,7 +635,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 //                TextView textView = (TextView) alert.findViewById(android.R.id.title);
 //                textView.setTextSize(20);
                 alert.show();
-
                 new Handler().postDelayed(new Runnable() {
 
                     @Override
@@ -711,8 +737,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
 
         backLayout.setVisibility(View.GONE);
-
+        toggle.getDrawerArrowDrawable().setColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
+        Drawable bd = getDrawableFromStringHOmeMethod(R.string.fa_icon_home, this, uiSettingsModel.getAppHeaderTextColor());
+        toolbar.setLogo(bd);
         homeControllClicked(false, 0, "", false, "");
+
+        updateBottomButtonColor();
+
     }
 
 
@@ -826,6 +857,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             lastClicked = -1;
             TextView mainSiteName = (TextView) backLayout.findViewById(R.id.txtbtn_back);
             TextView subsiteName = (TextView) subsiteLayout.findViewById(R.id.subsitename);
+            mainSiteName.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             LinearLayout subsiteLa = (LinearLayout) subsiteLayout.findViewById(R.id.subsitelays);
             subsiteName.setText(appUserModel.getSiteName());
             mainSiteName.setText(appUserModel.getMainSiteName());
@@ -857,6 +889,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 i++;
             }
             menuDynamicAdapter.refreshList(sideMenumodelList, hmSubMenuList);
+            toggle.getDrawerArrowDrawable().setColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
+            Drawable bd = getDrawableFromStringHOmeMethod(R.string.fa_icon_home, this, uiSettingsModel.getAppHeaderTextColor());
+            toolbar.setLogo(bd);
+            updateBottomButtonColor();
+
         } else {
             backLayout.setVisibility(View.GONE);
             subsiteLayout.setVisibility(View.GONE);

@@ -4,11 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
+
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,18 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.SideMenusModel;
+
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.utils.DateUtils;
+
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
-import java.io.UnsupportedEncodingException;
+
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -122,10 +118,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             messageText = (TextView) itemView.findViewById(R.id.text_message_body);
             timeText = (TextView) itemView.findViewById(R.id.text_message_time);
             attachmentImage = (ImageView) itemView.findViewById(R.id.imagethumb);
-//            messageText.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            messageText.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             Drawable tvBackground = (Drawable) messageText.getBackground();
             tvBackground.setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderColor()), PorterDuff.Mode.SRC_ATOP);
+
         }
 
         void bind(final BaseMessage message) {

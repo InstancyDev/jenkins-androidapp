@@ -803,8 +803,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
-
-                if (s.contains("ChatAttachments")) {
+                if (s.length() > 0) {
 
                     String attachmentStr = s.replaceAll("^\"|\"$", "");
 

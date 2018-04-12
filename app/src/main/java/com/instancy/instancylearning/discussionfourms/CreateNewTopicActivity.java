@@ -173,6 +173,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
             isUpdateForum = true;
             editTitle.setText(discussionTopicModel.name);
             editDescription.setText(discussionTopicModel.longdescription);
+            txtSave.setText("Update");
         } else {
 
             isUpdateForum = false;

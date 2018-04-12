@@ -19,7 +19,7 @@ public class MyLearningModel implements Serializable {
         this.completedEvent = completedEvent;
     }
 
-    boolean completedEvent=false;
+    boolean completedEvent = false;
 
     String progress = "";
     String userName = "";
@@ -94,7 +94,18 @@ public class MyLearningModel implements Serializable {
     String trackScoid = "";
     String showStatus = "";
 
-// membership level
+    public String getFolderPath() {
+        return folderPath;
+    }
+
+    public void setFolderPath(String folderPath) {
+        this.folderPath = folderPath;
+    }
+
+    String folderPath = "";
+
+
+    // membership level
     int memberShipLevel = 1;
 
     public int getMemberShipLevel() {
@@ -141,6 +152,25 @@ public class MyLearningModel implements Serializable {
 
     String currency = "";
 
+    String jwvideokey = "";
+
+    public String getJwvideokey() {
+        return jwvideokey;
+    }
+
+    public void setJwvideokey(String jwvideokey) {
+        this.jwvideokey = jwvideokey;
+    }
+
+    public String getCloudmediaplayerkey() {
+        return cloudmediaplayerkey;
+    }
+
+    public void setCloudmediaplayerkey(String cloudmediaplayerkey) {
+        this.cloudmediaplayerkey = cloudmediaplayerkey;
+    }
+
+    String cloudmediaplayerkey = "";
 
     public String getAviliableSeats() {
         return aviliableSeats;

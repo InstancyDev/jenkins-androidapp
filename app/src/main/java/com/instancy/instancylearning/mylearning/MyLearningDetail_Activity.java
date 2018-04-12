@@ -279,7 +279,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
             if (myLearningModel.getSiteName().equalsIgnoreCase("")) {
                 consolidateLine.setVisibility(View.INVISIBLE);
 
@@ -829,7 +828,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             txtCourseStatus.setText(displayStatus + "%)");
         }
-
+        myLearningModel.setStatus(courseStatus);
     }
 
     void initVolleyCallback() {
@@ -975,6 +974,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
                     new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
+                    refreshOrNo = "refresh";
                 } else {
                     openReportsActivity();
                 }
@@ -1094,6 +1094,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //
 //                }
             }
+            refreshCatalogContent = true;
         }
 
         if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
@@ -1120,6 +1121,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 }
 
             }
+            refreshCatalogContent = true;
         }
         refreshOrNo = "refresh";
     }
@@ -1197,20 +1199,29 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 break;
             case "11":
             case "14":
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getStartPage();
+                if (learningModel.getObjecttypeId().equalsIgnoreCase("11") && learningModel.getJwvideokey().length() > 0 & learningModel.getCloudmediaplayerkey().length() > 0) {
+                    //JW Standalone video content in offline mode.
+
+                    downloadSourcePath[0] = "https://content.jwplatform.com/videos/" + learningModel.getJwvideokey() + ".mp4";
+
+                } else {
+
+                    downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                            + learningModel.getFolderPath() + "/" + learningModel.getStartPage();
+                }
+
                 isZipFile = false;
                 break;
             case "8":
             case "9":
             case "10":
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                        + learningModel.getFolderPath() + "/" + learningModel.getContentID() + ".zip";
                 isZipFile = true;
                 break;
             default:
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID()
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                        + learningModel.getFolderPath() + "/" + learningModel.getContentID()
                         + ".zip";
                 isZipFile = true;
                 break;
@@ -1232,8 +1243,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         downloadThin(downloadSourcePath[0], view, learningModel);
 
                     } else {
-                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                                + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                                + learningModel.getFolderPath() + "/" + learningModel.getContentID() + ".zip";
                         downloadThin(downloadSourcePath[0], view, learningModel);
 
                     }
@@ -1360,7 +1371,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             btnDownload.setVisibility(View.VISIBLE);
             circleProgressBar.setVisibility(View.GONE);
             btnDownload.setEnabled(false);
-
+            refreshOrNo = "refresh";
         }
     }
 
@@ -1449,7 +1460,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
                 + userName + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" +  learningModel.getSiteID();
+                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + learningModel.getSiteID();
 
 
         urlStr = urlStr.replaceAll(" ", "%20");
@@ -1857,7 +1868,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
 
 //        myLearningModel.setRatingId("" + ratingValue);
-        refreshCatalogContent = true;
+
 
         if (jsonObject.has("UserRatingDetails")) {
             JSONArray userRatingJsonAry = jsonObject.getJSONArray("UserRatingDetails");

@@ -14,6 +14,7 @@ import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -112,6 +113,8 @@ public class Reports_Activity extends AppCompatActivity {
     TextView nodataLabel;
 
 
+    View header;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +136,8 @@ public class Reports_Activity extends AppCompatActivity {
 
         reportAdapter = new ReportAdapter(this, BIND_ABOVE_CLIENT, reportDetailList, reportDetailsForQuestionsArrayList, false);
         reportsListview.setAdapter(reportAdapter);
+
+        header = (View) getLayoutInflater().inflate(R.layout.detailsheader, null);
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -157,6 +162,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         } else {
             injectFromDbtoModel();
+
         }
 
     }
@@ -164,7 +170,7 @@ public class Reports_Activity extends AppCompatActivity {
     public void getDownloadedMobileContentMetaData() {
 
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-
+        nodataLabel.setText("");
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?SiteURL=" + appUserModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid=" + learningModel.getUserID() + "&DelivoryMode=1&IsDownload=0&IsDownload=0";
 
         vollyService.getJsonObjResponseVolley("DMCD", urlString, appUserModel.getAuthHeaders());
@@ -209,7 +215,7 @@ public class Reports_Activity extends AppCompatActivity {
                     injectFromDbtoModel();
                 }
 //
-                svProgressHUD.dismiss();
+
             }
 
             @Override
@@ -277,6 +283,8 @@ public class Reports_Activity extends AppCompatActivity {
                 if (reportDetailList.size() > 0) {
                     getTotalTime = returnTotalTime(reportDetailList);
                     reportDetail.timeSpent = getTotalTime;
+                    reportsListview.addHeaderView(header);
+
                 } else {
 
                     getTotalTime = "0:00:00";
@@ -290,6 +298,8 @@ public class Reports_Activity extends AppCompatActivity {
             updateUI(reportDetail);
 
         }
+
+        svProgressHUD.dismiss();
     }
 
     public String returnTotalTime(List<ReportDetail> reportDetailList) {
@@ -345,7 +355,6 @@ public class Reports_Activity extends AppCompatActivity {
         return timeStr;
     }
 
-
     public void updateUI(ReportDetail reportDetail) {
 
         txtName.setText(learningModel.getCourseName());
@@ -368,7 +377,6 @@ public class Reports_Activity extends AppCompatActivity {
 
         txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
 //        txtStatus.setTextSize(12);
-
 
         String statusFromModel = learningModel.getStatus();
 

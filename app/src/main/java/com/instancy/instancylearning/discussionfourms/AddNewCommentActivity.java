@@ -162,7 +162,6 @@ public class AddNewCommentActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 "Add Comment" + "</font>"));
 
-
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -344,7 +343,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (descriptionStr.length() < 10) {
-            Toast.makeText(AddNewCommentActivity.this, "Enter description", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddNewCommentActivity.this, "Enter Comment", Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();

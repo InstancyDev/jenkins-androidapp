@@ -20,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true">
-
         <include layout="@layout/reportscell" />
 
     </RelativeLayout>
@@ -32,8 +31,12 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/topicheader"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10dp"
-        android:padding="8dp"
+        android:dividerHeight="8dp"
+        android:paddingBottom="5dp"
+        android:paddingEnd="15dp"
+        android:paddingStart="15dp"
+        android:paddingTop="3dp"
+
         android:scrollbars="none"> </ListView>
 
 

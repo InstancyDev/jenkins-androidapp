@@ -316,13 +316,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
 
         //used upto here
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -351,16 +351,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
                 + "(lrsid INTEGER PRIMARY KEY AUTOINCREMENT,LRS TEXT,url TEXT,method TEXT,data TEXT,auth TEXT,callback TEXT,lrsactor TEXT,extraHeaders TEXT,siteid INTEGER,scoid INTEGER,userid INTEGER,isupdate TEXT)");
@@ -2293,6 +2293,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
 
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.getString("folderpath"));
+
+                }
+
+                //jwvideokey
+                if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                    if (isValidString(jwKey)){
+                        myLearningModel.setJwvideokey(jwKey);
+                    }else {
+                        myLearningModel.setJwvideokey("");
+                    }
+
+                }
+
+                //cloudmediaplayerkey
+                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                    if (isValidString(jwKey)){
+                        myLearningModel.setCloudmediaplayerkey(jwKey);
+                    }else {
+                        myLearningModel.setCloudmediaplayerkey("");
+                    }
+                }
+
 //            injectIntoRowWise(myLearningModel);
                 injectMyLearningIntoTable(myLearningModel, false);
             }
@@ -2357,7 +2391,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("progress", myLearningModel.getProgress());
             contentValues.put("membershiplevel", myLearningModel.getMemberShipLevel());
             contentValues.put("membershipname", myLearningModel.getMembershipname());
+            contentValues.put("folderpath", myLearningModel.getFolderPath());
 
+            contentValues.put("jwvideokey", myLearningModel.getJwvideokey());
+            contentValues.put("cloudmediaplayerkey", myLearningModel.getCloudmediaplayerkey());
 
             if (subscibed) {
 
@@ -2492,9 +2529,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setMemberShipLevel(cursor.getInt(cursor
                             .getColumnIndex("membershiplevel")));
+
                     myLearningModel.setMembershipname(cursor.getString(cursor
                             .getColumnIndex("membershipname")));
 
+                    myLearningModel.setFolderPath(cursor.getString(cursor
+                            .getColumnIndex("folderpath")));
+
+                    myLearningModel.setJwvideokey(cursor.getString(cursor
+                            .getColumnIndex("jwvideokey")));
+
+                    myLearningModel.setCloudmediaplayerkey(cursor.getString(cursor
+                            .getColumnIndex("cloudmediaplayerkey")));
 
                     myLearningModelList.add(myLearningModel);
 
@@ -2929,13 +2975,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
 
+                //folderpath
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.get("folderpath").toString());
+
+                }
+
+                //jwvideokey
+                if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                    if (isValidString(jwKey)){
+                        myLearningModel.setJwvideokey(jwKey);
+                    }else {
+                        myLearningModel.setJwvideokey("");
+                    }
+
+                }
+
+                //cloudmediaplayerkey
+                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                    if (isValidString(jwKey)){
+                        myLearningModel.setCloudmediaplayerkey(jwKey);
+                    }else {
+                        myLearningModel.setCloudmediaplayerkey("");
+                    }
+                }
+
                 injectCatalogDataIntoTable(myLearningModel, isFromCatageories);
             }
 
         }
 
     }
-
 
     public void injectCatalogDataIntoTable(MyLearningModel myLearningModel, boolean isFromCatageories) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -2984,6 +3063,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("isaddedtomylearning", myLearningModel.getAddedToMylearning());
             contentValues.put("membershiplevel", myLearningModel.getMemberShipLevel());
             contentValues.put("membershipname", myLearningModel.getMembershipname());
+            contentValues.put("folderpath", myLearningModel.getFolderPath());
+
+            contentValues.put("jwvideokey", myLearningModel.getJwvideokey());
+            contentValues.put("cloudmediaplayerkey", myLearningModel.getCloudmediaplayerkey());
+
 
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -3131,6 +3215,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("membershiplevel")));
                     myLearningModel.setMembershipname(cursor.getString(cursor
                             .getColumnIndex("membershipname")));
+
+                    myLearningModel.setFolderPath(cursor.getString(cursor
+                            .getColumnIndex("folderpath")));
+
+
+                    myLearningModel.setJwvideokey(cursor.getString(cursor
+                            .getColumnIndex("jwvideokey")));
+
+                    myLearningModel.setCloudmediaplayerkey(cursor.getString(cursor
+                            .getColumnIndex("cloudmediaplayerkey")));
 
                     myLearningModel.setEventAddedToCalender(false);
 
@@ -3590,6 +3684,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setAddedToMylearning(Integer.parseInt(jsonMyLearningColumnObj.get("isaddedtomylearning").toString()));
 
                 }
+
+                //viewtype
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.get("folderpath").toString());
+
+                }
+
+
                 injectEventCatalogDataIntoTable(myLearningModel);
             }
 
@@ -3650,7 +3753,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("availableseats", myLearningModel.getAviliableSeats());
             contentValues.put("joinurl", myLearningModel.getJoinurl());
 
-            contentValues.put("isaddedtomylearning ", myLearningModel.getAddedToMylearning());
+            contentValues.put("isaddedtomylearning", myLearningModel.getAddedToMylearning());
+
+            contentValues.put("folderpath", myLearningModel.getFolderPath());
+
+
 
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -3796,6 +3903,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setAddedToMylearning(cursor.getInt(cursor
                             .getColumnIndex("isaddedtomylearning")));
+
+                    myLearningModel.setFolderPath(cursor.getString(cursor
+                            .getColumnIndex("folderpath")));
 
                     myLearningModel.setEventAddedToCalender(false);
 
@@ -4275,6 +4385,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     trackLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
 
+                }
+
+                // folderpath
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    trackLearningModel.setFolderPath(jsonMyLearningColumnObj.get("folderpath").toString());
+
+                }
+
+                //jwvideokey
+                if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                    if (isValidString(jwKey)){
+                        trackLearningModel.setJwvideokey(jwKey);
+                    }else {
+                        trackLearningModel.setJwvideokey("");
+                    }
+
+                }
+
+                //cloudmediaplayerkey
+                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                    trackLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                    if (isValidString(jwKey)){
+                        trackLearningModel.setCloudmediaplayerkey(jwKey);
+                    }else {
+                        trackLearningModel.setCloudmediaplayerkey("");
+                    }
                 }
 
                 //sitename
@@ -4795,6 +4939,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("ruleid", "0");
             contentValues.put("stepid", "0");
             contentValues.put("wmessage", "");
+            contentValues.put("folderpath", trackListModel.getFolderPath());
+            contentValues.put("jwvideokey", trackListModel.getJwvideokey());
+            contentValues.put("cloudmediaplayerkey", trackListModel.getCloudmediaplayerkey());
+
 
             db.insert(TBL_TRACKLISTDATA, null, contentValues);
 
@@ -4937,6 +5085,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     trackListModel.setShowStatus(cursor.getString(cursor
                             .getColumnIndex("showstatus")));
+
+                    trackListModel.setFolderPath(cursor.getString(cursor
+                            .getColumnIndex("folderpath")));
+
+
+                    trackListModel.setJwvideokey(cursor.getString(cursor
+                            .getColumnIndex("jwvideokey")));
+
+                    trackListModel.setCloudmediaplayerkey(cursor.getString(cursor
+                            .getColumnIndex("cloudmediaplayerkey")));
 // for tracklis
 
                     if (isTrackListView) {
@@ -5104,6 +5262,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("offlinepath", trackListModel.getOfflinepath());
             contentValues.put("trackContentId", trackListModel.getOfflinepath());
             contentValues.put("showstatus", trackListModel.getShowStatus());
+            contentValues.put("folderpath", trackListModel.getFolderPath());
+            contentValues.put("jwvideokey", trackListModel.getJwvideokey());
+            contentValues.put("cloudmediaplayerkey", trackListModel.getCloudmediaplayerkey());
+
             contentValues.put("ruleid", "0");
             contentValues.put("stepid", "0");
             contentValues.put("wmessage", "");
@@ -9646,6 +9808,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
                 }
+
+
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.getString("folderpath"));
+
+                }
+
+                //jwvideokey
+                if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                    if (isValidString(jwKey)){
+                        myLearningModel.setJwvideokey(jwKey);
+                    }else {
+                        myLearningModel.setJwvideokey("");
+                    }
+
+                }
+
+                //cloudmediaplayerkey
+                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                    if (isValidString(jwKey)){
+                        myLearningModel.setCloudmediaplayerkey(jwKey);
+                    }else {
+                        myLearningModel.setCloudmediaplayerkey("");
+                    }
+                }
+
+
 
                 //sitename
                 if (jsonMyLearningColumnObj.has("progress")) {
@@ -14719,7 +14918,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ReportDetailsForQuestions reportDetail = new ReportDetailsForQuestions();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuerys = "SELECT distinct sr.questionid, q.quesname, sr.result  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + learningModel.getUserID() + " ORDER by sr.questionid";
+        String strSelQuerys = "SELECT distinct sr.questionid, q.quesname, sr.result  from QUESTIONS q inner join " + TBL_STUDENTRESPONSES + " sr on sr.questionid = q.questionid  AND sr.scoid = q.scoid where sr.userid = " + learningModel.getUserID() + " AND sr.scoid = " + learningModel.getScoId() + " AND sr.siteid =  " + learningModel.getSiteID() + " ORDER by sr.questionid";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
         try {

@@ -270,7 +270,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         ButterKnife.bind(this, rootView);
 
         View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.profile_header_layout_, null);
-        swipeRefreshLayout.setOnRefreshListener(this); // no games
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         profileRound = (ImageView) header.findViewById(R.id.profile_round);
 

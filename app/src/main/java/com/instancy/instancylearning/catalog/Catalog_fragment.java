@@ -1397,6 +1397,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 boolean refresh = data.getBooleanExtra("REFRESH", false);
                 if (refresh) {
                     injectFromDbtoModel();
+                    MenuItemCompat.collapseActionView(item_search);
                 }
             }
         }
@@ -1435,6 +1436,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
 
                 injectFromDbtoModel();
+                MenuItemCompat.collapseActionView(item_search);
             }
 
         }
@@ -1661,20 +1663,29 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 break;
             case "11":
             case "14":
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getStartPage();
+                if (learningModel.getObjecttypeId().equalsIgnoreCase("11") && learningModel.getJwvideokey().length() > 0 & learningModel.getCloudmediaplayerkey().length() > 0) {
+                    //JW Standalone video content in offline mode.
+
+                    downloadSourcePath[0] = "https://content.jwplatform.com/videos/" + learningModel.getJwvideokey() + ".mp4";
+
+                } else {
+
+                    downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                            + learningModel.getFolderPath() + "/" + learningModel.getStartPage();
+                }
+
                 isZipFile = false;
                 break;
             case "8":
             case "9":
             case "10":
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                        + learningModel.getFolderPath() + "/" + learningModel.getContentID() + ".zip";
                 isZipFile = true;
                 break;
             default:
-                downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                        + learningModel.getContentID() + "/" + learningModel.getContentID()
+                downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                        + learningModel.getFolderPath() + "/" + learningModel.getContentID()
                         + ".zip";
                 isZipFile = true;
                 break;
@@ -1696,8 +1707,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         downloadThin(downloadSourcePath[0], view, learningModel, position);
 
                     } else {
-                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/sitefiles/"
-                                + learningModel.getContentID() + "/" + learningModel.getContentID() + ".zip";
+                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/publishfiles/"
+                                + learningModel.getFolderPath() + "/" + learningModel.getContentID() + ".zip";
                         downloadThin(downloadSourcePath[0], view, learningModel, position);
 
                     }

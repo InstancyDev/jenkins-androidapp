@@ -130,7 +130,7 @@ public class Personalinfo_activity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(context);
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
-        countriesWebApiCall(appUserModel.getUserIDValue());
+
         profileConfigsModelist = new ArrayList<>();
 
         Bundle bundle = getIntent().getExtras();
@@ -155,12 +155,32 @@ public class Personalinfo_activity extends AppCompatActivity {
         }
 
         if (isNetworkConnectionAvailable(this, -1)) {
+            int i = returnHide();
+            if (i == 1) {
+                countriesWebApiCall(appUserModel.getUserIDValue());
+            }
 
         } else {
 
         }
         assert bottomLayout != null;
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+    }
+
+
+    public int returnHide() {
+        int returnValue = 0;
+
+        if (profileConfigsModelist.size() > 0) {
+
+            for (int i = 0; i < profileConfigsModelist.size(); i++) {
+
+                if (profileConfigsModelist.get(i).names.equalsIgnoreCase("DropDownList")) {
+                    returnValue = 1;
+                }
+            }
+        }
+        return returnValue;
     }
 
     void initVolleyCallback() {
@@ -174,7 +194,7 @@ public class Personalinfo_activity extends AppCompatActivity {
                     if (response != null) {
 
                         try {
-                             jsonArray = response.getJSONArray("table5");
+                            jsonArray = response.getJSONArray("table5");
 
                             Log.d(TAG, "Volley JSON post" + jsonArray.length());
 
@@ -301,31 +321,56 @@ public class Personalinfo_activity extends AppCompatActivity {
             }
         }
 
-        String schoolStr = "";
-        String countryStr = "";
-        String degreeStr = "";
-        String descriptionStr = "";
+        String finalString = "";
+
+//        JSONObject jsonObject = new JSONObject();
+
+        for (int i = 0; i < profileConfigsModelist.size(); i++) {
+
+//            finalString.put(profileConfigsModelist.get(i).datafieldname, profileConfigsModelist.get(i).valueName);
+
+            String keyString = profileConfigsModelist.get(i).datafieldname.toLowerCase();
+
+            String valueString = profileConfigsModelist.get(i).valueName;
+
+//            jsonObject.put(keyString, valueString);
+
+            if (i == profileConfigsModelist.size() - 1) {
+
+                finalString = finalString + keyString + "='" + valueString + "'";
+            } else {
+                finalString = finalString + keyString + "='" + valueString + "',";
+            }
+
+
+        }
+
+//        String newString = jsonObject.toString().replace(":", "=");
+//
+//        String newStringWithoutBraces = newString.replace("{", "");
+//
+//        String newStringWithout = newStringWithoutBraces.replace("}", "");
+//
+//        Log.d(TAG, "validateNewForumCreation: " + finalString);
+//
+        String replaceDataSt = finalString.replace("\'", "\\\'");
 
 
         if (isValidationCompleted) {
 
-            String totalYs = "";
             JSONObject parameters = new JSONObject();
 
-            parameters.put("oldtitle", "");
-            parameters.put("UserID", appUserModel.getUserIDValue());
-            parameters.put("school", schoolStr);
-            parameters.put("Country", countryStr);
-            parameters.put("title", "");
-            parameters.put("degree", degreeStr);
-            parameters.put("fromyear", "");
-            parameters.put("toyear", "");
-            parameters.put("discription", descriptionStr);
-            parameters.put("showfromdate", totalYs);
-            parameters.put("titleEducation", "");
+            //mandatory
+            parameters.put("UserGroupIDs", "");
+            parameters.put("RoleIDs", "");
+            parameters.put("CMGroupIDs", "");
+            parameters.put("Cmd", replaceDataSt);
 
             String parameterString = parameters.toString();
             Log.d(TAG, "validateNewForumCreation: " + parameterString);
+
+//            String replaceDataString = parameterString.replace("\"", "\\\"");
+//            String addQuotes = ('"' + replaceDataString + '"');
 
             if (isNetworkConnectionAvailable(this, -1)) {
                 sendNewOrUpdatedEducationDetailsDataToServer(parameterString);
@@ -348,7 +393,7 @@ public class Personalinfo_activity extends AppCompatActivity {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 
-                if (s.contains("true")) {
+                if (s.contains("success")) {
 
                     if (isNewRecord) {
                         Toast.makeText(context, "Success! \n.You have successfully added the education", Toast.LENGTH_SHORT).show();

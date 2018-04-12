@@ -309,7 +309,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
                     }
                 }
-
                 svProgressHUD.dismiss();
             }
         };

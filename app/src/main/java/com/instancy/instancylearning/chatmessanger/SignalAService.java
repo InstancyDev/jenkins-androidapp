@@ -2,7 +2,7 @@ package com.instancy.instancylearning.chatmessanger;
 
 import android.content.Context;
 import android.content.OperationApplicationException;
-import android.util.Log;
+
 import android.widget.Toast;
 
 import com.instancy.instancylearning.interfaces.Communicator;

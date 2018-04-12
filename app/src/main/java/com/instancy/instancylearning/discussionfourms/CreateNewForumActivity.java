@@ -170,6 +170,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             isUpdateForum = true;
             editTitle.setText(discussionForumModel.name);
             editDescription.setText(discussionForumModel.descriptionValue);
+            txtSave.setText("Update");
         } else {
 
             isUpdateForum = false;

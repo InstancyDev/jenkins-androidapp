@@ -144,13 +144,14 @@
 
         </LinearLayout>
 
-        <!--<View-->
-        <!--android:id="@+id/lineview"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height=".05dp"-->
-        <!--android:layout_below="@+id/linearlayout"-->
-        <!--android:layout_marginTop="1dp"-->
-        <!--android:background="@color/colorDarkGrey"></View>-->
+        <View
+            android:id="@+id/lineview"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_below="@+id/linearlayout"
+            android:layout_marginTop="1dp"
+            android:background="@color/colorDarkGrey"
+            android:visibility="gone"> </View>
 
     </RelativeLayout>
 

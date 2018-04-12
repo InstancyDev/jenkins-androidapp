@@ -18,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -656,7 +657,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 
         if (peopleListingModel.viewContentAction) {
-            menu.getItem(1).setVisible(false);
+            menu.getItem(1).setVisible(true);
         }
 
         // comment for cvcta
@@ -708,9 +709,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     nextFrag.setArguments(bundle);
                     getActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.container_body, nextFrag)
+                            .add(R.id.container_body, nextFrag)
                             .addToBackStack(BACK_STACK_ROOT_TAG)
                             .commit();
+
+//                    replaceFragment();
 
                 }
 
@@ -839,6 +842,20 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         vollyService.getStringResponseVolley("ADDACTION", appUserModel.getWebAPIUrl() + "/MobileLMS/PeopleListingActions?" + paramsEncodeString, appUserModel.getAuthHeaders());
     }
 
+
+    private void replaceFragment (Fragment fragment){
+        String backStateName = fragment.getClass().getName();
+
+        FragmentManager manager =  getActivity().getSupportFragmentManager();
+        boolean fragmentPopped = manager.popBackStackImmediate (backStateName, 0);
+
+        if (!fragmentPopped){ //fragment not in back stack, create it.
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.replace(R.id.container_body, fragment);
+            ft.addToBackStack(backStateName);
+            ft.commit();
+        }
+    }
 
     @Override
     public void onDetach() {

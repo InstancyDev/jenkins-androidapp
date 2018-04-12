@@ -107,7 +107,7 @@ public class ReportAdapter extends BaseAdapter {
             holder.txtName.setText(reportDetailsForQuestionsList.get(position).questionID + ". " + reportDetailsForQuestionsList.get(position).questionName);
             holder.txtDateCompleted.setText(" " + reportDetailsForQuestionsList.get(position).questionAnswer);
 
-
+            holder.lineview.setVisibility(View.GONE);
             if (reportDetailsForQuestionsList.get(position).questionAnswer.contains("in")){
                 holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorRed));
             }
@@ -120,6 +120,7 @@ else {
             holder.txtStatus.setVisibility(View.GONE);
             holder.txtTimeSpent.setVisibility(View.GONE);
             holder.txtStatusTitle.setVisibility(View.GONE);
+
 
         } else {
 
@@ -272,6 +273,9 @@ else {
         @BindView(R.id.txt_statustitle)
         TextView txtStatusTitle;
 
+        @Nullable
+        @BindView(R.id.lineview)
+        View lineview;
 
     }
 }

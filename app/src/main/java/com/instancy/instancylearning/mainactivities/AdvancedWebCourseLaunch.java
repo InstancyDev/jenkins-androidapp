@@ -47,6 +47,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     public SVProgressHUD svProgressHUD;
     hideProgressListner hideProgressListner = null;
 
+    boolean isCloseEnable = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
+            isCloseEnable = bundle.getBoolean("ISCLOSE", false);
 
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
@@ -330,7 +333,10 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        return;
+        if (isCloseEnable) {
+            super.onBackPressed();
+        }
+
     }
 
     @Override
