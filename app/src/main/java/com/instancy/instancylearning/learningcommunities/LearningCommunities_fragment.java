@@ -287,12 +287,17 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         }
 
         if (communitiesModelList.size() > 5) {
-            item_search.setVisible(true);
+            if (item_search != null) {
+                item_search.setVisible(true);
+            }
+
         } else {
-            item_search.setVisible(false);
+            if (item_search != null) {
+                item_search.setVisible(false);
+
+            }
         }
     }
-
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -703,7 +708,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             }
 
             public void onFinish() {
-                ((SideMenu) getActivity()).homeControllClicked(false, 0, "", true,"");
+                ((SideMenu) getActivity()).homeControllClicked(false, 0, "", true, "");
             }
         }.start();
 

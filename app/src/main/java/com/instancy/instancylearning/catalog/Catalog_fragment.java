@@ -37,6 +37,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -76,6 +77,7 @@ import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
+import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -128,12 +130,14 @@ import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
+import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 
@@ -209,6 +213,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public static int REFRESH = 0;
 
+    PeopleListingModel peopleListingModel;
+
     public Catalog_fragment() {
 
 
@@ -228,12 +234,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         membershipModel = new MembershipModel();
-//        try {
-//            communicator = (Communicator) context;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(context.toString()
-//                    + " must implement Communicator");
-//        }
 
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
 //        synchData = new SynchData(context);
@@ -266,6 +266,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 contentIDFromNotification = bundle.getString("CONTENTID");
             }
 
+            if (isFromPeopleListing) {
+
+                peopleListingModel = (PeopleListingModel) bundle.getSerializable("peopleListingModel");
+
+            }
+
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
 
             isFromCatogories = bundle.getBoolean("ISFROMCATEGORIES");
@@ -275,6 +281,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 catalogModelsList = (List<MyLearningModel>) bundle.getSerializable("cataloglist");
                 breadcrumbItemsList = new ArrayList<ContentValues>();
                 breadcrumbItemsList = (List<ContentValues>) bundle.getSerializable("breadicrumblist");
+
             }
         }
         if (responMap != null && responMap.containsKey("Type")) {
@@ -292,6 +299,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
         if (responMap != null && responMap.containsKey("sortby")) {
             sortBy = responMap.get("sortby");
+            if (isFromPeopleListing) {
+                sortBy = "";
+            }
         } else {
             // No such key
             sortBy = "";
@@ -321,6 +331,16 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
+    public void refreshPeopleListingCatalog(String authorID) {
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=1&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&AuthorID=" + authorID;
+
+        vollyService.getJsonObjResponseVolley("PEOPLELISTINGCATALOG", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+    }
+
+
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
@@ -342,6 +362,24 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
+
+
+                if (requestType.equalsIgnoreCase("PEOPLELISTINGCATALOG")) {
+                    if (response != null) {
+                        try {
+
+                            catalogModelsList = generateCatalogForPeopleListing(response);
+                            catalogAdapter.refreshList(catalogModelsList);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
 
                 if (requestType.equalsIgnoreCase("UPDATESTATUS")) {
 
@@ -451,19 +489,26 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
             BACKTOMAINSITE = 0;
         }
-
-        if (!isFromCatogories) {
-            catalogModelsList = new ArrayList<MyLearningModel>();
-            if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
-                refreshCatalog(false);
+        if (!isFromPeopleListing) {
+            if (!isFromCatogories) {
+                catalogModelsList = new ArrayList<MyLearningModel>();
+                if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
+                    refreshCatalog(false);
+                } else {
+                    injectFromDbtoModel();
+                }
             } else {
-                injectFromDbtoModel();
+                swipeRefreshLayout.setEnabled(false);
+
+                catalogAdapter.refreshList(catalogModelsList);
             }
+
         } else {
             swipeRefreshLayout.setEnabled(false);
-
-            catalogAdapter.refreshList(catalogModelsList);
+            refreshPeopleListingCatalog(peopleListingModel.userID);
+            CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
         }
+
 
         initilizeView();
 
@@ -548,7 +593,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            openDetailsPage(catalogModelsList.get(selectedPostion),false);
             isFromNotification = false;
         }
-
     }
 
     public int getPositionForNotification(String contentID) {
@@ -559,12 +603,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 position = k;
                 break;
             }
-
         }
 
         return position;
     }
-
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
@@ -939,6 +981,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Add")) {
 
+//                    if(item.getItemId().)
 //                    addToMyLearning(myLearningDetalData);
                     addToMyLearningCheckUser(myLearningDetalData, position, false);
                 }
@@ -1396,8 +1439,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             if (data != null) {
                 boolean refresh = data.getBooleanExtra("REFRESH", false);
                 if (refresh) {
-                    injectFromDbtoModel();
-                    MenuItemCompat.collapseActionView(item_search);
+                    if (!isFromPeopleListing) {
+                        injectFromDbtoModel();
+                        MenuItemCompat.collapseActionView(item_search);
+                    }
+
                 }
             }
         }
@@ -1435,8 +1481,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 }
 
-                injectFromDbtoModel();
-                MenuItemCompat.collapseActionView(item_search);
+                if (!isFromPeopleListing) {
+                    injectFromDbtoModel();
+                    MenuItemCompat.collapseActionView(item_search);
+                }
             }
 
         }
@@ -1998,5 +2046,458 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         }
     }
+
+
+    public List<MyLearningModel> generateCatalogForPeopleListing(JSONObject jsonObject) throws JSONException {
+
+
+        List<MyLearningModel> myLearningModelList = new ArrayList<>();
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
+        // for deleting records in table for respective table
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            MyLearningModel myLearningModel = new MyLearningModel();
+
+
+            //sitename
+            if (jsonMyLearningColumnObj.has("sitename")) {
+
+                myLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
+            }
+            // siteurl
+            if (jsonMyLearningColumnObj.has("siteurl")) {
+
+                myLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("orgunitid")) {
+
+                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("orgunitid").toString());
+
+            }
+            // userid
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                myLearningModel.setUserID(jsonMyLearningColumnObj.get("userid").toString());
+
+            }
+            // coursename
+
+
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
+
+            }
+
+
+            String authorName = "";
+            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
+                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
+
+            }
+
+            if (isValidString(authorName)) {
+                myLearningModel.setAuthor(authorName);
+            } else {
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+                }
+            }
+
+
+            // contentID
+            if (jsonMyLearningColumnObj.has("contentid")) {
+
+                myLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
+
+            }
+            // createddate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+
+            }
+
+            // durationEndDate
+            if (jsonMyLearningColumnObj.has("durationenddate")) {
+
+                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
+
+            }
+            // objectID
+            if (jsonMyLearningColumnObj.has("objectid")) {
+
+                myLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
+
+            }
+            // thumbnailimagepath
+            if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+
+                String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
+
+
+                if (isValidString(imageurl)) {
+
+                    myLearningModel.setThumbnailImagePath(imageurl);
+                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    myLearningModel.setImageData(imagePathSet);
+
+
+                } else {
+                    if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
+                        String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
+                        if (isValidString(imageurlContentType)) {
+                            String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
+                            myLearningModel.setImageData(imagePathSet);
+
+                        }
+                    }
+
+
+                }
+//                // imagedata
+//                if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+//
+//
+//                } else {
+//
+//                }
+                // relatedcontentcount
+                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
+
+                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
+
+                }
+                // isDownloaded
+                if (jsonMyLearningColumnObj.has("isdownloaded")) {
+
+                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
+
+                }
+                // courseattempts
+                if (jsonMyLearningColumnObj.has("courseattempts")) {
+
+                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
+
+                }
+                // objecttypeid
+                if (jsonMyLearningColumnObj.has("objecttypeid")) {
+
+                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
+
+                }
+                // scoid
+                if (jsonMyLearningColumnObj.has("scoid")) {
+
+                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
+
+                }
+                // startpage
+                if (jsonMyLearningColumnObj.has("startpage")) {
+
+                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
+
+                }
+                // status
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+
+                // shortdes
+                if (jsonMyLearningColumnObj.has("shortdescription")) {
+
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
+
+                    myLearningModel.setShortDes(result.toString());
+
+                }
+
+                // longdes
+                if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+
+//                    myLearningModel.setShortDes(result.toString());
+                    myLearningModel.setLongDes(result.toString());
+
+                }
+                // typeofevent
+                if (jsonMyLearningColumnObj.has("typeofevent")) {
+
+                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+
+                    myLearningModel.setTypeofevent(typeoFEvent);
+
+                }
+
+                // medianame
+                if (jsonMyLearningColumnObj.has("medianame")) {
+                    String medianame = "";
+
+                    if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                        if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
+                            medianame = "Assessment(Test)";
+
+                        } else {
+                            medianame = jsonMyLearningColumnObj.get("medianame").toString();
+                        }
+                    } else {
+                        if (myLearningModel.getTypeofevent() == 2) {
+                            medianame = "Event (Online)";
+
+
+                        } else if (myLearningModel.getTypeofevent() == 1) {
+                            medianame = "Event (Face to Face)";
+
+                        }
+                    }
+
+                    myLearningModel.setMediaName(medianame);
+
+                }       // ratingid
+                if (jsonMyLearningColumnObj.has("ratingid")) {
+
+                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
+
+                }
+                // publishedDate
+                if (jsonMyLearningColumnObj.has("publisheddate")) {
+
+                    myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
+
+                }
+                // eventstarttime
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+
+                }
+                // eventendtime
+                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+
+                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+
+                }
+
+                // mediatypeid
+                if (jsonMyLearningColumnObj.has("mediatypeid")) {
+
+                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+
+                }
+                // dateassigned
+                if (jsonMyLearningColumnObj.has("dateassigned")) {
+
+                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+
+                }
+                // keywords
+                if (jsonMyLearningColumnObj.has("seokeywords")) {
+
+                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
+
+                }
+                // eventcontentid
+                if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+
+                }
+                // eventAddedToCalender
+                myLearningModel.setEventAddedToCalender(false);
+
+
+                // isExpiry
+                myLearningModel.setIsExpiry("false");
+
+                // locationname
+                if (jsonMyLearningColumnObj.has("locationname")) {
+
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+
+                }
+                // timezone
+                if (jsonMyLearningColumnObj.has("timezone")) {
+
+                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
+
+                }
+                // participanturl
+                if (jsonMyLearningColumnObj.has("participanturl")) {
+
+                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
+
+                }
+                // display
+                myLearningModel.setDisplayName(appUserModel.getDisplayName());
+                // userName
+                myLearningModel.setUserName(appUserModel.getUserName());
+                // password
+                myLearningModel.setPassword(appUserModel.getPassword());
+
+                // isListView
+                if (jsonMyLearningColumnObj.has("bit5")) {
+
+                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
+
+                }
+
+                // joinurl
+                if (jsonMyLearningColumnObj.has("joinurl")) {
+
+                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+
+                }
+
+                // offlinepath
+                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
+                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
+                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
+                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                    String downloadDestFolderPath = context.getExternalFilesDir(null)
+                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+
+                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
+
+                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
+                }
+//
+
+                // wresult
+                if (jsonMyLearningColumnObj.has("wresult")) {
+
+                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
+
+                }
+                // wmessage
+                if (jsonMyLearningColumnObj.has("wmessage")) {
+
+                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
+
+                }
+
+                // presenter
+                if (jsonMyLearningColumnObj.has("presenter")) {
+
+                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+                }
+
+                //sitename
+                if (jsonMyLearningColumnObj.has("saleprice")) {
+
+                    myLearningModel.setPrice(jsonMyLearningColumnObj.get("saleprice").toString());
+
+                }
+
+                //googleproductid
+                if (jsonMyLearningColumnObj.has("googleproductid")) {
+
+                    myLearningModel.setGoogleProductID(jsonMyLearningColumnObj.get("googleproductid").toString());
+
+                }
+
+                //componentid
+                if (jsonMyLearningColumnObj.has("componentid")) {
+
+                    myLearningModel.setComponentId(jsonMyLearningColumnObj.get("componentid").toString());
+
+                }
+
+                //currency
+                if (jsonMyLearningColumnObj.has("currency")) {
+
+                    myLearningModel.setCurrency(jsonMyLearningColumnObj.get("currency").toString());
+
+                }
+
+                //viewtype
+                if (jsonMyLearningColumnObj.has("viewtype")) {
+
+                    myLearningModel.setViewType(jsonMyLearningColumnObj.get("viewtype").toString());
+
+                }
+                //isaddedtomylearning
+                if (jsonMyLearningColumnObj.has("isaddedtomylearning")) {
+
+                    myLearningModel.setAddedToMylearning(Integer.parseInt(jsonMyLearningColumnObj.get("isaddedtomylearning").toString()));
+
+                }
+
+
+                //membershipname
+                if (jsonMyLearningColumnObj.has("membershipname")) {
+
+                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
+
+                }
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("membershiplevel")) {
+
+                    String memberShip = jsonMyLearningColumnObj.getString("membershiplevel");
+                    int memberInt = 1;
+                    if (isValidString(memberShip)) {
+                        memberInt = Integer.parseInt(memberShip);
+                    } else {
+                        memberInt = 1;
+                    }
+                    myLearningModel.setMemberShipLevel(memberInt);
+
+                }
+
+                //folderpath
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.get("folderpath").toString());
+
+                }
+
+                //jwvideokey
+                if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                    if (isValidString(jwKey)) {
+                        myLearningModel.setJwvideokey(jwKey);
+                    } else {
+                        myLearningModel.setJwvideokey("");
+                    }
+
+                }
+
+                //cloudmediaplayerkey
+                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                    if (isValidString(jwKey)) {
+                        myLearningModel.setCloudmediaplayerkey(jwKey);
+                    } else {
+                        myLearningModel.setCloudmediaplayerkey("");
+                    }
+                }
+
+                myLearningModelList.add(myLearningModel);
+            }
+
+        }
+
+        return myLearningModelList;
+    }
+
 
 }

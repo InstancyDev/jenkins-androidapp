@@ -217,6 +217,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
+            btnSignup.setVisibility(View.INVISIBLE);
 
         } else {
 

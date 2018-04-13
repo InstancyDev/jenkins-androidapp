@@ -2305,9 +2305,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         myLearningModel.setJwvideokey(jwKey);
-                    }else {
+                    } else {
                         myLearningModel.setJwvideokey("");
                     }
 
@@ -2320,9 +2320,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         myLearningModel.setCloudmediaplayerkey(jwKey);
-                    }else {
+                    } else {
                         myLearningModel.setCloudmediaplayerkey("");
                     }
                 }
@@ -2987,9 +2987,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         myLearningModel.setJwvideokey(jwKey);
-                    }else {
+                    } else {
                         myLearningModel.setJwvideokey("");
                     }
 
@@ -3002,9 +3002,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         myLearningModel.setCloudmediaplayerkey(jwKey);
-                    }else {
+                    } else {
                         myLearningModel.setCloudmediaplayerkey("");
                     }
                 }
@@ -3758,7 +3758,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("folderpath", myLearningModel.getFolderPath());
 
 
-
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -4399,9 +4398,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         trackLearningModel.setJwvideokey(jwKey);
-                    }else {
+                    } else {
                         trackLearningModel.setJwvideokey("");
                     }
 
@@ -4414,9 +4413,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         trackLearningModel.setCloudmediaplayerkey(jwKey);
-                    }else {
+                    } else {
                         trackLearningModel.setCloudmediaplayerkey("");
                     }
                 }
@@ -9822,9 +9821,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         myLearningModel.setJwvideokey(jwKey);
-                    }else {
+                    } else {
                         myLearningModel.setJwvideokey("");
                     }
 
@@ -9837,13 +9836,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
 
-                    if (isValidString(jwKey)){
+                    if (isValidString(jwKey)) {
                         myLearningModel.setCloudmediaplayerkey(jwKey);
-                    }else {
+                    } else {
                         myLearningModel.setCloudmediaplayerkey("");
                     }
                 }
-
 
 
                 //sitename

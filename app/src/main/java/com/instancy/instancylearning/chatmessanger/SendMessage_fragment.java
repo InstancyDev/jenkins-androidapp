@@ -151,6 +151,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             }
         };
         signalAService = SignalAService.newInstance(context);
+        signalAService.stopSignalA();
         signalAService.communicator = communicator;
     }
 
@@ -383,8 +384,11 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
         }
 
-
-
     }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
 
+        signalAService.stopSignalA();
+    }
 }

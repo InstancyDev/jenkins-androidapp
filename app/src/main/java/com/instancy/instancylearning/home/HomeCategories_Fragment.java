@@ -225,7 +225,7 @@ public class HomeCategories_Fragment extends Fragment {
             mAdapter = new HomeButtonAdapter(homeMenuList, clicklistener);
         }
         if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            catalogRecycler.setLayoutManager(new GridLayoutManager(context, 3));
+            catalogRecycler.setLayoutManager(new GridLayoutManager(context, 2));
         } else {
             catalogRecycler.setLayoutManager(new GridLayoutManager(context, 5));
         }

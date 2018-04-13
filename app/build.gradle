@@ -17,13 +17,13 @@ android {
 
 // ----------------------------------for instancy lite app-------------------------
         applicationId "com.instancy.instancy_lite"
-        versionCode 12
-        versionName "2.1"
+        versionCode 13
+        versionName "2.2"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 16
-//           versionName "2.4"
+//           versionCode 17
+//           versionName "2.5"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"
@@ -37,8 +37,8 @@ android {
 
 //  -------------------------------- for trainingcompany app----------------------------------
 //        applicationId "com.instancy.trainingcompany"
-//        versionCode 9
-//        versionName "1.8"
+//        versionCode 11
+//        versionName "2.0"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.mobileup"

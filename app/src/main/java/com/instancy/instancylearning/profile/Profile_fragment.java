@@ -286,16 +286,16 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
-
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    editSelectedGroup("EDU", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    editSelectedGroup("EXP", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-                    editSelectedGroup("CNT", groupPosition);
-                }
+//                UnCOmment
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    editSelectedGroup("EDU", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    editSelectedGroup("EXP", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+//                }
 
                 return true;
             }
@@ -313,15 +313,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
 
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    educationClicked(groupPosition, childPosition, "EDU");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    educationClicked(groupPosition, childPosition, "EXP");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-//                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-//                    editSelectedGroup("CNT", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    educationClicked(groupPosition, childPosition, "EDU");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    educationClicked(groupPosition, childPosition, "EXP");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+////                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+////                    editSelectedGroup("CNT", groupPosition);
+//                }
 
                 return true;
             }

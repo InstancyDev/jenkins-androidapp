@@ -108,6 +108,8 @@ public class StaticValues {
      * @author Venu
      */
 
+
+
     public static final int DETAIL_CATALOG_CODE = 1212;
 
     public static final int COURSE_CLOSE_CODE = 9595;
@@ -282,6 +284,7 @@ public class StaticValues {
      */
     public static int SUB_MENU_POSITION = -1;
 
+    public static int REFRESH_PEOPLE = 0;
 
     public static int MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
 

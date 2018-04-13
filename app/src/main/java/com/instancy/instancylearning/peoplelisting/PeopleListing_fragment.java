@@ -81,6 +81,7 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
+import static com.instancy.instancylearning.utils.StaticValues.REFRESH_PEOPLE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
@@ -145,6 +146,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     Communicator communicator;
 
+//    SideMenusModel catalogSideMenuModel;
+
     public PeopleListing_fragment() {
 
 
@@ -165,13 +168,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //        chatService = ChatService.newInstance(context);
 
 
-        String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
-        if (isViewed.equalsIgnoreCase("true")) {
-            appcontroller.setAlreadyViewd(true);
-        } else {
-
-            appcontroller.setAlreadyViewd(false);
-        }
         vollyService = new VollyService(resultCallback, context);
 
         sideMenusModel = null;
@@ -180,7 +176,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
-
+//            catalogSideMenuModel = (SideMenusModel) bundle.getSerializable("catalogSideMenuModel");
         }
         if (responMap != null && responMap.containsKey("Type")) {
             String consolidate = responMap.get("Type");
@@ -207,8 +203,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             // No such key
             filterContentType = "";
         }
-        signalAService = SignalAService.newInstance(context);
-        signalAService.startSignalA();
+//        signalAService = SignalAService.newInstance(context);
+//        signalAService.startSignalA();
     }
 
     public void refreshPeopleListing(Boolean isRefreshed) {
@@ -224,9 +220,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
         } else
             injectFromDbtoModel();
+        REFRESH_PEOPLE = 0;
 
     }
-
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -400,7 +396,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         peopleListingModelList = new ArrayList<PeopleListingModel>();
 
-        if (isNetworkConnectionAvailable(getContext(), -1)) {
+        if (isNetworkConnectionAvailable(getContext(), -1) && REFRESH_PEOPLE == 0) {
             refreshPeopleListing(false);
         } else {
             injectFromDbtoModel();
@@ -421,9 +417,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 
         if (peopleListingModelList.size() > 5) {
-            item_search.setVisible(true);
+            if (item_search != null) {
+                item_search.setVisible(true);
+            }
         } else {
-            item_search.setVisible(false);
+            if (item_search != null) {
+                item_search.setVisible(false);
+            }
         }
     }
 
@@ -696,24 +696,16 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //                    Toast.makeText(context, "View Profile", Toast.LENGTH_SHORT).show();
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
-//                    Toast.makeText(context, "View Content", Toast.LENGTH_SHORT).show();
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    Bundle bundle = new Bundle();
 
-                    Catalog_fragment nextFrag = new Catalog_fragment();
-                    fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    bundle.putSerializable("sidemenumodel", sideMenusModel);
+                    if (isNetworkConnectionAvailable(context, -1)) {
 
-                    bundle.putBoolean("ISFROMPEOPELLISTING", true);
+                        replaceFragment(peopleListingModelList.get(position));
 
-                    nextFrag.setArguments(bundle);
-                    getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .add(R.id.container_body, nextFrag)
-                            .addToBackStack(BACK_STACK_ROOT_TAG)
-                            .commit();
+                    } else {
 
-//                    replaceFragment();
+                        showToast(context, "No Internet");
+                    }
+
 
                 }
 
@@ -742,6 +734,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         Intent intentDetail = new Intent(context, ChatActivity.class);
                         intentDetail.putExtra("peopleListingModel", peopleListingModel);
                         startActivity(intentDetail);
+
+                        signalAService = SignalAService.newInstance(context);
+                        signalAService.startSignalA();
+
 
                     } else {
                         Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -843,18 +839,33 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     }
 
 
-    private void replaceFragment (Fragment fragment){
-        String backStateName = fragment.getClass().getName();
+    private void replaceFragment(PeopleListingModel peopleListingModel) {
 
-        FragmentManager manager =  getActivity().getSupportFragmentManager();
-        boolean fragmentPopped = manager.popBackStackImmediate (backStateName, 0);
+        String backStateName = PeopleListing_fragment.class.getName();
 
-        if (!fragmentPopped){ //fragment not in back stack, create it.
-            FragmentTransaction ft = manager.beginTransaction();
-            ft.replace(R.id.container_body, fragment);
-            ft.addToBackStack(backStateName);
-            ft.commit();
-        }
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+
+        Bundle bundle = new Bundle();
+
+        Catalog_fragment nextFrag = new Catalog_fragment();
+        fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+//        boolean fragmentPopped = fragmentManager.popBackStackImmediate(backStateName, 0);
+
+        REFRESH_PEOPLE = 1;
+        bundle.putSerializable("sidemenumodel", sideMenusModel);
+        bundle.putSerializable("peopleListingModel", peopleListingModel);
+
+        bundle.putBoolean("ISFROMPEOPELLISTING", true);
+
+        nextFrag.setArguments(bundle);
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container_body, nextFrag)
+                .addToBackStack(backStateName)
+                .commit();
+        fragmentManager.executePendingTransactions();
+
     }
 
     @Override
@@ -987,4 +998,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         return receipent;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        signalAService = SignalAService.newInstance(context);
+        signalAService.stopSignalA();
+    }
 }

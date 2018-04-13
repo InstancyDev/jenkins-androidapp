@@ -251,8 +251,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta)) || getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp))) {
             notificationLayout.setVisibility(View.VISIBLE);
             sendMessageLayout.setVisibility(View.VISIBLE);
-            signalAService = SignalAService.newInstance(this);
-            signalAService.startSignalA();
+//            signalAService = SignalAService.newInstance(this);
+//            signalAService.startSignalA();
         }
 
 
@@ -318,8 +318,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             if (menu.getContextMenuId().equals("10")) {
                 sendMessageLayout.setVisibility(View.VISIBLE);
-                signalAService = SignalAService.newInstance(this);
-                signalAService.startSignalA();
+//                signalAService = SignalAService.newInstance(this);
+//                signalAService.startSignalA();
             }
 
             i++;
@@ -505,6 +505,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         Fragment fragment = null; //
 
+        SideMenusModel catalogSideMenuModel = sideMenusModel;
+
         switch (menuid) {
             case 1:
                 fragment = new MyLearningFragment();
@@ -539,6 +541,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case 10:
                 fragment = new PeopleListing_fragment();
+//                catalogSideMenuModel = getSideMenuModel();
                 break;
             case 99:
                 fragment = new SendMessage_fragment();
@@ -548,7 +551,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");
-
                 break;
         }
 
@@ -558,6 +560,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             Bundle bundle = new Bundle();
             if (menuid != 99) {
                 bundle.putSerializable("sidemenumodel", sideMenusModel);
+
                 bundle.putBoolean("ISFROMCATEGORIES", false);
                 bundle.putBoolean("ISFROMNOTIFICATIONS", isFromNotification);
 
@@ -608,44 +611,45 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-            if (getFragmentManager().getBackStackEntryCount() > 0) {
-                getFragmentManager().popBackStack();
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStack();
                 return;
             }
-            if (!doubleBackToExitPressedOnce) {
-                this.doubleBackToExitPressedOnce = true;
+
+//            if (!doubleBackToExitPressedOnce) {
+//                this.doubleBackToExitPressedOnce = true;
 //                Toast.makeText(this, "      Please click BACK again to exit.      ", Toast.LENGTH_SHORT).show();
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getResources().getString(R.string.exitapplication))
-                        .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        dialog.dismiss();
-                    }
-                }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //do things
-                        dialog.dismiss();
-                        finish();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getResources().getString(R.string.exitapplication))
+                    .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int i) {
+                    dialog.dismiss();
+                }
+            }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //do things
+                    dialog.dismiss();
+                    finish();
 
-                    }
-                });
-                AlertDialog alert = builder.create();
-//                TextView textView = (TextView) alert.findViewById(android.R.id.title);
-//                textView.setTextSize(20);
-                alert.show();
-                new Handler().postDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        doubleBackToExitPressedOnce = false;
-                    }
-                }, 2000);
-            } else {
-                super.onBackPressed();
-                return;
-            }
+                }
+            });
+            AlertDialog alert = builder.create();
+////                TextView textView = (TextView) alert.findViewById(android.R.id.title);
+////                textView.setTextSize(20);
+            alert.show();
+//                new Handler().postDelayed(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        doubleBackToExitPressedOnce = false;
+//                    }
+//                }, 2000);
+//            } else {
+//                super.onBackPressed();
+//                return;
+//            }
         }
     }
 
@@ -1011,4 +1015,26 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     }
 
+
+    public SideMenusModel getSideMenuModel() {
+
+        SideMenusModel sideMenusModel = new SideMenusModel();
+
+        if (sideMenumodelList.size() > 0) {
+
+            for (int i = 0; i < sideMenumodelList.size(); i++) {
+
+
+                if (sideMenumodelList.get(i).getComponentId().equalsIgnoreCase("1")) {
+
+                    sideMenusModel = sideMenumodelList.get(i);
+
+                }
+
+            }
+
+        }
+
+        return sideMenusModel;
+    }
 }
