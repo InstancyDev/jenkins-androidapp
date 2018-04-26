@@ -327,7 +327,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (descriptionStr.length() < 5) {
-            Toast.makeText(this, "Mandatory fields are required to be filled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select skill", Toast.LENGTH_SHORT).show();
         } else {
 //            Map<String, String> parameters = new HashMap<String, String>();
             JSONObject parameters = new JSONObject();
@@ -373,7 +373,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour new Question has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Success! \nYour new Question has been successfully posted.", Toast.LENGTH_SHORT).show();
                     AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
                     String replaceString = s.replace("##", "=");
                     String[] strSplitvalues = replaceString.split("=");
@@ -398,7 +398,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "New forum cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "New forum cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

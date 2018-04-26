@@ -108,6 +108,20 @@
                     android:textColor="@color/colorDarkGrey"
                     android:textSize="14sp" />
 
+                <TextView
+                    android:id="@+id/txtDelete"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/txtTitle"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="@string/fa_icon_trash"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="24sp" />
+
 
             </RelativeLayout>
 
@@ -117,20 +131,6 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:padding="1dp">
-
-                <TextView
-                    android:id="@+id/txtDelete"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:padding="2dp"
-                    android:text="@string/fa_icon_trash"
-                    android:textColor="@color/colorDarkGrey"
-                    android:textSize="24sp" />
 
 
             </RelativeLayout>

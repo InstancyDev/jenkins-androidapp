@@ -979,7 +979,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + "','"
                     + uiSettingsModel.getListBorderColor()
                     + "','"
-                    + uiSettingsModel.getMenuBGColor()
+                    + uiSettingsModel.getMenuHeaderBGColor()
                     + "','"
                     + uiSettingsModel.getMenuHeaderTextColor()
                     + "','"
@@ -3443,7 +3443,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // typeofevent
                 if (jsonMyLearningColumnObj.has("typeofevent")) {
 
-                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+//                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+
+                    int typeoFEvent = jsonMyLearningColumnObj.optInt("typeofevent",0);
+
 
                     myLearningModel.setTypeofevent(typeoFEvent);
 

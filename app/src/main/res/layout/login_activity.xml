@@ -43,7 +43,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/playground" />
+                android:src="@drawable/marketplacelogo" />
             <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout
@@ -71,6 +71,7 @@
                     android:text=""
                     android:textColor="@color/colorBlack"
                     android:textColorHint="@color/colorBlack"
+                    android:cursorVisible="true"
                     android:textSize="14sp" />
 
                 <TextView
@@ -103,6 +104,7 @@
                     android:backgroundTint="@color/colorBlack"
                     android:fontFamily="sans-serif"
                     android:hint="Password"
+                    android:cursorVisible="true"
                     android:inputType="textPassword"
                     android:maxLength="50"
                     android:maxLines="1"

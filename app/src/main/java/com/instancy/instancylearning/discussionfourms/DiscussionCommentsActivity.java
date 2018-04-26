@@ -255,6 +255,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         if (discussionTopicModel.longdescription.isEmpty() || discussionTopicModel.longdescription.contains("null")) {
             txtShortDisc.setVisibility(View.GONE);

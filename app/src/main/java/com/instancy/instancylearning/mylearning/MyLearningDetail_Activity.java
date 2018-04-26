@@ -1793,6 +1793,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         ratingsAdapter = new RatingsAdapter(this, BIND_ABOVE_CLIENT, reviewRatingModelList);
         ratinsgListview.setAdapter(ratingsAdapter);
         ratinsgListview.addHeaderView(header);
+        ratinsgListview.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         ratinsgListview.setOnScrollListener(new EndlessScrollListener() {
 
             @Override
@@ -1831,7 +1833,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             if (jsonObject.isNull("EditRating")) {
                 btnEditReview.setText("Write a Review");
                 isEditReview = false;
-
+                updateUiForRating();
             } else {
                 btnEditReview.setText("Edit Your Review");
                 isEditReview = true;
@@ -1924,6 +1926,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     reviewRatingModelList.add(reviewRatingModel);
                 }
                 ratingsAdapter.refreshList(reviewRatingModelList);
+            } else {
+                ratingValue = 0;
             }
             String rating = "" + ratingValue;
             if (reviewRatingModelList.size() > 0) {
@@ -1954,6 +1958,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
 
 
+    }
+
+    public void updateUiForRating() {
+
+//        String ratedStyle = "Rated 0 out of 5 of  0 ratings";//
+//        ratingBar.setRating(0);
+//        ratedOutOfTxt.setText(ratedStyle);
+        reviewRatingModelList = new ArrayList<>();
+        ratingsAdapter.refreshList(reviewRatingModelList);
     }
 
     public void openWriteReview() {

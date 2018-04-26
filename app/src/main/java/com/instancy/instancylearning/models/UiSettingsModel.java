@@ -304,8 +304,8 @@ public class UiSettingsModel {
     }
 
     public String getMenuHeaderTextColor() {
-//        return menuHeaderTextColor.isEmpty() ? "#FFFFFF" : menuHeaderTextColor;\
-        return "#FFFFFF";
+        return menuHeaderTextColor.isEmpty() ? "#FFFFFF" : menuHeaderTextColor;
+//        return "#FFFFFF";
     }
 
     public void setMenuHeaderTextColor(String menuHeaderTextColor) {
@@ -492,7 +492,7 @@ public class UiSettingsModel {
     }
 
     public String getMenuBGAlternativeColor() {
-        return menuBGAlternativeColor.isEmpty() ? brandingColor : menuBGAlternativeColor;
+        return menuBGAlternativeColor.isEmpty() ? menuBGColor : menuBGAlternativeColor;
     }
 
     public String getAppHeaderColor() {

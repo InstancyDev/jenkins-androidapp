@@ -2,6 +2,7 @@ package com.instancy.instancylearning.mainactivities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -76,6 +77,12 @@ public class Branding_activity extends Activity {
             btnSignup.setBackgroundColor(getResources().getColor(R.color.cle_drakbrown_color));
             btnLogin.setBackgroundColor(getResources().getColor(R.color.cle_drakbrown_color));
         }
+
+        btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        View someView = findViewById(R.id.brandinglayout);
+        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
     }
 

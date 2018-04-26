@@ -123,6 +123,8 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.txtTopicsCount.setText(discussionTopicModelList.get(position).noofviews + " Topic(s)");
         holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noofreplies + " Comment(s)");
 
+        holder.txtTopicsCount.setVisibility(View.INVISIBLE);
+
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -141,8 +143,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         if (discussionTopicModelList.get(position).createduserid.equalsIgnoreCase(appUserModel.getUserIDValue())) {
 
             holder.btnContextMenu.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             holder.btnContextMenu.setVisibility(View.INVISIBLE);
         }
 

@@ -3,13 +3,13 @@
     <!--<string name="app_name">Online Lifeskills</string>-->
     <!--<string name="app_name">Enterprise Learning </string>-->
     <!--<string name="app_name">CropLife Online Dealer Training</string>-->
-    <string name="app_name">Instancy </string>
+    <!--<string name="app_name">Instancy </string>-->
     <!--<string name="app_name">Learn Up - Learn on your phone</string>-->
     <!--<string name="app_name">Tracktech lifeskills</string>-->
     <!--<string name="app_name">Training Company</string>-->
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
-    <!--<string name="app_name"> Development </string>-->
+    <string name="app_name"> Development </string>
     <!--<string name="app_name">PPD Life</string>-->
 
     <!--<string name="app_name">HealthHelp IE</string>-->
@@ -193,7 +193,7 @@
     <string name="alert_headtext_no_url">URL not found!</string>
     <string name="alert_headtext_invalid_url">Invalid URL!</string>
     <string name="alert_headtext_email_notvalid">Email not valid</string>
-    <string name="alert_headtext_no_internet">   No Internet   </string>
+    <string name="alert_headtext_no_internet">    No Internet    </string>
     <string name="alert_headtext_no_guest_content">No guest content</string>
     <string name="password_reset_link_send_success">Password reset link sent to registered email.\nPlease check your inbox.</string>
     <string name="alert_text_need_valid_email">Please enter a valid registered email.</string>

@@ -119,10 +119,10 @@ public class AskSkillAdapter extends BaseAdapter {
 
         } else {
             holder.switchSkill.setChecked(false);
-            holder.switchSkill.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
+            holder.switchSkill.setTextColor(convertView.getResources().getColor(R.color.colorGray));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                holder.switchSkill.setThumbTintList(ColorStateList.valueOf(convertView.getResources().getColor(R.color.colorDarkGrey)));
+                holder.switchSkill.setThumbTintList(ColorStateList.valueOf(convertView.getResources().getColor(R.color.colorGray)));
                 holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
             }
         }

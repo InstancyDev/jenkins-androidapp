@@ -271,7 +271,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         toggle.syncState();
 
         drawerHeaderView = (RelativeLayout) findViewById(R.id.drawerheaderview);
-        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
         ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
 
@@ -293,10 +293,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         }
         txtUsername.setText(upperCaseWords(name));
-        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
         txtAddress.setText(upperCaseWords(strAry[1]));
-        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+        txtAddress.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+
         sideMenumodelList = db.getNativeMainMenusData();
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();

@@ -571,13 +571,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, " Success! \nNotification has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, " Success! \nNotification has been successfully deleted ", Toast.LENGTH_SHORT).show();
                     NOTIFICATIONVIWED = 1;
                     deleteAnswerFromLocalDB(notificationModel);
 
                 } else {
 
-                    Toast.makeText(context, "Notification cannot be deleted from server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Notification cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -640,7 +640,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, " Success! \nNotification has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, " Success! \nNotification has been successfully deleted  ", Toast.LENGTH_SHORT).show();
 
                     notificationModelList.get(position).markasread = "true";
                     notificationAdapter.notifyDataSetChanged();
@@ -648,7 +648,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 //                    deleteAnswerFromLocalDB(notificationModel);
                 } else {
 
-                    Toast.makeText(context, "Notification cannot be deleted from server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Notification cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

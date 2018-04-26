@@ -108,6 +108,11 @@ public class NotificationAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
+        holder.txtDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtDelete.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
         if (notificationModelList.get(position).contentid.length() > 5) {
 
             holder.txtTitle.setText(notificationModelList.get(position).contenttitle);
@@ -118,6 +123,7 @@ public class NotificationAdapter extends BaseAdapter {
             holder.txtTitle.setText(notificationModelList.get(position).notificationtitle);
             holder.txtDescription.setText(notificationModelList.get(position).subject);
         }
+
 
 //        if (notificationModelList.get(position).markasread.equalsIgnoreCase("false")) {
 //

@@ -265,7 +265,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         txtNoAnswers.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtAskedBy.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtAskedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
+        card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
     }
 
 
@@ -434,12 +434,12 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, " Success! \nAnswer has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, " Success! \nAnswer has been successfully deleted ", Toast.LENGTH_SHORT).show();
 
                     deleteAnswerFromLocalDB(answerModel);
                 } else {
 
-                    Toast.makeText(context, "Answer cannot be deleted from server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Answer cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -553,12 +553,12 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                         insertSingleAsktheExpertAnswerDataIntoSqLite(askExpertAnswerModel, 1);
                     }
 
-                    Toast.makeText(AskExpertsAnswersActivity.this, "Success! \nYour Answer has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsAnswersActivity.this, "Success! \nYour Answer has been successfully posted ", Toast.LENGTH_SHORT).show();
 
 
                 } else {
 
-                    Toast.makeText(AskExpertsAnswersActivity.this, "New Answer cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsAnswersActivity.this, "New Answer cannot be posted . Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

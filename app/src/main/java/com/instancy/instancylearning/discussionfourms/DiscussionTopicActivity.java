@@ -242,6 +242,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 

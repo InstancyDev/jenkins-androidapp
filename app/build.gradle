@@ -17,8 +17,8 @@ android {
 
 // ----------------------------------for instancy lite app-------------------------
         applicationId "com.instancy.instancy_lite"
-        versionCode 13
-        versionName "2.2"
+        versionCode 14
+        versionName "2.3"
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"

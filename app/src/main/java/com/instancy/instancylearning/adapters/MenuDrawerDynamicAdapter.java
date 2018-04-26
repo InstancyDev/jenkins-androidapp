@@ -165,21 +165,36 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         TextView expTxtIcon = (TextView) pView.findViewById(R.id.expIcon);
         TextView fontIcon = (TextView) pView.findViewById(R.id.fontawasomeIcon);
 
+//        if (parentPosition % 2 == 0) {
+//            pView.setBackgroundColor(Color
+//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//        } else {
+////            pView.setBackgroundColor(Color
+////                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//            pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+//        }
+
         if (isExpanded) {
             pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getSelectedMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             expTxtIcon.setVisibility(View.VISIBLE);
-
             expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_up));
         } else {
-            pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
-            txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-            fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-            expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-            expTxtIcon.setVisibility(View.VISIBLE);
-            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
+
+            if (parentPosition % 2 == 0) {
+                pView.setBackgroundColor(Color
+                        .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+            } else {
+                pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+            }
+                txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+                fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+                expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+                expTxtIcon.setVisibility(View.VISIBLE);
+                expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
+
         }
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);
@@ -240,13 +255,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         } else {
             expTxtIcon.setVisibility(View.INVISIBLE);
         }
-//        if (parentPosition % 2 == 0) {
-//            pView.setBackgroundColor(Color
-//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-//        } else {
-//            pView.setBackgroundColor(Color
-//                    .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-//        }
+
         return pView;
     }
 

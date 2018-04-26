@@ -207,6 +207,15 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     }
 
+    public void getFilterSkills() {
+
+
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQuestionCategories?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected";
+
+        vollyService.getJsonObjResponseVolley("FILSKIL", parmStringUrl, appUserModel.getAuthHeaders());
+
+    }
+
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -222,6 +231,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                             db.injectAsktheExpertAnswersDataTable(response);
                             injectFromDbtoModel();
                             getSkillsCalatalogFrom();
+                            getFilterSkills();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -243,6 +253,17 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
                     }
                 }
+
+                if (requestType.equalsIgnoreCase("FILSKIL")) {
+                    if (response != null) {
+                        Log.d(TAG, "notifySuccess: FILSKIL  " + response);
+
+                    } else {
+
+                    }
+                }
+
+
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -289,7 +310,6 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         askexpertListView.setAdapter(askExpertAdapter);
         askexpertListView.setOnItemClickListener(this);
         askexpertListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
@@ -366,7 +386,6 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         return position;
     }
 
-
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -426,15 +445,15 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -623,12 +642,12 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, " Success! \nQuestion has been successfully deleted from server. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, " Success! \nQuestion has been successfully deleted  ", Toast.LENGTH_SHORT).show();
 
                     deleteQuestionFromLocalDB(questionModel);
                 } else {
 
-                    Toast.makeText(context, "Question cannot be deleted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Question cannot be deleted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -753,6 +772,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
 //                    Toast.makeText(context, " Selected" + strSplitvalues[item], Toast.LENGTH_SHORT).show();
 
+                    filteredByCategory(strSplitvalues[item]);
+
                 }
             });
 
@@ -782,5 +803,23 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     }
 
+
+    public void filteredByCategory(String selectedCategory) {
+
+        List<AskExpertQuestionModel> tempList = new ArrayList<>();
+
+        if (askExpertQuestionModelList.size() > 0) {
+            for (int i = 0; i < askExpertQuestionModelList.size(); i++) {
+
+                if (selectedCategory.equalsIgnoreCase(askExpertQuestionModelList.get(i).questionCategories)) {
+                    tempList.add(askExpertQuestionModelList.get(i));
+
+                }
+            }
+
+            askExpertAdapter.refreshList(tempList);
+        }
+
+    }
 
 }

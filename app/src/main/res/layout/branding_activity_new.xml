@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/clebackground"
     android:orientation="vertical"
+    android:id="@+id/brandinglayout"
     android:weightSum="2">
 
 
@@ -34,7 +34,7 @@
         android:layout_gravity="center"
         android:layout_weight=".15"
         android:background="@color/colorRed"
-        android:text="@string/label_existing_user"
+        android:text="@string/btn_txt_signin"
         android:textColor="@color/colorWhite"
         android:textAllCaps="false"
         android:textSize="16sp" />
