@@ -8,7 +8,6 @@ import java.io.Serializable;
 
 public class AskExpertSkillsModel implements Serializable {
 
-
     public String orgUnitID = "";
     public String preferrenceID = "";
     public String preferrenceTitle = "";

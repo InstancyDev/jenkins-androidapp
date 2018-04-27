@@ -70,6 +70,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
+import com.instancy.instancylearning.models.AskExpertCategoriesModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 
 import com.instancy.instancylearning.models.AskExpertSkillsModel;
@@ -78,6 +79,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -141,12 +143,20 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
+    JSONObject skillsObject;
 
     boolean isFromNotification = false;
 
     String contentIDFromNotification = "";
 
-    List<AskExpertSkillsModel> askExpertSkillsModelList = null;
+    List<AskExpertCategoriesModel> askExpertCategoriesModels = null;
+
+    View header;
+
+    TextView headerTextView;
+
+    String[] skillsForFilter;
+    String[] categoriesID;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -183,8 +193,9 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                 contentIDFromNotification = bundle.getString("CONTENTID");
             }
 
-
         }
+
+
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -209,13 +220,10 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     public void getFilterSkills() {
 
-
         String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQuestionCategories?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected";
 
         vollyService.getJsonObjResponseVolley("FILSKIL", parmStringUrl, appUserModel.getAuthHeaders());
-
     }
-
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -245,7 +253,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                         Log.d(TAG, "notifySuccess: ASKQSCAT  " + response);
                         try {
                             db.injectAsktheExpertCategoryDataTable(response);
-                            askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -256,13 +264,19 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
                 if (requestType.equalsIgnoreCase("FILSKIL")) {
                     if (response != null) {
-                        Log.d(TAG, "notifySuccess: FILSKIL  " + response);
-
+                        Log.d(TAG, "notifySuccess: ASKQSCAT  " + response);
+                        try {
+                            db.injectAsktheExpertFiltersCategoryDataTable(response);
+                            db.injectAsktheExpertMapCategoryDataTable(response);
+                            askExpertCategoriesModels = db.fetchAskFilterSkillsModelList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+//                        generateSkillsFromJsonObj(response);
                     } else {
 
                     }
                 }
-
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -292,6 +306,23 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         };
     }
 
+    public void generateSkillsFromJsonObj(JSONObject response) {
+
+        JSONArray jsonAskCategories = response.optJSONArray("askcategories");
+
+        if (jsonAskCategories.length() > 0) {
+            skillsForFilter = new String[jsonAskCategories.length()];
+            categoriesID = new String[jsonAskCategories.length()];
+
+            for (int i = 0; i < jsonAskCategories.length(); i++) {
+
+                JSONObject object = jsonAskCategories.optJSONObject(i);
+                skillsForFilter[i] = object.optString("category");
+                categoriesID[i] = object.optString("categoryid");
+            }
+        }
+
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -310,6 +341,12 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         askexpertListView.setAdapter(askExpertAdapter);
         askexpertListView.setOnItemClickListener(this);
         askexpertListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+
+        header = (View) getLayoutInflater().inflate(R.layout.detailsheader, null);
+        headerTextView = (TextView) header.findViewById(R.id.track_details);
+        headerTextView.setText("");
+        askexpertListView.addHeaderView(header);
+        header.setVisibility(View.GONE);
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
@@ -751,12 +788,13 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     public void filterPopUp() {
 
-        if (askExpertSkillsModelList != null) {
-            final String[] strSplitvalues = new String[askExpertSkillsModelList.size()];
+        if (askExpertCategoriesModels.size() > 0) {
+            skillsForFilter = new String[askExpertCategoriesModels.size()];
+            categoriesID = new String[askExpertCategoriesModels.size()];
 
-            for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
-                strSplitvalues[s] = askExpertSkillsModelList.get(s).shortSkillName;
-
+            for (int s = 0; s < askExpertCategoriesModels.size(); s++) {
+                skillsForFilter[s] = askExpertCategoriesModels.get(s).category;
+                categoriesID[s] = askExpertCategoriesModels.get(s).categoryID;
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
@@ -764,7 +802,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             builder.setTitle("Choose a skill in order to filter the above questions");
 
             //set items to alert dialog. i.e. our array , which will be shown as list view in alert dialog
-            builder.setItems(strSplitvalues, new DialogInterface.OnClickListener() {
+            builder.setItems(skillsForFilter, new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int item) {
@@ -772,7 +810,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
 //                    Toast.makeText(context, " Selected" + strSplitvalues[item], Toast.LENGTH_SHORT).show();
 
-                    filteredByCategory(strSplitvalues[item]);
+                    filteredByCategory(categoriesID[item], skillsForFilter[item]);
 
                 }
             });
@@ -788,7 +826,15 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
 
                         }
-                    });
+                    }).setPositiveButton("All", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+//                    Toast.makeText(context, "   all clicked    ", Toast.LENGTH_SHORT).show();
+                    filteredByCategory("", "");
+                }
+            });
 
             //Creating alert dialog
             AlertDialog alert = builder.create();
@@ -804,20 +850,20 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
 
-    public void filteredByCategory(String selectedCategory) {
+    public void filteredByCategory(String selectedCategory, String selectedSkillName) {
 
-        List<AskExpertQuestionModel> tempList = new ArrayList<>();
 
-        if (askExpertQuestionModelList.size() > 0) {
-            for (int i = 0; i < askExpertQuestionModelList.size(); i++) {
+        askExpertQuestionModelList = db.fetchAskExpertModelList(selectedCategory);
 
-                if (selectedCategory.equalsIgnoreCase(askExpertQuestionModelList.get(i).questionCategories)) {
-                    tempList.add(askExpertQuestionModelList.get(i));
-
-                }
-            }
-
-            askExpertAdapter.refreshList(tempList);
+        if (askExpertQuestionModelList != null && askExpertQuestionModelList.size() > 0) {
+            askExpertAdapter.refreshList(askExpertQuestionModelList);
+            headerTextView.setText(selectedSkillName);
+            header.setVisibility(View.VISIBLE);
+        } else {
+            askExpertQuestionModelList = new ArrayList<>();
+            askExpertAdapter.refreshList(askExpertQuestionModelList);
+            headerTextView.setText("");
+            header.setVisibility(View.GONE);
         }
 
     }

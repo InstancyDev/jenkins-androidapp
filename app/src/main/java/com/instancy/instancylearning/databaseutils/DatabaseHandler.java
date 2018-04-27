@@ -23,6 +23,8 @@ import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
+import com.instancy.instancylearning.models.AskExpertCategoriesModel;
+import com.instancy.instancylearning.models.AskExpertCategoriesModelMapping;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.AskExpertSkillsModel;
 import com.instancy.instancylearning.models.CMIModel;
@@ -465,6 +467,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKRESPONSES + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, questionid INTEGER, responseid TEXT, response TEXT, respondeduserid TEXT, respondedusername, respondeddate TEXT, responsedate TEXT, siteid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONSKILLS + " (ID INTEGER PRIMARY KEY AUTOINCREMENT,orgunitid TEXT, preferrenceid TEXT, preferrencetitle TEXT, shortskillname, siteid TEXT)");
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKQUESTIONCATEGORIES + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, categoryid TEXT, category TEXT, siteid TEXT)");
 
@@ -3445,7 +3448,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 //                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
 
-                    int typeoFEvent = jsonMyLearningColumnObj.optInt("typeofevent",0);
+                    int typeoFEvent = jsonMyLearningColumnObj.optInt("typeofevent", 0);
 
 
                     myLearningModel.setTypeofevent(typeoFEvent);
@@ -14134,7 +14137,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (categoryID.length() == 0) {
             strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONS + " WHERE USERID = " + appUserModel.getUserIDValue() + " AND SITEID = " + appUserModel.getSiteIDValue() + " ORDER BY QUESTIONID DESC";
         } else {
-            strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONS + " AQ LEFT OUTER JOIN " + TBL_ASKQUESTIONCATEGORYMAPPING + " AQC ON AQ.QUESTIONID = AQC.QUESTIONID WHERE AQ.USERID = ? AND AQ.SITEID = ? AND AQC.CATEGORYID = ? ORDER BY AQ.QUESTIONID DESC";
+            strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONS + " AQ LEFT OUTER JOIN " + TBL_ASKQUESTIONCATEGORYMAPPING + " AQC ON AQ.QUESTIONID = AQC.QUESTIONID WHERE AQ.USERID = " + appUserModel.getUserIDValue() + " AND AQ.SITEID = " + appUserModel.getSiteIDValue() + " AND AQC.CATEGORYID = " + categoryID + " ORDER BY AQ.QUESTIONID DESC";
         }
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
@@ -14382,6 +14385,153 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return askExpertQuestionModelList;
     }
+
+    // ask experts category filters skills
+
+    public void injectAsktheExpertFiltersCategoryDataTable(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("askcategories");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_ASKQUESTIONCATEGORIES);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            AskExpertCategoriesModel askExpertCategoriesModel = new AskExpertCategoriesModel();
+
+            if (jsonMyLearningColumnObj.has("category")) {
+
+                askExpertCategoriesModel.category = jsonMyLearningColumnObj.getString("category");
+            }
+            // response
+            if (jsonMyLearningColumnObj.has("categoryid")) {
+
+                askExpertCategoriesModel.categoryID = jsonMyLearningColumnObj.get("categoryid").toString();
+
+            }
+
+            askExpertCategoriesModel.siteID = appUserModel.getSiteIDValue();
+
+            injectAsktheFilterSkillsDataIntoSqLite(askExpertCategoriesModel);
+        }
+
+    }
+
+
+    public void injectAsktheFilterSkillsDataIntoSqLite(AskExpertCategoriesModel askExpertCategoriesModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+            contentValues.put("category", askExpertCategoriesModel.category);
+            contentValues.put("categoryid", askExpertCategoriesModel.categoryID);
+            contentValues.put("siteid", askExpertCategoriesModel.siteID);
+
+            db.insert(TBL_ASKQUESTIONCATEGORIES, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+    public List<AskExpertCategoriesModel> fetchAskFilterSkillsModelList() {
+        List<AskExpertCategoriesModel> askExpertQuestionModelList = null;
+        AskExpertCategoriesModel askExpertCategoriesModel = new AskExpertCategoriesModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuerys = "SELECT * FROM " + TBL_ASKQUESTIONCATEGORIES + " WHERE siteid  = " + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                askExpertQuestionModelList = new ArrayList<AskExpertCategoriesModel>();
+                do {
+
+                    askExpertCategoriesModel = new AskExpertCategoriesModel();
+
+                    askExpertCategoriesModel.category = cursor.getString(cursor
+                            .getColumnIndex("category"));
+
+                    askExpertCategoriesModel.categoryID = cursor.getString(cursor
+                            .getColumnIndex("categoryid"));
+
+                    askExpertCategoriesModel.siteID = cursor.getString(cursor
+                            .getColumnIndex("siteid"));
+
+
+                    askExpertQuestionModelList.add(askExpertCategoriesModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return askExpertQuestionModelList;
+    }
+
+    // insert categoriesIDS
+    public void injectAsktheExpertMapCategoryDataTable(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("askcategoryquestions");
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_ASKQUESTIONCATEGORYMAPPING);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            AskExpertCategoriesModelMapping askExpertCategoriesModelMapping = new AskExpertCategoriesModelMapping();
+
+            if (jsonMyLearningColumnObj.has("questionid")) {
+
+                askExpertCategoriesModelMapping.questionID = jsonMyLearningColumnObj.getString("questionid");
+            }
+            // response
+            if (jsonMyLearningColumnObj.has("categoryid")) {
+
+                askExpertCategoriesModelMapping.categoryID = jsonMyLearningColumnObj.get("categoryid").toString();
+
+            }
+
+            askExpertCategoriesModelMapping.siteID = appUserModel.getSiteIDValue();
+
+            injectAsktheFilterMapDataIntoSqLite(askExpertCategoriesModelMapping);
+        }
+
+    }
+
+
+    public void injectAsktheFilterMapDataIntoSqLite(AskExpertCategoriesModelMapping askExpertCategoriesModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+            contentValues.put("questionid", askExpertCategoriesModel.questionID);
+            contentValues.put("categoryid", askExpertCategoriesModel.categoryID);
+            contentValues.put("siteid", askExpertCategoriesModel.siteID);
+
+            db.insert(TBL_ASKQUESTIONCATEGORYMAPPING, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
 
 // inject  all trackobjects data into table
 
