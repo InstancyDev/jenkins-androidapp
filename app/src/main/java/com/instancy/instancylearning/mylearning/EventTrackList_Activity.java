@@ -137,7 +137,18 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView);
+        String typeFrom="track";
+
+        if (isTraxkList){
+
+            typeFrom="track";
+
+        } else {
+
+            typeFrom="event";
+
+        }
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView,typeFrom);
 //        expandableListView.setOnChildClickListener(this);
         // setting list adapter
         expandableListView.setAdapter(trackListExpandableAdapter);

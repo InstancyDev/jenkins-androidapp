@@ -928,6 +928,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d(TAG, "onDownloadFailed: " + +errorCode);
+                        Toast.makeText(context, "    Currently we are unable to download the content.   Please try again later.     ", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

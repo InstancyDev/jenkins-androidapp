@@ -210,6 +210,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     boolean isFileExist = false;
     AppController appController;
     boolean isFromCatalog = false;
+    String typeFrom = "";
     boolean refreshCatalogContent = false;
     UiSettingsModel uiSettingsModel;
     MembershipModel membershipModel = null;
@@ -236,6 +237,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             myLearningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
             isFromCatalog = bundle.getBoolean("IFROMCATALOG");
+            typeFrom = bundle.getString("typeFrom", "");
 
         }
         String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
@@ -329,7 +331,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             } else {
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
                     btnDownload.setVisibility(View.GONE);
                     circleProgressBar.setVisibility(View.GONE);
                 } else {
@@ -683,7 +685,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             } else {
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("20") | myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("20") | myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
 
                     if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
                         buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
@@ -695,36 +697,41 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 } else {
 // uncomment after reports completed
-                    relativeSecond.setVisibility(View.VISIBLE);
-                    whiteLine.setVisibility(View.VISIBLE);
-                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
-                    iconSecond.setBackground(relatedContent);
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102"))
+                        {
+                            relativeSecond.setVisibility(View.GONE);
 
-                    buttonSecond.setText("Report");
+                        }else {
+                        relativeSecond.setVisibility(View.VISIBLE);
+                        whiteLine.setVisibility(View.VISIBLE);
+                        Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
+                        iconSecond.setBackground(relatedContent);
 
+                        buttonSecond.setText("Report");
+                    }
+                    }
+
+                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
+                    iconFirst.setBackground(viewIcon);
+                    buttonFirst.setText("View");
+                    txtPrice.setVisibility(View.GONE);
+                    txtPrice.setText("");
+                    btnDownload.setVisibility(View.VISIBLE);
                 }
 
-                Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
-                iconFirst.setBackground(viewIcon);
-                buttonFirst.setText("View");
-                txtPrice.setVisibility(View.GONE);
-                txtPrice.setText("");
-                btnDownload.setVisibility(View.VISIBLE);
             }
 
+            setCompleteListner = new SetCompleteListner() {
+                @Override
+                public void completedStatus() {
+
+                    relativeSecond.setVisibility(View.GONE);
+                    whiteLine.setVisibility(View.GONE);
+                    statusUpdate("Completed");
+
+                }
+            };
         }
-
-        setCompleteListner = new SetCompleteListner() {
-            @Override
-            public void completedStatus() {
-
-                relativeSecond.setVisibility(View.GONE);
-                whiteLine.setVisibility(View.GONE);
-                statusUpdate("Completed");
-
-            }
-        };
-    }
 
 
     public void updateEnrolledEvent() {
@@ -971,7 +978,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 downloadTheCourse(myLearningModel, view);
                 break;
             case R.id.relativesecond:
-
                 if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
                     new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
                     refreshOrNo = "refresh";
@@ -1580,8 +1586,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                     db.updateContenToCatalog(myLearningModel);
                                     buttonFirst.setText("View");
                                     Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, MyLearningDetail_Activity.this, uiSettingsModel.getAppHeaderTextColor());
-                                    iconFirst.setImageDrawable(null);
-                                    iconFirst.setImageDrawable(viewIcon);
+
+
+//                                    iconFirst.setImageDrawable(null);
+                                    iconFirst.setBackground(viewIcon);
                                     refreshCatalogContent = true;
 
                                     if (isFromCatalog) {
@@ -1702,6 +1710,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         Intent intentReports = new Intent(MyLearningDetail_Activity.this, Reports_Activity.class);
         intentReports.putExtra("myLearningDetalData", myLearningModel);
+        intentReports.putExtra("typeFrom", typeFrom);
         startActivity(intentReports);
 
     }

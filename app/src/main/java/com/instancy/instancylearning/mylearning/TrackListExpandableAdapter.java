@@ -92,12 +92,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     AppController appController;
     PreferencesManager preferencesManager;
     boolean autoLaunch = true;
+    String typeFrom;
 
-    public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView) {
+    public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView, String typeFrom) {
         this._context = context;
         this._blockNames = blockNames;
         this._trackList = trackList;
         this.activity = activity;
+        this.typeFrom = typeFrom;
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(_context);
@@ -217,7 +219,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
+            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("102") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("27")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
             } else {
@@ -234,7 +236,17 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     holder.btnDownload.setEnabled(true);
                 }
 
-                holder.btnDownload.setVisibility(View.VISIBLE);
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                    holder.btnDownload.setVisibility(View.GONE);
+                }
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+                    holder.btnDownload.setVisibility(View.VISIBLE);
+//                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
+//                        holder.btnDownload.setVisibility(View.GONE);
+//                    }
+                }
+
+//                holder.btnDownload.setVisibility(View.VISIBLE);
             }
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
@@ -511,7 +523,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());
@@ -787,7 +799,6 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
 
         if (wantedView != null) {
-
 
             TextView txtBtnDownload = (TextView) wantedView.findViewById(R.id.btntxt_download);
             CircleProgressBar circleProgressBar = (CircleProgressBar) wantedView.findViewById(R.id.circle_progress_track);

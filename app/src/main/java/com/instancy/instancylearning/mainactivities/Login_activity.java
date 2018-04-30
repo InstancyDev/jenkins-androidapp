@@ -603,6 +603,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
 
             btnSignup.setVisibility(View.VISIBLE);
+            btnSignup.setText(uiSettingsModel.getSignUpName());
 
         } else {
             btnSignup.setVisibility(View.INVISIBLE);

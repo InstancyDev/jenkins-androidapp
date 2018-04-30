@@ -112,6 +112,7 @@ public class Reports_Activity extends AppCompatActivity {
     @BindView(R.id.nodata_label)
     TextView nodataLabel;
 
+    String typeFrom = "";
 
     View header;
 
@@ -138,10 +139,12 @@ public class Reports_Activity extends AppCompatActivity {
         reportsListview.setAdapter(reportAdapter);
 
         header = (View) getLayoutInflater().inflate(R.layout.detailsheader, null);
-
+        TextView   headerTextView = (TextView) header.findViewById(R.id.track_details);
+        headerTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         learningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
+        typeFrom = (String) getIntent().getStringExtra("typeFrom");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -252,7 +255,7 @@ public class Reports_Activity extends AppCompatActivity {
 
             }
 
-            reportDetail = db.getReportForContent(learningModel, isEvent);
+            reportDetail = db.getReportForContent(learningModel, isEvent,typeFrom);
 
         } else if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
@@ -383,6 +386,14 @@ public class Reports_Activity extends AppCompatActivity {
         String displayStatus = learningModel.getStatus();
 
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+
+            if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")){
+                displayStatus = "Completed (failed)";
+            }
+
+            if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")){
+                displayStatus = "Completed (passed)";
+            }
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
             reportDetail.score = "100";

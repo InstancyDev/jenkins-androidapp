@@ -91,7 +91,6 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-
     /*
     *
     *  to get simple name of the class
@@ -1156,6 +1155,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setContentUnassigned(cursor.getString(cursor
                     .getColumnIndex("contentUnassigned")));
+
+
+            uiSettingsModel.setSelfRegistrationAllowed(cursor.getString(cursor
+                    .getColumnIndex("selfRegistrationAllowed")));
+
+
+
+
+            String signUpName=cursor.getString(cursor
+                    .getColumnIndex("selfRegDisplayName"));
+
+            if (isValidString(signUpName)){
+                uiSettingsModel.setSignUpName(signUpName);
+            }
+            else {
+                uiSettingsModel.setSignUpName("Sign up");
+            }
 
             uiSettingsModel.setAutoLaunchMyLearningFirst(cursor.getString(cursor
                     .getColumnIndex("AutoLaunchFirstContentInMyLearning")));
@@ -3777,7 +3793,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate DESC";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate ASC";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -15110,19 +15126,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return reportDetailList;
     }
 
-    public ReportDetail getReportForContent(MyLearningModel learningModel, boolean isRelatedContent) {
+    public ReportDetail getReportForContent(MyLearningModel learningModel, boolean isRelatedContent,String typeFrom) {
 
         ReportDetail reportDetail = new ReportDetail();
         SQLiteDatabase db = this.getWritableDatabase();
-        String pageTypeContent = "";
+        String pageTypeContent = typeFrom;
 
-        if (isRelatedContent) {
-            pageTypeContent = "event";
-        } else if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {
-            pageTypeContent = "";
-        } else {
-            pageTypeContent = "track";
-        }
+//        if (isRelatedContent) {
+//            pageTypeContent = "event";
+//        } else if (learningModel.getObjecttypeId().equalsIgnoreCase("8") || learningModel.getObjecttypeId().equalsIgnoreCase("9")) {
+//            pageTypeContent = "";
+//        } else {
+//            pageTypeContent = "track";
+//        }
 
         if (pageTypeContent.equalsIgnoreCase("event")) {
 

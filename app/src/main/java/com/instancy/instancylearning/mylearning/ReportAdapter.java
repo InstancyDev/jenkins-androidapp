@@ -3,6 +3,7 @@ package com.instancy.instancylearning.mylearning;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -25,6 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
+import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -105,13 +107,15 @@ public class ReportAdapter extends BaseAdapter {
 
         if (isAssesment) {
             holder.txtName.setText(reportDetailsForQuestionsList.get(position).questionID + ". " + reportDetailsForQuestionsList.get(position).questionName);
-            holder.txtDateCompleted.setText(" " + reportDetailsForQuestionsList.get(position).questionAnswer);
+
+            holder.txtName.setTypeface(null, Typeface.NORMAL);
+
+            holder.txtDateCompleted.setText(" " + upperCaseWords(reportDetailsForQuestionsList.get(position).questionAnswer));
 
             holder.lineview.setVisibility(View.GONE);
-            if (reportDetailsForQuestionsList.get(position).questionAnswer.contains("in")){
+            if (reportDetailsForQuestionsList.get(position).questionAnswer.contains("in")) {
                 holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorRed));
-            }
-else {
+            } else {
                 holder.txtDateCompleted.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
             }
             holder.txtDateCompleted.setTextSize(16);
@@ -156,11 +160,9 @@ else {
 //            holder.txtScore.setText("Score: " + reportDetailList.get(position).score + " ");
 
 
-
-            if (isValidString(reportDetailList.get(position).timeSpent)){
+            if (isValidString(reportDetailList.get(position).timeSpent)) {
                 holder.txtTimeSpent.setText("Time Spent: " + reportDetailList.get(position).timeSpent);
-            }
-            else {
+            } else {
                 holder.txtTimeSpent.setText("Time Spent: 0:00:00");
             }
 
@@ -170,36 +172,37 @@ else {
                 if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-                    reportDetailList.get(position).score="100";
+                    reportDetailList.get(position).score = "100";
                 } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
-                    reportDetailList.get(position).score="0";
+                    reportDetailList.get(position).score = "0";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusNotStarted));
 
 
                 } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
-                    reportDetailList.get(position).score="50";
+                    reportDetailList.get(position).score = "50";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusInProgress));
                     holder.txtStatus.setText("In Progress");
                 } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
-                    reportDetailList.get(position).score="50";
+                    reportDetailList.get(position).score = "50";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
 
                 } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
-                    reportDetailList.get(position).score="100";
+                    reportDetailList.get(position).score = "100";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
 
 
-                } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {reportDetailList.get(position).score="100";
+                } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+                    reportDetailList.get(position).score = "100";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
                 } else if (statusFromModel.toLowerCase().contains("Expired")) {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
-                    reportDetailList.get(position).score="0";
+                    reportDetailList.get(position).score = "0";
                 } else {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
@@ -210,10 +213,9 @@ else {
                 holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
             }
 
-            if (isValidString(reportDetailList.get(position).score)){
+            if (isValidString(reportDetailList.get(position).score)) {
                 holder.txtScore.setText("Score: " + reportDetailList.get(position).score);
-            }
-            else {
+            } else {
                 holder.txtScore.setText("Score: 0");
             }
         }

@@ -53,6 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/txt_title_name"
+                    android:padding="1dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -90,16 +91,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/rating_layout"
-                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="4dp"
-                    android:weightSum="2">
+                    android:padding="1dp">
 
                     <TextView
                         android:id="@+id/txt_course_progress"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1.0"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:maxLines="2"
@@ -110,10 +108,9 @@
                     <ProgressBar
                         android:id="@+id/course_progress_bar"
                         style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="5dp"
                         android:layout_gravity="center|left"
-                        android:layout_weight="1.0"
                         android:paddingLeft="5dp"
                         android:progress="0"
                         android:progressTint="@color/colorStatusInProgress" />
@@ -124,20 +121,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/content_progress_layout"
-                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="1dp"
-                    android:weightSum="2">
+                    android:padding="1dp">
 
                     <TextView
                         android:id="@+id/txt_author"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight=".8"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:maxLines="1"
-                        android:padding="2dp"
                         android:text="Upendra"
                         android:textColor="@color/colorGray"
                         android:textSize="14sp" />
@@ -145,17 +138,16 @@
                     <View
                         android:id="@+id/consolidateline"
                         android:layout_width="1dp"
-                        android:layout_height="12dp"
+                        android:layout_height="match_parent"
                         android:background="@color/colorGray"
-                        android:padding="5dp">
+                        android:padding="2dp">
 
                     </View>
 
                     <TextView
                         android:id="@+id/txt_site_name"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1.2"
                         android:gravity="left"
                         android:maxLines="1"
                         android:paddingLeft="6dp"

@@ -353,7 +353,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         super.onStop();
 //        adWebView.pauseTimers();
 //        adWebView.stopLoading();
-        adWebView.destroy();
+//        adWebView.destroy();
     }
 
     @Override

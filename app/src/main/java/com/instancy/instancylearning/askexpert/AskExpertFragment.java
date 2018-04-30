@@ -344,8 +344,9 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         header = (View) getLayoutInflater().inflate(R.layout.detailsheader, null);
         headerTextView = (TextView) header.findViewById(R.id.track_details);
+        headerTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         headerTextView.setText("");
-        askexpertListView.addHeaderView(header);
+//        askexpertListView.addHeaderView(header);
         header.setVisibility(View.GONE);
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
@@ -858,7 +859,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         if (askExpertQuestionModelList != null && askExpertQuestionModelList.size() > 0) {
             askExpertAdapter.refreshList(askExpertQuestionModelList);
             headerTextView.setText(selectedSkillName);
-            header.setVisibility(View.VISIBLE);
+            header.setVisibility(View.GONE);
         } else {
             askExpertQuestionModelList = new ArrayList<>();
             askExpertAdapter.refreshList(askExpertQuestionModelList);
