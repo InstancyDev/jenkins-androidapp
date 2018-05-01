@@ -240,6 +240,16 @@ public class UiSettingsModel {
     private String contentUnassigned = "";
     private String firstEvent = "";
 
+    public String getAddProfileAdditionalTab() {
+        return AddProfileAdditionalTab;
+    }
+
+    public void setAddProfileAdditionalTab(String addProfileAdditionalTab) {
+        AddProfileAdditionalTab = addProfileAdditionalTab;
+    }
+
+    private String AddProfileAdditionalTab = "";
+
 
     public String getMenuTextColor() {
         return menuTextColor.isEmpty() ? "#000000" : menuTextColor;

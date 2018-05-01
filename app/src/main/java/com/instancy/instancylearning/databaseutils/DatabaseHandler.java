@@ -308,7 +308,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_NATIVEMENUS
@@ -900,6 +900,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                             uiSettingsModel.setNativeAppLoginLogo(appLogos);
                                         }
                                     }
+                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AddProfileAdditionalTab"))) {
+
+                                        uiSettingsModel.setAddProfileAdditionalTab(nativeSettingsObj.get("keyvalue").getAsString());
+                                    }
                                 }
                             }
 
@@ -963,7 +967,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
         try {
             String strExeQuery = "";
-            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName, AutoLaunchFirstContentInMyLearning , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL )"
+            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName, AutoLaunchFirstContentInMyLearning , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL,AddProfileAdditionalTab )"
                     + " VALUES ('"
                     + uiSettingsModel.getAppTextColor()
                     + "','"
@@ -1054,6 +1058,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     + siteid
                     + "','"
                     + siteUrl
+                    + "','"
+                    + uiSettingsModel.getAddProfileAdditionalTab()
+                    + "','"
                     + "')";
             db.execSQL(strExeQuery);
         } catch (SQLiteException sqlEx) {
@@ -1161,15 +1168,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     .getColumnIndex("selfRegistrationAllowed")));
 
 
-
-
-            String signUpName=cursor.getString(cursor
+            String signUpName = cursor.getString(cursor
                     .getColumnIndex("selfRegDisplayName"));
 
-            if (isValidString(signUpName)){
+            if (isValidString(signUpName)) {
                 uiSettingsModel.setSignUpName(signUpName);
-            }
-            else {
+            } else {
                 uiSettingsModel.setSignUpName("Sign up");
             }
 
@@ -1193,6 +1197,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setIsGoogle(cursor.getString(cursor
                     .getColumnIndex("isGoogle")));
+
+            uiSettingsModel.setAddProfileAdditionalTab(cursor.getString(cursor
+                    .getColumnIndex("AddProfileAdditionalTab")));
+
 
             Log.d(TAG, "getReportButtonTextColor: " + uiSettingsModel.getAppHeaderColor());
         }
@@ -9968,6 +9976,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             JSONArray jsonMembershipAry = null;
 
+            JSONArray jsonUserConfigs = null;
+
 
             if (jsonObject.has("userprofiledetails")) {
                 jsonProfileAry = jsonObject.getJSONArray("userprofiledetails");
@@ -10034,6 +10044,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             } else {
                 //no else
+            }
+
+
+            if (jsonObject.has("userprivileges")) {
+
+                jsonUserConfigs = jsonObject.getJSONArray("userprivileges");
+
+
+                // for experience data
+                if (jsonUserConfigs.length() > 0) {
+
+                    injectUserPrivilages(jsonUserConfigs, userID);
+                }
+
+
             }
 
 
@@ -11099,6 +11124,114 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return membershipModel;
     }
+
+    // here userprivilages inserts into userprivilages
+
+    public void injectUserPrivilages(JSONArray jsonPrivilageAry, String userID) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+
+            String strDelete = "DELETE FROM " + TBL_USERPRIVILEGES + " WHERE userid   = " + userID + " and siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        for (int i = 0; i < jsonPrivilageAry.length(); i++) {
+
+            JSONObject profilePrivObj = jsonPrivilageAry.getJSONObject(i);
+
+            String userIDs = "";
+            String roleid = "";
+            String privilegeid = "";
+            String parentprivilegeid = "";
+            String objecttypeid = "";
+            String componentid = "";
+
+            if (profilePrivObj.has("userid")) {
+
+                userIDs = profilePrivObj.optString("userid");
+            }
+
+            if (profilePrivObj.has("roleid")) {
+
+                roleid = profilePrivObj.optString("roleid");
+            }
+
+
+            if (profilePrivObj.has("privilegeid")) {
+
+                privilegeid = profilePrivObj.optString("privilegeid");
+            }
+
+            if (profilePrivObj.has("parentprivilegeid")) {
+
+                parentprivilegeid = profilePrivObj.optString("parentprivilegeid");
+            }
+
+            if (profilePrivObj.has("objecttypeid")) {
+                objecttypeid = profilePrivObj.optString("objecttypeid");
+
+            }
+
+            if (profilePrivObj.has("componentid")) {
+                componentid = profilePrivObj.optString("componentid");
+
+            }
+
+            ContentValues contentValues = null;
+            try {
+                contentValues = new ContentValues();
+                contentValues.put("userid", userIDs);
+                contentValues.put("privilegeid", privilegeid);
+                contentValues.put("componentid", componentid);
+                contentValues.put("parentprivilegeid", parentprivilegeid);
+                contentValues.put("objecttypeid", objecttypeid);
+                contentValues.put("roleid", roleid);
+                contentValues.put("siteurl", appUserModel.getSiteURL());
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+                db.insert(TBL_USERPRIVILEGES, null, contentValues);
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+    public boolean isPrivilegeExistsFor(int privilegeID ) {
+        boolean isRecordExists = false;
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = null;
+            String strExeQuery = "SELECT * FROM USERPRIVILEGES WHERE siteid= "
+                    + appUserModel.getSiteIDValue()
+                    + " AND userid= "
+                    + appUserModel.getUserIDValue()
+                    + " AND privilegeid = "
+                    + privilegeID;
+            cursor = db.rawQuery(strExeQuery, null);
+
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+
+                    isRecordExists = true;
+                }
+            }
+
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+        return isRecordExists;
+    }
+
+
+
 
 
     public List<ProfileGroupModel> fetchProfileGroupNames(String siteId, String userID) {
@@ -15126,7 +15259,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return reportDetailList;
     }
 
-    public ReportDetail getReportForContent(MyLearningModel learningModel, boolean isRelatedContent,String typeFrom) {
+    public ReportDetail getReportForContent(MyLearningModel learningModel, boolean isRelatedContent, String typeFrom) {
 
         ReportDetail reportDetail = new ReportDetail();
         SQLiteDatabase db = this.getWritableDatabase();

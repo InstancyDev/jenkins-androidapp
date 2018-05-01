@@ -201,7 +201,7 @@ public class Experience_activity extends AppCompatActivity {
         }
 
         assert bottomLayout != null;
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
     }
 

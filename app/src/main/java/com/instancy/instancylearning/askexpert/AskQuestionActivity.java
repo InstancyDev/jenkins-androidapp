@@ -249,7 +249,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 //            switchrelatinship.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         }
 
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
 
     void initVolleyCallback() {

@@ -231,7 +231,7 @@ public class Education_activity extends AppCompatActivity {
         spinnerToYear.setAdapter(toYearAdapter);
 
         assert bottomLayout != null;
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         spinnerToYear.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 

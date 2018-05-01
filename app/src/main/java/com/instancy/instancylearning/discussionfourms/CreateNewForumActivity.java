@@ -203,7 +203,6 @@ public class CreateNewForumActivity extends AppCompatActivity {
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
         SpannableString styledTitle
                 = new SpannableString("*Tittle");
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
@@ -263,7 +262,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         }
 
 
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
 
     void initVolleyCallback() {

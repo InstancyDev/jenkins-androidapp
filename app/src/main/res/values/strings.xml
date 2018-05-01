@@ -213,8 +213,8 @@
     <string name="toast_no_application_audio">No Application available to view audio</string>
     <string name="toast_no_application_video">No Application available to view video</string>
     <string name="toast_no_application_pdf">No Application available to view pdf file</string>
-    <string name="toast_no_application_pp">No Application available to view powerpoint file</string>
-    <string name="toast_no_application_word">No Application available to view msword file</string>
+    <string name="toast_no_application_pp">  No Application available to view powerpoint file  </string>
+    <string name="toast_no_application_word"> No Application available to view msword file </string>
     <string name="toast_no_application_excel">No Application available to view excel file</string>
     <string name="toast_no_application_txt">No Application available to view .txt file</string>
     <string name="toast_no_application_mpp">No Application available to view .mpp file</string>

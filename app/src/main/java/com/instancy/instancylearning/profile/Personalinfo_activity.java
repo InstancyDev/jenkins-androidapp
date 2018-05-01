@@ -164,7 +164,7 @@ public class Personalinfo_activity extends AppCompatActivity {
 
         }
         assert bottomLayout != null;
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
 
 
@@ -290,7 +290,7 @@ public class Personalinfo_activity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.txtsave:
                 try {
-                    validateNewForumCreation();
+                    validateDataFields();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -302,11 +302,11 @@ public class Personalinfo_activity extends AppCompatActivity {
 
     }
 
-    public void validateNewForumCreation() throws JSONException {
+    public void validateDataFields() throws JSONException {
 
         boolean isValidationCompleted = true;
 
-        Log.d(TAG, "validateNewForumCreation: " + profileConfigsModelist);
+        Log.d(TAG, "validateDataFields: " + profileConfigsModelist);
 
 
         for (int i = 0; i < profileConfigsModelist.size(); i++) {
@@ -353,7 +353,7 @@ public class Personalinfo_activity extends AppCompatActivity {
 //
 //        Log.d(TAG, "validateNewForumCreation: " + finalString);
 //
-        String replaceDataSt = finalString.replace("\'", "\\\'");
+//        String replaceDataSt = finalString.replace("\'", "\\\'");
 
 
         if (isValidationCompleted) {
@@ -364,16 +364,16 @@ public class Personalinfo_activity extends AppCompatActivity {
             parameters.put("UserGroupIDs", "");
             parameters.put("RoleIDs", "");
             parameters.put("CMGroupIDs", "");
-            parameters.put("Cmd", replaceDataSt);
+            parameters.put("Cmd", finalString);
 
             String parameterString = parameters.toString();
             Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
-//            String replaceDataString = parameterString.replace("\"", "\\\"");
-//            String addQuotes = ('"' + replaceDataString + '"');
+            String replaceDataString = parameterString.replace("\"", "\\\"");
+            String addQuotes = ('"' + replaceDataString + '"');
 
             if (isNetworkConnectionAvailable(this, -1)) {
-                sendNewOrUpdatedEducationDetailsDataToServer(parameterString);
+                sendNewOrUpdatedEducationDetailsDataToServer(addQuotes);
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
@@ -396,14 +396,14 @@ public class Personalinfo_activity extends AppCompatActivity {
                 if (s.contains("success")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \n.You have successfully added the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \n.You have successfully added the "+groupName, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \n.You have successfully updated the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \n.You have successfully updated the "+groupName, Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, groupName + " cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -444,7 +444,7 @@ public class Personalinfo_activity extends AppCompatActivity {
         RequestQueue rQueue = Volley.newRequestQueue(context);
         rQueue.add(request);
         request.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
+                10000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 

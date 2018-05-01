@@ -61,6 +61,7 @@ import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.models.UserPrivilegesModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -124,6 +125,8 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     String contentIDFromNotification = "";
     String topicID = "";
 
+    boolean isPrivilageForDiscussion=false;
+
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
@@ -161,6 +164,10 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             }
 
         }
+
+        isPrivilageForDiscussion = db.isPrivilegeExistsFor(434);
+
+
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -253,8 +260,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+        d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
-        floatingActionButton.setVisibility(View.VISIBLE);
+        if (isPrivilageForDiscussion){
+            floatingActionButton.setVisibility(View.VISIBLE);
+        }
+
         floatingActionButton.setImageDrawable(d);
 
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));

@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.provider.CalendarContract;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -265,21 +266,21 @@ public class GlobalMethods {
 
                 offlinePathEncode = offlinePathEncode.replace("file://", "");
 
-                try {
-
-                    offlinePathEncode = URLDecoder.decode(offlinePath, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
                 File file = new File(offlinePathEncode);
-                Intent intent2 = new Intent();
-                intent2.setAction(android.content.Intent.ACTION_VIEW);
-                intent2.setDataAndType(
-                        Uri.fromFile(file),
-                        "application/mspowerpoint,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation");
-                try {
-                    context.startActivity(intent2);
+                Uri docUri = FileProvider.getUriForFile(
+                        context,
+                        context.getApplicationContext()
+                                .getPackageName() + ".provider", file);
 
+//                Intent intent3 = new Intent();
+//                intent3.setDataAndType(docUri, "application/pptx,application/ppt");
+//                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                intent3.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//                intent3.setAction(android.content.Intent.ACTION_VIEW);
+
+
+                try {
+//                    context.startActivity(intent3);
                 } catch (ActivityNotFoundException e) {
 
                     Toast toast = Toast.makeText(context,
@@ -301,13 +302,13 @@ public class GlobalMethods {
                         context.getApplicationContext()
                                 .getPackageName() + ".provider", file);
 
-                Intent intent3 = new Intent();
-
-                intent3.setDataAndType(docUri, ".docx");
-                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent3.setAction(android.content.Intent.ACTION_VIEW);
+//                Intent intent3 = new Intent();
+//
+//                intent3.setDataAndType(docUri, ".docx");
+//                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                intent3.setAction(android.content.Intent.ACTION_VIEW);
                 try {
-                    context.startActivity(intent3);
+//                    context.startActivity(intent3);
 
                 } catch (ActivityNotFoundException e) {
 
@@ -322,14 +323,26 @@ public class GlobalMethods {
                     || offlinePathEncode.toLowerCase().contains(".xls")) {
                 offlinePathEncode = offlinePathEncode.replace(" file://", "");
 
-                File file = new File(offlinePathEncode);
-                Intent intent4 = new Intent();
-                intent4.setAction(android.content.Intent.ACTION_VIEW);
-                intent4.setDataAndType(
-                        Uri.fromFile(file),
-                        "application/excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//                File file = new File(offlinePathEncode);
+//                Uri docUri = FileProvider.getUriForFile(
+//                        context,
+//                        context.getApplicationContext()
+//                                .getPackageName() + ".provider", file);
+//
+//                Intent intent3 = new Intent();
+//
+//                intent3.setDataAndType(docUri, "application/xls,application/xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                intent3.setAction(android.content.Intent.ACTION_VIEW);
+
+                Toast toasts = Toast.makeText(context,
+                        context.getString(R.string.toast_no_application_excel),
+                        Toast.LENGTH_LONG);
+                toasts.setGravity(Gravity.CENTER, 0, 0);
+                toasts.show();
+
                 try {
-                    context.startActivity(intent4);
+//                    context.startActivity(intent3);
 
                 } catch (ActivityNotFoundException e) {
 
