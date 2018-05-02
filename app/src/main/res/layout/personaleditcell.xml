@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/labelastrek"
         android:padding="10dp"
+        android:visibility="visible"
         android:text="edit field" />
 
     <TextView
@@ -45,12 +46,13 @@
         android:layout_below="@+id/editField"
         android:background="@drawable/bottomline"
         android:gravity="center_vertical"
-        android:padding="4dp"
+        android:padding="5dp"
         android:text="DOB"
         android:textColor="@color/colorBlack"
         android:textSize="16dp" />
 
     <Spinner
+        android:layout_below="@+id/txtdobclick"
         android:id="@+id/spnrCountries"
         android:layout_width="match_parent"
         android:layout_height="45dp"

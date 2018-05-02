@@ -11231,7 +11231,119 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+    // here  insert profile choice options
 
+    public void injectProfielFieldOptions(JSONArray jsonPrivilageAry) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+
+            String strDelete = "DELETE FROM " + TBL_USERPROFILEFIELDOPTIONS + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        for (int i = 0; i < jsonPrivilageAry.length(); i++) {
+
+            JSONObject profilePrivObj = jsonPrivilageAry.getJSONObject(i);
+
+            String choiceid = "";
+            String attributeconfigid = "";
+            String choicetext = "";
+            String choicevalue = "";
+            String localename = "";
+            String parenttext = "";
+            String siteid = "";
+
+            if (profilePrivObj.has("attributeconfigid")) {
+
+                attributeconfigid = profilePrivObj.optString("attributeconfigid");
+            }
+
+            if (profilePrivObj.has("choiceid")) {
+
+                choiceid = profilePrivObj.optString("choiceid");
+            }
+
+
+            if (profilePrivObj.has("choicetext")) {
+
+                choicetext = profilePrivObj.optString("choicetext");
+            }
+
+            if (profilePrivObj.has("choicevalue")) {
+
+                choicevalue = profilePrivObj.optString("choicevalue");
+            }
+
+            if (profilePrivObj.has("localename")) {
+                localename = profilePrivObj.optString("localename");
+
+            }
+
+            if (profilePrivObj.has("parenttext")) {
+                parenttext = profilePrivObj.optString("parenttext");
+
+            }
+
+            ContentValues contentValues = null;
+            try {
+                contentValues = new ContentValues();
+                contentValues.put("attributeconfigid", attributeconfigid);
+                contentValues.put("choiceid", choiceid);
+                contentValues.put("choicetext", choicetext);
+                contentValues.put("choicevalue", choicevalue);
+                contentValues.put("localename", localename);
+                contentValues.put("parenttext", parenttext);
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+                db.insert(TBL_USERPROFILEFIELDOPTIONS, null, contentValues);
+
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+
+    public ArrayList<String> fetchCountriesName(String siteId, String attributeConfigID) {
+
+        ArrayList<String> countryNames = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT choicetext FROM " + TBL_USERPROFILEFIELDOPTIONS + " WHERE attributeconfigid = "+attributeConfigID + " AND siteid = " + siteId + " ORDER BY choicetext" ;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    String countryNamesStr="";
+                    countryNamesStr = (cursor.getString(cursor.getColumnIndex("choicetext")));
+
+                    countryNames.add(countryNamesStr);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return countryNames;
+    }
 
 
     public List<ProfileGroupModel> fetchProfileGroupNames(String siteId, String userID) {

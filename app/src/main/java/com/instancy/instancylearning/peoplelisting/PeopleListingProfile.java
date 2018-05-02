@@ -171,6 +171,9 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
 
+        userName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        userLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
         profileDynamicAdapter = new PeopleProfileExpandAdapter(this, experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);

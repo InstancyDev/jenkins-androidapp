@@ -67,12 +67,12 @@ public class ProfileEditAdapter extends BaseAdapter {
 
     ArrayAdapter titleAdapter;
 
-    ArrayList<String> degreeTitleList;
+    List<String> countriesList;
 
 
-    public ProfileEditAdapter(Activity activity, int resource, List<ProfileConfigsModel> profileConfigsModelList, ArrayList<String> degreeTitleList) {
+    public ProfileEditAdapter(Activity activity, int resource, List<ProfileConfigsModel> profileConfigsModelList) {
         this.activity = activity;
-        this.degreeTitleList = degreeTitleList;
+
         this.profileConfigsModelList = profileConfigsModelList;
         this.searchList = new ArrayList<ProfileConfigsModel>();
         this.resource = resource;
@@ -83,14 +83,19 @@ public class ProfileEditAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-
-
+        countriesList = new ArrayList<>();
     }
 
     public void refreshList(List<ProfileConfigsModel> profileConfigsModelList) {
         this.profileConfigsModelList = profileConfigsModelList;
         this.searchList = new ArrayList<ProfileConfigsModel>();
         this.searchList.addAll(profileConfigsModelList);
+
+        this.notifyDataSetChanged();
+    }
+
+    public void refreshCountries(ArrayList<String> degreeTitleList) {
+        this.countriesList = degreeTitleList;
         this.notifyDataSetChanged();
     }
 
@@ -142,13 +147,18 @@ public class ProfileEditAdapter extends BaseAdapter {
             holder.edit_field.setVisibility(View.GONE);
             holder.spnrCountries.setVisibility(View.VISIBLE);
 
+            ArrayAdapter<String> cntAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item, countriesList);
+
+            // attaching data adapter to spinner
+            holder.spnrCountries.setAdapter(cntAdapter);
 
             holder.spnrCountries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position,
+                public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
                                            long id) {
 
+                    profileConfigsModelList.get(position).valueName=countriesList.get(spnrPosition);
 
                 }
 

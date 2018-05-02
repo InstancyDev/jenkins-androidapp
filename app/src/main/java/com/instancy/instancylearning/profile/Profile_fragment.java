@@ -280,8 +280,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         userName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         userLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
-
         boolean isProfileExists = getALlProfilesDetailsFromDB();
         profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
 

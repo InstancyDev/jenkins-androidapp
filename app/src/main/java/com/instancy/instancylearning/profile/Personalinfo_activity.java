@@ -15,19 +15,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -39,33 +33,24 @@ import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DegreeTypeModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
-import static com.instancy.instancylearning.utils.Utilities.getFromYearToYear;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -138,7 +123,7 @@ public class Personalinfo_activity extends AppCompatActivity {
         profileConfigsModelist = (List<ProfileConfigsModel>) bundle.getSerializable("profileConfigsModelArrayList");
         groupName = bundle.getString("GroupName");
 
-        profileEditAdapter = new ProfileEditAdapter(this, BIND_ABOVE_CLIENT, profileConfigsModelist, degreeTitleList);
+        profileEditAdapter = new ProfileEditAdapter(this, BIND_ABOVE_CLIENT, profileConfigsModelist);
         personalEditList.setAdapter(profileEditAdapter);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -197,6 +182,14 @@ public class Personalinfo_activity extends AppCompatActivity {
                             jsonArray = response.getJSONArray("table5");
 
                             Log.d(TAG, "Volley JSON post" + jsonArray.length());
+
+                            db.injectProfielFieldOptions(jsonArray);
+
+                            degreeTitleList=db.fetchCountriesName(appUserModel.getSiteIDValue(),"25");
+
+                            profileEditAdapter.refreshCountries(degreeTitleList);
+
+                            Log.d(TAG, "notifySuccess: "+degreeTitleList.size());
 
                         } catch (JSONException e) {
                             e.printStackTrace();

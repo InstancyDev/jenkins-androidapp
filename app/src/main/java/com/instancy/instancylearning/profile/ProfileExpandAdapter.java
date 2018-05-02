@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.profile;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.ProfileGroupModel;
+import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
 
@@ -33,6 +35,8 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
     private HashMap<String, List<ProfileConfigsModel>> expandableHashDetail;
     Typeface iconFon;
 
+    private UiSettingsModel uiSettingsModel;
+
     public ProfileExpandAdapter(Context context, List<UserExperienceModel> userExperienceModelList, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
         this.context = context;
         this.userEducationModelList = userEducationModelList;
@@ -41,6 +45,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         this.expandableListTitle = expandableListTitle;
         this.notifyDataSetChanged();
         iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        uiSettingsModel = UiSettingsModel.getInstance();
     }
 
 
@@ -115,7 +120,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         pView = inflater.inflate(R.layout.profilesectionview, parent, false);
         View view = (View) pView.findViewById(R.id.topview);
 
-
         TextView editIcon = (TextView) pView
                 .findViewById(R.id.editoptionicon);
 
@@ -138,6 +142,8 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
         }
 
+//        pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         return pView;
 
     }
@@ -157,6 +163,9 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         cView = inflater.inflate(R.layout.profile_education_item, parent, false);
 //        }
+
+
+
         TextView profileSchool = (TextView) cView
                 .findViewById(R.id.profile_school);
         TextView profileDegree = (TextView) cView
@@ -184,12 +193,14 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
         }
-
+//        cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         if (isLastChild) {
             cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitembottom));
         } else {
             cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitemmiddle));
         }
+
+
 
         return cView;
     }

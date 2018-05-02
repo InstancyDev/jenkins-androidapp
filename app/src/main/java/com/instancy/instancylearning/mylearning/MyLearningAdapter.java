@@ -485,9 +485,8 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);
-
         }
-        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102")|| myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("27")) {
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("27")) {
             holder.btnDownload.setVisibility(View.GONE);
             holder.circleProgressBar.setVisibility(View.GONE);
 //            holder.progressBar.setVisibility(View.GONE);
@@ -908,7 +907,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner,"");
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "");
             } else {
                 if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                     ((ListView) parent).performItemClick(view, getPosition, 0);
@@ -916,6 +915,7 @@ public class MyLearningAdapter extends BaseAdapter {
             }
         }
     }
+
     public void getUserRatingsOfTheContent(final int position, final float rating) throws
             JSONException {
 
