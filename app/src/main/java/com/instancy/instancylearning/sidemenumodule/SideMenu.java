@@ -292,6 +292,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         }
+
         txtUsername.setText(upperCaseWords(name));
         txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
@@ -783,7 +784,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (!detailsModel.displayname.equalsIgnoreCase("")) {
             name = detailsModel.displayname;
-        } else if (!detailsModel.firstname.equalsIgnoreCase("")) {
+        }
+        if (!detailsModel.firstname.equalsIgnoreCase("")) {
             name = detailsModel.firstname + " " + detailsModel.lastname;
         } else {
             name = "Anonymous";

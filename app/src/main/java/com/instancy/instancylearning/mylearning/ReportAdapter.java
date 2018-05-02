@@ -110,7 +110,11 @@ public class ReportAdapter extends BaseAdapter {
 
             holder.txtName.setTypeface(null, Typeface.NORMAL);
 
-            holder.txtDateCompleted.setText(" " + upperCaseWords(reportDetailsForQuestionsList.get(position).questionAnswer));
+            if (reportDetailsForQuestionsList.get(position).questionAnswer.equalsIgnoreCase("na")){
+                holder.txtDateCompleted.setText(" " + reportDetailsForQuestionsList.get(position).questionAnswer);
+            }else {
+                holder.txtDateCompleted.setText(" " + upperCaseWords(reportDetailsForQuestionsList.get(position).questionAnswer));
+            }
 
             holder.lineview.setVisibility(View.GONE);
             if (reportDetailsForQuestionsList.get(position).questionAnswer.contains("in")) {
@@ -127,12 +131,13 @@ public class ReportAdapter extends BaseAdapter {
 
 
         } else {
+            holder.txtDateCompleted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             holder.txtName.setText(reportDetailList.get(position).courseName);
 
             String dateCompleted = reportDetailList.get(position).dateCompleted;
 
-            String status = reportDetailList.get(position).status;
+
 
             String dateStarted = reportDetailList.get(position).dateStarted;
 
@@ -142,12 +147,7 @@ public class ReportAdapter extends BaseAdapter {
                 holder.txtDateCompleted.setText("Date Completed: ");
             }
 
-            if (isValidString(status)) {
 
-                holder.txtStatus.setText(status);
-            } else {
-                holder.txtStatus.setText("");
-            }
 
             if (isValidString(dateStarted)) {
 
@@ -170,6 +170,14 @@ public class ReportAdapter extends BaseAdapter {
 
             if (isValidString(statusFromModel)) {
                 if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+
+                    if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")){
+                        statusFromModel = "Completed (failed)";
+                    }
+
+                    if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")){
+                        statusFromModel = "Completed (passed)";
+                    }
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
                     reportDetailList.get(position).score = "100";
@@ -208,9 +216,15 @@ public class ReportAdapter extends BaseAdapter {
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
                 }
 
-
             } else {
                 holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
+            }
+
+            if (isValidString(statusFromModel)) {
+
+                holder.txtStatus.setText(upperCaseWords(statusFromModel));
+            } else {
+                holder.txtStatus.setText("");
             }
 
             if (isValidString(reportDetailList.get(position).score)) {
@@ -225,6 +239,8 @@ public class ReportAdapter extends BaseAdapter {
         holder.txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtStartDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtTimeSpent.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtStartDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtStatusTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
 ///   from here
 

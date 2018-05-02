@@ -470,6 +470,9 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+
+//        holder.btnContextMenu.setColorFilter(Color.parseColor(uiSettingsModel.getAppTextColor()), PorterDuff.Mode.SRC_ATOP);
+
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
@@ -534,6 +537,19 @@ public class MyLearningAdapter extends BaseAdapter {
         Log.d(TAG, "getView: statusFromModel " + statusFromModel);
 
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+
+            if (statusFromModel.equalsIgnoreCase("Completed")) {
+                statusFromModel = "Completed";
+
+            } else if (statusFromModel.equalsIgnoreCase("failed")) {
+
+                statusFromModel = "Completed(failed)";
+            } else if (statusFromModel.equalsIgnoreCase("passed")) {
+
+                statusFromModel = "Completed(passed)";
+
+            }
+
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
             holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
@@ -563,7 +579,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
             courseStatus = status + " (" + 50;
 
-        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
+        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade")) ) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 

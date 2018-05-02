@@ -186,7 +186,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @BindView(R.id.whiteline)
     View whiteLine;
 
-    TextView txtOverallRating, ratedOutOfTxt;
+    TextView txtOverallRating, ratedOutOfTxt,txtAvg,txtRating;
 
     View header;
 
@@ -280,6 +280,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtOverallRating.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            ratedOutOfTxt.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtRating.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtAvg.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             if (myLearningModel.getSiteName().equalsIgnoreCase("")) {
                 consolidateLine.setVisibility(View.INVISIBLE);
@@ -553,6 +557,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         ratedOutOfTxt = (TextView) header.findViewById(R.id.ratedoutofTxt);
 
+        txtAvg = (TextView) header.findViewById(R.id.txtAvg);
+
+        txtRating = (TextView) header.findViewById(R.id.txtRating);
+
         btnEditReview = (Button) header.findViewById(R.id.btnReview);
 
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
@@ -785,7 +793,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
             displayStatus = statusValue + " (" + progressPercent;
 
-        } else if (courseStatus.toLowerCase().contains("pending review") || (courseStatus.toLowerCase().contains("pendingreview"))) {
+        } else if (courseStatus.toLowerCase().contains("pending review") || (courseStatus.toLowerCase().contains("pendingreview")) || (courseStatus.toLowerCase().contains("grade"))) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 

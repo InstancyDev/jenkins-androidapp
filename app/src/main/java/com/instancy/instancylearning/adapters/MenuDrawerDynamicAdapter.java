@@ -184,8 +184,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
         } else {
 
             if (parentPosition % 2 == 0) {
-                pView.setBackgroundColor(Color
-                        .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+                pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
             } else {
                 pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             }

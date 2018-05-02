@@ -167,7 +167,6 @@ public class ProfileEditAdapter extends BaseAdapter {
 
                 }
 
-
             });
 
 //            titleAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, degreeTitleList);

@@ -221,7 +221,11 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                    finish();
                                                    return true;
                                                } else if (url.contains("blank.html?ioscourseclose=true")) {
-                                                   databaseHandler.saveCourseClose(url, myLearningModel);
+
+                                                   if (!isOffline && myLearningModel.getObjecttypeId().equalsIgnoreCase("9")) {
+                                                       databaseHandler.saveCourseClose(url, myLearningModel);
+                                                   }
+
 
                                                    Intent intent = getIntent();
                                                    intent.putExtra("myLearningDetalData", myLearningModel);
