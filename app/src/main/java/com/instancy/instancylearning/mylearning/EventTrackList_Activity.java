@@ -441,9 +441,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             if (trackList.get(i).getStatus().toLowerCase().contains("completed") || trackList.get(i).getStatus().toLowerCase().contains("failed") || trackList.get(i).getStatus().toLowerCase().contains("passed")) {
 
                 isTraxkListCompleted = true;
-                break;
+
             } else {
                 isTraxkListCompleted = false;
+                break;
             }
         }
 

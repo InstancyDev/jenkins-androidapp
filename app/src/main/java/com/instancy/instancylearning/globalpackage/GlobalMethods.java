@@ -862,6 +862,7 @@ public class GlobalMethods {
 
             menu.getItem(10).setVisible(true);
 
+
         } else {
 
             menu.getItem(10).setVisible(false);
@@ -921,6 +922,10 @@ public class GlobalMethods {
             // uncomment for report false
 //
             menu.getItem(1).setVisible(true);
+        }
+
+        if (typeFrom.equalsIgnoreCase("event") || typeFrom.equalsIgnoreCase("track")) {
+            menu.getItem(2).setVisible(false);
         }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {

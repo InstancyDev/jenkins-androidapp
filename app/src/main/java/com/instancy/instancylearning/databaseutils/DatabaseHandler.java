@@ -12575,7 +12575,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 //        let rs = try database.executeQuery("SELECT DF.*, UI.profileimagepath from \(DBTables.DiscussionForumTable.rawValue) DF LEFT OUTER JOIN USERSINFO UI ON DF.createduserid = UI.userid WHERE DF.siteid = ? ORDER BY forumid DESC", values: ["\(siteIDValue)"])
 
-        String strSelQuerys = "SELECT DF.*, UI.profileimagepath from " + TBL_FORUMS + " DF LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON DF.createduserid = UI.userid WHERE DF.siteid = " + siteID + " ORDER BY forumid DESC";
+        String strSelQuerys = "SELECT DF.*, UI.profileimagepath from " + TBL_FORUMS + " DF LEFT OUTER JOIN " + TBL_ALLUSERSINFO + " UI ON DF.createduserid = UI.userid WHERE DF.siteid = " + siteID + " ORDER BY createddate DESC";
 
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);

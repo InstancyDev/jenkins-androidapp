@@ -7,6 +7,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.os.CountDownTimer;
@@ -76,6 +78,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -438,6 +441,8 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
 
+
+//        holder.btnContextMenu.getDrawable().setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppTextColor())));
 
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 

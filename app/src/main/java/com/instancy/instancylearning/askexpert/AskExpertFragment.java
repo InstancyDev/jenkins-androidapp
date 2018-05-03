@@ -100,6 +100,7 @@ import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_AS
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 
@@ -440,19 +441,24 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     public void fabActionMenusInitilization() {
         askexpertMenu.setVisibility(View.VISIBLE);
         askexpertMenu.setClosedOnTouchOutside(true);
+
+
         askexpertMenu.setMenuButtonColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+
+        askexpertMenu.getMenuIconView().setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 
         fabAskeQuestion.setOnClickListener(this);
         fabFilter.setOnClickListener(this);
 
-        fabAskeQuestion.setImageDrawable(getDrawableFromString(R.string.fa_icon_question));
-        fabFilter.setImageDrawable(getDrawableFromString(R.string.fa_icon_filter));
+        fabAskeQuestion.setLabelText(getResources().getString(R.string.askaquestion));
+        fabFilter.setLabelText(getResources().getString(R.string.filter));
+
+
+        fabAskeQuestion.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_question, context, uiSettingsModel.getAppHeaderTextColor()));
+        fabFilter.setImageDrawable(getDrawableFromStringMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor()));
 
         fabAskeQuestion.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
         fabFilter.setColorNormal(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-
-        fabAskeQuestion.setLabelText(getResources().getString(R.string.askaquestion));
-        fabFilter.setLabelText(getResources().getString(R.string.filter));
 
     }
 

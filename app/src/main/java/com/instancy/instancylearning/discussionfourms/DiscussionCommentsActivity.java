@@ -105,6 +105,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     DiscussionCommentsAdapter commentsAdapter;
 
 
+    boolean refreshAnyThing = false;
+
     @Nullable
     @BindView(R.id.txt_name)
     TextView txtName;
@@ -160,12 +162,6 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         db = new DatabaseHandler(this);
         ButterKnife.bind(this);
 
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
@@ -188,9 +184,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         discussionCommentsModelList = new ArrayList<DiscussionCommentsModel>();
 
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
+
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -212,6 +206,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomment, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
+        d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
         floatingActionButton.setImageDrawable(d);
 
@@ -270,7 +265,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
         vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumComments?SiteID=" + appUserModel.getSiteIDValue() + "&ForumID=" + discussionTopicModel.forumid + "&TopicID=" + discussionTopicModel.topicid, appUserModel.getAuthHeaders());
@@ -326,14 +321,20 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             discussionCommentsModelList = new ArrayList<DiscussionCommentsModel>();
             commentsAdapter.refreshList(discussionCommentsModelList);
         }
-
+        txtCommentsCount.setText(discussionCommentsModelList.size() + " Comment(s)");
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        closeForum(refreshAnyThing);
     }
 
+    public void closeForum(boolean refresh) {
+        Intent intent = getIntent();
+        intent.putExtra("NEWFORUM", refreshAnyThing);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -350,8 +351,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
-                finish();
-
+                closeForum(true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -391,6 +391,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 boolean refresh = data.getBooleanExtra("NEWFORUM", false);
                 if (refresh) {
                     refreshMyLearning(false);
+                    refreshAnyThing = true;
                 }
             }
         }
@@ -524,7 +525,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     public void deleteCommentFromServer(final String postData, final DiscussionCommentsModel commentsModel) {
 
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteForumComment";
 
@@ -537,7 +538,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 if (s.contains("success")) {
 
                     Toast.makeText(context, "Success! \nYour new topic has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-
+                    refreshAnyThing = true;
                     deleteCommentFromLocalDB(commentsModel);
                 } else {
 

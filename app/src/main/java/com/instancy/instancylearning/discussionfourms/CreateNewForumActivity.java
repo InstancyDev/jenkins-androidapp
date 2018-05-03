@@ -208,16 +208,17 @@ public class CreateNewForumActivity extends AppCompatActivity {
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledTitle.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        styledTitle.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelTitle.setText(styledTitle);
 
-        SpannableString styledDescription
-                = new SpannableString("*Description");
-        styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
-        styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
-        styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        labelDescritpion.setText(styledDescription);
+//        SpannableString styledDescription
+//                = new SpannableString("Description");
+//        styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
+//        styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
+//        styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        styledDescription.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//
+//        labelDescritpion.setText(styledDescription);
 
         switchAttachFiles.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -259,8 +260,10 @@ public class CreateNewForumActivity extends AppCompatActivity {
             switchEmail.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
             switchAttachFiles.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
             switchNewTopics.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+            switchNewTopics.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            switchAttachFiles.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            switchEmail.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         }
-
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
@@ -307,11 +310,14 @@ public class CreateNewForumActivity extends AppCompatActivity {
         String descriptionStr = editDescription.getText().toString().trim();
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
-        if (titleStr.length() < 4) {
+        if (titleStr.length() < 1) {
             Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
-        } else if (descriptionStr.length() < 10) {
-            Toast.makeText(this, "Enter description", Toast.LENGTH_SHORT).show();
-        } else {
+        }
+//        else
+//            if (descriptionStr.length() < 10) {
+//            Toast.makeText(this, "Enter description", Toast.LENGTH_SHORT).show();
+//        }
+        else {
 //            Map<String, String> parameters = new HashMap<String, String>();
             JSONObject parameters = new JSONObject();
             if (isUpdateForum) {

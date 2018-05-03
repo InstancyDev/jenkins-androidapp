@@ -182,20 +182,20 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
     public void initilizeHeaderView() {
 
-        labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+//        labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledDescription
                 = new SpannableString("*Comment");
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        styledDescription.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelDescritpion.setText(styledDescription);
 
         labelTitle.setVisibility(View.GONE);
         editTitle.setVisibility(View.GONE);
 
-        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         editDescription.setHint("Enter Comment here...");
     }

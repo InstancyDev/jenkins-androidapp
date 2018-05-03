@@ -1609,7 +1609,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                                         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
                                             succesMessage = getResources().getString(R.string.event_add_success);
-                                            db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
+//                                            db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
                                             updateEnrolledEvent();
 
                                         }

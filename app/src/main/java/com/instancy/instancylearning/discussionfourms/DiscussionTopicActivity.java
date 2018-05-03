@@ -91,6 +91,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     UiSettingsModel uiSettingsModel;
     DiscussionTopicAdapter fourmAdapter;
 
+    boolean refreshAnyThing = false;
 
     @Nullable
     @BindView(R.id.txt_name)
@@ -205,6 +206,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomments, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
+        d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
         floatingActionButton.setImageDrawable(d);
 
@@ -253,8 +255,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumid, appUserModel.getAuthHeaders());
@@ -309,13 +310,41 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             discussionTopicModels = new ArrayList<DiscussionTopicModel>();
             fourmAdapter.refreshList(discussionTopicModels);
         }
+
+        updateCommentsCount();
+
         triggerActionForFirstItem();
     }
 
 
+    public void updateCommentsCount() {
+
+        int totalCount = 0;
+        for (int i = 0; i < discussionTopicModels.size(); i++) {
+            int noofreplies = 0;
+            try {
+                noofreplies = Integer.parseInt(discussionTopicModels.get(i).noofreplies);
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                noofreplies = 0;
+            }
+            totalCount = totalCount + noofreplies;
+
+        }
+        txtCommentsCount.setText(totalCount + " Comment(s)");
+    }
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+
+        closeForum(refreshAnyThing);
+    }
+
+    public void closeForum(boolean refresh) {
+        Intent intent = getIntent();
+        intent.putExtra("NEWFORUM", refresh);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
 
@@ -334,6 +363,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
+                closeForum(refreshAnyThing);
                 finish();
 
                 return true;
@@ -413,6 +443,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 boolean refresh = data.getBooleanExtra("NEWFORUM", false);
                 if (refresh) {
                     refreshMyLearning(false);
+                    refreshAnyThing = true;
                 }
             }
         }
@@ -448,7 +479,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     public void attachFragment(DiscussionTopicModel forumModel) {
         Intent intentDetail = new Intent(context, DiscussionCommentsActivity.class);
         intentDetail.putExtra("topicModel", forumModel);
-        startActivity(intentDetail);
+        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
     }
 
     public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final DiscussionTopicModel discussionTopicModel) {

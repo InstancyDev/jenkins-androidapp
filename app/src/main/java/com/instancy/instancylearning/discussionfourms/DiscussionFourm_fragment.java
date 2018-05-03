@@ -125,7 +125,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     String contentIDFromNotification = "";
     String topicID = "";
 
-    boolean isPrivilageForDiscussion=false;
+    boolean isPrivilageForDiscussion = false;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -262,7 +262,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
         d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
-        if (isPrivilageForDiscussion){
+        if (isPrivilageForDiscussion) {
             floatingActionButton.setVisibility(View.VISIBLE);
         }
 
@@ -276,7 +276,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                 Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
                 intentDetail.putExtra("isfromedit", false);
                 intentDetail.putExtra("forumModel", "");
-                startActivity(intentDetail);
+                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
             }
         });
 
@@ -344,6 +344,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         return position;
     }
+
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -371,7 +372,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
@@ -557,7 +558,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             if (data != null) {
                 boolean refresh = data.getBooleanExtra("NEWFORUM", false);
                 if (refresh) {
-                    refreshCatalog(false);
+                    refreshCatalog(true);
                 }
             }
         }
@@ -569,7 +570,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         intentDetail.putExtra("NOTIFICATION", isFromNotification);
         intentDetail.putExtra("TOPICID", topicID);
 
-        ((Activity) context).startActivity(intentDetail);
+        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
     }
 
     @Override

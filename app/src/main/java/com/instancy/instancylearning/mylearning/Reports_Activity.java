@@ -43,6 +43,7 @@ import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
+import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 
 /**
@@ -139,7 +140,7 @@ public class Reports_Activity extends AppCompatActivity {
         reportsListview.setAdapter(reportAdapter);
 
         header = (View) getLayoutInflater().inflate(R.layout.detailsheader, null);
-        TextView   headerTextView = (TextView) header.findViewById(R.id.track_details);
+        TextView headerTextView = (TextView) header.findViewById(R.id.track_details);
         headerTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -255,7 +256,7 @@ public class Reports_Activity extends AppCompatActivity {
 
             }
 
-            reportDetail = db.getReportForContent(learningModel, isEvent,typeFrom);
+            reportDetail = db.getReportForContent(learningModel, isEvent, typeFrom);
 
         } else if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
@@ -387,11 +388,11 @@ public class Reports_Activity extends AppCompatActivity {
 
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
-            if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")){
+            if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")) {
                 displayStatus = "Completed (failed)";
             }
 
-            if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")){
+            if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")) {
                 displayStatus = "Completed (passed)";
             }
 
@@ -430,7 +431,7 @@ public class Reports_Activity extends AppCompatActivity {
         }
 
         txtScore.setText("Score: " + reportDetail.score);
-        txtStatus.setText(displayStatus);
+        txtStatus.setText(upperCaseWords(displayStatus));
     }
 
     @Override
