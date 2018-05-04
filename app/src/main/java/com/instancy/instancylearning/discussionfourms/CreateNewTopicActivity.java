@@ -11,14 +11,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
-
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -27,18 +26,13 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Base64;
 import android.util.Log;
-
-import android.view.Menu;
 import android.view.MenuItem;
-
 import android.view.View;
 import android.widget.EditText;
-
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -50,6 +44,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.chatmessanger.ChatActivity;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 
@@ -71,6 +66,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,6 +78,8 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.encodeImage;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
+import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -99,8 +97,6 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     IResult resultCallback = null;
     private int GALLERY = 1;
     DatabaseHandler db;
-    ResultListner resultListner = null;
-
 
     DiscussionTopicModel discussionTopicModel;
     DiscussionForumModel discussionForumModel;
@@ -109,6 +105,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     AppController appController;
     UiSettingsModel uiSettingsModel;
 
+    String topicID = "", finalfileName = "", finalEncodedImageStr = "";
 
     @Nullable
     @BindView(R.id.txt_title)
@@ -143,8 +140,15 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     EditText editAttachment;
 
     @Nullable
+    @BindView(R.id.txtAttachment)
+    TextView txtAttachment;
+
+    @Nullable
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
+
+    Bitmap bitmapAttachment = null;
+    String endocedImageStr = "";
 
     boolean isUpdateForum = false;
 
@@ -173,6 +177,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
             isUpdateForum = true;
             editTitle.setText(discussionTopicModel.name);
             editDescription.setText(discussionTopicModel.longdescription);
+            editAttachment.setText(discussionTopicModel.attachment);
             txtSave.setText("Update");
         } else {
 
@@ -205,9 +210,9 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
     public void initilizeHeaderView() {
 
-
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledTitle
                 = new SpannableString("*Tittle");
@@ -295,24 +300,138 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GALLERY) {
-            if (data != null) {
-                Uri contentURI = data.getData();
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+        if (data != null) {
+            Uri contentURI = data.getData();
+            try {
+                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
 
-                    Toast.makeText(context, "Image Attached!", Toast.LENGTH_SHORT).show();
-//                    String imageENcode = encodeImage(bitmap);
-                    editAttachment.setText(contentURI.toString());
-//                    Log.d(TAG, "onActivityResult: " + imageENcode);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+                final String fileName = getFileNameFromPath(contentURI, this);
+                final String mimeType = getMimeTypeFromUri(contentURI);
+                Log.d(TAG, "onActivityResult: " + fileName);
+                bitmapAttachment = bitmap;
+                editAttachment.setText(fileName);
+                new CountDownTimer(1000, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                    }
 
+                    public void onFinish() {
+                        endocedImageStr = convertToBase64(bitmapAttachment);
+                        try {
+                            encodeAttachment(discussionTopicModel, fileName);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }.start();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(CreateNewTopicActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+
+    }
+
+    private String convertToBase64(Bitmap bitmap) {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        byte[] byteArrayImage = baos.toByteArray();
+
+        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
+
+        return encodedImage;
+    }
+
+    public void encodeAttachment(DiscussionTopicModel topicModel, String fileName) throws JSONException {
+
+        if (bitmapAttachment != null) {
+            endocedImageStr = convertToBase64(bitmapAttachment);
+        }
+
+        if (endocedImageStr.length() < 10) {
+            Toast.makeText(CreateNewTopicActivity.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
+        } else {
+
+            Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
+
+            if (isNetworkConnectionAvailable(this, -1)) {
+
+                String replaceDataString = endocedImageStr.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+
+                finalEncodedImageStr = addQuotes;
+                finalfileName = fileName;
+
+            } else {
+                Toast.makeText(CreateNewTopicActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void sendTopicAttachmentDataToServer(final String postData, String topicID, final String fileName) {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment?fileName=" + fileName + "&TopicID=" + topicID + "&ReplyID=&isTopic=true&isEdit=false";
+
+        StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                closeForum(true);
+                if (!s.contains("failed")) {
+
+
+                } else {
+
+                    Toast.makeText(CreateNewTopicActivity.this, "Attachment cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(CreateNewTopicActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
             }
 
-        }
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(CreateNewTopicActivity.this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
 
@@ -355,15 +474,10 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         String titleStr = editTitle.getText().toString().trim();
         String descriptionStr = editDescription.getText().toString().trim();
-        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (titleStr.length() < 1) {
             Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
-        }
-//        else if (descriptionStr.length() < 10) {
-//            Toast.makeText(this, "Enter description", Toast.LENGTH_SHORT).show();
-//        }
-        else {
+        } else {
 
             JSONObject parameters = new JSONObject();
             if (isUpdateForum) {
@@ -376,7 +490,8 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 parameters.put("Locale", "en-us");
                 parameters.put("ForumID", discussionForumModel.forumid);
                 parameters.put("ForumName", discussionForumModel.name);
-                parameters.put("strAttachFile", "");
+                parameters.put("strAttachFile", finalfileName);
+
 
             } else {
 
@@ -389,7 +504,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 parameters.put("SiteID", appUserModel.getSiteIDValue());
                 parameters.put("LocaleID", "en-us");
                 parameters.put("ForumName", discussionForumModel.name);
-                parameters.put("strAttachFile", "" + discussionForumModel.createddate);
+                parameters.put("strAttachFile", finalfileName);
 
             }
 
@@ -401,7 +516,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 String replaceDataString = parameterString.replace("\"", "\\\"");
                 String addQuotes = ('"' + replaceDataString + '"');
 
-                sendNewForumDataToServer(addQuotes);
+                sendNewForumDataToServer(addQuotes, isUpdateForum);
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
@@ -409,11 +524,18 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
     }
 
-    public void sendNewForumDataToServer(final String postData) {
+    public void sendNewForumDataToServer(final String postData, final boolean isUpdateForum) {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/CreateForumTopic?ForumID=" + discussionForumModel.forumid;
+        String urlString = "";
+        if (isUpdateForum) {
+
+            urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/EditForumTopic";
+        } else {
+
+            urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/CreateForumTopic?ForumID=" + discussionForumModel.forumid;
+        }
 
         final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
             @Override
@@ -423,11 +545,29 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour new topic has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-                    closeForum(true);
+                    s = s.replaceAll("#\\$#", "=");
+                    s = s.replaceAll("^\"|\"$", "");
+
+                    String[] strSplitvalues = s.split("=");
+
+                    if (strSplitvalues.length > 1) {
+
+                        topicID = strSplitvalues[1];
+                    }
+
+                    if (topicID.length() > 1 && finalEncodedImageStr.length() > 10) {
+                        sendTopicAttachmentDataToServer(finalEncodedImageStr, topicID, finalfileName);
+                    } else if (isUpdateForum && finalEncodedImageStr.length() > 10) {
+                        sendTopicAttachmentDataToServer(finalEncodedImageStr, discussionTopicModel.topicid, finalfileName);
+
+                    } else {
+                        closeForum(true);
+                        Toast.makeText(context, "Success! \nYour new topic has been successfully posted.", Toast.LENGTH_SHORT).show();
+                    }
+
                 } else {
 
-                    Toast.makeText(context, "New topic cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "New topic cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

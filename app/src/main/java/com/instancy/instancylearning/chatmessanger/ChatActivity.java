@@ -811,7 +811,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 } else {
 
-                    Toast.makeText(ChatActivity.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Attachment cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

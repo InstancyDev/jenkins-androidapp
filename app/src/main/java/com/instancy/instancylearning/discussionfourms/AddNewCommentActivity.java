@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
@@ -70,6 +71,8 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.encodeImage;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
+import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -87,8 +90,6 @@ public class AddNewCommentActivity extends AppCompatActivity {
     IResult resultCallback = null;
 
     DatabaseHandler db;
-    ResultListner resultListner = null;
-
 
     DiscussionTopicModel discussionTopicModel;
     PreferencesManager preferencesManager;
@@ -96,6 +97,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
     AppController appController;
     UiSettingsModel uiSettingsModel;
 
+    String finalfileName = "", finalEncodedImageStr = "";
 
     @Nullable
     @BindView(R.id.txt_title)
@@ -116,6 +118,10 @@ public class AddNewCommentActivity extends AppCompatActivity {
     @Nullable
     @BindView(R.id.txtsave)
     TextView txtSave;
+
+    @Nullable
+    @BindView(R.id.txtAttachment)
+    TextView txtAttachment;
 
     @Nullable
     @BindView(R.id.edit_title)
@@ -182,7 +188,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
     public void initilizeHeaderView() {
 
-//        labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledDescription
                 = new SpannableString("*Comment");
@@ -275,26 +282,36 @@ public class AddNewCommentActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GALLERY) {
-            if (data != null) {
-                Uri contentURI = data.getData();
-                try {
-                    final Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+        if (data != null) {
+            Uri contentURI = data.getData();
+            try {
+                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
 
-//                    Toast.makeText(context, "Image Attached!", Toast.LENGTH_SHORT).show();
+                final String fileName = getFileNameFromPath(contentURI, this);
+                final String mimeType = getMimeTypeFromUri(contentURI);
+                Log.d(TAG, "onActivityResult: " + fileName);
+                bitmapAttachment = bitmap;
+                editAttachment.setText(fileName);
+                new CountDownTimer(1000, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                    }
 
-                    editAttachment.setText(contentURI.toString());
-//                    Log.d(TAG, "onActivityResult: " + imageENcode);
-                    bitmapAttachment = bitmap;
+                    public void onFinish() {
+                        endocedImageStr = convertToBase64(bitmapAttachment);
+                        try {
+                            encodeAttachment(fileName);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
+                    }
+                }.start();
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(AddNewCommentActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(AddNewCommentActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
 
-                }
             }
-
         }
 
     }
@@ -388,8 +405,10 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
                 if (s.contains("success")) {
 
-                    String replaceString = s.replace("#$#", "=");
-                    String[] strSplitvalues = replaceString.split("=");
+
+                    s = s.replaceAll("#\\$#", "=");
+                    s = s.replaceAll("^\"|\"$", "");
+                    String[] strSplitvalues = s.split("=");
 
                     String replyID = "";
                     if (strSplitvalues.length > 1) {
@@ -399,11 +418,14 @@ public class AddNewCommentActivity extends AppCompatActivity {
                     String attachmentImg = editAttachment.getText().toString();
 
                     if (attachmentImg.length() > 7) {
-                        try {
-                            encodeAttachment(replyID);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+////                            encodeAttachment(replyID);
+//
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+
+                        sendTopicAttachmentDataToServer(finalEncodedImageStr, replyID, finalfileName);
 
                     } else {
                         Toast.makeText(AddNewCommentActivity.this, "Success! \nYour comment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
@@ -467,24 +489,11 @@ public class AddNewCommentActivity extends AppCompatActivity {
     }
 
 
-    /// photo upload to server
+    public void encodeAttachment(String fileName) throws JSONException {
 
-    public void encodeAttachment(String replayId) throws JSONException {
-
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        });
         if (bitmapAttachment != null) {
             endocedImageStr = convertToBase64(bitmapAttachment);
         }
-
-        String titleStr = editTitle.getText().toString().trim();
-        String descriptionStr = editDescription.getText().toString().trim();
-        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (endocedImageStr.length() < 10) {
             Toast.makeText(AddNewCommentActivity.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
@@ -496,7 +505,9 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
                 String replaceDataString = endocedImageStr.replace("\"", "\\\"");
                 String addQuotes = ('"' + replaceDataString + '"');
-                sendAttachmentDataToServer(addQuotes, replayId);
+
+                finalEncodedImageStr = addQuotes;
+                finalfileName = fileName;
 
             } else {
                 Toast.makeText(AddNewCommentActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -519,23 +530,21 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
     }
 
-    public void sendAttachmentDataToServer(final String postData, String replayId) {
+    public void sendTopicAttachmentDataToServer(final String postData, String replayID, final String fileName) {
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment?fileName=" + "&TopicID=" + discussionTopicModel.topicid + "&ReplyID=" + replayId + "&isTopic=false&isEdit=false";
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment?fileName=" + fileName + "&TopicID=" + discussionTopicModel.topicid + "&ReplyID=" + replayID + "&isTopic=false&isEdit=false";
 
         StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
-                Log.d(TAG, "onResponse: " + s);
+                closeForum(true);
+                if (!s.contains("failed")) {
 
-                if (s.contains("success")) {
 
-                    Toast.makeText(AddNewCommentActivity.this, "Success! \nYour attachment has been successfully posted to server.", Toast.LENGTH_SHORT).show();
-                    closeForum(true);
                 } else {
 
-                    Toast.makeText(AddNewCommentActivity.this, "Attachment cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddNewCommentActivity.this, "Attachment cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

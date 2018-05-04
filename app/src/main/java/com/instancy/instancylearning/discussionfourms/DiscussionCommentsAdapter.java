@@ -69,12 +69,6 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
         appcontroller = AppController.getInstance();
 
 
@@ -134,6 +128,7 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
         holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCommentsAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         holder.txtLastUpdate.setVisibility(View.GONE);
         holder.txtTopicsCount.setVisibility(View.GONE);

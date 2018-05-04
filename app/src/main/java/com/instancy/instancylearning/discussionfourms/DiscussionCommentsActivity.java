@@ -144,6 +144,11 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     TextView txtCommentsCount;
 
     @Nullable
+    @BindView(R.id.btn_attachment)
+    TextView txtTopicAttachment;
+
+
+    @Nullable
     @BindView(R.id.fab_comment_button)
     FloatingActionButton floatingActionButton;
 
@@ -221,8 +226,6 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             }
         });
 
-        // 34700 - 99474 =  65000 + 47000 = 102000 + 128000
-
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
     }
@@ -231,6 +234,27 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         btnContextMenu.setVisibility(View.INVISIBLE);
         txtTopicsCount.setVisibility(View.INVISIBLE);
+
+        if (discussionTopicModel.attachment.length() > 10) {
+
+
+            Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
+            FontManager.markAsIconContainer(findViewById(R.id.btn_attachment), iconFont);
+
+            txtTopicAttachment.setVisibility(View.VISIBLE);
+            txtTopicAttachment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intentSocial = new Intent(DiscussionCommentsActivity.this, SocialWebLoginsActivity.class);
+                    String imageUrl = appUserModel.getSiteURL() + "/content/sitefiles/" + discussionTopicModel.attachment;
+                    intentSocial.putExtra("ATTACHMENT", true);
+                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, imageUrl);
+                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, discussionTopicModel.displayName);
+                    startActivity(intentSocial);
+
+                }
+            });
+        }
 
         txtName.setText(discussionTopicModel.name);
         txtShortDisc.setText(discussionTopicModel.longdescription);
@@ -246,6 +270,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtTopicAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -260,6 +285,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         String imgUrl = appUserModel.getSiteURL() + discussionTopicModel.imagedata;
         Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
+
 
     }
 

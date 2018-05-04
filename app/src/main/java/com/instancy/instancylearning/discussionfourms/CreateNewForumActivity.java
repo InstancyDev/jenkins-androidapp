@@ -115,6 +115,10 @@ public class CreateNewForumActivity extends AppCompatActivity {
     TextView txtSave;
 
     @Nullable
+    @BindView(R.id.txtSettings)
+    TextView txtSettings;
+
+    @Nullable
     @BindView(R.id.edit_title)
     EditText editTitle;
 
@@ -202,6 +206,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtSettings.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledTitle
                 = new SpannableString("*Tittle");

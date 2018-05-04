@@ -217,7 +217,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     @Override
                     public void onClick(View view) {
 
-
                         if (attachment.endsWith(".pdf")) {
                             Intent intent = new Intent(Intent.ACTION_VIEW,
                                     Uri.parse(attachment));

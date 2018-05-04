@@ -43,6 +43,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
@@ -229,7 +230,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     public void initilizeHeaderView() {
 
         btnContextMenu.setVisibility(View.INVISIBLE);
-        txtTopicsCount.setVisibility(View.INVISIBLE);
+        txtTopicsCount.setVisibility(View.VISIBLE);
 
         txtName.setText(discussionForumModel.name);
         txtShortDisc.setText(discussionForumModel.descriptionValue);
@@ -332,6 +333,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         }
         txtCommentsCount.setText(totalCount + " Comment(s)");
+        txtTopicsCount.setText(discussionTopicModels.size() + " Topic(s)");
     }
 
     @Override
@@ -460,7 +462,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        Intent intentSocial = new Intent(this, SocialWebLoginsActivity.class);
         switch (view.getId()) {
             case R.id.card_view:
                 attachFragment(discussionTopicModels.get(position));
@@ -470,6 +472,14 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
                 catalogContextMenuMethod(position, view, txtBtnDownload, discussionTopicModels.get(position));
                 break;
+            case R.id.btn_attachment:
+//                Toast.makeText(context, "attachment" + discussionCommentsModelList.get(i).attachment, Toast.LENGTH_SHORT).show();
+                String imageUrl = appUserModel.getSiteURL() + "/content/sitefiles/" + discussionTopicModels.get(position).attachment;
+                intentSocial.putExtra("ATTACHMENT", true);
+                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, imageUrl);
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, discussionTopicModels.get(position).displayName);
+                startActivity(intentSocial);
+
             default:
 
         }

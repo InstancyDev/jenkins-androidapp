@@ -132,6 +132,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
         holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTopicAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         if (discussionTopicModelList.get(position).longdescription.isEmpty() || discussionTopicModelList.get(position).longdescription.contains("null")) {
             holder.txtShortDisc.setVisibility(View.GONE);
@@ -139,6 +140,11 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
+        if (discussionTopicModelList.get(position).attachment.length() == 0) {
+            holder.txtTopicAttachment.setVisibility(View.INVISIBLE);
+        } else {
+            holder.txtTopicAttachment.setVisibility(View.VISIBLE);
+        }
 
         if (discussionTopicModelList.get(position).createduserid.equalsIgnoreCase(appUserModel.getUserIDValue())) {
 
@@ -146,6 +152,9 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         } else {
             holder.btnContextMenu.setVisibility(View.INVISIBLE);
         }
+
+
+//        discussionTopicModel.attachment = appUserModel.getSiteURL() + "/content/sitefiles/" + result.toString();
 
 
         String imgUrl = appUserModel.getSiteURL() + discussionTopicModelList.get(position).imagedata;
@@ -176,8 +185,10 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
-
+            Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
+            FontManager.markAsIconContainer(view.findViewById(R.id.btn_attachment), iconFont);
         }
+
 
         @Nullable
         @BindView(R.id.txt_name)
@@ -215,8 +226,11 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         @BindView(R.id.txtcomments)
         TextView txtCommentsCount;
 
+        @Nullable
+        @BindView(R.id.btn_attachment)
+        TextView txtTopicAttachment;
 
-        @OnClick({R.id.btn_contextmenu, R.id.card_view})
+        @OnClick({R.id.btn_contextmenu, R.id.card_view,R.id.btn_attachment})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);
