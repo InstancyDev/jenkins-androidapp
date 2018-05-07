@@ -111,6 +111,8 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     UiSettingsModel uiSettingsModel;
     AskExpertAnswerAdapter askExpertAnswerAdapter;
 
+    boolean refreshAnswers = false;
+
     @Nullable
     @BindView(R.id.askexpertslistview)
     ListView askExpertsListView;
@@ -195,9 +197,9 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomment, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(this, customNav));
+        d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
         floatingActionButton.setImageDrawable(d);
-
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -205,9 +207,10 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
             }
         });
-
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-
+        if (appUserModel.getUserIDValue().equalsIgnoreCase(askExpertQuestionModel.postedUserId)) {
+            floatingActionButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void openCommentView() {
@@ -240,11 +243,11 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 });
 
         final AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
-        alertDialogAndroid.setOnShowListener( new DialogInterface.OnShowListener() {
+        alertDialogAndroid.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface arg0) {
-                alertDialogAndroid.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-                alertDialogAndroid.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+                alertDialogAndroid.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                alertDialogAndroid.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             }
         });
         alertDialogAndroid.show();
@@ -255,17 +258,16 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     public void initilizeHeaderView() {
 
         btnContextMenu.setVisibility(View.INVISIBLE);
-
         txtQuestion.setText(askExpertQuestionModel.userQuestion);
         txtAskedBy.setText("Asked by: " + askExpertQuestionModel.username + " ");
         txtAskedOn.setText("Asked on: " + askExpertQuestionModel.postedDate);
         txtNoAnswers.setText(askExpertQuestionModel.answers + " Answer(s)");
-
         txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtNoAnswers.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtAskedBy.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtAskedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
     }
 
 
@@ -277,11 +279,13 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
             askExpertAnswerAdapter.refreshList(askExpertAnswerModelList);
         }
+
+        txtNoAnswers.setText(askExpertAnswerModelList.size() + " Answer(s)");
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        closeForum(refreshAnswers);
     }
 
 
@@ -300,8 +304,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         switch (item.getItemId()) {
             case android.R.id.home:
                 // app icon in action bar clicked; go home
-                finish();
-
+                closeForum(refreshAnswers);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -435,7 +438,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 if (s.contains("success")) {
 
                     Toast.makeText(context, " Success! \nAnswer has been successfully deleted ", Toast.LENGTH_SHORT).show();
-
+                    refreshAnswers = true;
                     deleteAnswerFromLocalDB(answerModel);
                 } else {
 
@@ -544,7 +547,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
                     String replaceString = s.replace("#$#", "=");
                     String[] strSplitvalues = replaceString.split("=");
-
+                    refreshAnswers = true;
                     String replyID = "";
                     if (strSplitvalues.length > 1) {
                         replyID = strSplitvalues[1].replace("\"", "");
@@ -633,6 +636,13 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             sqlEx.printStackTrace();
         }
 
+    }
+
+    public void closeForum(boolean refresh) {
+        Intent intent = getIntent();
+        intent.putExtra("NEWQS", refreshAnswers);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
 

@@ -410,6 +410,7 @@ public class Reports_Activity extends AppCompatActivity {
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+            displayStatus = "Pending Review";
             reportDetail.score = "100";
         } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
 

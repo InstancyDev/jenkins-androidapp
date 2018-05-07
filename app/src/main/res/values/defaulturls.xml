@@ -18,8 +18,8 @@
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
-    <string name="app_default_url">http://mobileapp.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
+    <!--<string name="app_default_url">http://mobileapp.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--<string name="app_default_url">http://qa.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
@@ -79,8 +79,7 @@
     <!--<string name="app_default_url">http://croplife.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://mci-institute-newui.instancy.net/</string>-->
-    <!--<string name="app_default_webapi_url">http://mcinewwapi.instancy.net/api/</string>-->
+
 
     <!--<string name="app_default_url">http://qatoshiba.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">http://Toshiwebapi.instancy.net/api/</string>-->
@@ -88,8 +87,8 @@
     <!--<string name="app_default_url">http://toshiba.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://Toshiwebapi.instancy.net/api/</string>-->
 
-    <!--<string name="app_default_url">http://stagingmci.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
+    <string name="app_default_url">http://stagingmci.instancysoft.com/</string>
+    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
 
     <!--<string name="app_default_url">http://qamci.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->

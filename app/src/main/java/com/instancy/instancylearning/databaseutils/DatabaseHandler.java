@@ -4165,9 +4165,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     authorName = jsonMyLearningColumnObj.getString("author");
 
-                    String authorReplace = authorName.replaceAll(" ", "");
+//                    String authorReplace = authorName.replaceAll(" ", "");
 
-                    trackLearningModel.setAuthor(authorReplace);
+                    trackLearningModel.setAuthor(authorName);
 
                 }
             }

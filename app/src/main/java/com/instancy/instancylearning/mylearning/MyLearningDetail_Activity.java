@@ -17,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -186,7 +187,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @BindView(R.id.whiteline)
     View whiteLine;
 
-    TextView txtOverallRating, ratedOutOfTxt,txtAvg,txtRating;
+    TextView txtOverallRating, ratedOutOfTxt, txtAvg, txtRating;
 
     View header;
 
@@ -305,9 +306,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
             stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
+//            Drawable progress = ratingBar.getProgressDrawable();
+//            DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
+
 
             LayerDrawable overallRatingbarProgressDrawable = (LayerDrawable) overallRatingbar.getProgressDrawable();
             overallRatingbarProgressDrawable.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+
+            Drawable progresss = overallRatingbar.getProgressDrawable();
+            DrawableCompat.setTint(progresss, Color.parseColor(uiSettingsModel.getAppTextColor()));
+
 
             if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
                 ratingBar.setVisibility(View.INVISIBLE);
@@ -315,7 +323,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             if (myLearningModel.getLongDes().isEmpty()) {
 
-                txtDescription.setVisibility(View.GONE);
+                txtLongDisx.setVisibility(View.GONE);
             } else {
                 txtLongDisx.setVisibility(View.VISIBLE);
 
@@ -705,11 +713,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 } else {
 // uncomment after reports completed
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102"))
-                        {
-                            relativeSecond.setVisibility(View.GONE);
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                        relativeSecond.setVisibility(View.GONE);
 
-                        }else {
+                    } else {
                         relativeSecond.setVisibility(View.VISIBLE);
                         whiteLine.setVisibility(View.VISIBLE);
                         Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
@@ -717,29 +724,29 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                         buttonSecond.setText("Report");
                     }
-                    }
-
-                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
-                    iconFirst.setBackground(viewIcon);
-                    buttonFirst.setText("View");
-                    txtPrice.setVisibility(View.GONE);
-                    txtPrice.setText("");
-                    btnDownload.setVisibility(View.VISIBLE);
                 }
 
+                Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
+                iconFirst.setBackground(viewIcon);
+                buttonFirst.setText("View");
+                txtPrice.setVisibility(View.GONE);
+                txtPrice.setText("");
+                btnDownload.setVisibility(View.VISIBLE);
             }
 
-            setCompleteListner = new SetCompleteListner() {
-                @Override
-                public void completedStatus() {
-
-                    relativeSecond.setVisibility(View.GONE);
-                    whiteLine.setVisibility(View.GONE);
-                    statusUpdate("Completed");
-
-                }
-            };
         }
+
+        setCompleteListner = new SetCompleteListner() {
+            @Override
+            public void completedStatus() {
+
+                relativeSecond.setVisibility(View.GONE);
+                whiteLine.setVisibility(View.GONE);
+                statusUpdate("Completed");
+
+            }
+        };
+    }
 
 
     public void updateEnrolledEvent() {
@@ -795,9 +802,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         } else if (courseStatus.toLowerCase().contains("pending review") || (courseStatus.toLowerCase().contains("pendingreview")) || (courseStatus.toLowerCase().contains("grade"))) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
-            String status = "";
 
-            status = courseStatus;
+            String status = "Pending Review";
             progressBar.setProgress(100);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = status + "(" + 100;
@@ -1199,7 +1205,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         if (learningModel.getAddedToMylearning() == 0 && isFromCatalog) {
             addToMyLearning(learningModel, false);
         }
-
+        btnDownload.setEnabled(false);
         boolean isZipFile = false;
 
         final String[] downloadSourcePath = {null};
@@ -1353,6 +1359,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d(TAG, "onDownloadFailed: " + +errorCode);
+                        btnDownload.setEnabled(true);
                     }
 
                     @Override
@@ -1376,8 +1383,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         // Update ProgressBar
         // Update Text to ColStatus
 
-        circleProgressBar.setVisibility(View.VISIBLE);
         btnDownload.setVisibility(View.GONE);
+        circleProgressBar.setVisibility(View.VISIBLE);
         circleProgressBar.setProgress(Status);
         // Enabled Button View
         if (Status >= 100) {

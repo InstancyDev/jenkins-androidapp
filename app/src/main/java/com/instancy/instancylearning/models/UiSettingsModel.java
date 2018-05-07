@@ -56,7 +56,7 @@ public class UiSettingsModel {
     private String menuTextColor = "";
 
     public String getSignUpName() {
-        return signUpName;
+        return signUpName.isEmpty() ? "Sign up" : signUpName;
     }
 
     public void setSignUpName(String signUpName) {

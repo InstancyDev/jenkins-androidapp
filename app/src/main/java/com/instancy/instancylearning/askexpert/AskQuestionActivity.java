@@ -207,7 +207,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledTitle.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        styledTitle.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelTitle.setText(styledTitle);
 
         SpannableString styledDescription
@@ -215,7 +215,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 28, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 28, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelDescritpion.setText(styledDescription);
 
         switchCommunication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -293,42 +293,17 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         String category = "";
 
-        if (allowSkills) {
-
-            if (category.length() > 0) {
-
-                category = category.concat(",relation ship");
-            } else {
-                category = "relation ship";
-            }
-
-        } else {
-            category = "";
-        }
-        if (allowCommunication) {
-
-            if (category.length() > 0) {
-
-                category = category.concat(",process and product 2");
-
-            } else {
-                category = "process and product 2";
-            }
-
-        } else {
-
-            category = "";
-
-        }
-
-        generateSkills();
+        category = generateSkills();
 
         String descriptionStr = editDescription.getText().toString().trim();
-        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
-        if (descriptionStr.length() < 5) {
+        if (descriptionStr.length() < 1) {
+            Toast.makeText(this, "Please enter question", Toast.LENGTH_SHORT).show();
+        } else if (category.length()==0)
+        {
             Toast.makeText(this, "Please select skill", Toast.LENGTH_SHORT).show();
-        } else {
+        }
+            else {
 //            Map<String, String> parameters = new HashMap<String, String>();
             JSONObject parameters = new JSONObject();
 
@@ -547,21 +522,19 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     public String generateSkills() {
         String selectedSkills = "";
 
-        String[] strSplitvalues = new String[askExpertSkillsModelList.size()];
 
         for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
             if (askExpertSkillsModelList.get(s).isChecked) {
-                strSplitvalues[s] = askExpertSkillsModelList.get(s).shortSkillName;
-            } else {
-                strSplitvalues[s] = "";
+                if (selectedSkills.length() > 0) {
+                    selectedSkills = selectedSkills.concat("," + askExpertSkillsModelList.get(s).shortSkillName);
+                } else {
+                    selectedSkills = askExpertSkillsModelList.get(s).shortSkillName;
+                }
             }
+
+            Log.d(TAG, "generateSkills: " + selectedSkills);
+
         }
-
-        selectedSkills = toStringS(strSplitvalues);
-
-        Log.d(TAG, "generateSkills: " + selectedSkills);
-
         return selectedSkills;
     }
 }
-

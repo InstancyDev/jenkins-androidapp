@@ -5,10 +5,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -124,6 +126,8 @@ public class RatingsAdapter extends BaseAdapter {
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(convertView.getContext().getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
+        Drawable progress = holder.ratingBar.getProgressDrawable();
+        DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         convertView.setTag(holder);
         return convertView;

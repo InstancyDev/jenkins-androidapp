@@ -347,7 +347,6 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         headerTextView = (TextView) header.findViewById(R.id.track_details);
         headerTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         headerTextView.setText("");
-//        askexpertListView.addHeaderView(header);
         header.setVisibility(View.GONE);
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
@@ -583,8 +582,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                 attachFragment(askExpertQuestionModelList.get(position));
                 break;
             case R.id.btn_contextmenu:
-                View v = askexpertListView.getChildAt(position - askexpertListView.getFirstVisiblePosition());
-                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+//                View v = askexpertListView.getChildAt(position - askexpertListView.getFirstVisiblePosition());
+                ImageButton txtBtnDownload = (ImageButton) view.findViewById(R.id.btn_contextmenu);
                 catalogContextMenuMethod(position, view, txtBtnDownload, askExpertQuestionModelList.get(position));
                 break;
             default:
@@ -752,7 +751,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         Intent intentDetail = new Intent(context, AskExpertsAnswersActivity.class);
         intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);
 
-        startActivity(intentDetail);
+        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
 
     }
 
@@ -864,13 +863,19 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         if (askExpertQuestionModelList != null && askExpertQuestionModelList.size() > 0) {
             askExpertAdapter.refreshList(askExpertQuestionModelList);
-            headerTextView.setText(selectedSkillName);
-            header.setVisibility(View.GONE);
+            if (askexpertListView.getHeaderViewsCount()==0 && selectedSkillName.length()!=0){
+                askexpertListView.addHeaderView(header);
+            } else if ( selectedSkillName.length()==0){
+                askexpertListView.removeHeaderView(header);
+            }
+            headerTextView.setText(selectedSkillName); //
+            header.setVisibility(View.VISIBLE);
         } else {
             askExpertQuestionModelList = new ArrayList<>();
             askExpertAdapter.refreshList(askExpertQuestionModelList);
             headerTextView.setText("");
             header.setVisibility(View.GONE);
+            askexpertListView.removeHeaderView(header);
         }
 
     }

@@ -762,6 +762,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         final String[] downloadSourcePath = {null};
 
+        TextView txtBtnDownload = (TextView) view.findViewById(R.id.btntxt_download);
+        txtBtnDownload.setEnabled(false);
 
         switch (learningModel.getObjecttypeId()) {
             case "52":
@@ -1000,6 +1002,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         View v = myLearninglistView.getChildAt(index - myLearninglistView.getFirstVisiblePosition());
         TextView txtBtnDownload = (TextView) v.findViewById(R.id.btntxt_download);
         CircleProgressBar circleProgressBar = (CircleProgressBar) v.findViewById(R.id.circle_progress);
+
         circleProgressBar.setVisibility(View.VISIBLE);
         txtBtnDownload.setVisibility(View.GONE);
         circleProgressBar.setProgress(Status);

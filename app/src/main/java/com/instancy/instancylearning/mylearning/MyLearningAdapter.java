@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
@@ -481,6 +482,11 @@ public class MyLearningAdapter extends BaseAdapter {
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
+
+        Drawable progress = holder.ratingBar.getProgressDrawable();
+        DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+
 //        initVolleyCallback(myLearningModel.get(position), position);
 
         if (myLearningModel.get(position).getShortDes().isEmpty()) {
@@ -586,9 +592,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade")) ) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
-            String status = "";
-
-            status = statusFromModel;
+            String status = "Pending Review";
 
             holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));

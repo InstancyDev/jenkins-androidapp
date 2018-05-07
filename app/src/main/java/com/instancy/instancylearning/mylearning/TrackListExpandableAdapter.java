@@ -240,7 +240,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     holder.btnDownload.setVisibility(View.GONE);
                 }
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-                    holder.btnDownload.setVisibility(View.VISIBLE);
+                    if (trackChildList.getViewType().equalsIgnoreCase("1")) {
+                        holder.btnDownload.setVisibility(View.VISIBLE);
+                    }
 //                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
 //                        holder.btnDownload.setVisibility(View.GONE);
 //                    }

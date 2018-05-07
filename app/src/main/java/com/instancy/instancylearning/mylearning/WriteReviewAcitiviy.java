@@ -259,6 +259,9 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         stars.getDrawable(2).setColorFilter(getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        Drawable progress = ratingBar.getProgressDrawable();
+        DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
+
         if (isEditReview) {
             editDescription.getText().toString().trim();
 //        "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"

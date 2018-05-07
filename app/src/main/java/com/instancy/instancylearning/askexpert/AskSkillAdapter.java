@@ -111,7 +111,7 @@ public class AskSkillAdapter extends BaseAdapter {
 
         if (askExpertSkillsModelList.get(position).isChecked) {
             holder.switchSkill.setChecked(true);
-            holder.switchSkill.setTextColor(convertView.getResources().getColor(R.color.colorBlack));
+            holder.switchSkill.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 holder.switchSkill.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
                 holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -119,7 +119,7 @@ public class AskSkillAdapter extends BaseAdapter {
 
         } else {
             holder.switchSkill.setChecked(false);
-            holder.switchSkill.setTextColor(convertView.getResources().getColor(R.color.colorGray));
+            holder.switchSkill.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 holder.switchSkill.setThumbTintList(ColorStateList.valueOf(convertView.getResources().getColor(R.color.colorGray)));
