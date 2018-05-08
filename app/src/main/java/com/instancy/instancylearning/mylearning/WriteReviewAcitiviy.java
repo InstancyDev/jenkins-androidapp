@@ -155,6 +155,9 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         reviewContentModel = new ReviewContentModel();
         Bundle bundle = getIntent().getExtras();
 
+        txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
         if (bundle != null) {
 
             ratedValue = bundle.getFloat("ratednow", 0);

@@ -160,6 +160,9 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         svProgressHUD = new SVProgressHUD(context);
 
+        txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("forumModel");
@@ -373,7 +376,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             parameters.put("SiteID", appUserModel.getSiteIDValue());
             parameters.put("InvolvedUserIDList", "");
             parameters.put("LocaleID", "en-us");
-            parameters.put("strAttachFile", "");
+            parameters.put("strAttachFile", finalfileName);
 
             String parameterString = parameters.toString();
             Log.d(TAG, "validateNewForumCreation: " + parameterString);

@@ -235,13 +235,14 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         btnContextMenu.setVisibility(View.INVISIBLE);
         txtTopicsCount.setVisibility(View.INVISIBLE);
 
-        if (discussionTopicModel.attachment.length() > 10) {
+        if (discussionTopicModel.attachment.length() > 10 && discussionTopicModel.attachment.contains(".")) {
 
 
             Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(findViewById(R.id.btn_attachment), iconFont);
 
             txtTopicAttachment.setVisibility(View.VISIBLE);
+
             txtTopicAttachment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -407,7 +407,7 @@ public class Reports_Activity extends AppCompatActivity {
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
             reportDetail.score = "50";
             displayStatus = "In Progress";
-        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
+        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = "Pending Review";

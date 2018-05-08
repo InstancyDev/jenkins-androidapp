@@ -22,7 +22,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
         try {
             if (isNetworkConnectionAvailable(context, -1)) {
-                Log.e(TAG, "Online Connect Intenet ");
+                Log.e(TAG, "Conectivity Success !!! ");
                 CmiSynchTask cmiSynchTask = new CmiSynchTask(context);
                 cmiSynchTask.execute();
             } else {

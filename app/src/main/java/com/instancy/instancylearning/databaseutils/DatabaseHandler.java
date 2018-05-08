@@ -7122,7 +7122,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     objecTypeId = objectTypeIDScoid[1];
                 }
             } else {
-
+                objecTypeId = learningModel.getObjecttypeId();
             }
 
             StudentResponseModel studentresponse = new StudentResponseModel();

@@ -190,11 +190,10 @@ public class ReportAdapter extends BaseAdapter {
                     reportDetailList.get(position).score = "50";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusInProgress));
                     holder.txtStatus.setText("In Progress");
-                } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))) {
+                } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))  || (statusFromModel.toLowerCase().contains("grade"))) {
                     reportDetailList.get(position).score = "50";
-
+                    statusFromModel = "Pending Review";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
-
 
                 } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
                     reportDetailList.get(position).score = "100";

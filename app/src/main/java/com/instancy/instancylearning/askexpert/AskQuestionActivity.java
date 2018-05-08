@@ -172,6 +172,8 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         svProgressHUD = new SVProgressHUD(context);
 
+        txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);

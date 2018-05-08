@@ -502,7 +502,7 @@ public class UiSettingsModel {
     }
 
     public String getMenuBGAlternativeColor() {
-        return menuBGAlternativeColor.isEmpty() ? menuBGColor : menuBGAlternativeColor;
+        return menuBGAlternativeColor.isEmpty() ? "#ffffff" : menuBGAlternativeColor;
     }
 
     public String getAppHeaderColor() {

@@ -236,17 +236,17 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     holder.btnDownload.setEnabled(true);
                 }
 
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
-                    holder.btnDownload.setVisibility(View.GONE);
-                }
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-                    if (trackChildList.getViewType().equalsIgnoreCase("1")) {
-                        holder.btnDownload.setVisibility(View.VISIBLE);
-                    }
-//                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
-//                        holder.btnDownload.setVisibility(View.GONE);
+//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+//                    holder.btnDownload.setVisibility(View.GONE);
+//                }
+//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//                    if (trackChildList.getViewType().equalsIgnoreCase("1")) {
+//                        holder.btnDownload.setVisibility(View.VISIBLE);
 //                    }
-                }
+////                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
+////                        holder.btnDownload.setVisibility(View.GONE);
+////                    }
+//                }
 
 //                holder.btnDownload.setVisibility(View.VISIBLE);
             }
@@ -300,11 +300,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
                 courseStatus = status + "(" + 50;
 
-            } else if (trackChildList.getStatus().equalsIgnoreCase("pending review") || (trackChildList.getStatus().toLowerCase().contains("pendingreview"))) {
+            } else if (trackChildList.getStatus().equalsIgnoreCase("pending review") || (trackChildList.getStatus().toLowerCase().contains("pendingreview")) || (trackChildList.getStatus().toLowerCase().contains("grade"))) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
-                String status = "";
-
-                status = trackChildList.getStatus();
+                String status = "Pending Review";
 
                 holder.progressBar.setProgress(100);
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
@@ -334,7 +332,6 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //            }
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
-
 
         String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
 

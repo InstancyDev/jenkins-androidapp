@@ -71,12 +71,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-//        appUserModel.setWebAPIUrl(preferencesManager.getStringValue(StaticValues.KEY_WEBAPIURL));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID));
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setAuthHeaders(preferencesManager.getStringValue(StaticValues.KEY_AUTHENTICATION));
+
         appcontroller = AppController.getInstance();
 
     }
@@ -129,7 +124,6 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
         holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtTopicAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -140,7 +134,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-        if (discussionTopicModelList.get(position).attachment.length() == 0) {
+        if (discussionTopicModelList.get(position).attachment.length() == 0 || !discussionTopicModelList.get(position).attachment.contains(".")) {
             holder.txtTopicAttachment.setVisibility(View.INVISIBLE);
         } else {
             holder.txtTopicAttachment.setVisibility(View.VISIBLE);

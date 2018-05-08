@@ -812,7 +812,6 @@ public class GlobalMethods {
             }
         }
 
-
     }
 
     private static String GetCurrentDateTime() {
