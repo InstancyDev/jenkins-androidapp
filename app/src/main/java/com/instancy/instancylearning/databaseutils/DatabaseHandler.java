@@ -3801,7 +3801,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate ASC";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {

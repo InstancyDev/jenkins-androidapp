@@ -1,9 +1,11 @@
 package com.instancy.instancylearning.sidemenumodule;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,6 +14,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -49,6 +53,7 @@ import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.NetworkChangeReceiver;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
 import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
@@ -151,6 +156,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     @BindView(R.id.subsitename)
     TextView subsiteName;
 
+    private BroadcastReceiver mNetworkReceiver;
 
     VollyService vollyService;
     IResult resultCallback = null;
@@ -192,6 +198,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         initVolleyCallback();
 
+        mNetworkReceiver = new NetworkChangeReceiver();
+        registerNetworkBroadcastForNougat();
         vollyService = new VollyService(resultCallback, this);
 
         Bundle bundle = getIntent().getExtras();
@@ -451,6 +459,28 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         }
 
 
+    }
+
+    private void registerNetworkBroadcastForNougat() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            registerReceiver(mNetworkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterNetworkChanges();
+    }
+
+    protected void unregisterNetworkChanges() {
+        try {
+            unregisterReceiver(mNetworkReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 
     public void homeControllClicked(boolean isFromNotification, int menuId, String contentID, boolean isFromCommunityList, String fourmID) {

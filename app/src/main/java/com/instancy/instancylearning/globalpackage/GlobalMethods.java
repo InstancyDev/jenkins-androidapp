@@ -271,16 +271,16 @@ public class GlobalMethods {
                         context,
                         context.getApplicationContext()
                                 .getPackageName() + ".provider", file);
+                String mime = context.getContentResolver().getType(docUri);
+                Intent intent3 = new Intent();
 
-//                Intent intent3 = new Intent();
-//                intent3.setDataAndType(docUri, "application/pptx,application/ppt");
-//                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                intent3.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//                intent3.setAction(android.content.Intent.ACTION_VIEW);
+                intent3.setDataAndType(docUri, mime);
+                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent3.setAction(android.content.Intent.ACTION_VIEW);
 
 
                 try {
-//                    context.startActivity(intent3);
+                    context.startActivity(intent3);
                 } catch (ActivityNotFoundException e) {
 
                     Toast toast = Toast.makeText(context,
@@ -301,14 +301,14 @@ public class GlobalMethods {
                         context,
                         context.getApplicationContext()
                                 .getPackageName() + ".provider", file);
+                String mime = context.getContentResolver().getType(docUri);
+                Intent intent3 = new Intent();
 
-//                Intent intent3 = new Intent();
-//
-//                intent3.setDataAndType(docUri, ".docx");
-//                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                intent3.setAction(android.content.Intent.ACTION_VIEW);
+                intent3.setDataAndType(docUri, mime);
+                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent3.setAction(android.content.Intent.ACTION_VIEW);
                 try {
-//                    context.startActivity(intent3);
+                    context.startActivity(intent3);
 
                 } catch (ActivityNotFoundException e) {
 
@@ -321,28 +321,22 @@ public class GlobalMethods {
 
             } else if (offlinePathEncode.toLowerCase().contains(".xlsx")
                     || offlinePathEncode.toLowerCase().contains(".xls")) {
-                offlinePathEncode = offlinePathEncode.replace(" file://", "");
 
-//                File file = new File(offlinePathEncode);
-//                Uri docUri = FileProvider.getUriForFile(
-//                        context,
-//                        context.getApplicationContext()
-//                                .getPackageName() + ".provider", file);
-//
-//                Intent intent3 = new Intent();
-//
-//                intent3.setDataAndType(docUri, "application/xls,application/xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                intent3.setAction(android.content.Intent.ACTION_VIEW);
+                offlinePathEncode = offlinePathEncode.replace("file://", "");
 
-                Toast toasts = Toast.makeText(context,
-                        context.getString(R.string.toast_no_application_excel),
-                        Toast.LENGTH_LONG);
-                toasts.setGravity(Gravity.CENTER, 0, 0);
-                toasts.show();
+                File file = new File(offlinePathEncode);
+                Uri docUri = FileProvider.getUriForFile(
+                        context,
+                        context.getApplicationContext()
+                                .getPackageName() + ".provider", file);
+                String mime = context.getContentResolver().getType(docUri);
+                Intent intent3 = new Intent();
 
+                intent3.setDataAndType(docUri, mime);
+                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent3.setAction(android.content.Intent.ACTION_VIEW);
                 try {
-//                    context.startActivity(intent3);
+                    context.startActivity(intent3);
 
                 } catch (ActivityNotFoundException e) {
 
@@ -402,14 +396,22 @@ public class GlobalMethods {
                 }
 
             } else if (offlinePathEncode.toLowerCase().contains(".txt")) {
+
                 offlinePathEncode = offlinePathEncode.replace("file://", "");
 
                 File file = new File(offlinePathEncode);
-                Intent intent4 = new Intent();
-                intent4.setAction(android.content.Intent.ACTION_VIEW);
-                intent4.setDataAndType(Uri.fromFile(file), "text/plain");
+                Uri docUri = FileProvider.getUriForFile(
+                        context,
+                        context.getApplicationContext()
+                                .getPackageName() + ".provider", file);
+                String mime = context.getContentResolver().getType(docUri);
+                Intent intent3 = new Intent();
+
+                intent3.setDataAndType(docUri, mime);
+                intent3.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent3.setAction(android.content.Intent.ACTION_VIEW);
                 try {
-                    context.startActivity(intent4);
+                    context.startActivity(intent3);
 
                 } catch (ActivityNotFoundException e) {
 
@@ -811,6 +813,7 @@ public class GlobalMethods {
                 }
             }
         }
+
 
     }
 

@@ -55,11 +55,6 @@
     <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
 
-    <!--for enterprise native app for place-->
-    <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
-
-
     <!-- SCROM testing qalearning -->
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
@@ -78,7 +73,6 @@
 
     <!--<string name="app_default_url">http://croplife.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
-
 
 
     <!--<string name="app_default_url">http://qatoshiba.instancy.net/</string>-->

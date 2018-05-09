@@ -203,7 +203,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnForgot.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
 
-        if (isValidString(uiSettingsModel.getNativeAppLoginLogo())){
+        if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
             Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(imglogo);
 
         }
@@ -479,6 +479,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
                                     appUserModel.setUserIDValue(userId);
                                     MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                                    CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
 
                                     Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                                     intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
