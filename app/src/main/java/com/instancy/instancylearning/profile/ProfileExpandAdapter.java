@@ -48,7 +48,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         uiSettingsModel = UiSettingsModel.getInstance();
     }
 
-
     public void refreshList(List<UserExperienceModel> userExperienceModelList, List<UserEducationModel> userEducationModelList, List<ProfileGroupModel> expandableListTitle, HashMap<String, List<ProfileConfigsModel>> expandableHashDetail) {
         this.userEducationModelList = userEducationModelList;
         this.userExperienceModelList = userExperienceModelList;

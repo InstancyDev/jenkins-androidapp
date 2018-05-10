@@ -899,8 +899,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                             String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
                                             uiSettingsModel.setNativeAppLoginLogo(appLogos);
                                         }
-                                    }
-                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AddProfileAdditionalTab"))) {
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AddProfileAdditionalTab"))) {
 
                                         uiSettingsModel.setAddProfileAdditionalTab(nativeSettingsObj.get("keyvalue").getAsString());
                                     }
@@ -5748,7 +5747,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String checkForNull = jsonCMiColumnObj.getString("studentresponses");
 
                 if (isValidString(checkForNull)) {
+
+                    // Replace "@" with "#^#"
+                    if (checkForNull.contains("@")) {
+
+
+                        checkForNull = checkForNull.replaceAll("@", "#^#^");
+                    }
+
+                    // Replace "&&**&&" with "##^^##"
+                    if (checkForNull.contains("&&**&&")) {
+
+                        checkForNull = checkForNull.replaceAll("&&\\*\\*&&", "##^^##^^");
+
+                    }
+
                     studentResponseModel.set_studentresponses(checkForNull);
+
                 } else {
                     studentResponseModel.set_studentresponses("");
                 }
@@ -7224,6 +7239,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             insertStudentResponses(studentresponse);
 
+
+
         }
         return "true";
     }
@@ -7595,7 +7612,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
             }
         } catch (Exception e) {
-            Log.d("Insertstudentresponse s ", e.getMessage());
+            Log.d("Insertstudentresponses ", e.getMessage());
         }
 
         cursor.close();
@@ -11203,7 +11220,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public boolean isPrivilegeExistsFor(int privilegeID ) {
+    public boolean isPrivilegeExistsFor(int privilegeID) {
         boolean isRecordExists = false;
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -11316,7 +11333,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ArrayList<String> countryNames = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSelQuery = "SELECT choicetext FROM " + TBL_USERPROFILEFIELDOPTIONS + " WHERE attributeconfigid = "+attributeConfigID + " AND siteid = " + siteId + " ORDER BY choicetext" ;
+        String strSelQuery = "SELECT choicetext FROM " + TBL_USERPROFILEFIELDOPTIONS + " WHERE attributeconfigid = " + attributeConfigID + " AND siteid = " + siteId + " ORDER BY choicetext";
 
         try {
             Cursor cursor = null;
@@ -11325,7 +11342,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
 
-                    String countryNamesStr="";
+                    String countryNamesStr = "";
                     countryNamesStr = (cursor.getString(cursor.getColumnIndex("choicetext")));
 
                     countryNames.add(countryNamesStr);

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -276,6 +278,12 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
+
+       TextView uploadIconFont = (TextView) header.findViewById(R.id.uploadPhotoFont);
+
+        Typeface iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+
+        FontManager.markAsIconContainer(header.findViewById(R.id.uploadPhotoFont), iconFon);
 
         userName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         userLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

@@ -5,20 +5,44 @@
     android:background="@android:color/transparent"
     android:orientation="vertical">
 
-    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginTop="2dp"
-        android:id="@+id/profile_round"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/user_placeholder"
-        app:civ_border_color="@color/colorWhite"
-        app:civ_border_width="2dp" />
+
+    <RelativeLayout
+        android:id="@+id/profile_layout"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
+        android:layout_centerHorizontal="true">
+
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/profile_round"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="2dp"
+            android:src="@drawable/user_placeholder"
+            app:civ_border_color="@color/colorWhite"
+            app:civ_border_width="2dp" />
+
+        <TextView
+            android:id="@+id/uploadPhotoFont"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@+id/profile_round"
+            android:layout_alignEnd="@+id/profile_round"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="13dp"
+            android:gravity="center_vertical"
+            android:text="@string/fa_icon_edit"
+            android:textAlignment="center"
+            android:textColor="@color/colorBlack"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/profile_round"
+        android:layout_below="@+id/profile_layout"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="10dp">
@@ -28,8 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
-            android:textSize="16sp"
             android:textColor="@color/colorWhite"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <Space
@@ -37,13 +61,13 @@
             android:layout_height="3dp" />
 
         <TextView
-            android:textSize="14sp"
-
             android:id="@+id/userlocation"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             android:textColor="@color/colorWhite"
+            android:textSize="14sp"
             android:textStyle="normal" />
 
     </LinearLayout>

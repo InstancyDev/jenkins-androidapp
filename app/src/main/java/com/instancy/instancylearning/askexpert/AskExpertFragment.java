@@ -213,7 +213,13 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     public void getSkillsCalatalogFrom() {
 
 
-        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected";
+        String parmStringUrl = "";
+        if (sideMenusModel.getComponentId().length() == 0 || sideMenusModel.getRepositoryId().length() == 0) {
+            parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected";
+
+        } else {
+            parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected&CompID=" + sideMenusModel.getComponentId() + "&CompInsID=" + sideMenusModel.getRepositoryId();
+        }
 
         vollyService.getJsonObjResponseVolley("ASKQSCAT", parmStringUrl, appUserModel.getAuthHeaders());
 
@@ -863,9 +869,9 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         if (askExpertQuestionModelList != null && askExpertQuestionModelList.size() > 0) {
             askExpertAdapter.refreshList(askExpertQuestionModelList);
-            if (askexpertListView.getHeaderViewsCount()==0 && selectedSkillName.length()!=0){
+            if (askexpertListView.getHeaderViewsCount() == 0 && selectedSkillName.length() != 0) {
                 askexpertListView.addHeaderView(header);
-            } else if ( selectedSkillName.length()==0){
+            } else if (selectedSkillName.length() == 0) {
                 askexpertListView.removeHeaderView(header);
             }
             headerTextView.setText(selectedSkillName); //
