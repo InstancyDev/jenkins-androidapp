@@ -951,7 +951,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());
 
-                        insertIntoAppSettingsTable(uiSettingsModel, siteid, siteUrl);
+                        insertIntoAppContentSettingsTable(uiSettingsModel, siteid, siteUrl);
                     }
                 } catch (JsonIOException jsonExce) {
                     jsonExce.printStackTrace();
@@ -1070,6 +1070,77 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Method for getting appsetting model from local sqlite db
+
+    // new contentvalues method for appsettings
+
+    public void insertIntoAppContentSettingsTable(UiSettingsModel uiSettingsModel, String siteid, String siteUrl) {
+
+        deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = null;
+        try {
+
+            contentValues = new ContentValues();
+
+            contentValues.put("appTextColor", uiSettingsModel.getAppTextColor());
+            contentValues.put("appBGColor", uiSettingsModel.getAppBGColor());
+            contentValues.put("menuTextColor", uiSettingsModel.getMenuTextColor());
+            contentValues.put("menuBGColor", uiSettingsModel.getMenuBGColor());
+            contentValues.put("selectedMenuTextColor", uiSettingsModel.getSelectedMenuTextColor());
+            contentValues.put("selectedMenuBGColor", uiSettingsModel.getSelectedMenuBGColor());
+            contentValues.put("listBGColor", uiSettingsModel.getListBGColor());
+            contentValues.put("menuHeaderBGColor", uiSettingsModel.getListBorderColor());
+            contentValues.put("menuHeaderBGColor", uiSettingsModel.getMenuHeaderBGColor());
+            contentValues.put("menuHeaderTextColor", uiSettingsModel.getMenuHeaderTextColor());
+            contentValues.put("menuBGAlternativeColor", uiSettingsModel.getMenuBGAlternativeColor());
+            contentValues.put("menuBGSelectTextColor", uiSettingsModel.getMenuBGSelectTextColor());
+            contentValues.put("appButtonBGColor", uiSettingsModel.getAppButtonBgColor());
+            contentValues.put("appButtonTextColor", uiSettingsModel.getAppButtonTextColor());
+            contentValues.put("appHeaderTextColor", uiSettingsModel.getAppHeaderTextColor());
+            contentValues.put("appHeaderColor", uiSettingsModel.getAppHeaderColor());
+            contentValues.put("appLoginBGColor", uiSettingsModel.getAppLoginBGColor());
+            contentValues.put("appLoginPGTextColor", uiSettingsModel.getAppLoginTextolor());
+            contentValues.put("selfRegistrationAllowed", uiSettingsModel.getSelfRegistrationAllowed());
+            contentValues.put("contentDownloadType", uiSettingsModel.getContentDownloadType());
+            contentValues.put("courseAppContent", uiSettingsModel.getCourseAppContent());
+            contentValues.put("enableNativeCatlog", uiSettingsModel.getEnableNativeCatlog());
+            contentValues.put("enablePushNotification", uiSettingsModel.getEnablePushNotification());
+            contentValues.put("nativeAppType", uiSettingsModel.getNativeAppType());
+            contentValues.put("autodownloadsizelimit", uiSettingsModel.getAutodownloadsizelimit());
+            contentValues.put("catalogContentDownloadType", uiSettingsModel.getCatalogContentDownloadType());
+            contentValues.put("fileUploadButtonColor", uiSettingsModel.getFileUploadButtonColor());
+            contentValues.put("firstTarget", uiSettingsModel.getFirstTarget());
+            contentValues.put("secondTarget", uiSettingsModel.getSecondTarget());
+            contentValues.put("thirdTarget", uiSettingsModel.getThirdTarget());
+            contentValues.put("contentAssignment", uiSettingsModel.getContentAssignment());
+            contentValues.put("newContentAvailable", uiSettingsModel.getNewContentAvailable());
+            contentValues.put("enableNativeLogin", uiSettingsModel.getEnableAppLogin());
+            contentValues.put("nativeAppLoginLogo", uiSettingsModel.getNativeAppLoginLogo());
+            contentValues.put("enableBranding", uiSettingsModel.getEnableBranding());
+            contentValues.put("selfRegDisplayName", uiSettingsModel.getSignUpName());
+            contentValues.put("AutoLaunchFirstContentInMyLearning", uiSettingsModel.getAutoLaunchMyLearningFirst());
+            contentValues.put("firstEvent", uiSettingsModel.getFirstEvent());
+            contentValues.put("isFacebook", uiSettingsModel.getIsFaceBook());
+            contentValues.put("isLinkedin", uiSettingsModel.getIsLinkedIn());
+            contentValues.put("isGoogle", uiSettingsModel.getIsGoogle());
+            contentValues.put("isTwitter", uiSettingsModel.getIsTwitter());
+            contentValues.put("siteID", siteid);
+            contentValues.put("siteURL", siteUrl);
+            contentValues.put("AddProfileAdditionalTab", uiSettingsModel.getAddProfileAdditionalTab());
+            contentValues.put("contentUnassigned", uiSettingsModel.getContentUnassigned());
+
+
+            db.insert(TBL_APP_SETTINGS, null, contentValues);
+        } catch (SQLiteException sqlEx) {
+            sqlEx.printStackTrace();
+
+        }
+        db.close();
+
+    }
+
 
     public UiSettingsModel getAppSettingsFromLocal(String siteUrl,
                                                    String siteId) {
@@ -1207,7 +1278,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return uiSettingsModel;
     }
-
 
     // Methods for gettting native menus from server
 
@@ -7240,7 +7310,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             insertStudentResponses(studentresponse);
 
 
-
         }
         return "true";
     }
@@ -8693,8 +8762,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
             Log.d(TAG, "saveCourseClose: end ");
-
-
         }
         return completed;
     }
@@ -8742,6 +8809,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 totalNoOfAttempts = "" + Integer.parseInt(sqlNoOfAttempts);
             }
 
+            if (totalNoOfAttempts.equalsIgnoreCase("0")) {
+                updateCMIStartDate(objScoID, getCurrentDateTime("yyyy-MM-dd HH:mm:ss"), userIdValue);
+            }
+
             if (lStatus.equalsIgnoreCase("passed") || lStatus.equalsIgnoreCase("completed") || lStatus.equalsIgnoreCase("failed")) {
 
                 if (!(sqlPreviousState.toLowerCase().contains("completed") || sqlPreviousState.toLowerCase().contains("failed") || sqlPreviousState.toLowerCase().contains("passed"))) {
@@ -8760,6 +8831,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
             if (lStatus.equalsIgnoreCase("passed") || lStatus.equalsIgnoreCase("completed") || lStatus.equalsIgnoreCase("failed")) {
                 dateCompleted = GetCurrentDateTime();
+            }
+
+            if (sqlTimeSpent.length() != 0) {
+
             }
 
             totalSessionTimeSpent = timeSpent.isEmpty() ? "00:00:00" : timeSpent;
@@ -8781,9 +8856,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cmiModel.set_datecompleted(dateCompleted);
 
             if (!score.equalsIgnoreCase("")) {
-                cmiModel.set_score(sqlScore);
-            } else {
                 cmiModel.set_score(score);
+            } else {
+                cmiModel.set_score(sqlScore);
             }
         }
 
@@ -8795,7 +8870,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             cmiModel.set_seqNum("" + seqID);
         }
-
+        totalSessionTimeSpent = timeSpent.isEmpty() ? "00:00:00" : timeSpent;
         cmiModel.set_timespent(totalSessionTimeSpent);
 
         try {

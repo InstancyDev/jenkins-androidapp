@@ -361,6 +361,12 @@ public class Reports_Activity extends AppCompatActivity {
 
     public void updateUI(ReportDetail reportDetail) {
 
+
+        if (!isValidString(reportDetail.score)) {
+
+            reportDetail.score = "";
+        }
+
         txtName.setText(learningModel.getCourseName());
 
         if (isValidString(reportDetail.dateCompleted)) {
@@ -386,6 +392,8 @@ public class Reports_Activity extends AppCompatActivity {
 
         String displayStatus = learningModel.getStatus();
 
+        String displayScore = "";
+
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
             if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")) {
@@ -397,21 +405,21 @@ public class Reports_Activity extends AppCompatActivity {
             }
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-            reportDetail.score = "100";
+            displayScore = "100";
         } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
-            reportDetail.score = "0";
+            displayScore = "0";
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
             displayStatus = learningModel.getStatus();
         } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            reportDetail.score = "50";
+            displayScore = "50";
             displayStatus = "In Progress";
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = "Pending Review";
-            reportDetail.score = "100";
+            displayScore = "100";
         } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
 
             displayStatus = "Registered";
@@ -422,6 +430,7 @@ public class Reports_Activity extends AppCompatActivity {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = learningModel.getStatus();
+            displayScore = "100";
         } else if (statusFromModel.toLowerCase().contains("Expired")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
@@ -429,9 +438,19 @@ public class Reports_Activity extends AppCompatActivity {
         } else {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
+        }//
+
+        if (reportDetail.isListView.equalsIgnoreCase("true")) {
+
+            displayScore = displayScore;
+
+        } else if (!reportDetail.objectTypeID.equalsIgnoreCase("8")) {
+
+            displayScore = reportDetail.score.length() == 0 ? "0" : reportDetail.score;
+
         }
 
-        txtScore.setText("Score: " + reportDetail.score);
+        txtScore.setText("Score: " + displayScore);
         txtStatus.setText(upperCaseWords(displayStatus));
     }
 
