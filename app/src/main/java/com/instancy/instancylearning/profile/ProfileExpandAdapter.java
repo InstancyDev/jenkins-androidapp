@@ -122,7 +122,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         TextView editIcon = (TextView) pView
                 .findViewById(R.id.editoptionicon);
 
-        editIcon.setVisibility(View.VISIBLE);
+        editIcon.setVisibility(View.GONE);
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.editoptionicon), iconFon);
 
@@ -138,6 +138,9 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("1")) {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+            editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
+        }
+        else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
         }
 
@@ -188,6 +191,10 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+            profileSchool.setText(configsModel.attributedisplaytext);
+            profileDegree.setText(configsModel.valueName);
+            profileDuration.setVisibility(View.GONE);
+        }else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
             profileSchool.setText(configsModel.attributedisplaytext);
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);

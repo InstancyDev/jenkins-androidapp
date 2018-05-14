@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -78,8 +79,10 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static com.instancy.instancylearning.utils.StaticValues.EDUCATION_ACT;
-import static com.instancy.instancylearning.utils.StaticValues.EXPERIENCE_ACT;
+
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
+import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
@@ -125,11 +128,12 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     List<UserExperienceModel> experienceModelArrayList = new ArrayList<>();
 
-    static final int REQUEST_IMAGE_CAMERA = 1;
-    private static final int REQUEST_CAMERA = 0;
     private int GALLERY = 1, CAMERA = 2;
-    private Uri uri;
-    private File scaledFile;
+
+    String finalfileName = "", finalEncodedImageStr = "";
+
+    Bitmap bitmapAttachment = null;
+    String endocedImageStr = "";
 
     public Profile_fragment() {
 
@@ -237,7 +241,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
-        if (educationModelArrayList.size() > 0  && uiSettingsModel.getAddProfileAdditionalTab().contains("education")) {
+        if (educationModelArrayList.size() > 0 && uiSettingsModel.getAddProfileAdditionalTab().contains("education")) {
 
             ProfileGroupModel profileGroupModel = new ProfileGroupModel();
             profileGroupModel.groupId = "123";
@@ -279,7 +283,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         userName = header.findViewById(R.id.profilename);
         userLocation = header.findViewById(R.id.userlocation);
 
-       TextView uploadIconFont = (TextView) header.findViewById(R.id.uploadPhotoFont);
+        TextView uploadIconFont = (TextView) header.findViewById(R.id.uploadPhotoFont);
 
         Typeface iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
 
@@ -293,21 +297,22 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
         profileExpandableList.addHeaderView(header);
-
         profileExpandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
-//                UnCOmment
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    editSelectedGroup("EDU", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    editSelectedGroup("EXP", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-                    editSelectedGroup("CNT", groupPosition);
-                }
+//                UnComment
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    editSelectedGroup("EDU", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    editSelectedGroup("EXP", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+//                    editSelectedGroup("BCK", groupPosition);
+//                }
 
                 return true;
             }
@@ -317,7 +322,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             for (int i = 0; i < profileGroupModelList.size(); i++)
                 profileExpandableList.expandGroup(i);
         }
-
 
         profileExpandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 
@@ -457,35 +461,64 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             return;
         }
         if (requestCode == GALLERY) {
-            if (data != null) {
-                Uri contentURI = data.getData();
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
-//                    String path = saveImage(bitmap);
-//                    Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
+            Uri contentURI = data.getData();
+            try {
+                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), contentURI);
+                final String fileName = getFileNameFromPath(contentURI, context);
+                final String mimeType = getMimeTypeFromUri(contentURI);
+                Log.d(TAG, "onActivityResult: " + fileName);
+                bitmapAttachment = bitmap;
+                profileImage.setImageBitmap(bitmap);
+                profileRound.setImageBitmap(bitmap);
+                new CountDownTimer(1000, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                    }
 
-                    profileImage.setImageBitmap(bitmap);
-                    profileRound.setImageBitmap(bitmap);
-                    String imageENcode = encodeImage(bitmap);
-                    sendImageTOServer(imageENcode);
-                    Log.d(TAG, "onActivityResult: " + imageENcode);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+                    public void onFinish() {
+                        endocedImageStr = convertToBase64(bitmapAttachment);
+                        try {
+                            encodeAttachment(fileName);
 
-                }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+
             }
 
+
         } else if (requestCode == CAMERA) {
+//            Uri contentURI = data.getData();
+
             Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
             profileRound.setImageBitmap(thumbnail);
             profileImage.setImageBitmap(thumbnail);
 //            saveImage(thumbnail);
-            String imageENcode = encodeImage(thumbnail);
-            Log.d(TAG, "onActivityResult: " + imageENcode);
-//            Toast.makeText(context, "Image Saved!", Toast.LENGTH_SHORT).show();
+//            final String fileName = getFileNameFromPath(contentURI, context);
+//            final String mimeType = getMimeTypeFromUri(contentURI);
+//            Log.d(TAG, "onActivityResult: " + fileName);
+            bitmapAttachment = thumbnail;
 
-            sendImageTOServer(imageENcode);
+            new CountDownTimer(1000, 1000) {
+                public void onTick(long millisUntilFinished) {
+                }
+
+                public void onFinish() {
+                    endocedImageStr = convertToBase64(bitmapAttachment);
+                    try {
+                        encodeAttachment(finalfileName);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+
         }
 
         if (requestCode == EDUCATION_ACT && resultCode == RESULT_OK) {
@@ -509,6 +542,50 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 
     }
+
+
+    private String convertToBase64(Bitmap bitmap) {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        byte[] byteArrayImage = baos.toByteArray();
+
+        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
+
+        return encodedImage;
+    }
+
+
+    public void encodeAttachment(String fileName) throws JSONException {
+
+        if (bitmapAttachment != null) {
+            endocedImageStr = convertToBase64(bitmapAttachment);
+        }
+
+        if (endocedImageStr.length() < 10) {
+            Toast.makeText(context, "Invalid attached file", Toast.LENGTH_SHORT).show();
+        } else {
+
+            Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
+
+            if (isNetworkConnectionAvailable(context, -1)) {
+
+                String replaceDataString = endocedImageStr.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+
+                finalEncodedImageStr = addQuotes;
+                finalfileName = fileName;
+
+            } else {
+                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        sendImageTOServer(endocedImageStr, fileName);
+    }
+
 
     private String encodeImage(Bitmap bm) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -628,7 +705,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void choosePhotoFromGallary() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
         startActivityForResult(galleryIntent, GALLERY);
     }
 
@@ -637,11 +713,11 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         startActivityForResult(intent, CAMERA);
     }
 
-    public void sendImageTOServer(final String imageString) {
+    public void sendImageTOServer(final String imageString, String fileName) {
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         //sending image to server
 
-        String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=somename&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
+        String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=" + fileName + "&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
 
         final StringRequest request = new StringRequest(Request.Method.POST, apiString, new Response.Listener<String>() {
             @Override
@@ -752,6 +828,18 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             startActivityForResult(intentDetail, EDUCATION_ACT);
 
         } else if (typeString.equalsIgnoreCase("CNT")) {
+
+            List<ProfileConfigsModel> profileConfigsModelArrayList = hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname);
+
+            Log.d(TAG, "editSelectedGroup: " + profileConfigsModelArrayList.size());
+
+            Intent intentDetail = new Intent(context, Personalinfo_activity.class);
+            intentDetail.putExtra("fromWhichGroup", profileGroupModelList.get(groupPosition).groupId);
+            intentDetail.putExtra("GroupName", profileGroupModelList.get(groupPosition).groupname);
+            intentDetail.putExtra("profileConfigsModelArrayList", (Serializable) profileConfigsModelArrayList);
+            startActivityForResult(intentDetail, EDUCATION_ACT);
+
+        } else if (typeString.equalsIgnoreCase("BCK")) {
 
             List<ProfileConfigsModel> profileConfigsModelArrayList = hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname);
 

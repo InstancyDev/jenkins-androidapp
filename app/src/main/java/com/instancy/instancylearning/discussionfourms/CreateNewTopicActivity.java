@@ -307,7 +307,6 @@ public class CreateNewTopicActivity extends AppCompatActivity {
             Uri contentURI = data.getData();
             try {
                 final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
-
                 final String fileName = getFileNameFromPath(contentURI, this);
                 final String mimeType = getMimeTypeFromUri(contentURI);
                 Log.d(TAG, "onActivityResult: " + fileName);
@@ -320,7 +319,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                     public void onFinish() {
                         endocedImageStr = convertToBase64(bitmapAttachment);
                         try {
-                            encodeAttachment(discussionTopicModel, fileName);
+                            encodeAttachment(fileName);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -350,7 +349,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         return encodedImage;
     }
 
-    public void encodeAttachment(DiscussionTopicModel topicModel, String fileName) throws JSONException {
+    public void encodeAttachment(String fileName) throws JSONException {
 
         if (bitmapAttachment != null) {
             endocedImageStr = convertToBase64(bitmapAttachment);
