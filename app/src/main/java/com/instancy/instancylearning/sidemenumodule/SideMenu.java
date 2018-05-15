@@ -254,6 +254,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         updateBottomButtonColor();
 
+
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
         } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta)) || getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp))) {

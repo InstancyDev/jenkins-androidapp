@@ -122,7 +122,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         TextView editIcon = (TextView) pView
                 .findViewById(R.id.editoptionicon);
 
-        editIcon.setVisibility(View.GONE);
+        editIcon.setVisibility(View.VISIBLE);
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.editoptionicon), iconFon);
 

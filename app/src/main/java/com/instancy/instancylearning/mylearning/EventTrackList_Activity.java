@@ -542,6 +542,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 if (!myFile.exists()) {
                     if (myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("8") || myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("9") || myLearningModelLocal.getObjecttypeId().equalsIgnoreCase("10")) {
 
+                        updateTrackListViewBookMark(myLearningModelLocal);
                         getStatusFromServer(myLearningModelLocal);
 
                     } else {
@@ -577,7 +578,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         }
                     }
 //               remove if not required
-                    injectFromDbtoModel();
+//                    injectFromDbtoModel();
 
                     if (isTraxkList) {
                         workFlowType = "onitemChange";
@@ -602,8 +603,16 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
 //            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
-            injectFromDbtoModel();
+//            injectFromDbtoModel();
         }
+    }
+
+
+    public void updateTrackListViewBookMark(MyLearningModel learningModel){
+
+        String paramsString = "?UserID="+appUserModel.getUserIDValue()+"&ScoID="+learningModel.getScoId();
+
+        vollyService.getStringResponseVolley("BMARK", appUserModel.getWebAPIUrl() + "/MobileLMS/UpdateTrackListViewBookMark" + paramsString, appUserModel.getAuthHeaders());
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModelLocal) {

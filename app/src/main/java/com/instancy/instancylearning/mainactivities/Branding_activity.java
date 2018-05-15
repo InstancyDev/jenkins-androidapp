@@ -51,7 +51,7 @@ public class Branding_activity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.branding_activity_new);
+        setContentView(R.layout.branding_activity);
         ButterKnife.bind(this);
         Bundle extras = getIntent().getExtras();
         imagesArray = new ArrayList<String>();
@@ -81,8 +81,8 @@ public class Branding_activity extends Activity {
         btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        View someView = findViewById(R.id.brandinglayout);
-        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+//        View someView = findViewById(R.id.brandinglayout);
+//        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
     }
 

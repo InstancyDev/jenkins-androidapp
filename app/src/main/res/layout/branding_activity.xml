@@ -30,4 +30,20 @@
         android:background="@color/colorRed"
         android:text="@string/label_signin"
         android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/signup_brand"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight=".15"
+        android:textAllCaps="false"
+        android:background="@color/colorRed"
+        android:text="@string/label_new_user"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
 </LinearLayout>

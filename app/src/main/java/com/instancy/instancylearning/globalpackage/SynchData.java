@@ -122,12 +122,11 @@ public class SynchData {
                     + "</NoOfAttempts>");
 
             // need to send data  parentcontentid and parentscoid
-            sb.append("<TrackScoID>" + String.valueOf(tempCmi.get_scoId()) + "</TrackScoID>");
-            sb.append("<TrackContentID></TrackContentID>");
+            sb.append("<TrackScoID>" + tempCmi.getParentScoId() + "</TrackScoID>");
+            sb.append("<TrackContentID>" + tempCmi.getParentContentId() + "</TrackContentID>");
 
             // need to send parent obj type id
-            sb.append("<TrackObjectTypeID>" + tempCmi.get_objecttypeid() + "</TrackObjectTypeID>");
-
+            sb.append("<TrackObjectTypeID>" + tempCmi.getParentObjTypeId() + "</TrackObjectTypeID>");
 
 //            // send empty parentscoid and parent id just checked for some time
 //            sb.append("<TrackScoID></TrackScoID>");

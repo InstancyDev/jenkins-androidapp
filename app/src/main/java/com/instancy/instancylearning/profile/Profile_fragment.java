@@ -185,8 +185,12 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             return false;
         }
 
-        educationModelArrayList = db.fetchUserEducationModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+        String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
 
+        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
+
+        educationModelArrayList = db.fetchUserEducationModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
         experienceModelArrayList = db.fetchUserExperienceModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
         String[] strAry = new String[2];
@@ -302,17 +306,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
 //                UnComment
-//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-//                    editSelectedGroup("EDU", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-//                    editSelectedGroup("EXP", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-//                    editSelectedGroup("PER", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-//                    editSelectedGroup("CNT", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
-//                    editSelectedGroup("BCK", groupPosition);
-//                }
+                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+                    editSelectedGroup("EDU", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+                    editSelectedGroup("EXP", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+                    editSelectedGroup("PER", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+                    editSelectedGroup("CNT", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+                    editSelectedGroup("BCK", groupPosition);
+                }
 
                 return true;
             }
@@ -395,6 +399,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
+
         profileImage.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
         profileImage.setImageAlpha(25);
@@ -573,9 +578,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             if (isNetworkConnectionAvailable(context, -1)) {
 
                 String replaceDataString = endocedImageStr.replace("\"", "\\\"");
-                String addQuotes = ('"' + replaceDataString + '"');
+//                String addQuotes = ('"' + replaceDataString + '"');
 
-                finalEncodedImageStr = addQuotes;
+                finalEncodedImageStr = replaceDataString;
                 finalfileName = fileName;
 
             } else {
@@ -583,7 +588,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
-        sendImageTOServer(endocedImageStr, fileName);
+        sendImageTOServer(finalEncodedImageStr, fileName);
     }
 
 
@@ -667,14 +672,13 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         };
     }
 
-
     @Override
     public void onClick(View view) {
 
         switch (view.getId()) {
 
             case R.id.profile_round:
-//                showPictureDialog();
+                showPictureDialog();
                 break;
         }
     }
@@ -727,6 +731,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 if (s.contains("true")) {
                     Toast.makeText(context, "Profile Picture Successfully Updated", Toast.LENGTH_SHORT).show();
+//                    profileWebCall(appUserModel.getUserIDValue(), true);
                 } else {
                     Toast.makeText(context, "Profile Picture failed to Update", Toast.LENGTH_SHORT).show();
                 }
@@ -748,17 +753,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             @Override
             public byte[] getBody() throws com.android.volley.AuthFailureError {
-                String str = "\"\"" + imageString + "\"\"";
+
                 String encodedString = "";
 
                 try {
-                    encodedString = URLEncoder.encode(str, "UTF-8");
+                    encodedString = URLEncoder.encode(imageString, "UTF-8");
 
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
-                return encodedString.getBytes();
+                String addQuotes = ('"' + encodedString + '"');
+                return addQuotes.getBytes();
             }
 
             ;

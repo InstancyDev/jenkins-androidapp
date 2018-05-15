@@ -5862,7 +5862,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // author
             if (jsonCMiColumnObj.has("questionid") && !jsonCMiColumnObj.isNull("questionid")) {
 
-                int questionID = Integer.parseInt(jsonCMiColumnObj.get("questionid").toString());
+                int questionID =-1;
+                try
+                {
+                    questionID= Integer.parseInt(jsonCMiColumnObj.get("questionid").toString());
+
+                }catch (NumberFormatException numberEx){
+                    numberEx.printStackTrace();
+                    questionID=-1;
+                }
+
                 studentResponseModel.set_questionid(questionID);
 
             }

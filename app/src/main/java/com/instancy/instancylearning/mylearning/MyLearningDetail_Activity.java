@@ -873,6 +873,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 }
 
 
+
+
                 svProgressHUD.dismiss();
             }
 
@@ -910,6 +912,20 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+                if (requestType.equalsIgnoreCase("MLADP")) {
+
+                    if (response != null) {
+                        try {
+                            db.injectCMIDataInto(response, myLearningModel);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
+
                 svProgressHUD.dismiss();
             }
         };
@@ -1351,9 +1367,31 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             zipfile.delete();
                         }
 
-                        if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
-                            callMetaDataService(learningModel);
+//                        if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+//                            callMobileGetContentTrackedData(learningModel);
+//                        }
+
+                        if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                                callMobileGetContentTrackedData(learningModel);
+                                callMobileGetMobileContentMetaData(learningModel);
+                            } else {
+                                callMobileGetMobileContentMetaData(learningModel);
+
+                            }
+
+                        } else {
+                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                                callMobileGetContentTrackedData(learningModel);
+
+                            }
+
                         }
+
+
+
+
+
                     }
 
                     @Override
@@ -1372,7 +1410,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         int downloadId = downloadManager.add(downloadRequest);
     }
 
-    public void callMetaDataService(MyLearningModel learningModel) {
+    public void callMobileGetContentTrackedData(MyLearningModel learningModel) {
         String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
 
         vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
@@ -1574,6 +1612,53 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
+
+    public void callMobileGetMobileContentMetaData(final MyLearningModel learningModel) {
+
+        String paramsString = "SiteURL=" + learningModel.getSiteURL()
+                + "&ContentID=" + learningModel.getContentID()
+                + "&userid=" + learningModel.getUserID()
+                + "&DelivoryMode=1&IsDownload=1";
+
+        String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, metaDataUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                if (response != null) {
+                    try {
+                        db.insertTrackObjects(response, learningModel);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjReq);
+
+    }
+
+
+
+
+
 
     public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final boolean isJoinedCommunity) {
 
