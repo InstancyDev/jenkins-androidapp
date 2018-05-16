@@ -5127,8 +5127,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("scoid")));
                     trackListModel.setParticipantUrl(cursor.getString(cursor
                             .getColumnIndex("participanturl")));
-//                    trackListModel.setStatus(cursor.getString(cursor
-//                            .getColumnIndex("objStatus")));
+                    trackListModel.setTrackOrRelatedContentID(cursor.getString(cursor
+                            .getColumnIndex("trackContentId")));
 
                     String objStatus = cursor.getString(cursor
                             .getColumnIndex("objStatus"));
@@ -5225,6 +5225,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         trackListModel.setShowStatus(cursor.getString(cursor
                                 .getColumnIndex("showstatus")));
+
 
 
                     }
@@ -5358,7 +5359,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("dateassigned", trackListModel.getDateAssigned());
             contentValues.put("keywords", trackListModel.getKeywords());
             contentValues.put("offlinepath", trackListModel.getOfflinepath());
-            contentValues.put("trackContentId", trackListModel.getOfflinepath());
+            contentValues.put("trackContentId", trackListModel.getTrackOrRelatedContentID());
             contentValues.put("showstatus", trackListModel.getShowStatus());
             contentValues.put("folderpath", trackListModel.getFolderPath());
             contentValues.put("jwvideokey", trackListModel.getJwvideokey());

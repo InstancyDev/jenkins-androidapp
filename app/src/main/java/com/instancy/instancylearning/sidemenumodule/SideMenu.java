@@ -250,14 +250,14 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
-        notificationLayout.setVisibility(View.GONE);
+        notificationLayout.setVisibility(View.VISIBLE);
 
         updateBottomButtonColor();
 
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
-        } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta)) || getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp))) {
+        } else if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cvcta)) || getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)) || getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.enterprisedemo))) {
             notificationLayout.setVisibility(View.VISIBLE);
             sendMessageLayout.setVisibility(View.VISIBLE);
 //            signalAService = SignalAService.newInstance(this);
@@ -822,13 +822,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             name = "Anonymous";
         }
 
-        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("na")) {
-            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("null")) {
+            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("null")) {
                 location = detailsModel.addresscity + ", " + detailsModel.addressstate;
             } else {
                 location = detailsModel.addresscity;
             }
-        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("null")) {
             location = detailsModel.addressstate;
         } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("na")) {
             location = detailsModel.addresscountry;

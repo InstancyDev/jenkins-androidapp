@@ -113,6 +113,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tracklist_activity);
+        strlaunch = "0";
+        workFlowType = "onlaunch";
         linearLayout = (LinearLayout) findViewById(R.id.layout_linear_detail);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
@@ -129,7 +131,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         blockNames = new ArrayList<String>();
 
         webAPIClient = new WebAPIClient(this);
-        strlaunch = "0";
+
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
@@ -137,18 +139,18 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
-        String typeFrom="track";
+        String typeFrom = "track";
 
-        if (isTraxkList){
+        if (isTraxkList) {
 
-            typeFrom="track";
+            typeFrom = "track";
 
         } else {
 
-            typeFrom="event";
+            typeFrom = "event";
 
         }
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView,typeFrom);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView, typeFrom);
 //        expandableListView.setOnChildClickListener(this);
         // setting list adapter
         expandableListView.setAdapter(trackListExpandableAdapter);
@@ -313,6 +315,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     if (response != null) {
                         try {
                             db.injectCMIDataInto(response, myLearningModel);
+//                            executeWorkFlowRules("onitemChange");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -544,7 +547,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
                         updateTrackListViewBookMark(myLearningModelLocal);
                         getStatusFromServer(myLearningModelLocal);
-
+//                        executeWorkFlowRules("onitemChange");
                     } else {
 
                         if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
@@ -582,6 +585,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
                     if (isTraxkList) {
                         workFlowType = "onitemChange";
+                        Log.d(TAG, "executeWorkFlowRules: workflowtype activityresult" + workFlowType);
                         executeWorkFlowRules(workFlowType);
                     } else {
 
@@ -608,9 +612,9 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     }
 
 
-    public void updateTrackListViewBookMark(MyLearningModel learningModel){
+    public void updateTrackListViewBookMark(MyLearningModel learningModel) {
 
-        String paramsString = "?UserID="+appUserModel.getUserIDValue()+"&ScoID="+learningModel.getScoId();
+        String paramsString = "?UserID=" + appUserModel.getUserIDValue() + "&ScoID=" + learningModel.getScoId();
 
         vollyService.getStringResponseVolley("BMARK", appUserModel.getWebAPIUrl() + "/MobileLMS/UpdateTrackListViewBookMark" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -621,13 +625,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 + "&scoId="
                 + myLearningModelLocal.getScoId()
                 + "&TrackObjectTypeID="
-                + myLearningModelLocal.getObjecttypeId()
+                + "10"
                 + "&TrackContentID="
-                + myLearningModelLocal.getContentID()
-                + "&TrackScoID=" + myLearningModelLocal.getScoId()
+                + myLearningModelLocal.getTrackOrRelatedContentID()
+                + "&TrackScoID=" + myLearningModelLocal.getTrackScoid()
                 + "&SiteID=" + myLearningModelLocal.getSiteID()
-                + "&OrgUnitID=" + myLearningModelLocal.getSiteID()
-                + "&isonexist=onexit";
+                + "&OrgUnitID=" + myLearningModelLocal.getSiteID();
 
         vollyService.getJsonObjResponseVolley("UPDATESTATUS", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentStatus?" + paramsString, appUserModel.getAuthHeaders());
 
@@ -658,19 +661,21 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                             i = db.updateContentStatusInTrackList(myLearningModelLocal, status, progress, false);
                         }
 
-                        if (i == 1) {
-                            injectFromDbtoModel();
-//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-
-
-                            if (isTraxkList) {
-                                workFlowType = "onitemChange";
-                                executeWorkFlowRules(workFlowType);
-                            } else {
+                        if (isTraxkList) {
+                            workFlowType = "onitemChange";
+                            Log.d(TAG, "executeWorkFlowRules: workflowtype statusupdate" + workFlowType);
+                            executeWorkFlowRules(workFlowType);
+                        } else {
 
 //                                workFlowType = "onattendance";
 //                                executeWorkFlowRulesForEvents(workFlowType);
-                            }
+                        }
+
+
+                        if (i == 1) {
+//                            injectFromDbtoModel();
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+
 
                         } else {
 
@@ -691,13 +696,14 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         super.onResume();
         if (isTraxkList) {
             try {
-
                 if (strlaunch.equals("0")) {
                     strlaunch = "1";
                 } else if (strlaunch.equals("1")) {
                     injectFromDbtoModel();
+                    Log.d(TAG, "executeWorkFlowRules: workflowtype onresume" + workFlowType);
                     workFlowType = "onitemChange";
                     executeWorkFlowRules(workFlowType);
+
                 }
             } catch (Exception ex) {
                 Log.d("Onresume", ex.getMessage());
@@ -720,7 +726,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     }
 
     public void executeWorkFlowRules(final String workflowtype) {
-
+        Log.d(TAG, "executeWorkFlowRules: workflowtype " + workflowtype);
         try {
 
             File fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml");
@@ -1688,7 +1694,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 }
 
                 if (workFlowType.equals("onlaunch")) {
-
+                    Log.d(TAG, "executeWorkFlowRules: workflowtype onrules" + workFlowType);
                     workFlowType = "onitemChange";
                     executeWorkFlowRules(workFlowType);
 
@@ -1729,7 +1735,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 //            }
 //
 //        } else {
-        workFlowType = "";
+        workFlowType = "onitemChange";
         injectFromDbtoModel();
 
 //        }
@@ -1739,7 +1745,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     public void completedXmlFileDownload() {
 
         if (isTraxkList) {
-            executeWorkFlowRules("onlaunch");
+            workFlowType = "onlaunch";
+            executeWorkFlowRules(workFlowType);
         } else {
             boolean isEventRules = isEventCompleted();
             if (!isEventRules) {

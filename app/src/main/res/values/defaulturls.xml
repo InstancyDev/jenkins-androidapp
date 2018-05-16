@@ -51,8 +51,8 @@
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
     <!--for instancy market place-->
-    <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
+    <string name="app_default_url">https://learning.instancy.com/</string>
+    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
 
 
     <!-- SCROM testing qalearning -->
@@ -62,8 +62,8 @@
     <!--<string name="app_default_url">http://stagingmontessori.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://stagingmonteapi.instancysoft.com/api/</string>-->
 
-    <string name="app_default_url">http://staging.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
+    <!--<string name="app_default_url">http://staging.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://montessoritraining.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->

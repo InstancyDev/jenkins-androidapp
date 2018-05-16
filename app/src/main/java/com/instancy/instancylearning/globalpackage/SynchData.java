@@ -2,6 +2,7 @@ package com.instancy.instancylearning.globalpackage;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -65,7 +66,9 @@ public class SynchData {
 //        al.clear();
 //        al.addAll(hs);
 
+
         for (CMIModel tempCmi : cmiList) {
+
             bundlevalue1 = String.valueOf(tempCmi.get_userId());
             StringBuilder sb = new StringBuilder();
             sb.append("<TrackedData><CMI>");
@@ -423,6 +426,8 @@ public class SynchData {
                 String result = Utilities.convertStreamToString(inputStream);
                 dbh.insertCMiIsViewd(tempCmi);
                 Log.d("TAG", "SyncData: " + result);
+
+
             }
 //            dbh.finishSynch(tempCmi);
 //            dbh.sendOfflineUserPagenotes();

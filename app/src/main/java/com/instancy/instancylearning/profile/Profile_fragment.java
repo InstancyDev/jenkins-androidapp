@@ -84,6 +84,7 @@ import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 /**
@@ -291,6 +292,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Typeface iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
 
+        uploadIconFont.setVisibility(View.GONE);
+
         FontManager.markAsIconContainer(header.findViewById(R.id.uploadPhotoFont), iconFon);
 
         userName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -306,17 +309,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
 //                UnComment
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    editSelectedGroup("EDU", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    editSelectedGroup("EXP", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-                    editSelectedGroup("CNT", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
-                    editSelectedGroup("BCK", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    editSelectedGroup("EDU", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    editSelectedGroup("EXP", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+//                    editSelectedGroup("BCK", groupPosition);
+//                }
 
                 return true;
             }
@@ -439,15 +442,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             name = "Anonymous";
         }
 
-        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("na")) {
-            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+        if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("null")) {
+            if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("null")) {
                 location = detailsModel.addresscity + "," + detailsModel.addressstate;
             } else {
                 location = detailsModel.addresscity;
             }
-        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("na")) {
+        } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("null")) {
             location = detailsModel.addressstate;
-        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("na")) {
+        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("null")) {
             location = detailsModel.addresscountry;
         } else {
             location = "";
@@ -458,6 +461,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         return strAry;
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -582,7 +587,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 finalEncodedImageStr = replaceDataString;
                 finalfileName = fileName;
-
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
@@ -678,7 +682,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-                showPictureDialog();
+//                showPictureDialog();
                 break;
         }
     }
@@ -722,6 +726,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         //sending image to server
 
         String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=" + fileName + "&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
+
+        Log.d(TAG, "sendImageTOServer: "+apiString);
 
         final StringRequest request = new StringRequest(Request.Method.POST, apiString, new Response.Listener<String>() {
             @Override
