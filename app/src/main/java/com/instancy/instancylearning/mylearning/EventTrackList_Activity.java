@@ -315,6 +315,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     if (response != null) {
                         try {
                             db.injectCMIDataInto(response, myLearningModel);
+                            executeWorkFlowRules("");
 //                            executeWorkFlowRules("onitemChange");
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -661,6 +662,17 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                             i = db.updateContentStatusInTrackList(myLearningModelLocal, status, progress, false);
                         }
 
+
+                        if (i == 1) {
+                            injectFromDbtoModel();
+//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+
+
+                        } else {
+
+//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                        }
+
                         if (isTraxkList) {
                             workFlowType = "onitemChange";
                             Log.d(TAG, "executeWorkFlowRules: workflowtype statusupdate" + workFlowType);
@@ -672,15 +684,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         }
 
 
-                        if (i == 1) {
-//                            injectFromDbtoModel();
-//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
 
-
-                        } else {
-
-//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
-                        }
                     }
 
                 } catch (JSONException e) {

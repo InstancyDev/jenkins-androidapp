@@ -68,7 +68,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +80,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static android.util.Base64.encodeToString;
 import static com.instancy.instancylearning.utils.StaticValues.EDUCATION_ACT;
 
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
@@ -131,10 +134,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private int GALLERY = 1, CAMERA = 2;
 
-    String finalfileName = "", finalEncodedImageStr = "";
+    String finalfileName = "";
 
-    Bitmap bitmapAttachment = null;
-    String endocedImageStr = "";
 
     public Profile_fragment() {
 
@@ -336,15 +337,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
 
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    educationClicked(groupPosition, childPosition, "EDU");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    educationClicked(groupPosition, childPosition, "EXP");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-//                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-//                    editSelectedGroup("CNT", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    educationClicked(groupPosition, childPosition, "EDU");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    educationClicked(groupPosition, childPosition, "EXP");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+////                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+////                    editSelectedGroup("CNT", groupPosition);
+//                }
 
                 return true;
             }
@@ -398,10 +399,10 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 //        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
 
-        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
-
-        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
-        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
+//        String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
+//
+//        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+//        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
 
         profileImage.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
@@ -463,7 +464,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -477,7 +477,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 final String fileName = getFileNameFromPath(contentURI, context);
                 final String mimeType = getMimeTypeFromUri(contentURI);
                 Log.d(TAG, "onActivityResult: " + fileName);
-                bitmapAttachment = bitmap;
                 profileImage.setImageBitmap(bitmap);
                 profileRound.setImageBitmap(bitmap);
                 new CountDownTimer(1000, 1000) {
@@ -485,9 +484,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
 
                     public void onFinish() {
-                        endocedImageStr = convertToBase64(bitmapAttachment);
+                        String endocedImageStr = convertToBase64(bitmap);
                         try {
-                            encodeAttachment(fileName);
+                            encodeAttachment(fileName, endocedImageStr);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -505,23 +504,27 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         } else if (requestCode == CAMERA) {
 //            Uri contentURI = data.getData();
 
-            Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+            final Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
             profileRound.setImageBitmap(thumbnail);
             profileImage.setImageBitmap(thumbnail);
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+            final String fileName = "IMG_" + timeStamp + "_.jpg";
+
 //            saveImage(thumbnail);
 //            final String fileName = getFileNameFromPath(contentURI, context);
 //            final String mimeType = getMimeTypeFromUri(contentURI);
 //            Log.d(TAG, "onActivityResult: " + fileName);
-            bitmapAttachment = thumbnail;
+
 
             new CountDownTimer(1000, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
 
                 public void onFinish() {
-                    endocedImageStr = convertToBase64(bitmapAttachment);
+                    String endocedImageStr = convertToBase64(thumbnail);
                     try {
-                        encodeAttachment(finalfileName);
+                        encodeAttachment(fileName, endocedImageStr);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -550,9 +553,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
-
     }
-
 
     private String convertToBase64(Bitmap bitmap) {
 
@@ -562,37 +563,31 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         byte[] byteArrayImage = baos.toByteArray();
 
-        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
-
-        return encodedImage;
+        return encodeToString(byteArrayImage, Base64.NO_WRAP);
     }
 
 
-    public void encodeAttachment(String fileName) throws JSONException {
+    public void encodeAttachment(String fileName, String imageFileStrr) throws JSONException {
 
-        if (bitmapAttachment != null) {
-            endocedImageStr = convertToBase64(bitmapAttachment);
-        }
 
-        if (endocedImageStr.length() < 10) {
+        if (imageFileStrr.length() < 10) {
             Toast.makeText(context, "Invalid attached file", Toast.LENGTH_SHORT).show();
         } else {
 
-            Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
+            Log.d(TAG, "validateNewForumCreation: " + imageFileStrr);
 
             if (isNetworkConnectionAvailable(context, -1)) {
 
-                String replaceDataString = endocedImageStr.replace("\"", "\\\"");
-//                String addQuotes = ('"' + replaceDataString + '"');
+                String replaceDataString = imageFileStrr.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
 
-                finalEncodedImageStr = replaceDataString;
-                finalfileName = fileName;
+                sendImageTOServer(addQuotes, fileName);
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
         }
 
-        sendImageTOServer(finalEncodedImageStr, fileName);
+
     }
 
 
@@ -600,7 +595,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] b = baos.toByteArray();
-        String encImage = Base64.encodeToString(b, Base64.DEFAULT);
+        String encImage = encodeToString(b, Base64.DEFAULT);
 
         return encImage;
     }
@@ -721,13 +716,13 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         startActivityForResult(intent, CAMERA);
     }
 
-    public void sendImageTOServer(final String imageString, String fileName) {
+    public void sendImageTOServer(final String postData, String fileName) {
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         //sending image to server
 
         String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=" + fileName + "&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
 
-        Log.d(TAG, "sendImageTOServer: "+apiString);
+        Log.d(TAG, "sendImageTOServer: " + apiString);
 
         final StringRequest request = new StringRequest(Request.Method.POST, apiString, new Response.Listener<String>() {
             @Override
@@ -754,33 +749,26 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             @Override
             public String getBodyContentType() {
-                return "application/x-www-form-urlencoded";
+                return "application/json";
+
             }
 
             @Override
             public byte[] getBody() throws com.android.volley.AuthFailureError {
-
-                String encodedString = "";
-
-                try {
-                    encodedString = URLEncoder.encode(imageString, "UTF-8");
-
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                String addQuotes = ('"' + encodedString + '"');
-                return addQuotes.getBytes();
+                return postData.getBytes();
             }
+
 
             ;
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                String base64EncodedCredentials = encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
 //                headers.put("Content-Type", "application/json; charset=utf-8");
-                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
                 return headers;
             }
 
