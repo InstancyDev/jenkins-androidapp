@@ -67,6 +67,7 @@ import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.notifications.Notifications_fragment;
 import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
+import com.instancy.instancylearning.settings.SettingsInnerFragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
@@ -128,6 +129,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     @BindView(R.id.back_layout)
     RelativeLayout backLayout;
+
+    @BindView(R.id.settings_layout)
+    RelativeLayout settingsLayout;
 
     @BindView(R.id.sendmessage_layout)
     RelativeLayout sendMessageLayout;
@@ -251,7 +255,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
         notificationLayout.setVisibility(View.VISIBLE);
-
+        settingsLayout.setVisibility(View.VISIBLE);
+        settingsLayout.setOnClickListener(this);
         updateBottomButtonColor();
 
 
@@ -582,6 +587,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             case 100:
                 fragment = new Notifications_fragment();
                 break;
+            case 101:
+                fragment = new SettingsInnerFragment();
+                break;
             default:
                 Log.d(TAG, "selectItem: default contextmenu");
                 break;
@@ -605,7 +613,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
 
             }
-            if (menuid == 99 || menuid == 100) {
+            if (menuid == 99 || menuid == 100 || menuid == 101) {
 
                 lastClicked = -1;
                 navDrawerExpandableView.setItemChecked(lastClicked, false);
@@ -623,6 +631,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     public void updateBottomButtonColor() {
 
         backLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+        settingsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
         sendMessageLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
         notificationLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
         txtBtnNotification.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
@@ -854,6 +863,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case R.id.notification_layout:
                 selectItem(100, sideMenumodelList.get(0), false, "", "");
+                break;
+            case R.id.settings_layout:
+                selectItem(101, sideMenumodelList.get(0), false, "", "");
                 break;
         }
     }
