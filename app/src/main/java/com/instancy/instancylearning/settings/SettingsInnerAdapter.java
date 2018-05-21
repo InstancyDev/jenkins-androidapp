@@ -2,16 +2,20 @@ package com.instancy.instancylearning.settings;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
 
 import java.util.HashMap;
 import java.util.List;
+
+import butterknife.BindView;
 
 /**
  * Created by Upendranath on 5/29/2017. used tutorial
@@ -24,6 +28,7 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail;
+
 
     public SettingsInnerAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<String>> expandableListDetail) {
         this.context = context;
@@ -93,11 +98,33 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.nativesettingsplaincell, null);
+            convertView = layoutInflater.inflate(R.layout.askexpertskillcell, null);
         }
-        TextView expandedListTextView = (TextView) convertView
-                .findViewById(R.id.settings_label);
-        expandedListTextView.setText(expandedListText);
+
+        Switch switchSkill = (Switch) convertView.findViewById(R.id.swtchskills);
+
+
+        TextView labelTxt = (TextView) convertView
+                .findViewById(R.id.languagelabel);
+
+        TextView applanguageTxt = (TextView) convertView
+                .findViewById(R.id.applanguage);
+
+        if (expandableListTitle.get(groupPosition).contains("LANGUAGE")) {
+            switchSkill.setVisibility(View.GONE);
+            labelTxt.setVisibility(View.VISIBLE);
+            applanguageTxt.setVisibility(View.VISIBLE);
+
+            applanguageTxt.setText("English");
+
+            labelTxt.setText(expandedListText);
+
+
+        }
+
+
+        switchSkill.setText(expandedListText);
+
         return convertView;
     }
 
@@ -110,4 +137,6 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
+
+
 }

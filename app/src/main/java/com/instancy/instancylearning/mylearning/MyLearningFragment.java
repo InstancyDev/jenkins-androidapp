@@ -281,8 +281,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     if (response != null) {
                         try {
-                            db.insertFilterIntoDB(response, appUserModel);
+                            db.insertFilterIntoDB(response, appUserModel, 1);
                             Intent intent = new Intent(context, Filter_activity.class);
+                            intent.putExtra("isFrom", 1);
                             startActivityForResult(intent, FILTER_CLOSE_CODE);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -536,7 +537,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             itemInfo.setVisible(false);
         }
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -1220,10 +1221,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         } else {
 
-            JSONObject jsonObject = db.fetchFilterObject(appUserModel);
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel, 1);
             if (jsonObject != null) {
 
                 Intent intent = new Intent(context, Filter_activity.class);
+                intent.putExtra("isFrom", 1);
                 startActivityForResult(intent, FILTER_CLOSE_CODE);
 
             } else {

@@ -24,21 +24,22 @@ public class NativeSetttingsModel {
             cricket.add("Change site URL");
             expandableListDetail.put("Preferences", cricket);
         } else {
-//            List<String> football = new ArrayList<String>();
-//            football.add("Assigned Content Target Reminder");
-//            football.add("Content Assignment");
-//            football.add("New Content items Available in the Catalog_fragment");
-//            football.add("Content items Unassigned");
-//
-//            List<String> basketball = new ArrayList<String>();
-//            basketball.add("Enable Auto Download of Content");
+            List<String> football = new ArrayList<String>();
+
+            football.add("Assigned Content Target Reminder");
+            football.add("Content Assignment");
+            football.add("New Content items Available in the Catalog fragment");
+            football.add("Content items Unassigned");
+
+            List<String> basketball = new ArrayList<String>();
+            basketball.add("Enable Auto Download of Content");
 
             List<String> localization = new ArrayList<String>();
             localization.add("App Language");
 
-//            expandableListDetail.put("NOTIFICATION", football);
+            expandableListDetail.put("NOTIFICATION", football);
             expandableListDetail.put("LANGUAGE", localization);
-//            expandableListDetail.put("DOWNLOAD", basketball);
+            expandableListDetail.put("DOWNLOAD", basketball);
 
         }
 

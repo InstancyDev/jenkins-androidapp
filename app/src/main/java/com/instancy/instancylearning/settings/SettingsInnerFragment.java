@@ -112,6 +112,7 @@ public class SettingsInnerFragment extends Fragment {
 
         vollyService = new VollyService(resultCallback, context);
 
+
         Bundle bundle = getArguments();
         if (bundle != null) {
 
@@ -139,7 +140,8 @@ public class SettingsInnerFragment extends Fragment {
 
 
         settingsExpandList.expandGroup(0);
-//        settingsExpandList.expandGroup(1);
+        settingsExpandList.expandGroup(1);
+        settingsExpandList.expandGroup(2);
 
         initilizeView();
 

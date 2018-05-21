@@ -326,7 +326,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID="+sideMenusModel.getRepositoryId();
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId();
 
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -335,7 +335,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID="+sideMenusModel.getRepositoryId()+"&AuthorID=" + authorID;
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=0&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=" + authorID;
 
         vollyService.getJsonObjResponseVolley("PEOPLELISTINGCATALOG", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -407,9 +407,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     if (response != null) {
                         try {
-                            db.insertFilterIntoDB(response, appUserModel);
+                            db.insertFilterIntoDB(response, appUserModel,0);
                             Intent intent = new Intent(context, Filter_activity.class);
+                            intent.putExtra("isFrom", 0);
                             startActivityForResult(intent, FILTER_CLOSE_CODE);
+                            REFRESH = 0;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -642,18 +644,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
-//            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
+//          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
-//            searchView.setBackgroundColor(Color.WHITE);
-//            EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-//            txtSearch.setHint("Search..");
-//            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-//            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
@@ -680,16 +677,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
         if (item_filter != null) {
-//            item_filter.setIcon(R.drawable.filter_icon);
-//            tintMenuIcon(getActivity(), item_filter, R.color.colorWhite);
-//            Drawable myIcon = getResources().getDrawable(R.drawable.filter_icon);
-//            item_filter.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
-//            item_filter.setTitle("Filter");
-
-
-            Drawable myIcon = getResources().getDrawable(R.drawable.filter_icon);
-            item_filter.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
-
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
+            item_filter.setIcon(filterDrawable);
+            item_filter.setTitle("Filter");
 
         }
 
@@ -1504,6 +1494,44 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         }
 
+        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
+
+            boolean resetFilter = data.getBooleanExtra("FILTER", false);
+
+            if (resetFilter) {
+
+                injectFromDbtoModel();
+
+            } else {
+                String sortName = data.getStringExtra("coursetype");
+                boolean filterAscend = data.getBooleanExtra("sortby", false);
+                String configId = data.getStringExtra("configid");
+                catalogAdapter.applySortBy(filterAscend, configId);
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject = new JSONObject(data.getStringExtra("jsonInnerValues"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (jsonObject.length() > 0) {
+                    catalogAdapter.applyGroupBy(jsonObject);
+                }
+
+                if (jsonObject.length() > 0) {
+                    catalogAdapter.filterByObjTypeId(jsonObject);
+                }
+
+            }
+
+            if (catalogModelsList.size() <= 0) {
+                nodata_Label.setText(getResources().getString(R.string.no_data));
+            }
+
+
+        }
+
+
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
@@ -1582,17 +1610,18 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (isNetworkConnectionAvailable(getContext(), -1)) {
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-            String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3134";
+            String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3131";
             vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
 
         } else {
 
-            JSONObject jsonObject = db.fetchFilterObject(appUserModel);
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel,0);
             if (jsonObject != null) {
 
                 Intent intent = new Intent(context, Filter_activity.class);
+                intent.putExtra("isFrom", 0);
                 startActivityForResult(intent, FILTER_CLOSE_CODE);
-
+                REFRESH = 0;
             } else {
                 Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }

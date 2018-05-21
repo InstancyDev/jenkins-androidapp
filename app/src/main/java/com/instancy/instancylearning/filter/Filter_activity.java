@@ -61,6 +61,8 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
     AppController appcontroller;
     Button btnApply, btnReset;
 
+    int isFromMylearning=0;
+
     String contentKey = "", groupKey = "";
 
     JSONObject jsonInnerValues;
@@ -79,6 +81,9 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Filters</font>"));
+
+        isFromMylearning = getIntent().getIntExtra("ISTRACKLIST", 1);
+
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -92,7 +97,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         try {
 //            getFiltersFromDB();
 
-            JSONObject jsonObject = db.fetchFilterObject(appUserModel);
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel,isFromMylearning);
             if (jsonObject != null) {
                 HashMap<String, List<NativeSetttingsModel.FilterModel>> hashMap = NativeSetttingsModel.getFilterData(jsonObject);
                 Log.d(TAG, "getFiltersFromDB: " + hashMap.get("Sort By"));

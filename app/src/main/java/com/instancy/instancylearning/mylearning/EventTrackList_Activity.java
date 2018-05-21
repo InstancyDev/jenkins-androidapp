@@ -315,7 +315,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     if (response != null) {
                         try {
                             db.injectCMIDataInto(response, myLearningModel);
-                            executeWorkFlowRules("");
+//                            executeWorkFlowRules("");
 //                            executeWorkFlowRules("onitemChange");
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -582,7 +582,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         }
                     }
 //               remove if not required
-//                    injectFromDbtoModel();
+                    injectFromDbtoModel();
 
                     if (isTraxkList) {
                         workFlowType = "onitemChange";
@@ -1698,7 +1698,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 }
 
                 if (workFlowType.equals("onlaunch")) {
-                    Log.d(TAG, "executeWorkFlowRules: workflowtype onrules" + workFlowType);
+                    Log.d(TAG, "executeWorkFlowRules: workflowtype onrules " + workFlowType);
                     workFlowType = "onitemChange";
                     executeWorkFlowRules(workFlowType);
 

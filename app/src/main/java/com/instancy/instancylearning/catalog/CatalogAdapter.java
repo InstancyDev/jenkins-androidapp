@@ -52,6 +52,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -372,6 +374,242 @@ public class CatalogAdapter extends BaseAdapter {
         }
         notifyDataSetChanged();
     }
+
+    public void applySortBy(final boolean isAscn, String configid) {
+
+//        Collections.sort(myLearningModel, Collections.reverseOrder());
+
+        switch (configid) {
+
+            case "81":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        if (isAscn) {
+                            return obj1.getCourseName().compareToIgnoreCase(obj2.getCourseName());
+
+                        } else {
+                            return obj2.getCourseName().compareToIgnoreCase(obj1.getCourseName());
+                        }
+                    }
+                });
+                break;
+            case "211":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        if (isAscn) {
+                            return obj1.getAuthor().compareToIgnoreCase(obj2.getAuthor());
+
+                        } else {
+                            return obj2.getAuthor().compareToIgnoreCase(obj1.getAuthor());
+                        }
+
+                    }
+                });
+                break;
+            case "191":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+
+                        if (isAscn) {
+                            return obj1.getStatus().compareToIgnoreCase(obj2.getStatus());
+
+                        } else {
+                            return obj2.getStatus().compareToIgnoreCase(obj1.getStatus());
+                        }
+                    }
+                });
+                break;
+            case "181":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+
+                        if (isAscn) {
+                            return obj1.getDateAssigned().compareToIgnoreCase(obj2.getDateAssigned());
+
+                        } else {
+                            return obj2.getDateAssigned().compareToIgnoreCase(obj1.getDateAssigned());
+                        }
+                    }
+                });
+                break;
+            case "171":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+
+                        if (isAscn) {
+                            return obj1.getDateAssigned().compareToIgnoreCase(obj2.getDateAssigned());
+
+                        } else {
+                            return obj2.getDateAssigned().compareToIgnoreCase(obj1.getDateAssigned());
+                        }
+                    }
+                });
+                break;
+            case "default":
+                break;
+
+        }
+
+        this.notifyDataSetChanged();
+    }
+
+    public void applyGroupBy(JSONObject groupBy) {
+
+        String groupID = groupBy.optString("group").toLowerCase();
+        String objectID = "";
+        if (groupID.length() == 0)
+            return;
+
+        switch (groupID) {
+
+            case "authors":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getAuthor().compareToIgnoreCase(obj2.getAuthor());
+
+                    }
+                });
+                objectID = "authors";
+                break;
+            case "contenttypes":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
+
+                    }
+                });
+                objectID = "contenttypes";
+                break;
+            case "skills":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
+
+                    }
+                });
+                objectID = "skills";
+                break;
+
+            case "job":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
+
+                    }
+                });
+                objectID = "job";
+                break;
+            case "categories":
+                Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
+
+                    @Override
+                    public int compare(MyLearningModel obj1, MyLearningModel obj2) {
+                        // ## Ascending order
+                        return obj1.getComponentId().compareToIgnoreCase(obj2.getComponentId());
+
+                    }
+                });
+                objectID = "categories";
+                break;
+            case "default":
+                break;
+
+        }
+
+        if (objectID.equalsIgnoreCase("authors")) {
+            if (myLearningModel.size() > 0) {
+                String groupName = "";
+
+                for (int i = 0; i < myLearningModel.size(); i++) {
+                    Log.d(TAG, "applyGroupBy: author name " + myLearningModel.get(i).getAuthor());
+
+                    if (!myLearningModel.get(i).getAuthor().equalsIgnoreCase(groupName)) {
+                        myLearningModel.get(i).setGroupName(myLearningModel.get(i).getAuthor());
+                        groupName = myLearningModel.get(i).getAuthor();
+                    }
+                }
+
+            }
+//        } else if (objectID.equalsIgnoreCase("contenttypes")) {
+        } else {
+            if (myLearningModel.size() > 0) {
+                String groupName = "";
+
+                for (int i = 0; i < myLearningModel.size(); i++) {
+                    Log.d(TAG, "applyGroupBy: author name " + myLearningModel.get(i).getMediaName());
+
+                    if (!myLearningModel.get(i).getObjecttypeId().equalsIgnoreCase(groupName)) {
+                        myLearningModel.get(i).setGroupName(myLearningModel.get(i).getMediaName());
+                        groupName = myLearningModel.get(i).getObjecttypeId();
+                    }
+                }
+
+            }
+
+
+        }
+
+
+        this.notifyDataSetChanged();
+    }
+
+
+//    public static Set<Integer> findDuplicates(int[] input) {
+//        Set<Integer> duplicates = new HashSet<Integer>();
+//        for (int i = 0; i < input.length; i++) {
+//            for (int j = 1; j < input.length; j++) {
+//                if (input[i] == input[j] && i != j) {
+// duplicate element found duplicates.add(input[i]); break; } } } return duplicates; }
+
+
+    public void filterByObjTypeId(JSONObject filterBy) {
+
+        String contentType = filterBy.optString("contentype");
+
+        if (contentType.length() == 0)
+            return;
+
+        myLearningModel.clear();
+        if (contentType.length() == 0) {
+            myLearningModel.addAll(searchList);
+        } else {
+            for (MyLearningModel s : searchList) {
+                Log.d(TAG, "filterByCategoryId: " + s.getObjecttypeId());
+                if (s.getObjecttypeId().equalsIgnoreCase(contentType)) {
+                    myLearningModel.add(s);
+                }
+            }
+        }
+        this.notifyDataSetChanged();
+    }
+
+
 
     class ViewHolder {
         public int getPosition;

@@ -348,7 +348,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_MYLEARNINGFILTER
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT,siteurl TEXT, userid TEXT, jsonobject BLOB)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT,siteurl TEXT, userid TEXT, jsonobject BLOB, pageType int)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
@@ -5227,7 +5227,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 .getColumnIndex("showstatus")));
 
 
-
                     }
 
                     trackListModelList.add(trackListModel);
@@ -5863,14 +5862,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             // author
             if (jsonCMiColumnObj.has("questionid") && !jsonCMiColumnObj.isNull("questionid")) {
 
-                int questionID =-1;
-                try
-                {
-                    questionID= Integer.parseInt(jsonCMiColumnObj.get("questionid").toString());
+                int questionID = -1;
+                try {
+                    questionID = Integer.parseInt(jsonCMiColumnObj.get("questionid").toString());
 
-                }catch (NumberFormatException numberEx){
+                } catch (NumberFormatException numberEx) {
                     numberEx.printStackTrace();
-                    questionID=-1;
+                    questionID = -1;
                 }
 
                 studentResponseModel.set_questionid(questionID);
@@ -11760,11 +11758,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return userExperienceModelList;
     }
 
-    public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel) throws JSONException {
+    public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel,int fromMylearning) throws JSONException {
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String strDelete = "DELETE FROM " + TBL_MYLEARNINGFILTER + " WHERE userid   = " + userModel.getUserIDValue() + " and siteid = " + appUserModel.getSiteIDValue();
+            String strDelete = "DELETE FROM " + TBL_MYLEARNINGFILTER + " WHERE userid   = " + userModel.getUserIDValue() + " and siteid = " + appUserModel.getSiteIDValue()+" and pageType = " + fromMylearning;
             db.execSQL(strDelete);
 
             if (jsonObject != null) {
@@ -11777,6 +11775,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     contentValues.put("siteurl", appUserModel.getSiteURL());
                     contentValues.put("userid", appUserModel.getUserIDValue());
                     contentValues.put("jsonobject", jsonObject.toString());
+                    contentValues.put("pageType", fromMylearning);
+
 
                     db.insert(TBL_MYLEARNINGFILTER, null, contentValues);
                 } catch (SQLiteException exception) {
@@ -11793,14 +11793,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public JSONObject fetchFilterObject(AppUserModel appUserModel) {
+    public JSONObject fetchFilterObject(AppUserModel appUserModel,int forMylearning) {
         JSONObject jsonObject = null;
 
         SQLiteDatabase db = this.getWritableDatabase();
         String strSelQuery = "SELECT DISTINCT * FROM " + TBL_MYLEARNINGFILTER + " WHERE userid = " + appUserModel.getUserIDValue()
                 + " AND siteid="
                 + appUserModel.getSiteIDValue()
-                + " AND siteurl='" + appUserModel.getSiteURL() + "'";
+                + " AND siteurl='" + appUserModel.getSiteURL() + "' AND pageType=" + forMylearning;
         try {
             Cursor cursor = null;
             cursor = db.rawQuery(strSelQuery, null);
