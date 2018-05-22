@@ -205,9 +205,9 @@ public class NativeSetttingsModel {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     FilterInnerModel filterInnerModel = new FilterInnerModel();
                     JSONObject object = jsonArray.getJSONObject(i);
-                    if (object.has("datafieldname")) {
-                        filterInnerModel.name = object.getString("datafieldname");
-                        filterInnerModel.id = object.getString("categoryid");
+                    if (object.has("choicevalue")) {
+                        filterInnerModel.name = object.getString("choicetext");
+                        filterInnerModel.id = object.getString("choicevalue");
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }
@@ -228,9 +228,9 @@ public class NativeSetttingsModel {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     FilterInnerModel filterInnerModel = new FilterInnerModel();
                     JSONObject object = jsonArray.getJSONObject(i);
-                    if (object.has("datafieldname")) {
-                        filterInnerModel.name = object.getString("datafieldname");
-                        filterInnerModel.id = object.getString("categoryid");
+                    if (object.has("choicevalue")) {
+                        filterInnerModel.name = object.getString("choicetext");
+                        filterInnerModel.id = object.getString("choicevalue");
                         model.filterInnerModels.add(i, filterInnerModel);
                     }
                 }

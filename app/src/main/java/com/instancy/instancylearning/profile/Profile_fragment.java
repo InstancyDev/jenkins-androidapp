@@ -274,7 +274,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -293,7 +292,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Typeface iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
 
-        uploadIconFont.setVisibility(View.VISIBLE);
+        uploadIconFont.setVisibility(View.GONE);
 
         FontManager.markAsIconContainer(header.findViewById(R.id.uploadPhotoFont), iconFon);
 
@@ -310,17 +309,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
 //                UnComment
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    editSelectedGroup("EDU", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    editSelectedGroup("EXP", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-                    editSelectedGroup("CNT", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
-                    editSelectedGroup("BCK", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    editSelectedGroup("EDU", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    editSelectedGroup("EXP", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+//                    editSelectedGroup("BCK", groupPosition);
+//                }
 
                 return true;
             }
@@ -337,15 +336,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
 
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    educationClicked(groupPosition, childPosition, "EDU");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    educationClicked(groupPosition, childPosition, "EXP");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-//                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-//                    editSelectedGroup("CNT", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    educationClicked(groupPosition, childPosition, "EDU");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    educationClicked(groupPosition, childPosition, "EXP");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+////                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+////                    editSelectedGroup("CNT", groupPosition);
+//                }
 
                 return true;
             }
@@ -677,7 +676,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-                showPictureDialog();
+//                showPictureDialog();
                 break;
         }
     }

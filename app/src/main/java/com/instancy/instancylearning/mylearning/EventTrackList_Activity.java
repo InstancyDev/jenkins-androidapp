@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -95,6 +96,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     SwipeRefreshLayout swipeRefreshLayout;
     List<String> blockNames;
     Boolean isTraxkList = true;
+    Boolean isWorkFlowCompleted = false;
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
 
@@ -279,7 +281,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     }
                 }
                 if (requestType.equalsIgnoreCase("UPDATESTATUS")) {
-
+                    svProgressHUD.dismiss();
                     if (response != null) {
 
                         if (resultListner != null)
@@ -291,7 +293,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
                 } else {
                 }
-                svProgressHUD.dismiss();
+
                 swipeRefreshLayout.setRefreshing(false);
             }
 
@@ -369,6 +371,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 //                }
 //            }
 
+        }
+
+        if (svProgressHUD.isShowing() && isWorkFlowCompleted) {
+            dismissSvProgress();
         }
     }
 
@@ -684,7 +690,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         }
 
 
-
                     }
 
                 } catch (JSONException e) {
@@ -694,6 +699,21 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             }
         };
     }
+
+    public void dismissSvProgress() {
+
+        new CountDownTimer(400, 1000) {
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            public void onFinish() {
+                svProgressHUD.dismissImmediately();
+            }
+        }.start();
+
+    }
+
 
     @Override
     protected void onResume() {
@@ -727,16 +747,26 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             }
 
         }
+
+
     }
 
     public void executeWorkFlowRules(final String workflowtype) {
         Log.d(TAG, "executeWorkFlowRules: workflowtype " + workflowtype);
+
         try {
 
             File fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml");
 
 //            String fileXmls = getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml";
             if (fXmlFile.exists()) {
+
+                if (!svProgressHUD.isShowing()) {
+
+                    isWorkFlowCompleted = false;
+                    svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+                }
+
 
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory
                         .newInstance();
@@ -1696,7 +1726,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         }
                     }
                 }
-
+//                if (svProgressHUD.isShowing()){
+//                    svProgressHUD.dismissImmediately();
+//                }
+                isWorkFlowCompleted = true;
                 if (workFlowType.equals("onlaunch")) {
                     Log.d(TAG, "executeWorkFlowRules: workflowtype onrules " + workFlowType);
                     workFlowType = "onitemChange";
@@ -1714,8 +1747,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         }
                     }
                     workFlowType = "";
+                    isWorkFlowCompleted = true;
                     injectFromDbtoModel();
                 }
+//                if (svProgressHUD.isShowing()){
+//                    svProgressHUD.dismissImmediately();
+//                }
 
             } else {
                 defaultActionOnNoWorkflowRules();
@@ -1725,7 +1762,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             e.printStackTrace();
             defaultActionOnNoWorkflowRules();
         }
+
 //        injectFromDbtoModel();
+//        if (svProgressHUD.isShowing()){
+//            svProgressHUD.dismissImmediately();
+//        }
+
     }
 
     private void defaultActionOnNoWorkflowRules() {
@@ -1736,11 +1778,15 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 ////                SyncData();
 //            } else {
 //                finish();
+
 //            }
 //
 //        } else {
         workFlowType = "onitemChange";
         injectFromDbtoModel();
+//        if (svProgressHUD.isShowing()){
+//            svProgressHUD.dismissImmediately();
+//        }
 
 //        }
     }

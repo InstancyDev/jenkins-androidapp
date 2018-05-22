@@ -82,7 +82,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Filters</font>"));
 
-        isFromMylearning = getIntent().getIntExtra("ISTRACKLIST", 1);
+        isFromMylearning = getIntent().getIntExtra("isFrom", 1);
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);

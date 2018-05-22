@@ -407,7 +407,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     if (response != null) {
                         try {
-                            db.insertFilterIntoDB(response, appUserModel,0);
+                            db.insertFilterIntoDB(response, appUserModel, 0);
                             Intent intent = new Intent(context, Filter_activity.class);
                             intent.putExtra("isFrom", 0);
                             startActivityForResult(intent, FILTER_CLOSE_CODE);
@@ -644,7 +644,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(true);
+        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -1609,13 +1609,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-            String urlStr = "UserID=1&ComponentID=3&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3131";
+//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            String urlStr = "UserID=1&ComponentID=1&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=en-us&CompInsID=3131";
             vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
 
         } else {
 
-            JSONObject jsonObject = db.fetchFilterObject(appUserModel,0);
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel, 0);
             if (jsonObject != null) {
 
                 Intent intent = new Intent(context, Filter_activity.class);
@@ -2072,7 +2072,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (REFRESH == 1) {
             if (isNetworkConnectionAvailable(getContext(), -1)) {
-                refreshCatalog(false);
+                refreshCatalog(true);
             } else {
                 injectFromDbtoModel();
             }

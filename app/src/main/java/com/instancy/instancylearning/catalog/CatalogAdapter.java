@@ -427,7 +427,7 @@ public class CatalogAdapter extends BaseAdapter {
                     }
                 });
                 break;
-            case "181":
+            case "434":
                 Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
 
                     @Override
@@ -435,15 +435,15 @@ public class CatalogAdapter extends BaseAdapter {
                         // ## Ascending order
 
                         if (isAscn) {
-                            return obj1.getDateAssigned().compareToIgnoreCase(obj2.getDateAssigned());
+                            return obj1.getPublishedDate().compareToIgnoreCase(obj2.getPublishedDate());
 
                         } else {
-                            return obj2.getDateAssigned().compareToIgnoreCase(obj1.getDateAssigned());
+                            return obj2.getPublishedDate().compareToIgnoreCase(obj1.getPublishedDate());
                         }
                     }
                 });
                 break;
-            case "171":
+            case "221":
                 Collections.sort(myLearningModel, new Comparator<MyLearningModel>() {
 
                     @Override
@@ -451,10 +451,10 @@ public class CatalogAdapter extends BaseAdapter {
                         // ## Ascending order
 
                         if (isAscn) {
-                            return obj1.getDateAssigned().compareToIgnoreCase(obj2.getDateAssigned());
+                            return obj1.getObjecttypeId().compareToIgnoreCase(obj2.getObjecttypeId());
 
                         } else {
-                            return obj2.getDateAssigned().compareToIgnoreCase(obj1.getDateAssigned());
+                            return obj2.getObjecttypeId().compareToIgnoreCase(obj1.getObjecttypeId());
                         }
                     }
                 });

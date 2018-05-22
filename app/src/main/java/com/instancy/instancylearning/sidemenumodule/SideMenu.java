@@ -255,7 +255,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
         notificationLayout.setVisibility(View.VISIBLE);
-        settingsLayout.setVisibility(View.VISIBLE);
+        settingsLayout.setVisibility(View.GONE);
         settingsLayout.setOnClickListener(this);
         updateBottomButtonColor();
 

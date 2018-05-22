@@ -4350,13 +4350,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                             // delete usersession
 
-
                         }
                     }
 
-
                     trackLearningModel.setStatus(status);
-
 
                 }
 
