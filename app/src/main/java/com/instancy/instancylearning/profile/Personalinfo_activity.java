@@ -17,6 +17,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -134,6 +135,8 @@ public class Personalinfo_activity extends AppCompatActivity {
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         } catch (RuntimeException ex) {
 
             ex.printStackTrace();
@@ -389,14 +392,14 @@ public class Personalinfo_activity extends AppCompatActivity {
                 if (s.contains("success")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \n.You have successfully added the "+groupName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \nYou have successfully added the "+groupName, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \n.You have successfully updated the "+groupName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \nYou have successfully updated the "+groupName, Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, groupName + " cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, groupName + " cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

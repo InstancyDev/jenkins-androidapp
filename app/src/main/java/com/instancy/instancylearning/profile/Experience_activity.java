@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 
 import android.widget.EditText;
@@ -191,6 +192,7 @@ public class Experience_activity extends AppCompatActivity {
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
+            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         } catch (RuntimeException ex) {
 
             ex.printStackTrace();
@@ -406,9 +408,9 @@ public class Experience_activity extends AppCompatActivity {
                 if (s.contains("true")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \n.You have successfully added the experience", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \nYou have successfully added the experience", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \n.You have successfully updated the experience", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \nYou have successfully updated the experience", Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
@@ -582,11 +584,11 @@ public class Experience_activity extends AppCompatActivity {
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, "Success! \n.You have successfully deleted the education", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Success! \nYou have successfully deleted the education", Toast.LENGTH_SHORT).show();
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Experience cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }

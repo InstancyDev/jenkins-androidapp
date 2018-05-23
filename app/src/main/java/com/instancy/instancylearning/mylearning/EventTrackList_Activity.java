@@ -318,7 +318,15 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         try {
                             db.injectCMIDataInto(response, myLearningModel);
 //                            executeWorkFlowRules("");
-//                            executeWorkFlowRules("onitemChange");
+                            if (isTraxkList) {
+                                workFlowType = "onitemChange";
+                                Log.d(TAG, "executeWorkFlowRules: workflowtype cmi update" + workFlowType);
+                                executeWorkFlowRules(workFlowType);
+                            } else {
+
+//                                workFlowType = "onattendance";
+//                                executeWorkFlowRulesForEvents(workFlowType);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -326,7 +334,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
                     }
                 }
-                svProgressHUD.dismiss();
+//                svProgressHUD.dismiss();
             }
         };
     }
@@ -1795,8 +1803,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     public void completedXmlFileDownload() {
 
         if (isTraxkList) {
-            workFlowType = "onlaunch";
-            executeWorkFlowRules(workFlowType);
+
+            if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
+                workFlowType = "onlaunch";
+                executeWorkFlowRules(workFlowType);
+            }
+
         } else {
             boolean isEventRules = isEventCompleted();
             if (!isEventRules) {

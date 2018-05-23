@@ -122,7 +122,9 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         TextView editIcon = (TextView) pView
                 .findViewById(R.id.editoptionicon);
 
-        editIcon.setVisibility(View.GONE);
+        editIcon.setVisibility(View.VISIBLE);
+
+        editIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.editoptionicon), iconFon);
 
@@ -130,6 +132,8 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.profilesection);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(expandableListTitle.get(groupPosition).groupname);
+
+        listTitleTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_plus_circle));
@@ -139,8 +143,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("2")) {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
-        }
-        else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+        } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
         }
 
@@ -167,7 +170,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
 //        }
 
 
-
         TextView profileSchool = (TextView) cView
                 .findViewById(R.id.profile_school);
         TextView profileDegree = (TextView) cView
@@ -175,6 +177,11 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
 
         TextView profileDuration = (TextView) cView
                 .findViewById(R.id.profile_duration);
+
+        profileSchool.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        profileDegree.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        profileDuration.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
 
         if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Education")) {
             profileSchool.setText(this.userEducationModelList.get(childPosition).school);
@@ -194,7 +201,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileSchool.setText(configsModel.attributedisplaytext);
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
-        }else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+        } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
             profileSchool.setText(configsModel.attributedisplaytext);
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
@@ -205,7 +212,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         } else {
             cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitemmiddle));
         }
-
 
 
         return cView;

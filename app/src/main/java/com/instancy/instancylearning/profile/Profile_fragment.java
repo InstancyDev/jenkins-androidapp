@@ -247,7 +247,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
-        if (educationModelArrayList.size() > 0 && uiSettingsModel.getAddProfileAdditionalTab().contains("education")) {
+        if (educationModelArrayList.size() > 0 || uiSettingsModel.getAddProfileAdditionalTab().contains("education")) {
 
             ProfileGroupModel profileGroupModel = new ProfileGroupModel();
             profileGroupModel.groupId = "123";
@@ -258,7 +258,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             profileGroupModelList.add(profileGroupModel);
         }
 
-        if (experienceModelArrayList.size() > 0 && uiSettingsModel.getAddProfileAdditionalTab().contains("experience")) {
+        if (experienceModelArrayList.size() > 0 || uiSettingsModel.getAddProfileAdditionalTab().contains("experience")) {
 
             ProfileGroupModel profileGroupModel = new ProfileGroupModel();
             profileGroupModel.groupId = "124";
@@ -292,7 +292,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Typeface iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
 
-        uploadIconFont.setVisibility(View.GONE);
+        uploadIconFont.setVisibility(View.VISIBLE);
+
+        uploadIconFont.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         FontManager.markAsIconContainer(header.findViewById(R.id.uploadPhotoFont), iconFon);
 
@@ -309,17 +311,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
 //                UnComment
-//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-//                    editSelectedGroup("EDU", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-//                    editSelectedGroup("EXP", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-//                    editSelectedGroup("PER", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-//                    editSelectedGroup("CNT", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
-//                    editSelectedGroup("BCK", groupPosition);
-//                }
+                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+                    editSelectedGroup("EDU", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+                    editSelectedGroup("EXP", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+                    editSelectedGroup("PER", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+                    editSelectedGroup("CNT", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+                    editSelectedGroup("BCK", groupPosition);
+                }
 
                 return true;
             }
@@ -336,15 +338,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
 
-//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-//                    educationClicked(groupPosition, childPosition, "EDU");
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-//                    educationClicked(groupPosition, childPosition, "EXP");
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-////                    editSelectedGroup("PER", groupPosition);
-//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-////                    editSelectedGroup("CNT", groupPosition);
-//                }
+                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+                    educationClicked(groupPosition, childPosition, "EDU");
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+                    educationClicked(groupPosition, childPosition, "EXP");
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+                }
 
                 return true;
             }
@@ -590,16 +592,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-    private String encodeImage(Bitmap bm) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] b = baos.toByteArray();
-        String encImage = encodeToString(b, Base64.DEFAULT);
-
-        return encImage;
-    }
-
-
     @Override
     public void onRefresh() {
 
@@ -676,7 +668,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-//                showPictureDialog();
+                showPictureDialog();
                 break;
         }
     }
@@ -730,10 +722,10 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("true")) {
-                    Toast.makeText(context, "Profile Picture Successfully Updated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "    Profile Picture Successfully Updated   ", Toast.LENGTH_SHORT).show();
 //                    profileWebCall(appUserModel.getUserIDValue(), true);
                 } else {
-                    Toast.makeText(context, "Profile Picture failed to Update", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "   Profile Picture failed to Update    ", Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {

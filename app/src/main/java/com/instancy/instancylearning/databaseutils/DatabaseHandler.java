@@ -10588,7 +10588,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
                 if (profileObj.has("dateofbirth")) {
 
-                    String formattedDate = formatDate(profileObj.get("dateofbirth").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MMM-dd");
+                    String formattedDate = formatDate(profileObj.get("dateofbirth").toString(), "yyyy-MM-dd'T'HH:mm:ss", "MM/dd/yyyy");
 
                     profileModel.dateofbirth = formattedDate;
 

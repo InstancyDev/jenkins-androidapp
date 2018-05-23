@@ -158,7 +158,7 @@ public class ProfileEditAdapter extends BaseAdapter {
                 public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
                                            long id) {
 
-                    profileConfigsModelList.get(position).valueName=countriesList.get(spnrPosition);
+                    profileConfigsModelList.get(position).valueName = countriesList.get(spnrPosition);
 
                 }
 
@@ -195,7 +195,9 @@ public class ProfileEditAdapter extends BaseAdapter {
                                                           int monthOfYear, int dayOfMonth) {
 
 
-                                        profileConfigsModelList.get(position).valueName = "" + year + "-" + getMonthFromint(monthOfYear + 1) + "-" + dayOfMonth;
+//                                        profileConfigsModelList.get(position).valueName = "" + year + "-" + getMonthFromint(monthOfYear + 1) + "-" + dayOfMonth;
+                                        profileConfigsModelList.get(position).valueName = monthOfYear + 1 + "/" + dayOfMonth + "/" + year;
+
                                         holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
 
                                     }
