@@ -59,6 +59,7 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,6 +84,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.util.Base64.encodeToString;
 import static com.instancy.instancylearning.utils.StaticValues.EDUCATION_ACT;
 
+import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
@@ -186,7 +188,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             return false;
         }
-
+        ISPROFILENAMEORIMAGEUPDATED = 1;
         String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
 
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
@@ -627,10 +629,32 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                     for (int i = 0; i < profileGroupModelList.size(); i++)
                                         profileExpandableList.expandGroup(i);
                                 }
+                                countriesWebApiCall(appUserModel.getUserIDValue());
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+                    } else {
+
+                    }
+                }
+
+                if (requestType.equalsIgnoreCase("DROPDOWNLIST")) {
+                    if (response != null) {
+
+                        try {
+                            JSONArray jsonArray = response.getJSONArray("table5");
+
+                            Log.d(TAG, "Volley JSON post" + jsonArray.length());
+
+                            db.injectProfielFieldOptions(jsonArray);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     } else {
 
@@ -868,6 +892,22 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
     }
+
+    private void countriesWebApiCall(String userId) {
+
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        Log.d(TAG, "profileWebCall: " + urlStr);
+
+        vollyService.getJsonObjResponseVolley("DROPDOWNLIST", urlStr, appUserModel.getAuthHeaders());
+
+    }
+
+
 }
 
 

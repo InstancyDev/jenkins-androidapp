@@ -73,6 +73,7 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
 
+import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.NOTIFICATIONVIWED;
 import static com.instancy.instancylearning.utils.Utilities.*;
 
@@ -287,31 +288,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         drawerHeaderView = (RelativeLayout) findViewById(R.id.drawerheaderview);
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
-        ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
-
-        profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
-
-        String[] strAry = new String[2];
-
-        strAry = extractProfileNameAndLocation(profileDetailsModel);
-
-//        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
-
-        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
-
-        Picasso.with(this).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
-        String name = strAry[0];
-
-        if (name.contains("Anonymous") || name.contains("null")) {
-
-            name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
-        }
-
-        txtUsername.setText(upperCaseWords(name));
-        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-
-        txtAddress.setText(upperCaseWords(strAry[1]));
-        txtAddress.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+        updateDisplayNameAndImage();
 
         sideMenumodelList = db.getNativeMainMenusData();
 
@@ -466,6 +443,41 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
 
     }
+
+
+    public void updateDisplayNameAndImage() {
+
+        ProfileDetailsModel profileDetailsModel = new ProfileDetailsModel();
+
+        profileDetailsModel = db.fetchProfileDetails(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+        String[] strAry = new String[2];
+
+        strAry = extractProfileNameAndLocation(profileDetailsModel);
+
+//        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/" + appUserModel.getSiteIDValue() + "/ProfileImages/" + appUserModel.getProfileImage();
+
+//        String profileIma = appUserModel.getSiteURL() + "//Content/SiteFiles/374/ProfileImages/" + appUserModel.getProfileImage();
+
+        String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
+
+        Picasso.with(this).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+        String name = strAry[0];
+
+        if (name.contains("Anonymous") || name.contains("null")) {
+
+            name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
+        }
+
+        txtUsername.setText(upperCaseWords(name));
+        txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+
+        txtAddress.setText(upperCaseWords(strAry[1]));
+        txtAddress.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+
+
+    }
+
 
     private void registerNetworkBroadcastForNougat() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -895,6 +907,14 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         } else {
 
         }
+
+        if (isNetworkConnectionAvailable(this, -1) && ISPROFILENAMEORIMAGEUPDATED == 1) {
+            updateDisplayNameAndImage();
+            ISPROFILENAMEORIMAGEUPDATED = 0;
+        } else {
+
+        }
+
     }
 
     public void enteredSubsiteMethods() {

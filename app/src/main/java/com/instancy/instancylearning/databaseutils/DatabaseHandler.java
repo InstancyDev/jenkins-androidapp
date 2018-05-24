@@ -416,7 +416,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILECONFIGS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, attributedisplaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, name TEXT, userid TEXT, siteid TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, attributedisplaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, name TEXT, userid TEXT,maxlength INTEGER, siteid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERPROFILEFIELDOPTIONS
@@ -10295,6 +10295,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         String uicontroltypeid = "";
                         String name = "";
                         String datafieldname = "";
+                        int maxlength = 100;
 
                         if (profileObj.has("datafieldname")) {
 
@@ -10349,6 +10350,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             name = profileObj.get("name").toString();
 
                         }
+                        if (profileObj.has("maxlength")) {
+                            maxlength = profileObj.optInt("maxlength",100);
+
+                        }
                         ContentValues contentValues = null;
                         try {
                             contentValues = new ContentValues();
@@ -10365,6 +10370,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             contentValues.put("name", name);
                             contentValues.put("userid", userId);
                             contentValues.put("datafieldname", datafieldname);
+                            contentValues.put("maxlength",maxlength);
                             contentValues.put("siteid", appUserModel.getSiteIDValue());
 
                             db.insert(TBL_USERPROFILECONFIGS, null, contentValues);
@@ -11613,6 +11619,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     profileConfigsModel.enduservisibility = (cursor.getString(cursor.getColumnIndex("enduservisibility")));
                     profileConfigsModel.uicontroltypeid = (cursor.getString(cursor.getColumnIndex("uicontroltypeid")));
                     profileConfigsModel.names = (cursor.getString(cursor.getColumnIndex("name")));
+                    profileConfigsModel.maxLenth = (cursor.getInt(cursor.getColumnIndex("maxlength")));
+
                     profileConfigsModelList.add(profileConfigsModel);
                 }
             }

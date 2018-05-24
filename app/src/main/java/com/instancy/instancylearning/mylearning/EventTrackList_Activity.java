@@ -274,6 +274,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                 db.injectTracklistData(false, response, myLearningModel);
                                 injectFromDbtoModel();
                                 executeXmlWorkFlowFile();
+                                svProgressHUD.dismiss();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -323,7 +324,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                 Log.d(TAG, "executeWorkFlowRules: workflowtype cmi update" + workFlowType);
                                 executeWorkFlowRules(workFlowType);
                             } else {
-
+                                svProgressHUD.dismiss();
 //                                workFlowType = "onattendance";
 //                                executeWorkFlowRulesForEvents(workFlowType);
                             }

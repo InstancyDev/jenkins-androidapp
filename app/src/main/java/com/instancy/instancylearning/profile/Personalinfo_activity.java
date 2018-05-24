@@ -100,7 +100,7 @@ public class Personalinfo_activity extends AppCompatActivity {
 
     ArrayList<String> degreeTitleList;
 
-    JSONArray jsonArray;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -145,7 +145,13 @@ public class Personalinfo_activity extends AppCompatActivity {
         if (isNetworkConnectionAvailable(this, -1)) {
             int i = returnHide();
             if (i == 1) {
-                countriesWebApiCall(appUserModel.getUserIDValue());
+//                countriesWebApiCall(appUserModel.getUserIDValue());
+
+                degreeTitleList=db.fetchCountriesName(appUserModel.getSiteIDValue(),"25");
+
+//                profileEditAdapter.refreshCountries(degreeTitleList);
+
+
             }
 
         } else {
@@ -182,7 +188,7 @@ public class Personalinfo_activity extends AppCompatActivity {
                     if (response != null) {
 
                         try {
-                            jsonArray = response.getJSONArray("table5");
+                           JSONArray jsonArray = response.getJSONArray("table5");
 
                             Log.d(TAG, "Volley JSON post" + jsonArray.length());
 
@@ -190,7 +196,7 @@ public class Personalinfo_activity extends AppCompatActivity {
 
                             degreeTitleList=db.fetchCountriesName(appUserModel.getSiteIDValue(),"25");
 
-                            profileEditAdapter.refreshCountries(degreeTitleList);
+//                            profileEditAdapter.refreshCountries(degreeTitleList);
 
                             Log.d(TAG, "notifySuccess: "+degreeTitleList.size());
 

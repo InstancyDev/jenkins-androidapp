@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.CustomSpinner;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import java.util.ArrayList;
@@ -94,10 +96,10 @@ public class ProfileEditAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-    public void refreshCountries(ArrayList<String> degreeTitleList) {
-        this.countriesList = degreeTitleList;
-        this.notifyDataSetChanged();
-    }
+//    public void refreshCountries(ArrayList<String> degreeTitleList) {
+//        this.countriesList = degreeTitleList;
+//        this.notifyDataSetChanged();
+//    }
 
     @Override
     public int getCount() {
@@ -120,133 +122,186 @@ public class ProfileEditAdapter extends BaseAdapter {
 
         final ViewHolder holder;
 
-        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.personaleditcell, null);
-        holder = new ViewHolder(convertView);
-        holder.parent = parent;
-        holder.getPosition = position;
+        View view = null;
 
-        holder.labelField.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtAstrek.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        if (convertView == null) {
 
-        holder.labelField.setText(profileConfigsModelList.get(position).attributedisplaytext);
-        holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
-        holder.edit_field.setMaxLines(returnLines(profileConfigsModelList.get(position).names));
+            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.personaleditcell, null);
+            holder = new ViewHolder(view);
+            holder.parent = parent;
+            holder.getPosition = position;
 
+            holder.labelField.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            holder.txtAstrek.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        if (returnHide(profileConfigsModelList.get(position).names) == 1) {
+            holder.labelField.setText(profileConfigsModelList.get(position).attributedisplaytext);
             holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
+            holder.edit_field.setMaxLines(returnLines(profileConfigsModelList.get(position).names));
 
-            holder.txtDobClick.setVisibility(View.GONE);
-            holder.edit_field.setVisibility(View.VISIBLE);
-            holder.spnrCountries.setVisibility(View.GONE);
 
-        } else if (returnHide(profileConfigsModelList.get(position).names) == 3) {
+            if (returnHide(profileConfigsModelList.get(position).names) == 1) {
+                holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
+                holder.edit_field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(profileConfigsModelList.get(position).maxLenth)});
+                holder.txtDobClick.setVisibility(View.GONE);
+                holder.edit_field.setVisibility(View.VISIBLE);
+                holder.spnrCountries.setVisibility(View.GONE);
 
-            holder.txtDobClick.setVisibility(View.GONE);
-            holder.edit_field.setVisibility(View.GONE);
-            holder.spnrCountries.setVisibility(View.VISIBLE);
+            } else if (returnHide(profileConfigsModelList.get(position).names) == 3) {
 
-            ArrayAdapter<String> cntAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item, countriesList);
+                holder.txtDobClick.setVisibility(View.GONE);
+                holder.edit_field.setVisibility(View.GONE);
+                holder.spnrCountries.setVisibility(View.VISIBLE);
 
-            // attaching data adapter to spinner
-            holder.spnrCountries.setAdapter(cntAdapter);
+                // attaching data adapter to spinner
 
-            holder.spnrCountries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                holder.spnrCountries.setAdapter(holder.getAdapter(position));
 
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
-                                           long id) {
+                setSpinText(holder.spnrCountries, profileConfigsModelList.get(position).valueName);
 
-                    profileConfigsModelList.get(position).valueName = countriesList.get(spnrPosition);
+//            profileConfigsModelList.get(position).valueName = holder.getText();
 
-                }
+                holder.spnrCountries.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
+                                               long id) {
 
-                }
+                        if (profileConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("1030")) {
 
-            });
+                            if (holder.getText().toLowerCase().contains("fe")) {
+
+                                holder.setSelected(spnrPosition);
+                                profileConfigsModelList.get(position).valueName = "0";
+                            } else {
+                                holder.setSelected(spnrPosition);
+                                profileConfigsModelList.get(position).valueName = "1";
+                            }
+
+                        } else {
+
+                            holder.setSelected(spnrPosition);
+                            profileConfigsModelList.get(position).valueName = holder.getText();
+                        }
+
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+
+                });
 
 //            titleAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, degreeTitleList);
 //
 //            spinnerDgreType.setAdapter(titleAdapter);
 
-        } else {
-            holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
-            holder.edit_field.setVisibility(View.GONE);
-            holder.txtDobClick.setVisibility(View.VISIBLE);
-            holder.spnrCountries.setVisibility(View.GONE);
-            holder.txtDobClick.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            } else {
+                holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
+                holder.edit_field.setVisibility(View.GONE);
+                holder.txtDobClick.setVisibility(View.VISIBLE);
+                holder.spnrCountries.setVisibility(View.GONE);
+                holder.txtDobClick.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-                    if (returnHide(profileConfigsModelList.get(position).names) == 2) {
-                        int mYear, mMonth, mDay;
-                        final Calendar c = Calendar.getInstance();
-                        mYear = c.get(Calendar.YEAR);
-                        mMonth = c.get(Calendar.MONTH);
-                        mDay = c.get(Calendar.DAY_OF_MONTH);
-                        DatePickerDialog datePickerDialog = new DatePickerDialog(activity,
-                                new DatePickerDialog.OnDateSetListener() {
-                                    @Override
-                                    public void onDateSet(DatePicker view, int year,
-                                                          int monthOfYear, int dayOfMonth) {
+                        if (returnHide(profileConfigsModelList.get(position).names) == 2) {
+                            int mYear, mMonth, mDay;
+                            final Calendar c = Calendar.getInstance();
+                            mYear = c.get(Calendar.YEAR);
+                            mMonth = c.get(Calendar.MONTH);
+                            mDay = c.get(Calendar.DAY_OF_MONTH);
+                            DatePickerDialog datePickerDialog = new DatePickerDialog(activity,
+                                    new DatePickerDialog.OnDateSetListener() {
+                                        @Override
+                                        public void onDateSet(DatePicker view, int year,
+                                                              int monthOfYear, int dayOfMonth) {
 
 
 //                                        profileConfigsModelList.get(position).valueName = "" + year + "-" + getMonthFromint(monthOfYear + 1) + "-" + dayOfMonth;
-                                        profileConfigsModelList.get(position).valueName = monthOfYear + 1 + "/" + dayOfMonth + "/" + year;
+                                            profileConfigsModelList.get(position).valueName = monthOfYear + 1 + "/" + dayOfMonth + "/" + year;
 
-                                        holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
+                                            holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
 
-                                    }
-                                }, mYear, mMonth, mDay);
-                        // datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); completed dates
-                        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-                        datePickerDialog.show();
+                                        }
+                                    }, mYear, mMonth, mDay);
+                            // datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); completed dates
+                            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                            datePickerDialog.show();
 
-                    } else {
+                        } else {
 
-                        Toast.makeText(activity, "country list api", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "country list api", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                });
+
+            }
+            if (profileConfigsModelList.get(position).isrequired.contains("true")) {
+                holder.txtAstrek.setText("*");
+                holder.txtAstrek.setTextColor(view.getResources().getColor(R.color.colorRed));
+            } else {
+                holder.txtAstrek.setText("");
+            }
+
+            holder.edit_field.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (!hasFocus) {
+
+                        final EditText Caption = (EditText) v;
+
+                        profileConfigsModelList.get(position).valueName = Caption.getText().toString();
+
                     }
                 }
-
             });
-
-        }
-        if (profileConfigsModelList.get(position).isrequired.contains("true")) {
-            holder.txtAstrek.setText("*");
-            holder.txtAstrek.setTextColor(convertView.getResources().getColor(R.color.colorRed));
+            view.setTag(holder);
         } else {
-            holder.txtAstrek.setText("");
+
+            view = convertView;
         }
 
-        holder.edit_field.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-
-                    final EditText Caption = (EditText) v;
-
-                    profileConfigsModelList.get(position).valueName = Caption.getText().toString();
-
-                }
-            }
-        });
-
-
-        return convertView;
+        return view;
     }
 
     class ViewHolder {
 
+        private ArrayAdapter<String> spinnerAdapter;
+
+
         public int getPosition;
         public ViewGroup parent;
+
+        private int selected;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
 
+
         }
+
+        public ArrayAdapter<String> getAdapter(int position) {
+            countriesList = db.fetchCountriesName(appUserModel.getSiteIDValue(), profileConfigsModelList.get(position).attributeconfigid);
+            spinnerAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item, countriesList);
+            return spinnerAdapter;
+        }
+
+
+        public String getText() {
+            return (String) spinnerAdapter.getItem(selected);
+        }
+
+        public int getSelected() {
+            return selected;
+        }
+
+        public void setSelected(int selected) {
+            this.selected = selected;
+        }
+
 
         @Nullable
         @BindView(R.id.labelField)
@@ -288,6 +343,16 @@ public class ProfileEditAdapter extends BaseAdapter {
         return returnValue;
     }
 
+
+    public void setSpinText(Spinner spin, String text) {
+        for (int i = 0; i < spin.getAdapter().getCount(); i++) {
+            if (spin.getAdapter().getItem(i).toString().contains(text)) {
+                spin.setSelection(i);
+            }
+        }
+
+    }
+
     public int returnHide(String whichKeyboard) {
         int returnValue = 1;
         switch (whichKeyboard) {
@@ -300,6 +365,7 @@ public class ProfileEditAdapter extends BaseAdapter {
                 returnValue = 2;
                 break;
             case "DropDownList":
+            case "OptionButtonList":
                 returnValue = 3;
                 break;
 

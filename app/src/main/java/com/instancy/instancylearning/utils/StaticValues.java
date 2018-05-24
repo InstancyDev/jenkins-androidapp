@@ -304,6 +304,8 @@ public class StaticValues {
     public static final String ACTION_INTENT_TEXT_MESSAGE_INCOMING = "ACTION_INTENT_TEXT_MESSAGE_INCOMING";
 
 
+    public static int ISPROFILENAMEORIMAGEUPDATED = 0;
+
     /// all app configurations
 
 }
