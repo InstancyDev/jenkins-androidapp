@@ -147,6 +147,9 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     @BindView(R.id.btn_attachment)
     TextView txtTopicAttachment;
 
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
+
 
     @Nullable
     @BindView(R.id.fab_comment_button)
@@ -309,11 +312,15 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
                 if (requestType.equalsIgnoreCase("GETCALL")) {
 
-                    try {
-                        db.injectDiscussionCommentsList(response, discussionTopicModel);
-                        injectFromDbtoModel();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if (response != null) {
+                        try {
+                            db.injectDiscussionCommentsList(response, discussionTopicModel);
+                            injectFromDbtoModel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                     }
                 }
                 svProgressHUD.dismiss();
@@ -325,6 +332,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
+                nodata_Label.setText(getResources().getString(R.string.no_data));
             }
 
             @Override
@@ -347,6 +355,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         } else {
             discussionCommentsModelList = new ArrayList<DiscussionCommentsModel>();
             commentsAdapter.refreshList(discussionCommentsModelList);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
         txtCommentsCount.setText(discussionCommentsModelList.size() + " Comment(s)");
     }

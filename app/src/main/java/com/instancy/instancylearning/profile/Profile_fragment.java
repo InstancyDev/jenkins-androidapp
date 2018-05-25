@@ -188,7 +188,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             return false;
         }
-        ISPROFILENAMEORIMAGEUPDATED = 1;
+
         String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
 
         Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
@@ -748,6 +748,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (s.contains("true")) {
                     Toast.makeText(context, "    Profile Picture Successfully Updated   ", Toast.LENGTH_SHORT).show();
 //                    profileWebCall(appUserModel.getUserIDValue(), true);
+                    ISPROFILENAMEORIMAGEUPDATED = 1;
                 } else {
                     Toast.makeText(context, "   Profile Picture failed to Update    ", Toast.LENGTH_SHORT).show();
                 }

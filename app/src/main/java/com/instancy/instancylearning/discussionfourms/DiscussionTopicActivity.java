@@ -138,6 +138,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
+
+
     boolean isFromNotification = false;
 
 
@@ -271,12 +275,18 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 Log.d(TAG, "Volley JSON post" + response);
 
                 if (requestType.equalsIgnoreCase("GETCALL")) {
+                    if (response != null) {
+
 
                     try {
                         db.injectDiscussionTopicsList(response, discussionForumModel);
                         injectFromDbtoModel();
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                    } else {
+
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                     }
                 }
                 svProgressHUD.dismiss();
@@ -288,6 +298,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
+                nodata_Label.setText(getResources().getString(R.string.no_data));
             }
 
             @Override
@@ -310,6 +321,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         } else {
             discussionTopicModels = new ArrayList<DiscussionTopicModel>();
             fourmAdapter.refreshList(discussionTopicModels);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
         updateCommentsCount();

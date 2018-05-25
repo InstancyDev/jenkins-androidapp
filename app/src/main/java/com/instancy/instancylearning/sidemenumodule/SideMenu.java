@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -112,6 +113,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     @BindView(R.id.profile_thumbs)
     ImageView profileImage;
+
+
+    @BindView(R.id.bottom_logo)
+    ImageView bottomLogo;
+
 
     @BindView(R.id.id_username)
     TextView txtUsername;
@@ -464,10 +470,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         Picasso.with(this).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
         String name = strAry[0];
 
-        if (name.contains("Anonymous") || name.contains("null")) {
-
-            name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
-        }
+//        if (name.contains("Anonymous") || name.contains("null")) {
+//
+//            name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
+//        }
 
         txtUsername.setText(upperCaseWords(name));
         txtUsername.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
@@ -475,6 +481,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         txtAddress.setText(upperCaseWords(strAry[1]));
         txtAddress.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
+
+        if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
+            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(bottomLogo);
+            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
+        }
 
     }
 
@@ -834,10 +845,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         String name = "";
         String location = "";
 
-        if (!detailsModel.displayname.equalsIgnoreCase("")) {
+        if (!(detailsModel.displayname.equalsIgnoreCase("") || detailsModel.displayname.equalsIgnoreCase("null"))) {
             name = detailsModel.displayname;
-        }
-        if (!detailsModel.firstname.equalsIgnoreCase("")) {
+        } else if (!detailsModel.firstname.equalsIgnoreCase("")) {
             name = detailsModel.firstname + " " + detailsModel.lastname;
         } else {
             name = "Anonymous";
@@ -845,20 +855,20 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (!detailsModel.addresscity.equalsIgnoreCase("") && !detailsModel.addresscity.contains("null")) {
             if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("null")) {
-                location = detailsModel.addresscity + ", " + detailsModel.addressstate;
+                location = detailsModel.addresscity + "," + detailsModel.addressstate;
             } else {
                 location = detailsModel.addresscity;
             }
         } else if (!detailsModel.addressstate.equalsIgnoreCase("") && !detailsModel.addressstate.contains("null")) {
             location = detailsModel.addressstate;
-        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("na")) {
+        } else if (!detailsModel.addresscountry.equalsIgnoreCase("") && !detailsModel.addresscountry.contains("null")) {
             location = detailsModel.addresscountry;
         } else {
             location = "";
         }
 
-        strAry[0] = name;
-        strAry[1] = location;
+        strAry[0] = upperCaseWords(name);
+        strAry[1] = upperCaseWords(location);
 
         return strAry;
     }
@@ -914,7 +924,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         } else {
 
         }
-
     }
 
     public void enteredSubsiteMethods() {

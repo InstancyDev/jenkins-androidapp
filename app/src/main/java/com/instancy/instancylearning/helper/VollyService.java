@@ -31,7 +31,7 @@ public class VollyService {
     AppController appController;
     AppUserModel appUserModel;
     private String TAG = VollyService.class.getSimpleName();
-    private int MY_SOCKET_TIMEOUT_MS = 5000;
+    private int MY_SOCKET_TIMEOUT_MS = 10000;
 
 
     public VollyService() {

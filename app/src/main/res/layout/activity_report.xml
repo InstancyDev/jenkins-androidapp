@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
-        android:text="@string/no_data"
+        android:text=""
         android:textSize="24sp" />
 
     <RelativeLayout
@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true">
+
         <include layout="@layout/reportscell" />
 
     </RelativeLayout>
@@ -37,7 +38,7 @@
         android:paddingStart="15dp"
         android:paddingTop="3dp"
 
-        android:scrollbars="none"> </ListView>
+        android:scrollbars="none"></ListView>
 
 
 </RelativeLayout>

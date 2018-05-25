@@ -179,6 +179,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     @BindView(R.id.relativesecond)
     RelativeLayout relativeSecond;
 
+    RelativeLayout ratingsLayout;
+
     @Nullable
     @BindView(R.id.ratingslistview)
     ListView ratinsgListview;
@@ -425,6 +427,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         try {
             getUserRatingsOfTheContent(0, false);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -571,6 +574,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         btnEditReview = (Button) header.findViewById(R.id.btnReview);
 
+
+        ratingsLayout = (RelativeLayout) header.findViewById(R.id.overall_ratingslayout);
+
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
@@ -623,9 +629,18 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 } else {
 
-                    iconFirst.setBackground(calendarImg);
+                    if (myLearningModel.getViewType().equalsIgnoreCase("1") || myLearningModel.getViewType().equalsIgnoreCase("2") ) {
+                        if (!myLearningModel.isCompletedEvent()){
+                            iconFirst.setBackground(calendarImg);
+                            buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
 
-                    buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+
+                        }
+                        else {
+                            btnsLayout.setVisibility(View.INVISIBLE);
+                        }
+
+                    }
                 }
 
 
@@ -871,8 +886,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     }
 
                 }
-
-
 
 
                 svProgressHUD.dismiss();
@@ -1389,9 +1402,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         }
 
 
-
-
-
                     }
 
                     @Override
@@ -1656,10 +1666,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     }
 
 
-
-
-
-
     public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final boolean isJoinedCommunity) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
@@ -1817,6 +1823,10 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void getUserRatingsOfTheContent(int skippedRows, final boolean isFromActivityResult) throws JSONException {
 
+        if (skippedRows == 0) {
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        }
+
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.getContentID());
         parameters.put("Locale", "en-us");
@@ -1926,6 +1936,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     }
 
     public void mapReviewRating(String response, boolean isFromActivityResult) throws JSONException {
+
+        ratingsLayout.setVisibility(View.VISIBLE);
 
         JSONObject jsonObject = new JSONObject(response);
 

@@ -269,6 +269,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                 injectFromDbtoModel();
                                 callMobileGetContentTrackedData(myLearningModel);
                                 executeXmlWorkFlowFile();
+                                svProgressHUD.dismiss();
                             } else {
 //                                Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
                                 db.injectTracklistData(false, response, myLearningModel);
@@ -2833,6 +2834,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             defaultActionOnNoWorkflowRules();
         }
         injectFromDbtoModel();
+        svProgressHUD.dismissImmediately();
     }
 
     public void callMobileGetContentTrackedData(MyLearningModel learningModel) {

@@ -146,6 +146,10 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     JSONObject skillsObject;
 
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
+
+
     boolean isFromNotification = false;
 
     String contentIDFromNotification = "";
@@ -159,9 +163,9 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     String[] skillsForFilter;
     String[] categoriesID;
 
-    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
-    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
-    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
+//    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
+//    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
+//    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
     public AskExpertFragment() {
 
@@ -251,6 +255,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                             e.printStackTrace();
                         }
                     } else {
+
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -293,6 +299,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             public void notifyError(String requestType, VolleyError error) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                nodata_Label.setText(getResources().getString(R.string.no_data));
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
@@ -375,6 +382,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         } else {
             askExpertQuestionModelList = new ArrayList<AskExpertQuestionModel>();
             askExpertAdapter.refreshList(askExpertQuestionModelList);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
         if (askExpertQuestionModelList.size() > 5) {
@@ -800,7 +808,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     public void filterPopUp() {
 
-        if (askExpertCategoriesModels.size() > 0) {
+        if (askExpertCategoriesModels != null && askExpertCategoriesModels.size() > 0) {
             skillsForFilter = new String[askExpertCategoriesModels.size()];
             categoriesID = new String[askExpertCategoriesModels.size()];
 
@@ -882,6 +890,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             headerTextView.setText("");
             header.setVisibility(View.GONE);
             askexpertListView.removeHeaderView(header);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
     }

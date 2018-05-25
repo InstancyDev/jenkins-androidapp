@@ -477,8 +477,6 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
 
-//        holder.btnContextMenu.setColorFilter(Color.parseColor(uiSettingsModel.getAppTextColor()), PorterDuff.Mode.SRC_ATOP);
-
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
@@ -641,6 +639,8 @@ public class MyLearningAdapter extends BaseAdapter {
         String imgUrl = myLearningModel.get(position).getImageData();
 
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+
+//        holder.btnContextMenu.setImageTintList(ColorStateList.valueOf(Color.parseColor("#ff0000")));
 
         final float oldRating = ratingValue;
 
