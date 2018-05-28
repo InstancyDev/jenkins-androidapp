@@ -634,14 +634,19 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             iconFirst.setBackground(calendarImg);
                             buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
 
-
                         }
                         else {
                             btnsLayout.setVisibility(View.INVISIBLE);
                         }
 
+                    } else if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
+
+                        Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
+                        iconFirst.setBackground(cartIcon);
+                        buttonFirst.setText("Buy");
+
                     }
-                }
+                    }
 
 
             } else {

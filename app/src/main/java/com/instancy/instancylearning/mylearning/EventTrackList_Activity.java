@@ -269,7 +269,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                 injectFromDbtoModel();
                                 callMobileGetContentTrackedData(myLearningModel);
                                 executeXmlWorkFlowFile();
-                                svProgressHUD.dismiss();
+//                                svProgressHUD.dismiss(); for some reason
                             } else {
 //                                Toast.makeText(TrackList_Activity.this, "Related content", Toast.LENGTH_SHORT).show();
                                 db.injectTracklistData(false, response, myLearningModel);

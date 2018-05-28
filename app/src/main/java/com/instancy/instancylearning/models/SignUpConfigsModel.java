@@ -6,17 +6,17 @@ import java.io.Serializable;
  * Created by Upendranath on 6/8/2017 Working on InstancyLearning.
  */
 
-public class ProfileConfigsModel implements Serializable {
+public class SignUpConfigsModel implements Serializable {
 
 
     public String datafieldname = "";
     public String aliasname = "";
-    public String attributedisplaytext = "";
+    public String displaytext = "";
     public String groupid = "";
     public String displayorder = "";
     public String attributeconfigid = "";
     public String isrequired = "";
-    public String iseditable = "true";
+    public String iseditable = "";
     public String enduservisibility = "";
     public String uicontroltypeid = "";
     public String names = "";

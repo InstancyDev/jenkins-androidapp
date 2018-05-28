@@ -41,6 +41,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.nativesignup.NativeSignupActivity;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -351,7 +352,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 startActivity(intentSocial);
                 break;
             case 5:
+                // uncomment for web signup
                 Intent intentSignup = new Intent(this, SignUp_Activity.class);
+//                Intent intentSignup = new Intent(this, NativeSignupActivity.class);
                 startActivity(intentSignup);
                 break;
             case 6:

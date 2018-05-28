@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.profile;
+package com.instancy.instancylearning.nativesignup;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
@@ -7,9 +7,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.v7.widget.CardView;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,31 +23,23 @@ import android.widget.Toast;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.utils.CustomSpinner;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
-
-import static com.blankj.utilcode.util.Utils.getContext;
-import static com.instancy.instancylearning.utils.Utilities.getMonthFromint;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
  */
 
-public class ProfileEditAdapter extends BaseAdapter {
+public class NativeSignupAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
@@ -63,7 +50,7 @@ public class ProfileEditAdapter extends BaseAdapter {
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
     PreferencesManager preferencesManager;
-    private String TAG = ProfileEditAdapter.class.getSimpleName();
+    private String TAG = NativeSignupAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<ProfileConfigsModel> searchList;
 
@@ -72,7 +59,7 @@ public class ProfileEditAdapter extends BaseAdapter {
     List<String> countriesList;
 
 
-    public ProfileEditAdapter(Activity activity, int resource, List<ProfileConfigsModel> profileConfigsModelList) {
+    public NativeSignupAdapter(Activity activity, int resource, List<ProfileConfigsModel> profileConfigsModelList) {
         this.activity = activity;
 
         this.profileConfigsModelList = profileConfigsModelList;
@@ -139,12 +126,6 @@ public class ProfileEditAdapter extends BaseAdapter {
             holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
             holder.edit_field.setMaxLines(returnLines(profileConfigsModelList.get(position).names));
 
-
-            if (profileConfigsModelList.get(position).iseditable.contains("false")) {
-
-                holder.edit_field.setEnabled(false);
-                holder.spnrCountries.setEnabled(false);
-            }
 
             if (returnHide(profileConfigsModelList.get(position).names) == 1) {
                 holder.edit_field.setText(profileConfigsModelList.get(position).valueName);

@@ -261,6 +261,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public static final String TBL_NOTIFICATIONS = "TBL_NOTIFICATIONS";
 
+    public static final String TBL_NATIVESIGNUP = "TBL_NATIVESIGNUP";
+
     private Context dbctx;
     private WebAPIClient wap;
     private SharedPreferences sharedPreferences;
@@ -526,6 +528,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_PEOPLELISTINGTABS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, tabid TEXT, displayname TEXT, mobiledisplayname TEXT, displayicon TEXT, siteurl TEXT, siteid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NOTIFICATIONS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, usernotificationid INTEGER, fromuserid INTEGER, fromusername TEXT, fromuseremail TEXT, touserid INTEGER, subject TEXT, message TEXT, notificationstartdate TEXT, notificationenddate TEXT, notificationid INTEGER, ounotificationid INTEGER, contentid TEXT, markasread TEXT, notificationtitle TEXT, groupid INTEGER, contenttitle TEXT, forumname TEXT, forumid TEXT, username TEXT, notificationsubject TEXT, membershipexpirydate TEXT, passwordexpirtydays TEXT, durationenddate TEXT, publisheddate TEXT, assigneddate TEXT, siteid INTEGER, userid INTEGER, siteurl TEXT)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NATIVESIGNUP + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, displaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, siteid TEXT, ispublicfield TEXT, minlength TEXT, maxlength TEXT)");
 
 
         Log.d(TAG, "onCreate:  TABLES CREATED");
@@ -10351,7 +10356,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         }
                         if (profileObj.has("maxlength")) {
-                            maxlength = profileObj.optInt("maxlength",100);
+                            maxlength = profileObj.optInt("maxlength", 100);
 
                         }
                         ContentValues contentValues = null;
@@ -10370,7 +10375,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             contentValues.put("name", name);
                             contentValues.put("userid", userId);
                             contentValues.put("datafieldname", datafieldname);
-                            contentValues.put("maxlength",maxlength);
+                            contentValues.put("maxlength", maxlength);
                             contentValues.put("siteid", appUserModel.getSiteIDValue());
 
                             db.insert(TBL_USERPROFILECONFIGS, null, contentValues);
@@ -11333,6 +11338,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return isRecordExists;
     }
 
+    // check data present in choice table
+
+    public boolean checkChoiceTxtPresent() {
+
+        boolean isPresent = false;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String sqlQuery = "SELECT choicetext FROM USERPROFILEFIELDOPTIONS WHERE siteid = " + appUserModel.getSiteIDValue();
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(sqlQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToFirst()) {
+
+                    isPresent = true;
+                    break;
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return isPresent;
+    }
 
     // here  insert profile choice options
 
@@ -11763,11 +11802,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return userExperienceModelList;
     }
 
-    public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel,int fromMylearning) throws JSONException {
+    public void insertFilterIntoDB(JSONObject jsonObject, AppUserModel userModel, int fromMylearning) throws JSONException {
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String strDelete = "DELETE FROM " + TBL_MYLEARNINGFILTER + " WHERE userid   = " + userModel.getUserIDValue() + " and siteid = " + appUserModel.getSiteIDValue()+" and pageType = " + fromMylearning;
+            String strDelete = "DELETE FROM " + TBL_MYLEARNINGFILTER + " WHERE userid   = " + userModel.getUserIDValue() + " and siteid = " + appUserModel.getSiteIDValue() + " and pageType = " + fromMylearning;
             db.execSQL(strDelete);
 
             if (jsonObject != null) {
@@ -11798,7 +11837,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public JSONObject fetchFilterObject(AppUserModel appUserModel,int forMylearning) {
+    public JSONObject fetchFilterObject(AppUserModel appUserModel, int forMylearning) {
         JSONObject jsonObject = null;
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -13945,8 +13984,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 Spanned result = fromHtml(jsonMyLearningColumnObj.get("message").toString());
 
+                if (isValidString(result.toString())) {
 
-                notificationModel.message = result.toString();
+                    notificationModel.message = result.toString();
+
+                } else {
+
+                    notificationModel.message = "";
+                }
+
 
             }
             // membershipexpirydate

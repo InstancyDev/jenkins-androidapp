@@ -89,7 +89,7 @@ import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.isValidString;
+
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 /**
@@ -203,7 +203,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         userName.setText(strAry[0]);
         userLocation.setText(strAry[1]);
-
+        ISPROFILENAMEORIMAGEUPDATED = 1;
         profileGroupModelList = db.fetchProfileGroupNames(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
         for (ProfileGroupModel grp : profileGroupModelList) {
@@ -294,7 +294,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Typeface iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
 
-        uploadIconFont.setVisibility(View.VISIBLE);
+        uploadIconFont.setVisibility(View.GONE);
 
         uploadIconFont.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
@@ -304,6 +304,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         userLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         boolean isProfileExists = getALlProfilesDetailsFromDB();
+
         profileDynamicAdapter = new ProfileExpandAdapter(rootView.getContext(), experienceModelArrayList, educationModelArrayList, profileGroupModelList, hmGroupWiseConfigs);
 
         profileExpandableList.setAdapter(profileDynamicAdapter);
@@ -311,19 +312,19 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         profileExpandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                // Doing nothing
+
 //                UnComment
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    editSelectedGroup("EDU", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    editSelectedGroup("EXP", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-                    editSelectedGroup("CNT", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
-                    editSelectedGroup("BCK", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    editSelectedGroup("EDU", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    editSelectedGroup("EXP", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+//                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+//                    editSelectedGroup("CNT", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("6")) {
+//                    editSelectedGroup("BCK", groupPosition);
+//                }
 
                 return true;
             }
@@ -340,15 +341,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
 
-                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
-                    educationClicked(groupPosition, childPosition, "EDU");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
-                    educationClicked(groupPosition, childPosition, "EXP");
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
-//                    editSelectedGroup("PER", groupPosition);
-                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
-//                    editSelectedGroup("CNT", groupPosition);
-                }
+//                if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("123")) {
+//                    educationClicked(groupPosition, childPosition, "EDU");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("124")) {
+//                    educationClicked(groupPosition, childPosition, "EXP");
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("1")) {
+////                    editSelectedGroup("PER", groupPosition);
+//                } else if (profileGroupModelList.get(groupPosition).groupId.equalsIgnoreCase("2")) {
+////                    editSelectedGroup("CNT", groupPosition);
+//                }
 
                 return true;
             }
@@ -359,6 +360,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (isNetworkConnectionAvailable(getContext(), -1) && PROFILE_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
             profileWebCall(appUserModel.getUserIDValue(), false);
+
         } else {
 
             boolean checkPforile = getALlProfilesDetailsFromDB();
@@ -629,7 +631,13 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                     for (int i = 0; i < profileGroupModelList.size(); i++)
                                         profileExpandableList.expandGroup(i);
                                 }
-                                countriesWebApiCall(appUserModel.getUserIDValue());
+
+                                boolean isPresent = db.checkChoiceTxtPresent();
+
+                                if (!isPresent) {
+                                    countriesWebApiCall(appUserModel.getUserIDValue());
+                                }
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -692,7 +700,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         switch (view.getId()) {
 
             case R.id.profile_round:
-                showPictureDialog();
+//                showPictureDialog();
                 break;
         }
     }
@@ -732,7 +740,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void sendImageTOServer(final String postData, String fileName) {
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         //sending image to server
 
         String apiString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSyncProfileImage?fileName=" + fileName + "&siteURL=" + appUserModel.getSiteURL() + "&UserID=" + appUserModel.getUserIDValue();
@@ -748,6 +756,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (s.contains("true")) {
                     Toast.makeText(context, "    Profile Picture Successfully Updated   ", Toast.LENGTH_SHORT).show();
 //                    profileWebCall(appUserModel.getUserIDValue(), true);
+
                     ISPROFILENAMEORIMAGEUPDATED = 1;
                 } else {
                     Toast.makeText(context, "   Profile Picture failed to Update    ", Toast.LENGTH_SHORT).show();
@@ -788,14 +797,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 return headers;
             }
 
-
-            //adding parameters to send
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String, String> parameters = new HashMap<String, String>();
-//                parameters.put("image", imageString);
-//                return parameters;
-//            }
         };
 
         RequestQueue rQueue = Volley.newRequestQueue(context);
@@ -846,13 +847,17 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             List<ProfileConfigsModel> profileConfigsModelArrayList = hmGroupWiseConfigs.get(profileGroupModelList.get(groupPosition).groupname);
 
-            Log.d(TAG, "editSelectedGroup: " + profileConfigsModelArrayList.size());
+//            Log.d(TAG, "editSelectedGroup: " + profileConfigsModelArrayList.size());
 
-            Intent intentDetail = new Intent(context, Personalinfo_activity.class);
-            intentDetail.putExtra("fromWhichGroup", profileGroupModelList.get(groupPosition).groupId);
-            intentDetail.putExtra("GroupName", profileGroupModelList.get(groupPosition).groupname);
-            intentDetail.putExtra("profileConfigsModelArrayList", (Serializable) profileConfigsModelArrayList);
-            startActivityForResult(intentDetail, EDUCATION_ACT);
+            if (profileConfigsModelArrayList != null && profileConfigsModelArrayList.size() > 0) {
+
+                Intent intentDetail = new Intent(context, Personalinfo_activity.class);
+                intentDetail.putExtra("fromWhichGroup", profileGroupModelList.get(groupPosition).groupId);
+                intentDetail.putExtra("GroupName", profileGroupModelList.get(groupPosition).groupname);
+                intentDetail.putExtra("profileConfigsModelArrayList", (Serializable) profileConfigsModelArrayList);
+                startActivityForResult(intentDetail, EDUCATION_ACT);
+
+            }
 
         } else if (typeString.equalsIgnoreCase("BCK")) {
 

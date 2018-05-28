@@ -46,6 +46,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -118,6 +119,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.notificationlist)
     ListView discussionFourmlistView;
 
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
+
     NotificationAdapter notificationAdapter;
 
     List<NotificationModel> notificationModelList = null;
@@ -186,6 +190,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                             e.printStackTrace();
                         }
                     } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -274,6 +279,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         } else {
             notificationModelList = new ArrayList<NotificationModel>();
             notificationAdapter.refreshList(notificationModelList);
+                nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
         if (notificationModelList.size() > 5) {
