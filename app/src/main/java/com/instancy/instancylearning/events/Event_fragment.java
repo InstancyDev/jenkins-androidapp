@@ -281,7 +281,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                         nodata_Label.setText(getResources().getString(R.string.no_data));
 
-
                     }
                 }
 
@@ -1404,12 +1403,15 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     myLearningModelList.add(catalogModelsList.get(i));
 
                 }
-
             }
 
             catalogAdapter.refreshList(myLearningModelList);
             contextMenuModelList.clear();
             contextMenuModelList.addAll(myLearningModelList);
+        }
+
+        if (myLearningModelList.size()==0){
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
         addEvents(myLearningModelList);

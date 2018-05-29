@@ -8,6 +8,8 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.text.InputFilter;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
+import com.instancy.instancylearning.models.SignUpConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -43,8 +46,8 @@ public class NativeSignupAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<ProfileConfigsModel> profileConfigsModelList = null;
-    private int resource;
+    private List<SignUpConfigsModel> signUpConfigsModelList = null;
+
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
@@ -52,19 +55,18 @@ public class NativeSignupAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = NativeSignupAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<ProfileConfigsModel> searchList;
+
 
     ArrayAdapter titleAdapter;
 
     List<String> countriesList;
 
 
-    public NativeSignupAdapter(Activity activity, int resource, List<ProfileConfigsModel> profileConfigsModelList) {
+    public NativeSignupAdapter(Activity activity, int resource, List<SignUpConfigsModel> signUpConfigsModelList) {
         this.activity = activity;
 
-        this.profileConfigsModelList = profileConfigsModelList;
-        this.searchList = new ArrayList<ProfileConfigsModel>();
-        this.resource = resource;
+        this.signUpConfigsModelList = signUpConfigsModelList;
+
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
@@ -75,27 +77,22 @@ public class NativeSignupAdapter extends BaseAdapter {
         countriesList = new ArrayList<>();
     }
 
-    public void refreshList(List<ProfileConfigsModel> profileConfigsModelList) {
-        this.profileConfigsModelList = profileConfigsModelList;
-        this.searchList = new ArrayList<ProfileConfigsModel>();
-        this.searchList.addAll(profileConfigsModelList);
 
+    public void refreshList(List<SignUpConfigsModel> signUpConfigsModelList) {
+        this.signUpConfigsModelList = signUpConfigsModelList;
         this.notifyDataSetChanged();
     }
 
-//    public void refreshCountries(ArrayList<String> degreeTitleList) {
-//        this.countriesList = degreeTitleList;
-//        this.notifyDataSetChanged();
-//    }
+
 
     @Override
     public int getCount() {
-        return profileConfigsModelList != null ? profileConfigsModelList.size() : 0;
+        return signUpConfigsModelList != null ? signUpConfigsModelList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return profileConfigsModelList.get(position);
+        return signUpConfigsModelList.get(position);
     }
 
     @Override
@@ -122,19 +119,24 @@ public class NativeSignupAdapter extends BaseAdapter {
             holder.labelField.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             holder.txtAstrek.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-            holder.labelField.setText(profileConfigsModelList.get(position).attributedisplaytext);
-            holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
-            holder.edit_field.setMaxLines(returnLines(profileConfigsModelList.get(position).names));
+            holder.labelField.setText(signUpConfigsModelList.get(position).displaytext);
+            holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
+//            holder.edit_field.setMaxLines(returnLines(signUpConfigsModelList.get(position).names));
 
 
-            if (returnHide(profileConfigsModelList.get(position).names) == 1) {
-                holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
-                holder.edit_field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(profileConfigsModelList.get(position).maxLenth)});
+            if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("6")){
+                holder.edit_field.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                holder.edit_field.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            }
+
+            if (returnHide(signUpConfigsModelList.get(position).uicontroltypeid) == 1) {
+                holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
+                holder.edit_field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(signUpConfigsModelList.get(position).maxLenth)});
                 holder.txtDobClick.setVisibility(View.GONE);
                 holder.edit_field.setVisibility(View.VISIBLE);
                 holder.spnrCountries.setVisibility(View.GONE);
 
-            } else if (returnHide(profileConfigsModelList.get(position).names) == 3) {
+            } else if (returnHide(signUpConfigsModelList.get(position).uicontroltypeid) == 3) {
 
                 holder.txtDobClick.setVisibility(View.GONE);
                 holder.edit_field.setVisibility(View.GONE);
@@ -144,7 +146,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 
                 holder.spnrCountries.setAdapter(holder.getAdapter(position));
 
-                setSpinText(holder.spnrCountries, profileConfigsModelList.get(position).valueName);
+                setSpinText(holder.spnrCountries, signUpConfigsModelList.get(position).valueName);
 
 //            profileConfigsModelList.get(position).valueName = holder.getText();
 
@@ -154,23 +156,22 @@ public class NativeSignupAdapter extends BaseAdapter {
                     public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
                                                long id) {
 
-                        if (profileConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("1030")) {
+                        if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("1030")) {
 
                             if (holder.getText().toLowerCase().contains("fe")) {
 
                                 holder.setSelected(spnrPosition);
-                                profileConfigsModelList.get(position).valueName = "0";
+                                signUpConfigsModelList.get(position).valueName = "0";
                             } else {
                                 holder.setSelected(spnrPosition);
-                                profileConfigsModelList.get(position).valueName = "1";
+                                signUpConfigsModelList.get(position).valueName = "1";
                             }
 
                         } else {
 
                             holder.setSelected(spnrPosition);
-                            profileConfigsModelList.get(position).valueName = holder.getText();
+                            signUpConfigsModelList.get(position).valueName = holder.getText();
                         }
-
 
                     }
 
@@ -186,7 +187,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 //            spinnerDgreType.setAdapter(titleAdapter);
 
             } else {
-                holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
+                holder.txtDobClick.setText(signUpConfigsModelList.get(position).valueName);
                 holder.edit_field.setVisibility(View.GONE);
                 holder.txtDobClick.setVisibility(View.VISIBLE);
                 holder.spnrCountries.setVisibility(View.GONE);
@@ -194,7 +195,7 @@ public class NativeSignupAdapter extends BaseAdapter {
                     @Override
                     public void onClick(View view) {
 
-                        if (returnHide(profileConfigsModelList.get(position).names) == 2) {
+                        if (returnHide(signUpConfigsModelList.get(position).uicontroltypeid) == 2) {
                             int mYear, mMonth, mDay;
                             final Calendar c = Calendar.getInstance();
                             mYear = c.get(Calendar.YEAR);
@@ -208,14 +209,14 @@ public class NativeSignupAdapter extends BaseAdapter {
 
 
 //                                        profileConfigsModelList.get(position).valueName = "" + year + "-" + getMonthFromint(monthOfYear + 1) + "-" + dayOfMonth;
-                                            profileConfigsModelList.get(position).valueName = monthOfYear + 1 + "/" + dayOfMonth + "/" + year;
+                                            signUpConfigsModelList.get(position).valueName = monthOfYear + 1 + "/" + dayOfMonth + "/" + year;
 
-                                            holder.txtDobClick.setText(profileConfigsModelList.get(position).valueName);
+                                            holder.txtDobClick.setText(signUpConfigsModelList.get(position).valueName);
 
                                         }
                                     }, mYear, mMonth, mDay);
                             // datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000); completed dates
-                            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+                            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis()); //
                             datePickerDialog.show();
 
                         } else {
@@ -227,7 +228,7 @@ public class NativeSignupAdapter extends BaseAdapter {
                 });
 
             }
-            if (profileConfigsModelList.get(position).isrequired.contains("true")) {
+            if (signUpConfigsModelList.get(position).isrequired.contains("true")) {
                 holder.txtAstrek.setText("*");
                 holder.txtAstrek.setTextColor(view.getResources().getColor(R.color.colorRed));
             } else {
@@ -240,7 +241,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 
                         final EditText Caption = (EditText) v;
 
-                        profileConfigsModelList.get(position).valueName = Caption.getText().toString();
+                        signUpConfigsModelList.get(position).valueName = Caption.getText().toString();
 
                     }
                 }
@@ -271,7 +272,7 @@ public class NativeSignupAdapter extends BaseAdapter {
         }
 
         public ArrayAdapter<String> getAdapter(int position) {
-            countriesList = db.fetchCountriesName(appUserModel.getSiteIDValue(), profileConfigsModelList.get(position).attributeconfigid);
+            countriesList = db.fetchCountriesName(appUserModel.getSiteIDValue(), signUpConfigsModelList.get(position).attributeconfigid);
             spinnerAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item, countriesList);
             return spinnerAdapter;
         }

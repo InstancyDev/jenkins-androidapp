@@ -47,13 +47,12 @@
     <!--<string name="app_default_webapi_url">http://trackapi.instancy.com/api/</string>-->
 
     <!--fo enterprise lite app -->
-    <!--<string name="app_default_url">https://enterprisedemo.instancy.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
+    <string name="app_default_url">https://enterprisedemo.instancy.com/</string>
+    <string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>
 
     <!--for instancy market place-->
-    <string name="app_default_url">https://learning.instancy.com/</string>
-    <string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>
-
+    <!--<string name="app_default_url">https://learning.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://testpgapi.instancy.net/api/</string>-->
 
     <!-- SCROM testing qalearning -->
     <!--<string name="app_default_url">http://qalearning.instancysoft.com/</string>-->

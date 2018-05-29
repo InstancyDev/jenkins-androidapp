@@ -15,7 +15,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -65,8 +67,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.copyFile;
+import static com.instancy.instancylearning.utils.Utilities.hideSoftKeyboard;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -212,6 +216,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //       uncomment for backgroundcolor purpose
 
         View someView = findViewById(R.id.login_layout);
+        setupUI(someView);
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
@@ -348,7 +353,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 break;
             case 4:
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, ApiConstants.linkedInUrl);
-                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Linkedin");//9963014569
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Linkedin");
                 startActivity(intentSocial);
                 break;
             case 5:
@@ -687,7 +692,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                         try {
 
                             db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
-
+                            ISPROFILENAMEORIMAGEUPDATED = 1;
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -739,6 +744,27 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         Log.d(TAG, "pushNotification: " + urlStr);
         vollyService.getStringResponseVolley("PUSHNOTIFICATION", urlStr, appUserModel.getAuthHeaders());
 
+    }
+
+    public void setupUI(View view) {
+
+        // Set up touch listener for non-text box views to hide keyboard.
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(Login_activity.this);
+                    return false;
+                }
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
+        }
     }
 }
 

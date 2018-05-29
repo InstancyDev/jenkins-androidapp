@@ -375,10 +375,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 @Override
                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 //                    Toast.makeText(SideMenu.this, "Here groupPosition " + groupPosition, Toast.LENGTH_SHORT).show();
+
                     int logoutPos = sideMenumodelList.size() - 1;
 
+                    String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+
 //                    String filterCondition = sideMenumodelList.get(groupPosition).getConditions();
-                    if (logoutPos == groupPosition) {
+                    if (logoutPos == groupPosition && isSubSiteEntered.equalsIgnoreCase("false")) {
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         preferencesManager.setStringValue("", StaticValues.KEY_USERLOGINID);
@@ -666,6 +669,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         textBtnBack.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
         sendMessagFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
 
+
+        if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
+            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(bottomLogo);
+            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
+        }
+
+
     }
 
 
@@ -780,7 +790,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setPassword(preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD));
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
-        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
         sideMenumodelList = db.getNativeMainMenusData();
@@ -940,12 +950,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             LinearLayout subsiteLa = (LinearLayout) subsiteLayout.findViewById(R.id.subsitelays);
             subsiteName.setText(appUserModel.getSiteName());
             mainSiteName.setText(appUserModel.getMainSiteName());
-            subsiteLa.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
-            subsiteLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            subsiteLa.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
+            subsiteLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
             subsiteLa.setAlpha(.7f);
 //            subsiteLayout.setAlpha(.7f);
 
-            drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+            drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
             sideMenumodelList = new ArrayList<SideMenusModel>();
             sideMenumodelList = db.getNativeMainMenusData();

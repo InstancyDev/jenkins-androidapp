@@ -96,11 +96,6 @@ public class ProfileEditAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-//    public void refreshCountries(ArrayList<String> degreeTitleList) {
-//        this.countriesList = degreeTitleList;
-//        this.notifyDataSetChanged();
-//    }
-
     @Override
     public int getCount() {
         return profileConfigsModelList != null ? profileConfigsModelList.size() : 0;

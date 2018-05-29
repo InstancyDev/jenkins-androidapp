@@ -324,6 +324,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                 workFlowType = "onitemChange";
                                 Log.d(TAG, "executeWorkFlowRules: workflowtype cmi update" + workFlowType);
                                 executeWorkFlowRules(workFlowType);
+                                svProgressHUD.dismiss();
                             } else {
                                 svProgressHUD.dismiss();
 //                                workFlowType = "onattendance";

@@ -18,8 +18,7 @@ public class SignUpConfigsModel implements Serializable {
     public String isrequired = "";
     public String iseditable = "";
     public String enduservisibility = "";
-    public String uicontroltypeid = "";
-    public String names = "";
+    public String uicontroltypeid = "1";
     public String valueName = "";
     public int maxLenth = 100;
 

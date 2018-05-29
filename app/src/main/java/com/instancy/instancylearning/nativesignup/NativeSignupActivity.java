@@ -39,9 +39,9 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
-import com.instancy.instancylearning.models.ProfileConfigsModel;
+
+import com.instancy.instancylearning.models.SignUpConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.profile.ProfileEditAdapter;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -97,7 +97,8 @@ public class NativeSignupActivity extends AppCompatActivity {
     NativeSignupAdapter nativeSignupAdapter;
 
 
-    List<ProfileConfigsModel> profileConfigsModelist;
+    List<SignUpConfigsModel> signUpConfigsModelList;
+
 
     ArrayList<String> degreeTitleList;
 
@@ -117,11 +118,11 @@ public class NativeSignupActivity extends AppCompatActivity {
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
 
-        profileConfigsModelist = new ArrayList<>();
+        signUpConfigsModelList = new ArrayList<>();
 
         getSignUpDetails();
 
-        nativeSignupAdapter = new NativeSignupAdapter(this, BIND_ABOVE_CLIENT, profileConfigsModelist);
+        nativeSignupAdapter = new NativeSignupAdapter(this, BIND_ABOVE_CLIENT, signUpConfigsModelList);
         personalEditList.setAdapter(nativeSignupAdapter);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -162,11 +163,11 @@ public class NativeSignupActivity extends AppCompatActivity {
     public int returnHide() {
         int returnValue = 0;
 
-        if (profileConfigsModelist.size() > 0) {
+        if (signUpConfigsModelList.size() > 0) {
 
-            for (int i = 0; i < profileConfigsModelist.size(); i++) {
+            for (int i = 0; i < signUpConfigsModelList.size(); i++) {
 
-                if (profileConfigsModelist.get(i).names.equalsIgnoreCase("DropDownList")) {
+                if (signUpConfigsModelList.get(i).uicontroltypeid.equalsIgnoreCase("DropDownList")) {
                     returnValue = 1;
                 }
             }
@@ -211,6 +212,29 @@ public class NativeSignupActivity extends AppCompatActivity {
                 if (requestType.equalsIgnoreCase("SIGNUPDATA")) {
                     if (response != null) {
 
+                        if (response.has("profileconfigdata")) {
+
+                            JSONArray signUpConfigAry = null;
+                            try {
+                                signUpConfigAry = response.getJSONArray("profileconfigdata");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (signUpConfigAry.length() > 0) {
+
+                                try {
+                                    db.injectSignUpConfigDetails(signUpConfigAry);
+
+                                    injectFromDbToModel();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+
+                        }
+
 
                         boolean isPresent = db.checkChoiceTxtPresent();
 
@@ -248,6 +272,18 @@ public class NativeSignupActivity extends AppCompatActivity {
                 svProgressHUD.dismiss();
             }
         };
+    }
+
+    public void injectFromDbToModel() {
+
+
+        signUpConfigsModelList = db.fetchUserSignConfigs();
+
+        if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
+            nativeSignupAdapter.refreshList(signUpConfigsModelList);
+        }
+
+
     }
 
 
@@ -319,16 +355,16 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         boolean isValidationCompleted = true;
 
-        Log.d(TAG, "validateDataFields: " + profileConfigsModelist);
+        Log.d(TAG, "validateDataFields: " + signUpConfigsModelList);
 
 
-        for (int i = 0; i < profileConfigsModelist.size(); i++) {
+        for (int i = 0; i < signUpConfigsModelList.size(); i++) {
 
-            if (profileConfigsModelist.get(i).isrequired.contains("true") && profileConfigsModelist.get(i).valueName.length() == 0) {
+            if (signUpConfigsModelList.get(i).isrequired.contains("true") && signUpConfigsModelList.get(i).valueName.length() == 0) {
 
-                Log.d(TAG, "validateNewForumCreation:  required " + profileConfigsModelist.get(i).valueName);
+                Log.d(TAG, "validateNewForumCreation:  required " + signUpConfigsModelList.get(i).valueName);
 
-                Toast.makeText(context, "Enter " + profileConfigsModelist.get(i).attributedisplaytext, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Enter " + signUpConfigsModelList.get(i).displaytext, Toast.LENGTH_SHORT).show();
                 isValidationCompleted = false;
                 break;
             }
@@ -338,17 +374,17 @@ public class NativeSignupActivity extends AppCompatActivity {
 
 //        JSONObject jsonObject = new JSONObject();
 
-        for (int i = 0; i < profileConfigsModelist.size(); i++) {
+        for (int i = 0; i < signUpConfigsModelList.size(); i++) {
 
 //            finalString.put(profileConfigsModelist.get(i).datafieldname, profileConfigsModelist.get(i).valueName);
 
-            String keyString = profileConfigsModelist.get(i).datafieldname.toLowerCase();
+            String keyString = signUpConfigsModelList.get(i).datafieldname.toLowerCase();
 
-            String valueString = profileConfigsModelist.get(i).valueName;
+            String valueString = signUpConfigsModelList.get(i).valueName;
 
 //            jsonObject.put(keyString, valueString);
 
-            if (i == profileConfigsModelist.size() - 1) {
+            if (i == signUpConfigsModelList.size() - 1) {
 
                 finalString = finalString + keyString + "='" + valueString + "'";
             } else {

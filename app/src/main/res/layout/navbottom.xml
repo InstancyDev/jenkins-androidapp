@@ -168,8 +168,8 @@
         android:layout_gravity="center"
         android:background="@color/colorWhite"
         android:padding="3dp"
-        android:scaleType="centerInside"
-        android:src="@drawable/bottom_marketplace"
+        android:scaleType="fitCenter"
+        android:src="@drawable/bottom_ecommerce"
         android:visibility="visible" />
 
 </LinearLayout>

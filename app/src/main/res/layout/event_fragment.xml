@@ -19,7 +19,7 @@
     <com.github.sundeepk.compactcalendarview.CompactCalendarView
         android:id="@+id/compactcalendar_view"
         android:layout_width="fill_parent"
-        android:layout_height="230dp"
+        android:layout_height="210dp"
         android:layout_below="@+id/yearandmonth"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"

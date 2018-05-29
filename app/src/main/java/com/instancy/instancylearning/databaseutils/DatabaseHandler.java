@@ -45,6 +45,7 @@ import com.instancy.instancylearning.models.ProfileGroupModel;
 import com.instancy.instancylearning.models.ReportDetail;
 import com.instancy.instancylearning.models.ReportDetailsForQuestions;
 import com.instancy.instancylearning.models.SideMenusModel;
+import com.instancy.instancylearning.models.SignUpConfigsModel;
 import com.instancy.instancylearning.models.StudentResponseModel;
 import com.instancy.instancylearning.models.TrackObjectsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -901,7 +902,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                         String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
                                         if (isValidString(appLogo)) {
-                                            String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/374" + "/LoginSettingLogo/" + appLogo;
+                                            String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/"+appUserModel.getSiteIDValue() + "/LoginSettingLogo/" + appLogo;
                                             uiSettingsModel.setNativeAppLoginLogo(appLogos);
                                         }
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AddProfileAdditionalTab"))) {
@@ -1672,26 +1673,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         }
 
-        menu = new SideMenusModel();
-        menu.setMenuId(5555);
-        menu.setDisplayName("Sign Out");
-        menu.setDisplayOrder(9999);
-        menu.setImage("");
-        menu.setMenuImageResId(R.drawable.ic_info_black_24dp);
-        menu.setIsOfflineMenu("true");
-        menu.setIsEnabled("true");
-        menu.setContextTitle("Logout");
-        menu.setContextMenuId("9999");
-        menu.setRepositoryId("");
-        menu.setLandingPageType("0");
-        menu.setCategoryStyle("0");
-        menu.setComponentId("0");
-        menu.setConditions("0");
-        menu.setParentMenuId("0");
-        menu.setParameterStrings("");
-        menu.setIsSubMenuExists(0);
-        menuList.add(menu);
+        String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
+        if (!isSubSiteEntered.equalsIgnoreCase("true")) {
 
+            menu = new SideMenusModel();
+            menu.setMenuId(5555);
+            menu.setDisplayName("Sign Out");
+            menu.setDisplayOrder(9999);
+            menu.setImage("");
+            menu.setMenuImageResId(R.drawable.ic_info_black_24dp);
+            menu.setIsOfflineMenu("true");
+            menu.setIsEnabled("true");
+            menu.setContextTitle("Logout");
+            menu.setContextMenuId("9999");
+            menu.setRepositoryId("");
+            menu.setLandingPageType("0");
+            menu.setCategoryStyle("0");
+            menu.setComponentId("0");
+            menu.setConditions("0");
+            menu.setParentMenuId("0");
+            menu.setParameterStrings("");
+            menu.setIsSubMenuExists(0);
+            menuList.add(menu);
+        }
         return menuList;
     }
 
@@ -10198,6 +10202,195 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         }
     }
+
+
+    public void injectSignUpConfigDetails(JSONArray configAry) throws JSONException {
+
+        String[] profileAry = {"objectid", "accounttype", "orgunitid", "siteid", "approvalstatus", "firstname", "lastname", "displayname", "organization", "email", "usersite", "supervisoremployeeid", "addressline1", "addresscity", "addressstate", "addresszip", "addresscountry", "phone", "mobilephone", "imaddress", "dateofbirth", "gender", "nvarchar6", "paymentmode", "nvarchar7", "nvarchar8", "nvarchar9", "securepaypalid", "nvarchar10", "picture", "highschool", "college", "highestdegree", "jobtitle", "businessfunction", "primaryjobfunction", "payeeaccountno", "payeename", "paypalaccountname", "paypalemail", "shipaddline1", "shipaddcity", "shipaddstate", "shipaddzip", "shipaddcountry", "shipaddphone"};
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strDelete = "DELETE FROM " + TBL_NATIVESIGNUP + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        for (int i = 0; i < configAry.length(); i++) {
+
+            JSONObject profileObj = configAry.getJSONObject(i);
+
+            if (profileObj.has("datafieldname")) {
+
+                String dataFieldName = profileObj.get("datafieldname").toString();
+
+//                for (String fieldName : profileAry) {
+
+//                    if (dataFieldName.toLowerCase().equalsIgnoreCase(fieldName)) {
+                Log.d(TAG, "injectProfileConfigs: dataFieldName " + dataFieldName);
+
+                String aliasname = "";
+                String attributedisplaytext = "";
+                String groupid = "";
+                int displayOrder = 0;
+                String attributeconfigid = "";
+                String isrequired = "";
+                String iseditable = "";
+                String enduservisibility = "";
+                String uicontroltypeid = "";
+                String ispublicfield = "";
+                String datafieldname = "";
+                int maxlength = 100;
+                int minlength = 0;
+
+                if (profileObj.has("datafieldname")) {
+
+                    datafieldname = profileObj.get("datafieldname").toString();
+                }
+
+                if (profileObj.has("aliasname")) {
+
+                    aliasname = profileObj.get("aliasname").toString();
+                }
+                if (profileObj.has("displaytext")) {
+
+                    attributedisplaytext = profileObj.get("displaytext").toString();
+                }
+
+                if (profileObj.has("groupid")) {
+
+                    groupid = profileObj.get("groupid").toString();
+                }
+
+                if (profileObj.has("displayorder")) {
+
+                    displayOrder = profileObj.optInt("displayorder", 0);
+                }
+
+                if (profileObj.has("attributeconfigid")) {
+                    attributeconfigid = profileObj.get("attributeconfigid").toString();
+
+                }
+
+                if (profileObj.has("isrequired")) {
+
+                    isrequired = profileObj.get("isrequired").toString();
+                }
+
+                if (profileObj.has("iseditable")) {
+                    iseditable = profileObj.get("iseditable").toString();
+
+                }
+
+                if (profileObj.has("enduservisibility")) {
+                    enduservisibility = profileObj.get("enduservisibility").toString();
+
+                }
+
+                if (profileObj.has("uicontroltypeid")) {
+                    uicontroltypeid = profileObj.get("uicontroltypeid").toString();
+
+                }
+
+                if (profileObj.has("ispublicfield")) {
+                    ispublicfield = profileObj.get("ispublicfield").toString();
+
+                }
+                if (profileObj.has("maxlength")) {
+                    maxlength = profileObj.optInt("maxlength", 100);
+
+                }
+
+                if (profileObj.has("minlength")) {
+                    minlength = profileObj.optInt("minlength", 0);
+
+                }
+
+                ContentValues contentValues = null;
+                try {
+                    contentValues = new ContentValues();
+                    contentValues.put("aliasname", aliasname);
+                    contentValues.put("displaytext", attributedisplaytext);
+                    contentValues.put("displayOrder", displayOrder);
+                    contentValues.put("attributeconfigid", attributeconfigid);
+                    contentValues.put("isrequired", isrequired);
+                    contentValues.put("iseditable", iseditable);
+                    contentValues.put("groupid", groupid);
+                    contentValues.put("enduservisibility", enduservisibility);
+                    contentValues.put("uicontroltypeid", uicontroltypeid);
+                    contentValues.put("ispublicfield", ispublicfield);
+                    contentValues.put("datafieldname", datafieldname);
+                    contentValues.put("maxlength", maxlength);
+                    contentValues.put("minlength", minlength);
+                    contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+
+                    if (displayOrder < 10000) {
+                        db.insert(TBL_NATIVESIGNUP, null, contentValues);
+                    }
+
+
+                } catch (SQLiteException exception) {
+
+                    exception.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public List<SignUpConfigsModel> fetchUserSignConfigs() {
+
+
+        List<SignUpConfigsModel> signUpConfigsModelList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuery = "SELECT * from "+ TBL_NATIVESIGNUP + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    SignUpConfigsModel signUpConfigsModel = new SignUpConfigsModel();
+                    signUpConfigsModel.datafieldname = (cursor.getString(cursor.getColumnIndex("datafieldname")));
+                    signUpConfigsModel.aliasname = (cursor.getString(cursor.getColumnIndex("aliasname")));
+                    signUpConfigsModel.displaytext = (cursor.getString(cursor.getColumnIndex("displaytext")));
+                    signUpConfigsModel.groupid = (cursor.getString(cursor.getColumnIndex("groupid")));
+                    signUpConfigsModel.displayorder = (cursor.getString(cursor.getColumnIndex("displayorder")));
+                    signUpConfigsModel.attributeconfigid = (cursor.getString(cursor.getColumnIndex("attributeconfigid")));
+                    signUpConfigsModel.isrequired = (cursor.getString(cursor.getColumnIndex("isrequired")));
+                    signUpConfigsModel.iseditable = (cursor.getString(cursor.getColumnIndex("iseditable")));
+                    signUpConfigsModel.enduservisibility = (cursor.getString(cursor.getColumnIndex("enduservisibility")));
+                    signUpConfigsModel.uicontroltypeid = (cursor.getString(cursor.getColumnIndex("uicontroltypeid")));
+//                    signUpConfigsModel.names = (cursor.getString(cursor.getColumnIndex("name")));
+                    signUpConfigsModel.maxLenth = (cursor.getInt(cursor.getColumnIndex("maxlength")));
+
+                    signUpConfigsModelList.add(signUpConfigsModel);
+
+                    if (signUpConfigsModel.attributeconfigid.equalsIgnoreCase("6")&& signUpConfigsModel.uicontroltypeid.equalsIgnoreCase("4")){
+
+                       SignUpConfigsModel confirmPasswordModel =new SignUpConfigsModel();
+                       confirmPasswordModel.datafieldname = "ConfirmPassword";
+                        confirmPasswordModel.displaytext = "Confirm Password";
+                        confirmPasswordModel.attributeconfigid = "-1";
+                        signUpConfigsModelList.add(confirmPasswordModel);
+                    }
+
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return signUpConfigsModelList;
+    }
+
+
+
 
     public void injectProfileIntoTable(ProfileDetailsModel profileDetailsModel) {
 

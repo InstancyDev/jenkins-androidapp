@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/subsitelays"
     android:layout_width="match_parent"
-    android:layout_height="44dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@color/colorWhite"
     >
@@ -10,7 +10,7 @@
     <TextView
         android:id="@+id/subsitename"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="wrap_content"
         android:background="@color/colorWhite"
         android:gravity="center_vertical"
         android:padding="4dp"
