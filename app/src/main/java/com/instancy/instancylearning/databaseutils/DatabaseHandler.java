@@ -10307,7 +10307,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     minlength = profileObj.optInt("minlength", 0);
 
                 }
-
                 ContentValues contentValues = null;
                 try {
                     contentValues = new ContentValues();
@@ -10376,6 +10375,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                        SignUpConfigsModel confirmPasswordModel =new SignUpConfigsModel();
                        confirmPasswordModel.datafieldname = "ConfirmPassword";
                         confirmPasswordModel.displaytext = "Confirm Password";
+                        confirmPasswordModel.isrequired = "true";
                         confirmPasswordModel.attributeconfigid = "-1";
                         signUpConfigsModelList.add(confirmPasswordModel);
                     }

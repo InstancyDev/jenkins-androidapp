@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -37,6 +38,8 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.mainactivities.Login_activity;
+import com.instancy.instancylearning.mainactivities.SignUp_Activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 
@@ -57,6 +60,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_PASSWORD;
+import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_USERNAME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -96,11 +101,13 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     NativeSignupAdapter nativeSignupAdapter;
 
-
     List<SignUpConfigsModel> signUpConfigsModelList;
 
 
     ArrayList<String> degreeTitleList;
+
+
+    String passwordStr = "abc";
 
 
     @Override
@@ -124,6 +131,10 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         nativeSignupAdapter = new NativeSignupAdapter(this, BIND_ABOVE_CLIENT, signUpConfigsModelList);
         personalEditList.setAdapter(nativeSignupAdapter);
+
+
+
+
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -179,35 +190,6 @@ public class NativeSignupActivity extends AppCompatActivity {
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-                Log.d(TAG, "Volley requester " + requestType);
-                Log.d(TAG, "Volley JSON post" + response);
-
-                if (requestType.equalsIgnoreCase("PROFILEDATA")) {
-                    if (response != null) {
-
-                        try {
-                            JSONArray jsonArray = response.getJSONArray("table5");
-
-                            Log.d(TAG, "Volley JSON post" + jsonArray.length());
-
-                            db.injectProfielFieldOptions(jsonArray);
-
-                            degreeTitleList = db.fetchCountriesName(appUserModel.getSiteIDValue(), "25");
-
-//                            profileEditAdapter.refreshCountries(degreeTitleList);
-
-                            Log.d(TAG, "notifySuccess: " + degreeTitleList.size());
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-                    } else {
-
-                    }
-                }
-
 
                 if (requestType.equalsIgnoreCase("SIGNUPDATA")) {
                     if (response != null) {
@@ -215,8 +197,10 @@ public class NativeSignupActivity extends AppCompatActivity {
                         if (response.has("profileconfigdata")) {
 
                             JSONArray signUpConfigAry = null;
+                            JSONArray signUpChoiceAry = null;
                             try {
                                 signUpConfigAry = response.getJSONArray("profileconfigdata");
+                                signUpChoiceAry = response.getJSONArray("attributechoices");
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -225,6 +209,13 @@ public class NativeSignupActivity extends AppCompatActivity {
 
                                 try {
                                     db.injectSignUpConfigDetails(signUpConfigAry);
+
+                                    boolean isPresent = db.checkChoiceTxtPresent();
+
+                                    if (!isPresent) {
+
+                                        db.injectProfielFieldOptions(signUpChoiceAry);
+                                    }
 
                                     injectFromDbToModel();
                                 } catch (JSONException e) {
@@ -281,6 +272,10 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
             nativeSignupAdapter.refreshList(signUpConfigsModelList);
+            View header = (View) getLayoutInflater().inflate(R.layout.accepttermsview, null);
+            CheckBox acceptTerms = (CheckBox) header.findViewById(R.id.chxaccepttrms);
+            acceptTerms.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            personalEditList.addFooterView(header);
         }
 
 
@@ -352,21 +347,29 @@ public class NativeSignupActivity extends AppCompatActivity {
     }
 
     public void validateDataFields() throws JSONException {
-
+        passwordStr = "";
         boolean isValidationCompleted = true;
-
         Log.d(TAG, "validateDataFields: " + signUpConfigsModelList);
-
-
         for (int i = 0; i < signUpConfigsModelList.size(); i++) {
-
             if (signUpConfigsModelList.get(i).isrequired.contains("true") && signUpConfigsModelList.get(i).valueName.length() == 0) {
-
                 Log.d(TAG, "validateNewForumCreation:  required " + signUpConfigsModelList.get(i).valueName);
-
                 Toast.makeText(context, "Enter " + signUpConfigsModelList.get(i).displaytext, Toast.LENGTH_SHORT).show();
                 isValidationCompleted = false;
                 break;
+            } else {
+
+                if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("-1")) {
+
+                    if (!passwordStr.equalsIgnoreCase(signUpConfigsModelList.get(i).valueName)) {
+                        isValidationCompleted = false;
+                        Toast.makeText(context, "Password doesn't match", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+            }
+
+            if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("6")) {
+                passwordStr = signUpConfigsModelList.get(i).valueName;
             }
         }
 
@@ -390,20 +393,7 @@ public class NativeSignupActivity extends AppCompatActivity {
             } else {
                 finalString = finalString + keyString + "='" + valueString + "',";
             }
-
-
         }
-
-//        String newString = jsonObject.toString().replace(":", "=");
-//
-//        String newStringWithoutBraces = newString.replace("{", "");
-//
-//        String newStringWithout = newStringWithoutBraces.replace("}", "");
-//
-//        Log.d(TAG, "validateNewForumCreation: " + finalString);
-//
-//        String replaceDataSt = finalString.replace("\'", "\\\'");
-
 
         if (isValidationCompleted) {
 
@@ -422,7 +412,7 @@ public class NativeSignupActivity extends AppCompatActivity {
             String addQuotes = ('"' + replaceDataString + '"');
 
             if (isNetworkConnectionAvailable(this, -1)) {
-                sendNewOrUpdatedEducationDetailsDataToServer(addQuotes);
+                sendNewSignUpDetailsDataToServer(addQuotes);
             } else {
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             }
@@ -430,11 +420,11 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     }
 
-    public void sendNewOrUpdatedEducationDetailsDataToServer(final String postData) {
+    public void sendNewSignUpDetailsDataToServer(final String postData) {
         String apiURL = "";
 
 
-        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileUpdateUserProfile?studId=" + appUserModel.getUserIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCreateSignUp?Locale=en-us&SiteURL=" + appUserModel.getSiteURL();
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
             @Override
@@ -442,10 +432,15 @@ public class NativeSignupActivity extends AppCompatActivity {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 
-                if (s.contains("success")) {
-
-
+                if (s != null && s.length() > 0) {
+                    try {
+//                        autoLoginEnabled(s);
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
                 }
+
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -497,17 +492,31 @@ public class NativeSignupActivity extends AppCompatActivity {
         finish();
     }
 
-    private void countriesWebApiCall(String userId) {
 
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetails?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-
-        Log.d(TAG, "profileWebCall: " + urlStr);
-
-        vollyService.getJsonObjResponseVolley("PROFILEDATA", urlStr, appUserModel.getAuthHeaders());
+    public void autoLoginEnabled(String responseStr) {
+        try {
+            JSONObject jsonObject = new JSONObject(responseStr);
+            JSONArray usersignupdetailsAry = jsonObject.getJSONArray("usersignupdetails");
+            if (usersignupdetailsAry != null && usersignupdetailsAry.length() > 0) {
+                JSONObject userObj = usersignupdetailsAry.getJSONObject(0);
+                Toast.makeText(context, "" + userObj.optString("message"), Toast.LENGTH_LONG).show();
+                Intent loginIntent = new Intent(NativeSignupActivity.this, Login_activity.class);
+                if (userObj.getString("action").equalsIgnoreCase("selfregistration")) {
+                    String userNames = userObj.getString("login");
+                    Bundle bundle = new Bundle();
+                    bundle.putString(BUNDLE_USERNAME, userNames);
+                    bundle.putString(BUNDLE_PASSWORD, passwordStr);
+                    loginIntent.putExtras(bundle);
+                    startActivity(loginIntent);
+                } else {
+//                    startActivity(loginIntent);
+                    finish();
+                }
+            }
+            Log.d(TAG, "autoLoginEnabled: " + usersignupdetailsAry);
+        } catch (Throwable t) {
+            Log.e("My App", "Could not parse malformed JSON: \"" + responseStr + "\"");
+        }
 
     }
 

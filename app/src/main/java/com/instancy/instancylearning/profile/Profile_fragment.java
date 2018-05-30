@@ -658,7 +658,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                             db.injectProfielFieldOptions(jsonArray);
 
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

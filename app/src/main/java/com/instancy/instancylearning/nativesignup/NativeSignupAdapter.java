@@ -106,13 +106,18 @@ public class NativeSignupAdapter extends BaseAdapter {
 
         final ViewHolder holder;
 
-        View view = null;
+
 
         if (convertView == null) {
-
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.personaleditcell, null);
-            holder = new ViewHolder(view);
+            convertView = inflater.inflate(R.layout.personaleditcell, null);
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
+        } else {
+
+            holder = (ViewHolder) convertView.getTag();
+        }
+
             holder.parent = parent;
             holder.getPosition = position;
 
@@ -124,7 +129,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 //            holder.edit_field.setMaxLines(returnLines(signUpConfigsModelList.get(position).names));
 
 
-            if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("6")){
+            if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("6") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("-1")){
                 holder.edit_field.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 holder.edit_field.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
@@ -230,7 +235,7 @@ public class NativeSignupAdapter extends BaseAdapter {
             }
             if (signUpConfigsModelList.get(position).isrequired.contains("true")) {
                 holder.txtAstrek.setText("*");
-                holder.txtAstrek.setTextColor(view.getResources().getColor(R.color.colorRed));
+                holder.txtAstrek.setTextColor(convertView.getResources().getColor(R.color.colorRed));
             } else {
                 holder.txtAstrek.setText("");
             }
@@ -246,13 +251,9 @@ public class NativeSignupAdapter extends BaseAdapter {
                     }
                 }
             });
-            view.setTag(holder);
-        } else {
 
-            view = convertView;
-        }
 
-        return view;
+        return convertView;
     }
 
     class ViewHolder {

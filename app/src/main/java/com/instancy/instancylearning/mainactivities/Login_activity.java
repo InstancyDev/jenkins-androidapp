@@ -358,8 +358,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 break;
             case 5:
                 // uncomment for web signup
-                Intent intentSignup = new Intent(this, SignUp_Activity.class);
-//                Intent intentSignup = new Intent(this, NativeSignupActivity.class);
+//                Intent intentSignup = new Intent(this, SignUp_Activity.class);
+                Intent intentSignup = new Intent(this, NativeSignupActivity.class);
                 startActivity(intentSignup);
                 break;
             case 6:
