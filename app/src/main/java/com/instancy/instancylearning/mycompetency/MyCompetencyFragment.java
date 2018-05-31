@@ -94,28 +94,19 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.discussionfourmlist)
+
+    @BindView(R.id.mycompetencylist)
     ListView discussionFourmlistView;
+
     DiscussionFourmAdapter discussionFourmAdapter;
     List<DiscussionForumModel> discussionForumModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
-    Menu search_menu;
-    MenuItem item_search;
     SideMenusModel sideMenusModel = null;
     ResultListner resultListner = null;
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-
-    @Nullable
-    @BindView(R.id.fab_fourm_button)
-    FloatingActionButton floatingActionButton;
-
-
-    String contentIDFromNotification = "";
-    String topicID = "";
-
 
 
     public MyCompetencyFragment() {
@@ -129,24 +120,16 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         this.context = context;
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(context);
-
         initVolleyCallback();
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
         vollyService = new VollyService(resultCallback, context);
-
         sideMenusModel = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
-
-
         }
-
-
-
 
     }
 
@@ -156,7 +139,10 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID=109&ComponentInstanceID=2997&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&JobRoleID=0";
+
+
+        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
 
     }
 
@@ -172,7 +158,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
 
                     } else {
-                        swipeRefreshLayout.setRefreshing(false);
+
                     }
                 }
 
@@ -213,7 +199,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.discussionfourm_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.mycompetency, container, false);
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -239,20 +225,6 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
 
-        floatingActionButton.setImageDrawable(d);
-
-        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                intentDetail.putExtra("isfromedit", false);
-                intentDetail.putExtra("forumModel", "");
-                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-            }
-        });
-
         return rootView;
     }
 
@@ -265,35 +237,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
             discussionFourmAdapter.refreshList(discussionForumModelList);
         }
 
-        if (discussionForumModelList.size() > 5) {
-            if (item_search != null)
-                item_search.setVisible(true);
-        } else {
-            if (item_search != null)
-                item_search.setVisible(false);
-        }
 
-    }
-
-
-    public int getPositionForNotification(String contentID) {
-        int position = 0;
-        int contentIntID = 0;
-        try {
-            contentIntID = Integer.parseInt(contentID);
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
-
-        for (int k = 0; k < discussionForumModelList.size(); k++) {
-            if (discussionForumModelList.get(k).forumid == contentIntID) {
-                position = k;
-                break;
-            }
-
-        }
-
-        return position;
     }
 
     public void initilizeView() {
@@ -311,45 +255,17 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO Add your menu entries here
-
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.mylearning_menu, menu);
-        item_search = menu.findItem(R.id.mylearning_search);
+
+        MenuItem item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
+        item_search.setVisible(false);
 
-        if (item_search != null) {
-            Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
-//            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
-            final SearchView searchView = (SearchView) item_search.getActionView();
-//            searchView.setBackgroundColor(Color.WHITE);
-            EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-
-                    discussionFourmAdapter.filter(newText.toLowerCase(Locale.getDefault()));
-
-                    return true;
-                }
-
-            });
-
-        }
     }
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
@@ -375,24 +291,6 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-
-            case R.id.mylearning_search:
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    circleReveal(R.id.toolbar, 1, true, true);
-                else
-                    toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
-                break;
-            case R.id.mylearning_info_help:
-
-                break;
-            case R.id.mylearning_filter:
-                break;
-
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -402,7 +300,6 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(true);
-            MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -415,15 +312,8 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         switch (view.getId()) {
             case R.id.card_view:
                 break;
-            case R.id.btn_contextmenu:
-                View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
-                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, discussionForumModelList.get(position));
-                break;
             default:
-
         }
-
     }
 
     @Override
@@ -432,7 +322,6 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         Log.d(TAG, "onDestroy: in Mylearning fragment");
 
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
@@ -470,57 +359,11 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, DiscussionForumModel discussionForumModel) {
-
-        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.discussonforum, popup.getMenu());
-        //registering popup with OnMenuItemClickListene
-
-        Menu menu = popup.getMenu();
-
-        menu.getItem(0).setVisible(true);//view
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-
-                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
-                    Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                    intentDetail.putExtra("isfromedit", true);
-                    intentDetail.putExtra("forumModel", discussionForumModelList.get(position));
-                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-
-                }
-                return true;
-            }
-        });
-        popup.show();//showing popup menu
-
-    }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
-
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
-                if (refresh) {
-                    refreshCatalog(true);
-                }
-            }
-        }
-    }
-
-    public void attachFragment(DiscussionForumModel forumModel, boolean isFromNotification) {
-        Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
-        intentDetail.putExtra("forumModel", forumModel);
-        intentDetail.putExtra("NOTIFICATION", isFromNotification);
-        intentDetail.putExtra("TOPICID", topicID);
-
-        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
     }
 
     @Override

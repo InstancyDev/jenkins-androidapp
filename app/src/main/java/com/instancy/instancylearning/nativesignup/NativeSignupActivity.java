@@ -40,12 +40,14 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.mainactivities.SignUp_Activity;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 
 import com.instancy.instancylearning.models.SignUpConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,7 +95,7 @@ public class NativeSignupActivity extends AppCompatActivity {
     @BindView(R.id.personaleditlist)
     ListView personalEditList;
 
-    boolean isNewRecord = false;
+    boolean acceptedTerms = false;
 
     @Nullable
     @BindView(R.id.bottomlayout)
@@ -106,9 +108,13 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     ArrayList<String> degreeTitleList;
 
-
     String passwordStr = "abc";
 
+    CheckBox acceptChBox;
+
+    View headerView;
+
+    TextView termsTxt;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,10 +138,6 @@ public class NativeSignupActivity extends AppCompatActivity {
         nativeSignupAdapter = new NativeSignupAdapter(this, BIND_ABOVE_CLIENT, signUpConfigsModelList);
         personalEditList.setAdapter(nativeSignupAdapter);
 
-
-
-
-
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 getResources().getString(R.string.btn_txt_signup) + "</font>"));
@@ -151,16 +153,49 @@ public class NativeSignupActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
 
+        headerView = (View) getLayoutInflater().inflate(R.layout.accepttermsview, null);
+        acceptChBox = (CheckBox) headerView.findViewById(R.id.chxaccepttrms);
+        termsTxt = (TextView) headerView.findViewById(R.id.termsTxt);
+        termsTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+//                Toast.makeText(context, "accpted terms and conditions", Toast.LENGTH_SHORT).show();
+
+                Intent intentSocial = new Intent(NativeSignupActivity.this, SocialWebLoginsActivity.class);
+                String imageUrl = appUserModel.getSiteURL() + "/content/sitefiles/";
+                intentSocial.putExtra("ATTACHMENT", true);
+                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, imageUrl);
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Terms of use");
+                startActivity(intentSocial);
+
+            }
+        });
+
+        acceptChBox.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        acceptChBox.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                //is chkIos checked?
+                if (((CheckBox) v).isChecked()) {
+                    acceptedTerms = true;
+
+                } else {
+                    acceptedTerms = false;
+                }
+            }
+        });
+
         if (isNetworkConnectionAvailable(this, -1)) {
             int i = returnHide();
             if (i == 1) {
-//                countriesWebApiCall(appUserModel.getUserIDValue());
 
+//              countriesWebApiCall(appUserModel.getUserIDValue());
                 degreeTitleList = db.fetchCountriesName(appUserModel.getSiteIDValue(), "25");
+//              profileEditAdapter.refreshCountries(degreeTitleList);  Erragadd
 
-//                profileEditAdapter.refreshCountries(degreeTitleList);
-
-
+//
             }
 
         } else {
@@ -272,13 +307,9 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
             nativeSignupAdapter.refreshList(signUpConfigsModelList);
-            View header = (View) getLayoutInflater().inflate(R.layout.accepttermsview, null);
-            CheckBox acceptTerms = (CheckBox) header.findViewById(R.id.chxaccepttrms);
-            acceptTerms.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            personalEditList.addFooterView(header);
+
+            personalEditList.addFooterView(headerView);
         }
-
-
     }
 
 
@@ -397,24 +428,31 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         if (isValidationCompleted) {
 
-            JSONObject parameters = new JSONObject();
+            if (acceptedTerms) {
 
-            //mandatory
-            parameters.put("UserGroupIDs", "");
-            parameters.put("RoleIDs", "");
-            parameters.put("CMGroupIDs", "");
-            parameters.put("Cmd", finalString);
+                JSONObject parameters = new JSONObject();
 
-            String parameterString = parameters.toString();
-            Log.d(TAG, "validateNewForumCreation: " + parameterString);
+                //mandatory
+                parameters.put("UserGroupIDs", "");
+                parameters.put("RoleIDs", "");
+                parameters.put("CMGroupIDs", "");
+                parameters.put("Cmd", finalString);
 
-            String replaceDataString = parameterString.replace("\"", "\\\"");
-            String addQuotes = ('"' + replaceDataString + '"');
+                String parameterString = parameters.toString();
+                Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
-            if (isNetworkConnectionAvailable(this, -1)) {
-                sendNewSignUpDetailsDataToServer(addQuotes);
+                String replaceDataString = parameterString.replace("\"", "\\\"");
+                String addQuotes = ('"' + replaceDataString + '"');
+
+                if (isNetworkConnectionAvailable(this, -1)) {
+                    sendNewSignUpDetailsDataToServer(addQuotes);
+                } else {
+                    Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                }
+
+
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Accept terms of use ", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -434,13 +472,11 @@ public class NativeSignupActivity extends AppCompatActivity {
 
                 if (s != null && s.length() > 0) {
                     try {
-//                        autoLoginEnabled(s);
+                        autoLoginEnabled(s);
                     } catch (Throwable t) {
                         Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
                     }
                 }
-
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -522,9 +558,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     private void getSignUpDetails() {
 
-
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-
         String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
 
         urlStr = urlStr.replaceAll(" ", "%20");

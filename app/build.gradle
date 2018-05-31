@@ -127,5 +127,6 @@ dependencies {
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.github.erizet.signala:signala-longpolling:0.20'
     compile 'com.github.lutvie72:RackMonthPicker:1.4'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3' //https://github.com/PhilJay/MPAndroidChart
 }
 apply plugin: 'com.google.gms.google-services'

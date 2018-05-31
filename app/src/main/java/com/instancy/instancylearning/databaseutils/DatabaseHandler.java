@@ -264,6 +264,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public static final String TBL_NATIVESIGNUP = "TBL_NATIVESIGNUP";
 
+    public static final String TBL_COMPETENCYJOBROLES = "TBL_COMPETENCYJOBROLES";
+
     private Context dbctx;
     private WebAPIClient wap;
     private SharedPreferences sharedPreferences;
@@ -534,8 +536,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NATIVESIGNUP + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, displaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, siteid TEXT, ispublicfield TEXT, minlength TEXT, maxlength TEXT)");
 
 
-        Log.d(TAG, "onCreate:  TABLES CREATED");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYJOBROLES + "(jobrolename TEXT, jobroleid INTEGER, description TEXT, userid TEXT, siteid TEXT)");
 
+
+        Log.d(TAG, "onCreate:  TABLES CREATED");
     }
 
     @Override
@@ -902,7 +906,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                         String appLogo = nativeSettingsObj.get("keyvalue").getAsString();
                                         if (isValidString(appLogo)) {
-                                            String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/"+appUserModel.getSiteIDValue() + "/LoginSettingLogo/" + appLogo;
+                                            String appLogos = appUserModel.getSiteURL() + "/Content/SiteConfiguration/" + appUserModel.getSiteIDValue() + "/LoginSettingLogo/" + appLogo;
                                             uiSettingsModel.setNativeAppLoginLogo(appLogos);
                                         }
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AddProfileAdditionalTab"))) {
@@ -1288,7 +1292,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Methods for gettting native menus from server
 
     public void getNativeMenusFromServer(String webApiUrl, String siteUrl) {
-        String paramsString = "SiteURL=" + siteUrl;
+        String paramsString = "SiteURL=" + siteUrl + "&Locale=en-us";
         InputStream inputStream = wap.callWebAPIMethod(webApiUrl,
                 "MobileLMS", "MobileGetNativeMenus", appUserModel.getAuthHeaders(),
                 paramsString);
@@ -10206,8 +10210,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void injectSignUpConfigDetails(JSONArray configAry) throws JSONException {
 
-        String[] profileAry = {"objectid", "accounttype", "orgunitid", "siteid", "approvalstatus", "firstname", "lastname", "displayname", "organization", "email", "usersite", "supervisoremployeeid", "addressline1", "addresscity", "addressstate", "addresszip", "addresscountry", "phone", "mobilephone", "imaddress", "dateofbirth", "gender", "nvarchar6", "paymentmode", "nvarchar7", "nvarchar8", "nvarchar9", "securepaypalid", "nvarchar10", "picture", "highschool", "college", "highestdegree", "jobtitle", "businessfunction", "primaryjobfunction", "payeeaccountno", "payeename", "paypalaccountname", "paypalemail", "shipaddline1", "shipaddcity", "shipaddstate", "shipaddzip", "shipaddcountry", "shipaddphone"};
-
         SQLiteDatabase db = this.getWritableDatabase();
         try {
             String strDelete = "DELETE FROM " + TBL_NATIVESIGNUP + " WHERE siteid = " + appUserModel.getSiteIDValue();
@@ -10346,7 +10348,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT * from "+ TBL_NATIVESIGNUP + " WHERE siteid = " + appUserModel.getSiteIDValue();
+        String strSelQuery = "SELECT * from " + TBL_NATIVESIGNUP + " WHERE siteid = " + appUserModel.getSiteIDValue();
 
         try {
             Cursor cursor = null;
@@ -10370,10 +10372,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     signUpConfigsModelList.add(signUpConfigsModel);
 
-                    if (signUpConfigsModel.attributeconfigid.equalsIgnoreCase("6")&& signUpConfigsModel.uicontroltypeid.equalsIgnoreCase("4")){
+                    if (signUpConfigsModel.attributeconfigid.equalsIgnoreCase("6") && signUpConfigsModel.uicontroltypeid.equalsIgnoreCase("4")) {
 
-                       SignUpConfigsModel confirmPasswordModel =new SignUpConfigsModel();
-                       confirmPasswordModel.datafieldname = "ConfirmPassword";
+                        SignUpConfigsModel confirmPasswordModel = new SignUpConfigsModel();
+                        confirmPasswordModel.datafieldname = "ConfirmPassword";
                         confirmPasswordModel.displaytext = "Confirm Password";
                         confirmPasswordModel.isrequired = "true";
                         confirmPasswordModel.attributeconfigid = "-1";
@@ -10388,8 +10390,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return signUpConfigsModelList;
     }
-
-
 
 
     public void injectProfileIntoTable(ProfileDetailsModel profileDetailsModel) {

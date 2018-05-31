@@ -537,7 +537,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             itemInfo.setVisible(false);
         }
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -547,7 +547,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //            searchView.setBackgroundColor(Color.WHITE);
 
 //            searchView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
-
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");

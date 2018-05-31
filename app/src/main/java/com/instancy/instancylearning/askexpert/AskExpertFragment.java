@@ -892,7 +892,5 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             askexpertListView.removeHeaderView(header);
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
-
     }
-
 }

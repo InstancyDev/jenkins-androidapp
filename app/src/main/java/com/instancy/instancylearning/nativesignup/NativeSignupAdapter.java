@@ -106,8 +106,6 @@ public class NativeSignupAdapter extends BaseAdapter {
 
         final ViewHolder holder;
 
-
-
         if (convertView == null) {
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.personaleditcell, null);
@@ -126,7 +124,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 
             holder.labelField.setText(signUpConfigsModelList.get(position).displaytext);
             holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
-//            holder.edit_field.setMaxLines(returnLines(signUpConfigsModelList.get(position).names));
+//          holder.edit_field.setMaxLines(returnLines(signUpConfigsModelList.get(position).names));
 
 
             if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("6") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("-1")){

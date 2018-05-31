@@ -209,7 +209,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
         appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
         appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
-        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+//        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         if (Build.VERSION.SDK_INT > 22) {
             requestPermission();
 

@@ -64,6 +64,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.mycompetency.MyCompetencyFragment;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.notifications.Notifications_fragment;
 import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
@@ -605,7 +606,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case 10:
                 fragment = new PeopleListing_fragment();
-//                catalogSideMenuModel = getSideMenuModel();
+                break;
+            case 11:
+                fragment = new MyCompetencyFragment();
                 break;
             case 99:
                 fragment = new SendMessage_fragment();
