@@ -21,17 +21,18 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/topicheader">
 
-        <ListView
+        <ExpandableListView
             android:id="@+id/mycompetencylist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@color/colorDarkGrey"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:dividerHeight="1dp"
-            android:padding="8dp"
-            android:scrollbars="none"> </ListView>
-
+            android:layout_above="@+id/layout_sing_in"
+            android:background="@color/colorWhite"
+            android:childIndicator="@null"
+            android:choiceMode="singleChoice"
+            android:divider="@color/colorWhite"
+            android:dividerHeight="0.5dp"
+            android:groupIndicator="@null"
+            android:overScrollMode="never" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

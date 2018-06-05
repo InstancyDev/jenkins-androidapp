@@ -51,6 +51,8 @@ import com.instancy.instancylearning.models.TrackObjectsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
+import com.instancy.instancylearning.mycompetency.CompetencyCategoryModel;
+import com.instancy.instancylearning.mycompetency.CompetencyJobRoles;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -265,6 +267,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String TBL_NATIVESIGNUP = "TBL_NATIVESIGNUP";
 
     public static final String TBL_COMPETENCYJOBROLES = "TBL_COMPETENCYJOBROLES";
+
+    public static final String TBL_COMPETENCYCATEGORYLIST = "TBL_COMPETENCYCATEGORYLIST";
+
+    public static final String TBL_COMPETENCYSKILLLIST = "TBL_COMPETENCYSKILLLIST";
 
     private Context dbctx;
     private WebAPIClient wap;
@@ -532,12 +538,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NOTIFICATIONS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, usernotificationid INTEGER, fromuserid INTEGER, fromusername TEXT, fromuseremail TEXT, touserid INTEGER, subject TEXT, message TEXT, notificationstartdate TEXT, notificationenddate TEXT, notificationid INTEGER, ounotificationid INTEGER, contentid TEXT, markasread TEXT, notificationtitle TEXT, groupid INTEGER, contenttitle TEXT, forumname TEXT, forumid TEXT, username TEXT, notificationsubject TEXT, membershipexpirydate TEXT, passwordexpirtydays TEXT, durationenddate TEXT, publisheddate TEXT, assigneddate TEXT, siteid INTEGER, userid INTEGER, siteurl TEXT)");
 
-
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NATIVESIGNUP + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, displaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, siteid TEXT, ispublicfield TEXT, minlength TEXT, maxlength TEXT)");
-
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYJOBROLES + "(jobrolename TEXT, jobroleid INTEGER, description TEXT, userid TEXT, siteid TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYCATEGORYLIST + "(prefcategorytitle TEXT, prefcategoryid INTEGER, jobroleid INTEGER, userid TEXT, siteid TEXT)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYSKILLLIST + "(skillname TEXT, skillid INTEGER, prefcategoryid INTEGER, jobroleid INTEGER, description TEXT, gap TEXT, userevaluation TEXT, managerevaluation TEXT, contentevaluation TEXT, weightedaverage TEXT, requiredproficiency TEXT, requiredprofvalues BLOB, userid TEXT, siteid TEXT)");
 
         Log.d(TAG, "onCreate:  TABLES CREATED");
     }
@@ -16317,6 +16325,196 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ex.printStackTrace();
         }
     }
+
+
+    public void injectCompetencyJobRoles(JSONObject jsonObject) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+        JSONArray jsonArrayJobRoles=jsonObject.getJSONArray("CompetencyList");
+
+        try {
+
+            String strDelete = "DELETE FROM " + TBL_COMPETENCYJOBROLES + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        for (int i = 0; i < jsonArrayJobRoles.length(); i++) {
+
+            JSONObject profilePrivObj = jsonArrayJobRoles.getJSONObject(i);
+
+            String jobrolename = "";
+            String jobroleid = "";
+            String description = "";
+
+            if (profilePrivObj.has("JobRoleName")) {
+
+                jobrolename = profilePrivObj.optString("JobRoleName");
+            }
+
+            if (profilePrivObj.has("JobRoleId")) {
+
+                jobroleid = profilePrivObj.optString("JobRoleId");
+            }
+
+            if (profilePrivObj.has("JobRoleDescription")) {
+
+                description = profilePrivObj.optString("JobRoleDescription");
+            }
+
+            ContentValues contentValues = null;
+            try {
+                contentValues = new ContentValues();
+                contentValues.put("jobrolename", jobrolename);
+                contentValues.put("jobroleid", jobroleid);
+                contentValues.put("description", description);
+                contentValues.put("userid", appUserModel.getUserIDValue());
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+                db.insert(TBL_COMPETENCYJOBROLES, null, contentValues);
+
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+
+    public List<CompetencyJobRoles> fetchCompetencyJobSkills() {
+
+        List<CompetencyJobRoles> competencyJobRolesList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_COMPETENCYJOBROLES + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid="+appUserModel.getSiteIDValue();
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    CompetencyJobRoles competencyJobRoles = new CompetencyJobRoles();
+                    competencyJobRoles.jobRoleName = (cursor.getString(cursor.getColumnIndex("jobrolename")));
+                    competencyJobRoles.jobRoleID = (cursor.getInt(cursor.getColumnIndex("jobroleid")));
+                    competencyJobRoles.jobRoleDescription = (cursor.getString(cursor.getColumnIndex("description")));
+
+                    competencyJobRolesList.add(competencyJobRoles);
+
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return competencyJobRolesList;
+    }
+
+    public void injectPrefCategoryList(JSONObject jsonObject,String jobRoleId) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+        JSONArray jsonArrayJobRoles=jsonObject.getJSONArray("PrefCategoryList");
+
+        try {
+
+            String strDelete = "DELETE FROM " + TBL_COMPETENCYCATEGORYLIST + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        for (int i = 0; i < jsonArrayJobRoles.length(); i++) {
+
+            JSONObject profilePrivObj = jsonArrayJobRoles.getJSONObject(i);
+
+            String prefcategorytitle = "";
+            String prefcategoryid = "";
+
+            if (profilePrivObj.has("PrefCategoryTitle")) {
+
+                prefcategorytitle = profilePrivObj.optString("PrefCategoryTitle");
+            }
+
+            if (profilePrivObj.has("PrefCategoryID")) {
+
+                prefcategoryid = profilePrivObj.optString("PrefCategoryID");
+            }
+
+
+            ContentValues contentValues = null;
+            try {
+                contentValues = new ContentValues();
+                contentValues.put("prefcategorytitle", prefcategorytitle);
+                contentValues.put("prefcategoryid", prefcategoryid);
+                contentValues.put("jobroleid",jobRoleId);
+                contentValues.put("userid", appUserModel.getUserIDValue());
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+
+                db.insert(TBL_COMPETENCYCATEGORYLIST, null, contentValues);
+
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+    public List<CompetencyCategoryModel> fetchCompetencyCategoryModel() {
+
+        List<CompetencyCategoryModel> competencyCategoryModelList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_COMPETENCYCATEGORYLIST + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid="+appUserModel.getSiteIDValue();
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    CompetencyCategoryModel competencyCategoryModel = new CompetencyCategoryModel();
+                    competencyCategoryModel.prefCategoryTitle = (cursor.getString(cursor.getColumnIndex("prefcategorytitle")));
+                    competencyCategoryModel.jobRoleID = (cursor.getInt(cursor.getColumnIndex("jobroleid")));
+                    competencyCategoryModel.prefCategoryID = (cursor.getString(cursor.getColumnIndex("prefcategoryid")));
+                    competencyCategoryModelList.add(competencyCategoryModel);
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return competencyCategoryModelList;
+    }
+
 
     // uncomment for pagenotes
 //    public void sendOfflineUserPagenotes() {

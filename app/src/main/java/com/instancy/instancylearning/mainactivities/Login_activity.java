@@ -73,6 +73,7 @@ import static com.instancy.instancylearning.utils.Utilities.copyFile;
 import static com.instancy.instancylearning.utils.Utilities.hideSoftKeyboard;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
+import static com.instancy.instancylearning.utils.Utilities.setCursorColor;
 
 /**
  * Created by Upendranath on 5/11/2017.
@@ -197,6 +198,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         editPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+
+        setCursorColor(editPassword,Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        setCursorColor(editUserName,Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
         editPassword.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editUserName.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));

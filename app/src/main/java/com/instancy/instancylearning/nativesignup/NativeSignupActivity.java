@@ -162,8 +162,10 @@ public class NativeSignupActivity extends AppCompatActivity {
 
 //                Toast.makeText(context, "accpted terms and conditions", Toast.LENGTH_SHORT).show();
 
+//                http://qalearning.instancysoft.com/content/SiteConfiguration/SiteID/TermsofUse_New.html
+
                 Intent intentSocial = new Intent(NativeSignupActivity.this, SocialWebLoginsActivity.class);
-                String imageUrl = appUserModel.getSiteURL() + "/content/sitefiles/";
+                String imageUrl = "http://qalearning.instancysoft.com/content/SiteConfiguration/"+appUserModel.getSiteIDValue()+"/TermsofUse_New.html";
                 intentSocial.putExtra("ATTACHMENT", true);
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, imageUrl);
                 intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Terms of use");

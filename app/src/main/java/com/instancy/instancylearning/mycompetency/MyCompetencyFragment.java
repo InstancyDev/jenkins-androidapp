@@ -94,20 +94,17 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
-
+    DatabaseHandler db;
     @BindView(R.id.mycompetencylist)
     ListView discussionFourmlistView;
 
-    DiscussionFourmAdapter discussionFourmAdapter;
-    List<DiscussionForumModel> discussionForumModelList = null;
+    CompetencyJobRoleAdapter competencyJobRoleAdapter;
+    List<CompetencyJobRoles> competencyJobRolesList = null;
     PreferencesManager preferencesManager;
     Context context;
-    Toolbar toolbar;
     SideMenusModel sideMenusModel = null;
-    ResultListner resultListner = null;
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-
 
     public MyCompetencyFragment() {
 
@@ -120,6 +117,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         this.context = context;
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(context);
+        db = new DatabaseHandler(context);
         initVolleyCallback();
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
@@ -139,10 +137,10 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID=109&ComponentInstanceID=2997&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&JobRoleID=0";
+        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID="+sideMenusModel.getComponentId()+"&ComponentInstanceID="+sideMenusModel.getRepositoryId()+"&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
 
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("COMPSKILLS", urlStr + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
 
     }
 
@@ -153,9 +151,14 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("FOURMSLIST")) {
-                    if (response != null) {
-
+                if (requestType.equalsIgnoreCase("COMPSKILLS")) {
+                    if (response != null && response.has("CompetencyList")) {
+                        try {
+                            db.injectCompetencyJobRoles(response);
+                            injectFromDbtoModel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                     } else {
 
@@ -203,13 +206,13 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
-
-        discussionFourmAdapter = new DiscussionFourmAdapter(getActivity(), BIND_ABOVE_CLIENT, discussionForumModelList);
-        discussionFourmlistView.setAdapter(discussionFourmAdapter);
+        competencyJobRolesList = new ArrayList<CompetencyJobRoles>();
+        competencyJobRoleAdapter = new CompetencyJobRoleAdapter(getActivity(), BIND_ABOVE_CLIENT, competencyJobRolesList);
+        discussionFourmlistView.setAdapter(competencyJobRoleAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
         discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        discussionForumModelList = new ArrayList<DiscussionForumModel>();
+
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
@@ -230,14 +233,15 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
 
     public void injectFromDbtoModel() {
-        if (discussionForumModelList != null) {
-            discussionFourmAdapter.refreshList(discussionForumModelList);
+
+        competencyJobRolesList = db.fetchCompetencyJobSkills();
+
+        if (competencyJobRolesList != null) {
+            competencyJobRoleAdapter.refreshList(competencyJobRolesList);
         } else {
-            discussionForumModelList = new ArrayList<DiscussionForumModel>();
-            discussionFourmAdapter.refreshList(discussionForumModelList);
+            competencyJobRolesList = new ArrayList<CompetencyJobRoles>();
+            competencyJobRoleAdapter.refreshList(competencyJobRolesList);
         }
-
-
     }
 
     public void initilizeView() {
@@ -309,60 +313,17 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        switch (view.getId()) {
-            case R.id.card_view:
-                break;
-            default:
-        }
+        Intent intentDetail = new Intent(context, CompetencyCatSkillActivity.class);
+        intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+        intentDetail.putExtra("JOBROLEID", competencyJobRolesList.get(position).jobRoleID);
+        intentDetail.putExtra("JOBROLENAME", competencyJobRolesList.get(position).jobRoleName);
+        startActivity(intentDetail);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
-
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
-        final View myView = getActivity().findViewById(viewID);
-        int width = myView.getWidth();
-        if (posFromRight > 0)
-            width -= (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material)) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
-        if (containsOverflow)
-            width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
-        int cx = width;
-        int cy = myView.getHeight() / 2;
-
-        Animator anim;
-        if (isShow)
-            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, (float) width);
-        else
-            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, (float) width, 0);
-        anim.setDuration((long) 400);
-        // make the view invisible when the animation is done
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (!isShow) {
-                    super.onAnimationEnd(animation);
-                    myView.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-        // make the view visible and start the animation
-        if (isShow)
-            myView.setVisibility(View.VISIBLE);
-
-        // start the animation
-        anim.start();
-
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
     }
 

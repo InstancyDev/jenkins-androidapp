@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -14,7 +15,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.text.Spanned;
@@ -26,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1138,6 +1143,31 @@ public class Utilities {
                         Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    public static void setCursorColor(EditText view, @ColorInt int color) {
+        try {
+            // Get the cursor resource id
+            Field field = TextView.class.getDeclaredField("mCursorDrawableRes");
+            field.setAccessible(true);
+            int drawableResId = field.getInt(view);
+
+            // Get the editor
+            field = TextView.class.getDeclaredField("mEditor");
+            field.setAccessible(true);
+            Object editor = field.get(view);
+
+            // Get the drawable and set a color filter
+            Drawable drawable = ContextCompat.getDrawable(view.getContext(), drawableResId);
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            Drawable[] drawables = {drawable, drawable};
+
+            // Set the drawables
+            field = editor.getClass().getDeclaredField("mCursorDrawable");
+            field.setAccessible(true);
+            field.set(editor, drawables);
+        } catch (Exception ignored) {
+        }
     }
 
 }

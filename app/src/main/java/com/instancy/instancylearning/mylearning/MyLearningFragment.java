@@ -106,6 +106,7 @@ import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGME
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.setCursorColor;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 
@@ -549,6 +550,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //            searchView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
+//            setCursorColor(txtSearch,Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
