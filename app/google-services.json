@@ -8,12 +8,51 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:1032432174237:android:d00d5b5e619f3f9e",
+        "android_client_info": {
+          "package_name": "com.instancy.development"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJCQmdYix-Kxu1Q3a2KZEBPMv_xq4YOG4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:1032432174237:android:592cc9e861ec11ab",
         "android_client_info": {
           "package_name": "com.instancy.enterpriselearninglite"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
+        },
         {
           "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
           "client_type": 3
@@ -48,6 +87,10 @@
         {
           "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -79,6 +122,10 @@
         {
           "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -107,6 +154,10 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
+        },
         {
           "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
           "client_type": 3
@@ -153,6 +204,10 @@
             "package_name": "com.instancy.trainingcompany",
             "certificate_hash": "cc3ba6db21b5c7326a97706adfbb873e53bd9de3"
           }
+        },
+        {
+          "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "1032432174237-uha3t0ut21plkpc2pgqi59usus2ng63j.apps.googleusercontent.com",

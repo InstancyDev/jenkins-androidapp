@@ -2,11 +2,15 @@ package com.instancy.instancylearning.profile;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
@@ -117,12 +121,20 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         pView = inflater.inflate(R.layout.profilesectionview, parent, false);
+
+        RelativeLayout headerlayout = (RelativeLayout) pView.findViewById(R.id.relativelayout);
+
         View view = (View) pView.findViewById(R.id.topview);
+
+        Drawable mDrawable = context.getResources().getDrawable(R.drawable.sectionshape);
+        mDrawable.setColorFilter(new
+                PorterDuffColorFilter(Color.parseColor(uiSettingsModel.getAppBGColor()), PorterDuff.Mode.MULTIPLY));
+        headerlayout.setBackground(mDrawable);
 
         TextView editIcon = (TextView) pView
                 .findViewById(R.id.editoptionicon);
 
-        editIcon.setVisibility(View.GONE);
+        editIcon.setVisibility(View.VISIBLE);
 
         editIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
@@ -147,8 +159,6 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             editIcon.setText(pView.getResources().getString(R.string.fa_icon_edit));
         }
 
-//        pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-
         return pView;
 
     }
@@ -168,7 +178,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         cView = inflater.inflate(R.layout.profile_education_item, parent, false);
 //        }
-
+//
 
         TextView profileSchool = (TextView) cView
                 .findViewById(R.id.profile_school);
@@ -206,11 +216,23 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
         }
-//        cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         if (isLastChild) {
-            cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitembottom));
+//            cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitembottom));
+
+            Drawable mDrawable = context.getResources().getDrawable(R.drawable.profileitembottom);
+            mDrawable.setColorFilter(new
+                    PorterDuffColorFilter(Color.parseColor(uiSettingsModel.getAppBGColor()), PorterDuff.Mode.MULTIPLY));
+            cView.setBackground(mDrawable);
+
         } else {
-            cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitemmiddle));
+//            cView.setBackground(cView.getResources().getDrawable(R.drawable.profileitemmiddle));
+//            cView.getBackground().setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderColor()), PorterDuff.Mode.DARKEN);
+
+            Drawable mDrawable = context.getResources().getDrawable(R.drawable.profileitemmiddle);
+            mDrawable.setColorFilter(new
+                    PorterDuffColorFilter(Color.parseColor(uiSettingsModel.getAppBGColor()), PorterDuff.Mode.MULTIPLY));
+            cView.setBackground(mDrawable);
         }
 
 

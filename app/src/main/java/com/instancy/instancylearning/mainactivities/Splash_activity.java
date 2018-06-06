@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 
+import com.crashlytics.android.Crashlytics;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import io.fabric.sdk.android.Fabric;
 
 import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
@@ -89,6 +91,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
 
         db = new DatabaseHandler(context);
+        Fabric.with(this, new Crashlytics());
 
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:padding="15dp">
+
+    <RelativeLayout
+        android:id="@+id/morebtnlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <ImageButton
+            android:id="@+id/btn_contextmenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_more_vert_black_24dp" />
+
+        <TextView
+            android:id="@+id/btntxt_download"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@android:color/transparent"
+            android:gravity="left"
+            android:text="Skill"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/jobrolename"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/morebtnlayout"
+        android:layout_gravity="left"
+        android:gravity="left"
+        android:padding="5dp"
+        android:text="asasdas    "
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/jobdescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/jobrolename"
+        android:layout_gravity="left"
+        android:gravity="left"
+        android:padding="5dp"
+        android:text="some description"
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="16sp" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayoutscore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/jobdescription"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/txtself"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Self"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtself"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="2"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/txtmanager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Manager"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtmanager"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="2"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/txtcontent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Content"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtcontent"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="2"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/txtavarage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="Average"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtavarage"
+                android:layout_gravity="left"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="2"
+                android:textColor="@color/colorDarkGrey"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayoutscore"
+        android:gravity="center">
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/piechart"
+            android:layout_width="230dp"
+            android:layout_height="230dp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

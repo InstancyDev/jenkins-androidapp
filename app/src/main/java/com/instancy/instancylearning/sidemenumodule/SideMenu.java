@@ -672,10 +672,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         textBtnBack.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
         sendMessagFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
 
-
+        notificationLayout.setVisibility(View.GONE);
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
             Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(bottomLogo);
             bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
+
         }
 
 

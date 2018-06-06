@@ -6,8 +6,10 @@ import android.support.multidex.MultiDexApplication;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
+import com.crashlytics.android.Crashlytics;
 import com.instancy.instancylearning.utils.ApiConstants;
 
+import io.fabric.sdk.android.Fabric;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -58,6 +60,7 @@ public class AppController extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         // initialize the singleton
 

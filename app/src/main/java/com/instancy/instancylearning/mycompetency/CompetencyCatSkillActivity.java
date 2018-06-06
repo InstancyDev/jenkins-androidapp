@@ -99,7 +99,8 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
 
     int jobRoleID = 0;
 
-    private static int lastClicked = -1;
+    private static int lastClicked = 0;
+    private static int lastClickedItems = -1;
 
     List<CompetencyCategoryModel> competencyCategoryModelList = null;
     ExpandableListView skillSetListView;
@@ -160,6 +161,9 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 //                Toast.makeText(CompetencyCatSkillActivity.this, "Here groupPosition " + competencyCategoryModelList.get(groupPosition).prefCategoryTitle, Toast.LENGTH_SHORT).show();
                 if (lastClicked != groupPosition) {
+                    skillModelList = new ArrayList<>();
+                    competencyCatSkillAdapter.refreshList(competencyCategoryModelList, skillModelList);
+
                     refreshChildslist(competencyCategoryModelList.get(groupPosition));
                 }
 
@@ -174,11 +178,10 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
 
             @Override
             public void onGroupExpand(int groupPosition) {
-                if (lastClicked != -1
-                        && groupPosition != lastClicked) {
-                    skillSetListView.collapseGroup(lastClicked);
+                if (lastClickedItems != -1 && groupPosition != lastClickedItems) {
+                    skillSetListView.collapseGroup(lastClickedItems);
                 }
-                lastClicked = groupPosition;
+                lastClickedItems = groupPosition;
             }
         });
 
@@ -311,6 +314,14 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
             if (skillsSetObj.has("SkillName")) {
 
                 skillModel.skillName = skillsSetObj.optString("SkillName");
+                skillModel.skillDescription = skillsSetObj.optString("Description");
+                skillModel.jobRoleID = skillsSetObj.optString("JobRoleID");
+                skillModel.gapScore = skillsSetObj.optDouble("Gap");
+                skillModel.managerScore = skillsSetObj.optInt("ManagersEvaluation");
+                skillModel.contentAuthorScore = skillsSetObj.optDouble("ContentEval");
+                skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
+                skillModel.skillID = skillsSetObj.optString("SkillID");
+                skillModel.prefCategoryID = skillsSetObj.optString("JobRoleID");
             }
 
             skillModelList.add(skillModel);

@@ -46,6 +46,10 @@
     <color name="black">#3b4144</color>
     <color name="calendarBackgroundColor">#FFFFFF</color>
 
+    <color name="piechartred">#FF3333</color>
+    <color name="piechartgreen">#92D050</color>
+    <color name="piechartcircle">#CDE585</color>
+
     <!-- Fonts -->
     <color name="monthTitleColor">#161d20</color>
     <color name="dayOfWeekColor">#161d20</color>
