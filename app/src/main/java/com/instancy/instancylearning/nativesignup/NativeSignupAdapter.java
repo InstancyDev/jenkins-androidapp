@@ -337,7 +337,6 @@ public class NativeSignupAdapter extends BaseAdapter {
                 spin.setSelection(i);
             }
         }
-
     }
 
     public int returnHide(String whichKeyboard) {

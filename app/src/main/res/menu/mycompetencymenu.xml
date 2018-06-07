@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".mycompetency.CompetencyCatSkillActivity">
+
+    <item
+        android:id="@+id/ctx_viewcontent"
+        android:orderInCategory="100"
+        android:title="View Content" />
+    <item
+        android:id="@+id/ctx_save"
+        android:orderInCategory="100"
+        android:title="Save" />
+
+
+</menu>
+

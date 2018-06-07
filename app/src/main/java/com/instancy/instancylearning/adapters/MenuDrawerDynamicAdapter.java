@@ -193,7 +193,6 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
                 expTxtIcon.setVisibility(View.VISIBLE);
                 expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
-
         }
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);

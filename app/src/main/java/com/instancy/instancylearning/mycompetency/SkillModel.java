@@ -1,5 +1,7 @@
 package com.instancy.instancylearning.mycompetency;
 
+import org.json.JSONArray;
+
 import java.io.Serializable;
 
 /**
@@ -18,11 +20,13 @@ public class SkillModel implements Serializable {
     public String userPictureURL = "";
     public String managerPictureURL = "";
     public String contentAuthorPictureURL = "";
+    public double requiredProficiency = 0.0;
     public int requiredScore = 0;
     public String valueName = "";
     public double gapScore = 0.0;
+    public double weightedAverage = 0.0;
     public int userScore = 100;
     public int managerScore = 100;
     public double contentAuthorScore = 0.0;
-
+    public JSONArray requiredProfArys = null ;
 }

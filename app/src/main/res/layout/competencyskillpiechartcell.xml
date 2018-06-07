@@ -26,6 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@+id/btn_contextmenu"
             android:background="@android:color/transparent"
             android:gravity="left"
             android:text="Skill"
@@ -43,7 +44,7 @@
         android:gravity="left"
         android:padding="5dp"
         android:text="asasdas    "
-        android:textColor="@color/colorDarkGrey"
+        android:textColor="@color/black"
         android:textSize="18sp" />
 
     <TextView
@@ -55,7 +56,7 @@
         android:gravity="left"
         android:padding="5dp"
         android:text="some description"
-        android:textColor="@color/colorDarkGrey"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
 
@@ -81,7 +82,7 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Self"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <TextView
@@ -92,8 +93,17 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="2"
-                android:textColor="@color/colorDarkGrey"
-                android:textSize="16sp" />
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/spnrScore"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_below="@+id/txtself"
+                android:background="@drawable/edittext_border"
+                android:padding="10dp"> </Spinner>
 
         </RelativeLayout>
 
@@ -111,10 +121,11 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Manager"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/txtMgScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txtmanager"
@@ -122,7 +133,7 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="2"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
         </RelativeLayout>
@@ -141,10 +152,11 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Content"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/txtCntScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txtcontent"
@@ -152,7 +164,7 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="2"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
         </RelativeLayout>
@@ -171,10 +183,11 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="Average"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/txtAvgScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txtavarage"
@@ -182,13 +195,12 @@
                 android:gravity="center"
                 android:padding="5dp"
                 android:text="2"
-                android:textColor="@color/colorDarkGrey"
+                android:textColor="@color/black"
                 android:textSize="16sp" />
 
         </RelativeLayout>
 
     </LinearLayout>
-
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -198,8 +210,8 @@
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/piechart"
-            android:layout_width="230dp"
-            android:layout_height="230dp" />
+            android:layout_width="245dp"
+            android:layout_height="245dp" />
 
     </RelativeLayout>
 

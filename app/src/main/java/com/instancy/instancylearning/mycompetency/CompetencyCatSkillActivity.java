@@ -155,7 +155,6 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
         skillSetListView.setAdapter(competencyCatSkillAdapter);
         skillSetListView.setOnItemClickListener(this);
         skillSetListView.setEmptyView(findViewById(R.id.nodata_label));
-
         skillSetListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
@@ -320,8 +319,14 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.managerScore = skillsSetObj.optInt("ManagersEvaluation");
                 skillModel.contentAuthorScore = skillsSetObj.optDouble("ContentEval");
                 skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
+                skillModel.valueName = skillsSetObj.optString("UserEvaluation");
                 skillModel.skillID = skillsSetObj.optString("SkillID");
                 skillModel.prefCategoryID = skillsSetObj.optString("JobRoleID");
+                skillModel.weightedAverage = skillsSetObj.optDouble("WeightedAverage");
+                skillModel.requiredProficiency = skillsSetObj.optDouble("RequiredProficiency");
+                skillModel.requiredProfArys = skillsSetObj.optJSONArray("RequiredProfValues");
+
+
             }
 
             skillModelList.add(skillModel);
@@ -386,7 +391,6 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
         }
 
     }
-
 
     @Override
     protected void onResume() {
