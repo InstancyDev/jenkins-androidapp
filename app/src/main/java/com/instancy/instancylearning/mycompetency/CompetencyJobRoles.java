@@ -11,5 +11,5 @@ public class CompetencyJobRoles implements Serializable {
     public String jobRoleDescription = "";
     public String jobRoleName = "";
     public int jobRoleID = 0;
-
+    public String jobTag = "";
 }

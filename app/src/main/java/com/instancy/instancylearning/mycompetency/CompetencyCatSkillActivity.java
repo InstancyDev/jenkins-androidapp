@@ -69,6 +69,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,7 +96,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
     VollyService vollyService;
     IResult resultCallback = null;
     DatabaseHandler db;
-    String jobRoleName = "";
+    String jobRoleName = "", jobTag = "";
 
     int jobRoleID = 0;
 
@@ -140,6 +141,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("SIDEMENUMODEL");
         jobRoleID = getIntent().getIntExtra("JOBROLEID", 0);
         jobRoleName = getIntent().getStringExtra("JOBROLENAME");
+        jobTag = getIntent().getStringExtra("JOBTAG");
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -147,11 +149,10 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 "" + jobRoleName + "</font>"));
-
         competencyCategoryModelList = new ArrayList<CompetencyCategoryModel>();
 
         skillSetListView = (ExpandableListView) findViewById(R.id.mycompetencylist);
-        competencyCatSkillAdapter = new CompetencyCatSkillAdapter(this, BIND_ABOVE_CLIENT, competencyCategoryModelList);
+        competencyCatSkillAdapter = new CompetencyCatSkillAdapter(this, BIND_ABOVE_CLIENT, competencyCategoryModelList, jobTag, appUserModel, sideMenusModel);
         skillSetListView.setAdapter(competencyCatSkillAdapter);
         skillSetListView.setOnItemClickListener(this);
         skillSetListView.setEmptyView(findViewById(R.id.nodata_label));
@@ -316,25 +317,33 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.skillDescription = skillsSetObj.optString("Description");
                 skillModel.jobRoleID = skillsSetObj.optString("JobRoleID");
                 skillModel.gapScore = skillsSetObj.optDouble("Gap");
-                skillModel.managerScore = skillsSetObj.optInt("ManagersEvaluation");
+                skillModel.managerScore = skillsSetObj.optDouble("ManagersEvaluation");
                 skillModel.contentAuthorScore = skillsSetObj.optDouble("ContentEval");
-                skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
+                skillModel.userScore = skillsSetObj.optDouble("UserEvaluation");
                 skillModel.valueName = skillsSetObj.optString("UserEvaluation");
                 skillModel.skillID = skillsSetObj.optString("SkillID");
                 skillModel.prefCategoryID = skillsSetObj.optString("JobRoleID");
                 skillModel.weightedAverage = skillsSetObj.optDouble("WeightedAverage");
                 skillModel.requiredProficiency = skillsSetObj.optDouble("RequiredProficiency");
                 skillModel.requiredProfArys = skillsSetObj.optJSONArray("RequiredProfValues");
-
-
             }
-
             skillModelList.add(skillModel);
         }
-
+        averageTheValues();
         competencyCatSkillAdapter.refreshList(competencyCategoryModelList, skillModelList);
-
     }
+
+    public void averageTheValues() {
+        DecimalFormat df2 = new DecimalFormat(".#");
+        for (int i = 0; i < skillModelList.size(); i++) {
+
+            //            DecimalFormat df = new DecimalFormat("#.#");
+//            df.format(averageScore);
+            double averageValue = (skillModelList.get(i).userScore + skillModelList.get(i).managerScore + skillModelList.get(i).contentAuthorScore) / 3.0;
+            skillModelList.get(i).weightedAverage = Double.parseDouble(df2.format(averageValue));
+        }
+    }
+
 
     @Override
     public void onBackPressed() {

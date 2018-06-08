@@ -317,6 +317,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
         intentDetail.putExtra("JOBROLEID", competencyJobRolesList.get(position).jobRoleID);
         intentDetail.putExtra("JOBROLENAME", competencyJobRolesList.get(position).jobRoleName);
+        intentDetail.putExtra("JOBTAG", competencyJobRolesList.get(position).jobTag);
         startActivity(intentDetail);
     }
 

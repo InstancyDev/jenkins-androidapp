@@ -451,8 +451,6 @@ public class NativeSignupActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                 }
-
-
             } else {
                 Toast.makeText(context, "Accept terms of use ", Toast.LENGTH_SHORT).show();
             }

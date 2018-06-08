@@ -2,10 +2,12 @@ package com.instancy.instancylearning.mycompetency;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.PopupMenu;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,34 +22,48 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.animation.Easing;
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.MPPointF;
+
+
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.catalogfragment.CatalogFragmentActivity;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.nativesignup.NativeSignupAdapter;
-import com.instancy.instancylearning.utils.StaticValues;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
 
 public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
     Context ctx;
@@ -55,15 +71,21 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
     private HashMap<Integer, List<CompetencyCategoryModel>> subMenuList;
     private List<SkillModel> skillModelList;
     Typeface iconFon;
-
+    String jobTagId = "";
+    AppUserModel appUserModel = null;
+    SideMenusModel sideMenusModel = null;
     UiSettingsModel uiSettingsModel;
     List<String> scoreList;
+    VollyService vollyService;
+    IResult resultCallback = null;
+    private static DecimalFormat df2 = new DecimalFormat(".#");
 
     public void refreshList(List<CompetencyCategoryModel> mainMenuList, List<SkillModel> skillModelList) {
         this.mainMenuList = mainMenuList;
         this.skillModelList = skillModelList;
         this.notifyDataSetChanged();
         iconFon = FontManager.getTypeface(ctx, FontManager.FONTAWESOME);
+
     }
 
     public HashMap<Integer, List<CompetencyCategoryModel>> getSubMenuList() {
@@ -71,16 +93,18 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
     }
 
 
-    public CompetencyCatSkillAdapter(Context ctx, int resource,
-                                     List<CompetencyCategoryModel> mainMenuList) {
+    public CompetencyCatSkillAdapter(Context ctx, int resource, List<CompetencyCategoryModel> mainMenuList, String jobTagId, AppUserModel appUserModel, SideMenusModel sideMenusModel) {
 
         this.ctx = ctx;
         this.subMenuList = subMenuList;
         this.mainMenuList = mainMenuList;
-
+        this.appUserModel = appUserModel;
+        this.sideMenusModel = sideMenusModel;
+        this.jobTagId = jobTagId;
         uiSettingsModel = UiSettingsModel.getInstance();
         scoreList = new ArrayList<>();
 
+        vollyService = new VollyService(resultCallback, ctx);
     }
 
     @Override
@@ -200,6 +224,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         }
         holder.parent = parentView;
         holder.getPosition = childPosition;
+        holder.categoryModel = mainMenuList.get(parentPosition);
 //        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 //        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
@@ -242,18 +267,15 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
         holder.mChart.setEntryLabelTextSize(12f);
         holder.txtJobRole.setText(skillModelList.get(childPosition).skillName);
-
         holder.txtjobDescription.setText(skillModelList.get(childPosition).skillDescription);
-
         holder.txtAvgScore.setText("" + skillModelList.get(childPosition).weightedAverage);
         holder.txtContentScore.setText("" + skillModelList.get(childPosition).contentAuthorScore);
         holder.txtManagerScore.setText("" + skillModelList.get(childPosition).managerScore);
-
         holder.spnrScore.setAdapter(holder.getAdapter(childPosition));
 
         setSpinText(holder.spnrScore, skillModelList.get(childPosition).valueName);
 
-//            profileConfigsModelList.get(position).valueName = holder.getText();
+//      profileConfigsModelList.get(position).valueName = holder.getText();
 
         holder.spnrScore.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -262,6 +284,12 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
                                        long id) {
 
                 skillModelList.get(childPosition).valueName = scoreList.get(spnrPosition);
+                try {
+                    skillModelList.get(childPosition).userScore = Integer.parseInt(scoreList.get(spnrPosition));
+                } catch (NumberFormatException ex) {
+                    skillModelList.get(childPosition).userScore = 1;
+                }
+
             }
 
             @Override
@@ -335,7 +363,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
     class ViewHolder {
 
         private ArrayAdapter<String> spinnerAdapter;
-
+        CompetencyCategoryModel categoryModel;
         public int getPosition;
         public ViewGroup parent;
 
@@ -421,12 +449,12 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         @OnClick({R.id.btn_contextmenu})
         public void actionsForMenu(View view) {
 
-            mycompetencyContextMenuMethod(view, btnContextMenu, getPosition);
+            mycompetencyContextMenuMethod(view, btnContextMenu, getPosition, categoryModel);
         }
 
     }
 
-    public static void mycompetencyContextMenuMethod(final View v, ImageButton btnselected, final int position) {
+    public void mycompetencyContextMenuMethod(final View v, ImageButton btnselected, final int position, final CompetencyCategoryModel categoryModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -443,15 +471,21 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
                 if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
 
-                    Toast.makeText(v.getContext(), "clicked " + position, Toast.LENGTH_SHORT).show();
+                    Intent intentDetail = new Intent(ctx, CatalogFragmentActivity.class);
+                    intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+                    intentDetail.putExtra("ISFROMMYCOMPETENCY", true);
+                    ctx.startActivity(intentDetail);
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Save")) {
 
-                    Toast.makeText(v.getContext(), "clicked Save " + position, Toast.LENGTH_SHORT).show();
-
+                    String skillValueString = prepareTheSkillSetValueString();
+                    try {
+                        submitSkillData(skillValueString, categoryModel);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-
 
                 return true;
             }
@@ -467,4 +501,119 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         }
     }
 
+    public String prepareTheSkillSetValueString() {
+
+        String skillString = "";
+
+        for (int i = 0; i < skillModelList.size(); i++) {
+
+            skillString = skillString + "$" + skillModelList.get(i).skillID + "&" + skillModelList.get(i).jobRoleID + "&" + skillModelList.get(i).userScore + "&" + skillModelList.get(i).managerScore + "&" + jobTagId;
+
+        }
+        return skillString;
+    }
+
+    public void submitSkillData(String skillString, CompetencyCategoryModel categoryModel) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+
+        //mandatory
+        parameters.put("ComponentID", sideMenusModel.getComponentId());
+        parameters.put("ComponentInstanceID", sideMenusModel.getRepositoryId());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("PrefCategoryID", categoryModel.prefCategoryID);
+        parameters.put("JobRoleID", categoryModel.jobRoleID);
+        parameters.put("SkillSetValue", skillString);
+
+
+        String parameterString = parameters.toString();
+
+//
+//        String replaceDataString = parameterString.replace("\"", "\\\"");
+//        String addQuotes = ('"' + replaceDataString + '"');
+//
+        sendNewSignUpDetailsDataToServer(parameterString);
+    }
+
+
+    public void sendNewSignUpDetailsDataToServer(final String postData) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/CompetencyManagement/UpdateUserEvaluation";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+
+                        if (s.contains("true")) {
+                            averageTheValues();
+                        }
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(ctx, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(ctx);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void averageTheValues() {
+
+        for (int i = 0; i < skillModelList.size(); i++) {
+
+            //            DecimalFormat df = new DecimalFormat("#.#");
+//            df.format(averageScore);
+
+            double averageValue = (skillModelList.get(i).userScore + skillModelList.get(i).managerScore + skillModelList.get(i).contentAuthorScore) / 3.0;
+
+            skillModelList.get(i).weightedAverage = Double.parseDouble(df2.format(averageValue));
+        }
+        notifyDataSetChanged();
+    }
 }

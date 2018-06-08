@@ -540,7 +540,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_NATIVESIGNUP + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, datafieldname TEXT, aliasname TEXT, displaytext TEXT, groupid TEXT, displayorder INTEGER, attributeconfigid TEXT, isrequired TEXT, iseditable TEXT, enduservisibility TEXT, uicontroltypeid TEXT, siteid TEXT, ispublicfield TEXT, minlength TEXT, maxlength TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYJOBROLES + "(jobrolename TEXT, jobroleid INTEGER, description TEXT, userid TEXT, siteid TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYJOBROLES + "(jobrolename TEXT, jobroleid INTEGER, description TEXT, userid TEXT, siteid TEXT,tag TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYCATEGORYLIST + "(prefcategorytitle TEXT, prefcategoryid INTEGER, jobroleid INTEGER, userid TEXT, siteid TEXT)");
 
@@ -16351,6 +16351,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             String jobrolename = "";
             String jobroleid = "";
             String description = "";
+            String tagString = "";
 
             if (profilePrivObj.has("JobRoleName")) {
 
@@ -16367,6 +16368,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 description = profilePrivObj.optString("JobRoleDescription");
             }
 
+
+            if (profilePrivObj.has("Tag")) {
+
+                tagString = profilePrivObj.optString("Tag");
+            }
+
+
+
             ContentValues contentValues = null;
             try {
                 contentValues = new ContentValues();
@@ -16375,6 +16384,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 contentValues.put("description", description);
                 contentValues.put("userid", appUserModel.getUserIDValue());
                 contentValues.put("siteid", appUserModel.getSiteIDValue());
+                contentValues.put("tag",tagString);
 
                 db.insert(TBL_COMPETENCYJOBROLES, null, contentValues);
 
@@ -16405,10 +16415,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     competencyJobRoles.jobRoleName = (cursor.getString(cursor.getColumnIndex("jobrolename")));
                     competencyJobRoles.jobRoleID = (cursor.getInt(cursor.getColumnIndex("jobroleid")));
                     competencyJobRoles.jobRoleDescription = (cursor.getString(cursor.getColumnIndex("description")));
-
+                    competencyJobRoles.jobRoleDescription = (cursor.getString(cursor.getColumnIndex("description")));
+                    competencyJobRoles.jobTag=(cursor.getString(cursor.getColumnIndex("tag")));
                     competencyJobRolesList.add(competencyJobRoles);
-
-
                 }
             }
             cursor.close();

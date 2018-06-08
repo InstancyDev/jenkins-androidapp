@@ -210,6 +210,9 @@
             android:name=".mycompetency.CompetencyCatSkillActivity"
             android:screenOrientation="portrait"> </activity>
 
+        <activity
+            android:name=".catalogfragment.CatalogFragmentActivity"
+            android:screenOrientation="portrait"> </activity>
 
 
 

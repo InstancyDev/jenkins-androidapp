@@ -25,8 +25,8 @@ public class SkillModel implements Serializable {
     public String valueName = "";
     public double gapScore = 0.0;
     public double weightedAverage = 0.0;
-    public int userScore = 100;
-    public int managerScore = 100;
+    public double userScore = 0;
+    public double managerScore = 0;
     public double contentAuthorScore = 0.0;
     public JSONArray requiredProfArys = null ;
 }

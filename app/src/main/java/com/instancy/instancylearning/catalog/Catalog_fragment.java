@@ -170,6 +170,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     BillingProcessor billingProcessor;
     boolean isFromCatogories = false;
     boolean isFromPeopleListing = false;
+    boolean isFromMyCompetency = false;
     WebAPIClient webAPIClient;
 
     MembershipModel membershipModel = null;
@@ -261,6 +262,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             isFromPeopleListing = bundle.getBoolean("ISFROMPEOPELLISTING", false);
 
+            isFromMyCompetency = bundle.getBoolean("ISFROMMYCOMPETENCY", false);
+
             if (isFromNotification) {
 
                 contentIDFromNotification = bundle.getString("CONTENTID");
@@ -341,13 +344,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-    public void refreshMyCompetencyCatalog(String authorID) {
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+    public void refreshMyCompetencyCatalog() {
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=&AuthorID=" + authorID;
+
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=skills&fValue=4548";
 
         vollyService.getJsonObjResponseVolley("MYCMPTCY", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+
     }
 
 
@@ -380,6 +384,28 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                             catalogModelsList = generateCatalogForPeopleListing(response);
                             catalogAdapter.refreshList(catalogModelsList);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
+                if (requestType.equalsIgnoreCase("MYCMPTCY")) {
+                    if (response != null) {
+                        try {
+
+                            catalogModelsList = generateCatalogForPeopleListing(response);
+
+                            if (catalogModelsList.size() > 0) {
+                                catalogAdapter.refreshList(catalogModelsList);
+                            } else {
+                                nodata_Label.setText(getResources().getString(R.string.no_data));
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -501,7 +527,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
             BACKTOMAINSITE = 0;
         }
-        if (!isFromPeopleListing) {
+
+        if (isFromMyCompetency) {
+            swipeRefreshLayout.setEnabled(false);
+            refreshMyCompetencyCatalog();
+            CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+        } else if (!isFromPeopleListing) {
             if (!isFromCatogories) {
                 catalogModelsList = new ArrayList<MyLearningModel>();
                 if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
