@@ -56,6 +56,7 @@ public class NativeSignupAdapter extends BaseAdapter {
     private String TAG = NativeSignupAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
 
+    boolean countryChk = false;
 
     ArrayAdapter titleAdapter;
 
@@ -120,26 +121,30 @@ public class NativeSignupAdapter extends BaseAdapter {
             holder.getPosition = position;
 
             holder.labelField.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            holder.labelField.setVisibility(View.INVISIBLE);
             holder.txtAstrek.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             holder.labelField.setText(signUpConfigsModelList.get(position).displaytext);
+            holder.edit_field.setHint(signUpConfigsModelList.get(position).displaytext);
             holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
 //          holder.edit_field.setMaxLines(returnLines(signUpConfigsModelList.get(position).names));
-
 
             if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("6") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("-1")){
                 holder.edit_field.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 holder.edit_field.setTransformationMethod(PasswordTransformationMethod.getInstance());
             }
+        if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("18") ){
+            holder.edit_field.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
 
-            if (returnHide(signUpConfigsModelList.get(position).uicontroltypeid) == 1) {
+        if (signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("1")||signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("9") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("15")||signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("4")) {
                 holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
                 holder.edit_field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(signUpConfigsModelList.get(position).maxLenth)});
                 holder.txtDobClick.setVisibility(View.GONE);
                 holder.edit_field.setVisibility(View.VISIBLE);
                 holder.spnrCountries.setVisibility(View.GONE);
 
-            } else if (returnHide(signUpConfigsModelList.get(position).uicontroltypeid) == 3) {
+            } else if (signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("3")) {
 
                 holder.txtDobClick.setVisibility(View.GONE);
                 holder.edit_field.setVisibility(View.GONE);
@@ -149,7 +154,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 
                 holder.spnrCountries.setAdapter(holder.getAdapter(position));
 
-                setSpinText(holder.spnrCountries, signUpConfigsModelList.get(position).valueName);
+//                setSpinText(holder.spnrCountries, signUpConfigsModelList.get(position).valueName);
 
 //            profileConfigsModelList.get(position).valueName = holder.getText();
 
@@ -172,8 +177,14 @@ public class NativeSignupAdapter extends BaseAdapter {
 
                         } else {
 
-                            holder.setSelected(spnrPosition);
-                            signUpConfigsModelList.get(position).valueName = holder.getText();
+                            if (countryChk) {
+                                holder.setSelected(spnrPosition);
+                                signUpConfigsModelList.get(position).valueName = holder.getText();
+                            } else {
+                                countryChk = true;
+                            }
+
+
                         }
 
                     }
@@ -190,15 +201,15 @@ public class NativeSignupAdapter extends BaseAdapter {
 //            spinnerDgreType.setAdapter(titleAdapter);
 
             } else {
-                holder.txtDobClick.setText(signUpConfigsModelList.get(position).valueName);
                 holder.edit_field.setVisibility(View.GONE);
                 holder.txtDobClick.setVisibility(View.VISIBLE);
+                holder.txtDobClick.setText(signUpConfigsModelList.get(position).displaytext);
                 holder.spnrCountries.setVisibility(View.GONE);
                 holder.txtDobClick.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
-                        if (returnHide(signUpConfigsModelList.get(position).uicontroltypeid) == 2) {
+                        if (signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("8")) {
                             int mYear, mMonth, mDay;
                             final Calendar c = Calendar.getInstance();
                             mYear = c.get(Calendar.YEAR);
@@ -348,6 +359,7 @@ public class NativeSignupAdapter extends BaseAdapter {
                 returnValue = 1;
                 break;
             case "DatePicker":
+            case "DateOfBirth":
                 returnValue = 2;
                 break;
             case "DropDownList":

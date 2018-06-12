@@ -80,6 +80,8 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
 
             ex.printStackTrace();
         }
+
+
 //        webView.getSettings().setLoadWithOverviewMode(true);
 //        webView.getSettings().setUseWideViewPort(true);
 //        webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
@@ -94,6 +96,10 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
 //        webView.getSettings().setDomStorageEnabled(true);
 
         WebSettings webSettings = this.webView.getSettings();
+
+        if (actionBaritle.contains("Terms of use")){
+            webSettings.setBuiltInZoomControls(true);
+        }
 
         webSettings.setJavaScriptEnabled(true);
 //        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
@@ -112,6 +118,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
         webSettings.setAllowFileAccess(true);
         webSettings.setAllowUniversalAccessFromFileURLs(true);
         webSettings.setSupportZoom(true);
+
         webSettings.setPluginState(WebSettings.PluginState.ON);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -213,7 +220,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//                svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             }
 
             @Override

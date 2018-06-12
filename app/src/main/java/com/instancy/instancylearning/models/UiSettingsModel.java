@@ -7,7 +7,7 @@ package com.instancy.instancylearning.models;
 public class UiSettingsModel {
 
     // for acclife
-    private String brandingColor = "#C6A553";
+    private String brandingColor = "#5db100";
 
     private String appBackGroundColor = "#ffffff";
 
@@ -202,7 +202,7 @@ public class UiSettingsModel {
 
     }
 
-    private String appHeaderTextColor = "";
+    private String appHeaderTextColor = defaultTextColor;
 
     private String headerBGColor = "";
     private String listBGColor = "";
@@ -282,7 +282,7 @@ public class UiSettingsModel {
     }
 
     public String getHeaderTextColor() {
-        return appHeaderTextColor.isEmpty() ? "#ffffff" : appHeaderTextColor;
+        return appHeaderTextColor.isEmpty() ? defaultTextColor : appHeaderTextColor;
 //        return "#ffffff";
 
     }

@@ -53,6 +53,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +86,8 @@ public class NativeSignupActivity extends AppCompatActivity {
     RelativeLayout relativeLayout;
 
     UiSettingsModel uiSettingsModel;
+
+
 
 
     @Nullable
@@ -439,14 +442,16 @@ public class NativeSignupActivity extends AppCompatActivity {
                 //mandatory
                 parameters.put("UserGroupIDs", "");
                 parameters.put("RoleIDs", "");
-                parameters.put("CMGroupIDs", "");
                 parameters.put("Cmd", finalString);
-
+                parameters.put("CMGroupIDs", "");
                 String parameterString = parameters.toString();
                 Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
                 String replaceDataString = parameterString.replace("\"", "\\\"");
                 String addQuotes = ('"' + replaceDataString + '"');
+
+
+                Log.d(TAG, "validateDataFields: " + addQuotes);
 
                 if (isNetworkConnectionAvailable(this, -1)) {
                     sendNewSignUpDetailsDataToServer(addQuotes);
@@ -461,11 +466,19 @@ public class NativeSignupActivity extends AppCompatActivity {
     }
 
     public void sendNewSignUpDetailsDataToServer(final String postData) {
+
+        byte[] encrpt = new byte[0];
+        try {
+            encrpt = postData.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
         String apiURL = "";
-
-
         apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCreateSignUp?Locale=en-us&SiteURL=" + appUserModel.getSiteURL();
+
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+        final byte[] finalEncrpt = encrpt;
         final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -498,7 +511,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
             @Override
             public byte[] getBody() throws AuthFailureError {
-                return postData.getBytes();
+                return finalEncrpt;
             }
 
             @Override
@@ -517,7 +530,7 @@ public class NativeSignupActivity extends AppCompatActivity {
         RequestQueue rQueue = Volley.newRequestQueue(context);
         rQueue.add(request);
         request.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
+                50000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
@@ -551,7 +564,7 @@ public class NativeSignupActivity extends AppCompatActivity {
                     finish();
                 }
             }
-            Log.d(TAG, "autoLoginEnabled: " + usersignupdetailsAry);
+//            Log.d(TAG, "autoLoginEnabled: " + usersignupdetailsAry);
         } catch (Throwable t) {
             Log.e("My App", "Could not parse malformed JSON: \"" + responseStr + "\"");
         }
