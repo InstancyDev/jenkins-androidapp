@@ -41,6 +41,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -97,6 +98,9 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
     DatabaseHandler db;
     @BindView(R.id.mycompetencylist)
     ListView discussionFourmlistView;
+
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
 
     CompetencyJobRoleAdapter competencyJobRoleAdapter;
     List<CompetencyJobRoles> competencyJobRolesList = null;
@@ -161,7 +165,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
                         }
 
                     } else {
-
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
                     }
                 }
 
@@ -236,11 +240,13 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
         competencyJobRolesList = db.fetchCompetencyJobSkills();
 
-        if (competencyJobRolesList != null) {
+        if (competencyJobRolesList != null &&competencyJobRolesList.size()>0) {
             competencyJobRoleAdapter.refreshList(competencyJobRolesList);
+
         } else {
             competencyJobRolesList = new ArrayList<CompetencyJobRoles>();
             competencyJobRoleAdapter.refreshList(competencyJobRolesList);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
     }
 

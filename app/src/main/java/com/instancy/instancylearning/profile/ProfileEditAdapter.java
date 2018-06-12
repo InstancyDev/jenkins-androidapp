@@ -329,13 +329,13 @@ public class ProfileEditAdapter extends BaseAdapter {
     }
 
     public int returnLines(String linesRequired) {
-        int returnValue = 1;
+        int returnValue = 3;
         switch (linesRequired) {
             case "SingleLineTextField":
-                returnValue = 2;
+                returnValue = 3;
                 break;
             case "EmailTextField":
-                returnValue = 2;
+                returnValue = 3;
                 break;
             case "MultiLineTextField":
                 returnValue = 100;

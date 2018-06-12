@@ -69,6 +69,7 @@ import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStrin
 import static com.instancy.instancylearning.utils.Utilities.getIntFromMonth;
 import static com.instancy.instancylearning.utils.Utilities.getMonthFromint;
 import static com.instancy.instancylearning.utils.Utilities.getMonthName;
+import static com.instancy.instancylearning.utils.Utilities.hideSoftKeyboard;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -192,7 +193,8 @@ public class Experience_activity extends AppCompatActivity {
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
-            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         } catch (RuntimeException ex) {
 
             ex.printStackTrace();
@@ -295,10 +297,12 @@ public class Experience_activity extends AppCompatActivity {
                 finish();
                 break;
             case R.id.fromYearTextview:
+                hideSoftKeyboard(Experience_activity.this);
                 showOnlyYearAndMonth(1);
                 break;
 
             case R.id.toYearTextview:
+                hideSoftKeyboard(Experience_activity.this);
                 showOnlyYearAndMonth(2);
                 break;
             case R.id.chx_crnthere:

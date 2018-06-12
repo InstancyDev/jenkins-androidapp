@@ -51,6 +51,7 @@
             android:id="@+id/profilename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text=""
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
@@ -62,9 +63,9 @@
 
         <TextView
             android:id="@+id/userlocation"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text=""
             android:textColor="@color/colorWhite"
             android:textSize="14sp"

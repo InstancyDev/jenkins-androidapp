@@ -165,7 +165,9 @@ public class NativeSignupActivity extends AppCompatActivity {
 //                http://qalearning.instancysoft.com/content/SiteConfiguration/SiteID/TermsofUse_New.html
 
                 Intent intentSocial = new Intent(NativeSignupActivity.this, SocialWebLoginsActivity.class);
-                String imageUrl = "http://qalearning.instancysoft.com/content/SiteConfiguration/"+appUserModel.getSiteIDValue()+"/TermsofUse_New.html";
+//                String imageUrl = "http://qalearning.instancysoft.com/content/SiteConfiguration/"+appUserModel.getSiteIDValue()+"/TermsofUse_New.html";
+                String imageUrl = appUserModel.getSiteURL() + "/content/SiteConfiguration/" + appUserModel.getSiteIDValue() + "/TermsofUse_New.html";
+
                 intentSocial.putExtra("ATTACHMENT", true);
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, imageUrl);
                 intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Terms of use");

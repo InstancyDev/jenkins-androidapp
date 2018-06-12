@@ -35,6 +35,7 @@
             android:paddingTop="4dp"
             android:textStyle="bold"
             android:textSize="16sp"
+            android:lines="1"
             android:text="Android Studio"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 

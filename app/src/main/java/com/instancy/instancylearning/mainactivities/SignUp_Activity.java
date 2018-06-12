@@ -144,7 +144,7 @@ public class SignUp_Activity extends AppCompatActivity {
         });
 
 //		webview.loadUrl(editTextPreference + "logoff");
-        String url = appDefaultUrl + "nativemobile/Sign%20Up/nativesignup/true";
+        String url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true";
         Log.d("In setWebViewClient", "url: " + url);
         if (isNetworkConnectionAvailable(this, -1)) {
 

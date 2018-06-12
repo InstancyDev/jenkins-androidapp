@@ -70,13 +70,13 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-        applicationId "com.instancy.development"
-        versionCode 1
-        versionName "1.0"
+//        applicationId "com.instancy.development"
+//        versionCode 1
+//        versionName "1.0"
 
-//        applicationId "com.instancy.ppdlife"
-//        versionCode 5
-//        versionName "1.4"
+        applicationId "com.instancy.ppdlife"
+        versionCode 6
+        versionName "1.5"
 
 //        applicationId "com.instancy.healthhelp"
 //        versionCode 1

@@ -150,6 +150,9 @@ public class Education_activity extends AppCompatActivity {
 
     int fromYInt = 0, toYearInt = 0;
 
+    boolean fromCheck = false;
+    boolean toCheck = false;
+
     UserEducationModel userEducationModel;
 
     @Override
@@ -200,14 +203,14 @@ public class Education_activity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "     Education" + "</font>"));
+                "     Education" + "</font>"));//
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
-            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         } catch (RuntimeException ex) {
 
             ex.printStackTrace();
@@ -240,8 +243,12 @@ public class Education_activity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position,
                                        long id) {
-                Log.d(TAG, "onItemSelected: " + toYList.get(position));
-                toYearInt = Integer.parseInt(toYList.get(position));
+                if (toCheck) {
+                    toYearInt = Integer.parseInt(toYList.get(position));
+                } else {
+                    toCheck = true;
+                }
+
             }
 
             @Override
@@ -259,15 +266,18 @@ public class Education_activity extends AppCompatActivity {
                                        long id) {
 
                 Log.d(TAG, "onItemSelected: " + fromYList.get(position));
+                if (fromCheck) {
+                    fromYInt = Integer.parseInt(fromYList.get(position));
+                } else {
+                    fromCheck = true;
+                }
 
-                fromYInt = Integer.parseInt(fromYList.get(position));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
             }
-
 
         });
 
@@ -477,15 +487,23 @@ public class Education_activity extends AppCompatActivity {
         String degreeStr = edit_Degree.getText().toString().trim();
         String descriptionStr = editDescription.getText().toString().trim();
 
+        boolean isLEssthan = false;
+        if (fromYInt != 0 && toYearInt != 0) {
 
-        boolean isLEssthan = isGreater(fromYInt, toYearInt);
+            isLEssthan = isGreater(fromYInt, toYearInt);
+
+        }
 
         if (schoolStr.length() < 4) {
             Toast.makeText(this, "Enter school", Toast.LENGTH_SHORT).show();
         } else if (countryStr.length() < 3) {
             Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
-        } else if (degreeStr.length() < 3) {
+        } else if (degreeStr.length() < 2) {
             Toast.makeText(this, "Enter degree", Toast.LENGTH_SHORT).show();
+        } else if (fromYInt == 0) {
+            Toast.makeText(this, "Please select from year", Toast.LENGTH_SHORT).show();
+        } else if (toYearInt == 0) {
+            Toast.makeText(this, "Please select to year", Toast.LENGTH_SHORT).show();
         } else if (isLEssthan) {
             Toast.makeText(this, "Your To year can't be earlier or same than your From year ", Toast.LENGTH_SHORT).show();
         } else {

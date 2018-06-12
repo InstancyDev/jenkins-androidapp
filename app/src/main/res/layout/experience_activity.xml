@@ -250,7 +250,7 @@
             <EditText
                 android:id="@+id/edit_description"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/edittext_border"
                 android:gravity="top|start"
                 android:hint="Enter description here..."
@@ -296,7 +296,6 @@
             android:text="Save"
             android:textAlignment="center"
             android:textColor="@color/colorWhite" />
-
 
     </LinearLayout>
 </RelativeLayout>

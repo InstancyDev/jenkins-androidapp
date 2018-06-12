@@ -6,8 +6,10 @@
     android:orientation="vertical">
 
     <ScrollView
+        android:id="@+id/scroll1view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/bottomlayout"
         android:padding="4dp">
 
         <LinearLayout
@@ -262,7 +264,7 @@
             <EditText
                 android:id="@+id/edit_description"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/edittext_border"
                 android:gravity="top|start"
                 android:hint="Enter description here..."
@@ -272,7 +274,6 @@
         </LinearLayout>
 
     </ScrollView>
-
 
     <LinearLayout
         android:id="@+id/bottomlayout"
@@ -308,7 +309,6 @@
             android:text="Save"
             android:textAlignment="center"
             android:textColor="@color/colorWhite" />
-
 
     </LinearLayout>
 </RelativeLayout>
