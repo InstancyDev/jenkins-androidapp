@@ -66,6 +66,7 @@ import butterknife.OnClick;
 import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_PASSWORD;
 import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_USERNAME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidEmail;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
@@ -86,9 +87,6 @@ public class NativeSignupActivity extends AppCompatActivity {
     RelativeLayout relativeLayout;
 
     UiSettingsModel uiSettingsModel;
-
-
-
 
     @Nullable
     @BindView(R.id.txtsave)
@@ -406,8 +404,20 @@ public class NativeSignupActivity extends AppCompatActivity {
                 }
             }
 
+            if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15") ) {
+
+                if (isValidEmail(signUpConfigsModelList.get(i).valueName)){
+                    isValidationCompleted = true;
+                }else {
+                    isValidationCompleted = false;
+                    Toast.makeText(context, "Email is not valid", Toast.LENGTH_SHORT).show();
+                }
+            }
+
             if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("6")) {
                 passwordStr = signUpConfigsModelList.get(i).valueName;
+            } else {
+                passwordStr = uiSettingsModel.getCommonPasswordValue();
             }
         }
 
@@ -449,7 +459,6 @@ public class NativeSignupActivity extends AppCompatActivity {
 
                 String replaceDataString = parameterString.replace("\"", "\\\"");
                 String addQuotes = ('"' + replaceDataString + '"');
-
 
                 Log.d(TAG, "validateDataFields: " + addQuotes);
 

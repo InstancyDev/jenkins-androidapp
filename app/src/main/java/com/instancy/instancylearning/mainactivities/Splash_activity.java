@@ -272,9 +272,15 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     startActivity(intent);
 
                 } else {
-                    Intent intent = new Intent(this, Login_activity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                    if (uiSettingsModel.isEnableAzureSSOForLearner())
+                    {
+                        Intent intentSignup = new Intent(this, SignUp_Activity.class);
+                        startActivity(intentSignup);
+                    }else {
+                        Intent intent = new Intent(this, Login_activity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
 
                 }
 
@@ -431,9 +437,22 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                 startActivity(intent);
             } else {
 
-                Intent intent = new Intent(this, Login_activity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+
+                if (uiSettingsModel.isEnableAzureSSOForLearner())
+                {
+                    Intent intentSignup = new Intent(this, SignUp_Activity.class);
+                    startActivity(intentSignup);
+
+                }else {
+                    Intent intent = new Intent(this, Login_activity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+
+//
+//                Intent intent = new Intent(this, Login_activity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
 
             }
         }

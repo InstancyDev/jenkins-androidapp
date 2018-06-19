@@ -134,7 +134,7 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
         TextView editIcon = (TextView) pView
                 .findViewById(R.id.editoptionicon);
 
-        editIcon.setVisibility(View.GONE);
+        editIcon.setVisibility(View.VISIBLE);
 
         editIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 

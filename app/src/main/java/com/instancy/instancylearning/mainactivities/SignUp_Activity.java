@@ -62,7 +62,7 @@ public class SignUp_Activity extends AppCompatActivity {
         webSettings.setSupportZoom(true);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
-        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+        final UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
@@ -79,8 +79,15 @@ public class SignUp_Activity extends AppCompatActivity {
 
 
 //        final String appDefaultUrl = "http://sslcroplife.instancy.com/";
-
         final String appDefaultUrl = preferencesManager.getStringValue(StaticValues.KEY_SITEURL);
+
+        String url = "";
+
+        if (uiSettingsModel.isEnableAzureSSOForLearner()) {
+            url = appDefaultUrl + "nativemobile/Sign%20in";
+        } else {
+            url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true";
+        }
 
 
         webView.setWebViewClient(new WebViewClient() {
@@ -127,7 +134,7 @@ public class SignUp_Activity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 svProgressHUD.dismiss();
-                if (url.toLowerCase().contains("sign%20in") || url.toLowerCase().contains("sign in")) {
+                if ((url.toLowerCase().contains("sign%20in") || url.toLowerCase().contains("sign in")) && uiSettingsModel.isEnableAzureSSOForLearner()) {
                     Intent signinIntent = new Intent(SignUp_Activity.this, Login_activity.class);
                     startActivity(signinIntent);
                 }
@@ -144,7 +151,7 @@ public class SignUp_Activity extends AppCompatActivity {
         });
 
 //		webview.loadUrl(editTextPreference + "logoff");
-        String url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true";
+
         Log.d("In setWebViewClient", "url: " + url);
         if (isNetworkConnectionAvailable(this, -1)) {
 

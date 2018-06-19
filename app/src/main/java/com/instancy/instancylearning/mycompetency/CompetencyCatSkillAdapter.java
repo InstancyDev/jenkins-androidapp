@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -227,6 +228,12 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         holder.categoryModel = mainMenuList.get(parentPosition);
 //        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 //        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        if (!uiSettingsModel.isEnableContentEvaluation()){
+            holder.linearLayoutScore.setVisibility(View.GONE);
+            holder.mChart.setVisibility(View.GONE);
+        }
+
 
         holder.mChart.setUsePercentValues(true);
         holder.mChart.getDescription().setEnabled(false);
@@ -440,6 +447,9 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         @BindView(R.id.piechart)
         PieChart mChart;
 
+        @Nullable
+        @BindView(R.id.linearLayoutscore)
+        LinearLayout linearLayoutScore;
 
         @Nullable
         @BindView(R.id.spnrScore)
@@ -473,6 +483,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
                     Intent intentDetail = new Intent(ctx, CatalogFragmentActivity.class);
                     intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+                    intentDetail.putExtra("SKILLID",skillModelList.get(position).skillID);
                     intentDetail.putExtra("ISFROMMYCOMPETENCY", true);
                     ctx.startActivity(intentDetail);
                 }

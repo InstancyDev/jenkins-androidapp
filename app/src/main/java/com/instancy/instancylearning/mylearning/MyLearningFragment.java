@@ -106,9 +106,7 @@ import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGME
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.setCursorColor;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
-import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 
 /**
  * Created by Upendranath on 5/19/2017.
@@ -671,6 +669,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//            showCustomAlert(context);
         }
     }
 

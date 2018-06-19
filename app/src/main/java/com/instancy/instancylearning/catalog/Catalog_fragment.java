@@ -78,6 +78,7 @@ import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
+import com.instancy.instancylearning.mycompetency.SkillModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -216,6 +217,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     PeopleListingModel peopleListingModel;
 
+    String skillID="";
+
     public Catalog_fragment() {
 
 
@@ -274,6 +277,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 peopleListingModel = (PeopleListingModel) bundle.getSerializable("peopleListingModel");
 
             }
+
+            if (isFromMyCompetency) {
+
+                skillID = bundle.getString("SKILLID");
+
+            }
+
 
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
 
@@ -346,9 +356,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     public void refreshMyCompetencyCatalog() {
 
-
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=skills&fValue=4548";
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1"  + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=Skills&fValue="+skillID;
 
         vollyService.getJsonObjResponseVolley("MYCMPTCY", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
 
@@ -675,7 +684,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));

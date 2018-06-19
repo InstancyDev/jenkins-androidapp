@@ -210,8 +210,8 @@
 
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/piechart"
-            android:layout_width="245dp"
-            android:layout_height="245dp" />
+            android:layout_width="260dp"
+            android:layout_height="260dp" />
 
     </RelativeLayout>
 

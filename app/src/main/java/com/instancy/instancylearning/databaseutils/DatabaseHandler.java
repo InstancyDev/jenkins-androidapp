@@ -319,7 +319,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_NATIVEMENUS
@@ -920,6 +920,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AddProfileAdditionalTab"))) {
 
                                         uiSettingsModel.setAddProfileAdditionalTab(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("CommonPasswordValue"))) {
+
+                                        uiSettingsModel.setCommonPasswordValue(nativeSettingsObj.get("keyvalue").getAsString());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableAzureSSOForLearner"))) {
+
+                                        uiSettingsModel.setEnableAzureSSOForLearner(nativeSettingsObj.get("keyvalue").getAsBoolean());
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableContentEvaluation"))) {
+
+                                        uiSettingsModel.setEnableContentEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
                                     }
                                 }
                             }
@@ -962,12 +971,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                     }
 
-
                                 }
                             }
                         }
 
-                        Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());
+                        Log.d(TAG, "getNativeAppType: " + uiSettingsModel.getNativeAppType());//
 
                         insertIntoAppContentSettingsTable(uiSettingsModel, siteid, siteUrl);
                     }
@@ -979,113 +987,113 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public void insertIntoAppSettingsTable(UiSettingsModel uiSettingsModel, String siteid, String siteUrl) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
-        try {
-            String strExeQuery = "";
-            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName, AutoLaunchFirstContentInMyLearning , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL,AddProfileAdditionalTab )"
-                    + " VALUES ('"
-                    + uiSettingsModel.getAppTextColor()
-                    + "','"
-                    + uiSettingsModel.getAppBGColor()
-                    + "','"
-                    + uiSettingsModel.getMenuTextColor()
-                    + "','"
-                    + uiSettingsModel.getMenuBGColor()
-                    + "','"
-                    + uiSettingsModel.getSelectedMenuTextColor()
-                    + "','"
-                    + uiSettingsModel.getSelectedMenuBGColor()
-                    + "','"
-                    + uiSettingsModel.getListBGColor()
-                    + "','"
-                    + uiSettingsModel.getListBorderColor()
-                    + "','"
-                    + uiSettingsModel.getMenuHeaderBGColor()
-                    + "','"
-                    + uiSettingsModel.getMenuHeaderTextColor()
-                    + "','"
-                    + uiSettingsModel.getMenuBGAlternativeColor()
-                    + "','"
-                    + uiSettingsModel.getMenuBGSelectTextColor()
-                    + "','"
-                    + uiSettingsModel.getAppButtonBgColor()
-                    + "','"
-                    + uiSettingsModel.getAppButtonTextColor()
-                    + "','"
-                    + uiSettingsModel.getAppHeaderTextColor()
-                    + "','"
-                    + uiSettingsModel.getAppHeaderColor()
-                    + "','"
-                    + uiSettingsModel.getAppLoginBGColor()
-                    + "','"
-                    + uiSettingsModel.getAppLoginTextolor()
-                    + "','"
-                    + uiSettingsModel.getSelfRegistrationAllowed()
-                    + "','"
-                    + uiSettingsModel.getContentDownloadType()
-                    + "','"
-                    + uiSettingsModel.getCourseAppContent()
-                    + "','"
-                    + uiSettingsModel.getEnableNativeCatlog()
-                    + "','"
-                    + uiSettingsModel.getEnablePushNotification()
-                    + "','"
-                    + uiSettingsModel.getNativeAppType()
-                    + "','"
-                    + uiSettingsModel.getAutodownloadsizelimit()
-                    + "','"
-                    + uiSettingsModel.getCatalogContentDownloadType()
-                    + "','"
-                    + uiSettingsModel.getFileUploadButtonColor()
-                    + "','"
-                    + uiSettingsModel.getFirstTarget()
-                    + "','"
-                    + uiSettingsModel.getSecondTarget()
-                    + "','"
-                    + uiSettingsModel.getThirdTarget()
-                    + "','"
-                    + uiSettingsModel.getContentAssignment()
-                    + "','"
-                    + uiSettingsModel.getNewContentAvailable()
-                    + "','"
-                    + uiSettingsModel.getContentUnassigned()
-                    + "','"
-                    + uiSettingsModel.getEnableAppLogin()
-                    + "','"
-                    + uiSettingsModel.getNativeAppLoginLogo()
-                    + "','"
-                    + uiSettingsModel.getEnableBranding()
-                    + "','"
-                    + uiSettingsModel.getSignUpName()
-                    + "','"
-                    + uiSettingsModel.getAutoLaunchMyLearningFirst()
-                    + "','"
-                    + uiSettingsModel.getFirstEvent()
-                    + "','"
-                    + uiSettingsModel.getIsFaceBook()
-                    + "','"
-                    + uiSettingsModel.getIsLinkedIn()
-                    + "','"
-                    + uiSettingsModel.getIsGoogle()
-                    + "','"
-                    + uiSettingsModel.getIsTwitter()
-                    + "','"
-                    + siteid
-                    + "','"
-                    + siteUrl
-                    + "','"
-                    + uiSettingsModel.getAddProfileAdditionalTab()
-                    + "','"
-                    + "')";
-            db.execSQL(strExeQuery);
-        } catch (SQLiteException sqlEx) {
-            sqlEx.printStackTrace();
-
-        }
-        db.close();
-    }
+//    public void insertIntoAppSettingsTable(UiSettingsModel uiSettingsModel, String siteid, String siteUrl) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
+//        try {
+//            String strExeQuery = "";
+//            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName, AutoLaunchFirstContentInMyLearning , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL,AddProfileAdditionalTab )"
+//                    + " VALUES ('"
+//                    + uiSettingsModel.getAppTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppBGColor()
+//                    + "','"
+//                    + uiSettingsModel.getMenuTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getMenuBGColor()
+//                    + "','"
+//                    + uiSettingsModel.getSelectedMenuTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getSelectedMenuBGColor()
+//                    + "','"
+//                    + uiSettingsModel.getListBGColor()
+//                    + "','"
+//                    + uiSettingsModel.getListBorderColor()
+//                    + "','"
+//                    + uiSettingsModel.getMenuHeaderBGColor()
+//                    + "','"
+//                    + uiSettingsModel.getMenuHeaderTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getMenuBGAlternativeColor()
+//                    + "','"
+//                    + uiSettingsModel.getMenuBGSelectTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppButtonBgColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppButtonTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppHeaderTextColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppHeaderColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppLoginBGColor()
+//                    + "','"
+//                    + uiSettingsModel.getAppLoginTextolor()
+//                    + "','"
+//                    + uiSettingsModel.getSelfRegistrationAllowed()
+//                    + "','"
+//                    + uiSettingsModel.getContentDownloadType()
+//                    + "','"
+//                    + uiSettingsModel.getCourseAppContent()
+//                    + "','"
+//                    + uiSettingsModel.getEnableNativeCatlog()
+//                    + "','"
+//                    + uiSettingsModel.getEnablePushNotification()
+//                    + "','"
+//                    + uiSettingsModel.getNativeAppType()
+//                    + "','"
+//                    + uiSettingsModel.getAutodownloadsizelimit()
+//                    + "','"
+//                    + uiSettingsModel.getCatalogContentDownloadType()
+//                    + "','"
+//                    + uiSettingsModel.getFileUploadButtonColor()
+//                    + "','"
+//                    + uiSettingsModel.getFirstTarget()
+//                    + "','"
+//                    + uiSettingsModel.getSecondTarget()
+//                    + "','"
+//                    + uiSettingsModel.getThirdTarget()
+//                    + "','"
+//                    + uiSettingsModel.getContentAssignment()
+//                    + "','"
+//                    + uiSettingsModel.getNewContentAvailable()
+//                    + "','"
+//                    + uiSettingsModel.getContentUnassigned()
+//                    + "','"
+//                    + uiSettingsModel.getEnableAppLogin()
+//                    + "','"
+//                    + uiSettingsModel.getNativeAppLoginLogo()
+//                    + "','"
+//                    + uiSettingsModel.getEnableBranding()
+//                    + "','"
+//                    + uiSettingsModel.getSignUpName()
+//                    + "','"
+//                    + uiSettingsModel.getAutoLaunchMyLearningFirst()
+//                    + "','"
+//                    + uiSettingsModel.getFirstEvent()
+//                    + "','"
+//                    + uiSettingsModel.getIsFaceBook()
+//                    + "','"
+//                    + uiSettingsModel.getIsLinkedIn()
+//                    + "','"
+//                    + uiSettingsModel.getIsGoogle()
+//                    + "','"
+//                    + uiSettingsModel.getIsTwitter()
+//                    + "','"
+//                    + siteid
+//                    + "','"
+//                    + siteUrl
+//                    + "','"
+//                    + uiSettingsModel.getAddProfileAdditionalTab()
+//                    + "','"
+//                    + "')";
+//            db.execSQL(strExeQuery);
+//        } catch (SQLiteException sqlEx) {
+//            sqlEx.printStackTrace();
+//
+//        }
+//        db.close();
+//    }
 
     // Method for getting appsetting model from local sqlite db
 
@@ -1148,6 +1156,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("siteURL", siteUrl);
             contentValues.put("AddProfileAdditionalTab", uiSettingsModel.getAddProfileAdditionalTab());
             contentValues.put("contentUnassigned", uiSettingsModel.getContentUnassigned());
+
+            contentValues.put("EnableContentEvaluation", uiSettingsModel.isEnableContentEvaluation());
+            contentValues.put("CommonPasswordValue", uiSettingsModel.getCommonPasswordValue());
+            contentValues.put("EnableAzureSSOForLearner", uiSettingsModel.isEnableAzureSSOForLearner());
+            contentValues.put("AllowExpiredEventsSubscription", uiSettingsModel.isAllowExpiredEventsSubscription());
 
 
             db.insert(TBL_APP_SETTINGS, null, contentValues);
@@ -1289,6 +1302,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             uiSettingsModel.setAddProfileAdditionalTab(cursor.getString(cursor
                     .getColumnIndex("AddProfileAdditionalTab")));
 
+            uiSettingsModel.setEnableAzureSSOForLearner(cursor.getInt(cursor
+                    .getColumnIndex("EnableAzureSSOForLearner")) > 0);
+
+            uiSettingsModel.setEnableContentEvaluation(cursor.getInt(cursor
+                    .getColumnIndex("EnableContentEvaluation")) > 0);
+
+            uiSettingsModel.setCommonPasswordValue(cursor.getString(cursor
+                    .getColumnIndex("CommonPasswordValue")));
+
+            uiSettingsModel.setAllowExpiredEventsSubscription(cursor.getInt(cursor
+                    .getColumnIndex("AllowExpiredEventsSubscription")) > 0);
 
             Log.d(TAG, "getReportButtonTextColor: " + uiSettingsModel.getAppHeaderColor());
         }
@@ -4028,6 +4052,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setEventAddedToCalender(false);
 
+                    Log.d(TAG, "fetchEventCatalogModel: is event added " + myLearningModel.getAddedToMylearning() + "  with getCourseName  " + myLearningModel.getCourseName());
+
                     myLearningModelList.add(myLearningModel);
                 } while (cursor.moveToNext());
             }
@@ -5421,10 +5447,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public int updateEventStatus(MyLearningModel myLearningModel, JSONObject jsonObject) throws JSONException {
+    public int updateEventStatus(MyLearningModel myLearningModel, JSONObject jsonObject, boolean expired) throws JSONException {
         SQLiteDatabase db = this.getWritableDatabase();
         int status = -1;
+
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
+
         JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(0);
         if (jsonTableAry.length() > 0) {
             try {
@@ -14341,6 +14369,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("userid", notificationModel.userid);
             contentValues.put("siteurl", notificationModel.siteurl);
 
+
             db.insert(TBL_NOTIFICATIONS, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -16332,7 +16361,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
 
-        JSONArray jsonArrayJobRoles=jsonObject.getJSONArray("CompetencyList");
+        JSONArray jsonArrayJobRoles = jsonObject.getJSONArray("CompetencyList");
 
         try {
 
@@ -16375,7 +16404,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
 
 
-
             ContentValues contentValues = null;
             try {
                 contentValues = new ContentValues();
@@ -16384,7 +16412,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 contentValues.put("description", description);
                 contentValues.put("userid", appUserModel.getUserIDValue());
                 contentValues.put("siteid", appUserModel.getSiteIDValue());
-                contentValues.put("tag",tagString);
+                contentValues.put("tag", tagString);
 
                 db.insert(TBL_COMPETENCYJOBROLES, null, contentValues);
 
@@ -16402,7 +16430,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         List<CompetencyJobRoles> competencyJobRolesList = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSelQuery = "SELECT * FROM " + TBL_COMPETENCYJOBROLES + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid="+appUserModel.getSiteIDValue();
+        String strSelQuery = "SELECT * FROM " + TBL_COMPETENCYJOBROLES + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid=" + appUserModel.getSiteIDValue();
 
         try {
             Cursor cursor = null;
@@ -16416,7 +16444,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     competencyJobRoles.jobRoleID = (cursor.getInt(cursor.getColumnIndex("jobroleid")));
                     competencyJobRoles.jobRoleDescription = (cursor.getString(cursor.getColumnIndex("description")));
                     competencyJobRoles.jobRoleDescription = (cursor.getString(cursor.getColumnIndex("description")));
-                    competencyJobRoles.jobTag=(cursor.getString(cursor.getColumnIndex("tag")));
+                    competencyJobRoles.jobTag = (cursor.getString(cursor.getColumnIndex("tag")));
                     competencyJobRolesList.add(competencyJobRoles);
                 }
             }
@@ -16434,12 +16462,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return competencyJobRolesList;
     }
 
-    public void injectPrefCategoryList(JSONObject jsonObject,String jobRoleId) throws JSONException {
+    public void injectPrefCategoryList(JSONObject jsonObject, String jobRoleId) throws JSONException {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
 
-        JSONArray jsonArrayJobRoles=jsonObject.getJSONArray("PrefCategoryList");
+        JSONArray jsonArrayJobRoles = jsonObject.getJSONArray("PrefCategoryList");
 
         try {
 
@@ -16474,7 +16502,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 contentValues = new ContentValues();
                 contentValues.put("prefcategorytitle", prefcategorytitle);
                 contentValues.put("prefcategoryid", prefcategoryid);
-                contentValues.put("jobroleid",jobRoleId);
+                contentValues.put("jobroleid", jobRoleId);
                 contentValues.put("userid", appUserModel.getUserIDValue());
                 contentValues.put("siteid", appUserModel.getSiteIDValue());
 
@@ -16493,7 +16521,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         List<CompetencyCategoryModel> competencyCategoryModelList = new ArrayList<>();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSelQuery = "SELECT * FROM " + TBL_COMPETENCYCATEGORYLIST + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid="+appUserModel.getSiteIDValue();
+        String strSelQuery = "SELECT * FROM " + TBL_COMPETENCYCATEGORYLIST + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid=" + appUserModel.getSiteIDValue();
 
         try {
             Cursor cursor = null;

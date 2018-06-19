@@ -196,7 +196,6 @@ public class UiSettingsModel {
 
     private String selectedMenuBGColor = "";
 
-
     public void setAppHeaderTextColor(String appHeaderTextColor) {
         this.appHeaderTextColor = appHeaderTextColor;
 
@@ -250,9 +249,49 @@ public class UiSettingsModel {
 
     private String AddProfileAdditionalTab = "";
 
+    public String getCommonPasswordValue() {
+        return commonPasswordValue;
+    }
+
+    public void setCommonPasswordValue(String commonPasswordValue) {
+        this.commonPasswordValue = commonPasswordValue;
+    }
+
+    private String commonPasswordValue = "";
+
+
+    private boolean enableContentEvaluation = false;
+
+    private boolean enableAzureSSOForLearner = false;
+
+    private boolean allowExpiredEventsSubscription = false;
 
     public String getMenuTextColor() {
         return menuTextColor.isEmpty() ? "#000000" : menuTextColor;
+    }
+
+    public boolean isEnableContentEvaluation() {
+        return enableContentEvaluation;
+    }
+
+    public void setEnableContentEvaluation(boolean enableContentEvaluation) {
+        this.enableContentEvaluation = enableContentEvaluation;
+    }
+
+    public boolean isEnableAzureSSOForLearner() {
+        return enableAzureSSOForLearner;
+    }
+
+    public void setEnableAzureSSOForLearner(boolean enableAzureSSOForLearner) {
+        this.enableAzureSSOForLearner = enableAzureSSOForLearner;
+    }
+
+    public boolean isAllowExpiredEventsSubscription() {
+        return allowExpiredEventsSubscription;
+    }
+
+    public void setAllowExpiredEventsSubscription(boolean allowExpiredEventsSubscription) {
+        this.allowExpiredEventsSubscription = allowExpiredEventsSubscription;
     }
 
     public void setMenuTextColor(String menuTextColor) {

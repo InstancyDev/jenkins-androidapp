@@ -27,6 +27,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.mycompetency.SkillModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -47,6 +48,8 @@ public class CatalogFragmentActivity extends AppCompatActivity {
     UiSettingsModel uiSettingsModel;
     SideMenusModel sideMenusModel;
 
+    String skillID;
+
     private static final int CONTENT_VIEW_ID = 10101010;
 
     public CatalogFragmentActivity() {
@@ -59,6 +62,8 @@ public class CatalogFragmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("SIDEMENUMODEL");
+        skillID =getIntent().getStringExtra("SKILLID");
+
 
         FrameLayout frame = new FrameLayout(this);
         frame.setId(CONTENT_VIEW_ID);
@@ -70,6 +75,7 @@ public class CatalogFragmentActivity extends AppCompatActivity {
 
             Bundle bundle = new Bundle();
             bundle.putSerializable("sidemenumodel", sideMenusModel);
+            bundle.putSerializable("SKILLID",skillID);
             bundle.putBoolean("ISFROMCATEGORIES", false);
             bundle.putBoolean("ISFROMNOTIFICATIONS", false);
             bundle.putBoolean("ISFROMMYCOMPETENCY", true);

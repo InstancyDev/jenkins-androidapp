@@ -82,6 +82,7 @@ import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_TO
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
@@ -100,7 +101,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
 
     int jobRoleID = 0;
 
-    private static int lastClicked = 0;
+    private static int lastClicked = -1;
     private static int lastClickedItems = -1;
 
     List<CompetencyCategoryModel> competencyCategoryModelList = null;
@@ -137,7 +138,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
 
         swipeRefreshLayout.setOnRefreshListener(this);
         svProgressHUD = new SVProgressHUD(context);
-        lastClicked = 0;
+        lastClicked = 1;
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("SIDEMENUMODEL");
         jobRoleID = getIntent().getIntExtra("JOBROLEID", 0);
         jobRoleName = getIntent().getStringExtra("JOBROLENAME");
@@ -164,13 +165,17 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                     skillModelList = new ArrayList<>();
                     competencyCatSkillAdapter.refreshList(competencyCategoryModelList, skillModelList);
 
-                    refreshChildslist(competencyCategoryModelList.get(groupPosition));
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        refreshChildslist(competencyCategoryModelList.get(groupPosition));
+                    } else {
+                        showToast(context, "No Internet");
+                    }
+
                 }
 
                 lastClicked = groupPosition;
                 return false;
             }
-
 
         });
 

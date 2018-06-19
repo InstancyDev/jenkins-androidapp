@@ -184,7 +184,6 @@ public class NativeSignupAdapter extends BaseAdapter {
                                 countryChk = true;
                             }
 
-
                         }
 
                     }

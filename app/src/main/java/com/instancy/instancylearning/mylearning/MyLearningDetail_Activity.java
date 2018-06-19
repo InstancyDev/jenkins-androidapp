@@ -1690,7 +1690,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             try {
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
                                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                                    db.updateEventStatus(learningModel, jsonObj);
+                                    db.updateEventStatus(learningModel, jsonObj,true);
                                 }
                                 if (isInserted) {
                                     myLearningModel.setAddedToMylearning(1);

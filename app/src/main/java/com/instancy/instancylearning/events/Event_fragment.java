@@ -5,6 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 
 import android.content.ContentValues;
@@ -697,8 +700,22 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if (myLearningDetalData.isCompletedEvent()) {
 
-            menu.getItem(0).setVisible(true);//view
-            menu.getItem(1).setVisible(false);//enroll
+            if (myLearningDetalData.getAddedToMylearning() == 1) {
+
+                if (!myLearningDetalData.getRelatedContentCount().equalsIgnoreCase("0")) {
+                    menu.getItem(0).setVisible(true);
+                    menu.getItem(1).setVisible(false);//enroll
+
+                }
+            } else {
+                if (myLearningDetalData.getViewType().equalsIgnoreCase("2")){
+                    menu.getItem(1).setVisible(true);//enroll
+
+                }
+            }
+
+//                menu.getItem(0).setVisible(true);//view
+
             menu.getItem(2).setVisible(false);//buy
             menu.getItem(3).setVisible(true);//detail
             menu.getItem(4).setVisible(false);//cancel enrollment
@@ -750,9 +767,25 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        if (myLearningDetalData.isCompletedEvent()) {
 
-                    addToMyLearningCheckUser(myLearningDetalData, position, false);
+//                            addExpiredEventToMyLearning(myLearningDetalData, position);
+                            try {
+                                addExpiryEvets(myLearningDetalData, position);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            addToMyLearningCheckUser(myLearningDetalData, position, false);
+                        }
+                    }
+
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
+
+
+
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
 //                    addToMyLearningCheckUser(myLearningDetalData, position, true);
@@ -813,7 +846,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
 //                            contextMenuModelList.get(position).setAddedToMylearning(1);
-                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
+                            getMobileGetMobileContentMetaData(myLearningDetalData, position,true);
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             builder.setMessage(context.getString(R.string.event_add_success))
@@ -968,7 +1001,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position) {
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position, final boolean isExpired) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
@@ -986,11 +1019,12 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                             boolean isInserted = false;
                             try {
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
-                                db.updateEventStatus(learningModel, jsonObj);
+                                    db.updateEventStatus(learningModel, jsonObj,isExpired);
+
                                 if (isInserted) {
                                     contextMenuModelList.get(position).setAddedToMylearning(1);
                                     MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
-                                    injectFromDbtoModel(true);
+                                    injectFromDbtoModel(isExpired);
                                     final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                     builder.setMessage(context.getString(R.string.cat_add_success))
                                             .setCancelable(false)
@@ -1027,6 +1061,89 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
+
+
+//    public void addExpiredEventToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
+//
+//        if (isNetworkConnectionAvailable(context, -1)) {
+//            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
+//            if (isSubscribed) {
+//                Toast toast = Toast.makeText(
+//                        context,
+//                        context.getString(R.string.cat_add_already),
+//                        Toast.LENGTH_SHORT);
+//                toast.setGravity(Gravity.CENTER, 0, 0);
+//                toast.show();
+//            } else {
+//                String requestURL = appUserModel.getWebAPIUrl() + "/Catalog/AddExpiredContentToMyLearning?"
+//                        + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
+//                        + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
+//
+//                requestURL = requestURL.replaceAll(" ", "%20");
+//                Log.d(TAG, "inside catalog login : " + requestURL);
+//
+//                StringRequest strReq = new StringRequest(Request.Method.GET,
+//                        requestURL, new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        Log.d(TAG, "add to mylearning data " + response.toString());
+//                        if (response.equalsIgnoreCase("true")) {
+////                            contextMenuModelList.get(position).setAddedToMylearning(1);
+//                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
+//
+//                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//                            builder.setMessage(context.getString(R.string.event_add_success))
+//                                    .setCancelable(false)
+//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                        public void onClick(DialogInterface dialog, int id) {
+//                                            //do things
+//                                            dialog.dismiss();
+//                                            // add event to android calander
+//                                            addEventToAndroidDevice(myLearningDetalData);
+//                                            db.updateEventAddedToMyLearningInEventCatalog(contextMenuModelList.get(position), 1);
+//                                            injectFromDbtoModel(true);
+//
+//                                        }
+//                                    });
+//                            AlertDialog alert = builder.create();
+//                            alert.show();
+//
+//                        } else {
+//                            Toast toast = Toast.makeText(
+//                                    context, "Unable to process request",
+//                                    Toast.LENGTH_SHORT);
+//                            toast.setGravity(Gravity.CENTER, 0, 0);
+//                            toast.show();
+//
+//                        }
+//
+//                    }
+//                }, new Response.ErrorListener() {
+//
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+//
+//                    }
+//                }) {
+//                    @Override
+//                    public Map<String, String> getHeaders() throws AuthFailureError {
+//                        final Map<String, String> headers = new HashMap<>();
+//                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+//                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                        return headers;
+//                    }
+//                };
+//                ;
+//                VolleySingleton.getInstance(context).addToRequestQueue(strReq);
+//
+//            }
+//
+//        }
+//    }
+
+
+
 
 //    public void inAppActivityCall(MyLearningModel learningModel) {
 //        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
@@ -1410,7 +1527,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             contextMenuModelList.addAll(myLearningModelList);
         }
 
-        if (myLearningModelList.size()==0){
+        if (myLearningModelList.size() == 0) {
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
@@ -1606,4 +1723,127 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
+
+    public void addExpiryEvets(MyLearningModel catalogModel,int position) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+
+        //mandatory
+        parameters.put("SelectedContent",catalogModel.getContentID());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("SiteID", catalogModel.getSiteID());
+        parameters.put("OrgUnitID",catalogModel.getSiteID());
+        parameters.put("Locale", "en-us");
+
+        String parameterString = parameters.toString();
+        boolean isSubscribed = db.isSubscribedContent(catalogModel);
+        if (isSubscribed) {
+            Toast toast = Toast.makeText(
+                    context,
+                    context.getString(R.string.cat_add_already),
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        else {
+            sendExpiryEventData(parameterString,position,catalogModel);
+        }
+    }
+
+    public void sendExpiryEventData(final String postData, final int position, final MyLearningModel catalogModel) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/Catalog/AddExpiredContentToMyLearning";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+
+                        if (s.contains("true")) {
+// ------------------------- old code here
+
+                            getMobileGetMobileContentMetaData(catalogModel, position,false);
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(context.getString(R.string.event_add_success))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                            // add event to android calander
+                                            addEventToAndroidDevice(catalogModel);
+                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+                                            injectFromDbtoModel(false);
+
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    context, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+//--------------------------- old code end here
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
 }

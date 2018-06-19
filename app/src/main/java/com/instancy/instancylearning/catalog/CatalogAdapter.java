@@ -193,7 +193,6 @@ public class CatalogAdapter extends BaseAdapter {
         Drawable progress = holder.ratingBar.getProgressDrawable();
         DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
         // apply colors
 
         holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -203,9 +202,6 @@ public class CatalogAdapter extends BaseAdapter {
 //        holder.txtPriceLabel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 //        holder.txtPrice.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTag(position);
-
-
-
 
 
 //        initVolleyCallback(myLearningModel.get(position), position);

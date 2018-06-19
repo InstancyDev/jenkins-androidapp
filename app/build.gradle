@@ -72,7 +72,7 @@ android {
 
         applicationId "com.instancy.development"
         versionCode 1
-        versionName "1.0"
+        versionName "1.0(9.5.1.2)"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6

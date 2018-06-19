@@ -43,6 +43,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -145,6 +146,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     String userStatus = "";
 
     Communicator communicator;
+
+
+    @BindView(R.id.nodata_label)
+    TextView nodata_Label;
 
 //    SideMenusModel catalogSideMenuModel;
 
@@ -266,6 +271,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+                nodata_Label.setText(getResources().getString(R.string.no_data));
             }
 
             @Override
@@ -414,6 +420,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         } else {
             peopleListingModelList = new ArrayList<PeopleListingModel>();
             peopleListingAdapter.refreshList(peopleListingModelList);
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
         if (peopleListingModelList.size() > 5) {

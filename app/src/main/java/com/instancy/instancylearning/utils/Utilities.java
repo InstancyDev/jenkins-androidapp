@@ -1171,5 +1171,25 @@ public class Utilities {
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
+    public static void showCustomAlert(Context context)
+    {
 
+        // Create layout inflator object to inflate toast.xml file
+        LayoutInflater inflater = (LayoutInflater) context
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        // Call toast.xml file for toast layout
+        View toastRoot = inflater.inflate(R.layout.customtoast, null);
+
+        Toast toast = new Toast(context);
+
+        // Set layout to toast
+        toast.setView(toastRoot);
+        toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL,
+                0, 0);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.show();
+
+    }
+//    https://github.com/TellH/RecyclerTreeView
 }

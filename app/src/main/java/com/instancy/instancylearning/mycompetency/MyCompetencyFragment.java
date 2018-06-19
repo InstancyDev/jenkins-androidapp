@@ -1,8 +1,6 @@
 package com.instancy.instancylearning.mycompetency;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -12,22 +10,14 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.SimpleDateFormat;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,11 +25,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,16 +35,11 @@ import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.CreateNewForumActivity;
-import com.instancy.instancylearning.discussionfourms.DiscussionFourmAdapter;
-import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -67,17 +49,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 
@@ -141,7 +119,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID="+sideMenusModel.getComponentId()+"&ComponentInstanceID="+sideMenusModel.getRepositoryId()+"&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
+        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
 
 
         vollyService.getJsonObjResponseVolley("COMPSKILLS", urlStr + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
@@ -179,6 +157,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
+                nodata_Label.setText(getResources().getString(R.string.no_data));
             }
 
             @Override
@@ -240,7 +219,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
 
         competencyJobRolesList = db.fetchCompetencyJobSkills();
 
-        if (competencyJobRolesList != null &&competencyJobRolesList.size()>0) {
+        if (competencyJobRolesList != null && competencyJobRolesList.size() > 0) {
             competencyJobRoleAdapter.refreshList(competencyJobRolesList);
 
         } else {
