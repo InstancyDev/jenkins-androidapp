@@ -536,10 +536,13 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         parameters.put("PrefCategoryID", categoryModel.prefCategoryID);
         parameters.put("JobRoleID", categoryModel.jobRoleID);
         parameters.put("SkillSetValue", skillString);
+        parameters.put("Locale", "en-us");
 
 
         String parameterString = parameters.toString();
 
+
+        Log.d("CMP", "onResponse: " + parameterString);
 //
 //        String replaceDataString = parameterString.replace("\"", "\\\"");
 //        String addQuotes = ('"' + replaceDataString + '"');

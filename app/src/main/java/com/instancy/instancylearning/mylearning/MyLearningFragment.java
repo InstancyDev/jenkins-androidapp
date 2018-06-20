@@ -53,6 +53,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.advancedfilters.AdvancedFilterActivity;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.filter.Filter_activity;
@@ -281,7 +282,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     if (response != null) {
                         try {
                             db.insertFilterIntoDB(response, appUserModel, 1);
-                            Intent intent = new Intent(context, Filter_activity.class);
+                            Intent intent = new Intent(context, AdvancedFilterActivity.class);
                             intent.putExtra("isFrom", 1);
                             startActivityForResult(intent, FILTER_CLOSE_CODE);
                         } catch (JSONException e) {
@@ -495,8 +496,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 if (isCancel) {
                     cancelEnrollmentMethod(learningModel);
                 } else {
-//                    addEventToAndroidDevice(learningModel);
-                    GlobalMethods.addToDeviceCalendar(learningModel, context);
+                    GlobalMethods.addEventToDeviceCalendar(learningModel, context);
                 }
             }
         };

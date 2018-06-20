@@ -698,6 +698,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         }
 
+        // expired event functionality
         if (myLearningDetalData.isCompletedEvent()) {
 
             if (myLearningDetalData.getAddedToMylearning() == 1) {
@@ -1496,7 +1497,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (new Date().before(strDate)) {
                     catalogModelsList.get(i).setCompletedEvent(false);
                     myLearningModelList.add(catalogModelsList.get(i));
-
 //                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
                 }
             }

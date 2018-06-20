@@ -588,16 +588,6 @@ public class Utilities {
         return profileImageDir;
     }
 
-    /**
-     * To highlight the search text.
-     *
-     * @param ctx
-     * @param textView
-     * @param text
-     * @param spanText
-     * @author Venu
-     */
-
 
 //	public static void highlightSearchText(Context ctx, TextView textView, String text,
 //			String spanText) {
@@ -647,17 +637,16 @@ public class Utilities {
 //		return imageOut;
 //	}
 
-	
-	
-	/*
+
+    /*
     Program output
-	LDPI: 165.0 X 60.0
-	MDPI: 220.0 X 80.0
-	HDPI: 330.0 X 120.0
-	XHDPI: 440.0 X 160.0
-	XXHDPI: 660.0 X 240.0
-	XXXHDPI: 880.0 X 320.0
-	*/
+    LDPI: 165.0 X 60.0
+    MDPI: 220.0 X 80.0
+    HDPI: 330.0 X 120.0
+    XHDPI: 440.0 X 160.0
+    XXHDPI: 660.0 X 240.0
+    XXXHDPI: 880.0 X 320.0
+    */
     public class DPICalculator {
 
         private final float LDPI = 120;
@@ -726,14 +715,7 @@ public class Utilities {
         return false;
     }
 
-    /**
-     * To log the message to LogCat.
-     *
-     * @param tag      Used to identify the source of a log message. It usually identifies the class or activity where the log call occurs.
-     * @param message  The message you would like logged.
-     * @param priority One of the Log.DEBUG, Log.ERROR OR Log.INFO
-     * @author Venu
-     */
+
     public void LogMessage(String Tag, String message, int priority) {
         switch (priority) {
             case Log.DEBUG:
@@ -1138,7 +1120,6 @@ public class Utilities {
     }
 
 
-
     public static void setCursorColor(EditText view, @ColorInt int color) {
         try {
             // Get the cursor resource id
@@ -1171,8 +1152,8 @@ public class Utilities {
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
     }
-    public static void showCustomAlert(Context context)
-    {
+
+    public static void showCustomAlert(Context context) {
 
         // Create layout inflator object to inflate toast.xml file
         LayoutInflater inflater = (LayoutInflater) context
@@ -1192,4 +1173,47 @@ public class Utilities {
 
     }
 //    https://github.com/TellH/RecyclerTreeView
+
+
+    public static long convertStringToLong(String dateString) {
+
+        long timeInMilliseconds = 0;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+            Date mDate = sdf.parse(dateString);
+            timeInMilliseconds = mDate.getTime();
+            System.out.println("Date in milli :: " + timeInMilliseconds);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return timeInMilliseconds;
+    }
+
+
+    public static boolean returnEventCompleted(String eventDate) {
+
+        boolean isCompleted = false;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date strDate = null;
+
+        try {
+            strDate = sdf.parse(eventDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            isCompleted = false;
+        }
+        if (new Date().after(strDate)) {
+            isCompleted = true;
+
+        } else {
+            isCompleted = false;
+        }
+
+        return isCompleted;
+    }
+
 }

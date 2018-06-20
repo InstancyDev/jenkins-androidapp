@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.advancedfilters.AdvancedFilterModel;
+import com.instancy.instancylearning.advancedfilters.FiltersSerilization;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.NativeSetttingsModel;
 
@@ -28,9 +30,9 @@ public class FilterAdapter extends BaseExpandableListAdapter {
     Typeface iconFon;
     private Context context;
     private List<String> expandableListTitle;
-    private HashMap<String, List<NativeSetttingsModel.FilterModel>> expandableListDetail;
+    private HashMap<String, List<AdvancedFilterModel>> expandableListDetail;
 
-    public FilterAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<NativeSetttingsModel.FilterModel>> expandableListDetail) {
+    public FilterAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<AdvancedFilterModel>> expandableListDetail) {
         this.context = context;
         this.expandableListDetail = expandableListDetail;
         this.expandableListTitle = expandableListTitle;
@@ -95,7 +97,7 @@ public class FilterAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        final NativeSetttingsModel.FilterModel expandedListText = (NativeSetttingsModel.FilterModel) getChild(groupPosition, childPosition);
+        final AdvancedFilterModel expandedListText = (AdvancedFilterModel) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -104,11 +106,18 @@ public class FilterAdapter extends BaseExpandableListAdapter {
 
         TextView expandedListTextView = (TextView) convertView
                 .findViewById(R.id.sortfilter);
-        expandedListTextView.setText(expandedListText.name);
-        ImageView iconimage = (ImageView) convertView.findViewById(R.id.expIcon);
 
+        ImageView iconimage = (ImageView) convertView.findViewById(R.id.expIcon);
         TextView sortAwasomeIcon = (TextView) convertView
                 .findViewById(R.id.sortawasome);
+
+        if (expandedListText.cellIdentifier == 1) {
+            expandedListTextView.setText(expandedListText.aliasName);
+        } else if (expandedListText.cellIdentifier == 2) {
+            expandedListTextView.setText(expandedListText.sortTypeName);
+        } else if (expandedListText.cellIdentifier == 3) {
+            expandedListTextView.setText(expandedListText.categoryName);
+        }
         FontManager.markAsIconContainer(convertView.findViewById(R.id.sortawasome), iconFon);
         if (groupPosition == 0) {
             sortAwasomeIcon.setVisibility(View.VISIBLE);
@@ -116,21 +125,21 @@ public class FilterAdapter extends BaseExpandableListAdapter {
             sortAwasomeIcon.setVisibility(View.GONE);
         }
 
-        if (expandedListText.isSelected) {
-            expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-            expandableListDetail.get("Sort By").get(childPosition).isSelected = false;
-//            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
-            sortAwasomeIcon.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-
-            if (expandedListText.isSorted) {
-                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_asc));
-            } else {
-                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_desc));
-            }
-        } else {
-            expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
-            sortAwasomeIcon.setVisibility(View.GONE);
-        }
+//        if (expandedListText.isSelected) {
+//            expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+////            expandableListDetail.get("Sort By").get(childPosition).isSelected = false;
+////            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
+//            sortAwasomeIcon.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
+//
+//            if (expandedListText.isSorted) {
+//                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_asc));
+//            } else {
+//                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_desc));
+//            }
+//        } else {
+        expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
+//            sortAwasomeIcon.setVisibility(View.GONE);
+//        }
 
         return convertView;
     }

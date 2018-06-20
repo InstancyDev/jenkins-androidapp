@@ -72,19 +72,20 @@ import com.blankj.utilcode.util.ImageUtils;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.instancy.instancylearning.advancedfilters.AdvancedFilterActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
-import com.instancy.instancylearning.mycompetency.SkillModel;
+
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.filter.Filter_activity;
+
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.IResult;
@@ -442,7 +443,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (response != null) {
                         try {
                             db.insertFilterIntoDB(response, appUserModel, 0);
-                            Intent intent = new Intent(context, Filter_activity.class);
+                            Intent intent = new Intent(context, AdvancedFilterActivity.class);
                             intent.putExtra("isFrom", 0);
                             startActivityForResult(intent, FILTER_CLOSE_CODE);
                             REFRESH = 0;
@@ -684,7 +685,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(true);
+        item_filter.setVisible(false);
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -1657,8 +1658,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             JSONObject jsonObject = db.fetchFilterObject(appUserModel, 0);
             if (jsonObject != null) {
-
-                Intent intent = new Intent(context, Filter_activity.class);
+                Intent intent = new Intent(context, AdvancedFilterActivity.class);
                 intent.putExtra("isFrom", 0);
                 startActivityForResult(intent, FILTER_CLOSE_CODE);
                 REFRESH = 0;
@@ -1668,7 +1668,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         }
     }
-
     public void breadCrumbPlusButtonInit(View rootView) {
 
         LinearLayout llCatalogGridCatageory = (LinearLayout) rootView.findViewById(R.id.llCatalogGridCatageory);

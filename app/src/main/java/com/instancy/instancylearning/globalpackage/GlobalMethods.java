@@ -57,10 +57,12 @@ import java.util.Calendar;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.Utilities.convertStringToLong;
 import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.replace;
+import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 /**
@@ -864,7 +866,6 @@ public class GlobalMethods {
 
             menu.getItem(10).setVisible(true);
 
-
         } else {
 
             menu.getItem(10).setVisible(false);
@@ -903,17 +904,28 @@ public class GlobalMethods {
                 menu.getItem(6).setVisible(true);
 
             }
+//  commented for MCI
+//            if (myLearningDetalData.getTypeofevent() == 2) {
+//                menu.getItem(3).setVisible(true);
+//            } else if (myLearningDetalData.getTypeofevent() == 1) {
+//                menu.getItem(3).setVisible(false);
+//            }
 
-            if (myLearningDetalData.getTypeofevent() == 2) {
-                menu.getItem(3).setVisible(true);
-            } else if (myLearningDetalData.getTypeofevent() == 1) {
-                menu.getItem(3).setVisible(false);
+            // returnEventCompleted
+
+            if (!returnEventCompleted(myLearningDetalData.getEventstartTime()))
+            {
+                menu.getItem(9).setVisible(true);
             }
-            menu.getItem(9).setVisible(true);
+
+            if (!returnEventCompleted(myLearningDetalData.getEventendTime()))
+            {
+                menu.getItem(3).setVisible(true);
+            }
+
         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")) {
 
             menu.getItem(1).setVisible(false);
-
         } else {
             menu.getItem(2).setVisible(true);
             if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("27")) {
@@ -1122,6 +1134,25 @@ public class GlobalMethods {
         context.startActivity(intent);
 
     }
+
+    public static void addEventToDeviceCalendar(MyLearningModel myLearningModel, Context context) {
+
+        long startMillis = convertStringToLong(myLearningModel.getEventstartTime());
+        long endMillis = convertStringToLong(myLearningModel.getEventendTime());
+
+        Intent intent = new Intent(Intent.ACTION_EDIT);
+        intent.setType("vnd.android.cursor.item/event");
+        intent.putExtra(CalendarContract.Events.ALL_DAY, true);
+        intent.putExtra(CalendarContract.Events.RRULE, "FREQ=YEARLY");
+        intent.putExtra(CalendarContract.Events.DESCRIPTION, myLearningModel.getShortDes());
+        intent.putExtra(CalendarContract.Events.TITLE, myLearningModel.getCourseName());
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMillis);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMillis);
+        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, myLearningModel.getLocationName());
+        context.startActivity(intent);
+    }
+
+
 //    public static void catalogContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 //
 //        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);

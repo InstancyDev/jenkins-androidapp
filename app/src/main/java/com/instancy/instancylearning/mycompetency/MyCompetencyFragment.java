@@ -122,7 +122,7 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
 
 
-        vollyService.getJsonObjResponseVolley("COMPSKILLS", urlStr + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("COMPSKILLS", urlStr , appUserModel.getAuthHeaders());
 
     }
 

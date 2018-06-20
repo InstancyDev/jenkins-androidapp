@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -153,6 +156,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
+
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -200,8 +204,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         editUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
 
-        setCursorColor(editPassword,Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
-        setCursorColor(editUserName,Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        setCursorColor(editPassword, Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+        setCursorColor(editUserName, Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
         editPassword.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editUserName.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
@@ -224,6 +228,13 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         setupUI(someView);
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 
+        if (uiSettingsModel.isEnableAzureSSOForLearner()) {
+            someView.setVisibility(View.INVISIBLE);
+            Window window = this.getWindow();
+            window.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        }
+
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
 //            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
@@ -233,6 +244,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         } else {
 
             settingTxt.setVisibility(View.VISIBLE);
+
         }
 
 
@@ -274,6 +286,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         getMyCatalogData();
     }
+
 
     @OnClick({R.id.btntxt_facebook, R.id.btntxt_twitter, R.id.btntxt_linkedin, R.id.btntxt_google, R.id.id_settings_txt, R.id.id_loginbtn, R.id.btnewuser, R.id.btnforgot})
     public void socialLoginBtns(View view) {
@@ -773,5 +786,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             }
         }
     }
+
+
 }
 

@@ -290,7 +290,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         updateDisplayNameAndImage();
 
-        sideMenumodelList = db.getNativeMainMenusData();
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -375,7 +375,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
 
 //                    String filterCondition = sideMenumodelList.get(groupPosition).getConditions();
-                    if (logoutPos == groupPosition && isSubSiteEntered.equalsIgnoreCase("false")) {
+//                    if (logoutPos == groupPosition && isSubSiteEntered.equalsIgnoreCase("false")) {
+                    if (logoutPos == groupPosition && sideMenumodelList.get(groupPosition).menuId==5555) {
+
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         preferencesManager.setStringValue("", StaticValues.KEY_USERLOGINID);
@@ -751,7 +753,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
 
-        sideMenumodelList = db.getNativeMainMenusData();
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -790,7 +792,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
-        sideMenumodelList = db.getNativeMainMenusData();
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -955,7 +957,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
             sideMenumodelList = new ArrayList<SideMenusModel>();
-            sideMenumodelList = db.getNativeMainMenusData();
+            sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
 
             hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 

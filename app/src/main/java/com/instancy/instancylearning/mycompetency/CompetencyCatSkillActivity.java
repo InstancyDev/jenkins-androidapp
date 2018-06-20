@@ -322,9 +322,9 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.skillDescription = skillsSetObj.optString("Description");
                 skillModel.jobRoleID = skillsSetObj.optString("JobRoleID");
                 skillModel.gapScore = skillsSetObj.optDouble("Gap");
-                skillModel.managerScore = skillsSetObj.optDouble("ManagersEvaluation");
+                skillModel.managerScore = skillsSetObj.optInt("ManagersEvaluation");
                 skillModel.contentAuthorScore = skillsSetObj.optDouble("ContentEval");
-                skillModel.userScore = skillsSetObj.optDouble("UserEvaluation");
+                skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
                 skillModel.valueName = skillsSetObj.optString("UserEvaluation");
                 skillModel.skillID = skillsSetObj.optString("SkillID");
                 skillModel.prefCategoryID = skillsSetObj.optString("JobRoleID");

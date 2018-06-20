@@ -404,11 +404,11 @@ public class NativeSignupActivity extends AppCompatActivity {
                 }
             }
 
-            if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15") ) {
+            if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15")) {
 
-                if (isValidEmail(signUpConfigsModelList.get(i).valueName)){
+                if (isValidEmail(signUpConfigsModelList.get(i).valueName)) {
                     isValidationCompleted = true;
-                }else {
+                } else {
                     isValidationCompleted = false;
                     Toast.makeText(context, "Email is not valid", Toast.LENGTH_SHORT).show();
                 }
@@ -433,7 +433,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
             String valueString = signUpConfigsModelList.get(i).valueName;
 
-//            jsonObject.put(keyString, valueString);
+//            jsonObject.put(keyString, valueString);//
 
             if (i == signUpConfigsModelList.size() - 1) {
 

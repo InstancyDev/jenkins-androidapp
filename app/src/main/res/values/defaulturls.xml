@@ -13,7 +13,7 @@
     <!--  <string name="app_default_url">http://qacle.instancy.net/</string>
           <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
-    <!--&lt;!&ndash;&lt;!&ndash;for app  development place&ndash;&gt;&ndash;&gt;-->
+    <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
     <!--<string name="app_default_url">http://staging.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
@@ -96,10 +96,8 @@
     <!--<string name="app_default_url">http://9.5.1.2dev.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
-
     <string name="app_default_url">http://qademos.instancysoft.com/</string>
     <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
-
 
     <!--  PPD APP -->
     <!--<string name="app_default_url">https://ppdlife.instancy.com/</string>-->

@@ -64,8 +64,7 @@ public class SignUp_Activity extends AppCompatActivity {
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         final UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
+
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -84,10 +83,15 @@ public class SignUp_Activity extends AppCompatActivity {
         String url = "";
 
         if (uiSettingsModel.isEnableAzureSSOForLearner()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> Login </font>"));
             url = appDefaultUrl + "nativemobile/Sign%20in";
         } else {
             url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true";
+            getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
         }
+
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
 
         webView.setWebViewClient(new WebViewClient() {
@@ -99,7 +103,7 @@ public class SignUp_Activity extends AppCompatActivity {
                     view.loadUrl(appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true");
                 } else if (url.toLowerCase().contains("autosignupnativeapp.aspx")) {
                     if (url.contains("?")) {
-                        Toast.makeText(SignUp_Activity.this, "Sign up success..!!", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(SignUp_Activity.this, "Sign up success..!!", Toast.LENGTH_SHORT).show();
                         String query = url.substring(url.lastIndexOf("?") + 1);
                         String userCredentials[] = query.split("&");
                         String userName = userCredentials[0].substring(userCredentials[0].lastIndexOf("=") + 1);
@@ -134,7 +138,7 @@ public class SignUp_Activity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 svProgressHUD.dismiss();
-                if ((url.toLowerCase().contains("sign%20in") || url.toLowerCase().contains("sign in")) && uiSettingsModel.isEnableAzureSSOForLearner()) {
+                if ((url.toLowerCase().contains("sign%20in") || url.toLowerCase().contains("sign in")) && !uiSettingsModel.isEnableAzureSSOForLearner()) {
                     Intent signinIntent = new Intent(SignUp_Activity.this, Login_activity.class);
                     startActivity(signinIntent);
                 }

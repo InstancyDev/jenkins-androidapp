@@ -629,14 +629,22 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 } else {
 
-                    if (myLearningModel.getViewType().equalsIgnoreCase("1") || myLearningModel.getViewType().equalsIgnoreCase("2") ) {
-                        if (!myLearningModel.isCompletedEvent()){
+                    if (myLearningModel.getViewType().equalsIgnoreCase("1") || myLearningModel.getViewType().equalsIgnoreCase("2")) {
+                        if (!myLearningModel.isCompletedEvent()) {
                             iconFirst.setBackground(calendarImg);
                             buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
 
-                        }
-                        else {
-                            btnsLayout.setVisibility(View.INVISIBLE);
+                        } else {
+
+                            if (myLearningModel.getViewType().equalsIgnoreCase("2")) {
+                                iconFirst.setBackground(calendarImg);
+                                buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+
+                            } else {
+                                btnsLayout.setVisibility(View.INVISIBLE);
+
+                            }
+
                         }
 
                     } else if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
@@ -646,7 +654,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         buttonFirst.setText("Buy");
 
                     }
-                    }
+                }
 
 
             } else {
@@ -1016,10 +1024,27 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase("Buy")) {
                     addToMyLearningCheckUser(myLearningModel, true);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_add_to_calendar))) {
-                    GlobalMethods.addToDeviceCalendar(myLearningModel, this);
+                    GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
 
-                    addToMyLearningCheckUser(myLearningModel, false);
+
+                    if (myLearningModel.isCompletedEvent()) {
+
+//                            addExpiredEventToMyLearning(myLearningDetalData, position);
+                        try {
+                            addExpiryEvets(myLearningModel);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        addToMyLearningCheckUser(myLearningModel, false);
+                    }
+
+
+
+
+
                 }
                 break;
             case R.id.btntxt_download_detail:
@@ -1670,7 +1695,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     }
 
-
     public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final boolean isJoinedCommunity) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
@@ -1690,14 +1714,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             try {
                                 isInserted = db.saveNewlySubscribedContentMetadata(jsonObj);
                                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                                    db.updateEventStatus(learningModel, jsonObj,true);
+                                    db.updateEventStatus(learningModel, jsonObj, true);
                                 }
                                 if (isInserted) {
                                     myLearningModel.setAddedToMylearning(1);
                                     db.updateContenToCatalog(myLearningModel);
                                     buttonFirst.setText("View");
                                     Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, MyLearningDetail_Activity.this, uiSettingsModel.getAppHeaderTextColor());
-
 
 //                                    iconFirst.setImageDrawable(null);
                                     iconFirst.setBackground(viewIcon);
@@ -2107,5 +2130,123 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         startActivityForResult(intentReview, REVIEW_REFRESH);
 
     }
+    public void addExpiryEvets(MyLearningModel catalogModel) throws JSONException {
 
+        JSONObject parameters = new JSONObject();
+
+        //mandatory
+        parameters.put("SelectedContent",catalogModel.getContentID());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("SiteID", catalogModel.getSiteID());
+        parameters.put("OrgUnitID",catalogModel.getSiteID());
+        parameters.put("Locale", "en-us");
+
+        String parameterString = parameters.toString();
+        boolean isSubscribed = db.isSubscribedContent(catalogModel);
+        if (isSubscribed) {
+            Toast toast = Toast.makeText(
+                    MyLearningDetail_Activity.this,
+                    getString(R.string.cat_add_already),
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        else {
+            sendExpiryEventData(parameterString,catalogModel);
+        }
+    }
+
+    public void sendExpiryEventData(final String postData, final MyLearningModel catalogModel) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/Catalog/AddExpiredContentToMyLearning";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+
+                        if (s.contains("true")) {
+// ------------------------- old code here
+
+                            getMobileGetMobileContentMetaData(catalogModel,false);
+
+//                            final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
+//                            builder.setMessage(getString(R.string.event_add_success))
+//                                    .setCancelable(false)
+//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                        public void onClick(DialogInterface dialog, int id) {
+//                                            //do things
+//                                            dialog.dismiss();
+//                                            // add event to android calander
+////                                            addEventToAndroidDevice(catalogModel);
+//                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+//
+//                                        }
+//                                    });
+//                            AlertDialog alert = builder.create();
+//                            alert.show();
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    MyLearningDetail_Activity.this, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+//--------------------------- old code end here
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(MyLearningDetail_Activity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
 }

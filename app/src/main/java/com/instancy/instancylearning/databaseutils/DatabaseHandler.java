@@ -1593,7 +1593,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @author Upendra
      */
 
-    public List<SideMenusModel> getNativeMainMenusData() {
+    public List<SideMenusModel> getNativeMainMenusData(boolean isAzureEnabled) {
         List<SideMenusModel> menuList = null;
         SideMenusModel menu = null;
         Boolean isMylearning = false;
@@ -1730,7 +1730,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             menu.setParentMenuId("0");
             menu.setParameterStrings("");
             menu.setIsSubMenuExists(0);
-            menuList.add(menu);
+            if (!isAzureEnabled) {
+                menuList.add(menu);
+            }
+
         }
         return menuList;
     }

@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.filter;
+package com.instancy.instancylearning.advancedfilters;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,11 +18,13 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.advancedfilters.FiltersSerilization;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.filter.FilterAdapter;
+import com.instancy.instancylearning.filter.Filter_Inner_activity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.FiltersApplyModel;
+import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -40,12 +42,12 @@ import static com.instancy.instancylearning.utils.StaticValues.INNER_FILTER_CLOS
  * Created by Upendranath on 9/28/2017 Working on Instancy-Playground-Android.
  */
 
-public class Filter_activity extends AppCompatActivity implements View.OnClickListener {
+public class AdvancedFilterActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = Filter_activity.class.getSimpleName();
+    private static final String TAG = AdvancedFilterActivity.class.getSimpleName();
     ExpandableListView expandableListView;
     List<String> expandableListTitle;
-    HashMap<String, List<FiltersSerilization.FilterModel>> expandableListDetail;
+    HashMap<String, List<AdvancedFilterModel>> expandableListDetail;
     FilterAdapter filterAdapter;
     AppUserModel appUserModel;
     String sortName = "";
@@ -61,7 +63,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
     AppController appcontroller;
     Button btnApply, btnReset;
 
-    int isFromMylearning=0;
+    int isFromMylearning = 0;
 
     String contentKey = "", groupKey = "";
 
@@ -94,90 +96,88 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
 
             ex.printStackTrace();
         }
-//        try {
-////            getFiltersFromDB();
-//
-//            JSONObject jsonObject = db.fetchFilterObject(appUserModel,isFromMylearning);
-//            if (jsonObject != null) {
-//                HashMap<String, List<FiltersSerilization.FilterModel>> hashMap = FiltersSerilization.getFilterData(jsonObject);
-//                Log.d(TAG, "getFiltersFromDB: " + hashMap.get("Sort By"));
-//
-//                expandableListDetail = FiltersSerilization.getFilterData(jsonObject);
-//
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-////        }
+        try {
+
+            JSONObject jsonObject = db.fetchFilterObject(appUserModel, isFromMylearning);
+            if (jsonObject != null) {
+                HashMap<String, List<AdvancedFilterModel>> hashMap = FiltersSerilization.fetchFilterData(jsonObject);
+
+                expandableListDetail = FiltersSerilization.fetchFilterData(jsonObject);
+                FiltersSerilization.fetchFilterData(jsonObject);
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
         expandableListView = (ExpandableListView) findViewById(R.id.filter_list);
         // Construct our adapter, using our own layout and myTeams
-//        filterAdapter = new FilterAdapter(this, expandableListTitle, expandableListDetail);
+        filterAdapter = new FilterAdapter(this, expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(filterAdapter);
-        expandableListView.expandGroup(0);
-        expandableListView.expandGroup(1);
+
 //        expandableListView.setSelector(R.color.colorBlack);
 
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                if (groupPosition == 1) {
-
-                    FiltersSerilization.FilterModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
-                    Log.d(TAG, "onChildClick: " + filterModel.name);
-
-
-                    if (filterModel.name.contains("group")) {
-                        groupKey = "groupby";
-                    } else {
-                        contentKey = "contentkey";
-                    }
-
-                    Intent intent = new Intent(Filter_activity.this, Filter_Inner_activity.class);
-                    intent.putExtra("filtermodel", filterModel);
-                    intent.putExtra("filtername", filterModel.name);
-                    startActivityForResult(intent, INNER_FILTER_CLOSE);
-
-                } else {
-                    int index = childPosition - parent.getFirstVisiblePosition();
-                    if (index == childPosition) {
-                        expandableListDetail.get("Sort By").get(childPosition).isSelected = true;
-
-
-                        if (expandableListDetail.get("Sort By").get(childPosition).isSorted) {
-                            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
-                            typeOrder = false;
-                            sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
-                            atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
-
-                        } else {
-                            expandableListDetail.get("Sort By").get(childPosition).isSorted = true;
-                            typeOrder = true;
-                            sortedPosition = childPosition;
-                            sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
-                            atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
-                        }
-
-                    }
-
-                    filterAdapter.notifyDataSetChanged();
-
-                }
-                if (childPosition == (parent.getSelectedItemPosition())) {
-                    // Start your new activity here.
-                    Log.d("TAG", "second push"); // 16
-                }
-                return true;
-            }
-        });
+//        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//
+//                if (groupPosition == 1) {
+//
+//                    FiltersSerilization.FilterModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
+//                    Log.d(TAG, "onChildClick: " + filterModel.name);
+//
+//
+//                    if (filterModel.name.contains("group")) {
+//                        groupKey = "groupby";
+//                    } else {
+//                        contentKey = "contentkey";
+//                    }
+//
+//                    Intent intent = new Intent(AdvancedFilterActivity.this, Filter_Inner_activity.class);
+//                    intent.putExtra("filtermodel", filterModel);
+//                    intent.putExtra("filtername", filterModel.name);
+//                    startActivityForResult(intent, INNER_FILTER_CLOSE);
+//
+//                } else {
+//                    int index = childPosition - parent.getFirstVisiblePosition();
+//                    if (index == childPosition) {
+//                        expandableListDetail.get("Sort By").get(childPosition).isSelected = true;
+//
+//
+//                        if (expandableListDetail.get("Sort By").get(childPosition).isSorted) {
+//                            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
+//                            typeOrder = false;
+//                            sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
+//                            atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
+//
+//                        } else {
+//                            expandableListDetail.get("Sort By").get(childPosition).isSorted = true;
+//                            typeOrder = true;
+//                            sortedPosition = childPosition;
+//                            sortName = expandableListDetail.get("Sort By").get(childPosition).name.toLowerCase();
+//                            atributeConfigId = expandableListDetail.get("Sort By").get(childPosition).attributeConfigId.toLowerCase();
+//                        }
+//
+//                    }
+//
+//                    filterAdapter.notifyDataSetChanged();
+//
+//                }
+//                if (childPosition == (parent.getSelectedItemPosition())) {
+//                    // Start your new activity here.
+//                    Log.d("TAG", "second push"); // 16
+//                }
+//                return true;
+//            }
+//        });
         expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 // Doing nothing
-                return true;
+                return false;
             }
         });
 
