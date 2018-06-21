@@ -108,10 +108,12 @@ import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
+import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 
 /**
  * Created by Upendranath on 6/27/2017 Working on InstancyLearning.
@@ -151,6 +153,23 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     RelativeLayout downloadlayout;
 
     RelativeLayout relativeLayout;
+
+    // added for events
+
+    TextView txtEvntIcon;
+
+    TextView txtAthrIcon;
+
+    TextView txtLocationIcon;
+
+    TextView txtEventFromTo;
+
+    TextView txtTimeZone;
+
+    TextView txtEventLocation;
+
+    LinearLayout eventLayout, locationLayout;
+
 
     TextView txtPrice;
 
@@ -271,8 +290,23 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
                 txtAuthor.setText(myLearningModel.getPresenter() + " ");
-            } else {
+                String fromDate = convertToEventDisplayDateFormat(myLearningModel.getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
+                String toDate = convertToEventDisplayDateFormat(myLearningModel.getEventendTime(), "yyyy-MM-dd hh:mm:ss");
 
+                txtEventFromTo.setText(fromDate + "  to  " + toDate);
+                txtEventLocation.setText(myLearningModel.getLocationName());
+                txtTimeZone.setText(myLearningModel.getTimeZone());
+
+                eventLayout.setVisibility(View.VISIBLE);
+                txtAthrIcon.setVisibility(View.VISIBLE);
+
+                if (myLearningModel.getTypeofevent() == 2) {
+                    locationLayout.setVisibility(View.GONE);
+                }
+
+            } else {
+                eventLayout.setVisibility(View.GONE);
+                txtAthrIcon.setVisibility(View.GONE);
                 txtAuthor.setText(myLearningModel.getAuthor() + " ");
             }
 
@@ -287,6 +321,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             ratedOutOfTxt.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             txtRating.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             txtAvg.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+            txtEventFromTo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtEventLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtTimeZone.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+            txtAthrIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtLocationIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            txtEvntIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
             if (myLearningModel.getSiteName().equalsIgnoreCase("")) {
                 consolidateLine.setVisibility(View.INVISIBLE);
@@ -574,14 +616,36 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         btnEditReview = (Button) header.findViewById(R.id.btnReview);
 
-
         ratingsLayout = (RelativeLayout) header.findViewById(R.id.overall_ratingslayout);
 
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
+
+        // event labels
+        txtEvntIcon = (TextView) header.findViewById(R.id.txteventicon);
+
+        txtAthrIcon = (TextView) header.findViewById(R.id.txtathricon);
+
+        txtLocationIcon = (TextView) header.findViewById(R.id.txtlocationicon);
+
+        txtEventFromTo = (TextView) header.findViewById(R.id.txt_eventfromtotime);
+
+        txtTimeZone = (TextView) header.findViewById(R.id.txt_timezone);
+
+        txtEventLocation = (TextView) header.findViewById(R.id.txt_eventlocation);
+
+        eventLayout = (LinearLayout) header.findViewById(R.id.eventlayout);
+
+        locationLayout = (LinearLayout) header.findViewById(R.id.locationlayout);
+
+
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
 
         FontManager.markAsIconContainer(header.findViewById(R.id.btntxt_download_detail), iconFont);
+
+        FontManager.markAsIconContainer(header.findViewById(R.id.txteventicon), iconFont);
+        FontManager.markAsIconContainer(header.findViewById(R.id.txtathricon), iconFont);
+        FontManager.markAsIconContainer(header.findViewById(R.id.txtlocationicon), iconFont);
 
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -719,12 +783,19 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 iconFirst.setBackground(calendarImg);
                 buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
 
+
                 if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
                     relativeSecond.setVisibility(View.VISIBLE);
                     whiteLine.setVisibility(View.VISIBLE);
                     Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
                     iconSecond.setBackground(relatedContent);
                     buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
+                }
+
+                if (returnEventCompleted(myLearningModel.getEventstartTime())) {
+
+                    btnsLayout.setVisibility(View.GONE);
+
                 }
 
             } else {
@@ -873,6 +944,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
             txtCourseStatus.setText(courseStatus);
+
         } else {
 
             txtCourseStatus.setText(displayStatus + "%)");
@@ -1040,9 +1112,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     } else {
                         addToMyLearningCheckUser(myLearningModel, false);
                     }
-
-
-
 
 
                 }
@@ -2130,15 +2199,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         startActivityForResult(intentReview, REVIEW_REFRESH);
 
     }
+
     public void addExpiryEvets(MyLearningModel catalogModel) throws JSONException {
 
         JSONObject parameters = new JSONObject();
 
         //mandatory
-        parameters.put("SelectedContent",catalogModel.getContentID());
+        parameters.put("SelectedContent", catalogModel.getContentID());
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("SiteID", catalogModel.getSiteID());
-        parameters.put("OrgUnitID",catalogModel.getSiteID());
+        parameters.put("OrgUnitID", catalogModel.getSiteID());
         parameters.put("Locale", "en-us");
 
         String parameterString = parameters.toString();
@@ -2150,9 +2220,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
-        }
-        else {
-            sendExpiryEventData(parameterString,catalogModel);
+        } else {
+            sendExpiryEventData(parameterString, catalogModel);
         }
     }
 
@@ -2173,7 +2242,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         if (s.contains("true")) {
 // ------------------------- old code here
 
-                            getMobileGetMobileContentMetaData(catalogModel,false);
+                            getMobileGetMobileContentMetaData(catalogModel, false);
 
 //                            final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
 //                            builder.setMessage(getString(R.string.event_add_success))

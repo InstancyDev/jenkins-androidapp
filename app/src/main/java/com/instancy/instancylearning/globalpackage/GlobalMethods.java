@@ -895,32 +895,33 @@ public class GlobalMethods {
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
-                // uncomment for reports it to false
-                menu.getItem(5).setVisible(true);
+                // uncomment for reports it to false mci client
+                menu.getItem(5).setVisible(false);
             }
 
-            if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
-
-                menu.getItem(6).setVisible(true);
-
-            }
-//  commented for MCI
-//            if (myLearningDetalData.getTypeofevent() == 2) {
-//                menu.getItem(3).setVisible(true);
-//            } else if (myLearningDetalData.getTypeofevent() == 1) {
-//                menu.getItem(3).setVisible(false);
+//            if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
+//
+//                menu.getItem(6).setVisible(true);
+//
 //            }
 
             // returnEventCompleted
 
-            if (!returnEventCompleted(myLearningDetalData.getEventstartTime()))
-            {
+            if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
                 menu.getItem(9).setVisible(true);
+                menu.getItem(6).setVisible(true);
+
             }
 
-            if (!returnEventCompleted(myLearningDetalData.getEventendTime()))
-            {
-                menu.getItem(3).setVisible(true);
+            if (!returnEventCompleted(myLearningDetalData.getEventendTime())) {
+
+                if (myLearningDetalData.getTypeofevent() == 2) {
+                    menu.getItem(3).setVisible(true);
+                } else if (myLearningDetalData.getTypeofevent() == 1) {
+                    menu.getItem(3).setVisible(false);
+                }
+
+//                menu.getItem(3).setVisible(true);
             }
 
         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")) {

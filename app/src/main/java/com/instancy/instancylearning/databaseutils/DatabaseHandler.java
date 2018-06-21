@@ -372,7 +372,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
                 + "(lrsid INTEGER PRIMARY KEY AUTOINCREMENT,LRS TEXT,url TEXT,method TEXT,data TEXT,auth TEXT,callback TEXT,lrsactor TEXT,extraHeaders TEXT,siteid INTEGER,scoid INTEGER,userid INTEGER,isupdate TEXT)");
@@ -2335,9 +2335,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //
 //            }
                 // locationname
-                if (jsonMyLearningColumnObj.has("locationname")) {
+                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
 
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
                 }
                 // timezone
@@ -2662,8 +2662,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setPresenter(cursor.getString(cursor
                             .getColumnIndex("presenter")));
                     myLearningModel.setEventAddedToCalender(false);
-//                    myLearningModel.setEventAddedToCalender(cursor.getb(cursor
-//                            .getColumnIndex("eventaddedtocalender")));
+                    myLearningModel.setTimeZone(cursor.getString(cursor
+                            .getColumnIndex("timezone")));
                     myLearningModel.setJoinurl(cursor.getString(cursor
                             .getColumnIndex("joinurl")));
                     myLearningModel.setTypeofevent(cursor.getInt(cursor
@@ -3611,7 +3611,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         if (myLearningModel.getTypeofevent() == 2) {
                             medianame = "Event (Online)";
 
-
                         } else if (myLearningModel.getTypeofevent() == 1) {
                             medianame = "Event (Face to Face)";
 
@@ -3658,40 +3657,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("timezone")) {
 
                     // timezone
-                    if (jsonMyLearningColumnObj.has("timezone")) {
-
+//                    if (jsonMyLearningColumnObj.has("timezone")) {
+//
                         String timez = jsonMyLearningColumnObj.get("timezone").toString();
+                        myLearningModel.setTimeZone(timez);
 
-                        String timezone = "EST";
-                        switch (timez.toLowerCase()) {
-                            case "eastern standard time":
-                                timezone = "EST";
-                                break;
-                            case "india standard time":
-                                timezone = "IST";
-                                break;
-                            case "pacific standard time":
-                                timezone = "PST";
-                                break;
-                            case "mountain daylight time":
-                                timezone = "MDT";
-                                break;
-                            case "central standard time":
-                                timezone = "CST";
-                                break;
-                            case "central daylight time":
-                                timezone = "CDT";
-                                break;
-                            default:
-                                timezone = "EST";
-                                break;
-                        }
-
-                        long currentTime = System.currentTimeMillis();
-                        myLearningModel.setTimeZone(timezone);
-                    }
+//                        String timezone = "EST";
+//                        switch (timez.toLowerCase()) {
+//                            case "eastern standard time":
+//                                timezone = "EST";
+//                                break;
+//                            case "india standard time":
+//                                timezone = "IST";
+//                                break;
+//                            case "pacific standard time":
+//                                timezone = "PST";
+//                                break;
+//                            case "mountain daylight time":
+//                                timezone = "MDT";
+//                                break;
+//                            case "central standard time":
+//                                timezone = "CST";
+//                                break;
+//                            case "central daylight time":
+//                                timezone = "CDT";
+//                                break;
+//                            default:
+//                                timezone = "EST";
+//                                break;
+//                        }
+//
+//                        long currentTime = System.currentTimeMillis();
+//                        myLearningModel.setTimeZone(timezone);
+//                    }
 
                 }
+
 
                 // mediatypeid
                 if (jsonMyLearningColumnObj.has("mediatypeid")) {
@@ -3725,9 +3726,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 myLearningModel.setIsExpiry("false");
 
                 // locationname
-                if (jsonMyLearningColumnObj.has("locationname")) {
+                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
 
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
                 }
                 // participanturl
@@ -3904,6 +3905,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             contentValues.put("folderpath", myLearningModel.getFolderPath());
 
+            contentValues.put("typeofevent", myLearningModel.getTypeofevent());
+
 
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -4052,6 +4055,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setFolderPath(cursor.getString(cursor
                             .getColumnIndex("folderpath")));
+
+                    myLearningModel.setTypeofevent(cursor.getInt(cursor
+                            .getColumnIndex("typeofevent")));
 
                     myLearningModel.setEventAddedToCalender(false);
 

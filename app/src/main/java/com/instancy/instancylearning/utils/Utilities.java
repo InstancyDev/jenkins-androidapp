@@ -1216,4 +1216,20 @@ public class Utilities {
         return isCompleted;
     }
 
+
+    public static String convertToEventDisplayDateFormat(String dateTime, String currentFormat) {
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat preFormat = new SimpleDateFormat(currentFormat);
+        SimpleDateFormat postFormater = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+        String newDate = null;
+        try {
+            newDate = postFormater.format(preFormat.parse(dateTime));
+        } catch (Exception e) {
+            Log.d("In getCurrentDateTime", e.getMessage());
+        }
+        return newDate;
+    }
+
+
+
 }

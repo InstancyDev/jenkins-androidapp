@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -63,6 +64,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -84,7 +86,7 @@ public class CatalogAdapter extends BaseAdapter {
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
     AppController appcontroller;
-    boolean isEvent=false;
+    boolean isEvent = false;
 
 
     public CatalogAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, boolean isEvent) {
@@ -100,7 +102,7 @@ public class CatalogAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-        this.isEvent=isEvent;
+        this.isEvent = isEvent;
         appcontroller = AppController.getInstance();
 
     }
@@ -135,7 +137,8 @@ public class CatalogAdapter extends BaseAdapter {
         View vi = convertView;
         if (convertView == null)
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        vi = inflater.inflate(R.layout.catalogcellitem, null);
+//        vi = inflater.inflate(R.layout.catalogcellitem, null);
+        vi = inflater.inflate(R.layout.catalogneventcellitem, null);
         holder = new ViewHolder(vi);
         holder.parent = parent;
         holder.getPosition = position;
@@ -145,10 +148,22 @@ public class CatalogAdapter extends BaseAdapter {
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
 
-        if (isEvent){
-            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
-        }
-        else {
+        if (isEvent) {
+
+            String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
+
+            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
+
+            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter());
+            holder.txtEventFromTo.setText(fromDate + "  to  " + toDate);
+            holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
+            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
+
+            if (myLearningModel.get(position).getTypeofevent() == 2) {
+                holder.locationlayout.setVisibility(View.GONE);
+            }
+
+        } else {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
 
@@ -199,10 +214,22 @@ public class CatalogAdapter extends BaseAdapter {
         holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-//        holder.txtPriceLabel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-//        holder.txtPrice.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        holder.txtEventFromTo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtEventLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTimeZone.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        holder.txtAthrIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtLocationIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtEvntIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+
         holder.btnDownload.setTag(position);
 
+
+        String imgUrl = myLearningModel.get(position).getImageData();
+
+        Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
 //        initVolleyCallback(myLearningModel.get(position), position);
 
@@ -216,8 +243,12 @@ public class CatalogAdapter extends BaseAdapter {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.txtPrice.setVisibility(View.GONE);
+            holder.eventLayout.setVisibility(View.VISIBLE);
+            holder.txtAthrIcon.setVisibility(View.VISIBLE);
 
         } else {
+            holder.eventLayout.setVisibility(View.GONE);
+            holder.txtAthrIcon.setVisibility(View.GONE);
             if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
@@ -252,98 +283,6 @@ public class CatalogAdapter extends BaseAdapter {
 //              File extStore = Environment.getExternalStorageDirectory();
 
             }
-
-            String imgUrl = myLearningModel.get(position).getImageData();
-            Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
-            final float oldRating = ratingValue;
-            holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-
-                @Override
-                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                    // TODO Auto-generated method stub
-
-                    if (fromUser) {
-//                        int ratingInt = Math.round(rating);
-//                        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-//                        String paramsString = appUserModel.getWebAPIUrl() +
-//                                ApiConstants.UPDATERATINGURL + "UserID=" + appUserModel.getUserIDValue() +
-//                                "&ContentID=" + myLearningModel.get(position).getContentID()
-//                                + "&Title=" +
-//                                "&Description=From%20Android%20Native%20App" +
-//                                "&RatingID=" + ratingInt;
-//                        if (isNetworkConnectionAvailable(activity, -1)) {
-//                            try {
-//
-//                                Log.d(TAG, "getJsonObjResponseVolley: " + paramsString);
-//                                JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, paramsString, null, new Response.Listener<JSONObject>() {
-//                                    @Override
-//                                    public void onResponse(JSONObject response) {
-//                                        try {
-//                                            Log.d("logr  response =", "response " + response.get("table1"));
-//                                            JSONArray jsonArray = response.getJSONArray("table1");
-//                                            String status = jsonArray.getJSONObject(0).get("status").toString();
-//                                            String rating = jsonArray.getJSONObject(0).get("rating").toString();
-//                                            if (status.contains("Success")) {
-//                                                db.updateContentRatingToLocalDB(myLearningModel.get(position), rating);
-//                                                Toast.makeText(
-//                                                        activity,
-//                                                        activity.getString(R.string.rating_update_success),
-//                                                        Toast.LENGTH_SHORT)
-//                                                        .show();
-//                                                myLearningModel.get(position).setRatingId(rating);
-////                                        notifyDataSetChanged();
-//                                            } else {
-//                                                Toast.makeText(
-//                                                        activity,
-//                                                        activity.getString(R.string.rating_update_fail),
-//                                                        Toast.LENGTH_SHORT)
-//                                                        .show();
-//                                                holder.ratingBar.setRating(oldRating);
-//                                            }
-//
-//                                        } catch (JSONException e) {
-//                                            e.printStackTrace();
-//                                            holder.ratingBar.setRating(oldRating);
-//                                        }
-//                                        svProgressHUD.dismiss();
-//                                    }
-//                                }, new Response.ErrorListener() {
-//                                    @Override
-//                                    public void onErrorResponse(VolleyError error) {
-//                                        holder.ratingBar.setRating(oldRating);
-//                                        svProgressHUD.dismiss();
-//                                        Toast.makeText(
-//                                                activity,
-//                                                activity.getString(R.string.rating_update_fail),
-//                                                Toast.LENGTH_SHORT)
-//                                                .show();
-//                                    }
-//                                }) {
-//                                    @Override
-//                                    public Map<String, String> getHeaders() throws AuthFailureError {
-//                                        final Map<String, String> headers = new HashMap<>();
-//                                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-//                                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
-//                                        return headers;
-//                                    }
-//                                };
-////                        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
-////                                0,
-////                                -1,
-////                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-//                                VolleySingleton.getInstance(activity).addToRequestQueue(jsonObjReq);
-//
-//                            } catch (Exception e) {
-//
-//                                e.printStackTrace();
-//                            }
-//
-//                        } else {
-//                            Toast.makeText(activity, "No internet", Toast.LENGTH_SHORT).show();
-//                        }
-                    }
-                }
-            });
 
             // do something for phones running an SDK before lollipop
 
@@ -606,7 +545,6 @@ public class CatalogAdapter extends BaseAdapter {
     }
 
 
-
     class ViewHolder {
         public int getPosition;
         public MyLearningModel myLearningDetalData;
@@ -661,9 +599,40 @@ public class CatalogAdapter extends BaseAdapter {
         @BindView(R.id.btn_price)
         TextView txtPrice;
 
-//        @Nullable
-//        @BindView(R.id.pricelabel)
-//        TextView txtPriceLabel;
+        // added for events
+
+        @Nullable
+        @BindView(R.id.txteventicon)
+        TextView txtEvntIcon;
+
+        @Nullable
+        @BindView(R.id.txtathricon)
+        TextView txtAthrIcon;
+
+        @Nullable
+        @BindView(R.id.txtlocationicon)
+        TextView txtLocationIcon;
+
+        @Nullable
+        @BindView(R.id.txt_eventfromtotime)
+        TextView txtEventFromTo;
+
+        @Nullable
+        @BindView(R.id.txt_timezone)
+        TextView txtTimeZone;
+
+        @Nullable
+        @BindView(R.id.txt_eventlocation)
+        TextView txtEventLocation;
+
+        @Nullable
+        @BindView(R.id.eventlayout)
+        LinearLayout eventLayout;
+
+        @Nullable
+        @BindView(R.id.locationlayout)
+        LinearLayout locationlayout;
+
 
         @Nullable
         @BindView(R.id.circle_progress)
@@ -673,6 +642,9 @@ public class CatalogAdapter extends BaseAdapter {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(view.findViewById(R.id.btntxt_download), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txtathricon), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txteventicon), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txtlocationicon), iconFont);
             downloadInterface = new DownloadInterface() {
                 @Override
                 public void deletedTheContent(int updateProgress) {

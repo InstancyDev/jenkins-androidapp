@@ -93,11 +93,11 @@
     <!--<string name="app_default_url">http://www.mci-institute.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://9.5.1.2dev.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
-
-    <string name="app_default_url">http://qademos.instancysoft.com/</string>
+    <string name="app_default_url">http://9.5.1.2dev.instancysoft.com/</string>
     <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
+
+    <!--<string name="app_default_url">http://qademos.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--  PPD APP -->
     <!--<string name="app_default_url">https://ppdlife.instancy.com/</string>-->

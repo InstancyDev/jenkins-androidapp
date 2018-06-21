@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
@@ -82,6 +83,7 @@ import butterknife.OnClick;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
+import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -438,6 +440,15 @@ public class MyLearningAdapter extends BaseAdapter {
 
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
+            String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
+            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
+            holder.txtEventFromTo.setText(fromDate + "  to  " + toDate);
+            holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
+            if (myLearningModel.get(position).getTypeofevent() == 2) {
+                holder.locationlayout.setVisibility(View.GONE);
+            }
+
+            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
         } else {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
@@ -476,14 +487,19 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        holder.txtEventFromTo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtEventLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTimeZone.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        holder.txtAthrIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtLocationIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtEvntIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
-
         Drawable progress = holder.ratingBar.getProgressDrawable();
         DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
-
 
 //        initVolleyCallback(myLearningModel.get(position), position);
 
@@ -497,10 +513,19 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);
+
+            holder.eventLayout.setVisibility(View.VISIBLE);
+            holder.txtAthrIcon.setVisibility(View.VISIBLE);
+
+        } else {
+            holder.eventLayout.setVisibility(View.GONE);
+            holder.txtAthrIcon.setVisibility(View.GONE);
         }
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("27")) {
             holder.btnDownload.setVisibility(View.GONE);
             holder.circleProgressBar.setVisibility(View.GONE);
+
+
 //            holder.progressBar.setVisibility(View.GONE);
 
         } else {
@@ -588,7 +613,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
             courseStatus = status + " (" + 50;
 
-        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade")) ) {
+        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "Pending Review";
 
@@ -892,6 +917,41 @@ public class MyLearningAdapter extends BaseAdapter {
         @BindView(R.id.btntxt_download)
         TextView btnDownload;
 
+        // event labels
+
+        @Nullable
+        @BindView(R.id.txteventicon)
+        TextView txtEvntIcon;
+
+        @Nullable
+        @BindView(R.id.txtathricon)
+        TextView txtAthrIcon;
+
+        @Nullable
+        @BindView(R.id.txtlocationicon)
+        TextView txtLocationIcon;
+
+        @Nullable
+        @BindView(R.id.txt_eventfromtotime)
+        TextView txtEventFromTo;
+
+        @Nullable
+        @BindView(R.id.txt_timezone)
+        TextView txtTimeZone;
+
+        @Nullable
+        @BindView(R.id.txt_eventlocation)
+        TextView txtEventLocation;
+
+        @Nullable
+        @BindView(R.id.eventlayout)
+        LinearLayout eventLayout;
+
+        @Nullable
+        @BindView(R.id.locationlayout)
+        LinearLayout locationlayout;
+
+
         @Nullable
         @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
@@ -900,6 +960,11 @@ public class MyLearningAdapter extends BaseAdapter {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(view.findViewById(R.id.btntxt_download), iconFont);
+
+            FontManager.markAsIconContainer(view.findViewById(R.id.txtathricon), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txteventicon), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txtlocationicon), iconFont);
+
             downloadInterface = new DownloadInterface() {
                 @Override
                 public void deletedTheContent(int updateProgress) {
