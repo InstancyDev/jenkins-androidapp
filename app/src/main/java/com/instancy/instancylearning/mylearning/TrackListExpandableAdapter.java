@@ -93,7 +93,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     PreferencesManager preferencesManager;
     boolean autoLaunch = true;
     String typeFrom;
-
+    boolean isReportEnabled = true;
     public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView, String typeFrom) {
         this._context = context;
         this._blockNames = blockNames;
@@ -106,6 +106,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         webAPIClient = new WebAPIClient(_context);
         vollyService = new VollyService(resultCallback, _context);
         db = new DatabaseHandler(context);
+        isReportEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         this.expandableListView = expandableListView;
 //        mNotifyManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         appController = AppController.getInstance();
@@ -522,7 +523,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom,isReportEnabled);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());

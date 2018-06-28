@@ -152,15 +152,19 @@ public class CatalogAdapter extends BaseAdapter {
 
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
 
-            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
+//            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
 
             holder.txtAuthor.setText(myLearningModel.get(position).getPresenter());
-            holder.txtEventFromTo.setText(fromDate + "  to  " + toDate);
+            holder.txtEventFromTo.setText(fromDate);
             holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
             holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
-
+            holder.txtTimeZone.setVisibility(View.GONE);
             if (myLearningModel.get(position).getTypeofevent() == 2) {
                 holder.locationlayout.setVisibility(View.GONE);
+            }
+            holder.ratingBar.setVisibility(View.GONE);
+            if (!myLearningModel.get(position).isCompletedEvent()) {
+                holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Available seats : " + myLearningModel.get(position).getAviliableSeats());
             }
 
         } else {
@@ -201,12 +205,14 @@ public class CatalogAdapter extends BaseAdapter {
             ratingValue = 0;
         }
         holder.ratingBar.setRating(ratingValue);
+
         holder.ratingBar.setIsIndicator(true);
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
         Drawable progress = holder.ratingBar.getProgressDrawable();
         DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
+
 
         // apply colors
 
@@ -238,15 +244,33 @@ public class CatalogAdapter extends BaseAdapter {
         } else {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
-        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
 
+         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.txtPrice.setVisibility(View.GONE);
             holder.eventLayout.setVisibility(View.VISIBLE);
             holder.txtAthrIcon.setVisibility(View.VISIBLE);
 
+            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
+            String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
+//            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
+            holder.txtEventFromTo.setText(fromDate);
+            holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
+            if (myLearningModel.get(position).getTypeofevent() == 2) {
+                holder.locationlayout.setVisibility(View.GONE);
+            }
+
+             if (myLearningModel.get(position).getLocationName().length()==0) {
+                 holder.locationlayout.setVisibility(View.GONE);
+             }
+//            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
+            holder.txtTimeZone.setVisibility(View.GONE);
+
         } else {
+
+
+            holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
             holder.eventLayout.setVisibility(View.GONE);
             holder.txtAthrIcon.setVisibility(View.GONE);
             if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
@@ -661,6 +685,7 @@ public class CatalogAdapter extends BaseAdapter {
 
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.card_view})
         public void actionsForMenu(View view) {
+
 
             ((ListView) parent).performItemClick(view, getPosition, 0);
 

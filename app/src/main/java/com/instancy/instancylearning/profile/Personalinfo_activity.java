@@ -313,14 +313,18 @@ public class Personalinfo_activity extends AppCompatActivity {
 
         for (int i = 0; i < profileConfigsModelist.size(); i++) {
 
-            if (profileConfigsModelist.get(i).isrequired.contains("true") && profileConfigsModelist.get(i).valueName.length() == 0) {
+            if (profileConfigsModelist.get(i).iseditable.equalsIgnoreCase("true")){
+                if (profileConfigsModelist.get(i).isrequired.contains("true") && profileConfigsModelist.get(i).valueName.length() == 0) {
 
-                Log.d(TAG, "validateNewForumCreation:  required " + profileConfigsModelist.get(i).valueName);
+                    Log.d(TAG, "validateNewForumCreation:  required " + profileConfigsModelist.get(i).valueName);
 
-                Toast.makeText(context, "Enter " + profileConfigsModelist.get(i).attributedisplaytext, Toast.LENGTH_SHORT).show();
-                isValidationCompleted = false;
-                break;
+                    Toast.makeText(context, "Enter " + profileConfigsModelist.get(i).attributedisplaytext, Toast.LENGTH_SHORT).show();
+                    isValidationCompleted = false;
+                    break;
+                }
+
             }
+
         }
 
         String finalString = "";

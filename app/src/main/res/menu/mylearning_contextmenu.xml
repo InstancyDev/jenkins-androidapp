@@ -41,10 +41,16 @@
         android:orderInCategory="100"
         android:title="Set Complete" />
 
+    <!--<item-->
+        <!--android:id="@+id/ctx_relatedcontent"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="Related Content" />-->
+
     <item
         android:id="@+id/ctx_relatedcontent"
         android:orderInCategory="100"
-        android:title="Related Content" />
+        android:title="View" />
+
 
     <item
         android:id="@+id/ctx_cancelenrollment"

@@ -56,6 +56,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.TimeZone;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -1220,7 +1221,7 @@ public class Utilities {
     public static String convertToEventDisplayDateFormat(String dateTime, String currentFormat) {
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat preFormat = new SimpleDateFormat(currentFormat);
-        SimpleDateFormat postFormater = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
+        SimpleDateFormat postFormater = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         String newDate = null;
         try {
             newDate = postFormater.format(preFormat.parse(dateTime));
@@ -1231,5 +1232,32 @@ public class Utilities {
     }
 
 
+    public static boolean getEventCompletedUTC(String eventDate) {
+        boolean isCompleted = false;
 
+        Date myDate = new Date();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        calendar.setTime(myDate);
+        Date dateTimeInUtc = calendar.getTime();
+        SimpleDateFormat outputFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(dateTimeInUtc);
+        Log.d("UTC", "getEventCompletedUTC: "+dateTimeInUtc);
+        Date strDate = null;
+        try {
+            strDate = outputFmt.parse(eventDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            isCompleted = false;
+        }
+        if (dateTimeInUtc.after(strDate)) {
+            isCompleted = true;
+
+        } else {
+            isCompleted = false;
+        }
+
+        return isCompleted;
+    }
 }

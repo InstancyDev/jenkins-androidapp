@@ -59,12 +59,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
@@ -131,6 +134,7 @@ import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CO
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
@@ -140,6 +144,7 @@ import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStrin
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
+import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
 
@@ -173,6 +178,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isFromCatogories = false;
     boolean isFromPeopleListing = false;
     boolean isFromMyCompetency = false;
+    boolean isReportEnabled = true;
     WebAPIClient webAPIClient;
 
     MembershipModel membershipModel = null;
@@ -218,7 +224,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     PeopleListingModel peopleListingModel;
 
-    String skillID="";
+    String skillID = "";
 
     public Catalog_fragment() {
 
@@ -239,7 +245,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         membershipModel = new MembershipModel();
-
+        isReportEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
 //        synchData = new SynchData(context);
         if (isViewed.equalsIgnoreCase("true")) {
@@ -339,6 +345,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
+// uncomment after MCI
+        sortBy="c.publisheddate%20desc,c.name";
 
         String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId();
 
@@ -358,7 +366,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void refreshMyCompetencyCatalog() {
 
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1"  + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=Skills&fValue="+skillID;
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1" + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=Skills&fValue=" + skillID;
 
         vollyService.getJsonObjResponseVolley("MYCMPTCY", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
 
@@ -824,7 +832,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 break;
             case R.id.imagethumb:
             case R.id.card_view:
-                openDetailsPage(catalogModelsList.get(position));
+                if (!catalogModelsList.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+                    openDetailsPage(catalogModelsList.get(position));
+                }
                 break;
             default:
 
@@ -901,11 +911,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
         if (myLearningDetalData.getAddedToMylearning() == 1) {
+
             menu.getItem(0).setVisible(true);
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
 
+            if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")){
+                Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
+                if (relatedCount > 0 && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
+                    menu.getItem(0).setVisible(true);
+                }
+                else {
+                    menu.getItem(0).setVisible(false);
+                }
+            }
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
                 File myFile = new File(myLearningDetalData.getOfflinepath());
@@ -925,6 +945,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 if (myLearningDetalData.getAddedToMylearning() == 0) {
                     menu.getItem(0).setVisible(true);
+
                 } else {
                     menu.getItem(0).setVisible(false);
                 }
@@ -1006,16 +1027,17 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("View")) {
 
-
                     if (myLearningDetalData.getAddedToMylearning() == 0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
                         GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
+                    } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
+
+                        GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
+
+
                     } else {
                         GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                     }
-
-
                 }
-
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
 //                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
 
@@ -1027,14 +1049,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Add")) {
 
-//                    if(item.getItemId().)
-//                    addToMyLearning(myLearningDetalData);
-                    addToMyLearningCheckUser(myLearningDetalData, position, false);
+                    if ( myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime())) {
+
+                        try {
+                            addExpiryEvets(myLearningDetalData, position);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }else {
+                        addToMyLearningCheckUser(myLearningDetalData, position, false);
+                    }
+
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
                     addToMyLearningCheckUser(myLearningDetalData, position, true);
-//
-//                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
 
                 }
                 return true;
@@ -1668,6 +1697,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         }
     }
+
     public void breadCrumbPlusButtonInit(View rootView) {
 
         LinearLayout llCatalogGridCatageory = (LinearLayout) rootView.findViewById(R.id.llCatalogGridCatageory);
@@ -2580,6 +2610,124 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
 
         return myLearningModelList;
+    }
+    public void addExpiryEvets(MyLearningModel catalogModel, int position) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+
+        //mandatory
+        parameters.put("SelectedContent", catalogModel.getContentID());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("SiteID", catalogModel.getSiteID());
+        parameters.put("OrgUnitID", catalogModel.getSiteID());
+        parameters.put("Locale", "en-us");
+
+        String parameterString = parameters.toString();
+        boolean isSubscribed = db.isSubscribedContent(catalogModel);
+        if (isSubscribed) {
+            Toast toast = Toast.makeText(
+                    context,
+                    context.getString(R.string.cat_add_already),
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        } else {
+            sendExpiryEventData(parameterString, position, catalogModel);
+        }
+    }
+
+    public void sendExpiryEventData(final String postData, final int position, final MyLearningModel catalogModel) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/Catalog/AddExpiredContentToMyLearning";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+
+                        if (s.contains("true")) {
+// ------------------------- old code here
+
+                            getMobileGetMobileContentMetaData(catalogModel, position);
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(context.getString(R.string.event_add_success))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                            // add event to android calander
+                                            MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+                                            injectFromDbtoModel();
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    context, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+//--------------------------- old code end here
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
     }
 
 

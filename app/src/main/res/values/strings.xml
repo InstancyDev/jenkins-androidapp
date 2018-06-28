@@ -10,7 +10,7 @@
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
     <!--<string name="app_name"> Development </string>-->
-    <string name="app_name"> Switch </string>
+    <string name="app_name"> MCI Institute Switch </string>
 
     <!--<string name="app_name">PPD Life</string>-->
 
@@ -201,7 +201,8 @@
     <string name="alert_text_need_valid_email">Please enter a valid registered email.</string>
     <string name="alert_text_site_not_accessible">Could not connect to server. Please contact your administrator.</string>
     <string name="alert_text_check_connection">Please check your internet connection and try again.</string>
-    <string name="alert_text_connection_lost">The internet connection is lost. You can access the downloaded content (if any) from the &#8216;My Learning&#8217;</string>//SBIEBAY009
+    <string name="alert_text_connection_lost">The internet connection is lost. You can access the downloaded content (if any) from the &#8216;My Learning&#8217;</string>
+    //SBIEBAY009
     <string name="no_guest_content_is_configured">No guest content is configured for downloading.\nPlease contact site admin.</string>
     <string name="alert_text_event_add_success">Event added successfully</string>
     <string name="alert_url_invalid">The associated URL is invalid.\nPlease contact site admin for valid URL.</string>

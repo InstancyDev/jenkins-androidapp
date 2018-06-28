@@ -890,7 +890,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 allPBtn.setTypeface(null, Typeface.NORMAL);
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
-//                sortByDate("before");
                 TABBALUE = "Experts";
                 refreshPeopleListing(true);
                 break;

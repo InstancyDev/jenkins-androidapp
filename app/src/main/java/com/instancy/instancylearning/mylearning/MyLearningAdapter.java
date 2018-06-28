@@ -99,27 +99,27 @@ public class MyLearningAdapter extends BaseAdapter {
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
-    DatabaseHandler db;
     PreferencesManager preferencesManager;
     private String TAG = MyLearningAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
     AppController appcontroller;
     EventInterface eventInterface;
+    boolean isReportEnabled = true;
 
-
-    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface) {
+    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface, boolean isReportEnabled) {
         this.eventInterface = eventInterface;
         this.activity = activity;
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
         this.searchList.addAll(myLearningModel);
         this.resource = resource;
+        this.isReportEnabled=isReportEnabled;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(activity);
-        db = new DatabaseHandler(activity);
+
         preferencesManager = PreferencesManager.getInstance();
         appUserModel.getWebAPIUrl();
           /* setup enter and exit animation */
@@ -441,14 +441,14 @@ public class MyLearningAdapter extends BaseAdapter {
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
-            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
-            holder.txtEventFromTo.setText(fromDate + "  to  " + toDate);
+//            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
+            holder.txtEventFromTo.setText(fromDate);
             holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
             if (myLearningModel.get(position).getTypeofevent() == 2) {
                 holder.locationlayout.setVisibility(View.GONE);
             }
-
-            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
+//            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
+            holder.txtTimeZone.setVisibility(View.GONE);
         } else {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
@@ -473,7 +473,6 @@ public class MyLearningAdapter extends BaseAdapter {
             ratingValue = 0;
         }
         holder.ratingBar.setRating(ratingValue);
-
 
         if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
             holder.ratingBar.setVisibility(View.INVISIBLE);
@@ -997,7 +996,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "");
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "",isReportEnabled);
             } else {
                 if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                     ((ListView) parent).performItemClick(view, getPosition, 0);

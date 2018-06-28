@@ -145,6 +145,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     AppController appcontroller;
     boolean firstTimeVisible = true;
 
+    boolean isReportEnabled = true;
+
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
 
@@ -165,6 +167,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(context);
         db = new DatabaseHandler(context);
+
         initVolleyCallback();
         cmiSynchTask = new CmiSynchTask(context);
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -446,9 +449,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         myLearningModelsList = new ArrayList<MyLearningModel>();
-
+        isReportEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         initilizeInterface();
-        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface);
+        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface,isReportEnabled);
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -1254,7 +1257,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         if (response.contains("true")) {
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.mycatalog_enddurationdate))
+                            builder.setMessage(context.getString(R.string.event_cancelled))
                                     .setCancelable(false)
                                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {

@@ -4,12 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-import com.github.sundeepk.compactcalendarview.domain.Event;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -55,40 +49,39 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.catalog.CatalogAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
-
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
-
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
-
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -102,13 +95,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
-
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -116,9 +106,9 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
-import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
@@ -127,6 +117,7 @@ import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTimeInDate;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 
@@ -135,9 +126,9 @@ import static com.instancy.instancylearning.utils.Utilities.showToast;
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler, RadioGroup.OnCheckedChangeListener, CompactCalendarView.CompactCalendarViewListener {
+public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, BillingProcessor.IBillingHandler, RadioGroup.OnCheckedChangeListener, CompactCalendarView.CompactCalendarViewListener {
 
-    String TAG = Event_fragment.class.getSimpleName();
+    String TAG = Event_fragment_new.class.getSimpleName();
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
@@ -183,12 +174,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     String TABBALUE = "upcoming";
 
-
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
-    public Event_fragment() {
+    public Event_fragment_new() {
 
     }
 
@@ -251,33 +241,39 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             // No such key
             filterContentType = "";
         }
-
-
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
-        if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        }
-        String paramsString = "";
-        if (!TABBALUE.equalsIgnoreCase("")) {
 
-            filterContentType = "";
-            sortBy = "c.name%20asc";
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
 
-            paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=" + TABBALUE;
+            if (!isRefreshed) {
+                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            }
+            String paramsString = "";
+            if (!TABBALUE.equalsIgnoreCase("calendar")) {
 
+                filterContentType = "";
+                sortBy = "c.name%20asc";
+
+                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=" + TABBALUE;
+
+            } else {
+
+                filterContentType = "%20C.ObjectTypeID%20=%2070%20And%20C.bit4%20Is%20null%20";
+                sortBy = "c.name%20asc";
+
+                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=300&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
+            }
+            vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+
+//            MenuItemCompat.collapseActionView(item_search);
         } else {
-            filterContentType = "%20C.ObjectTypeID%20=%2070%20And%20C.bit4%20Is%20null%20";
-            filterContentType = "";
-            sortBy = "c.name%20asc";
-
-            paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=300&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
-
+            swipeRefreshLayout.setRefreshing(false);
+            injectFromDbtoModel(true);
+//            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
         }
 
-
-        vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
     void initVolleyCallback() {
@@ -289,8 +285,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
+
+                        if (TABBALUE.equalsIgnoreCase("upcoming")) {
+                            StaticValues.UPCOMINGCALLED = 1;
+                        } else if (TABBALUE.equalsIgnoreCase("calendar")) {
+                            StaticValues.CALENDARCALLED = 1;
+                        } else if (TABBALUE.equalsIgnoreCase("past")) {
+                            StaticValues.PASTCALLED = 1;
+                        }
                         try {
-                            db.injectEventCatalog(response,TABBALUE);
+                            db.injectEventCatalog(response, TABBALUE);
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -321,8 +325,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     nodata_Label.setText(getResources().getString(R.string.no_data));
                 }
-
-
             }
 
             @Override
@@ -367,7 +369,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setEnabled(false);
+//        swipeRefreshLayout.setEnabled(true);
 
         catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true);
         myLearninglistView.setAdapter(catalogAdapter);
@@ -406,7 +408,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(),"");
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -416,10 +418,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         contextMenuModelList = new ArrayList<>();
         contextMenuModelList.addAll(catalogModelsList);
-        if (sortToUpcoming) {
-            sortByDate("before");
-        }
 
+        if (TABBALUE.equalsIgnoreCase("calendar") && catalogModelsList.size() > 0) {
+            compactCalendarView.removeAllEvents();
+            addEvents(catalogModelsList);
+        }
     }
 
     public void initilizeCalander() {
@@ -645,9 +648,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         menu.getItem(4).setVisible(false);//cancel enrollment
 
 
-        Log.d(TAG, "catalogContextMenuMethod: " + menu.getItem(1).getItemId());
-        Log.d(TAG, "catalogContextMenuMethod ctx_add: " + R.id.ctx_add);
-
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
         if (myLearningDetalData.getAddedToMylearning() == 1) {
@@ -659,7 +659,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
-            menu.getItem(4).setVisible(true);
+
+            if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
+                menu.getItem(4).setVisible(true);
+            }
 
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
@@ -765,6 +768,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
                 if (item.getItemId() == R.id.ctx_view) {
+//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                     GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
                 }
 
@@ -792,13 +796,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     AlertDialog alert = builder.create();
                     alert.show();
 
-
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
                     if (isNetworkConnectionAvailable(context, -1)) {
                         if (myLearningDetalData.isCompletedEvent()) {
 
-//                            addExpiredEventToMyLearning(myLearningDetalData, position);
                             try {
                                 addExpiryEvets(myLearningDetalData, position);
                             } catch (JSONException e) {
@@ -1090,116 +1092,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
 
-//    public void addExpiredEventToMyLearning(final MyLearningModel myLearningDetalData, final int position) {
-//
-//        if (isNetworkConnectionAvailable(context, -1)) {
-//            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
-//            if (isSubscribed) {
-//                Toast toast = Toast.makeText(
-//                        context,
-//                        context.getString(R.string.cat_add_already),
-//                        Toast.LENGTH_SHORT);
-//                toast.setGravity(Gravity.CENTER, 0, 0);
-//                toast.show();
-//            } else {
-//                String requestURL = appUserModel.getWebAPIUrl() + "/Catalog/AddExpiredContentToMyLearning?"
-//                        + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
-//                        + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
-//
-//                requestURL = requestURL.replaceAll(" ", "%20");
-//                Log.d(TAG, "inside catalog login : " + requestURL);
-//
-//                StringRequest strReq = new StringRequest(Request.Method.GET,
-//                        requestURL, new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        Log.d(TAG, "add to mylearning data " + response.toString());
-//                        if (response.equalsIgnoreCase("true")) {
-////                            contextMenuModelList.get(position).setAddedToMylearning(1);
-//                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
-//
-//                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                            builder.setMessage(context.getString(R.string.event_add_success))
-//                                    .setCancelable(false)
-//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                        public void onClick(DialogInterface dialog, int id) {
-//                                            //do things
-//                                            dialog.dismiss();
-//                                            // add event to android calander
-//                                            addEventToAndroidDevice(myLearningDetalData);
-//                                            db.updateEventAddedToMyLearningInEventCatalog(contextMenuModelList.get(position), 1);
-//                                            injectFromDbtoModel(true);
-//
-//                                        }
-//                                    });
-//                            AlertDialog alert = builder.create();
-//                            alert.show();
-//
-//                        } else {
-//                            Toast toast = Toast.makeText(
-//                                    context, "Unable to process request",
-//                                    Toast.LENGTH_SHORT);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//
-//                        }
-//
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        VolleyLog.d(TAG, "Error: " + error.getMessage());
-//
-//                    }
-//                }) {
-//                    @Override
-//                    public Map<String, String> getHeaders() throws AuthFailureError {
-//                        final Map<String, String> headers = new HashMap<>();
-//                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-//                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
-//                        return headers;
-//                    }
-//                };
-//                ;
-//                VolleySingleton.getInstance(context).addToRequestQueue(strReq);
-//
-//            }
-//
-//        }
-//    }
-
-
-//    public void inAppActivityCall(MyLearningModel learningModel) {
-//        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
-//        if (!BillingProcessor.isIabServiceAvailable(context)) {
-//
-//            Toast.makeText(context, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        String testId = "android.test.purchased";
-//        String productId = "com.instancy.managedproduct";
-//        String originalproductid = learningModel.getGoogleProductID();
-//
-//        if (originalproductid.length() != 0) {
-//            Intent intent = new Intent();
-//            intent.putExtra("learningdata", learningModel);
-//            billingProcessor.handleActivityResult(IAP_LAUNCH_FLOW_CODE, 80, intent);
-//            billingProcessor.purchase(getActivity(), originalproductid);
-//        } else {
-//            Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
-//        }
-//
-////        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
-////        String productid = null;
-////        productid = learningModel.getGoogleProductID();
-//
-////        SkuDetails sku = billingProcessor.getPurchaseListingDetails(testId);
-//
-////        Toast.makeText(this, sku != null ? sku.toString() : "Failed to load SKU details", Toast.LENGTH_SHORT).show();
-//
-//
-//    }
 
     @Override
     public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
@@ -1476,7 +1368,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 pastBtn.setTypeface(null, Typeface.NORMAL);
                 sortByDate("before");
                 TABBALUE = "upcoming";
-                refreshCatalog(true);
+                if (StaticValues.UPCOMINGCALLED == 0) {
+                    refreshCatalog(false);
+                } else {
+                    injectFromDbtoModel(false);
+                }
                 break;
             case R.id.calanderbtn:
                 upBtn.setTypeface(null, Typeface.NORMAL);
@@ -1484,12 +1380,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 pastBtn.setTypeface(null, Typeface.NORMAL);
                 compactCalendarView.setVisibility(View.VISIBLE);
                 YearTitle.setVisibility(View.VISIBLE);
-                sortByDate("before");
+//                sortByDate("before");
 //                catalogAdapter.refreshList(catalogModelsList);
                 String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
                 onDayClick(getCurrentDateTimeInDate(todayD));
-                TABBALUE = "";
-                refreshCatalog(true);
+                TABBALUE = "calendar";
+                if (StaticValues.CALENDARCALLED == 0) {
+                    refreshCatalog(false);
+                } else {
+                    injectFromDbtoModel(false);
+                }
                 break;
             case R.id.pastbtn:
                 upBtn.setTypeface(null, Typeface.NORMAL);
@@ -1497,9 +1397,13 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 pastBtn.setTypeface(null, Typeface.BOLD);
                 compactCalendarView.setVisibility(View.GONE);
                 YearTitle.setVisibility(View.GONE);
-                sortByDate("after");
+//                sortByDate("after");
                 TABBALUE = "past";
-                refreshCatalog(true);
+                if (StaticValues.PASTCALLED == 0) {
+                    refreshCatalog(false);
+                } else {
+                    injectFromDbtoModel(false);
+                }
                 break;
             default:
                 // Nothing to do
@@ -1601,7 +1505,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
     }
 
-
     private void addEvents(List<MyLearningModel> myLearningModelList) {
 
         for (int i = 0; i < myLearningModelList.size(); i++) {
@@ -1613,6 +1516,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             long timeInMillis = currentCalender.getTimeInMillis();
             List<Event> events = getEvents(timeInMillis, i);
             compactCalendarView.addEvents(events);
+
         }
     }
 

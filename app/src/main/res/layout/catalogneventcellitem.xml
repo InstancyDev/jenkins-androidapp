@@ -184,7 +184,7 @@
                             android:maxLines="2"
                             android:padding="3dp"
                             android:paddingLeft="6dp"
-                            android:text="Houstan, city of houstan,bagby houstan,TX"
+                            android:text=" "
                             android:textColor="@color/colorGray"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -220,9 +220,9 @@
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:gravity="left"
-                        android:paddingLeft="2dp"
                         android:maxLines="1"
                         android:padding="1dp"
+                        android:paddingLeft="2dp"
                         android:text="By Upendra  "
                         android:textColor="@color/colorGray"
                         android:textSize="14sp" />

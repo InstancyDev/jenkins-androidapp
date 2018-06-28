@@ -96,7 +96,6 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
-    AppController appController;
     UiSettingsModel uiSettingsModel;
 
     @Nullable
@@ -159,7 +158,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         relativeLayout = (RelativeLayout) findViewById(R.id.layout_relative);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-        appController = AppController.getInstance();
+
         db = new DatabaseHandler(this);
         askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
 

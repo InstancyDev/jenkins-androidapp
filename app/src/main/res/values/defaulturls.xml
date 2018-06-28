@@ -83,18 +83,20 @@
     <!--<string name="app_default_url">http://stagingmci.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://qamci.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
+    <string name="app_default_url">http://qamci.instancysoft.com/</string>
+    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
 
     <!--<string name="app_default_url">http://learntoflyair.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
-
-
-    <!--<string name="app_default_url">http://www.mci-institute.com/</string>-->
+    
+    <!--<string name="app_default_url">https://www.mci-institute.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
-    <string name="app_default_url">http://9.5.1.2dev.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
+    <!--<string name="app_default_url">http://mci4.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
+
+    <!--<string name="app_default_url">http://9.5.1.2dev.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--<string name="app_default_url">http://qademos.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->

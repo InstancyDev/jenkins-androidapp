@@ -21,6 +21,16 @@ public class MyLearningModel implements Serializable {
 
     boolean completedEvent = false;
 
+    public boolean isEventCompletedOrNot() {
+        return eventCompletedOrNot;
+    }
+
+    public void setEventCompletedOrNot(boolean eventCompletedOrNot) {
+        this.eventCompletedOrNot = eventCompletedOrNot;
+    }
+
+    boolean eventCompletedOrNot = false;
+
     String progress = "";
     String userName = "";
     String siteID = "";
@@ -104,6 +114,25 @@ public class MyLearningModel implements Serializable {
 
     String folderPath = "";
 
+    String eventstartUtcTime = "";
+
+    public String getEventstartUtcTime() {
+        return eventstartUtcTime;
+    }
+
+    public void setEventstartUtcTime(String eventstartUtcTime) {
+        this.eventstartUtcTime = eventstartUtcTime;
+    }
+
+    public String getEventendUtcTime() {
+        return eventendUtcTime;
+    }
+
+    public void setEventendUtcTime(String eventendUtcTime) {
+        this.eventendUtcTime = eventendUtcTime;
+    }
+
+    String eventendUtcTime = "";
 
     // membership level
     int memberShipLevel = 1;

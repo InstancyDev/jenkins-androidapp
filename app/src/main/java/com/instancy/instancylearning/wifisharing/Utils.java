@@ -41,7 +41,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 
-
 /**
  * Created by anuj.sharma on 1/12/2017.
  */
@@ -322,7 +321,6 @@ public class Utils {
         animator.setDuration(COLOR_ANIMATION_DURATION);
         animator.start();
     }
-
     /*
   Play Notification Sound Vibrate
    */
@@ -337,6 +335,4 @@ public class Utils {
         Ringtone r = RingtoneManager.getRingtone(ctx, alarmSound);
         r.play();
     }
-
-
 }

@@ -45,6 +45,7 @@ import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
+import com.instancy.instancylearning.events.Event_fragment_new;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.NetworkChangeReceiver;
@@ -588,7 +589,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 fragment = new HomeCategories_Fragment();
                 break;
             case 8:
-                fragment = new Event_fragment();
+//                fragment = new Event_fragment();
+                fragment = new Event_fragment_new();
                 break;
             case 4:
                 fragment = new DiscussionFourm_fragment();

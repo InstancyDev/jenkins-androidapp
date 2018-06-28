@@ -114,7 +114,7 @@ public class GlobalMethods {
 
         }
 
-        if (myFile.exists()) {
+        if (myFile.exists() && !myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
             databaseH = new DatabaseHandler(context);
             JSONObject jsonObject = new JSONObject();
@@ -546,7 +546,18 @@ public class GlobalMethods {
                         }
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
                     {
-                        urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && isValidString(myLearningModel.getJwvideokey())) {
+
+//                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+
+                            urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html";
+
+                        } else {
+                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+                        }
+
+
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
                         urlForView = myLearningModel.getStartPage();
@@ -806,7 +817,6 @@ public class GlobalMethods {
                         Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
                         iWeb.putExtra("COURSE_URL", encodedStr);
                         iWeb.putExtra("myLearningDetalData", myLearningModel);
-
                         ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
                     }
                 } else {
@@ -815,8 +825,6 @@ public class GlobalMethods {
                 }
             }
         }
-
-
     }
 
     private static String GetCurrentDateTime() {
@@ -835,12 +843,12 @@ public class GlobalMethods {
             ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
         } else {
 
-            Toast.makeText(context, "No Content found for this event", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, " No Content found for this event ", Toast.LENGTH_SHORT).show();
 
         }
     }
 
-    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom) {
+    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -861,6 +869,7 @@ public class GlobalMethods {
         menu.getItem(10).setVisible(false);
 
         File myFile = new File(myLearningDetalData.getOfflinepath());
+
 
         if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
 
@@ -895,8 +904,7 @@ public class GlobalMethods {
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
-                // uncomment for reports it to false mci client
-                menu.getItem(5).setVisible(false);
+
             }
 
 //            if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
@@ -943,6 +951,13 @@ public class GlobalMethods {
             menu.getItem(2).setVisible(false);
         }
 
+        if (!isReportEnabled) {
+
+            menu.getItem(5).setVisible(false);
+
+        }
+
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
@@ -957,7 +972,7 @@ public class GlobalMethods {
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("View")) {
+                if (item.getItemId() == R.id.ctx_view) {
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Report")) {
@@ -972,7 +987,7 @@ public class GlobalMethods {
 //                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Related Content")) {
+                if (item.getItemId() == R.id.ctx_relatedcontent) {
                     relatedContentView(myLearningDetalData, v.getContext());
 
                 }
@@ -1119,23 +1134,6 @@ public class GlobalMethods {
         return encImage;
     }
 
-    public static void addToDeviceCalendar(MyLearningModel myLearningModel, Context context) {
-
-        long startMillis = 0;
-        Calendar cal = Calendar.getInstance();
-        Intent intent = new Intent(Intent.ACTION_EDIT);
-        intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra("beginTime", startMillis);
-        intent.putExtra("allDay", true);
-        intent.putExtra("rrule", "FREQ=YEARLY");
-        intent.putExtra("endTime", cal.getTimeInMillis() + 60 * 60 * 1000);
-        intent.putExtra(CalendarContract.Events.DESCRIPTION, myLearningModel.getShortDes());
-        intent.putExtra(CalendarContract.Events.TITLE, myLearningModel.getCourseName());
-        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, myLearningModel.getLocationName());
-        context.startActivity(intent);
-
-    }
-
     public static void addEventToDeviceCalendar(MyLearningModel myLearningModel, Context context) {
 
         long startMillis = convertStringToLong(myLearningModel.getEventstartTime());
@@ -1143,7 +1141,7 @@ public class GlobalMethods {
 
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra(CalendarContract.Events.ALL_DAY, true);
+        intent.putExtra(CalendarContract.Events.ALL_DAY, false);
         intent.putExtra(CalendarContract.Events.RRULE, "FREQ=YEARLY");
         intent.putExtra(CalendarContract.Events.DESCRIPTION, myLearningModel.getShortDes());
         intent.putExtra(CalendarContract.Events.TITLE, myLearningModel.getCourseName());

@@ -303,8 +303,17 @@ public class StaticValues {
 
     public static final String ACTION_INTENT_TEXT_MESSAGE_INCOMING = "ACTION_INTENT_TEXT_MESSAGE_INCOMING";
 
-
     public static int ISPROFILENAMEORIMAGEUPDATED = 0;
+
+    public static int CALENDARCALLED = 0;
+
+    public static int PASTCALLED = 0;
+
+    public static int UPCOMINGCALLED = 0;
+
+    public static int REPORTPREVILAGEID = 1072;
+
+
 
     /// all app configurations
 

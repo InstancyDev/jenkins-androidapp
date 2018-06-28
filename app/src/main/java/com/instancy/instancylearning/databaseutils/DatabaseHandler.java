@@ -138,6 +138,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String TBL_RELATEDCONTENTDATA = "RELATEDCONTENTDATA";
 
     public static final String TBL_EVENTCONTENTDATA = "EVENTCONTENTDATA";
+
     public static final String TBL_LRSDATA = "LRSDATA";
     public static final String TBL_SITETINCANCONFIG = "SITETINCANCONFIG";
     public static final String TBL_CATEGORY = "CATEGORY";
@@ -328,13 +329,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
         //used upto here
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -363,16 +364,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
                 + "(lrsid INTEGER PRIMARY KEY AUTOINCREMENT,LRS TEXT,url TEXT,method TEXT,data TEXT,auth TEXT,callback TEXT,lrsactor TEXT,extraHeaders TEXT,siteid INTEGER,scoid INTEGER,userid INTEGER,isupdate TEXT)");
@@ -1817,6 +1818,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    public void ejectRecordsInEventByTab(String TabValue) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE  siteid = "
+                    + appUserModel.getSiteIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' AND eventTabValue = '" + TabValue + "'";
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+
+    }
+
     public void ejectRecordsinTable(String TABLENAME) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -2114,7 +2131,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String scoreraw = jsonMyLearningColumnObj.getString("durationenddate");
                 if (isValidString(scoreraw)) {
-                    myLearningModel.setDurationEndDate(scoreraw); // upendranath
+                    myLearningModel.setDurationEndDate(scoreraw);
 
                     myLearningModel.setIsExpiry("false");
                     boolean isCompleted = false;
@@ -2162,15 +2179,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         }
                     }
 
-
                 }
-//                // imagedata
-//                if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
-//
-//
-//                } else {
-//
-//                }
+
                 // relatedcontentcount
                 if (jsonMyLearningColumnObj.has("relatedconentcount")) {
 
@@ -2268,28 +2278,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
 
                 }
-                // eventstarttime
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+                // eventstartdatedisplay
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
 
 //                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
                     Log.d(TAG, "injectEventCatalog: " + formattedDate);
                     myLearningModel.setEventstartTime(formattedDate);
 
 
                 }
-                // eventendtime
-                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
 
-//                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                //  eventenddatedisplay
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
                     Log.d(TAG, "injectEventCatalog: " + formattedDate);
                     myLearningModel.setEventendTime(formattedDate);
 
                 }
 
+                // eventstartdatetime UTC
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartUtcTime(formattedDate);
+
+
+                }
+
+                //  eventenddatetime UTC
+                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendUtcTime(formattedDate);
+
+                }
                 // mediatypeid
                 if (jsonMyLearningColumnObj.has("mediatypeid")) {
 
@@ -2540,6 +2568,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("jwvideokey", myLearningModel.getJwvideokey());
             contentValues.put("cloudmediaplayerkey", myLearningModel.getCloudmediaplayerkey());
 
+            contentValues.put("eventstartUtctime", myLearningModel.getEventstartUtcTime());
+            contentValues.put("eventendUtctime", myLearningModel.getEventendUtcTime());
+
+
             if (subscibed) {
 
                 db.delete(TBL_DOWNLOADDATA, "siteid='" + myLearningModel.getSiteID()
@@ -2685,6 +2717,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setCloudmediaplayerkey(cursor.getString(cursor
                             .getColumnIndex("cloudmediaplayerkey")));
+
+
+                    myLearningModel.setEventstartUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventstartUtctime")));
+
+                    myLearningModel.setEventendUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventendUtctime")));
+
 
                     myLearningModelList.add(myLearningModel);
 
@@ -2940,16 +2980,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
 
                 }
-                // eventstarttime
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+                //  eventstartdatedisplay
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
 
-                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString());
 
                 }
-                // eventendtime
+                // eventenddatedisplay
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+
+                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatedisplay").toString());
+
+                }
+
+                // eventstartdatetime UTC
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartUtcTime(formattedDate);
+
+
+                }
+
+                //  eventenddatetime UTC
                 if (jsonMyLearningColumnObj.has("eventenddatetime")) {
 
-                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendUtcTime(formattedDate);
 
                 }
 
@@ -2984,10 +3043,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // isExpiry
                 myLearningModel.setIsExpiry("false");
 
-                // locationname
-                if (jsonMyLearningColumnObj.has("locationname")) {
+                // eventfulllocation
+                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
 
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
                 }
                 // timezone
@@ -3153,6 +3212,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
+                // presenter
+                if (jsonMyLearningColumnObj.has("presenter")) {
+
+                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+                }
+
+                // eventstartdatedisplay
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartTime(formattedDate);
+                }
+                // eventenddatedisplay
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendTime(formattedDate);
+                }
+
+
                 injectCatalogDataIntoTable(myLearningModel, isFromCatageories);
             }
 
@@ -3208,9 +3292,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("membershiplevel", myLearningModel.getMemberShipLevel());
             contentValues.put("membershipname", myLearningModel.getMembershipname());
             contentValues.put("folderpath", myLearningModel.getFolderPath());
-
             contentValues.put("jwvideokey", myLearningModel.getJwvideokey());
             contentValues.put("cloudmediaplayerkey", myLearningModel.getCloudmediaplayerkey());
+
+            contentValues.put("relatedconentcount", myLearningModel.getRelatedContentCount());
+
+
+            contentValues.put("presenter", myLearningModel.getPresenter());
+            contentValues.put("eventstarttime", myLearningModel.getEventstartTime());
+            contentValues.put("eventendtime", myLearningModel.getEventendTime());
+
+            contentValues.put("eventstartUtctime", myLearningModel.getEventstartUtcTime());
+            contentValues.put("eventendUtctime", myLearningModel.getEventendUtcTime());
 
 
             db.insert(TBL_CATALOGDATA, null, contentValues);
@@ -3363,12 +3456,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setFolderPath(cursor.getString(cursor
                             .getColumnIndex("folderpath")));
 
-
                     myLearningModel.setJwvideokey(cursor.getString(cursor
                             .getColumnIndex("jwvideokey")));
 
                     myLearningModel.setCloudmediaplayerkey(cursor.getString(cursor
                             .getColumnIndex("cloudmediaplayerkey")));
+
+                    myLearningModel.setPresenter(cursor.getString(cursor
+                            .getColumnIndex("presenter")));
+
+                    myLearningModel.setEventstartTime(cursor.getString(cursor
+                            .getColumnIndex("eventstarttime")));
+
+                    myLearningModel.setEventendTime(cursor.getString(cursor
+                            .getColumnIndex("eventendtime")));
+
+                    myLearningModel.setRelatedContentCount(cursor.getString(cursor
+                            .getColumnIndex("relatedconentcount")));
+
+                    myLearningModel.setEventstartUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventstartUtctime")));
+
+                    myLearningModel.setEventendUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventendUtctime")));
 
                     myLearningModel.setEventAddedToCalender(false);
 
@@ -3393,12 +3503,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 // inject eventcatalog data to table
 
-    public void injectEventCatalog(JSONObject jsonObject) throws JSONException {
-
+    public void injectEventCatalog(JSONObject jsonObject, String tabValue) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
-        ejectRecordsinTable(TBL_EVENTCONTENTDATA);
+//        ejectRecordsinTable(TBL_EVENTCONTENTDATA);
+
+        ejectRecordsInEventByTab(tabValue);
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
@@ -3636,21 +3747,40 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
                 }
-                // eventstarttime
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+                // eventstartdatedisplay
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
                     Log.d(TAG, "injectEventCatalog: " + formattedDate);
                     myLearningModel.setEventstartTime(formattedDate);
                 }
-                // eventendtime
-                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+                // eventenddatedisplay
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
                     Log.d(TAG, "injectEventCatalog: " + formattedDate);
                     myLearningModel.setEventendTime(formattedDate);
+                }
+
+                // eventstartdatetime UTC
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartUtcTime(formattedDate);
+
+
+                }
+
+                //  eventenddatetime UTC
+                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendUtcTime(formattedDate);
+
                 }
 
                 // timezone
@@ -3659,8 +3789,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     // timezone
 //                    if (jsonMyLearningColumnObj.has("timezone")) {
 //
-                        String timez = jsonMyLearningColumnObj.get("timezone").toString();
-                        myLearningModel.setTimeZone(timez);
+                    String timez = jsonMyLearningColumnObj.get("timezone").toString();
+                    myLearningModel.setTimeZone(timez);
 
 //                        String timezone = "EST";
 //                        switch (timez.toLowerCase()) {
@@ -3840,8 +3970,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
 
+//                availableseats
+                if (jsonMyLearningColumnObj.has("availableseats")) {
 
-                injectEventCatalogDataIntoTable(myLearningModel);
+                    myLearningModel.setAviliableSeats(jsonMyLearningColumnObj.optString("availableseats", ""));
+
+                }
+
+                injectEventCatalogDataIntoTable(myLearningModel, tabValue);
             }
 
         }
@@ -3849,7 +3985,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public void injectEventCatalogDataIntoTable(MyLearningModel myLearningModel) {
+    public void injectEventCatalogDataIntoTable(MyLearningModel myLearningModel, String tabValue) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
         try {
@@ -3907,6 +4043,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             contentValues.put("typeofevent", myLearningModel.getTypeofevent());
 
+            contentValues.put("eventTabValue", tabValue);
+
+            contentValues.put("eventstartUtctime", myLearningModel.getEventstartUtcTime());
+            contentValues.put("eventendUtctime", myLearningModel.getEventendUtcTime());
+
 
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -3916,12 +4057,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public List<MyLearningModel> fetchEventCatalogModel(String componentID) {
+    public List<MyLearningModel> fetchEventCatalogModel(String componentID, String typeTab) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventTabValue = '" + typeTab + "'  ORDER BY eventstarttime ASC";
+
+//        switch (typeTab){
+//            case "upcoming": //eventTabValue typeTab
+//                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
+//                break;
+//            case "past":
+//                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
+//                break;
+//            case "calendar":
+//                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
+//                break;
+//        }
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -4058,6 +4211,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setTypeofevent(cursor.getInt(cursor
                             .getColumnIndex("typeofevent")));
+
+                    myLearningModel.setAviliableSeats(cursor.getString(cursor
+                            .getColumnIndex("availableseats")));
+
+                    myLearningModel.setEventstartUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventstartUtctime")));
+
+                    myLearningModel.setEventendUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventendUtctime")));
 
                     myLearningModel.setEventAddedToCalender(false);
 
@@ -4241,24 +4403,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 trackLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedcontentcount").toString());
             }
 
-//            //sitename
-//            if (jsonMyLearningColumnObj.has("sitename")) {
-//
-//                trackLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
-//            }
-//            // siteurl
-//            if (jsonMyLearningColumnObj.has("siteurl")) {
-//
-//                trackLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
-//
-//            }
-//            // siteid
-//            if (jsonMyLearningColumnObj.has("corelessonstatus")) {
-//
-//                trackLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
-//
-//            }
-
             // coursename
             if (jsonMyLearningColumnObj.has("name")) {
 
@@ -4274,7 +4418,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 trackLearningModel.setShortDes(result.toString());
 
             }
-
 
             String authorName = "";
             if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
@@ -4456,15 +4599,36 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
                 // eventstarttime
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
 
-                    trackLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    trackLearningModel.setEventstartTime(formattedDate);
 
                 }
                 // eventendtime
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    trackLearningModel.setEventendTime(formattedDate);
+                }
+
+                // eventstartdatetime UTC
+                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    trackLearningModel.setEventstartUtcTime(formattedDate);
+
+                }
+
+                //  eventenddatetime UTC
                 if (jsonMyLearningColumnObj.has("eventenddatetime")) {
 
-                    trackLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    trackLearningModel.setEventendUtcTime(formattedDate);
 
                 }
 
@@ -4483,25 +4647,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // eventAddedToCalender
                 trackLearningModel.setEventAddedToCalender(false);
 
-//            if (jsonMyLearningColumnObj.has("startdate")) {
-//
-//                String checkfalseOrTrue = jsonMyLearningColumnObj.get("startdate").toString();
-//                if (checkfalseOrTrue.equalsIgnoreCase("false")) {
-//                    myLearningModel.setEventAddedToCalender(false);
-//                } else {
-//                    myLearningModel.setEventAddedToCalender(true);
-//                }
-//            }
-                // isExpiry
-//            if (jsonMyLearningColumnObj.has("startdate")) {
-//
-//                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
-//
-//            }
-                // locationname
-                if (jsonMyLearningColumnObj.has("locationname")) {
 
-                    trackLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+                // locationname
+                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
+
+                    trackLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
                 }
                 // timezone
@@ -4910,15 +5060,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
 
                     // eventstarttime
-                    if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+                    if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
 
-                        trackLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
+                        trackLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString());
 
                     }
-                    // eventendtime
-                    if (jsonMyLearningColumnObj.has("eventenddatetime")) {
+                    // eventenddatedisplay
+                    if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
 
-                        trackLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+                        trackLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatedisplay").toString());
 
                     }
 
@@ -4952,10 +5102,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
 //
 //            }
-                    // locationname
-                    if (jsonMyLearningColumnObj.has("locationname")) {
+                    // eventfulllocation
+                    if (jsonMyLearningColumnObj.has("eventfulllocation")) {
 
-                        trackLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+                        trackLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
                     }
                     // timezone
@@ -5094,6 +5244,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("jwvideokey", trackListModel.getJwvideokey());
             contentValues.put("cloudmediaplayerkey", trackListModel.getCloudmediaplayerkey());
 
+            contentValues.put("eventstartUtctime", trackListModel.getEventstartUtcTime());
+            contentValues.put("eventendUtctime", trackListModel.getEventendUtcTime());
 
             db.insert(TBL_TRACKLISTDATA, null, contentValues);
 
@@ -5247,6 +5399,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     trackListModel.setCloudmediaplayerkey(cursor.getString(cursor
                             .getColumnIndex("cloudmediaplayerkey")));
 // for tracklis
+
+                    trackListModel.setEventstartUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventstartUtctime")));
+
+                    trackListModel.setEventendUtcTime(cursor.getString(cursor
+                            .getColumnIndex("eventendUtctime")));
+
 
                     if (isTrackListView) {
 
@@ -5420,6 +5579,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("ruleid", "0");
             contentValues.put("stepid", "0");
             contentValues.put("wmessage", "");
+
+
+            contentValues.put("eventstartUtctime", trackListModel.getEventstartUtcTime());
+            contentValues.put("eventendUtctime", trackListModel.getEventendUtcTime());
+
 
             db.insert(TBL_RELATEDCONTENTDATA, null, contentValues);
 
@@ -9693,7 +9857,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
             }
 
-
             // contentID
             if (jsonMyLearningColumnObj.has("contentid")) {
 
@@ -9746,7 +9909,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
                 }
-
                 // relatedcontentcount
                 if (jsonMyLearningColumnObj.has("relatedconentcount")) {
 
@@ -9801,9 +9963,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
                 // typeofevent
-                if (jsonMyLearningColumnObj.has("typeofevent")) {
+                if (jsonMyLearningColumnObj.has("viewtype")) {
 
-                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("viewtype").toString());
 
                     myLearningModel.setTypeofevent(typeoFEvent);
 
@@ -9842,22 +10004,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // publishedDate
                 if (jsonMyLearningColumnObj.has("publisheddate")) {
 
-                    myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("publisheddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
-                }
-                // eventstarttime
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
-
-                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
-
-                }
-                // eventendtime
-                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
-
-                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setPublishedDate(formattedDate);
 
                 }
 
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartTime(formattedDate);
+                }
+                // eventenddatedisplay
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendTime(formattedDate);
+                }
                 // mediatypeid
                 if (jsonMyLearningColumnObj.has("mediatypeid")) {
 
@@ -9885,26 +10053,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 // eventAddedToCalender
                 myLearningModel.setEventAddedToCalender(false);
 
-//            if (jsonMyLearningColumnObj.has("startdate")) {
-//
-//                String checkfalseOrTrue = jsonMyLearningColumnObj.get("startdate").toString();
-//                if (checkfalseOrTrue.equalsIgnoreCase("false")) {
-//                    myLearningModel.setEventAddedToCalender(false);
-//                } else {
-//                    myLearningModel.setEventAddedToCalender(true);
-//                }
-//            }
                 // isExpiry
                 myLearningModel.setIsExpiry("false");
-//            if (jsonMyLearningColumnObj.has("startdate")) {
-//
-//                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
-//
-//            }
-                // locationname
-                if (jsonMyLearningColumnObj.has("locationname")) {
 
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
+                // locationname
+                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
+
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
                 }
                 // timezone
@@ -9964,9 +10119,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
                 // presenter
-                if (jsonMyLearningColumnObj.has("presenter")) {
+                if (jsonMyLearningColumnObj.has("presentername")) {
 
-                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presentername").toString());
 
                 }
 

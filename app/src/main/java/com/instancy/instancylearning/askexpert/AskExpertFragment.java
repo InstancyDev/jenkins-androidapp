@@ -154,7 +154,9 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     String contentIDFromNotification = "";
 
-    List<AskExpertCategoriesModel> askExpertCategoriesModels = null;
+//    List<AskExpertCategoriesModel> askExpertCategoriesModels = null;
+
+    List<AskExpertSkillsModel> askExpertSkillsModelList = null;
 
     View header;
 
@@ -281,7 +283,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                         try {
                             db.injectAsktheExpertFiltersCategoryDataTable(response);
                             db.injectAsktheExpertMapCategoryDataTable(response);
-                            askExpertCategoriesModels = db.fetchAskFilterSkillsModelList();
+//                            askExpertCategoriesModels = db.fetchAskFilterSkillsModelList();
+                            askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -807,14 +810,14 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
 
     public void filterPopUp() {
+        askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
+        if (askExpertSkillsModelList != null && askExpertSkillsModelList.size() > 0) {
+            skillsForFilter = new String[askExpertSkillsModelList.size()];
+            categoriesID = new String[askExpertSkillsModelList.size()];
 
-        if (askExpertCategoriesModels != null && askExpertCategoriesModels.size() > 0) {
-            skillsForFilter = new String[askExpertCategoriesModels.size()];
-            categoriesID = new String[askExpertCategoriesModels.size()];
-
-            for (int s = 0; s < askExpertCategoriesModels.size(); s++) {
-                skillsForFilter[s] = askExpertCategoriesModels.get(s).category;
-                categoriesID[s] = askExpertCategoriesModels.get(s).categoryID;
+            for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
+                skillsForFilter[s] = askExpertSkillsModelList.get(s).preferrenceTitle;
+                categoriesID[s] = askExpertSkillsModelList.get(s).preferrenceID;
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
