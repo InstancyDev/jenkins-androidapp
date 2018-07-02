@@ -12,6 +12,7 @@
     <string name="cle_academy">CropLife Online Dealer Training</string>
 
     <string name="acclife">Online Lifeskills</string>
+
     <string name="enterprisedemo">Enterprise Learning Lite</string>
 
     <string name="ppdlife">PPD Life</string>
@@ -21,5 +22,7 @@
     <string name="development">Development</string>
 
     <string name="healthhelp">HealthHelp IE</string>
+
+    <string name="mciswitchinstitute"> MCI Institute Switch </string>
 
 </resources>

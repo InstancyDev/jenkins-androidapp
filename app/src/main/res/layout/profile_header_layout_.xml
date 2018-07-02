@@ -32,6 +32,7 @@
             android:gravity="center_vertical"
             android:text="@string/fa_icon_edit"
             android:textAlignment="center"
+            android:visibility="gone"
             android:textColor="@color/colorBlack"
             android:textSize="24sp"
             android:textStyle="bold" />

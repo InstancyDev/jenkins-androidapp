@@ -1235,6 +1235,9 @@ public class Utilities {
     public static boolean getEventCompletedUTC(String eventDate) {
         boolean isCompleted = false;
 
+        if (!isValidString(eventDate))
+            return isCompleted;
+
         Date myDate = new Date();
 
         Calendar calendar = Calendar.getInstance();
@@ -1243,7 +1246,7 @@ public class Utilities {
         Date dateTimeInUtc = calendar.getTime();
         SimpleDateFormat outputFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(dateTimeInUtc);
-        Log.d("UTC", "getEventCompletedUTC: "+dateTimeInUtc);
+        Log.d("UTC", "getEventCompletedUTC: " + dateTimeInUtc);
         Date strDate = null;
         try {
             strDate = outputFmt.parse(eventDate);

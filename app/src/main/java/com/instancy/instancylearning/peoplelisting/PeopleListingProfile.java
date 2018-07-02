@@ -509,6 +509,9 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                         groupid = profileGroupObj.get("groupid").toString();
                     }
 
+                    if (groupid.equalsIgnoreCase("6"))
+                        continue;
+
                     if (jsonObjectProfileConfigs.has("datafilelist")) {
 
                         JSONArray jsonProfileConfigArray = jsonObjectProfileConfigs.getJSONArray("datafilelist");

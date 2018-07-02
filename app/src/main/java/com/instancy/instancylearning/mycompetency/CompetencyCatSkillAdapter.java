@@ -65,6 +65,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+
 
 public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
     Context ctx;
@@ -229,13 +231,12 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 //        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 //        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        if (!uiSettingsModel.isEnableContentEvaluation()){
+        if (!uiSettingsModel.isEnableContentEvaluation()) {
             holder.linearLayoutScore.setVisibility(View.GONE);
             holder.mChart.setVisibility(View.GONE);
         }
 
 
-        holder.mChart.setUsePercentValues(true);
         holder.mChart.getDescription().setEnabled(false);
         holder.mChart.setExtraOffsets(5, 10, 5, 5);
         holder.mChart.setDragDecelerationFrictionCoef(0.95f);
@@ -251,6 +252,8 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         // enable rotation of the chart by touch
         holder.mChart.setRotationEnabled(true);
         holder.mChart.setHighlightPerTapEnabled(true);
+        holder.mChart.setDrawSliceText(false);
+        holder.mChart.setUsePercentValues(false);
         // mChart.setUnit(" €");
         // mChart.setDrawUnitsInChart(true);
 
@@ -473,8 +476,23 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
         Menu menu = popup.getMenu();
 
-        menu.getItem(0).setVisible(true);
-        menu.getItem(1).setVisible(true);
+        if (skillModelList.get(position).viewContent.equalsIgnoreCase("disabled")) {
+            menu.getItem(0).setVisible(false);//viewcontent
+
+        } else {
+            menu.getItem(0).setVisible(true);//viewcontent
+
+        }
+
+        if (!uiSettingsModel.isEnableContentEvaluation()) {
+
+            menu.getItem(1).setVisible(false);// save skills
+
+        } else {
+            menu.getItem(1).setVisible(true);// save skills
+
+        }
+
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -483,16 +501,26 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
                     Intent intentDetail = new Intent(ctx, CatalogFragmentActivity.class);
                     intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
-                    intentDetail.putExtra("SKILLID",skillModelList.get(position).skillID);
+                    intentDetail.putExtra("SKILLID", skillModelList.get(position).skillID);
                     intentDetail.putExtra("ISFROMMYCOMPETENCY", true);
                     ctx.startActivity(intentDetail);
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Save")) {
 
+
                     String skillValueString = prepareTheSkillSetValueString();
                     try {
-                        submitSkillData(skillValueString, categoryModel);
+
+                        if (isNetworkConnectionAvailable(ctx, -1)) {
+
+                            submitSkillData(skillValueString, categoryModel);
+                        } else {
+
+                            Toast.makeText(ctx, ctx.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        }
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

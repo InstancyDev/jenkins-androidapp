@@ -298,7 +298,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
                                                svProgressHUD.dismiss();
                                            }
-
+                                           svProgressHUD.dismiss();
                                        }
 
                                        @Override
@@ -308,6 +308,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                svProgressHUD.dismiss();
                                                Log.d(TAG, "onReceivedError: from normal web " + failingUrl);
                                            }
+
                                        }
 
                                    }
@@ -339,6 +340,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
         if (isCloseEnable) {
             super.onBackPressed();
+            adWebView.destroy();
+            adWebView.pauseTimers();
         }
 
     }
@@ -346,6 +349,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+//        adWebView.pauseTimers();
 
 //        adWebView.loadUrl("");
 //        adWebView.stopLoading();
@@ -368,6 +372,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
                 setResult(RESULT_OK, intent);
+                adWebView.destroy();
+                adWebView.pauseTimers();
                 finish();
                 return true;
             default:

@@ -326,7 +326,7 @@ public class CatalogAdapter extends BaseAdapter {
             myLearningModel.addAll(searchList);
         } else {
             for (MyLearningModel s : searchList) {
-                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) || s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText) || s.getShortDes().toLowerCase(Locale.getDefault()).contains(charText)|| s.getKeywords().toLowerCase(Locale.getDefault()).contains(charText)) {
                     myLearningModel.add(s);
                 }
             }

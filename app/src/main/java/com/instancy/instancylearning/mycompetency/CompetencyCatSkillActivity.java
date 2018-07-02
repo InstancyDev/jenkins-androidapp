@@ -196,7 +196,6 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         } catch (RuntimeException ex) {
-
             ex.printStackTrace();
         }
 
@@ -331,6 +330,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.weightedAverage = skillsSetObj.optDouble("WeightedAverage");
                 skillModel.requiredProficiency = skillsSetObj.optDouble("RequiredProficiency");
                 skillModel.requiredProfArys = skillsSetObj.optJSONArray("RequiredProfValues");
+                skillModel.viewContent = skillsSetObj.getString("SkillViewContentlink");
             }
             skillModelList.add(skillModel);
         }

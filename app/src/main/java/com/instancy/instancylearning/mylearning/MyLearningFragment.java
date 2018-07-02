@@ -41,6 +41,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +74,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.thin.downloadmanager.DownloadRequest;
@@ -155,6 +157,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     String contentIDFromNotification = "";
 
     EventInterface eventInterface = null;
+
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    boolean isSearching = false;
+
+    ProgressBar progressBar;
 
     public MyLearningFragment() {
 
@@ -244,7 +251,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 + "&Type=" + consolidationType
                 + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=&SiteID="
                 + appUserModel.getSiteIDValue()
-                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0";
+                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
         vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
@@ -258,7 +265,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 if (requestType.equalsIgnoreCase("MYLEARNINGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectMyLearningData(response);
+                            db.injectMyLearningData(response, pageIndex);
+                            totalRecordsCount = countOfTotalRecords(response);
                             injectFromDbtoModel();
 
                         } catch (JSONException e) {
@@ -382,6 +390,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             public void onFinish() {
                 triggerActionForFirstItem();
+                progressBar.setVisibility(View.GONE);
             }
         }.start();
 
@@ -451,7 +460,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearningModelsList = new ArrayList<MyLearningModel>();
         isReportEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         initilizeInterface();
-        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface,isReportEnabled);
+        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface, isReportEnabled);
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -467,6 +476,37 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
             }
         });
+
+        final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
+        myLearninglistView.addFooterView(footerView);
+        progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
+
+        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
+                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
+
+                    Log.d(TAG, "onLoadMore size: catalogModelsList" + myLearningModelsList.size());
+
+                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+
+                    if (!isSearching) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        refreshMyLearning(true);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+
+                    }
+
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
         toolbar = ((SideMenu) getActivity()).toolbar;
 //        setSearchtollbar();
 
@@ -585,6 +625,20 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             Drawable myIcon = getResources().getDrawable(R.drawable.help);
             itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
         }
+        item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                isSearching = true;
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                isSearching = false;
+                return true;
+            }
+        });
     }
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
@@ -1296,6 +1350,19 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
+    public int countOfTotalRecords(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        int totalRecs = 0;
+
+        if (jsonTableAry.length() > 0) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(0);
+
+            totalRecs = jsonMyLearningColumnObj.getInt("totalrecordscount");
+        }
+
+        return totalRecs;
+    }
 //    public void getUpdatedDataAfterReviewToContent(MyLearningModel learningModel) {
 //
 //        String paramsString = "FilterCondition=" + filterContentType +

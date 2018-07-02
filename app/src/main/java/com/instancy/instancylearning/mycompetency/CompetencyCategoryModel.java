@@ -12,4 +12,5 @@ public class CompetencyCategoryModel implements Serializable {
     public String prefCategoryID = "";
     public int jobRoleID = 0;
 
+
 }

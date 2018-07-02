@@ -931,6 +931,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                         uiSettingsModel.setEnableContentEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
                                     }
+                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableContentEvaluation"))) {
+
+                                        uiSettingsModel.setEnableUserEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
+                                    }
                                 }
                             }
 
@@ -1818,12 +1822,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public void ejectRecordsInEventByTab(String TabValue) {
+    public void ejectRecordsInEventByTab(String TabValue,String ComponentId) {
+
+        String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"'";
+
+        // according time get data
+        switch (TabValue){
+            case "upcoming": //eventTabValue typeTab
+                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"'";
+                break;
+            case "past":
+                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime <= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"'";
+                break;
+            case "calendar":
+                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId ;
+                break;
+        }
 
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE  siteid = "
-                    + appUserModel.getSiteIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' AND eventTabValue = '" + TabValue + "'";
+//            String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE  siteid = "
+//                    + appUserModel.getSiteIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' AND eventTabValue = '" + TabValue + "'";
             db.execSQL(strDelete);
 
         } catch (SQLiteException sqlEx) {
@@ -2034,7 +2053,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //////////////////////////  DB INSERTIONS FOR MYLEARNING
 
 
-    public void injectMyLearningData(JSONObject jsonObject) throws JSONException {
+    public void injectMyLearningData(JSONObject jsonObject,int pageIndex) throws JSONException {
         SQLiteDatabase db = this.getWritableDatabase();
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
@@ -2499,7 +2518,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
-//            injectIntoRowWise(myLearningModel);
+                if (isCotentExists(myLearningModel,TBL_DOWNLOADDATA)) {
+                    continue;
+                }
+
+
                 injectMyLearningIntoTable(myLearningModel, false);
             }
 
@@ -2510,6 +2533,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void injectMyLearningIntoTable(MyLearningModel myLearningModel, boolean subscibed) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues contentValues = null;
         try {
 
@@ -2584,7 +2608,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                        + myLearningModel.getScoId() + "'", null);
 
             }
-
 
             db.insert(TBL_DOWNLOADDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -2746,17 +2769,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public void injectCatalogData(JSONObject jsonObject, boolean isFromCatageories) throws JSONException {
-
+    public void injectCatalogData(JSONObject jsonObject, boolean isFromCatageories, int pageIndex) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
 
-        if (!isFromCatageories) {
+        if (!isFromCatageories && pageIndex == 1) {
 
             ejectRecordsinTable(TBL_CATALOGDATA);
         }
-
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
@@ -3236,12 +3257,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventendTime(formattedDate);
                 }
 
+                if (isCotentExists(myLearningModel,TBL_CATALOGDATA)) {
+                    continue;
+                }
 
                 injectCatalogDataIntoTable(myLearningModel, isFromCatageories);
+
             }
 
         }
 
+    }
+
+    public boolean isCotentExists(MyLearningModel learningModel,String TableName) {
+        boolean isRecordExists = false;
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            Cursor cursor = null;
+            String strExeQuery = "SELECT * FROM "+TableName+" WHERE siteid= "
+                    + learningModel.getSiteID()
+                    + " AND userid= "
+                    + learningModel.getUserID()
+                    + " AND contentid = '"
+                    + learningModel.getContentID()+ "' ";
+            cursor = db.rawQuery(strExeQuery, null);
+
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+
+                    isRecordExists = true;
+                }
+            }
+
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        }
+
+        return isRecordExists;
     }
 
     public void injectCatalogDataIntoTable(MyLearningModel myLearningModel, boolean isFromCatageories) {
@@ -3253,7 +3305,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         try {
 
             contentValues = new ContentValues();
-
             contentValues.put("siteid", myLearningModel.getSiteID());
             contentValues.put("siteurl", myLearningModel.getSiteURL());
             contentValues.put("sitename", myLearningModel.getSiteName());
@@ -3294,17 +3345,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("folderpath", myLearningModel.getFolderPath());
             contentValues.put("jwvideokey", myLearningModel.getJwvideokey());
             contentValues.put("cloudmediaplayerkey", myLearningModel.getCloudmediaplayerkey());
-
             contentValues.put("relatedconentcount", myLearningModel.getRelatedContentCount());
-
-
             contentValues.put("presenter", myLearningModel.getPresenter());
             contentValues.put("eventstarttime", myLearningModel.getEventstartTime());
             contentValues.put("eventendtime", myLearningModel.getEventendTime());
-
             contentValues.put("eventstartUtctime", myLearningModel.getEventstartUtcTime());
             contentValues.put("eventendUtctime", myLearningModel.getEventendUtcTime());
-
 
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -3503,13 +3549,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 // inject eventcatalog data to table
 
-    public void injectEventCatalog(JSONObject jsonObject, String tabValue) throws JSONException {
+    public void injectEventCatalog(JSONObject jsonObject, String tabValue,int pageIndex,String ComponentId) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
 //        ejectRecordsinTable(TBL_EVENTCONTENTDATA);
 
-        ejectRecordsInEventByTab(tabValue);
+        if (pageIndex == 1) {
+
+            ejectRecordsInEventByTab(tabValue,ComponentId);
+
+        }
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
@@ -3972,18 +4022,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 //                availableseats
                 if (jsonMyLearningColumnObj.has("availableseats")) {
-
                     myLearningModel.setAviliableSeats(jsonMyLearningColumnObj.optString("availableseats", ""));
-
                 }
-
+                if (isCotentExists(myLearningModel,TBL_EVENTCONTENTDATA)) {
+                    continue;
+                }
                 injectEventCatalogDataIntoTable(myLearningModel, tabValue);
             }
-
         }
-
     }
-
 
     public void injectEventCatalogDataIntoTable(MyLearningModel myLearningModel, String tabValue) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -4062,19 +4109,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventTabValue = '" + typeTab + "'  ORDER BY eventstarttime ASC";
+        // original
+//        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventTabValue = '" + typeTab + "'  ORDER BY eventstarttime ASC";
 
-//        switch (typeTab){
-//            case "upcoming": //eventTabValue typeTab
-//                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
-//                break;
-//            case "past":
-//                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
-//                break;
-//            case "calendar":
-//                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + "  ORDER BY eventstarttime ASC";
-//                break;
-//        }
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"' ORDER BY eventstarttime ASC";
+
+        // according time get data
+
+        switch (typeTab){
+            case "upcoming": //eventTabValue typeTab
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"' ORDER BY eventstarttime ASC";
+                break;
+            case "past":
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime <= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"' ORDER BY eventstarttime ASC";;
+                break;
+            case "calendar":
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' ORDER BY eventstarttime ASC";
+                break;
+        }
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -10196,6 +10248,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
                 getTrackScoIdsAndDeleteCMI(myLearningModel);
+
 
                 injectMyLearningIntoTable(myLearningModel, true);
 

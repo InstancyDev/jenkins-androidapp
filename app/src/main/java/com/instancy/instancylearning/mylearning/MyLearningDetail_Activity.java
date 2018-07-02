@@ -261,7 +261,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         billingProcessor = new BillingProcessor(this, apiKey, this);
 //        }
 
-        boolean isCompleted=getEventCompletedUTC(myLearningModel.getEventstartUtcTime());
+//        boolean isCompleted=getEventCompletedUTC(myLearningModel.getEventstartUtcTime());
 
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(this);

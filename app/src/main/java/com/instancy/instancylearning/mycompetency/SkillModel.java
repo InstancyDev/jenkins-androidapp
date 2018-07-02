@@ -29,4 +29,5 @@ public class SkillModel implements Serializable {
     public int managerScore = 0;
     public double contentAuthorScore = 0.0;
     public JSONArray requiredProfArys = null ;
+    public String viewContent="true";
 }

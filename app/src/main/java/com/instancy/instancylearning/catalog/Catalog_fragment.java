@@ -9,11 +9,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -26,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -48,13 +45,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Switch;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +67,6 @@ import com.android.volley.toolbox.Volley;
 import com.anjlab.android.iab.v3.BillingProcessor;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.blankj.utilcode.util.ImageUtils;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -101,6 +96,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.thin.downloadmanager.DownloadRequest;
@@ -112,9 +108,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -126,16 +120,13 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
-import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
-import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
-import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
@@ -146,7 +137,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
-import static com.instancy.instancylearning.utils.Utilities.tintMenuIcon;
+
 
 /**
  * Created by Upendranath on 5/19/2017.
@@ -180,6 +171,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isFromMyCompetency = false;
     boolean isReportEnabled = true;
     WebAPIClient webAPIClient;
+
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    boolean isSearching = false;
+
+    ProgressBar progressBar ;
 
     MembershipModel membershipModel = null;
 
@@ -346,9 +342,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 // uncomment after MCI
-        sortBy="c.publisheddate%20desc,c.name";
+//        sortBy = "c.publisheddate%20desc,c.name";
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId();
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
 
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -382,7 +378,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectCatalogData(response, false);
+                            db.injectCatalogData(response, false, pageIndex);
+
+                            totalRecordsCount = countOfTotalRecords(response);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -518,6 +516,19 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         };
     }
 
+    public int countOfTotalRecords(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        int totalRecs = 0;
+
+        if (jsonTableAry.length() > 0) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(0);
+
+            totalRecs = jsonMyLearningColumnObj.getInt("totalrecordscount");
+        }
+
+        return totalRecs;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -540,6 +551,38 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
+
+        final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
+        myLearninglistView.addFooterView(footerView);
+        progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
+
+        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+//                Log.d(TAG, "onLoadMore: called page " + page);
+                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
+
+                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
+
+                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
+
+                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+
+                    if (!isSearching) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        refreshCatalog(true);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+
+                    }
+
+                } else {
+                    progressBar.setVisibility(View.GONE);                }
+
+            }
+        });
+
         if (BACKTOMAINSITE == 2) {
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
             BACKTOMAINSITE = 0;
@@ -553,7 +596,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         } else if (!isFromPeopleListing) {
             if (!isFromCatogories) {
                 catalogModelsList = new ArrayList<MyLearningModel>();
-                if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
+//                if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+
                     refreshCatalog(false);
                 } else {
                     injectFromDbtoModel();
@@ -624,6 +669,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
+        if (catalogModelsList.size() == 10) {
+            pageIndex = 2;
+        } else {
+            pageIndex = catalogModelsList.size() / pageSize;
+            pageIndex = pageIndex + 1;
+        }
+
         if (catalogModelsList.size() > 5) {
             if (item_search != null) {
                 item_search.setVisible(true);
@@ -640,6 +692,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
     }
+
 
     public void triggerActionForFirstItem() {
 
@@ -691,6 +744,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
+        if (isFromMyCompetency){
+            item_search.setVisible(false);
+        }
         itemInfo.setVisible(false);
 
         item_filter.setVisible(false);
@@ -710,6 +766,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
+
                     return false;
                 }
 
@@ -723,6 +780,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             });
 
+
+            item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                    isSearching=true;
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                    isSearching=false;
+                    return true;
+                }
+            });
         }
 
         if (item_filter != null) {
@@ -789,6 +861,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+            pageIndex = 1;
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -917,12 +990,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
 
-            if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")){
+            if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                 Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
                 if (relatedCount > 0 && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
                     menu.getItem(0).setVisible(true);
-                }
-                else {
+                } else {
                     menu.getItem(0).setVisible(false);
                 }
             }
@@ -1049,7 +1121,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Add")) {
 
-                    if ( myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime())) {
+                    if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime())) {
 
                         try {
                             addExpiryEvets(myLearningDetalData, position);
@@ -1057,7 +1129,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             e.printStackTrace();
                         }
 
-                    }else {
+                    } else {
                         addToMyLearningCheckUser(myLearningDetalData, position, false);
                     }
 
@@ -2043,7 +2115,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         };
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjReq);
-
     }
 
     private void updateStatus(int index, int Status) {
@@ -2125,7 +2196,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         customTabsIntent.launchUrl(context, Uri.parse(urlStr));
     }
 
-    //    // Main action: create notification 12500+30000+50000+50000+100000+15868=258368 257280
+    //    // Main action: create notification
 
     private static PendingIntent createPendingMainActionNotifyIntent(
             @NonNull final Context context,
@@ -2611,6 +2682,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         return myLearningModelList;
     }
+
     public void addExpiryEvets(MyLearningModel catalogModel, int position) throws JSONException {
 
         JSONObject parameters = new JSONObject();

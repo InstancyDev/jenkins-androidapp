@@ -311,11 +311,15 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             if (menu.getContextMenuId().equals("10")) {
-                sendMessageLayout.setVisibility(View.VISIBLE);
+
+                if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
+                    sendMessageLayout.setVisibility(View.GONE);
+                }else{
+                    sendMessageLayout.setVisibility(View.VISIBLE);
+                }
 //                signalAService = SignalAService.newInstance(this);
 //                signalAService.startSignalA();
             }
-
             i++;
         }
 

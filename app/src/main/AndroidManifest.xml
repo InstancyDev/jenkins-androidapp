@@ -274,9 +274,14 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
+        <!--<meta-data-->
+            <!--android:name="io.fabric.ApiKey"-->
+            <!--android:value="724fe005f4a5bbeeebfef818ff4e321719b7c405" />-->
+
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="724fe005f4a5bbeeebfef818ff4e321719b7c405" />
+            android:value="a80963795d57613b811a880699912ca0d5dc6b95" />
+
     </application>
 
 </manifest>

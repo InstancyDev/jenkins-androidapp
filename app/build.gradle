@@ -70,9 +70,9 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-//        applicationId "com.instancy.development"
-//        versionCode 1
-//        versionName "1.0(9.5.1.2)MCIbuild"
+        applicationId "com.instancy.development"
+        versionCode 1
+        versionName "1.0(9.5.1.2)MCIbuild"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -82,9 +82,9 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-        applicationId "com.instancy.switch"
-        versionCode 2
-        versionName "1.1"
+//        applicationId "com.instancy.switch"
+//        versionCode 3
+//        versionName "1.2"
 
         minSdkVersion 21
         targetSdkVersion 26

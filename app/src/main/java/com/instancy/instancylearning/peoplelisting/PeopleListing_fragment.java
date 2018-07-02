@@ -233,8 +233,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-//                Log.d(TAG, "Volley requester " + requestType);
-//                Log.d(TAG, "Volley JSON post" + response);
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
                     if (response != null) {

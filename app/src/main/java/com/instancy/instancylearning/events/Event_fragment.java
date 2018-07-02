@@ -290,7 +290,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectEventCatalog(response,TABBALUE);
+                            db.injectEventCatalog(response,TABBALUE,1,"");
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();

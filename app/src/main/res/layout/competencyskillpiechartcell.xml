@@ -102,8 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:layout_below="@+id/txtself"
-                android:background="@drawable/edittext_border"
-                android:padding="10dp"> </Spinner>
+                android:padding="15dp"> </Spinner>
 
         </RelativeLayout>
 
