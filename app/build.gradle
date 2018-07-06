@@ -72,7 +72,7 @@ android {
 
         applicationId "com.instancy.development"
         versionCode 1
-        versionName "1.0(9.5.1.2)MCIbuild"
+        versionName "1.0(9.5.1.2)SIGNUP"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -91,7 +91,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
-
     }
 
     buildTypes {

@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +67,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidEmail;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
@@ -215,7 +218,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
                              boolean isLastChild, View cView, ViewGroup parentView) {
 
         final ViewHolder holder;
-
+        final SkillModel childSkillModel = skillModelList.get(childPosition);
         if (cView == null) {
             LayoutInflater inflater = (LayoutInflater) ctx
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -228,19 +231,36 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         holder.parent = parentView;
         holder.getPosition = childPosition;
         holder.categoryModel = mainMenuList.get(parentPosition);
-//        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-//        holder.txtJobRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        if (!uiSettingsModel.isEnableContentEvaluation()) {
-            holder.linearLayoutScore.setVisibility(View.GONE);
+// Commented for not apply appsettings table
+//        if (!uiSettingsModel.isEnableContentEvaluation()) {
+//            holder.linearLayoutScore.setVisibility(View.GONE);
+//            holder.mChart.setVisibility(View.GONE);
+//
+//        }
+
+        if (!isValidString(childSkillModel.userScoreStr) && childSkillModel.userScoreStr.length() == 0) {
+            holder.spinnerLayout.setVisibility(View.GONE);
             holder.mChart.setVisibility(View.GONE);
+        }
+
+        if (!isValidString(childSkillModel.managerScoreStr) && childSkillModel.managerScoreStr.length() == 0) {
+            holder.managerLayout.setVisibility(View.GONE);
+        }
+
+        if (!isValidString(childSkillModel.contentAuthorScoreStr) && childSkillModel.contentAuthorScoreStr.length() == 0) {
+            holder.relativeLayoutScore.setVisibility(View.GONE);
+        }
+
+        if (!isValidString(childSkillModel.weightedAverageStr) && childSkillModel.weightedAverageStr.length() == 0) {
+            holder.averageLayout.setVisibility(View.GONE);
         }
 
 
         holder.mChart.getDescription().setEnabled(false);
         holder.mChart.setExtraOffsets(5, 10, 5, 5);
         holder.mChart.setDragDecelerationFrictionCoef(0.95f);
-        holder.mChart.setCenterText("" + skillModelList.get(childPosition).requiredProficiency);
+        holder.mChart.setCenterText("" + childSkillModel.requiredProficiency);
         holder.mChart.setDrawHoleEnabled(true);
         holder.mChart.setHoleColor(ctx.getResources().getColor(R.color.piechartcircle));
         holder.mChart.setTransparentCircleColor(Color.WHITE);
@@ -254,12 +274,10 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         holder.mChart.setHighlightPerTapEnabled(true);
         holder.mChart.setDrawSliceText(false);
         holder.mChart.setUsePercentValues(false);
-        // mChart.setUnit(" €");
-        // mChart.setDrawUnitsInChart(true);
-
+        holder.mChart.setCenterTextColor(Color.WHITE);
         // add a selection listener
 
-        setData(2, 5, holder.mChart, skillModelList.get(childPosition));
+        setData(2, 5, holder.mChart, childSkillModel);
 
         // mChart.spin(2000, 0, 360);
 
@@ -274,18 +292,19 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
         // entry label styling
         holder.mChart.setEntryLabelColor(Color.WHITE);
+        holder.mChart.setDrawEntryLabels(false);
 
         holder.mChart.setEntryLabelTextSize(12f);
-        holder.txtJobRole.setText(skillModelList.get(childPosition).skillName);
-        holder.txtjobDescription.setText(skillModelList.get(childPosition).skillDescription);
-        holder.txtAvgScore.setText("" + skillModelList.get(childPosition).weightedAverage);
-        holder.txtContentScore.setText("" + skillModelList.get(childPosition).contentAuthorScore);
-        holder.txtManagerScore.setText("" + skillModelList.get(childPosition).managerScore);
+        holder.txtJobRole.setText(childSkillModel.skillName);
+        holder.txtjobDescription.setText(childSkillModel.skillDescription);
+        holder.txtAvgScore.setText("" + childSkillModel.weightedAverage);
+        holder.txtContentScore.setText("" + childSkillModel.contentAuthorScore);
+        holder.txtManagerScore.setText("" + childSkillModel.managerScore);
+
         holder.spnrScore.setAdapter(holder.getAdapter(childPosition));
 
-        setSpinText(holder.spnrScore, skillModelList.get(childPosition).valueName);
+        setSpinText(holder.spnrScore, childSkillModel.valueName);
 
-//      profileConfigsModelList.get(position).valueName = holder.getText();
 
         holder.spnrScore.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -293,11 +312,11 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
             public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
                                        long id) {
 
-                skillModelList.get(childPosition).valueName = scoreList.get(spnrPosition);
+                childSkillModel.valueName = scoreList.get(spnrPosition);
                 try {
-                    skillModelList.get(childPosition).userScore = Integer.parseInt(scoreList.get(spnrPosition));
+                    childSkillModel.userScore = Integer.parseInt(scoreList.get(spnrPosition));
                 } catch (NumberFormatException ex) {
-                    skillModelList.get(childPosition).userScore = 1;
+                    childSkillModel.userScore = 1;
                 }
 
             }
@@ -323,7 +342,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         // the chart.
 
         String[] mParties = new String[]{
-                "Gap " + skillModel.gapScore, "Average " + skillModel.weightedAverage,
+                skillModel.gapScore + " Gap", skillModel.weightedAverage + " Average", skillModel.requiredProficiency + " Required"
         };
 
 //        for (int i = 0; i < count; i++) {
@@ -342,7 +361,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
             }
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, "" + skillModel.requiredProficiency);
+        PieDataSet dataSet = new PieDataSet(entries, skillModel.requiredProficiency + " Required");
         // add a lot of colors
 
         ArrayList<Integer> colors = new ArrayList<Integer>();
@@ -357,10 +376,10 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         data.setValueFormatter(new PercentFormatter());
         data.setValueTextSize(11f);
         data.setValueTextColor(Color.WHITE);
+        pieChart.setDrawCenterText(true);
         pieChart.setData(data);
         // undo all highlights
         pieChart.highlightValues(null);
-
         pieChart.invalidate();
     }
 
@@ -439,6 +458,25 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         TextView txtContentScore;
 
         @Nullable
+        @BindView(R.id.scoreLayout)
+        RelativeLayout relativeLayoutScore;
+
+
+        @Nullable
+        @BindView(R.id.spinnerLayout)
+        RelativeLayout spinnerLayout;
+
+
+        @Nullable
+        @BindView(R.id.managerLayout)
+        RelativeLayout managerLayout;
+
+
+        @Nullable
+        @BindView(R.id.averageLayout)
+        RelativeLayout averageLayout;
+
+        @Nullable
         @BindView(R.id.txtAvgScore)
         TextView txtAvgScore;
 
@@ -501,6 +539,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
                     Intent intentDetail = new Intent(ctx, CatalogFragmentActivity.class);
                     intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+                    intentDetail.putExtra("TITLENAME", skillModelList.get(position).skillName);
                     intentDetail.putExtra("SKILLID", skillModelList.get(position).skillID);
                     intentDetail.putExtra("ISFROMMYCOMPETENCY", true);
                     ctx.startActivity(intentDetail);
@@ -546,8 +585,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
         for (int i = 0; i < skillModelList.size(); i++) {
 
-            skillString = skillString + "$" + skillModelList.get(i).skillID + "&" + skillModelList.get(i).jobRoleID + "&" + skillModelList.get(i).userScore + "&" + skillModelList.get(i).managerScore + "&" + jobTagId;
-
+            skillString = skillString + "$" + skillModelList.get(i).skillID + "&" + skillModelList.get(i).jobRoleID + "&" + skillModelList.get(i).userScore + "&" + skillModelList.get(i).managerEvaluation + "&" + jobTagId;
         }
         return skillString;
     }
@@ -566,9 +604,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         parameters.put("SkillSetValue", skillString);
         parameters.put("Locale", "en-us");
 
-
         String parameterString = parameters.toString();
-
 
         Log.d("CMP", "onResponse: " + parameterString);
 //

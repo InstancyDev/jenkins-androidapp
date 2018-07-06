@@ -72,6 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:id="@+id/spinnerLayout"
             android:gravity="center">
 
             <TextView
@@ -100,9 +101,9 @@
             <Spinner
                 android:id="@+id/spnrScore"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="35dp"
                 android:layout_below="@+id/txtself"
-                android:padding="15dp"> </Spinner>
+                android:padding="10dp"> </Spinner>
 
         </RelativeLayout>
 
@@ -110,6 +111,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:id="@+id/managerLayout"
             android:gravity="center">
 
             <TextView
@@ -140,6 +142,7 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:id="@+id/scoreLayout"
             android:layout_weight="1"
             android:gravity="center">
 
@@ -172,6 +175,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:id="@+id/averageLayout"
             android:gravity="center">
 
             <TextView
@@ -202,9 +206,20 @@
     </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/grayline"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGray"
+        android:layout_below="@+id/linearLayoutscore"
+        android:gravity="center">
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayoutscore"
+        android:layout_below="@+id/grayline"
         android:gravity="center">
 
         <com.github.mikephil.charting.charts.PieChart

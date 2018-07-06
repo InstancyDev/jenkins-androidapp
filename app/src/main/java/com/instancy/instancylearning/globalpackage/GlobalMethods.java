@@ -993,7 +993,14 @@ public class GlobalMethods {
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+
+                    if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+
+                        deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+                    } else {
+
+                        Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    }
 
                 }
 

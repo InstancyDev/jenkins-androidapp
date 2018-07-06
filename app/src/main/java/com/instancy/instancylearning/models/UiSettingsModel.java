@@ -259,15 +259,15 @@ public class UiSettingsModel {
 
     private String commonPasswordValue = "";
 
-    public boolean isEnableUserEvaluation() {
-        return enableUserEvaluation;
-    }
+//    public boolean isEnableUserEvaluation() {
+//        return enableUserEvaluation;
+//    }
+//
+//    public void setEnableUserEvaluation(boolean enableUserEvaluation) {
+//        this.enableUserEvaluation = enableUserEvaluation;
+//    }
 
-    public void setEnableUserEvaluation(boolean enableUserEvaluation) {
-        this.enableUserEvaluation = enableUserEvaluation;
-    }
-
-    private boolean enableUserEvaluation = false;
+//    private boolean enableUserEvaluation = false;
 
     private boolean enableContentEvaluation = false;
 

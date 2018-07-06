@@ -163,7 +163,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     BillingProcessor billingProcessor;
     boolean isFromCatogories = false;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
     boolean isSearching = false;
 
     @BindView(R.id.segmentedswitch)
@@ -469,7 +469,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         contextMenuModelList = new ArrayList<>();
         contextMenuModelList.addAll(catalogModelsList);
 
-        if (catalogModelsList.size() == 10) {
+        if (catalogModelsList.size() == pageSize) {
             pageIndex = 2;
         } else {
             pageIndex = catalogModelsList.size() / pageSize;

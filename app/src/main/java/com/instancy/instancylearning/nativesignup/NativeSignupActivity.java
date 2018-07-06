@@ -98,6 +98,8 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     boolean acceptedTerms = false;
 
+    boolean termsExists = false;
+
     @Nullable
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
@@ -116,6 +118,8 @@ public class NativeSignupActivity extends AppCompatActivity {
     View headerView;
 
     TextView termsTxt;
+
+    String termsString = "";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -166,11 +170,11 @@ public class NativeSignupActivity extends AppCompatActivity {
 //                http://qalearning.instancysoft.com/content/SiteConfiguration/SiteID/TermsofUse_New.html
 
                 Intent intentSocial = new Intent(NativeSignupActivity.this, SocialWebLoginsActivity.class);
-//                String imageUrl = "http://qalearning.instancysoft.com/content/SiteConfiguration/"+appUserModel.getSiteIDValue()+"/TermsofUse_New.html";
-                String imageUrl = appUserModel.getSiteURL() + "/content/SiteConfiguration/" + appUserModel.getSiteIDValue() + "/TermsofUse_New.html";
+//                String imageUrl = appUserModel.getSiteURL() + "/content/SiteConfiguration/" + appUserModel.getSiteIDValue() + "/TermsofUse_New.html";
+                String termsUrl = appUserModel.getSiteURL() + termsString;
 
                 intentSocial.putExtra("ATTACHMENT", true);
-                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, imageUrl);
+                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, termsUrl);
                 intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Terms of use");
                 startActivity(intentSocial);
 
@@ -187,7 +191,9 @@ public class NativeSignupActivity extends AppCompatActivity {
                     acceptedTerms = true;
 
                 } else {
+
                     acceptedTerms = false;
+
                 }
             }
         });
@@ -238,9 +244,11 @@ public class NativeSignupActivity extends AppCompatActivity {
 
                             JSONArray signUpConfigAry = null;
                             JSONArray signUpChoiceAry = null;
+                            JSONArray termsWebAry = null;
                             try {
                                 signUpConfigAry = response.getJSONArray("profileconfigdata");
                                 signUpChoiceAry = response.getJSONArray("attributechoices");
+                                termsWebAry = response.getJSONArray("termsofusewebpage");
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -257,7 +265,7 @@ public class NativeSignupActivity extends AppCompatActivity {
                                         db.injectProfielFieldOptions(signUpChoiceAry);
                                     }
 
-                                    injectFromDbToModel();
+                                    injectFromDbToModel(termsWebAry, signUpConfigAry);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -305,16 +313,63 @@ public class NativeSignupActivity extends AppCompatActivity {
         };
     }
 
-    public void injectFromDbToModel() {
-
+    public void injectFromDbToModel(JSONArray termsWebAry, JSONArray signUpConfigAry) {
 
         signUpConfigsModelList = db.fetchUserSignConfigs();
 
         if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
             nativeSignupAdapter.refreshList(signUpConfigsModelList);
-
-            personalEditList.addFooterView(headerView);
         }
+
+        if (signUpConfigAry != null) {
+
+            for (int i = 0; i < signUpConfigAry.length(); i++) {
+
+                JSONObject profilePrivObj = null;
+                try {
+                    profilePrivObj = signUpConfigAry.getJSONObject(i);
+
+                    String attributeConfigid = profilePrivObj.getString("attributeconfigid");
+                    if (attributeConfigid.equalsIgnoreCase("522")) {
+                        termsExists = true;
+                        if (termsWebAry != null) {
+
+                            for (int j = 0; j < termsWebAry.length(); j++) {
+
+                                JSONObject termsWebObj = null;
+                                try {
+                                    termsWebObj = termsWebAry.getJSONObject(j);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                String webPageUrl = "";
+
+                                if (termsWebObj.has("termsofusewebpage")) {
+                                    try {
+
+                                        webPageUrl = termsWebObj.getString("termsofusewebpage");
+                                        termsString = webPageUrl;
+                                        personalEditList.addFooterView(headerView);
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Log.d(TAG, "termsUrl: " + webPageUrl);
+                                }
+                            }
+
+                        }
+                        break;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+
     }
 
 
@@ -445,6 +500,10 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         if (isValidationCompleted) {
 
+            if (!termsExists) {
+                acceptedTerms = true; // no terms found
+            }
+
             if (acceptedTerms) {
 
                 JSONObject parameters = new JSONObject();
@@ -471,7 +530,6 @@ public class NativeSignupActivity extends AppCompatActivity {
                 Toast.makeText(context, "Accept terms of use ", Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     public void sendNewSignUpDetailsDataToServer(final String postData) {

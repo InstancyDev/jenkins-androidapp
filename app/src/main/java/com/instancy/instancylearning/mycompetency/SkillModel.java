@@ -30,4 +30,13 @@ public class SkillModel implements Serializable {
     public double contentAuthorScore = 0.0;
     public JSONArray requiredProfArys = null ;
     public String viewContent="true";
+
+
+    public String weightedAverageStr="";
+    public String managerScoreStr="";
+    public String userScoreStr="";
+    public String contentAuthorScoreStr="";
+
+    public String managerEvaluation = "";
+
 }

@@ -14,10 +14,13 @@
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_gravity="left"
+        android:layout_toStartOf="@+id/expIcon"
         android:gravity="left"
+        android:maxLines="1"
         android:padding="5dp"
-        android:text="asasdas    "
         android:textColor="@color/colorDarkGrey" />
 
     <TextView
@@ -32,7 +35,7 @@
         android:textColor="@color/colorDarkGrey"
         android:textAlignment="center"
         android:gravity="center_vertical"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:textSize="20sp" />
 
 

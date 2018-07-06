@@ -158,7 +158,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     EventInterface eventInterface = null;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
     boolean isSearching = false;
 
     ProgressBar progressBar;
@@ -251,7 +251,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 + "&Type=" + consolidationType
                 + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=&SiteID="
                 + appUserModel.getSiteIDValue()
-                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
+                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize+"&CompInsID="+sideMenusModel.getRepositoryId();
         vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
@@ -368,6 +368,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             myLearningAdapter.refreshList(myLearningModelsList);
 //            myLearninglistView.setVisibility(View.GONE);
             nodata_Label.setText(getResources().getString(R.string.no_data));
+        }
+
+        if (myLearningModelsList.size() == pageSize) {
+            pageIndex = 2;
+        } else {
+            pageIndex = myLearningModelsList.size() / pageSize;
+            pageIndex = pageIndex + 1;
         }
 
         if (myLearningModelsList.size() > 5) {

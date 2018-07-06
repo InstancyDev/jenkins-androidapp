@@ -78,6 +78,7 @@ import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 
+import com.instancy.instancylearning.mycompetency.SkillModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -160,7 +161,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     Menu search_menu;
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "", allowAddContentType = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", allowAddContentType = "", ddlSortList = "", ddlSortType = "";
     ResultListner resultListner = null;
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
@@ -172,10 +173,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isReportEnabled = true;
     WebAPIClient webAPIClient;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
     boolean isSearching = false;
 
-    ProgressBar progressBar ;
+    ProgressBar progressBar;
 
     MembershipModel membershipModel = null;
 
@@ -221,6 +222,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     PeopleListingModel peopleListingModel;
 
     String skillID = "";
+    String skillName = "";
 
     public Catalog_fragment() {
 
@@ -284,9 +286,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             if (isFromMyCompetency) {
 
                 skillID = bundle.getString("SKILLID");
-
+                skillName = bundle.getString("TITLENAME");
             }
-
 
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
 
@@ -322,6 +323,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             // No such key
             sortBy = "";
         }
+// added extra parameters
+        if (responMap != null && responMap.containsKey("ddlSortList")) {
+            ddlSortList = responMap.get("ddlSortList");
+        } else {
+            // No such key
+            ddlSortList = "publisheddate";
+        }
+
+        if (responMap != null && responMap.containsKey("ddlSortType")) {
+            ddlSortType = responMap.get("ddlSortType");
+        } else {
+            // No such key
+            ddlSortType = "asc";
+        }
+
         if (responMap != null && responMap.containsKey("FilterContentType")) {
             filterContentType = responMap.get("FilterContentType");
         } else {
@@ -333,7 +349,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             allowAddContentType = responMap.get("AllowAddContentType");
 
         }
-
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -344,7 +359,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 // uncomment after MCI
 //        sortBy = "c.publisheddate%20desc,c.name";
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList;
 
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -578,7 +593,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
 
                 } else {
-                    progressBar.setVisibility(View.GONE);                }
+                    progressBar.setVisibility(View.GONE);
+                }
 
             }
         });
@@ -660,7 +676,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void injectFromDbtoModel() {
-        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId());
+        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId(),ddlSortList,ddlSortType);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -669,7 +685,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
-        if (catalogModelsList.size() == 10) {
+        if (catalogModelsList.size() == pageSize) {
             pageIndex = 2;
         } else {
             pageIndex = catalogModelsList.size() / pageSize;
@@ -728,7 +744,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
+
+        String titleName = sideMenusModel.getDisplayName();
+        if (isFromMyCompetency) {
+            titleName = skillName;
+        }
+
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + titleName + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -744,7 +766,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
-        if (isFromMyCompetency){
+        if (isFromMyCompetency) {
             item_search.setVisible(false);
         }
         itemInfo.setVisible(false);
@@ -785,13 +807,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem menuItem) {
-                    isSearching=true;
+                    isSearching = true;
                     return true;
                 }
 
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                    isSearching=false;
+                    isSearching = false;
                     return true;
                 }
             });

@@ -35,9 +35,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/labelastrek"
+        android:digits="0123456789*qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_- =+&amp;@."
+        android:imeOptions="actionNext"
         android:padding="10dp"
-        android:visibility="visible"
-        android:text="edit field" />
+        android:text=""
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/txtdobclick"
@@ -52,12 +54,12 @@
         android:textSize="16dp" />
 
     <Spinner
-        android:layout_below="@+id/txtdobclick"
         android:id="@+id/spnrCountries"
         android:layout_width="match_parent"
         android:layout_height="45dp"
+        android:layout_below="@+id/txtdobclick"
         android:background="@drawable/bottomline"
-        android:padding="10dp"></Spinner>
+        android:padding="10dp"> </Spinner>
 
 
 </RelativeLayout>

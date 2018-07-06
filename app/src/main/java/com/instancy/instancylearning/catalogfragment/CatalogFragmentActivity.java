@@ -63,6 +63,7 @@ public class CatalogFragmentActivity extends AppCompatActivity {
 
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("SIDEMENUMODEL");
         skillID =getIntent().getStringExtra("SKILLID");
+        String titleName=getIntent().getStringExtra("TITLENAME");
 
 
         FrameLayout frame = new FrameLayout(this);
@@ -76,6 +77,7 @@ public class CatalogFragmentActivity extends AppCompatActivity {
             Bundle bundle = new Bundle();
             bundle.putSerializable("sidemenumodel", sideMenusModel);
             bundle.putSerializable("SKILLID",skillID);
+            bundle.putSerializable("TITLENAME",titleName);
             bundle.putBoolean("ISFROMCATEGORIES", false);
             bundle.putBoolean("ISFROMNOTIFICATIONS", false);
             bundle.putBoolean("ISFROMMYCOMPETENCY", true);

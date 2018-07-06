@@ -26,7 +26,7 @@ public class LRSJavaScriptInterface {
     DatabaseHandler databaseHandler;
     Activity activity;
     public hideProgressListner hideProgressListner;
-    String TAG = LRSJavaScriptInterface.class.getSimpleName();
+    String TAG = "LRS";
     boolean isDownloaded;
 
 
@@ -152,12 +152,6 @@ public class LRSJavaScriptInterface {
         return scormExit;
     }
 
-    @JavascriptInterface
-    public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
-
-
-        Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404: " + lrs);
-    }
 
     @JavascriptInterface
     public String LMSGetRandomQuestionNos() {
@@ -438,5 +432,49 @@ public class LRSJavaScriptInterface {
 //
 //    }
 
+// LRS Functionality started here
+@JavascriptInterface
+public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
 
+
+    Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404: " + lrs);
+}
+    @JavascriptInterface
+    public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore400(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
+
+
+        Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore400: " + lrs);
+    }
+
+    @JavascriptInterface
+    public String GetNativeStateValue(String nativeSateId) {
+
+        Log.d(TAG, "GetNativeStateValue: "+nativeSateId);
+
+        return "";
+    }
+
+    @JavascriptInterface
+    public String GetTinCanNoofAttampt() {
+
+        Log.d(TAG, "GetTinCanNoofAttampt: ");
+
+        return "";
+    }
+
+    @JavascriptInterface
+    public String GetTinCanSuspendData() {
+
+        Log.d(TAG, "GetTinCanSuspendData: ");
+
+        return "";
+    }
+
+    @JavascriptInterface
+    public String  XHR_GetSatate(String stateKey){
+
+        Log.d(TAG, "XHR_GetSatate: "+stateKey);
+
+        return stateKey;
+    }
 }

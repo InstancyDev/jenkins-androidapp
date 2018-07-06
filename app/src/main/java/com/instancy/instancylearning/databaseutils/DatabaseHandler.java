@@ -679,6 +679,184 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 }
                             }
                         }
+//                        if (jsonObject.has("table1")) {
+//                            JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
+//                            if (jsonTableOne.size() > 0) {
+//
+//                                for (int i = 0; i < jsonTableOne.size(); i++) {
+//                                    JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
+//
+//                                    if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#SITE_BACKGROUND#")) {
+//                                        uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#SITETEXT_COLOR#")) {
+//                                        uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#HEADER_BACKGROUND#")) {
+//                                        uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#HEADERTEXT_COLOR#")) {
+//                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENU_BACKGROUND#")) {
+//                                        uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENUTEXT_COLOR#")) {
+//                                        uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENUSLT_BACKGROUND#")) {
+//                                        uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENUSLT_COLOR#")) {
+//                                        uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#HEADER_BACKGROUND#")) {
+//                                        uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#HEADERTEXT_COLOR#")) {
+//                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENU_BACKGROUND#")) {
+//                                        uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENUTEXT_COLOR#")) {
+//                                        uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENUSEPARATOR_COLOR#")) {
+//                                        uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#MENUSLT_COLOR#")) {
+//                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#BUTTON_BACKGROUND#")) {
+//                                        uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#BUTTONTEXT_COLOR#")) {
+//                                        uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#BUTTON_BACKGROUND#")) {
+//                                        uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#LIST_BG_COLOR#")) {
+//                                        uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#LIST_BORDER_COLOR#")) {
+//                                        uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#SITE_BACKGROUND#")) {
+//                                        uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+//                                                "bgcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    } else if (uisettingsJsonOjb
+//                                            .get("csseditingpalceholdername")
+//                                            .getAsString()
+//                                            .equals("#SITETEXT_COLOR#")) {
+//                                        uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+//                                                "textcolor")
+//                                                .getAsString()
+//                                                .substring(0, 7));
+//                                    }
+//
+//                                }
+//
+//                            }
+//
+//                        }
+
                         if (jsonObject.has("table1")) {
                             JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
                             if (jsonTableOne.size() > 0) {
@@ -857,6 +1035,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         }
 
+
+
                         if (jsonObject.has("table2")) {
                             JsonArray jsonTableTwo = jsonObject.get("table2").getAsJsonArray();
                             if (jsonTableTwo.size() > 0) {
@@ -931,13 +1111,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                         uiSettingsModel.setEnableContentEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
                                     }
-                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableContentEvaluation"))) {
-
-                                        uiSettingsModel.setEnableUserEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
-                                    }
+//                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableContentEvaluation"))) {
+//
+//                                        uiSettingsModel.setEnableUserEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
+//                                    }
                                 }
                             }
-
                         }
 
                         if (jsonObject.has("table3")) {
@@ -992,113 +1171,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-//    public void insertIntoAppSettingsTable(UiSettingsModel uiSettingsModel, String siteid, String siteUrl) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        deleteRecordsinTable(siteid, siteUrl, TBL_APP_SETTINGS);
-//        try {
-//            String strExeQuery = "";
-//            strExeQuery = "INSERT INTO APPSETTINGS (appTextColor , appBGColor , menuTextColor , menuBGColor , selectedMenuTextColor , selectedMenuBGColor , listBGColor , listBorderColor , menuHeaderBGColor , menuHeaderTextColor , menuBGAlternativeColor , menuBGSelectTextColor , appButtonBGColor , appButtonTextColor , appHeaderTextColor , appHeaderColor , appLoginBGColor ,appLoginPGTextColor , selfRegistrationAllowed , contentDownloadType , courseAppContent , enableNativeCatlog , enablePushNotification , nativeAppType , autodownloadsizelimit , catalogContentDownloadType , fileUploadButtonColor , firstTarget , secondTarget , thirdTarget , contentAssignment , newContentAvailable , contentUnassigned ,enableNativeLogin , nativeAppLoginLogo ,enableBranding ,selfRegDisplayName, AutoLaunchFirstContentInMyLearning , firstEvent , isFacebook  , isLinkedin , isGoogle , isTwitter , siteID , siteURL,AddProfileAdditionalTab )"
-//                    + " VALUES ('"
-//                    + uiSettingsModel.getAppTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppBGColor()
-//                    + "','"
-//                    + uiSettingsModel.getMenuTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getMenuBGColor()
-//                    + "','"
-//                    + uiSettingsModel.getSelectedMenuTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getSelectedMenuBGColor()
-//                    + "','"
-//                    + uiSettingsModel.getListBGColor()
-//                    + "','"
-//                    + uiSettingsModel.getListBorderColor()
-//                    + "','"
-//                    + uiSettingsModel.getMenuHeaderBGColor()
-//                    + "','"
-//                    + uiSettingsModel.getMenuHeaderTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getMenuBGAlternativeColor()
-//                    + "','"
-//                    + uiSettingsModel.getMenuBGSelectTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppButtonBgColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppButtonTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppHeaderTextColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppHeaderColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppLoginBGColor()
-//                    + "','"
-//                    + uiSettingsModel.getAppLoginTextolor()
-//                    + "','"
-//                    + uiSettingsModel.getSelfRegistrationAllowed()
-//                    + "','"
-//                    + uiSettingsModel.getContentDownloadType()
-//                    + "','"
-//                    + uiSettingsModel.getCourseAppContent()
-//                    + "','"
-//                    + uiSettingsModel.getEnableNativeCatlog()
-//                    + "','"
-//                    + uiSettingsModel.getEnablePushNotification()
-//                    + "','"
-//                    + uiSettingsModel.getNativeAppType()
-//                    + "','"
-//                    + uiSettingsModel.getAutodownloadsizelimit()
-//                    + "','"
-//                    + uiSettingsModel.getCatalogContentDownloadType()
-//                    + "','"
-//                    + uiSettingsModel.getFileUploadButtonColor()
-//                    + "','"
-//                    + uiSettingsModel.getFirstTarget()
-//                    + "','"
-//                    + uiSettingsModel.getSecondTarget()
-//                    + "','"
-//                    + uiSettingsModel.getThirdTarget()
-//                    + "','"
-//                    + uiSettingsModel.getContentAssignment()
-//                    + "','"
-//                    + uiSettingsModel.getNewContentAvailable()
-//                    + "','"
-//                    + uiSettingsModel.getContentUnassigned()
-//                    + "','"
-//                    + uiSettingsModel.getEnableAppLogin()
-//                    + "','"
-//                    + uiSettingsModel.getNativeAppLoginLogo()
-//                    + "','"
-//                    + uiSettingsModel.getEnableBranding()
-//                    + "','"
-//                    + uiSettingsModel.getSignUpName()
-//                    + "','"
-//                    + uiSettingsModel.getAutoLaunchMyLearningFirst()
-//                    + "','"
-//                    + uiSettingsModel.getFirstEvent()
-//                    + "','"
-//                    + uiSettingsModel.getIsFaceBook()
-//                    + "','"
-//                    + uiSettingsModel.getIsLinkedIn()
-//                    + "','"
-//                    + uiSettingsModel.getIsGoogle()
-//                    + "','"
-//                    + uiSettingsModel.getIsTwitter()
-//                    + "','"
-//                    + siteid
-//                    + "','"
-//                    + siteUrl
-//                    + "','"
-//                    + uiSettingsModel.getAddProfileAdditionalTab()
-//                    + "','"
-//                    + "')";
-//            db.execSQL(strExeQuery);
-//        } catch (SQLiteException sqlEx) {
-//            sqlEx.printStackTrace();
-//
-//        }
-//        db.close();
-//    }
+
 
     // Method for getting appsetting model from local sqlite db
 
@@ -1822,20 +1895,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public void ejectRecordsInEventByTab(String TabValue,String ComponentId) {
+    public void ejectRecordsInEventByTab(String TabValue, String ComponentId) {
 
-        String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"'";
+        String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "'";
 
         // according time get data
-        switch (TabValue){
+        switch (TabValue) {
             case "upcoming": //eventTabValue typeTab
-                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"'";
+                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "'";
                 break;
             case "past":
-                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime <= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"'";
+                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId + " AND eventstartUtctime <= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "'";
                 break;
             case "calendar":
-                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId ;
+                strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + ComponentId;
                 break;
         }
 
@@ -2053,13 +2126,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //////////////////////////  DB INSERTIONS FOR MYLEARNING
 
 
-    public void injectMyLearningData(JSONObject jsonObject,int pageIndex) throws JSONException {
+    public void injectMyLearningData(JSONObject jsonObject, int pageIndex) throws JSONException {
         SQLiteDatabase db = this.getWritableDatabase();
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
-        ejectRecordsinTable(TBL_DOWNLOADDATA);
-
+        if (pageIndex == 1) {
+            ejectRecordsinTable(TBL_DOWNLOADDATA);
+        }
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
 //            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
@@ -2518,7 +2592,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
                 }
 
-                if (isCotentExists(myLearningModel,TBL_DOWNLOADDATA)) {
+                if (isCotentExists(myLearningModel, TBL_DOWNLOADDATA)) {
                     continue;
                 }
 
@@ -3257,7 +3331,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventendTime(formattedDate);
                 }
 
-                if (isCotentExists(myLearningModel,TBL_CATALOGDATA)) {
+                if (isCotentExists(myLearningModel, TBL_CATALOGDATA)) {
                     continue;
                 }
 
@@ -3269,17 +3343,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public boolean isCotentExists(MyLearningModel learningModel,String TableName) {
+    public boolean isCotentExists(MyLearningModel learningModel, String TableName) {
         boolean isRecordExists = false;
         try {
             SQLiteDatabase db = this.getWritableDatabase();
             Cursor cursor = null;
-            String strExeQuery = "SELECT * FROM "+TableName+" WHERE siteid= "
+            String strExeQuery = "SELECT * FROM " + TableName + " WHERE siteid= "
                     + learningModel.getSiteID()
                     + " AND userid= "
                     + learningModel.getUserID()
                     + " AND contentid = '"
-                    + learningModel.getContentID()+ "' ";
+                    + learningModel.getContentID() + "' ";
             cursor = db.rawQuery(strExeQuery, null);
 
             if (cursor != null) {
@@ -3373,15 +3447,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Log.d("deteleTackListItems", ex.getMessage());
         }
 
-//        db.close();
+//        db.close(); 5lk + 376000 + 220000 + 106000 +
     }
 
-    public List<MyLearningModel> fetchCatalogModel(String componentID) {
+    public String getTheDatabaseColumnName(String sortType) {
+        switch (sortType.toLowerCase()) {
+            case "contenttype":
+                return "objecttypeid";
+            case "authordisplayname":
+                return "author";
+            case "name":
+                return "coursename";
+            case "publisheddate":
+                return "publisheddate";
+            default:
+                return "publisheddate";
+        }
+    }
+
+    public List<MyLearningModel> fetchCatalogModel(String componentID, String ddlSortList, String ddlSortType) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
 
         String strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate DESC";
+
+        String orderType = getTheDatabaseColumnName(ddlSortList);
+
+        if (!orderType.equalsIgnoreCase("publisheddate")) {
+
+            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY " + orderType + " " + ddlSortType;
+
+        } else if (ddlSortList.equalsIgnoreCase("publisheddate")) {
+            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY " + orderType + " " + ddlSortType;
+
+        } else {
+            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate DESC";
+        }
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -3395,7 +3497,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setSiteID(cursor.getString(cursor
                             .getColumnIndex("siteid")));
-
 
                     myLearningModel.setSiteURL(cursor.getString(cursor
                             .getColumnIndex("siteurl")));
@@ -3549,7 +3650,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 // inject eventcatalog data to table
 
-    public void injectEventCatalog(JSONObject jsonObject, String tabValue,int pageIndex,String ComponentId) throws JSONException {
+    public void injectEventCatalog(JSONObject jsonObject, String tabValue, int pageIndex, String ComponentId) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
@@ -3557,7 +3658,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         if (pageIndex == 1) {
 
-            ejectRecordsInEventByTab(tabValue,ComponentId);
+            ejectRecordsInEventByTab(tabValue, ComponentId);
 
         }
 
@@ -4024,7 +4125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("availableseats")) {
                     myLearningModel.setAviliableSeats(jsonMyLearningColumnObj.optString("availableseats", ""));
                 }
-                if (isCotentExists(myLearningModel,TBL_EVENTCONTENTDATA)) {
+                if (isCotentExists(myLearningModel, TBL_EVENTCONTENTDATA)) {
                     continue;
                 }
                 injectEventCatalogDataIntoTable(myLearningModel, tabValue);
@@ -4112,16 +4213,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // original
 //        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventTabValue = '" + typeTab + "'  ORDER BY eventstarttime ASC";
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"' ORDER BY eventstarttime ASC";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
 
         // according time get data
 
-        switch (typeTab){
+        switch (typeTab) {
             case "upcoming": //eventTabValue typeTab
-                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"' ORDER BY eventstarttime ASC";
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
                 break;
             case "past":
-                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime <= '"+getCurrentDateTime("yyyy-MM-dd HH:mm:ss")+"' ORDER BY eventstarttime ASC";;
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime <= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+                ;
                 break;
             case "calendar":
                 strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' ORDER BY eventstarttime ASC";
@@ -9282,7 +9384,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
 
             String strUpdate = "UPDATE " + TBL_CMI
-                    + " SET status = '" + updatedStatus + "', isupdate= 'false'" + "' WHERE siteid ='"
+                    + " SET status = '" + updatedStatus + "', isupdate= 'false'" + " WHERE siteid ='"
                     + learningmodel.getSiteID() + "'" + " AND " + " scoid=" + "'" + learningmodel.getScoId() + "'"
                     + " AND " + " userid=" + "'" + learningmodel.getUserID() + "'";
 
@@ -10580,10 +10682,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     contentValues.put("minlength", minlength);
                     contentValues.put("siteid", appUserModel.getSiteIDValue());
 
-
-                    if (displayOrder < 10000) {
-                        db.insert(TBL_NATIVESIGNUP, null, contentValues);
+                    if (displayOrder > 10000 || uicontroltypeid.equalsIgnoreCase("33") || uicontroltypeid.equalsIgnoreCase("12") || uicontroltypeid.equalsIgnoreCase("7") || uicontroltypeid.equalsIgnoreCase("20")) {
+                        continue;
                     }
+                    db.insert(TBL_NATIVESIGNUP, null, contentValues);
 
 
                 } catch (SQLiteException exception) {

@@ -20,6 +20,7 @@ import android.support.annotation.ColorRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
+import android.text.InputFilter;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -1263,4 +1264,23 @@ public class Utilities {
 
         return isCompleted;
     }
+
+    public static InputFilter checkInputFilter(final String blockCharacterSet) {
+
+        InputFilter filter = new InputFilter() {
+
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+
+                if (source != null && blockCharacterSet.contains(("" + source))) {
+                    return "";
+                }
+                return null;
+            }
+        };
+
+        return filter;
+    }
+
+ //   https://github.com/RusticiSoftware/TinCanAndroid-Offline/tree/master/TinCanJava-Offline/src/com/rs
 }

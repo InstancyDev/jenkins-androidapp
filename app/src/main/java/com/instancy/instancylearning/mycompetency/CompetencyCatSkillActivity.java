@@ -320,17 +320,27 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.skillName = skillsSetObj.optString("SkillName");
                 skillModel.skillDescription = skillsSetObj.optString("Description");
                 skillModel.jobRoleID = skillsSetObj.optString("JobRoleID");
-                skillModel.gapScore = skillsSetObj.optDouble("Gap");
                 skillModel.managerScore = skillsSetObj.optInt("ManagersEvaluation");
-                skillModel.contentAuthorScore = skillsSetObj.optDouble("ContentEval");
-                skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
                 skillModel.valueName = skillsSetObj.optString("UserEvaluation");
                 skillModel.skillID = skillsSetObj.optString("SkillID");
                 skillModel.prefCategoryID = skillsSetObj.optString("JobRoleID");
-                skillModel.weightedAverage = skillsSetObj.optDouble("WeightedAverage");
-                skillModel.requiredProficiency = skillsSetObj.optDouble("RequiredProficiency");
                 skillModel.requiredProfArys = skillsSetObj.optJSONArray("RequiredProfValues");
                 skillModel.viewContent = skillsSetObj.getString("SkillViewContentlink");
+
+
+                skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
+                skillModel.gapScore = skillsSetObj.optDouble("Gap",0);
+                skillModel.contentAuthorScore = skillsSetObj.optDouble("ContentEval",0);
+                skillModel.weightedAverage = skillsSetObj.optDouble("WeightedAverage",0);
+                skillModel.requiredProficiency = skillsSetObj.optDouble("RequiredProficiency",0);
+
+
+                skillModel.managerScoreStr = skillsSetObj.getString("ManagersEvaluation");
+                skillModel.contentAuthorScoreStr = skillsSetObj.getString("ContentEval");
+                skillModel.weightedAverageStr = skillsSetObj.getString("WeightedAverage");
+                skillModel.userScoreStr = skillsSetObj.optString("UserEvaluation");
+                skillModel.managerEvaluation=skillsSetObj.getString("ManagersEval");
+
             }
             skillModelList.add(skillModel);
         }
