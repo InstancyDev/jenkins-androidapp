@@ -197,6 +197,8 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         TextView expTxtIcon = (TextView) pView.findViewById(R.id.expIcon);
         TextView txtTitle = (TextView) pView.findViewById(R.id.jobrolename);
         txtTitle.setText(mainMenu.prefCategoryTitle);
+        txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         if (isExpanded) {
             expTxtIcon.setVisibility(View.VISIBLE);

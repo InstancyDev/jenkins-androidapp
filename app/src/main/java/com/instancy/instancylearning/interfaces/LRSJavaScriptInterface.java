@@ -8,8 +8,12 @@ import android.webkit.JavascriptInterface;
 
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.models.CMIModel;
+import com.instancy.instancylearning.models.LrsDetails;
 import com.instancy.instancylearning.models.MyLearningModel;
 
+import org.json.JSONObject;
+
+import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
 import static android.app.Activity.RESULT_OK;
@@ -168,7 +172,7 @@ public class LRSJavaScriptInterface {
     }
 
 
-    // normal
+    // Normal
     @JavascriptInterface
     public void SaveQuestionDataWithQuestionData(String quesData) {
         Log.d("SaveQuesWD", quesData);
@@ -432,48 +436,70 @@ public class LRSJavaScriptInterface {
 //
 //    }
 
-// LRS Functionality started here
-@JavascriptInterface
-public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
-
-
-    Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404: " + lrs);
-}
+    // LRS Functionality started here
     @JavascriptInterface
-    public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore400(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
+    public void XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore404(String lrs, String url, String method, String data, String auth, String callback, String ignore404, String extraHeaders, String actor) {
+
+        LrsDetails _lrsDetails = new LrsDetails();
+        _lrsDetails.lrs = lrs;
+        if (url.contains("cid="))
+            url = url.split("&cid")[0];
+        _lrsDetails.lrsUrl = url;
+        _lrsDetails.method = method;
+        _lrsDetails.auth = auth;
+        _lrsDetails.data = data;
+        _lrsDetails.callback = callback;
+        _lrsDetails.extraHeaders = extraHeaders;
+        _lrsDetails.ignore404 = ignore404;
+        _lrsDetails.siteId = Integer.parseInt(_learningModel.getSiteID());
+        _lrsDetails.userId = Integer.parseInt(_learningModel.getUserID());
+        _lrsDetails.scoId = Integer.parseInt(_learningModel.getScoId());
+        _lrsDetails.isUpdated = "false";
+
+        if (actor.equals(""))
+            actor = "%7b%22mbox%22%3a%5b%22mailto%3a" + URLEncoder.encode(_learningModel.getUserName()) + "%22%5d%2c%22name%22%3a%5b%22" + URLEncoder.encode(_learningModel.getUserName()).replace("+", " ") + "%22%5d%7d";
+        _lrsDetails.actor = actor;
 
 
-        Log.d(TAG, "XHR_requestWithLrsUrlMethodDataAuthCallbackIgnore400: " + lrs);
+        databaseHandler.InsertLRSStatement(_lrsDetails);
+
+        Log.d("Data:", data);
+
+
+        if (data.contains("/verbs/exited")) {
+            try {
+                JSONObject jsonObj = new JSONObject(data);
+                // Getting JSON Array node
+                JSONObject context = jsonObj.getJSONObject("context");
+                JSONObject contextActivities = context.getJSONObject("contextActivities");
+                JSONObject grouping = contextActivities.getJSONArray("grouping").getJSONObject(0);
+                String grouptId = grouping.getString("id");
+                String parentId = "";
+                try {
+                    JSONObject parent = contextActivities.getJSONArray("parent").getJSONObject(0);
+                    parentId = parent.getString("id");
+                } catch (Exception ex) {
+
+                }
+                if (parentId.equals("") || parentId.equals(grouptId)) {
+
+                } else {
+
+                }
+
+            } catch (Exception jx) {
+                Log.d("JSON Exception: ", jx.getMessage());
+            }
+
+        }
+
+
     }
 
     @JavascriptInterface
-    public String GetNativeStateValue(String nativeSateId) {
+    public String XHR_GetSatate(String stateKey) {
 
-        Log.d(TAG, "GetNativeStateValue: "+nativeSateId);
-
-        return "";
-    }
-
-    @JavascriptInterface
-    public String GetTinCanNoofAttampt() {
-
-        Log.d(TAG, "GetTinCanNoofAttampt: ");
-
-        return "";
-    }
-
-    @JavascriptInterface
-    public String GetTinCanSuspendData() {
-
-        Log.d(TAG, "GetTinCanSuspendData: ");
-
-        return "";
-    }
-
-    @JavascriptInterface
-    public String  XHR_GetSatate(String stateKey){
-
-        Log.d(TAG, "XHR_GetSatate: "+stateKey);
+        Log.d(TAG, "XHR_GetSatate: " + stateKey);
 
         return stateKey;
     }

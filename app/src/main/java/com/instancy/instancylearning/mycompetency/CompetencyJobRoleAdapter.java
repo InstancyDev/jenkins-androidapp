@@ -65,7 +65,6 @@ public class CompetencyJobRoleAdapter extends BaseAdapter {
         db = new DatabaseHandler(activity);
         preferencesManager = PreferencesManager.getInstance();
 
-
     }
 
     public void refreshList(List<CompetencyJobRoles> competencyJobRolesList) {

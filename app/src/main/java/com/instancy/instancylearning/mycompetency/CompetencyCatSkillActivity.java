@@ -97,6 +97,8 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
     VollyService vollyService;
     IResult resultCallback = null;
     DatabaseHandler db;
+
+
     String jobRoleName = "", jobTag = "";
 
     int jobRoleID = 0;
@@ -118,6 +120,10 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
 
+
+    @BindView(R.id.competencyactivity)
+    RelativeLayout relativeLayout;
+
     SideMenusModel sideMenusModel = null;
 
     @Nullable
@@ -133,7 +139,6 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
 
         db = new DatabaseHandler(this);
         ButterKnife.bind(this);
-
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -150,9 +155,13 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 "" + jobRoleName + "</font>"));
+
+        relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         competencyCategoryModelList = new ArrayList<CompetencyCategoryModel>();
 
         skillSetListView = (ExpandableListView) findViewById(R.id.mycompetencylist);
+        skillSetListView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         competencyCatSkillAdapter = new CompetencyCatSkillAdapter(this, BIND_ABOVE_CLIENT, competencyCategoryModelList, jobTag, appUserModel, sideMenusModel);
         skillSetListView.setAdapter(competencyCatSkillAdapter);
         skillSetListView.setOnItemClickListener(this);

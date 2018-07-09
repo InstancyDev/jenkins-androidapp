@@ -210,7 +210,6 @@ public class MyCompetencyFragment extends Fragment implements SwipeRefreshLayout
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
         d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
-
         return rootView;
     }
 
