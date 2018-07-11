@@ -235,12 +235,15 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         holder.categoryModel = mainMenuList.get(parentPosition);
 
 // Commented for not apply appsettings table
-//        if (!uiSettingsModel.isEnableContentEvaluation()) {
-//            holder.linearLayoutScore.setVisibility(View.GONE);
-//            holder.mChart.setVisibility(View.GONE);
-//
-//        }
+        if (!uiSettingsModel.isEnableContentEvaluation() && skillModelList.get(childPosition).viewContent.equalsIgnoreCase("false")) {
 
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+
+        }
+else {
+            holder.btnContextMenu.setVisibility(View.VISIBLE);
+
+        }
         if (!isValidString(childSkillModel.userScoreStr) && childSkillModel.userScoreStr.length() == 0) {
             holder.spinnerLayout.setVisibility(View.GONE);
             holder.mChart.setVisibility(View.GONE);
@@ -516,7 +519,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
         Menu menu = popup.getMenu();
 
-        if (skillModelList.get(position).viewContent.equalsIgnoreCase("disabled")) {
+        if (skillModelList.get(position).viewContent.equalsIgnoreCase("false")) {
             menu.getItem(0).setVisible(false);//viewcontent
 
         } else {

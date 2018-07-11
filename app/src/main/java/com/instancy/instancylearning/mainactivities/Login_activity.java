@@ -470,8 +470,30 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                         svProgressHUD.dismiss();
                         Log.d("Response: ", " " + response.has("faileduserlogin"));
                         if (response.has("faileduserlogin")) {
-//                            SweetAlert.sweetErrorAlert(Login_activity.this, "Oops...", getResources().getString(R.string.login_failed_contact_admin));
-                            alertText.setVisibility(View.VISIBLE);
+
+                            try {
+                                JSONArray  jsonArray=response.getJSONArray("faileduserlogin");
+                                if ( jsonArray!=null && jsonArray.length()>0){
+                                    JSONObject innerObj=jsonArray.getJSONObject(0);
+                                    if (innerObj.has("userstatus")){
+
+                                        if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")){
+                                            alertText.setVisibility(View.VISIBLE);
+                                        }
+                                        else if (innerObj.getString("userstatus").equalsIgnoreCase("Peding Registration"))
+                                        {
+
+                                            Toast.makeText(Login_activity.this, "Your registration is not yet approved!", Toast.LENGTH_SHORT).show();
+
+                                        }
+                                    }
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+
 
                         } else if (response.has("successfulluserlogin")) {
                             alertText.setVisibility(View.GONE);

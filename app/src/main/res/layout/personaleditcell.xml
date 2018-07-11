@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/labelastrek"
-        android:digits="0123456789*qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_- =+&amp;@."
+        android:digits="0123456789*qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM_- +&amp;@."
         android:imeOptions="actionNext"
         android:padding="10dp"
         android:text=""

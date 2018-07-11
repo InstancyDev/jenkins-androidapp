@@ -173,7 +173,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isReportEnabled = true;
     WebAPIClient webAPIClient;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
     boolean isSearching = false;
 
     ProgressBar progressBar;
@@ -368,11 +368,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=" + authorID;
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=" + authorID ;
 
         vollyService.getJsonObjResponseVolley("PEOPLELISTINGCATALOG", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
-
 
     public void refreshMyCompetencyCatalog() {
 
@@ -570,34 +569,34 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
         myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
-
-        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
-
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-//                Log.d(TAG, "onLoadMore: called page " + page);
-                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
-
-                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
-
-                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
-
-                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
-
-                    if (!isSearching) {
-                        progressBar.setVisibility(View.VISIBLE);
-                        refreshCatalog(true);
-                    } else {
                         progressBar.setVisibility(View.GONE);
-
-                    }
-
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                }
-
-            }
-        });
+//        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+//
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount) {
+////                Log.d(TAG, "onLoadMore: called page " + page);
+//                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
+//
+//                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
+//
+//                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
+//
+//                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+//
+//                    if (!isSearching) {
+//                        progressBar.setVisibility(View.VISIBLE);
+//                        refreshCatalog(true);
+//                    } else {
+//                        progressBar.setVisibility(View.GONE);
+//
+//                    }
+//
+//                } else {
+//                    progressBar.setVisibility(View.GONE);
+//                }
+//
+//            }
+//        });
 
         if (BACKTOMAINSITE == 2) {
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
@@ -1802,7 +1801,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         generateBreadcrumb(breadcrumbItemsList);
 
     }
-
 
     @Override
     public void onDetach() {

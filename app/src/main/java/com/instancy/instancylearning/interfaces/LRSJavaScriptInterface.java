@@ -372,7 +372,7 @@ public class LRSJavaScriptInterface {
 //                                            + resArray[5]);
 //                        }
 //                    }
-//                    if (resArray.length > 6) {
+//                    if (resArray.length > 6) {//
 //
 //                        if (resArray[6].length() == 0
 //                                && resArray[6].equals("undefined")) {
@@ -459,7 +459,6 @@ public class LRSJavaScriptInterface {
         if (actor.equals(""))
             actor = "%7b%22mbox%22%3a%5b%22mailto%3a" + URLEncoder.encode(_learningModel.getUserName()) + "%22%5d%2c%22name%22%3a%5b%22" + URLEncoder.encode(_learningModel.getUserName()).replace("+", " ") + "%22%5d%7d";
         _lrsDetails.actor = actor;
-
 
         databaseHandler.InsertLRSStatement(_lrsDetails);
 

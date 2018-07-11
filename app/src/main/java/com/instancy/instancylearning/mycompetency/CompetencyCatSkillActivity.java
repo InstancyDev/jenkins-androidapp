@@ -334,7 +334,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.skillID = skillsSetObj.optString("SkillID");
                 skillModel.prefCategoryID = skillsSetObj.optString("JobRoleID");
                 skillModel.requiredProfArys = skillsSetObj.optJSONArray("RequiredProfValues");
-                skillModel.viewContent = skillsSetObj.getString("SkillViewContentlink");
+                skillModel.viewContent = skillsSetObj.getString("isViewlinkenable");
 
 
                 skillModel.userScore = skillsSetObj.optInt("UserEvaluation");
@@ -349,6 +349,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 skillModel.weightedAverageStr = skillsSetObj.getString("WeightedAverage");
                 skillModel.userScoreStr = skillsSetObj.optString("UserEvaluation");
                 skillModel.managerEvaluation=skillsSetObj.getString("ManagersEval");
+//                isViewlinkenable
 
             }
             skillModelList.add(skillModel);

@@ -46,6 +46,7 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.events.Event_fragment_new;
+import com.instancy.instancylearning.gameficitation.MyAchivementsFragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.NetworkChangeReceiver;
@@ -314,7 +315,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                 if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
                     sendMessageLayout.setVisibility(View.GONE);
-                }else{
+                } else {
                     sendMessageLayout.setVisibility(View.VISIBLE);
                 }
 //                signalAService = SignalAService.newInstance(this);
@@ -381,7 +382,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
 //                    String filterCondition = sideMenumodelList.get(groupPosition).getConditions();
 //                    if (logoutPos == groupPosition && isSubSiteEntered.equalsIgnoreCase("false")) {
-                    if (logoutPos == groupPosition && sideMenumodelList.get(groupPosition).menuId==5555) {
+                    if (logoutPos == groupPosition && sideMenumodelList.get(groupPosition).menuId == 5555) {
 
                         Intent intent = new Intent(SideMenu.this, Login_activity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -603,7 +604,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 fragment = new AskExpertFragment();
                 break;
             case 9:
-                fragment = new LearningCommunities_fragment();
+                fragment = new LearningCommunities_fragment(); // commented for gamification
+//                fragment = new MyAchivementsFragment();
                 break;
             case 10:
                 fragment = new PeopleListing_fragment();

@@ -520,7 +520,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.eventLayout.setVisibility(View.GONE);
             holder.txtAthrIcon.setVisibility(View.GONE);
         }
-        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("27")) {
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("27")) {
             // 102 commented for some XAPI content
             holder.btnDownload.setVisibility(View.GONE);
             holder.circleProgressBar.setVisibility(View.GONE);
@@ -844,7 +844,7 @@ public class MyLearningAdapter extends BaseAdapter {
             myLearningModel.addAll(searchList);
         } else {
             for (MyLearningModel s : searchList) {
-                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) || s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText) || s.getShortDes().toLowerCase(Locale.getDefault()).contains(charText)|| s.getKeywords().toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) || s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText) || s.getShortDes().toLowerCase(Locale.getDefault()).contains(charText)|| s.getKeywords().toLowerCase(Locale.getDefault()).contains(charText) || s.getPresenter().toLowerCase(Locale.getDefault()).contains(charText)) {
                     myLearningModel.add(s);
                 }
             }

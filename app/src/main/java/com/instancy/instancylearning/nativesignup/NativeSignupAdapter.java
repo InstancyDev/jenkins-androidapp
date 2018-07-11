@@ -136,18 +136,19 @@ public class NativeSignupAdapter extends BaseAdapter {
             holder.edit_field.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
             holder.edit_field.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
-        if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("18")) {
+        if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("18") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("1438") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("1439")) {
             holder.edit_field.setInputType(InputType.TYPE_CLASS_NUMBER);
         }
 
         if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("2") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("4")) {
 
-            holder.edit_field.setKeyListener(DigitsKeyListener.getInstance("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"));
+//            holder.edit_field.setKeyListener(DigitsKeyListener.getInstance("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"));
             holder.edit_field.setRawInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
 
         }
 
-        if (signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("1") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("9") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("15") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("4")) {
+        if (signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("1") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("9") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("15") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("4") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("10") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("11") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("2") || signUpConfigsModelList.get(position).uicontroltypeid.equalsIgnoreCase("984") ) {
+
             holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
             holder.edit_field.setFilters(new InputFilter[]{new InputFilter.LengthFilter(signUpConfigsModelList.get(position).maxLenth)});
             holder.txtDobClick.setVisibility(View.GONE);
@@ -303,7 +304,7 @@ public class NativeSignupAdapter extends BaseAdapter {
 
 
         public String getText() {
-            return (String) spinnerAdapter.getItem(selected);
+            return (String) spinnerAdapter.getItem(selected!=0?selected-1:selected);
         }
 
         public int getSelected() {

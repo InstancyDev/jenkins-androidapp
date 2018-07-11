@@ -282,7 +282,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
-        if (notificationModelList.size() > 5) {
+        if (item_search!=null && notificationModelList.size() > 5) {
             item_search.setVisible(true);
         } else {
             item_search.setVisible(false);

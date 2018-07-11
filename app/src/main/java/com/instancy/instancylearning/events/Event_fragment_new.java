@@ -163,7 +163,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     BillingProcessor billingProcessor;
     boolean isFromCatogories = false;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
     boolean isSearching = false;
 
     @BindView(R.id.segmentedswitch)
@@ -392,39 +392,41 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
 //        myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
-        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
 
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-//                Log.d(TAG, "onLoadMore: called page " + page);
-                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
-
-                if (TABBALUE.equalsIgnoreCase("calendar")) {
-                    progressBar.setVisibility(View.GONE);
-                }
-
-                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
-
-                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
-
-                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
-
-//                    if (totalRecordsCount == catalogModelsList.size()) {
-//                        progressBar.setVisibility(View.GONE);
-//                    } else {
-                        if (!isSearching && !TABBALUE.equalsIgnoreCase("calendar")) {
-                            progressBar.setVisibility(View.VISIBLE);
-                            refreshCatalog(true);
-                        } else {
-                            progressBar.setVisibility(View.GONE);
-                        }
-
-//                    }
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
-        });
+        progressBar.setVisibility(View.GONE);
+//        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+//
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount) {
+////                Log.d(TAG, "onLoadMore: called page " + page);
+//                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
+//
+//                if (TABBALUE.equalsIgnoreCase("calendar")) {
+//                    progressBar.setVisibility(View.GONE);
+//                }
+//
+//                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
+//
+//                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
+//
+//                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+//
+////                    if (totalRecordsCount == catalogModelsList.size()) {
+////                        progressBar.setVisibility(View.GONE);
+////                    } else {
+//                        if (!isSearching && !TABBALUE.equalsIgnoreCase("calendar")) {
+//                            progressBar.setVisibility(View.VISIBLE);
+//                            refreshCatalog(true);
+//                        } else {
+//                            progressBar.setVisibility(View.GONE);
+//                        }
+//
+////                    }
+//                } else {
+//                    progressBar.setVisibility(View.GONE);
+//                }
+//            }
+//        });
 
         upBtn = (RadioButton) rootView.findViewById(R.id.upcomingbtn);
         upBtn.setChecked(true);

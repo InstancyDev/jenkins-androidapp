@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginTop="3dp"
+    app:cardCornerRadius="3dp"
+    app:cardElevation="4dp"
+    app:contentPadding="4dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <RelativeLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:padding="2dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/imagethumb"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="center"
+                    android:background="@drawable/user_placeholder"
+                    app:civ_border_color="@color/colorWhite"
+                    app:civ_border_width="1dp" />
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/relattitle"
+                android:layout_width="297dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3.6">
+
+                <TextView
+                    android:id="@+id/txt_name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="0dp"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical|fill_horizontal"
+                    android:maxLines="200"
+                    android:padding="1dp"
+                    android:text="Lisa yow"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="14sp"
+                    android:typeface="sans" />
+
+
+                <ProgressBar
+                    android:id="@+id/achivement_progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="140dp"
+                    android:layout_height="10dp"
+                    android:layout_below="@+id/txt_name"
+                    android:layout_gravity="center|left"
+                    android:layout_marginTop="10dp"
+                    android:paddingLeft="5dp"
+                    android:progress="40"
+                    android:progressTint="@color/colorStatusInProgress" />
+
+                <TextView
+                    android:id="@+id/txtLastUpdate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/achivement_progress_bar"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="200"
+                    android:padding="2dp"
+                    android:textColor="@color/colorGray"
+                    android:textSize="12sp"
+                    tools:text="400 Points to advance level " />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/lineview"
+            android:layout_width="match_parent"
+            android:layout_height=".05dp"
+            android:layout_below="@+id/linearlayout"
+            android:layout_marginTop="1dp"
+            android:background="@color/colorDarkGrey"> </View>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutscore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lineview"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="3">
+
+            <RelativeLayout
+                android:id="@+id/managerLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/txtmanager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Points"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/txtMgScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtmanager"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textStyle="bold"
+                    android:text="2"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+            <View
+                android:layout_width=".05dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:background="@color/colorDarkGrey"> </View>
+
+            <RelativeLayout
+                android:id="@+id/scoreLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/txtcontent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Level"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/txtCntScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtcontent"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:textStyle="bold"
+                    android:text="Intermediate"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+            <View
+                android:layout_width=".05dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:background="@color/colorDarkGrey"> </View>
+
+            <RelativeLayout
+                android:id="@+id/averageLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/txtavarage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="Badges"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/txtAvgScore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtavarage"
+                    android:layout_gravity="left"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="2"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorDarkGrey"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

@@ -45,7 +45,7 @@
         android:padding="5dp"
         android:text="asasdas    "
         android:textColor="@color/black"
-        android:textSize="18sp" />
+         />
 
     <TextView
         android:id="@+id/jobdescription"
@@ -57,7 +57,7 @@
         android:padding="5dp"
         android:text="some description"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        />
 
 
     <LinearLayout

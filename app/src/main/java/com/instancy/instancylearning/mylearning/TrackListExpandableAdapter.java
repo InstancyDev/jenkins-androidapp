@@ -220,7 +220,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("102") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("27")) {
+            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0") || trackChildList.getObjecttypeId().equalsIgnoreCase("102") || trackChildList.getObjecttypeId().equalsIgnoreCase("27")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
             } else {

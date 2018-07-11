@@ -158,7 +158,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     EventInterface eventInterface = null;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
     boolean isSearching = false;
 
     ProgressBar progressBar;
@@ -488,31 +488,33 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
 
-        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+        progressBar.setVisibility(View.GONE);
 
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
-                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
-
-                    Log.d(TAG, "onLoadMore size: catalogModelsList" + myLearningModelsList.size());
-
-                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
-
-                    if (!isSearching) {
-                        progressBar.setVisibility(View.VISIBLE);
-                        refreshMyLearning(true);
-                    } else {
-                        progressBar.setVisibility(View.GONE);
-
-                    }
-
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                }
-
-            }
-        });
+//        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+//
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount) {
+//                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
+//                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
+//
+//                    Log.d(TAG, "onLoadMore size: catalogModelsList" + myLearningModelsList.size());
+//
+//                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+//
+//                    if (!isSearching) {
+//                        progressBar.setVisibility(View.VISIBLE);
+//                        refreshMyLearning(true);
+//                    } else {
+//                        progressBar.setVisibility(View.GONE);
+//
+//                    }
+//
+//                } else {
+//                    progressBar.setVisibility(View.GONE);
+//                }
+//
+//            }
+//        });
 
         toolbar = ((SideMenu) getActivity()).toolbar;
 //        setSearchtollbar();
