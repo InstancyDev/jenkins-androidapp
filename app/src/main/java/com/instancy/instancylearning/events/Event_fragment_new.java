@@ -44,6 +44,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -119,7 +120,9 @@ import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTimeInDate;
+import static com.instancy.instancylearning.utils.Utilities.getLastDateOfMonth;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+
 import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
@@ -137,7 +140,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
-
+    boolean isCalendarTabScrolled = false;
     ProgressBar progressBar;
 
     @BindView(R.id.swipemylearning)
@@ -155,7 +158,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     Menu search_menu;
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "";
     ResultListner resultListner = null;
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
@@ -165,6 +168,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
     int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
     boolean isSearching = false;
+    boolean userScrolled = false;
 
     @BindView(R.id.segmentedswitch)
     SegmentedGroup segmentedSwitch;
@@ -181,10 +185,17 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     RadioButton upBtn, calenderBtn, pastBtn;
 
     String TABBALUE = "upcoming";
+    String startDateStr = "", endDateStr = "";
+
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
+
+    private SimpleDateFormat dateFormatToSendserver = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
+
+
+    private SimpleDateFormat getyearAndMonth = new SimpleDateFormat("MM-yyyy", Locale.getDefault());
 
     public Event_fragment_new() {
 
@@ -250,6 +261,23 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             // No such key
             filterContentType = "";
         }
+
+        // added extra parameters
+        if (responMap != null && responMap.containsKey("ddlSortList")) {
+            ddlSortList = responMap.get("ddlSortList");
+        } else {
+            // No such key
+            ddlSortList = "publisheddate";
+        }
+
+        if (responMap != null && responMap.containsKey("ddlSortType")) {
+            ddlSortType = responMap.get("ddlSortType");
+        } else {
+            // No such key
+            ddlSortType = "asc";
+        }
+
+
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -265,14 +293,22 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 filterContentType = "";
                 sortBy = "c.name%20asc";
 
-                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
+                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList;
 
             } else {
 
                 filterContentType = "%20C.ObjectTypeID%20=%2070%20And%20C.bit4%20Is%20null%20";
                 sortBy = "c.name%20asc";
 
-                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=300&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1";
+//                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=300&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1" + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList + "+&pageIndex=1&pageSize=100";
+
+//                if (isValidString(uiSettingsModel.getcCEventStartdate())) {
+//
+//                    startDateStr = uiSettingsModel.getcCEventStartdate();
+//                }
+
+                paramsString = "FilterCondition=&SortCondition=" + ddlSortList + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1" + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=calendarview&pageIndex=1&pageSize=10&sortType=" + ddlSortType + "sortby" + ddlSortList + "&StartDate=" + startDateStr + "&EndDate=" + endDateStr;
+
             }
             vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
 
@@ -298,13 +334,13 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         if (TABBALUE.equalsIgnoreCase("upcoming")) {
                             StaticValues.UPCOMINGCALLED = 1;
                         } else if (TABBALUE.equalsIgnoreCase("calendar")) {
+                            pageIndex = 1;
                             StaticValues.CALENDARCALLED = 1;
                         } else if (TABBALUE.equalsIgnoreCase("past")) {
                             StaticValues.PASTCALLED = 1;
                         }
                         try {
-                            pageIndex=1;
-                            db.injectEventCatalog(response, TABBALUE, pageIndex,sideMenusModel.getComponentId());
+                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId());
                             totalRecordsCount = countOfTotalRecords(response);
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
@@ -390,43 +426,69 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
 
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
-//        myLearninglistView.addFooterView(footerView);
+        myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
 
-        progressBar.setVisibility(View.GONE);
-//        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
-//
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount) {
-////                Log.d(TAG, "onLoadMore: called page " + page);
-//                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
-//
-//                if (TABBALUE.equalsIgnoreCase("calendar")) {
-//                    progressBar.setVisibility(View.GONE);
-//                }
-//
-//                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
-//
-//                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
-//
-//                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
-//
-////                    if (totalRecordsCount == catalogModelsList.size()) {
-////                        progressBar.setVisibility(View.GONE);
-////                    } else {
-//                        if (!isSearching && !TABBALUE.equalsIgnoreCase("calendar")) {
-//                            progressBar.setVisibility(View.VISIBLE);
-//                            refreshCatalog(true);
-//                        } else {
-//                            progressBar.setVisibility(View.GONE);
-//                        }
-//
-////                    }
-//                } else {
-//                    progressBar.setVisibility(View.GONE);
-//                }
-//            }
-//        });
+        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+
+
+            @Override
+            public void onScrollStateChanged(AbsListView arg0, int scrollState) {
+                // If scroll state is touch scroll then set userScrolled
+                // true
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    userScrolled = true;
+
+                }
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+                if (TABBALUE.equalsIgnoreCase("calendar")) {
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                } else {
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+                if (totalItemCount <= totalRecordsCount && totalItemCount != 0) {
+
+                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
+
+                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+
+                    if (userScrolled && firstVisibleItem + visibleItemCount == totalItemCount) {
+                        userScrolled = false;
+
+                        if (!isSearching && !TABBALUE.equalsIgnoreCase("calendar")) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            if (isNetworkConnectionAvailable(getContext(), -1)) {
+                                refreshCatalog(true);
+
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+
+                    }
+
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+
+            }
+
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+            }
+        });
 
         upBtn = (RadioButton) rootView.findViewById(R.id.upcomingbtn);
         upBtn.setChecked(true);
@@ -460,7 +522,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE);
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE, ddlSortList, ddlSortType);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -478,20 +540,26 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             pageIndex = pageIndex + 1;
         }
 
-        progressBar.setVisibility(View.GONE);
         if (TABBALUE.equalsIgnoreCase("calendar") && catalogModelsList.size() > 0) {
-//            compactCalendarView.removeAllEvents();
+            compactCalendarView.removeAllEvents();
             addEvents(catalogModelsList);
             String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
             onDayClick(getCurrentDateTimeInDate(todayD));
+            progressBar.setVisibility(View.GONE);
+            dismissSvProgress();
+            if (isCalendarTabScrolled) {
+                onDayClick(compactCalendarView.getFirstDayOfCurrentMonth());
+            }
+
         }
-        progressBar.setVisibility(View.GONE);
-        dismissSvProgress();
+
     }
 
     public void initilizeCalander() {
         compactCalendarView.setListener(this);
         YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+        compactCalendarView.shouldDrawIndicatorsBelowSelectedDays(true);
+        isCalendarTabScrolled = false;
     }
 
     public void initilizeView() {
@@ -697,7 +765,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, final UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -862,7 +930,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
                     if (isNetworkConnectionAvailable(context, -1)) {
-                        if (myLearningDetalData.isCompletedEvent()) {
+                        if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
 
                             try {
                                 addExpiryEvets(myLearningDetalData, position);
@@ -948,8 +1016,8 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                             //do things
                                             dialog.dismiss();
                                             // add event to android calander
-                                            addEventToAndroidDevice(myLearningDetalData);
-                                            db.updateEventAddedToMyLearningInEventCatalog(contextMenuModelList.get(position), 1);
+//                                            addEventToAndroidDevice(myLearningDetalData);
+                                            db.updateEventAddedToMyLearningInEventCatalog(myLearningDetalData, 1);
                                             injectFromDbtoModel(true);
 
                                         }
@@ -1425,9 +1493,10 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 upBtn.setTypeface(null, Typeface.BOLD);
                 calenderBtn.setTypeface(null, Typeface.NORMAL);
                 pastBtn.setTypeface(null, Typeface.NORMAL);
-                sortByDate("before");
+//                sortByDate("before");
                 TABBALUE = "upcoming";
-
+                injectFromDbtoModel(false);
+                nodata_Label.setText("");
                 if (StaticValues.UPCOMINGCALLED == 0) {
                     pageIndex = 1;
                     refreshCatalog(false);
@@ -1436,23 +1505,24 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 }
                 break;
             case R.id.calanderbtn:
+//                isCalendarTabScrolled=false;
                 upBtn.setTypeface(null, Typeface.NORMAL);
                 calenderBtn.setTypeface(null, Typeface.BOLD);
                 pastBtn.setTypeface(null, Typeface.NORMAL);
                 compactCalendarView.setVisibility(View.VISIBLE);
                 YearTitle.setVisibility(View.VISIBLE);
                 StaticValues.UPCOMINGCALLED = 0;
-//                sortByDate("before");
-//                catalogAdapter.refreshList(catalogModelsList);
-                String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
-                onDayClick(getCurrentDateTimeInDate(todayD));
+                StaticValues.PASTCALLED = 0;
+//                String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+//                onDayClick(getCurrentDateTimeInDate(todayD));
                 TABBALUE = "calendar";
-                if (StaticValues.CALENDARCALLED == 0) {
-
-                    refreshCatalog(false);
-                } else {
-                    injectFromDbtoModel(false);
-                }
+                nodata_Label.setText("");
+                getStartDateandEndDate(true);
+//                if (StaticValues.CALENDARCALLED == 0) {
+                refreshCatalog(false);
+//                } else {
+//                    injectFromDbtoModel(false);
+//                }
                 break;
             case R.id.pastbtn:
                 upBtn.setTypeface(null, Typeface.NORMAL);
@@ -1461,9 +1531,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 compactCalendarView.setVisibility(View.GONE);
                 YearTitle.setVisibility(View.GONE);
                 TABBALUE = "past";
+                injectFromDbtoModel(false);
+                nodata_Label.setText("");
                 if (StaticValues.PASTCALLED == 0) {
                     pageIndex = 1;
-                    refreshCatalog(true);
+                    refreshCatalog(false);
                 } else {
                     injectFromDbtoModel(false);
                 }
@@ -1568,8 +1640,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 catalogAdapter.refreshList(calanderEventList);
                 contextMenuModelList.clear();
                 contextMenuModelList.addAll(calanderEventList);
+                nodata_Label.setText("");
             } else {
-
+                nodata_Label.setText(getResources().getString(R.string.no_data));
                 catalogAdapter.refreshList(calanderEventList);
                 contextMenuModelList.clear();
                 contextMenuModelList.addAll(calanderEventList);
@@ -1580,7 +1653,38 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onMonthScroll(Date firstDayOfNewMonth) {
 
+        getStartDateandEndDate(false);
+//        onDayClick(compactCalendarView.getFirstDayOfCurrentMonth());
+        isCalendarTabScrolled = true;
+    }
+
+
+    public void getStartDateandEndDate(boolean tabClicked) {
+
         YearTitle.setText(dateFormatForMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+
+        String start = (dateFormatToSendserver.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+        Log.d(TAG, "onMonthScroll: startDate" + start);
+
+        String getyearAndMonthInt = (getyearAndMonth.format(compactCalendarView.getFirstDayOfCurrentMonth()));
+
+        Log.d(TAG, "onMonthScroll: getyearAndMonthInt" + getyearAndMonthInt);
+        String[] dateAry = getyearAndMonthInt.split("-");
+
+        if (dateAry.length > 0) {
+
+            int yearInt = Integer.parseInt(dateAry[1]);
+            int monthInt = Integer.parseInt(dateAry[0]);
+
+            String endDate = getLastDateOfMonth(yearInt, monthInt - 1);
+            Log.d(TAG, "onMonthScroll: endDate" + endDate);
+            startDateStr = start.replace(" ", "%20");
+            endDateStr = endDate.replace(" ", "%20");
+            if (!tabClicked) {
+                refreshCatalog(false);
+            }
+        }
+
     }
 
     private void addEvents(List<MyLearningModel> myLearningModelList) {
@@ -1786,7 +1890,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                             //do things
                                             dialog.dismiss();
                                             // add event to android calander
-                                            addEventToAndroidDevice(catalogModel);
+//                                            addEventToAndroidDevice(catalogModel);
                                             db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
                                             injectFromDbtoModel(false);
 

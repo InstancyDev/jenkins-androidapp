@@ -103,7 +103,6 @@ import static com.instancy.instancylearning.utils.Utilities.convertDateToDayForm
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
-import static com.instancy.instancylearning.utils.Utilities.getEventCompletedUTC;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
@@ -649,7 +648,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 downloadTheCourse(myLearningModel, view);
             }
         });
-
+        btnEditReview.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        btnEditReview.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnEditReview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -879,9 +879,27 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
     }
 
     public void updateEnrolledEvent() {
-        Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
-        iconFirst.setBackground(calendarImg);
-        buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+
+
+        if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
+            Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
+            iconFirst.setBackground(viewIcon);
+            buttonFirst.setText("View");
+            txtPrice.setVisibility(View.GONE);
+            txtPrice.setText("");
+
+        } else {
+
+            if (!myLearningModel.isCompletedEvent()) {
+                Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
+                iconFirst.setBackground(calendarImg);
+                buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+            } else {
+                btnsLayout.setVisibility(View.GONE);
+            }
+
+        }
+
         db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
         refreshCatalogContent = true;
         MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
@@ -1129,7 +1147,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
 
-                    if (myLearningModel.isCompletedEvent()) {
+                    if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
 
 //                            addExpiredEventToMyLearning(myLearningDetalData, position);
                         try {
@@ -1150,7 +1168,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 break;
             case R.id.relativesecond:
                 if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
-                    new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
+                    if (isNetworkConnectionAvailable(MyLearningDetail_Activity.this, -1)) {
+                        new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
+                    }
                     refreshOrNo = "refresh";
                 } else {
                     openReportsActivity();
@@ -1478,11 +1498,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();
@@ -2083,6 +2103,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             } else {
                 btnEditReview.setText("Edit Your Review");
                 isEditReview = true;
+
                 editObj = jsonObject.getJSONObject("EditRating");
             }
 

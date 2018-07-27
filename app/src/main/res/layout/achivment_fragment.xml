@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <Spinner
+        android:id="@+id/spnrGame"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:padding="10dp"> </Spinner>
+
     <RelativeLayout
         android:id="@+id/achivmentheader"
         android:layout_width="match_parent"
@@ -15,30 +21,42 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/nodata_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:text="@string/no_data"
-        android:textSize="24sp"
-        android:visibility="gone" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipeachivments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ExpandableListView
-            android:id="@+id/achivmentexpandlist"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="10.0sp"
-            android:focusable="true"
-            android:groupIndicator="@null"></ExpandableListView>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <ExpandableListView
+                android:id="@+id/achivmentexpandlist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="1sp"
+                android:focusable="true"
+                android:groupIndicator="@null"> </ExpandableListView>
+
+            <TextView
+                android:id="@+id/nodata_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="@string/no_data"
+                android:textSize="24sp"
+                android:visibility="visible" />
+
+        </RelativeLayout>
+
+
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

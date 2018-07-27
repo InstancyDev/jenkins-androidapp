@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.sidemenumodule;
 
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 
 import android.content.DialogInterface;
@@ -46,6 +47,7 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.events.Event_fragment_new;
+import com.instancy.instancylearning.gameficitation.LeaderboardFragment;
 import com.instancy.instancylearning.gameficitation.MyAchivementsFragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
@@ -64,6 +66,7 @@ import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.notifications.Notifications_fragment;
 import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
+import com.instancy.instancylearning.progressreports.ProgressReportfragment;
 import com.instancy.instancylearning.settings.SettingsInnerFragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -271,8 +274,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 //            signalAService = SignalAService.newInstance(this);
 //            signalAService.startSignalA();
         }
-
-
         Log.d(TAG, "onCreate: appname " + getResources().getString(R.string.app_name));
 
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -316,7 +317,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
                     sendMessageLayout.setVisibility(View.GONE);
                 } else {
-                    sendMessageLayout.setVisibility(View.VISIBLE);
+                    sendMessageLayout.setVisibility(View.GONE);
                 }
 //                signalAService = SignalAService.newInstance(this);
 //                signalAService.startSignalA();
@@ -586,6 +587,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case 3:
                 fragment = new Profile_fragment();
+//                fragment = new LeaderboardFragment();
                 break;
             case 7:
                 fragment = new Webpage_fragment();
@@ -604,14 +606,23 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 fragment = new AskExpertFragment();
                 break;
             case 9:
-                fragment = new LearningCommunities_fragment(); // commented for gamification
-//                fragment = new MyAchivementsFragment();
+//                fragment = new MyAchivementsFragment(); //
+                fragment = new LearningCommunities_fragment();
                 break;
             case 10:
                 fragment = new PeopleListing_fragment();
                 break;
             case 11:
                 fragment = new MyCompetencyFragment();
+                break;
+            case 12:
+                fragment = new LeaderboardFragment();
+                break;
+            case 13:
+                fragment = new MyAchivementsFragment();
+                break;
+            case 14:
+                fragment = new ProgressReportfragment();
                 break;
             case 99:
                 fragment = new SendMessage_fragment();
@@ -677,10 +688,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         notificationLayout.setVisibility(View.VISIBLE);
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(bottomLogo);
+            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(bottomLogo);
             bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
-
         }
+
     }
 
 
@@ -911,6 +922,16 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     protected void onPostResume() {
         super.onPostResume();
         Log.d(TAG, "onPostResume: sidemenu");
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+//        ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getResources().getString(R.string.app_name), null, Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
+//        (SideMenu.this).setTaskDescription(taskDescription);
+
     }
 
     @Override

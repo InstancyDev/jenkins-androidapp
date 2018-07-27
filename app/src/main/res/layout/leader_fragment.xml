@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_linear_detail"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Spinner
+        android:id="@+id/spnrGame"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:padding="10dp"></Spinner>
+
+    <RelativeLayout
+        android:id="@+id/leadertheader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorGray"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/jobrolename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="left"
+            android:gravity="left"
+            android:padding="5dp"
+            android:text="Name"
+            android:textColor="@color/colorDarkGrey"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txt_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="left"
+            android:gravity="left"
+            android:padding="5dp"
+            android:text="Rank"
+            android:textColor="@color/colorDarkGrey"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeachivments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+
+            <ListView
+                android:id="@+id/leaderboardlist"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="10dp"
+                android:padding="6dp"
+                android:scrollbars="none" > </ListView>
+
+
+            <TextView
+                android:id="@+id/nodata_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="@string/no_data"
+                android:textSize="24sp"
+                android:visibility="visible" />
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+</LinearLayout>

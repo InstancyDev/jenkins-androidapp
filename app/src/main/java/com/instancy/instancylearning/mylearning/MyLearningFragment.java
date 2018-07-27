@@ -60,6 +60,8 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.filter.Filter_activity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
+import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
+import com.instancy.instancylearning.globalsearch.GlobalSearchAdapter;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
@@ -159,7 +161,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     EventInterface eventInterface = null;
 
     int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+
     boolean isSearching = false;
+    boolean userScrolled = false;
 
     ProgressBar progressBar;
 
@@ -251,7 +255,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 + "&Type=" + consolidationType
                 + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=&SiteID="
                 + appUserModel.getSiteIDValue()
-                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize+"&CompInsID="+sideMenusModel.getRepositoryId();
+                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&CompInsID=" + sideMenusModel.getRepositoryId();
         vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
@@ -397,7 +401,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             public void onFinish() {
                 triggerActionForFirstItem();
-                progressBar.setVisibility(View.GONE);
+//                progressBar.setVisibility(View.GONE);
             }
         }.start();
 
@@ -471,29 +475,74 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-        myLearninglistView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                appcontroller.setAlreadyViewd(true);
-                preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
-            }
-        });
+//        myLearninglistView.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView view, int scrollState) {
+//
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//
+//            }
+//        });
 
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
         myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
 
-        progressBar.setVisibility(View.GONE);
+        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
 
-//        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
-//
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount) {
+            @Override
+            public void onScrollStateChanged(AbsListView arg0, int scrollState) {
+                // If scroll state is touch scroll then set userScrolled
+                // true
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    userScrolled = true;
+
+                }
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+
+                if (totalItemCount < totalRecordsCount && totalItemCount != 0) {
+
+                    Log.d(TAG, "onLoadMore size: catalogModelsList" + myLearningModelsList.size());
+
+                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+
+
+                    if (userScrolled && firstVisibleItem + visibleItemCount == totalItemCount) {
+                        userScrolled = false;
+
+                        if (!isSearching) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            if (isNetworkConnectionAvailable(getContext(), -1)) {
+                                refreshMyLearning(true);
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+
+                    }
+
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+                appcontroller.setAlreadyViewd(true);
+                preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+            }
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
 //                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
 //                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
 //
@@ -513,8 +562,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                    progressBar.setVisibility(View.GONE);
 //                }
 //
-//            }
-//        });
+            }
+        });
 
         toolbar = ((SideMenu) getActivity()).toolbar;
 //        setSearchtollbar();
@@ -621,6 +670,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 }
             });
+
+
         }
 
         if (item_filter != null) {
@@ -639,6 +690,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 isSearching = true;
+//                gotoGlobalSearch();
                 return true;
             }
 
@@ -689,6 +741,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                else
 //                    toolbar.setVisibility(View.VISIBLE);
 //                item_search.expandActionView();
+//                gotoGlobalSearch();
                 break;
             case R.id.mylearning_info_help:
                 appcontroller.setAlreadyViewd(false);
@@ -702,6 +755,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void gotoGlobalSearch() {
+
+        Intent intent = new Intent(context, GlobalSearchActivity.class);
+        intent.putExtra("isFrom", 1);
+        startActivityForResult(intent, FILTER_CLOSE_CODE);
+
     }
 
     public HashMap<String, String> generateHashMap(String[] conditionsArray) {
@@ -730,6 +791,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onRefresh() {
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+            pageIndex = 1;
             refreshMyLearning(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -943,11 +1005,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();

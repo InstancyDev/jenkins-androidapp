@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.TimeZone;
@@ -1233,6 +1234,74 @@ public class Utilities {
     }
 
 
+    public static String getCurrentDateTimeInUTC(String format) {
+
+        Calendar c = Calendar.getInstance();
+        c.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date myDate = new Date();
+        Log.d("TIME", "getCurrentDateTimeInNormal: " + myDate);
+        c.setTime(myDate);
+        Date dateTimeInUtc = c.getTime();
+
+        Log.d("TIME", "getCurrentDateTimeInUTC: " + dateTimeInUtc);
+        SimpleDateFormat df = null;
+        if (isValidString(format)) {
+            df = new SimpleDateFormat(format);
+        } else {
+            df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+        return df.format(dateTimeInUtc);
+    }
+
+
+    public static String getLastDateOfMonth(int year, int month) {
+
+        SimpleDateFormat postFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String endDateStr = "";
+        Calendar calendar = new GregorianCalendar(year, month,
+                Calendar.DAY_OF_MONTH);
+        calendar.set(Calendar.DAY_OF_MONTH,
+                calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+
+        endDateStr = postFormater.format(calendar.getTime());
+
+        return endDateStr;
+
+    }
+
+    public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
+        drawable.clearColorFilter();
+        drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        drawable.invalidateSelf();
+        Drawable wrapDrawable = DrawableCompat.wrap(drawable).mutate();
+        DrawableCompat.setTint(wrapDrawable, color);
+        return wrapDrawable;
+    }
+
+
+//    public String getDate(String format)
+//    {
+//        Date ourDate = new Date();
+//        try
+//        {
+//            SimpleDateFormat formatter = new SimpleDateFormat(format);
+//            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+//            Date value = formatter.parse(ourDate);
+//
+//            SimpleDateFormat dateFormatter = new SimpleDateFormat(format); //this format changeable
+//            dateFormatter.setTimeZone(TimeZone.getDefault());
+//            ourDate = dateFormatter.format(value);
+//
+//            //Log.d("ourDate", ourDate);
+//        }
+//        catch (Exception e)
+//        {
+//            ourDate = "00-00-0000 00:00";
+//        }
+//        return ourDate;
+//    }
+
     public static boolean getEventCompletedUTC(String eventDate) {
         boolean isCompleted = false;
 
@@ -1282,5 +1351,5 @@ public class Utilities {
         return filter;
     }
 
- //   https://github.com/RusticiSoftware/TinCanAndroid-Offline/tree/master/TinCanJava-Offline/src/com/rs
+    //   https://github.com/RusticiSoftware/TinCanAndroid-Offline/tree/master/TinCanJava-Offline/src/com/rs
 }

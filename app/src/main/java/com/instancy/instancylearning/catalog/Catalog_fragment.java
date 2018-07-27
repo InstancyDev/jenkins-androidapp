@@ -45,6 +45,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -173,8 +174,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isReportEnabled = true;
     WebAPIClient webAPIClient;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
     boolean isSearching = false;
+    boolean userScrolled = false;
 
     ProgressBar progressBar;
 
@@ -223,6 +225,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     String skillID = "";
     String skillName = "";
+
+
 
     public Catalog_fragment() {
 
@@ -357,7 +361,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 // uncomment after MCI
-//        sortBy = "c.publisheddate%20desc,c.name";
+        sortBy = "c.publisheddate%20desc,c.name";
 
         String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList;
 
@@ -368,7 +372,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=" + authorID ;
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=" + authorID;
 
         vollyService.getJsonObjResponseVolley("PEOPLELISTINGCATALOG", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -569,34 +573,66 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
         myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
-                        progressBar.setVisibility(View.GONE);
-//        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
-//
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount) {
-////                Log.d(TAG, "onLoadMore: called page " + page);
-//                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
-//
-//                if (totalItemsCount < totalRecordsCount && totalItemsCount != 0) {
-//
-//                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
-//
-//                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
-//
-//                    if (!isSearching) {
-//                        progressBar.setVisibility(View.VISIBLE);
-//                        refreshCatalog(true);
-//                    } else {
-//                        progressBar.setVisibility(View.GONE);
-//
-//                    }
-//
-//                } else {
-//                    progressBar.setVisibility(View.GONE);
-//                }
-//
-//            }
-//        });
+
+
+        myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
+
+
+            @Override
+            public void onScrollStateChanged(AbsListView arg0, int scrollState) {
+                // If scroll state is touch scroll then set userScrolled
+                // true
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    userScrolled = true;
+
+                }
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+
+                if (totalItemCount < totalRecordsCount && totalItemCount != 0) {
+
+                    Log.d(TAG, "onLoadMore size: catalogModelsList" + catalogModelsList.size());
+
+                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+
+
+                    if (userScrolled && firstVisibleItem + visibleItemCount == totalItemCount) {
+                        userScrolled = false;
+
+                        if (!isSearching) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            if (isNetworkConnectionAvailable(getContext(), -1)) {
+                                refreshCatalog(true);
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+
+                    }
+
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+//                Log.d(TAG, "onLoadMore: called page " + page);
+                Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
+
+
+            }
+        });
 
         if (BACKTOMAINSITE == 2) {
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
@@ -675,7 +711,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void injectFromDbtoModel() {
-        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId(),ddlSortList,ddlSortType);
+        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId(), ddlSortList, ddlSortType);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -2018,11 +2054,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();
@@ -2571,7 +2607,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = context.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 

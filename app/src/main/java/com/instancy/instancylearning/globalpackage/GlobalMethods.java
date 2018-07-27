@@ -868,7 +868,7 @@ public class GlobalMethods {
         menu.getItem(9).setVisible(false); // cancel
         menu.getItem(10).setVisible(false);
 
-        File myFile = new File(myLearningDetalData.getOfflinepath());
+        final File myFile = new File(myLearningDetalData.getOfflinepath());
 
 
         if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
@@ -1008,7 +1008,9 @@ public class GlobalMethods {
                     Log.d("GLB", "onMenuItemClick: Set Complete ");
                     databaseH = new DatabaseHandler(v.getContext());
 //                  databaseH.setCompleteMethods(v.getContext(), myLearningDetalData);
-                    new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
+                    if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+                        new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
+                    }
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Play")) {

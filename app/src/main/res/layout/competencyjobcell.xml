@@ -18,23 +18,23 @@
         android:layout_gravity="left"
         android:layout_toStartOf="@+id/expIcon"
         android:gravity="left"
-        android:padding="5dp"
+        android:padding="1dp"
         android:textColor="@color/colorDarkGrey" />
 
     <TextView
         android:id="@+id/expIcon"
-        android:layout_width="50dp"
+        android:layout_width="35dp"
         android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="10dp"
-        android:text="@string/fa_icon_angle_down"
-        android:textColor="@color/colorDarkGrey"
-        android:textAlignment="center"
         android:gravity="center_vertical"
-        android:visibility="invisible"
-        android:textSize="20sp" />
+        android:text="@string/fa_icon_angle_down"
+        android:textAlignment="center"
+        android:textColor="@color/colorDarkGrey"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

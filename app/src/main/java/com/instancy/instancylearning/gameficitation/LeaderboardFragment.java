@@ -27,12 +27,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.github.mikephil.charting.formatter.IFillFormatter;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -40,6 +44,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.LeaderboardList;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -48,6 +53,7 @@ import com.instancy.instancylearning.mycompetency.CompetencyJobRoleAdapter;
 import com.instancy.instancylearning.mycompetency.CompetencyJobRoles;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -74,17 +80,23 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
 
-    @BindView(R.id.swipemylearning)
+    String gameId = "1";
+
+    @BindView(R.id.swipeachivments)
     SwipeRefreshLayout swipeRefreshLayout;
     DatabaseHandler db;
-    @BindView(R.id.mycompetencylist)
-    ListView discussionFourmlistView;
+    @BindView(R.id.leaderboardlist)
+    ListView leaderBoardlistView;
 
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
 
-    CompetencyJobRoleAdapter competencyJobRoleAdapter;
-    List<CompetencyJobRoles> competencyJobRolesList = null;
+    @Nullable
+    @BindView(R.id.spnrGame)
+    Spinner spnrGame;
+
+    LeaderBoardAdapter leaderBoardAdapter;
+    List<LeaderboardList> leaderboardListList = null;
     PreferencesManager preferencesManager;
     Context context;
     SideMenusModel sideMenusModel = null;
@@ -116,40 +128,56 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
 
     }
 
-    public void refreshCatalog(Boolean isRefreshed) {
+    public void refreshGameList(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserJobRoleSkills?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us";
+        JSONObject parameters = new JSONObject();
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/LeaderBoard/GetGameList";
+
+        try {
+            parameters.put("Locale", "en-us");
+            parameters.put("SiteID", appUserModel.getSiteIDValue());
+            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+            parameters.put("ComponentID", sideMenusModel.getComponentId());
+            parameters.put("UserID", appUserModel.getUserIDValue());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
 
 
-        vollyService.getJsonObjResponseVolley("COMPSKILLS", urlStr , appUserModel.getAuthHeaders());
+        vollyService.getStringResponseFromPostMethod(parameterString, "GAMESLIST", urlStr);
 
+    }
+
+    public void getLeaderBoardOnGameID(String gameID) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/LeaderBoard/GetLeaderboardData";
+
+        JSONObject parameters = new JSONObject();
+
+        try {
+            parameters.put("Locale", "en-us");
+            parameters.put("SiteID", appUserModel.getSiteIDValue());
+            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+            parameters.put("ComponentID", sideMenusModel.getComponentId());
+            parameters.put("GameID", gameID);
+            parameters.put("UserID", appUserModel.getUserIDValue());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "LEADERBOARD", urlStr);
     }
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
-                Log.d(TAG, "Volley requester " + requestType);
-                Log.d(TAG, "Volley JSON post" + response);
-
-                if (requestType.equalsIgnoreCase("COMPSKILLS")) {
-                    if (response != null && response.has("CompetencyList")) {
-                        try {
-                            db.injectCompetencyJobRoles(response);
-                            injectFromDbtoModel();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
-                    }
-                }
-
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -160,12 +188,57 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
             }
 
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+
+                if (requestType.equalsIgnoreCase("GAMESLIST")) {
+                    Log.d(TAG, requestType + " : " + response);
+//                    [{"GameID":1,"GameName":"Ergonomics Challenge"}]
+
+
+                    if (response != null && response.length() > 0) {
+
+
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+
+                            if (jsonArray.length() > 0) {
+                                db.injectGameslist(jsonArray);
+                                JSONObject object = jsonArray.getJSONObject(0);
+                                gameId = object.getString("GameID");
+                                getLeaderBoardOnGameID(gameId);
+                                updateGameSpinner();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+
+                if (requestType.equalsIgnoreCase("LEADERBOARD")) {
+
+                    Log.d(TAG, requestType + " : " + response);
+
+                    if (response != null && response.length() > 0) {
+
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            db.injectLeaderboardList(jsonObj, gameId);
+                            injectFromDbtoModel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
 
@@ -173,12 +246,49 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
 
             @Override
             public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
-
                 svProgressHUD.dismiss();
             }
         };
     }
 
+    public void updateGameSpinner() {
+
+        final ArrayList<String> gamesList = db.fetchGames();
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, gamesList);
+        spnrGame.setAdapter(spinnerAdapter);
+        spnrGame.setSelection(0, true);
+        View v = spnrGame.getSelectedView();
+        ((TextView) v).setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        spnrGame.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppTextColor())));
+        spnrGame.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
+                                       long id) {
+
+                Log.d(TAG, "onItemSelected: gamesList " + gamesList.get(spnrPosition));
+
+                gameId = db.getGamesID(gamesList.get(spnrPosition));
+
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    getLeaderBoardOnGameID(gameId);
+                } else {
+                    injectFromDbtoModel();
+//                    Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+
+        });
+
+
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -188,19 +298,20 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.mycompetency, container, false);
+        View rootView = inflater.inflate(R.layout.leader_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
-        swipeRefreshLayout.setOnRefreshListener(this);
-        competencyJobRolesList = new ArrayList<CompetencyJobRoles>();
-        competencyJobRoleAdapter = new CompetencyJobRoleAdapter(getActivity(), BIND_ABOVE_CLIENT, competencyJobRolesList);
-        discussionFourmlistView.setAdapter(competencyJobRoleAdapter);
-        discussionFourmlistView.setOnItemClickListener(this);
-        discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+        leaderboardListList = new ArrayList<LeaderboardList>();
+        leaderBoardAdapter = new LeaderBoardAdapter(getActivity(), BIND_ABOVE_CLIENT, leaderboardListList);
+        leaderBoardlistView.setAdapter(leaderBoardAdapter);
+        leaderBoardlistView.setOnItemClickListener(this);
+        leaderBoardlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshCatalog(false);
+            refreshGameList(false);
         } else {
             injectFromDbtoModel();
         }
@@ -216,18 +327,17 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
         return rootView;
     }
 
-
     public void injectFromDbtoModel() {
 
-        competencyJobRolesList = db.fetchCompetencyJobSkills();
+        leaderboardListList = db.fetchLeaderBoardList(gameId);
 
-        if (competencyJobRolesList != null && competencyJobRolesList.size() > 0) {
-            competencyJobRoleAdapter.refreshList(competencyJobRolesList);
+        if (leaderboardListList != null && leaderboardListList.size() > 0) {
+            leaderBoardAdapter.refreshList(leaderboardListList);
 
         } else {
-            competencyJobRolesList = new ArrayList<CompetencyJobRoles>();
-            competencyJobRoleAdapter.refreshList(competencyJobRolesList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            leaderboardListList = new ArrayList<LeaderboardList>();
+            leaderBoardAdapter.refreshList(leaderboardListList);
+            nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
         }
     }
 
@@ -290,7 +400,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            refreshCatalog(true);
+            refreshGameList(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
             Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -300,12 +410,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        Intent intentDetail = new Intent(context, CompetencyCatSkillActivity.class);
-        intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
-        intentDetail.putExtra("JOBROLEID", competencyJobRolesList.get(position).jobRoleID);
-        intentDetail.putExtra("JOBROLENAME", competencyJobRolesList.get(position).jobRoleName);
-        intentDetail.putExtra("JOBTAG", competencyJobRolesList.get(position).jobTag);
-        startActivity(intentDetail);
+
     }
 
     @Override

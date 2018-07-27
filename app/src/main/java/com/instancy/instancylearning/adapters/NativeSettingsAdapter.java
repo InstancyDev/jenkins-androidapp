@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.models.UiSettingsModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,11 +26,12 @@ public class NativeSettingsAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail;
-
+    UiSettingsModel uiSettingsModel;
     public NativeSettingsAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<String>> expandableListDetail) {
         this.context = context;
         this.expandableListDetail = expandableListDetail;
         this.expandableListTitle = expandableListTitle;
+        uiSettingsModel = UiSettingsModel.getInstance();
     }
 
 
@@ -83,6 +86,7 @@ public class NativeSettingsAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.category_title);
         listTitleTextView.setTypeface(null, Typeface.BOLD);
         listTitleTextView.setText(listTitle);
+        listTitleTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         return convertView;
 
     }
@@ -98,6 +102,7 @@ public class NativeSettingsAdapter extends BaseExpandableListAdapter {
         TextView expandedListTextView = (TextView) convertView
                 .findViewById(R.id.settings_label);
         expandedListTextView.setText(expandedListText);
+        expandedListTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         return convertView;
     }
 

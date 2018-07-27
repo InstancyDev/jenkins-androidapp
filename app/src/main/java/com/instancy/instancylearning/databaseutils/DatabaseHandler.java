@@ -20,6 +20,11 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
+import com.instancy.instancylearning.models.Ach_UserBadges;
+import com.instancy.instancylearning.models.Ach_UserLevel;
+import com.instancy.instancylearning.models.Ach_UserOverAllData;
+import com.instancy.instancylearning.models.Ach_UserPoints;
+import com.instancy.instancylearning.models.AchievementModel;
 import com.instancy.instancylearning.models.AllUserInfoModel;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
@@ -33,6 +38,7 @@ import com.instancy.instancylearning.models.CommunitiesModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
+import com.instancy.instancylearning.models.LeaderboardList;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.LrsDetails;
 import com.instancy.instancylearning.models.MembershipModel;
@@ -85,6 +91,7 @@ import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTimeInUTC;
 import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
@@ -262,6 +269,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String TBL_SUBSITESETTINGS = "TBL_SUBSITESETTINGS";
 
     public static final String TBL_PEOPLELISTING = "TBL_PEOPLELISTING";
+
     public static final String TBL_PEOPLELISTINGTABS = "TBL_PEOPLELISTINGTABS";
 
     public static final String TBL_NOTIFICATIONS = "TBL_NOTIFICATIONS";
@@ -273,6 +281,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public static final String TBL_COMPETENCYCATEGORYLIST = "TBL_COMPETENCYCATEGORYLIST";
 
     public static final String TBL_COMPETENCYSKILLLIST = "TBL_COMPETENCYSKILLLIST";
+
+
+    // gamification tables
+
+
+    public static final String TBL_GAMIFICATIONGAMES = "TBL_GAMIFICATIONGAMES";
+
+    public static final String TBL_ACHIEVEMENTSDATA = "TBL_ACHIEVEMENTSDATA";
+
+    public static final String TBL_ACHIEVEMENTUSEROVERALLDATA = "TBL_ACHIEVEMENTUSEROVERALLDATA";
+
+    public static final String TBL_ACHIEVEMENTUSERLEVEL = "TBL_ACHIEVEMENTUSERLEVEL";
+
+    public static final String TBL_ACHIEVEMENTUSERPOINTS = "TBL_ACHIEVEMENTUSERPOINTS";
+
+    public static final String TBL_ACHIEVEMENTUSERBADGES = "TBL_ACHIEVEMENTUSERBADGES";
+
+
+    // leadershiptables
+
+    public static final String TBL_LEADERBOARDDATA = "TBL_LEADERBOARDDATA";
+
+    public static final String TBL_LEADERBOARDLISTDATA = "TBL_LEADERBOARDLISTDATA";
+
 
     private Context dbctx;
     private WebAPIClient wap;
@@ -321,7 +353,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT,appLoginLogoBackgroundcolorColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER, CCEventStartdate TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_NATIVEMENUS
@@ -514,7 +546,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_JOBROLECONTENTNEW
                 + "(contentid TEXT, jobroleid TEXT, dateassigned TEXT, assignedby TEXT, siteid TEXT, componentid TEXT)");
 
-        // MY IMPLEMENTATIONS FOR COMMUNITY LISTING UPENDRA
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_COMMUNITYLISTING
@@ -548,6 +579,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_COMPETENCYSKILLLIST + "(skillname TEXT, skillid INTEGER, prefcategoryid INTEGER, jobroleid INTEGER, description TEXT, gap TEXT, userevaluation TEXT, managerevaluation TEXT, contentevaluation TEXT, weightedaverage TEXT, requiredproficiency TEXT, requiredprofvalues BLOB, userid TEXT, siteid TEXT)");
+
+
+        // Gamification tables
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_GAMIFICATIONGAMES + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, userid TEXT, gamename TEXT, gameid INTEGER)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ACHIEVEMENTSDATA + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, userid TEXT, showlevelsection INTEGER, showpointsection INTEGER, showbadgesection INTEGER)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ACHIEVEMENTUSEROVERALLDATA + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, badges INTEGER, gameid INTEGER, userid INTEGER, overallpoints INTEGER, userlevel TEXT, neededlevel TEXT, neededpoints INTEGER, userprofilepath TEXT, userdisplayname TEXT)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ACHIEVEMENTUSERLEVEL + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, levelid INTEGER, levelreceiveddate TEXT, userid INTEGER, levelname TEXT, gameid INTEGER, levelpoints INTEGER)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ACHIEVEMENTUSERPOINTS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, points INTEGER, gameid INTEGER, userid INTEGER, userreceiveddate TEXT, actionid INTEGER, pointsdescription TEXT, actionname TEXT)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ACHIEVEMENTUSERBADGES + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, gameid INTEGER, userid INTEGER, badgedescription TEXT, badgeid INTEGER, badgename TEXT, badgereceiveddate TEXT, badgeimage TEXT)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_LEADERBOARDDATA + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, userid TEXT, showbadges INTEGER, showlevels INTEGER, showpoints INTEGER, showloggedusertop INTEGER)");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_LEADERBOARDLISTDATA + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteid TEXT, userid TEXT, badges INTEGER, gameid INTEGER, gamename TEXT, levelname TEXT, points INTEGER, profileaction TEXT, rank INTEGER, userdisplayname TEXT, userpicturepath TEXT, intsiteid INTEGER, intuserid INTEGER)");
 
         Log.d(TAG, "onCreate:  TABLES CREATED");
     }
@@ -680,185 +736,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                 }
                             }
                         }
-//                        if (jsonObject.has("table1")) {
-//                            JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
-//                            if (jsonTableOne.size() > 0) {
-//
-//                                for (int i = 0; i < jsonTableOne.size(); i++) {
-//                                    JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
-//
-//                                    if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#SITE_BACKGROUND#")) {
-//                                        uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#SITETEXT_COLOR#")) {
-//                                        uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADER_BACKGROUND#")) {
-//                                        uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADERTEXT_COLOR#")) {
-//                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_BACKGROUND#")) {
-//                                        uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENUTEXT_COLOR#")) {
-//                                        uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENUSLT_BACKGROUND#")) {
-//                                        uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENUSLT_COLOR#")) {
-//                                        uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADER_BACKGROUND#")) {
-//                                        uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADERTEXT_COLOR#")) {
-//                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_BACKGROUND#")) {
-//                                        uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENUTEXT_COLOR#")) {
-//                                        uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENUSEPARATOR_COLOR#")) {
-//                                        uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENUSLT_COLOR#")) {
-//                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#BUTTON_BACKGROUND#")) {
-//                                        uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#BUTTONTEXT_COLOR#")) {
-//                                        uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#BUTTON_BACKGROUND#")) {
-//                                        uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#LIST_BG_COLOR#")) {
-//                                        uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#LIST_BORDER_COLOR#")) {
-//                                        uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#SITE_BACKGROUND#")) {
-//                                        uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
-//                                                "bgcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#SITETEXT_COLOR#")) {
-//                                        uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
-//                                                "textcolor")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    }
-//
-//                                }
-//
-//                            }
-//
-//                        }
 
-                        if (jsonObject.has("table1")) {
+// old COLOR THEMES
+                            if (jsonObject.has("table1")) {
                             JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
                             if (jsonTableOne.size() > 0) {
 
@@ -1036,6 +916,150 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         }
 
+                        {
+                            /// new code
+//                            if (jsonObject.has("table1")) {
+//                                JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
+//                                if (jsonTableOne.size() > 0) {
+//
+//                                    for (int i = 0; i < jsonTableOne.size(); i++) {
+//                                        JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
+//
+//                                        if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#SITE_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#SITETEXT_COLOR#")) {
+//                                            uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENU_BACKGROUND#")) {
+//                                            uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUTEXT_COLOR#")) {
+//                                            uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUSLT_BACKGROUND#")) {
+//                                            uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUSLT_COLOR#")) {
+//                                            uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#HEADER_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                            uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#HEADERTEXT_COLOR#")) {
+//                                            uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                            uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUSEPARATOR_COLOR#")) {
+//                                            uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#BUTTON_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#BUTTONTEXT_COLOR#")) {
+//                                            uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#LOGO_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppLogoBackgroundColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        }
+//
+//                                    }
+//                                }
+//
+//                            }
+//
+
+
+                        }
+
 
                         if (jsonObject.has("table2")) {
                             JsonArray jsonTableTwo = jsonObject.get("table2").getAsJsonArray();
@@ -1111,10 +1135,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                                         uiSettingsModel.setEnableContentEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
                                     }
-//                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableContentEvaluation"))) {
+//                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("CCEventStartdate"))) {
 //
-//                                        uiSettingsModel.setEnableUserEvaluation(nativeSettingsObj.get("keyvalue").getAsBoolean());
+//                                        uiSettingsModel.setcCEventStartdate(nativeSettingsObj.get("keyvalue").getAsString());
 //                                    }
+                                    else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("AllowExpiredEventsSubscription"))) {
+
+                                        uiSettingsModel.setAllowExpiredEventsSubscription(nativeSettingsObj.get("keyvalue").getAsBoolean());
+                                    }
+
                                 }
                             }
                         }
@@ -1170,7 +1199,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             }
         }
     }
-
 
     // Method for getting appsetting model from local sqlite db
 
@@ -1238,7 +1266,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("CommonPasswordValue", uiSettingsModel.getCommonPasswordValue());
             contentValues.put("EnableAzureSSOForLearner", uiSettingsModel.isEnableAzureSSOForLearner());
             contentValues.put("AllowExpiredEventsSubscription", uiSettingsModel.isAllowExpiredEventsSubscription());
+//            contentValues.put("CCEventStartdate", uiSettingsModel.getcCEventStartdate());
 
+
+if (!uiSettingsModel.isEnableAzureSSOForLearner()){
+    contentValues.put("appLoginLogoBackgroundcolorColor", uiSettingsModel.getAppLogoBackgroundColor());
+
+}
 
             db.insert(TBL_APP_SETTINGS, null, contentValues);
         } catch (SQLiteException sqlEx) {
@@ -1295,6 +1329,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setAppHeaderColor(cursor.getString(cursor
                     .getColumnIndex("appHeaderColor")));
+
+
 
             uiSettingsModel.setSelfRegistrationAllowed(cursor.getString(cursor
                     .getColumnIndex("selfRegistrationAllowed")));
@@ -1390,6 +1426,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             uiSettingsModel.setAllowExpiredEventsSubscription(cursor.getInt(cursor
                     .getColumnIndex("AllowExpiredEventsSubscription")) > 0);
+
+            if (!uiSettingsModel.isEnableAzureSSOForLearner()){
+                uiSettingsModel.setAppLogoBackgroundColor(cursor.getString(cursor
+                        .getColumnIndex("appLoginLogoBackgroundcolorColor")));
+
+            }
+
+//            uiSettingsModel.setcCEventStartdate(cursor.getString(cursor
+//                    .getColumnIndex("CCEventStartdate")));
+
+
 
             Log.d(TAG, "getReportButtonTextColor: " + uiSettingsModel.getAppHeaderColor());
         }
@@ -1706,11 +1753,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 while (cursor.moveToNext()) {
                     String contextMenuID = cursor.getString(cursor
                             .getColumnIndex("contextmenuid"));
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("4")))
-//
-////                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("2")))
-//                    if (!(contextMenuID.equalsIgnoreCase("1") || contextMenuID.equalsIgnoreCase("3") || contextMenuID.equalsIgnoreCase("2") || contextMenuID.equalsIgnoreCase("4") || contextMenuID.equalsIgnoreCase("9") || contextMenuID.equalsIgnoreCase("10") || contextMenuID.equalsIgnoreCase("8") || contextMenuID.equalsIgnoreCase("5")))
-//                        continue;
                     isMylearning = true;
                     menu = new SideMenusModel();
                     menu.setMenuId(cursor.getInt(cursor
@@ -2506,7 +2548,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -3446,7 +3488,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             Log.d("deteleTackListItems", ex.getMessage());
         }
 
-//        db.close(); 5lk + 376000 + 220000 + 106000 +
+//        db.close();
     }
 
     public String getTheDatabaseColumnName(String sortType) {
@@ -4204,7 +4246,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public List<MyLearningModel> fetchEventCatalogModel(String componentID, String typeTab) {
+    public List<MyLearningModel> fetchEventCatalogModel(String componentID, String typeTab, String ddlSortList, String ddlSortType) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
@@ -4212,22 +4254,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // original
 //        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventTabValue = '" + typeTab + "'  ORDER BY eventstarttime ASC";
 
-        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
 
-        // according time get data
 
-        switch (typeTab) {
-            case "upcoming": //eventTabValue typeTab
-                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
-                break;
-            case "past":
-                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' AND eventstartUtctime <= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
-                ;
-                break;
-            case "calendar":
-                strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventstartUtctime !='' ORDER BY eventstarttime ASC";
-                break;
+        String orderType = getTheDatabaseColumnName(ddlSortList);
+
+
+        if (!orderType.equalsIgnoreCase("publisheddate")) {
+
+            switch (typeTab) {
+                case "upcoming": //eventTabValue typeTab
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss")+"'";
+                    break;
+                case "past":
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss")+"'";
+
+                    break;
+                case "calendar":
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !=''";
+                    break;
+            }
+
+        } else {
+
+            switch (typeTab) {
+                case "upcoming": //eventTabValue typeTab
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+                    break;
+                case "past":
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+                    ;
+                    break;
+                case "calendar":
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' ORDER BY eventstarttime ASC";
+                    break;
+            }
+
+
         }
+
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -4648,7 +4713,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -5121,7 +5186,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                         String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                         String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                                + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                                + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                         String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -10251,7 +10316,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -14064,20 +14129,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     // inject peoplelisting
 
-    public void injectPeopleListingListIntoSqLite(JSONObject jsonObject, String TabValue) throws JSONException {
+    public void injectPeopleListingListIntoSqLite(JSONObject jsonObject, String TabValue,int pageIndex) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("PeopleList");
         // for deleting records in table for respective tabid
 
+
         SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            String strDelete = "DELETE FROM " + TBL_PEOPLELISTING + " WHERE  siteid = "
-                    + appUserModel.getSiteIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' AND tabid = '" + TabValue + "'";
-            db.execSQL(strDelete);
 
-        } catch (SQLiteException sqlEx) {
+        if (pageIndex==1){
 
-            sqlEx.printStackTrace();
+            try {
+                String strDelete = "DELETE FROM " + TBL_PEOPLELISTING + " WHERE  siteid = "
+                        + appUserModel.getSiteIDValue() + " AND siteurl = '" + appUserModel.getSiteURL() + "' AND tabid = '" + TabValue + "'";
+                db.execSQL(strDelete);
+
+            } catch (SQLiteException sqlEx) {
+
+                sqlEx.printStackTrace();
+            }
         }
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
@@ -16742,7 +16812,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-
     public List<CompetencyJobRoles> fetchCompetencyJobSkills() {
 
         List<CompetencyJobRoles> competencyJobRolesList = new ArrayList<>();
@@ -16968,16 +17037,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     LrsDetails lrsDetails = new LrsDetails();
                     lrsDetails.Id = Integer.parseInt(cursor.getString(0));
                     lrsDetails.lrs = cursor.getString(1);
-                    lrsDetails.lrsUrl=cursor.getString(2);
-                    lrsDetails.method=cursor.getString(3);
-                    lrsDetails.data=cursor.getString(4);
-                    lrsDetails.auth=cursor.getString(5);
-                    lrsDetails.callback=cursor.getString(6);
-                    lrsDetails.extraHeaders=cursor.getString(7);
-                    lrsDetails.siteId=Integer.parseInt(cursor.getString(8));
-                    lrsDetails.userId=Integer.parseInt(cursor.getString(9));
-                    lrsDetails.scoId=Integer.parseInt(cursor.getString(10));
-                    lrsDetails.actor=cursor.getString(11);
+                    lrsDetails.lrsUrl = cursor.getString(2);
+                    lrsDetails.method = cursor.getString(3);
+                    lrsDetails.data = cursor.getString(4);
+                    lrsDetails.auth = cursor.getString(5);
+                    lrsDetails.callback = cursor.getString(6);
+                    lrsDetails.extraHeaders = cursor.getString(7);
+                    lrsDetails.siteId = Integer.parseInt(cursor.getString(8));
+                    lrsDetails.userId = Integer.parseInt(cursor.getString(9));
+                    lrsDetails.scoId = Integer.parseInt(cursor.getString(10));
+                    lrsDetails.actor = cursor.getString(11);
                     lrsList.add(lrsDetails);
 
                 } while (cursor.moveToNext());
@@ -17027,7 +17096,907 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         return strState;
     }
-        // uncomment for pagenotes
+
+
+    public void injectGameslist(JSONArray jsonArrayJobRoles) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+
+            String strDelete = "DELETE FROM " + TBL_GAMIFICATIONGAMES + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+
+        String gameId="";
+        String gameName="";
+
+
+        for (int i = 0; i < jsonArrayJobRoles.length(); i++) {
+
+
+
+            JSONObject profilePrivObj = jsonArrayJobRoles.getJSONObject(i);
+
+            if (profilePrivObj.has("GameID")) {
+
+                gameId = profilePrivObj.getString("GameID");
+            }
+
+            if (profilePrivObj.has("GameName")) {
+
+                gameName = profilePrivObj.getString("GameName");
+            }
+
+
+            ContentValues contentValues = null;
+            try {
+
+
+                contentValues = new ContentValues();
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+                contentValues.put("userid", appUserModel.getUserIDValue());
+                contentValues.put("gamename",gameName);
+                contentValues.put("gameid",gameId);
+
+
+                db.insert(TBL_GAMIFICATIONGAMES, null, contentValues);
+
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+    public ArrayList<String> fetchGames() {
+
+        ArrayList<String> gameNames = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT gamename FROM " + TBL_GAMIFICATIONGAMES + " WHERE userid = " + appUserModel.getUserIDValue() + " AND siteid = " + appUserModel.getSiteIDValue() ;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    String gameName = "";
+                    gameName = (cursor.getString(cursor.getColumnIndex("gamename")));
+                    gameNames.add(gameName);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("gamename db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting gamename");
+        }
+
+        return gameNames;
+    }
+
+
+    public String getGamesID(String gameName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT gameid FROM TBL_GAMIFICATIONGAMES WHERE  siteid=" + appUserModel.getSiteIDValue()
+                + " AND gamename= '" + gameName + "' AND userid="+appUserModel.getUserIDValue();
+        Cursor cursor = db.rawQuery(strSelQuery, null);
+        String prevStatus = "";
+        if (cursor.moveToFirst()) {
+            prevStatus = cursor.getString(cursor.getColumnIndex("gameid"));
+        }
+        cursor.close();
+        db.close();
+        return prevStatus;
+    }
+
+    // Injecting data leaderboard data into local database
+
+    public void injectLeaderboardList(JSONObject jsonObject,String gameid) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+        JSONArray jsonArrayJobRoles = jsonObject.getJSONArray("LeaderBoardList");
+
+        try {
+            String strDelete = "DELETE FROM " + TBL_LEADERBOARDLISTDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            String strDelteLeader = "DELETE FROM " + TBL_LEADERBOARDDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+            if (gameid.length()==0) {
+                 strDelete = "DELETE FROM " + TBL_LEADERBOARDLISTDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+                strDelteLeader = "DELETE FROM " + TBL_LEADERBOARDDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            }
+            else {
+                 strDelete = "DELETE FROM " + TBL_LEADERBOARDLISTDATA + " WHERE siteid = " + appUserModel.getSiteIDValue() +" AND gameid="+gameid;
+                strDelteLeader = "DELETE FROM " + TBL_LEADERBOARDDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+            }
+
+
+            db.execSQL(strDelete);
+            db.execSQL(strDelteLeader);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        String showbadges = "";
+        String showlevels = "";
+        String showpoints = "";
+        String showloggedusertop = "";
+
+
+
+
+        if (jsonObject.has("GameID")) {
+
+            showbadges = jsonObject.getString("GameID");
+        }
+
+        if (jsonObject.has("GameName")) {
+
+            showlevels = jsonObject.getString("GameName");
+        }
+
+        if (jsonObject.has("intUserID")) {
+
+            showpoints = jsonObject.getString("intUserID");
+        }
+
+        if (jsonObject.has("intSiteID")) {
+
+            showloggedusertop = jsonObject.getString("intSiteID");
+        }
+
+
+        ContentValues contentdata = null;
+        try {
+
+            contentdata = new ContentValues();
+            contentdata.put("siteid", appUserModel.getSiteIDValue());
+            contentdata.put("userid", appUserModel.getUserIDValue());
+            contentdata.put("showbadges", showbadges);
+            contentdata.put("showlevels", showlevels);
+            contentdata.put("showpoints", showpoints);
+            contentdata.put("showloggedusertop", showloggedusertop);
+
+
+            db.insert(TBL_LEADERBOARDDATA, null, contentdata);
+
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+
+        for (int i = 0; i < jsonArrayJobRoles.length(); i++) {
+
+            LeaderboardList leaderboardList = new LeaderboardList();
+
+            JSONObject profilePrivObj = jsonArrayJobRoles.getJSONObject(i);
+
+            if (profilePrivObj.has("GameID")) {
+
+                leaderboardList.gameID = profilePrivObj.getInt("GameID");
+            }
+
+            if (profilePrivObj.has("GameName")) {
+
+                leaderboardList.gameName = profilePrivObj.getString("GameName");
+            }
+
+            if (profilePrivObj.has("intUserID")) {
+
+                leaderboardList.intUserID = profilePrivObj.getInt("intUserID");
+            }
+
+
+            if (profilePrivObj.has("intSiteID")) {
+
+                leaderboardList.intSiteID = profilePrivObj.getInt("intSiteID");
+            }
+
+            if (profilePrivObj.has("UserDisplayName")) {
+
+                leaderboardList.userDisplayName = profilePrivObj.getString("UserDisplayName");
+            }
+
+
+            if (profilePrivObj.has("UserPicturePath")) {
+
+                leaderboardList.userPicturePath = appUserModel.getSiteURL() +  profilePrivObj.getString("UserPicturePath");
+            }
+
+            if (profilePrivObj.has("LevelName")) {
+
+                leaderboardList.levelName = profilePrivObj.getString("LevelName");
+            }
+
+            if (profilePrivObj.has("Points")) {
+
+                leaderboardList.points = profilePrivObj.getInt("Points");
+            }
+
+            if (profilePrivObj.has("Badges")) {
+
+                leaderboardList.badges = profilePrivObj.getInt("Badges");
+            }
+
+            if (profilePrivObj.has("Rank")) {
+
+                leaderboardList.rank = profilePrivObj.getInt("Rank");
+            }
+
+            if (profilePrivObj.has("ProfileAction")) {
+
+                leaderboardList.profileAction = profilePrivObj.getString("ProfileAction");
+            }
+
+
+            ContentValues contentValues = null;
+            try {
+
+                contentValues = new ContentValues();
+                contentValues.put("siteid", appUserModel.getSiteIDValue());
+                contentValues.put("userid", appUserModel.getUserIDValue());
+                contentValues.put("badges", leaderboardList.badges);
+                contentValues.put("gameid", leaderboardList.gameID);
+                contentValues.put("gamename", leaderboardList.gameName);
+                contentValues.put("levelname", leaderboardList.levelName);
+                contentValues.put("points", leaderboardList.points);
+                contentValues.put("levelname", leaderboardList.levelName);
+                contentValues.put("profileaction", leaderboardList.profileAction);
+                contentValues.put("rank", leaderboardList.rank);
+                contentValues.put("userdisplayname", leaderboardList.userDisplayName);
+                contentValues.put("intsiteid", leaderboardList.intSiteID);
+                contentValues.put("intuserid", leaderboardList.intUserID);
+                contentValues.put("userpicturepath",leaderboardList.userPicturePath);
+
+                db.insert(TBL_LEADERBOARDLISTDATA, null, contentValues);
+
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+        }
+
+    }
+
+    public List<LeaderboardList> fetchLeaderBoardList(String gameID) {
+
+        List<LeaderboardList> leaderboardLists = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_LEADERBOARDLISTDATA + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid=" + appUserModel.getSiteIDValue() +" AND gameid=" + gameID;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+
+                    LeaderboardList leaderboardList = new LeaderboardList();
+                    leaderboardList.intSiteID = (cursor.getInt(cursor.getColumnIndex("intsiteid")));
+                    leaderboardList.intUserID = (cursor.getInt(cursor.getColumnIndex("intuserid")));
+                    leaderboardList.userDisplayName = (cursor.getString(cursor.getColumnIndex("userdisplayname")));
+                    leaderboardList.userPicturePath = (cursor.getString(cursor.getColumnIndex("userpicturepath")));
+                    leaderboardList.rank = (cursor.getInt(cursor.getColumnIndex("rank")));
+
+                    leaderboardList.profileAction = (cursor.getString(cursor.getColumnIndex("profileaction")));
+
+                    leaderboardList.points = (cursor.getInt(cursor.getColumnIndex("points")));
+                    leaderboardList.gameID = (cursor.getInt(cursor.getColumnIndex("gameid")));
+                    leaderboardList.levelName = (cursor.getString(cursor.getColumnIndex("levelname")));
+                    leaderboardList.gameName = (cursor.getString(cursor.getColumnIndex("gamename")));
+                    leaderboardList.badges = (cursor.getInt(cursor.getColumnIndex("badges")));
+                    leaderboardLists.add(leaderboardList);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return leaderboardLists;
+    }
+
+// ACHIVMENTBOARD LIST
+
+    public void injectAchivmentData(JSONObject jsonObject) throws JSONException {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        JSONObject JsonjOverAllData = jsonObject.getJSONObject("UserOverAllData");
+
+        JSONArray jsonUserPointsAry = jsonObject.getJSONArray("UserPoints");
+
+        JSONArray jsonUserLevelAry = jsonObject.getJSONArray("UserLevel");
+
+        JSONArray jsonUserBadgesAry = jsonObject.getJSONArray("UserBadges");
+
+        try {
+
+            String strDelete = "DELETE FROM " + TBL_ACHIEVEMENTSDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+            String strDelteLeader = "DELETE FROM " + TBL_ACHIEVEMENTUSERLEVEL + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+            String strDelteUserPoints = "DELETE FROM " + TBL_ACHIEVEMENTUSERPOINTS + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+            String strDelteBadges = "DELETE FROM " + TBL_ACHIEVEMENTUSERBADGES + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+            String overAldelete = "DELETE FROM " + TBL_ACHIEVEMENTUSEROVERALLDATA + " WHERE siteid = " + appUserModel.getSiteIDValue();
+
+
+            db.execSQL(overAldelete);
+            db.execSQL(strDelete);
+            db.execSQL(strDelteLeader);
+            db.execSQL(strDelteUserPoints);
+            db.execSQL(strDelteBadges);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
+        String showlevelsection = "";
+        String showpointsection = "";
+        String showbadgesection = "";
+
+
+        if (jsonObject.has("showLevelSection")) {
+
+            showlevelsection = jsonObject.getString("showLevelSection");
+        }
+
+        if (jsonObject.has("showPointSection")) {
+
+            showpointsection = jsonObject.getString("showPointSection");
+        }
+
+        if (jsonObject.has("showBadgeSection")) {
+
+            showbadgesection = jsonObject.getString("showBadgeSection");
+        }
+
+        ContentValues contentdata = null;
+        try {
+
+            contentdata = new ContentValues();
+            contentdata.put("siteid", appUserModel.getSiteIDValue());
+            contentdata.put("userid", appUserModel.getUserIDValue());
+            contentdata.put("showlevelsection", showlevelsection);
+            contentdata.put("showpointsection", showpointsection);
+            contentdata.put("showbadgesection", showbadgesection);
+
+            db.insert(TBL_ACHIEVEMENTSDATA, null, contentdata);
+
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+
+        // UserOveralldata
+
+
+        if (JsonjOverAllData.length() > 0) {
+
+
+            Ach_UserOverAllData achUserOverAllData = new Ach_UserOverAllData();
+
+            if (JsonjOverAllData.has("OverAllPoints")) {
+
+                achUserOverAllData.overAllPoints = JsonjOverAllData.getInt("OverAllPoints");
+            }
+
+            if (JsonjOverAllData.has("Badges")) {
+
+                achUserOverAllData.badges = JsonjOverAllData.getInt("Badges");
+            }
+
+            if (JsonjOverAllData.has("UserLevel")) {
+
+                achUserOverAllData.userLevel = JsonjOverAllData.getString("UserLevel");
+            }
+
+            if (JsonjOverAllData.has("UserProfilePath")) {
+
+                achUserOverAllData.userProfilePath =  JsonjOverAllData.getString("UserProfilePath");
+            }
+
+            if (JsonjOverAllData.has("UserDisplayName")) {
+
+                achUserOverAllData.userDisplayName = JsonjOverAllData.getString("UserDisplayName");
+            }
+
+
+            if (JsonjOverAllData.has("NeededPoints")) {
+
+                achUserOverAllData.neededPoints = JsonjOverAllData.getInt("NeededPoints");
+            }
+
+            if (JsonjOverAllData.has("NeededLevel")) {
+
+                achUserOverAllData.neededLevel = JsonjOverAllData.getString("NeededLevel");
+            }
+
+            if (JsonjOverAllData.has("GameID")) {
+
+                achUserOverAllData.gameID = JsonjOverAllData.getInt("GameID");
+            }
+            if (JsonjOverAllData.has("UserID")) {
+
+                achUserOverAllData.userID = JsonjOverAllData.getInt("UserID");
+            }
+
+            ContentValues useroveralldata = null;
+            try {
+
+
+                useroveralldata = new ContentValues();
+                useroveralldata.put("siteid", appUserModel.getSiteIDValue());
+                useroveralldata.put("badges", achUserOverAllData.badges);
+                useroveralldata.put("gameid", achUserOverAllData.gameID);
+                useroveralldata.put("userid", achUserOverAllData.userID);
+                useroveralldata.put("overallpoints", achUserOverAllData.overAllPoints);
+                useroveralldata.put("userlevel", achUserOverAllData.userLevel);
+                useroveralldata.put("neededlevel", achUserOverAllData.neededLevel);
+                useroveralldata.put("neededpoints", achUserOverAllData.neededPoints);
+                useroveralldata.put("userprofilepath", achUserOverAllData.userProfilePath);
+                useroveralldata.put("userdisplayname", achUserOverAllData.userDisplayName);
+
+                db.insert(TBL_ACHIEVEMENTUSEROVERALLDATA, null, useroveralldata);
+
+            } catch (SQLiteException exception) {
+
+                exception.printStackTrace();
+            }
+
+
+        }
+
+
+        // UserPointsAry
+
+        if (jsonUserPointsAry != null && jsonUserPointsAry.length() > 0) {
+
+
+            for (int i = 0; i < jsonUserPointsAry.length(); i++) {
+
+                Ach_UserPoints achipoints = new Ach_UserPoints();
+
+                JSONObject profilePrivObj = jsonUserPointsAry.getJSONObject(i);
+
+                if (profilePrivObj.has("GameID")) {
+
+                    achipoints.gameID = profilePrivObj.getInt("GameID");
+                }
+
+                if (profilePrivObj.has("ActionID")) {
+
+                    achipoints.actionID = profilePrivObj.getInt("ActionID");
+                }
+
+                if (profilePrivObj.has("Description")) {
+
+                    achipoints.pointsDescription = profilePrivObj.getString("Description");
+                }
+
+
+                if (profilePrivObj.has("Points")) {
+
+                    achipoints.points = profilePrivObj.getInt("Points");
+                }
+
+                if (profilePrivObj.has("UserID")) {
+
+                    achipoints.userID = profilePrivObj.getInt("UserID");
+                }
+
+
+                if (profilePrivObj.has("UserReceivedDate")) {
+
+                    String formattedDate = formatDate(profilePrivObj.getString("UserReceivedDate"), "yyyy-MM-dd'T'HH:mm:ss", "MMM dd, yyyy");
+
+                    achipoints.userReceivedDate = formattedDate;
+                }
+
+                ContentValues contentValues = null;
+                try {
+
+                    contentValues = new ContentValues();
+                    contentValues.put("siteid", appUserModel.getSiteIDValue());
+                    contentValues.put("userid", achipoints.userID);
+                    contentValues.put("points", achipoints.points);
+                    contentValues.put("gameid", achipoints.gameID);
+                    contentValues.put("userreceiveddate", achipoints.userReceivedDate);
+                    contentValues.put("actionid", achipoints.actionID);
+                    contentValues.put("pointsdescription", achipoints.pointsDescription);
+                    contentValues.put("actionname", achipoints.actionName);
+
+
+                    db.insert(TBL_ACHIEVEMENTUSERPOINTS, null, contentValues);
+
+
+                } catch (SQLiteException exception) {
+
+                    exception.printStackTrace();
+                }
+            }
+
+
+        }
+
+//UserLevelAry
+
+        if (jsonUserLevelAry != null && jsonUserLevelAry.length() > 0) {
+
+            for (int i = 0; i < jsonUserLevelAry.length(); i++) {
+
+                Ach_UserLevel achUserLevel = new Ach_UserLevel();
+
+                JSONObject profilePrivObj = jsonUserLevelAry.getJSONObject(i);
+
+                if (profilePrivObj.has("LevelName")) {
+
+                    achUserLevel.levelName = profilePrivObj.getString("LevelName");
+                }
+
+                if (profilePrivObj.has("LevelPoints")) {
+
+                    achUserLevel.levelPoints = profilePrivObj.getInt("LevelPoints");
+                }
+
+                if (profilePrivObj.has("LevelID")) {
+
+                    achUserLevel.levelID = profilePrivObj.getInt("LevelID");
+                }
+
+                if (profilePrivObj.has("GameID")) {
+
+                    achUserLevel.gameID = profilePrivObj.getInt("GameID");
+                }
+
+                if (profilePrivObj.has("UserID")) {
+
+                    achUserLevel.userID = profilePrivObj.getInt("UserID");
+                }
+
+                if (profilePrivObj.has("LevelRecivedDate")) {
+
+                    String formattedDate = formatDate(profilePrivObj.getString("LevelRecivedDate"), "yyyy-MM-dd'T'HH:mm:ss", "MMM dd, yyyy");
+
+                    achUserLevel.levelReceivedDate = formattedDate;
+
+                }
+
+
+                ContentValues contentValues = null;
+                try {
+
+                    contentValues = new ContentValues();
+                    contentValues.put("siteid", appUserModel.getSiteIDValue());
+                    contentValues.put("userid", achUserLevel.userID);
+                    contentValues.put("levelid", achUserLevel.levelID);
+                    contentValues.put("levelreceiveddate", achUserLevel.levelReceivedDate);
+                    contentValues.put("levelname", achUserLevel.levelName);
+                    contentValues.put("gameid", achUserLevel.gameID);
+                    contentValues.put("levelpoints", achUserLevel.levelPoints);
+
+                    db.insert(TBL_ACHIEVEMENTUSERLEVEL, null, contentValues);
+
+                } catch (SQLiteException exception) {
+
+                    exception.printStackTrace();
+                }
+            }
+        }
+// UserBadges Ary
+
+        if (jsonUserBadgesAry != null && jsonUserBadgesAry.length() > 0) {
+
+            for (int i = 0; i < jsonUserBadgesAry.length(); i++) {
+
+                Ach_UserBadges achUserBadges = new Ach_UserBadges();
+
+                JSONObject profilePrivObj = jsonUserBadgesAry.getJSONObject(i);
+
+
+                if (profilePrivObj.has("BadgeID")) {
+
+                    achUserBadges.badgeID = profilePrivObj.getInt("BadgeID");
+                }
+
+                if (profilePrivObj.has("BadgeName")) {
+
+                    achUserBadges.badgeName = profilePrivObj.getString("BadgeName");
+                }
+
+                if (profilePrivObj.has("BadgeDescription")) {
+
+                    achUserBadges.badgeDescription = profilePrivObj.getString("BadgeDescription");
+                }
+
+
+                if (profilePrivObj.has("BadgeImage")) {
+
+                    achUserBadges.badgeImage = appUserModel.getSiteURL() +  profilePrivObj.getString("BadgeImage");
+                }
+
+                if (profilePrivObj.has("GameID")) {
+
+                    achUserBadges.gameID = profilePrivObj.getInt("GameID");
+                }
+
+                if (profilePrivObj.has("BadgeReceivedDate")) {
+
+                    String formattedDate = formatDate(profilePrivObj.getString("BadgeReceivedDate"), "yyyy-MM-dd'T'HH:mm:ss", "MMM dd, yyyy");
+
+                    achUserBadges.badgeReceivedDate = formattedDate;
+
+                }
+
+                if (profilePrivObj.has("UserID")) {
+
+                    achUserBadges.userID = profilePrivObj.getInt("UserID");
+                }
+
+
+                ContentValues contentValues = null;
+                try {
+
+                    contentValues = new ContentValues();
+                    contentValues.put("siteid", appUserModel.getSiteIDValue());
+                    contentValues.put("userid", achUserBadges.userID);
+                    contentValues.put("gameid", achUserBadges.gameID);
+                    contentValues.put("badgedescription", achUserBadges.badgeDescription);
+                    contentValues.put("badgeid", achUserBadges.badgeID);
+                    contentValues.put("badgename", achUserBadges.badgeName);
+                    contentValues.put("badgereceiveddate", achUserBadges.badgeReceivedDate);
+                    contentValues.put("badgeimage", achUserBadges.badgeImage);
+
+
+                    db.insert(TBL_ACHIEVEMENTUSERBADGES, null, contentValues);
+
+                } catch (SQLiteException exception) {
+
+                    exception.printStackTrace();
+                }
+            }
+
+        }
+
+    }
+
+
+    // fetch all details from
+
+    public List<Ach_UserPoints> fetchUserAchivPoints(String gameID) {
+
+        List<Ach_UserPoints> ach_userPointsArrayList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_ACHIEVEMENTUSERPOINTS + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid=" + appUserModel.getSiteIDValue()+" AND gameid="+gameID;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+
+                    Ach_UserPoints achUserPoints = new Ach_UserPoints();
+                    achUserPoints.userID = (cursor.getInt(cursor.getColumnIndex("userid")));
+                    achUserPoints.points = (cursor.getInt(cursor.getColumnIndex("points")));
+                    achUserPoints.gameID = (cursor.getInt(cursor.getColumnIndex("gameid")));
+                    achUserPoints.userReceivedDate = (cursor.getString(cursor.getColumnIndex("userreceiveddate")));
+                    achUserPoints.actionID = (cursor.getInt(cursor.getColumnIndex("actionid")));
+                    achUserPoints.actionName = (cursor.getString(cursor.getColumnIndex("actionname")));
+                    achUserPoints.pointsDescription = (cursor.getString(cursor.getColumnIndex("pointsdescription")));
+
+
+                    ach_userPointsArrayList.add(achUserPoints);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return ach_userPointsArrayList;
+    }
+
+
+    public List<Ach_UserLevel> fetchUserAchivLevels(String gameID) {
+
+        List<Ach_UserLevel> ach_userLevelArrayList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_ACHIEVEMENTUSERLEVEL + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid=" + appUserModel.getSiteIDValue() +" AND gameid="+gameID;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+
+                    Ach_UserLevel achUserLevel = new Ach_UserLevel();
+                    achUserLevel.userID = (cursor.getInt(cursor.getColumnIndex("userid")));
+                    achUserLevel.levelID = (cursor.getInt(cursor.getColumnIndex("levelid")));
+                    achUserLevel.gameID = (cursor.getInt(cursor.getColumnIndex("gameid")));
+                    achUserLevel.levelReceivedDate = (cursor.getString(cursor.getColumnIndex("levelreceiveddate")));
+                    achUserLevel.levelName = (cursor.getString(cursor.getColumnIndex("levelname")));
+                    achUserLevel.levelPoints = (cursor.getInt(cursor.getColumnIndex("levelpoints")));
+
+
+                    ach_userLevelArrayList.add(achUserLevel);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return ach_userLevelArrayList;
+    }
+
+
+    public List<Ach_UserBadges> fetchUserAchivBadges(String gameID) {
+
+        List<Ach_UserBadges> ach_userBadgesArrayList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * FROM " + TBL_ACHIEVEMENTUSERBADGES + " WHERE  userid = " + appUserModel.getUserIDValue() + " AND siteid=" + appUserModel.getSiteIDValue()+" AND gameid="+gameID;
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+
+                    Ach_UserBadges achUserPoints = new Ach_UserBadges();
+                    achUserPoints.userID = (cursor.getInt(cursor.getColumnIndex("userid")));
+                    achUserPoints.badgeDescription = (cursor.getString(cursor.getColumnIndex("badgedescription")));
+                    achUserPoints.gameID = (cursor.getInt(cursor.getColumnIndex("gameid")));
+                    achUserPoints.badgeID = (cursor.getInt(cursor.getColumnIndex("badgeid")));
+                    achUserPoints.badgeName = (cursor.getString(cursor.getColumnIndex("badgename")));
+                    achUserPoints.badgeReceivedDate = (cursor.getString(cursor.getColumnIndex("badgereceiveddate")));
+                    achUserPoints.badgeImage = (cursor.getString(cursor.getColumnIndex("badgeimage")));
+                    ach_userBadgesArrayList.add(achUserPoints);
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchCountriesName db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return ach_userBadgesArrayList;
+    }
+
+    public Ach_UserOverAllData fetchUserAllOverData(String siteId, String userID, String gameID) {
+
+        Ach_UserOverAllData achUserOverAllData = new Ach_UserOverAllData();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_ACHIEVEMENTUSEROVERALLDATA + " WHERE userid =" + userID + " AND siteid = " + siteId + " AND gameid = " + gameID;
+
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    achUserOverAllData = new Ach_UserOverAllData();
+                    achUserOverAllData.userID = (cursor.getInt(cursor.getColumnIndex("userid")));
+                    achUserOverAllData.badges = (cursor.getInt(cursor.getColumnIndex("badges")));
+                    achUserOverAllData.gameID = (cursor.getInt(cursor.getColumnIndex("gameid")));
+                    achUserOverAllData.overAllPoints = (cursor.getInt(cursor.getColumnIndex("overallpoints")));
+                    achUserOverAllData.userLevel = (cursor.getString(cursor.getColumnIndex("userlevel")));
+                    achUserOverAllData.neededLevel = (cursor.getString(cursor.getColumnIndex("neededlevel")));
+                    achUserOverAllData.neededPoints = (cursor.getInt(cursor.getColumnIndex("neededpoints")));
+                    achUserOverAllData.userProfilePath = (cursor.getString(cursor.getColumnIndex("userprofilepath")));
+                    achUserOverAllData.userDisplayName = (cursor.getString(cursor.getColumnIndex("userdisplayname")));
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return achUserOverAllData;
+    }
+
+    public AchievementModel fetchAchivmentData() {
+
+        AchievementModel achievementModel = new AchievementModel();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_ACHIEVEMENTSDATA + " WHERE userid =" + appUserModel.getUserIDValue() + " AND siteid = " + appUserModel.getSiteIDValue();
+
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    achievementModel = new AchievementModel();
+                    achievementModel.userBadges = (cursor.getString(cursor.getColumnIndex("showlevelsection")));
+                    achievementModel.userLevel = (cursor.getString(cursor.getColumnIndex("showpointsection")));
+                    achievementModel.userPoints = (cursor.getString(cursor.getColumnIndex("showbadgesection")));
+
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return achievementModel;
+    }
+
+    // uncomment for pagenotes
 //    public void sendOfflineUserPagenotes() {
 //
 //        String selectQuery = "SELECT ContentID, PageID, UserID, Usernotestext, TrackID, SequenceID, NoteDate, Notecount, ModifiedNotedate FROM UserPageNotes";

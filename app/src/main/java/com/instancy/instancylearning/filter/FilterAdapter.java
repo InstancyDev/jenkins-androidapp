@@ -124,23 +124,7 @@ public class FilterAdapter extends BaseExpandableListAdapter {
         } else {
             sortAwasomeIcon.setVisibility(View.GONE);
         }
-
-//        if (expandedListText.isSelected) {
-//            expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-////            expandableListDetail.get("Sort By").get(childPosition).isSelected = false;
-////            expandableListDetail.get("Sort By").get(childPosition).isSorted = false;
-//            sortAwasomeIcon.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-//
-//            if (expandedListText.isSorted) {
-//                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_asc));
-//            } else {
-//                sortAwasomeIcon.setText(context.getResources().getString(R.string.fa_icon_sort_amount_desc));
-//            }
-//        } else {
         expandedListTextView.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
-//            sortAwasomeIcon.setVisibility(View.GONE);
-//        }
-
         return convertView;
     }
 

@@ -219,6 +219,9 @@
             android:name=".catalogfragment.CatalogFragmentActivity"
             android:screenOrientation="portrait"> </activity>
 
+        <activity
+            android:name=".globalsearch.GlobalSearchActivity"
+            android:screenOrientation="portrait"> </activity>
 
 
         <!-- Push Notification  Services-->

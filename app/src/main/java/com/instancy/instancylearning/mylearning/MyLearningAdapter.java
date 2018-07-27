@@ -85,6 +85,7 @@ import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertDateToDayFormat;
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.setTintDrawable;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -114,7 +115,7 @@ public class MyLearningAdapter extends BaseAdapter {
         this.searchList = new ArrayList<MyLearningModel>();
         this.searchList.addAll(myLearningModel);
         this.resource = resource;
-        this.isReportEnabled=isReportEnabled;
+        this.isReportEnabled = isReportEnabled;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
@@ -455,6 +456,10 @@ public class MyLearningAdapter extends BaseAdapter {
 
 
 //        holder.btnContextMenu.getDrawable().setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppTextColor())));
+
+//        Drawable myIcon = convertView.getContext().getDrawable(R.drawable.ic_more_vert_black_24dp);
+//        holder.btnContextMenu.setImageDrawable(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
+//        holder.btnContextMenu.setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
@@ -844,7 +849,7 @@ public class MyLearningAdapter extends BaseAdapter {
             myLearningModel.addAll(searchList);
         } else {
             for (MyLearningModel s : searchList) {
-                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) || s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText) || s.getShortDes().toLowerCase(Locale.getDefault()).contains(charText)|| s.getKeywords().toLowerCase(Locale.getDefault()).contains(charText) || s.getPresenter().toLowerCase(Locale.getDefault()).contains(charText)) {
+                if (s.getCourseName().toLowerCase(Locale.getDefault()).contains(charText) || s.getAuthor().toLowerCase(Locale.getDefault()).contains(charText) || s.getMediaName().toLowerCase(Locale.getDefault()).contains(charText) || s.getShortDes().toLowerCase(Locale.getDefault()).contains(charText) || s.getKeywords().toLowerCase(Locale.getDefault()).contains(charText) || s.getPresenter().toLowerCase(Locale.getDefault()).contains(charText)) {
                     myLearningModel.add(s);
                 }
             }
@@ -997,7 +1002,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "",isReportEnabled);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled);
             } else {
                 if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                     ((ListView) parent).performItemClick(view, getPosition, 0);

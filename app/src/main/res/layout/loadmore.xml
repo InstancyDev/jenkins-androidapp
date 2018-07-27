@@ -4,12 +4,12 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/activatedBackgroundIndicator"
-    android:padding="6dip">
+    android:padding="4dip">
 
     <ProgressBar
         android:id="@+id/loadMoreProgressBar"
         style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="25dp"
         android:layout_weight="1" />
 </LinearLayout>

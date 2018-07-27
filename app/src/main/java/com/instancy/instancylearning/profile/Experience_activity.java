@@ -531,6 +531,9 @@ public class Experience_activity extends AppCompatActivity {
         txtToYear.setText(userExperienceModel.toDate);
         txtFromYear.setText(userExperienceModel.fromDate);
 
+//        holder.edit_field.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+//        holder.edit_field.setHintTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
         if (userExperienceModel.tillDate) {
             tillDate = 1;
             checkCrntHere.setChecked(true);

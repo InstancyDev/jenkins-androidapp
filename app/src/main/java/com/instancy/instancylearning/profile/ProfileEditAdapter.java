@@ -135,6 +135,8 @@ public class ProfileEditAdapter extends BaseAdapter {
         holder.edit_field.setText(profileConfigsModelList.get(position).valueName);
         holder.edit_field.setMaxLines(returnLines(profileConfigsModelList.get(position).names));
 
+        holder.edit_field.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.edit_field.setHintTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         if (profileConfigsModelList.get(position).iseditable.contains("false")) {
 

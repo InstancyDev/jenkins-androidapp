@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.method.DigitsKeyListener;
 import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +26,6 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.SignUpConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.NothingSelectedSpinnerAdapter;
@@ -40,7 +38,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.instancy.instancylearning.utils.Utilities.checkInputFilter;
+
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -130,6 +128,9 @@ public class NativeSignupAdapter extends BaseAdapter {
         holder.labelField.setText(signUpConfigsModelList.get(position).displaytext);
         holder.edit_field.setHint(signUpConfigsModelList.get(position).displaytext);
         holder.edit_field.setText(signUpConfigsModelList.get(position).valueName);
+        holder.edit_field.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.edit_field.setHintTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
 //          holder.edit_field.setMaxLines(returnLines(signUpConfigsModelList.get(position).names));
 
         if (signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("6") || signUpConfigsModelList.get(position).attributeconfigid.equalsIgnoreCase("-1")) {

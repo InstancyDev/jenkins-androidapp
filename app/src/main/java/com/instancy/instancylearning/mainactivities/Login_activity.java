@@ -193,9 +193,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
-        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
         imgPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
@@ -215,7 +213,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         btnForgot.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
-
+        settingTxt.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+//        imglogo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLogoBackgroundColor()));
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
             Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(imglogo);
@@ -226,7 +225,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         View someView = findViewById(R.id.login_layout);
         setupUI(someView);
-        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         if (uiSettingsModel.isEnableAzureSSOForLearner()) {
             someView.setVisibility(View.INVISIBLE);
@@ -480,10 +479,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                         if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")){
                                             alertText.setVisibility(View.VISIBLE);
                                         }
-                                        else if (innerObj.getString("userstatus").equalsIgnoreCase("Peding Registration"))
+                                        else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration"))
                                         {
 
-                                            Toast.makeText(Login_activity.this, "Your registration is not yet approved!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Login_activity.this, "   Your registration is not yet approved!  ", Toast.LENGTH_LONG).show();
 
                                         }
                                     }

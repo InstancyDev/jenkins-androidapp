@@ -17,6 +17,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,32 +43,6 @@ public class VollyService {
         mContext = context;
         appController = AppController.getInstance();
         appUserModel = AppUserModel.getInstance();
-    }
-
-    public void postDataVolley(final String requestType, String url, JSONObject sendObj) {
-        Log.d(TAG, "getJsonObjResponseVolley: " + url);
-
-        try {
-//            RequestQueue queue = Volley.newRequestQueue(mContext);
-            JsonObjectRequest jsonObj = new JsonObjectRequest(url, sendObj, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    if (mResultCallback != null)
-                        mResultCallback.notifySuccess(requestType, response);
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    if (mResultCallback != null)
-                        mResultCallback.notifyError(requestType, error);
-                }
-            });
-
-            VolleySingleton.getInstance(mContext).addToRequestQueue(jsonObj);
-
-        } catch (Exception e) {
-
-        }
     }
 
     public void getJsonObjResponseVolley(final String requestType, String url, final String authHeaders) {
@@ -219,5 +194,132 @@ public class VollyService {
 
         }
     }
+
+
+    public void getStringResponseFromPostMethod(final String postData,final String requestType, String apiURL) {
+
+        byte[] encrpt = new byte[0];
+        try {
+            encrpt = postData.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        final byte[] finalEncrpt = encrpt;
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String _response) {
+
+                Log.d(TAG, "onResponse: " + _response);
+
+                if (mResultCallback != null)
+                    mResultCallback.notifySuccess(requestType, _response);
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return finalEncrpt;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+//    public void getStringResponseFromPostDataForGetMethod(final String postData,final String requestType, String apiURL) {
+//
+//        byte[] encrpt = new byte[0];
+//        try {
+//            encrpt = postData.getBytes("UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        final byte[] finalEncrpt = encrpt;
+//        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String _response) {
+//
+//                Log.d(TAG, "onResponse: " + _response);
+//
+//                if (mResultCallback != null)
+//                    mResultCallback.notifySuccess(requestType, _response);
+//
+//
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError volleyError) {
+//
+//            }
+//        })
+//
+//        {
+//
+//            @Override
+//            public String getBodyContentType() {
+//                return "application/json";
+//
+//            }
+//
+//            @Override
+//            public byte[] getBody() throws AuthFailureError {
+//                return finalEncrpt;
+//            }
+//
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                final Map<String, String> headers = new HashMap<>();
+//                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+//                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+//
+//                return headers;
+//            }
+//
+//        };
+//
+//        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+//        request.setRetryPolicy(new DefaultRetryPolicy(
+//                50000,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//
+//    }
+
+
 
 }

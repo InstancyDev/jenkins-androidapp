@@ -168,7 +168,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
                 }
                 if (childPosition == (parent.getSelectedItemPosition())) {
                     // Start your new activity here.
-                    Log.d("TAG", "second push"); // 16
+                    Log.d("TAG", "second push");
                 }
                 return true;
             }

@@ -406,7 +406,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(),"");
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(),"","","");
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {

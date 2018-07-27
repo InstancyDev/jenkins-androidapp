@@ -115,7 +115,7 @@
             android:gravity="center">
 
             <TextView
-                android:id="@+id/txtmanager"
+                android:id="@+id/txtLevel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -129,7 +129,7 @@
                 android:id="@+id/txtMgScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/txtmanager"
+                android:layout_below="@+id/txtLevel"
                 android:layout_gravity="left"
                 android:gravity="center"
                 android:padding="5dp"
@@ -147,7 +147,7 @@
             android:gravity="center">
 
             <TextView
-                android:id="@+id/txtcontent"
+                android:id="@+id/txtPoints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -161,7 +161,7 @@
                 android:id="@+id/txtCntScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/txtcontent"
+                android:layout_below="@+id/txtPoints"
                 android:layout_gravity="left"
                 android:gravity="center"
                 android:padding="5dp"
@@ -179,7 +179,7 @@
             android:gravity="center">
 
             <TextView
-                android:id="@+id/txtavarage"
+                android:id="@+id/txtAwardedon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
@@ -193,7 +193,7 @@
                 android:id="@+id/txtAvgScore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/txtavarage"
+                android:layout_below="@+id/txtAwardedon"
                 android:layout_gravity="left"
                 android:gravity="center"
                 android:padding="5dp"

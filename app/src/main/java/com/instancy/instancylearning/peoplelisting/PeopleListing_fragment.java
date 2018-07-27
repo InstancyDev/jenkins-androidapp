@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -37,10 +38,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -63,6 +66,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -147,9 +151,17 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     Communicator communicator;
 
-
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
+
+
+    // load more
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+
+    boolean isSearching = false;
+    boolean userScrolled = false;
+
+    ProgressBar progressBar;
 
 //    SideMenusModel catalogSideMenuModel;
 
@@ -214,19 +226,20 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     public void refreshPeopleListing(Boolean isRefreshed) {
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-//            peopleListingTabsEitherFromDatabaseOrAPI();
             if (!isRefreshed) {
 
                 svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             }
 
-            String paramsString = "ComponentID=78&ComponentInstanceID=3473&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE;
+            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
 
             vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
-        } else
-            injectFromDbtoModel();
-        REFRESH_PEOPLE = 0;
+        } else {
 
+
+        injectFromDbtoModel();
+        REFRESH_PEOPLE = 0;
+    }
     }
 
     void initVolleyCallback() {
@@ -237,8 +250,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
                     if (response != null) {
                         try {
-                            db.injectPeopleListingListIntoSqLite(response, TABBALUE);
+                            db.injectPeopleListingListIntoSqLite(response, TABBALUE,pageIndex);
                             injectFromDbtoModel();
+                            totalRecordsCount = countOfTotalRecords(response);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -250,7 +264,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("PEOPLELISTINGTABS")) {
                     if (response != null) {
                         try {
-                            db.injectPeopleListingListIntoSqLite(response, TABBALUE);
+                            db.injectPeopleListingListIntoSqLite(response, TABBALUE,pageIndex);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -382,6 +396,67 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         peopleListView.setOnItemClickListener(this);
         peopleListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
+
+
+        final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
+        peopleListView.addFooterView(footerView);
+        progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
+
+        peopleListView.setOnScrollListener(new EndlessScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(AbsListView arg0, int scrollState) {
+                // If scroll state is touch scroll then set userScrolled
+                // true
+                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    userScrolled = true;
+
+                }
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+
+                if (totalItemCount < totalRecordsCount && totalItemCount != 0) {
+
+                    Log.d(TAG, "onLoadMore size: peopleListingModelList" + peopleListingModelList.size());
+
+                    Log.d(TAG, "onLoadMore size: totalRecordsCount" + totalRecordsCount);
+
+
+                    if (userScrolled && firstVisibleItem + visibleItemCount == totalItemCount) {
+                        userScrolled = false;
+
+                        if (!isSearching) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            if (isNetworkConnectionAvailable(getContext(), -1)) {
+                                refreshPeopleListing(true);
+                            } else {
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(),"   "+ getString(R.string.alert_headtext_no_internet)+"   ", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+
+                    }
+
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+                appcontroller.setAlreadyViewd(true);
+                preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+            }
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+
+            }
+        });
+
         pendingBtn.setTextColor(getResources().getColor(R.color.colorWhite));
         allPBtn.setTextColor(getResources().getColor(R.color.colorWhite));
         expertsBtn.setTextColor(getResources().getColor(R.color.colorWhite));
@@ -419,6 +494,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             peopleListingModelList = new ArrayList<PeopleListingModel>();
             peopleListingAdapter.refreshList(peopleListingModelList);
             nodata_Label.setText(getResources().getString(R.string.no_data));
+        }
+
+        if (peopleListingModelList.size() == pageSize) {
+            pageIndex = 2;
+        } else {
+            pageIndex = peopleListingModelList.size() / pageSize;
+            pageIndex = pageIndex + 1;
         }
 
         if (peopleListingModelList.size() > 5) {
@@ -469,15 +551,18 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
-            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
+            item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
+
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
-            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
-            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
+
+            txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+            txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -496,6 +581,20 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             });
 
         }
+        item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                isSearching = true;
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                isSearching = false;
+                return true;
+            }
+        });
 
     }
 
@@ -549,7 +648,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     @Override
     public void onRefresh() {
-
+        pageIndex = 1;
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshPeopleListing(true);
             MenuItemCompat.collapseActionView(item_search);
@@ -883,12 +982,15 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     public void onCheckedChanged(RadioGroup radioGroup, int isChecked) {
         MenuItemCompat.collapseActionView(item_search);
         switch (isChecked) {
+
             case R.id.expertsbtn:
                 expertsBtn.setTypeface(null, Typeface.BOLD);
                 allPBtn.setTypeface(null, Typeface.NORMAL);
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
                 TABBALUE = "Experts";
+                pageIndex = 1;
+                nodata_Label.setText("");
                 refreshPeopleListing(true);
                 break;
             case R.id.allPeoplebtn:
@@ -896,9 +998,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 expertsBtn.setTypeface(null, Typeface.NORMAL);
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
-//                catalogAdapter.refreshList(catalogModelsList);
-
                 TABBALUE = "All";
+                pageIndex = 1;
+                nodata_Label.setText("");
                 refreshPeopleListing(true);
                 break;
             case R.id.myconnectionbtn:
@@ -907,7 +1009,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 allPBtn.setTypeface(null, Typeface.NORMAL);
                 pendingBtn.setTypeface(null, Typeface.NORMAL);
                 TABBALUE = "MyConnections";
-//                sortByDate("after");
+                pageIndex = 1;
+                nodata_Label.setText("");
                 refreshPeopleListing(true);
 
                 break;
@@ -917,68 +1020,15 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 myConBtn.setTypeface(null, Typeface.NORMAL);
                 allPBtn.setTypeface(null, Typeface.NORMAL);
                 TABBALUE = "Pending";
+                pageIndex = 1;
+                nodata_Label.setText("");
                 refreshPeopleListing(true);
-//                sortByDate("after");
 
                 break;
             default:
                 // Nothing to do
                 TABBALUE = "Experts";
         }
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    public void sortByDate(String typeTime) {
-//        List<MyLearningModel> myLearningModelList = new ArrayList<>();
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//
-//        if (typeTime.equalsIgnoreCase("before")) {
-//
-//            for (int i = 0; i < catalogModelsList.size(); i++) {
-//                Date strDate = null;
-//                String checkDate = catalogModelsList.get(i).getEventstartTime();
-//
-//                try {
-//                    strDate = sdf.parse(checkDate);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                if (new Date().before(strDate)) {
-//                    myLearningModelList.add(catalogModelsList.get(i));
-//                    catalogAdapter.refreshList(myLearningModelList);
-////                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
-//                }
-//
-//
-//            }
-//
-//        } else {
-//
-//            for (int i = 0; i < catalogModelsList.size(); i++) {
-//                Date strDate = null;
-//                String checkDate = catalogModelsList.get(i).getEventstartTime();
-//
-//                try {
-//                    strDate = sdf.parse(checkDate);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                if (new Date().after(strDate)) {
-//                    myLearningModelList.add(catalogModelsList.get(i));
-//                    catalogAdapter.refreshList(myLearningModelList);
-////                 Toast.makeText(context, typeTime + " if  event " + strDate, Toast.LENGTH_SHORT).show();
-//                } else {
-//
-//                    catalogAdapter.refreshList(myLearningModelList);
-//                }
-//
-//
-//            }
-//
-//
-//        }
 
     }
 
@@ -1008,4 +1058,19 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         signalAService = SignalAService.newInstance(context);
         signalAService.stopSignalA();
     }
+
+    public int countOfTotalRecords(JSONObject jsonObject) throws JSONException {
+
+
+        int totalRecs = 0;
+
+        if (jsonObject!=null && jsonObject.length() > 0) {
+
+
+            totalRecs = jsonObject.getInt("PeopleCount");
+        }
+
+        return totalRecs;
+    }
+
 }

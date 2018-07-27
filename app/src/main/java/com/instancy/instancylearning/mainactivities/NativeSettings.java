@@ -84,6 +84,11 @@ public class NativeSettings extends AppCompatActivity {
 
             ex.printStackTrace();
         }
+
+
+        View someView = findViewById(R.id.settingslayout);
+        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+
         // Add a few teams to display.
         expandableListDetail = NativeSetttingsModel.getData(isLogin);
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());

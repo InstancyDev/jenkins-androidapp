@@ -630,7 +630,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
         try {
 
-            File fXmlFile = new File(getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml");
+            File fXmlFile = new File(getExternalFilesDir(null) + "/.Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml");
 
 //            String fileXmls = getExternalFilesDir(null) + "/Mydownloads/Contentdownloads/" + myLearningModel.getContentID() + "/content.xml";
             if (fXmlFile.exists()) {

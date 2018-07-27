@@ -120,7 +120,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
-        llForgot.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
+        llForgot.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         txtBody.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editResetMail.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
@@ -249,8 +249,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                             if (_response.contains("true")) {
 
                                 isResetLinkGenerated(pwdResetLink, userID);
-                            }
-                            else {
+                            } else {
 
                             }
                         }
@@ -307,7 +306,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                             Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.password_reset_link_send_success), Toast.LENGTH_SHORT).show();
                         } else {
 
-                            Toast.makeText(ForgotPasswordActivity.this,"Failed to Send Reset Link, Contact Site Admin", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ForgotPasswordActivity.this, "Failed to Send Reset Link, Contact Site Admin", Toast.LENGTH_SHORT).show();
 
                         }
                     }

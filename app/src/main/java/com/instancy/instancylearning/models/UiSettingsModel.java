@@ -96,7 +96,7 @@ public class UiSettingsModel {
     private String enableBranding = "";
 
     public String getAppLoginBGColor() {
-        return appLoginBGColor.isEmpty() ? appBackGroundColor : appLoginBGColor;
+        return appLoginBGColor.isEmpty() ? appBackGroundColor : appBackGroundColor;
     }
 
     public void setAppLoginBGColor(String appLoginBGColor) {
@@ -194,6 +194,16 @@ public class UiSettingsModel {
     private String menuBGColor = "";
     private String selectedMenuTextColor = "";
 
+    public String getAppLogoBackgroundColor() {
+        return appLogoBackgroundColor;
+    }
+
+    public void setAppLogoBackgroundColor(String appLogoBackgroundColor) {
+        this.appLogoBackgroundColor = appLogoBackgroundColor;
+    }
+
+    private String appLogoBackgroundColor = "";
+
     private String selectedMenuBGColor = "";
 
     public void setAppHeaderTextColor(String appHeaderTextColor) {
@@ -287,6 +297,16 @@ public class UiSettingsModel {
         this.enableContentEvaluation = enableContentEvaluation;
     }
 
+    public String getcCEventStartdate() {
+        return cCEventStartdate;
+    }
+
+    public void setcCEventStartdate(String cCEventStartdate) {
+        this.cCEventStartdate = cCEventStartdate;
+    }
+
+    private String cCEventStartdate = "";
+
     public boolean isEnableAzureSSOForLearner() {
         return enableAzureSSOForLearner;
     }
@@ -356,10 +376,6 @@ public class UiSettingsModel {
         this.listBorderColor = listBorderColor;
     }
 
-
-    public void setMenuHeaderBGColor(String menuHeaderBGColor) {
-        this.menuHeaderBGColor = menuHeaderBGColor;
-    }
 
     public String getMenuHeaderTextColor() {
         return menuHeaderTextColor.isEmpty() ? "#FFFFFF" : menuHeaderTextColor;
@@ -548,6 +564,11 @@ public class UiSettingsModel {
     public String getMenuHeaderBGColor() {
         return menuHeaderBGColor.isEmpty() ? brandingColor : menuHeaderBGColor;
     }
+
+    public void setMenuHeaderBGColor(String menuHeaderBGColor) {
+        this.menuHeaderBGColor = menuHeaderBGColor;
+    }
+
 
     public String getMenuBGAlternativeColor() {
         return menuBGAlternativeColor.isEmpty() ? "#ffffff" : menuBGAlternativeColor;

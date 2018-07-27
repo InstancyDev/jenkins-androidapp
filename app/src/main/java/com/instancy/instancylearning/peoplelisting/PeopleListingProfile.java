@@ -111,6 +111,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     PeopleProfileExpandAdapter profileDynamicAdapter;
+
     HashMap<String, List<ProfileConfigsModel>> hmGroupWiseConfigs = new HashMap<String, List<ProfileConfigsModel>>();
 
     List<ProfileGroupModel> profileGroupModelList = new ArrayList<>();
