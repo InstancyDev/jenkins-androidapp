@@ -690,8 +690,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 isSearching = true;
-//                gotoGlobalSearch();
-                return true;
+                gotoGlobalSearch();
+                return false;
             }
 
             @Override
@@ -760,8 +760,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void gotoGlobalSearch() {
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
-        intent.putExtra("isFrom", 1);
-        startActivityForResult(intent, FILTER_CLOSE_CODE);
+        intent.putExtra("sideMenusModel", sideMenusModel);
+        startActivity(intent);
 
     }
 

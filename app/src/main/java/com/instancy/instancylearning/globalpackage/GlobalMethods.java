@@ -579,7 +579,7 @@ public class GlobalMethods {
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
-                        urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
+                        urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
                         String cerName = myLearningModel.getContentID() + "_Certificate";
@@ -1008,9 +1008,14 @@ public class GlobalMethods {
                     Log.d("GLB", "onMenuItemClick: Set Complete ");
                     databaseH = new DatabaseHandler(v.getContext());
 //                  databaseH.setCompleteMethods(v.getContext(), myLearningDetalData);
-                    if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+                    File myFile = new File(myLearningDetalData.getOfflinepath());
+                    if (isNetworkConnectionAvailable(v.getContext(), -1) ||  myFile.exists()) {
                         new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
+                    } else {
+
+                        Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                     }
+
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Play")) {
@@ -1324,7 +1329,7 @@ public class GlobalMethods {
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                     String encodedString = "";
 
-                    urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + "" + "&auth=" + "" + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO" + "&nativeappURL=true";
+                    urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + "" + "&auth=" + "" + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO" + "&nativeappURL=true";
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
                     String cerName = myLearningModel.getContentID() + "_Certificate";

@@ -19,6 +19,7 @@
         android:layout_below="@+id/globalsearchheader"
         android:background="@drawable/filter_key"
         android:choiceMode="singleChoice"
+        android:focusable="true"
         android:groupIndicator="@null"
         android:padding="1dp" />
 

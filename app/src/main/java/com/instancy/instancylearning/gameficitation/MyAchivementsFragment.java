@@ -262,7 +262,6 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             @Override
             public void notifySuccess(String requestType, String response) {
 
-
                 if (requestType.equalsIgnoreCase("GAMESLIST")) {
                     Log.d(TAG, requestType + " : " + response);
                     if (response != null && response.length() > 0) {
@@ -277,6 +276,10 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                                 gameId = object.getString("GameID");
                                 getAchivmentsByGameID(gameId);
                                 updateGameSpinner();
+                            } else {
+                                svProgressHUD.dismiss();
+
+                                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
                             }
 
                         } catch (JSONException e) {
@@ -324,6 +327,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, gamesList);
         spnrGame.setAdapter(spinnerAdapter);
         spnrGame.setSelection(0, true);
+        spnrGame.setVisibility(View.VISIBLE);
         View v = spnrGame.getSelectedView();
         ((TextView) v).setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         spnrGame.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppTextColor())));
@@ -392,11 +396,12 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             }
         });
 
-
+        swipeRefreshLayout.setEnabled(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshGameList(false);
         } else {
-            injectFromDbtoModel();
+//            injectFromDbtoModel();
+            nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
         }
 
         initilizeView();
@@ -412,7 +417,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
 
     public void injectFromDbtoModel() {
-
+        achiveheader.setVisibility(View.VISIBLE);
         achievementModel = new AchievementModel();
         achUserOverAllData = new Ach_UserOverAllData();
         achUserBadgesList = new ArrayList<>();
@@ -426,15 +431,16 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         gamificationModelList = new ArrayList<>();
 
         updateLeaderBoard(achUserOverAllData);
-        if (achievementModel.userBadges.equalsIgnoreCase("false")) {
+
+        if (achievementModel.userBadges.equalsIgnoreCase("true")) {
             achUserBadgesList = db.fetchUserAchivBadges(gameId);
         }
 
-        if (achievementModel.userLevel.equalsIgnoreCase("false")) {
+        if (achievementModel.userLevel.equalsIgnoreCase("true")) {
             achUserPointsList = db.fetchUserAchivPoints(gameId);
         }
 
-        if (achievementModel.userPoints.equalsIgnoreCase("false")) {
+        if (achievementModel.userPoints.equalsIgnoreCase("true")) {
             achUserLevelList = db.fetchUserAchivLevels(gameId);
         }
 
@@ -460,12 +466,12 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             gamificationModelList.add(gamificationModel);
         }
 
+        achiviExpandAdapter.refreshList(achUserBadgesList, achUserLevelList, gamificationModelList, achUserPointsList);
+
         if (gamificationModelList != null && gamificationModelList.size() > 0) {
             for (int i = 0; i < gamificationModelList.size(); i++)
                 achExpandList.expandGroup(i);
         }
-
-        achiviExpandAdapter.refreshList(achUserBadgesList, achUserLevelList, gamificationModelList, achUserPointsList);
 
     }
 

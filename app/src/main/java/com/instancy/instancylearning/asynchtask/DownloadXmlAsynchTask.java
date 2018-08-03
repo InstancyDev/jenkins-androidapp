@@ -28,7 +28,7 @@ public class DownloadXmlAsynchTask extends AsyncTask<String, Integer, Void> {
     boolean isTraxkListView;
     MyLearningModel learningModel;
     String siteUrl;
-   public   XmlDownloadListner xmlDownloadListner;
+    public XmlDownloadListner xmlDownloadListner;
 
     public DownloadXmlAsynchTask(Context context, boolean isTraxkListView, MyLearningModel learningModel, String siteUrl) {
         this.context = context;

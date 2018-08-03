@@ -381,7 +381,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 Log.d(TAG, "Volley String post" + response);
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-
             }
 
             @Override
@@ -546,13 +545,13 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
             onDayClick(getCurrentDateTimeInDate(todayD));
             progressBar.setVisibility(View.GONE);
-            dismissSvProgress();
+
             if (isCalendarTabScrolled) {
                 onDayClick(compactCalendarView.getFirstDayOfCurrentMonth());
             }
 
         }
-
+        dismissSvProgress();
     }
 
     public void initilizeCalander() {
@@ -843,6 +842,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         menu.getItem(4).setVisible(true);
                     }
                 }
+                if (!uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())){
+                    menu.getItem(1).setVisible(false);
+                }
 
 //                if (myLearningDetalData.isCompletedEvent()){
 //                    menu.getItem(1).setVisible(false);
@@ -859,7 +861,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         }
 
         // expired event functionality
-        if (myLearningDetalData.isCompletedEvent()) {
+        if (returnEventCompleted(myLearningDetalData.getEventendUtcTime()) && uiSettingsModel.isAllowExpiredEventsSubscription()) {
 
             if (myLearningDetalData.getAddedToMylearning() == 1) {
 
@@ -869,7 +871,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
                 }
             } else {
-                if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
+                if (myLearningDetalData.getViewType().equalsIgnoreCase("2") && uiSettingsModel.isAllowExpiredEventsSubscription()) {
                     menu.getItem(1).setVisible(true);//enroll
 
                 }
@@ -930,7 +932,8 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
                     if (isNetworkConnectionAvailable(context, -1)) {
-                        if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
+
+                        if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())){
 
                             try {
                                 addExpiryEvets(myLearningDetalData, position);

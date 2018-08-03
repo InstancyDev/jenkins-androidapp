@@ -9,12 +9,14 @@
         android:id="@+id/spnrGame"
         android:layout_width="match_parent"
         android:layout_height="45dp"
+        android:visibility="invisible"
         android:padding="10dp"> </Spinner>
 
     <RelativeLayout
         android:id="@+id/achivmentheader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_alignParentTop="true">
 
         <include layout="@layout/achivmentscard" />
@@ -49,13 +51,11 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center"
-                android:text="@string/no_data"
+                android:text=""
                 android:textSize="24sp"
                 android:visibility="visible" />
 
         </RelativeLayout>
-
-
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -90,6 +91,9 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
 
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
+
+    @BindView(R.id.leadertheader)
+    RelativeLayout leadertHeader;
 
     @Nullable
     @BindView(R.id.spnrGame)
@@ -212,12 +216,17 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                                 gameId = object.getString("GameID");
                                 getLeaderBoardOnGameID(gameId);
                                 updateGameSpinner();
+                            } else {
+                                svProgressHUD.dismiss();
+                                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
                             }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
+                    } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
                     }
 
                 }
@@ -252,7 +261,8 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
     }
 
     public void updateGameSpinner() {
-
+        spnrGame.setVisibility(View.VISIBLE);
+        leadertHeader.setVisibility(View.VISIBLE);
         final ArrayList<String> gamesList = db.fetchGames();
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, gamesList);
         spnrGame.setAdapter(spinnerAdapter);

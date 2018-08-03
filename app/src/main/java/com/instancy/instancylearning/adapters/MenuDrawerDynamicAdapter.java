@@ -188,11 +188,11 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             } else {
                 pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             }
-                txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-                fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-                expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
-                expTxtIcon.setVisibility(View.VISIBLE);
-                expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
+            txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+            fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+            expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+            expTxtIcon.setVisibility(View.VISIBLE);
+            expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_down));
         }
 
         FontManager.markAsIconContainer(pView.findViewById(R.id.fontawasomeIcon), iconFon);
@@ -230,8 +230,14 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             case "10":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_user_plus));
                 break;
+            case "11":
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_bullseye));
+                break;
+            case "12":
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_group));
+                break;
             case "13":
-                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_connectdevelop));
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_trophy));
                 break;
             case "9999":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_sign_out));
@@ -306,8 +312,14 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             case "10":
                 fontIcon.setText(cView.getResources().getString(R.string.fa_icon_user_plus));
                 break;
+            case "11":
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_bullseye));
+                break;
+            case "12":
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_group));
+                break;
             case "13":
-                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_connectdevelop));
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_trophy));
                 break;
             case "9999":
                 fontIcon.setText(cView.getResources().getString(R.string.fa_icon_sign_out));
@@ -333,6 +345,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             }
             cView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
+            fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
 
         } else {
             if (parentPosition == MAIN_MENU_POSITION && childPosition == StaticValues.SUB_MENU_POSITION) {

@@ -9,9 +9,11 @@
         android:id="@+id/spnrGame"
         android:layout_width="match_parent"
         android:layout_height="45dp"
+        android:visibility="invisible"
         android:padding="10dp"></Spinner>
 
     <RelativeLayout
+        android:visibility="gone"
         android:id="@+id/leadertheader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center"
-                android:text="@string/no_data"
+                android:text=""
                 android:textSize="24sp"
                 android:visibility="visible" />
 

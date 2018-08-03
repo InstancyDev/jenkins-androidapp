@@ -52,7 +52,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
     }
 
 
-    public void refreshList( List<Ach_UserBadges> achUserBadgesList, List<Ach_UserLevel> achUserLevelList, List<GamificationModel> expandableListTitle, List<Ach_UserPoints> achUserPointsList) {
+    public void refreshList(List<Ach_UserBadges> achUserBadgesList, List<Ach_UserLevel> achUserLevelList, List<GamificationModel> expandableListTitle, List<Ach_UserPoints> achUserPointsList) {
         this.achUserLevelList = achUserLevelList;
         this.achUserPointsList = achUserPointsList;
         this.achUserBadgesList = achUserBadgesList;
@@ -70,7 +70,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
     public int getChildrenCount(int groupPosition) {
 
 
-        if (expandableListTitle!=null && expandableListTitle.size()>0){
+        if (expandableListTitle != null && expandableListTitle.size() > 0) {
             if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("1")) {
 
                 return this.achUserPointsList == null ? 0 : this.achUserPointsList
@@ -89,14 +89,12 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                 return this.achUserBadgesList == null ? 0 : this.achUserBadgesList
                         .size();
 
-            }
-            else {
+            } else {
 
                 return 0;
             }
 
-        }
-        else {
+        } else {
 
             return 0;
         }
@@ -150,16 +148,16 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
         int childType = groupPosition;
 
         // We need to create a new "cell container"
-        if (convertView == null ) {
+        if (convertView == null) {
             switch (expandableListTitle.get(groupPosition).groupId) {
                 case "1":
                     convertView = inflater.inflate(R.layout.achivmentspointscell, null);
-                    TextView textCount =convertView.findViewById(R.id.txt_count);
-                    TextView textAwardedOn =convertView.findViewById(R.id.txt_awardedon);
-                    TextView textTitle =convertView.findViewById(R.id.txt_title);
-                    textCount.setText(""+achUserPointsList.get(childPosition).points);
-                    textAwardedOn.setText("Awarded on "+achUserPointsList.get(childPosition).userReceivedDate);
-                    textTitle.setText(""+achUserPointsList.get(childPosition).pointsDescription);
+                    TextView textCount = convertView.findViewById(R.id.txt_count);
+                    TextView textAwardedOn = convertView.findViewById(R.id.txt_awardedon);
+                    TextView textTitle = convertView.findViewById(R.id.txt_title);
+                    textCount.setText("" + achUserPointsList.get(childPosition).points);
+                    textAwardedOn.setText("Awarded on " + achUserPointsList.get(childPosition).userReceivedDate);
+                    textTitle.setText("" + achUserPointsList.get(childPosition).pointsDescription);
                     textCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                     textAwardedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                     textTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -167,12 +165,18 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                     break;
                 case "2":
                     convertView = inflater.inflate(R.layout.achivmentslevelcell, null);
-                    TextView textPoints =convertView.findViewById(R.id.txtPoints);
-                    TextView textAwarded =convertView.findViewById(R.id.txtAwardedon);
-                    TextView txtLevel =convertView.findViewById(R.id.txtLevel);
-                    txtLevel.setText(""+achUserLevelList.get(childPosition).levelName);
-                    textAwarded.setText("Awarded on "+achUserLevelList.get(childPosition).levelReceivedDate);
-                    textPoints.setText(""+achUserLevelList.get(childPosition).levelPoints);
+                    TextView textPoints = convertView.findViewById(R.id.txtPoints);
+                    TextView textAwarded = convertView.findViewById(R.id.txtAwardedon);
+                    TextView txtLevel = convertView.findViewById(R.id.txtLevel);
+                    txtLevel.setText("" + achUserLevelList.get(childPosition).levelName);
+                    if (achUserLevelList.get(childPosition).levelReceivedDate.length() > 0) {
+
+                        textAwarded.setText("Awarded on " + achUserLevelList.get(childPosition).levelReceivedDate);
+
+                    } else {
+                        textAwarded.setText("");
+                    }
+                    textPoints.setText("" + achUserLevelList.get(childPosition).levelPoints);
                     textPoints.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                     textAwarded.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                     txtLevel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -180,13 +184,13 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                     break;
                 case "3":
                     convertView = inflater.inflate(R.layout.achivmentsbadgescell, null);
-                    TextView txtTitle =convertView.findViewById(R.id.txt_title);
-                    TextView textDesc =convertView.findViewById(R.id.txt_description);
-                    TextView textAwardedBadge =convertView.findViewById(R.id.txt_awardedon);
-                    ImageView badgeImage= (ImageView)convertView.findViewById(R.id.imageBadge);
-                    txtTitle.setText(""+achUserBadgesList.get(childPosition).badgeName);
-                    textAwardedBadge.setText("Awarded on "+achUserBadgesList.get(childPosition).badgeReceivedDate);
-                    textDesc.setText(""+achUserBadgesList.get(childPosition).badgeDescription);
+                    TextView txtTitle = convertView.findViewById(R.id.txt_title);
+                    TextView textDesc = convertView.findViewById(R.id.txt_description);
+                    TextView textAwardedBadge = convertView.findViewById(R.id.txt_awardedon);
+                    ImageView badgeImage = (ImageView) convertView.findViewById(R.id.imageBadge);
+                    txtTitle.setText("" + achUserBadgesList.get(childPosition).badgeName);
+                    textAwardedBadge.setText("Awarded on " + achUserBadgesList.get(childPosition).badgeReceivedDate);
+                    textDesc.setText("" + achUserBadgesList.get(childPosition).badgeDescription);
                     String imgUrl = achUserBadgesList.get(childPosition).badgeImage;
                     Picasso.with(context).load(imgUrl).placeholder(R.drawable.badge).into(badgeImage);
                     txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

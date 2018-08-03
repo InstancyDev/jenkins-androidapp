@@ -9,12 +9,16 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.interfaces.DataCallback;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -196,7 +200,7 @@ public class VollyService {
     }
 
 
-    public void getStringResponseFromPostMethod(final String postData,final String requestType, String apiURL) {
+    public void getStringResponseFromPostMethod(final String postData, final String requestType, String apiURL) {
 
         byte[] encrpt = new byte[0];
         try {
@@ -256,6 +260,37 @@ public class VollyService {
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
+    }
+
+
+    public void getSearchResults(final DataCallback callback, String paramsStringUrl) {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, paramsStringUrl, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+//                        Log.d("SYNCHRONUSCALL", response.toString());
+                        callback.onSuccess(response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d("SYNCHRONUSCALL", "Error: " + error.getMessage());
+                    }
+
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+
+        };
+
+        VolleySingleton.getInstance().addToRequestQueue(jsonObjectRequest);
     }
 
 //    public void getStringResponseFromPostDataForGetMethod(final String postData,final String requestType, String apiURL) {
@@ -319,7 +354,6 @@ public class VollyService {
 //                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 //
 //    }
-
 
 
 }

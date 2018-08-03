@@ -128,6 +128,16 @@ public class NativeMenuModel {
         this.parameterString = parameterString;
     }
 
+    public int getWebMenuId() {
+        return webMenuId;
+    }
+
+    public void setWebMenuId(int webMenuId) {
+        this.webMenuId = webMenuId;
+    }
+
+    public int webMenuId = 0;
+
     public String getSiteUrl() {
         return siteUrl;
     }

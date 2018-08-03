@@ -21,6 +21,16 @@ public class SideMenusModel implements Serializable {
     public String parameterStrings = "";
     public int isSubMenuExists = 0;
 
+    public int getWebMenuId() {
+        return webMenuId;
+    }
+
+    public void setWebMenuId(int webMenuId) {
+        this.webMenuId = webMenuId;
+    }
+
+    public int webMenuId = 0;
+
     public SideMenusModel() {
 
     }
@@ -170,6 +180,5 @@ public class SideMenusModel implements Serializable {
     public void setIsSubMenuExists(int isSubMenuExists) {
         this.isSubMenuExists = isSubMenuExists;
     }
-
 
 }

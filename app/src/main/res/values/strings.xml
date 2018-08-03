@@ -9,8 +9,9 @@
     <!--<string name="app_name">Training Company</string>-->
     <!--<string name="app_name">CLE Academy</string>-->
     <!--<string name="app_name">CVCTA</string>-->
-    <!--<string name="app_name"> Development </string>-->
-    <string name="app_name"> MCI Institute Switch </string>
+    <!--<string name="app_name"> MCI Institute Switch </string>-->
+
+    <string name="app_name"> Development </string>
 
     <!--<string name="app_name">PPD Life</string>-->
 
@@ -42,7 +43,10 @@
     <string name="no_games_avaliable">There are no games available at this time.</string>
 
 
+    <string name="alert_nocat_selected"> Please select at least one component </string>
+
     <string name="loadingtxt">Loading...</string>
+
 
     <!--f fabbutton localisations -->
 
@@ -198,7 +202,7 @@
     <string name="alert_headtext_no_url">URL not found!</string>
     <string name="alert_headtext_invalid_url">Invalid URL!</string>
     <string name="alert_headtext_email_notvalid">Email not valid</string>
-    <string name="alert_headtext_no_internet">     No Internet     </string>
+    <string name="alert_headtext_no_internet">      No Internet      </string>
     <string name="alert_headtext_no_guest_content">No guest content</string>
     <string name="password_reset_link_send_success">Password reset link sent to registered email.\nPlease check your inbox.</string>
     <string name="alert_text_need_valid_email">Please enter a valid registered email.</string>

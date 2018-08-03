@@ -59,7 +59,6 @@
                     android:gravity="center_vertical|fill_horizontal"
                     android:maxLines="200"
                     android:padding="1dp"
-                    android:text="Lisa yow"
                     android:textColor="@color/colorBlack"
                     android:textSize="14sp"
                     android:typeface="sans" />
@@ -73,9 +72,9 @@
                     android:layout_below="@+id/txt_name"
                     android:layout_gravity="center|left"
                     android:layout_marginTop="10dp"
-                    android:paddingLeft="5dp"
-                    android:progress="40"
                     android:padding="10dp"
+                    android:paddingLeft="5dp"
+                    android:progress="0"
                     android:progressTint="@color/colorStatusInProgress" />
 
                 <TextView
@@ -88,7 +87,6 @@
                     android:gravity="center_vertical|fill_horizontal"
                     android:maxLines="200"
                     android:padding="1dp"
-                    android:text="400 Points to advance level "
                     android:textColor="@color/colorGray"
                     android:textSize="14sp"
                     android:typeface="sans" />
@@ -141,7 +139,6 @@
                     android:layout_gravity="left"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="2"
                     android:textColor="@color/colorDarkGrey"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -180,7 +177,6 @@
                     android:layout_gravity="left"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="Intermediate"
                     android:textColor="@color/colorDarkGrey"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -219,7 +215,6 @@
                     android:layout_gravity="left"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="2"
                     android:textColor="@color/colorDarkGrey"
                     android:textSize="16sp"
                     android:textStyle="bold" />

@@ -37,8 +37,8 @@ android {
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 27
-//           versionName "3.4"
+//           versionCode 28
+//           versionName "3.5"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"
@@ -52,8 +52,8 @@ android {
 
 //  -------------------------------- for trainingcompany app----------------------------------
 //        applicationId "com.instancy.trainingcompany"
-//        versionCode 17
-//        versionName "2.6"
+//        versionCode 18
+//        versionName "2.7"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.mobileup"
@@ -70,9 +70,9 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-//        applicationId "com.instancy.development"
-//        versionCode 3
-//        versionName "1.0(9.5.1.2)Pagination"
+        applicationId "com.instancy.development"
+        versionCode 3
+        versionName "1.0(9.5.2)ReleaseEvent"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -82,9 +82,9 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-        applicationId "com.instancy.switch"
-        versionCode 8
-        versionName "1.7"
+//        applicationId "com.instancy.switch"
+//        versionCode 10
+//        versionName "1.9"
 
         minSdkVersion 21
         targetSdkVersion 26

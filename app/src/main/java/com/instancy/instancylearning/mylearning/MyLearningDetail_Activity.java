@@ -682,13 +682,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 Drawable reportImg = getButtonDrawable(R.string.fa_icon_filter, this, uiSettingsModel.getAppButtonTextColor());
 
                 if (myLearningModel.getAddedToMylearning() == 1) {
-                    if (!returnEventCompleted(myLearningModel.getEventstartTime())) {
-//                        buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-//                        buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-//                        btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-//                        iconFirst.setBackground(calendarImg);
-//                        buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
-                    }
 
                     if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
                         if (isReportEnabled) {
@@ -707,26 +700,31 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         btnDownload.setVisibility(View.VISIBLE);
 
                     } else {
-//                        if (returnEventCompleted(myLearningModel.getEventstartTime())){ // uncommented for MCI
-                        btnsLayout.setVisibility(View.GONE);
-//                        }
+                        if (!returnEventCompleted(myLearningModel.getEventendUtcTime())) {
+                            Drawable calendar = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
+                            iconFirst.setBackground(calendar);
+                            buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+                        } else {
+                            btnsLayout.setVisibility(View.GONE);
+                        }
+
                     }
 
                 } else {
 
                     if (myLearningModel.getViewType().equalsIgnoreCase("1") || myLearningModel.getViewType().equalsIgnoreCase("2")) {
-                        if (!myLearningModel.isCompletedEvent()) {
+                        if (!returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
                             iconFirst.setBackground(calendarImg);
                             buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
 
                         } else {
 
-                            if (myLearningModel.getViewType().equalsIgnoreCase("2")) {
+                            if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
                                 iconFirst.setBackground(calendarImg);
                                 buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
 
                             } else {
-                                btnsLayout.setVisibility(View.INVISIBLE);
+                                btnsLayout.setVisibility(View.GONE);
 
                             }
 
@@ -741,11 +739,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     }
                 }
 
-
             } else {
 
                 buttonFirst.setText("Add");
-
                 Drawable addPlusIcon = getButtonDrawable(R.string.fa_icon_plus_circle, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(addPlusIcon);
                 if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
@@ -798,7 +794,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         } else {
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
-                if (!returnEventCompleted(myLearningModel.getEventstartTime())) {
+                if (!returnEventCompleted(myLearningModel.getEventendUtcTime())) {
                     buttonFirst.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                     buttonSecond.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                     btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -890,7 +886,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         } else {
 
-            if (!myLearningModel.isCompletedEvent()) {
+            if (!returnEventCompleted(myLearningModel.getEventendUtcTime())) {
                 Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(calendarImg);
                 buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
@@ -1147,7 +1143,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
 
-                    if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
+                    if (uiSettingsModel.isAllowExpiredEventsSubscription()  && returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
 
 //                            addExpiredEventToMyLearning(myLearningDetalData, position);
                         try {

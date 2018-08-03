@@ -1,9 +1,7 @@
 package com.instancy.instancylearning.sidemenumodule;
 
 
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -34,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
 import com.android.volley.VolleyError;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
@@ -45,7 +42,6 @@ import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
-import com.instancy.instancylearning.events.Event_fragment;
 import com.instancy.instancylearning.events.Event_fragment_new;
 import com.instancy.instancylearning.gameficitation.LeaderboardFragment;
 import com.instancy.instancylearning.gameficitation.MyAchivementsFragment;
@@ -73,10 +69,6 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 import com.squareup.picasso.Picasso;
 
-import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
-import static com.instancy.instancylearning.utils.StaticValues.NOTIFICATIONVIWED;
-import static com.instancy.instancylearning.utils.Utilities.*;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,15 +81,19 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
+import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
 import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.NOTIFICATIONVIWED;
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
-import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 public class SideMenu extends AppCompatActivity implements View.OnClickListener, DrawerLayout.DrawerListener {
@@ -348,9 +344,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
 
                 // on first time to display view for first time navigation item based on the number
-                if (!isFromPushNotification) {
-                    selectItem(Integer.parseInt(indexed), model, false, "", ""); // 2 is your fragment's number for "CollectionFragment"
-                }
                 homeModel = model;
                 tempHomeModel = model;
                 homeIndex = Integer.parseInt(indexed);
@@ -379,7 +372,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                     int logoutPos = sideMenumodelList.size() - 1;
 
-                    String isSubSiteEntered = preferencesManager.getStringValue(StaticValues.SUB_SITE_ENTERED);
 
 //                    String filterCondition = sideMenumodelList.get(groupPosition).getConditions();
 //                    if (logoutPos == groupPosition && isSubSiteEntered.equalsIgnoreCase("false")) {
@@ -426,7 +418,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v,
                                             int groupPosition, int childPosition, long id) {
-                    subMenuItemClickListener(parent, groupPosition, childPosition);
+                    subMenuItemClickListener(groupPosition, childPosition);
                     return true;
                 }
 
@@ -451,6 +443,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
 
+        }
+
+
+        if (!isFromPushNotification) {
+            selectItem(homeIndex, homeModel, false, "", ""); // 2 is your fragment's number for "CollectionFragment"
         }
 
 
@@ -634,7 +631,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 fragment = new SettingsInnerFragment();
                 break;
             default:
-                Log.d(TAG, "selectItem: default contextmenu");
+                subMenuItemClickListener(0, 0);
                 break;
         }
 
@@ -745,8 +742,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     }
 
 
-    private void subMenuItemClickListener(ExpandableListView parent,
-                                          int groupPosition, int childPosition) {
+    private void subMenuItemClickListener(int groupPosition, int childPosition) {
 
         if (!(MAIN_MENU_POSITION == groupPosition && SUB_MENU_POSITION == childPosition)) {
             MAIN_MENU_POSITION = groupPosition;

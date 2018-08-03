@@ -132,7 +132,7 @@
 
         <activity
             android:name=".filter.Filter_Inner_activity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".discussionfourms.DiscussionTopicActivity"
@@ -191,37 +191,42 @@
         <activity
             android:name=".profile.Education_activity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustPan" > </activity>
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
 
         <activity
             android:name=".profile.Experience_activity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"> </activity>
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
 
         <activity
             android:name=".profile.Personalinfo_activity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"> </activity>
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
 
         <activity
             android:name=".nativesignup.NativeSignupActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"> </activity>
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
 
         <activity
             android:name=".mycompetency.CompetencyCatSkillActivity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".catalogfragment.CatalogFragmentActivity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
 
         <activity
             android:name=".globalsearch.GlobalSearchActivity"
-            android:screenOrientation="portrait"> </activity>
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".globalsearch.GlobalSearchResultsActivity"
+            android:screenOrientation="portrait"></activity>
 
 
         <!-- Push Notification  Services-->
@@ -278,8 +283,8 @@
         </provider>
 
         <!--<meta-data-->
-            <!--android:name="io.fabric.ApiKey"-->
-            <!--android:value="724fe005f4a5bbeeebfef818ff4e321719b7c405" />-->
+        <!--android:name="io.fabric.ApiKey"-->
+        <!--android:value="724fe005f4a5bbeeebfef818ff4e321719b7c405" />-->
 
         <meta-data
             android:name="io.fabric.ApiKey"

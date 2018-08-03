@@ -5,9 +5,12 @@ import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.gson.JsonParser;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.Utilities;
+
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
@@ -23,6 +26,8 @@ import java.net.URLEncoder;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static com.instancy.instancylearning.utils.Utilities.convertStreamToString;
 
 public class WebAPIClient {
     private HttpURLConnection httpURLConnection;
@@ -101,7 +106,7 @@ public class WebAPIClient {
 
         String requestURL = strAPIURL + "/MobileLMS/GetAPIAuthDetails"
                 + "?AppURL=" + siteUrl;
-        Log.d("AUTH", "getAPIAuthDetails: "+requestURL);
+        Log.d("AUTH", "getAPIAuthDetails: " + requestURL);
         inputStream = null;
         httpURLConnection = null;
 
@@ -272,6 +277,38 @@ public class WebAPIClient {
         }
 
         return inputStream;
+    }
+
+    public String getInputStreamForSearchResults(String requestURL, String authentication) {
+        inputStream = null;
+        httpURLConnection = null;
+        requestURL = requestURL.replace(" ", "%20");
+
+        try {
+
+            Log.d("TAG", "HERE " + requestURL);
+
+            URL url = new URL(requestURL);
+
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            String base64EncodedCredentials = Base64.encodeToString(
+                    authentication.getBytes(), Base64.NO_WRAP);
+            httpURLConnection.setRequestProperty("Authorization", "Basic "
+                    + base64EncodedCredentials);
+            int statusCode = httpURLConnection.getResponseCode();
+
+            if (statusCode == 200) {
+
+                inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
+
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            inputStream = null;
+        }
+
+
+        return convertStreamToString(inputStream);
     }
 
 
