@@ -11,6 +11,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.GlobalSearchCategoryModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModel;
@@ -128,7 +130,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
 
         LayoutInflater inflater;
         View vi = convertView;
-        ViewHolder holder;
+        final ViewHolder holder;
         if (vi == null) {
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             vi = inflater.inflate(R.layout.globalsearchresultitem, null);
@@ -180,17 +182,33 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
             }
         }
 
+        if (expandedListText.contextMenuId == 10) {
+            holder.txtAvaSeats.setVisibility(View.GONE);
+            holder.txtSiteName.setVisibility(View.GONE);
+            holder.txtSiteLine.setVisibility(View.GONE);
+            holder.txtAutLine.setVisibility(View.GONE);
+
+        }
+
         String imgUrl = appUserModel.getSiteURL() + expandedListText.thumbnailImagePath;
 
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(vi.getResources().getDrawable(R.drawable.cellimage)).into(holder.imageThumb);
 
+        final View finalVi = vi;
+        holder.btnContextMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GlobalMethods.globalSearchContextMenu(finalVi,childPosition,holder.btnContextMenu,"");
+
+            }
+        });
 
         holder.txtFotor.setVisibility(View.GONE);
         if (childPosition == getChildrenCount(groupPosition) - 1) {
 
             holder.txtFotor.setVisibility(View.VISIBLE);
             if (holder.txtFotor != null) {
-                final View finalVi = vi;
+
                 holder.txtFotor.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -272,6 +290,19 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         @Nullable
         @BindView(R.id.txt_sitename)
         TextView txtSiteName;
+
+        @Nullable
+        @BindView(R.id.txt_lineatcoursename)
+        TextView txtAutLine;
+
+        @Nullable
+        @BindView(R.id.txt_linesitename)
+        TextView txtSiteLine;
+
+        @Nullable
+        @BindView(R.id.btn_contextmenu)
+        ImageButton btnContextMenu;
+
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

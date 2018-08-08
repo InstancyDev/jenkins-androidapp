@@ -1,0 +1,65 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/ctx_view"
+        android:orderInCategory="100"
+        android:title="View" />
+    <item
+        android:id="@+id/ctx_detail"
+        android:orderInCategory="100"
+        android:title="Details" />
+
+    <item
+        android:id="@+id/ctx_join"
+        android:orderInCategory="100"
+        android:title="Join" />
+
+    <item
+        android:id="@+id/ctx_addtocalender"
+        android:orderInCategory="100"
+        android:title="@string/btn_txt_add_to_calendar" />
+
+    <item
+        android:id="@+id/ctx_relatedcontent"
+        android:orderInCategory="100"
+        android:title="Related Content" />
+
+    <item
+        android:id="@+id/ctx_add"
+        android:orderInCategory="100"
+        android:title="Add" />
+
+    <item
+        android:id="@+id/ctx_buy"
+        android:orderInCategory="100"
+        android:title="Buy" />
+
+    <item
+        android:id="@+id/ctx_enroll"
+        android:orderInCategory="100"
+        android:title="Enroll" />
+
+    <item
+        android:id="@+id/ctx_profile"
+        android:orderInCategory="100"
+        android:title="View Profile" />
+
+    <item
+        android:id="@+id/ctx_addtomy"
+        android:orderInCategory="100"
+        android:title="Add to My Connections" />
+
+    <item
+        android:id="@+id/ctx_disc"
+        android:orderInCategory="100"
+        android:title="go to forum" />
+
+    <item
+        android:id="@+id/ctx_ask"
+        android:orderInCategory="100"
+        android:title="go to topic" />
+
+</menu>
+

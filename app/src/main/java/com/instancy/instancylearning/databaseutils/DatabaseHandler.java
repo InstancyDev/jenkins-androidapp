@@ -1676,7 +1676,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                             } else {
 
-                                nativeMenuModel.setComponentId("");
+                                nativeMenuModel.setComponentId("-1");
                             }
 
                         }
@@ -1807,6 +1807,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("issubmenuexists")));
                     menu.setWebMenuId(cursor.getInt(cursor
                             .getColumnIndex("webmenuid")));
+                    menu.setSiteID(cursor.getInt(cursor
+                            .getColumnIndex("siteid")));
 
                     menuList.add(menu);
                 }
@@ -1922,6 +1924,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("parentmenuid")));
                     menu.setParameterStrings(cursor.getString(cursor
                             .getColumnIndex("parameterstrings")));
+                    menu.setSiteID(cursor.getInt(cursor
+                            .getColumnIndex("siteid")));
 
                     menuList.add(menu);
                 } while (cursor.moveToNext());
@@ -1939,12 +1943,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public SideMenusModel getSideMenuModelForGlobalSearch(int siteId, int menuId) {
+    public SideMenusModel getSideMenuModelForGlobalSearch(int siteId, int contextmenuid) {
 
         SideMenusModel sideMenusModel = new SideMenusModel();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSelQuery = "SELECT * from " + TBL_NATIVEMENUS + " WHERE webmenuid =" + menuId  + " AND siteid = " + siteId;
+        String strSelQuery = "SELECT * from " + TBL_NATIVEMENUS + " WHERE contextmenuid =" + contextmenuid  + " AND siteid = " + siteId;
 
 
         try {
@@ -1962,8 +1966,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("displayorder")));
                     sideMenusModel.setImage(cursor.getString(cursor
                             .getColumnIndex("image")));
-                    int menuIconResId = -1;
-                    sideMenusModel.setMenuImageResId(menuIconResId);
+                    sideMenusModel.setDataFound(true);
+//                    sideMenusModel.setMenuImageResId(menuIconResId);
                     sideMenusModel.setIsOfflineMenu(cursor.getString(cursor
                             .getColumnIndex("isofflinemenu")));
                     sideMenusModel.setIsEnabled(cursor.getString(cursor
@@ -1986,11 +1990,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("parentmenuid")));
                     sideMenusModel.setParameterStrings(cursor.getString(cursor
                             .getColumnIndex("parameterstrings")));
-                    sideMenusModel.setIsSubMenuExists(cursor.getInt(cursor
-                            .getColumnIndex("issubmenuexists")));
-                    sideMenusModel.setWebMenuId(cursor.getInt(cursor
-                            .getColumnIndex("webmenuid")));
+                    sideMenusModel.setSiteID(cursor.getInt(cursor
+                            .getColumnIndex("siteid")));
 
+//                    sideMenusModel.setIsSubMenuExists(cursor.getInt(cursor
+//                            .getColumnIndex("issubmenuexists")));
+//                    sideMenusModel.setWebMenuId(cursor.getInt(cursor
+//                            .getColumnIndex("webmenuid")));
                 }
             }
             cursor.close();

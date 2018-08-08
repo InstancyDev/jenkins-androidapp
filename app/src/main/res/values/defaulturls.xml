@@ -73,18 +73,17 @@
     <!--<string name="app_default_url">http://croplife.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">http://edemowebapi.instancyplatform.com/api/</string>-->
 
-
     <!--<string name="app_default_url">http://qatoshiba.instancy.net/</string>-->
     <!--<string name="app_default_webapi_url">http://Toshiwebapi.instancy.net/api/</string>-->
 
     <!--<string name="app_default_url">http://toshiba.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://Toshiwebapi.instancy.net/api/</string>-->
 
-    <string name="app_default_url">http://stagingmci.instancysoft.com/</string>
-    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
-
-    <!--<string name="app_default_url">http://qamci.instancysoft.com/</string>-->
+    <!--<string name="app_default_url">http://stagingmci.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
+
+    <string name="app_default_url">http://staging.instancysoft.com/</string>
+    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
 
     <!--<string name="app_default_url">http://game.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->

@@ -1009,7 +1009,7 @@ public class GlobalMethods {
                     databaseH = new DatabaseHandler(v.getContext());
 //                  databaseH.setCompleteMethods(v.getContext(), myLearningDetalData);
                     File myFile = new File(myLearningDetalData.getOfflinepath());
-                    if (isNetworkConnectionAvailable(v.getContext(), -1) ||  myFile.exists()) {
+                    if (isNetworkConnectionAvailable(v.getContext(), -1) || myFile.exists()) {
                         new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
                     } else {
 
@@ -1444,5 +1444,29 @@ public class GlobalMethods {
             }
         }
     }
+
+    public static void globalSearchContextMenu(final View v, final int position, ImageButton btnselected, final String typeFrom) {
+
+        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.global_contextmenu, popup.getMenu());
+        //registering popup with OnMenuItemClickListene
+
+//        Menu menu = popup.getMenu();
+
+//        menu.getItem(0).setVisible(false);
+//        menu.getItem(1).setVisible(false);
+//        menu.getItem(3).setVisible(false);
+//        menu.getItem(4).setVisible(false);
+//        menu.getItem(5).setVisible(false);// reports
+//        menu.getItem(6).setVisible(false);
+//        menu.getItem(7).setVisible(false);
+//        menu.getItem(8).setVisible(false); // related content
+//        menu.getItem(9).setVisible(false); // cancel
+//        menu.getItem(10).setVisible(false);
+
+        popup.show();//showing popup menu
+    }
+
 
 }

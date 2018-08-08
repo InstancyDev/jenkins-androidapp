@@ -89,6 +89,7 @@ import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_T
 import static com.instancy.instancylearning.utils.StaticValues.REFRESH_PEOPLE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 
@@ -165,6 +166,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
 //    SideMenusModel catalogSideMenuModel;
 
+    boolean isFromGlobalSearch = false;
+
+    String queryString = "";
+
     public PeopleListing_fragment() {
 
 
@@ -194,6 +199,14 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
 //            catalogSideMenuModel = (SideMenusModel) bundle.getSerializable("catalogSideMenuModel");
+
+            isFromGlobalSearch = bundle.getBoolean("ISFROMGLOBAL", false);
+
+            if (isFromGlobalSearch) {
+                queryString = bundle.getString("query");
+                TABBALUE = "All";
+            }
+
         }
         if (responMap != null && responMap.containsKey("Type")) {
             String consolidate = responMap.get("Type");
@@ -237,10 +250,28 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         } else {
 
 
-        injectFromDbtoModel();
-        REFRESH_PEOPLE = 0;
+            injectFromDbtoModel();
+            REFRESH_PEOPLE = 0;
+        }
     }
+
+    public void refreshPeopleListingGlobalListing(Boolean isRefreshed) {
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            if (!isRefreshed) {
+
+                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            }
+
+            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&SearchText=" + queryString;
+
+            vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
+        } else {
+
+//            injectFromDbtoModel();
+//            REFRESH_PEOPLE = 0;
+        }
     }
+
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -250,9 +281,16 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
                     if (response != null) {
                         try {
-                            db.injectPeopleListingListIntoSqLite(response, TABBALUE,pageIndex);
-                            injectFromDbtoModel();
                             totalRecordsCount = countOfTotalRecords(response);
+                            if (isFromGlobalSearch) {
+                                peopleListingModelList.addAll(generateOnlinePeoplelistingModel(response));
+                                peopleListingAdapter.refreshList(peopleListingModelList);
+                            } else {
+                                db.injectPeopleListingListIntoSqLite(response, TABBALUE, pageIndex);
+                                injectFromDbtoModel();
+                            }
+
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -264,7 +302,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("PEOPLELISTINGTABS")) {
                     if (response != null) {
                         try {
-                            db.injectPeopleListingListIntoSqLite(response, TABBALUE,pageIndex);
+                            db.injectPeopleListingListIntoSqLite(response, TABBALUE, pageIndex);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -397,7 +435,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         peopleListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
 
-
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
         peopleListView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
@@ -433,10 +470,15 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         if (!isSearching) {
                             progressBar.setVisibility(View.VISIBLE);
                             if (isNetworkConnectionAvailable(getContext(), -1)) {
-                                refreshPeopleListing(true);
+                                if (isFromGlobalSearch) {
+                                    refreshPeopleListingGlobalListing(true);
+                                } else {
+                                    refreshPeopleListing(true);
+                                }
+
                             } else {
                                 progressBar.setVisibility(View.GONE);
-                                Toast.makeText(getContext(),"   "+ getString(R.string.alert_headtext_no_internet)+"   ", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "   " + getString(R.string.alert_headtext_no_internet) + "   ", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             progressBar.setVisibility(View.GONE);
@@ -451,6 +493,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 appcontroller.setAlreadyViewd(true);
                 preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
             }
+
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
 
@@ -466,6 +509,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         segmentedSwitch.setOnCheckedChangeListener(this);
 
+        if (isFromGlobalSearch) {
+            segmentedSwitch.setVisibility(View.GONE);
+        }
+
         segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         pendingBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -476,7 +523,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         peopleListingModelList = new ArrayList<PeopleListingModel>();
 
         if (isNetworkConnectionAvailable(getContext(), -1) && REFRESH_PEOPLE == 0) {
-            refreshPeopleListing(false);
+            if (isFromGlobalSearch) {
+                refreshPeopleListingGlobalListing(false);
+            } else {
+                refreshPeopleListing(false);
+            }
+
         } else {
             injectFromDbtoModel();
         }
@@ -548,6 +600,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
+
+        if (isFromGlobalSearch) {
+            item_search.setVisible(false);
+            swipeRefreshLayout.setEnabled(false);
+        }
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -1064,13 +1121,204 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         int totalRecs = 0;
 
-        if (jsonObject!=null && jsonObject.length() > 0) {
+        if (jsonObject != null && jsonObject.length() > 0) {
 
 
             totalRecs = jsonObject.getInt("PeopleCount");
         }
 
         return totalRecs;
+    }
+
+    public List<PeopleListingModel> generateOnlinePeoplelistingModel(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("PeopleList");
+
+        List<PeopleListingModel> peopleListingModelList = new ArrayList<>();
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            PeopleListingModel peopleListingModel = new PeopleListingModel();
+
+            //ConnectionUserID
+            if (jsonMyLearningColumnObj.has("ConnectionUserID")) {
+
+                peopleListingModel.connectionUserID = jsonMyLearningColumnObj.getInt("ConnectionUserID");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("ObjectID")) {
+
+                peopleListingModel.userID = jsonMyLearningColumnObj.get("ObjectID").toString();
+
+            }
+//            // JobTitle
+//            if (jsonMyLearningColumnObj.has("JobTitle")) {
+//
+//                Spanned result = fromHtml(jsonMyLearningColumnObj.get("JobTitle").toString());
+//
+//                peopleListingModel.communitydescription = result.toString();
+//
+//            }
+            // JobTitle
+            if (jsonMyLearningColumnObj.has("JobTitle")) {
+
+                peopleListingModel.jobTitle = jsonMyLearningColumnObj.get("JobTitle").toString();
+
+            }
+            // MainOfficeAddress
+            if (jsonMyLearningColumnObj.has("MainOfficeAddress")) {
+
+                peopleListingModel.mainOfficeAddress = jsonMyLearningColumnObj.getString("MainOfficeAddress");
+
+            }
+
+            // MemberProfileImage
+            if (jsonMyLearningColumnObj.has("MemberProfileImage")) {
+                peopleListingModel.memberProfileImage = jsonMyLearningColumnObj.getString("MemberProfileImage");
+
+            }
+
+            // UserDisplayname
+            if (jsonMyLearningColumnObj.has("UserDisplayname")) {
+
+                peopleListingModel.userDisplayname = jsonMyLearningColumnObj.getString("UserDisplayname");
+
+            }
+            // connectionstate
+            if (jsonMyLearningColumnObj.has("connectionstate")) {
+
+                peopleListingModel.connectionState = jsonMyLearningColumnObj.getString("connectionstate");
+
+            }
+            // connectionstateAccept
+            if (jsonMyLearningColumnObj.has("connectionstateAccept")) {
+
+                peopleListingModel.connectionStateAccept = jsonMyLearningColumnObj.get("connectionstateAccept").toString();
+
+            }
+            // ViewProfileAction
+            if (jsonMyLearningColumnObj.has("ViewProfileAction")) {
+
+                String viewprofileAction = jsonMyLearningColumnObj.getString("ViewProfileAction");
+
+                if (isValidString(viewprofileAction)) {
+                    peopleListingModel.viewProfileAction = true;
+                } else {
+                    peopleListingModel.viewProfileAction = false;
+                }
+            }
+
+            // AcceptAction
+            if (jsonMyLearningColumnObj.has("AcceptAction")) {
+
+                String acceptAction = jsonMyLearningColumnObj.getString("AcceptAction");
+
+                if (isValidString(acceptAction)) {
+                    peopleListingModel.acceptAction = true;
+
+                } else {
+                    peopleListingModel.acceptAction = false;
+                }
+            }
+
+            // IgnoreAction
+            if (jsonMyLearningColumnObj.has("IgnoreAction")) {
+
+                String ignoreAction = jsonMyLearningColumnObj.getString("IgnoreAction");
+
+                if (isValidString(ignoreAction)) {
+                    peopleListingModel.ignoreAction = true;
+
+                } else {
+                    peopleListingModel.ignoreAction = false;
+                }
+            }
+
+            // ViewContentAction
+            if (jsonMyLearningColumnObj.has("ViewContentAction")) {
+
+                String viewContentAction = jsonMyLearningColumnObj.getString("ViewContentAction");
+
+                if (isValidString(viewContentAction)) {
+                    peopleListingModel.viewContentAction = true;
+
+                } else {
+                    peopleListingModel.viewContentAction = false;
+                }
+            }
+
+            // SendMessageAction
+            if (jsonMyLearningColumnObj.has("SendMessageAction")) {
+
+                String sendMessageAction = jsonMyLearningColumnObj.getString("SendMessageAction");
+
+                if (isValidString(sendMessageAction)) {
+                    peopleListingModel.sendMessageAction = true;
+
+                } else {
+                    peopleListingModel.sendMessageAction = false;
+                }
+            }
+            // AddToMyConnectionAction
+            if (jsonMyLearningColumnObj.has("AddToMyConnectionAction")) {
+
+                String addToMyConnectionAction = jsonMyLearningColumnObj.getString("AddToMyConnectionAction");
+
+                if (isValidString(addToMyConnectionAction)) {
+                    peopleListingModel.addToMyConnectionAction = true;
+
+                } else {
+                    peopleListingModel.addToMyConnectionAction = false;
+                }
+            }
+
+            // RemoveFromMyConnectionAction
+            if (jsonMyLearningColumnObj.has("RemoveFromMyConnectionAction")) {
+
+                String removeFromMyConnectionAction = jsonMyLearningColumnObj.getString("RemoveFromMyConnectionAction");
+
+                if (isValidString(removeFromMyConnectionAction)) {
+                    peopleListingModel.removeFromMyConnectionAction = true;
+
+                } else {
+                    peopleListingModel.removeFromMyConnectionAction = false;
+                }
+            }
+
+            // InterestAreas
+            if (jsonMyLearningColumnObj.has("InterestAreas")) {
+
+                peopleListingModel.interestAreas = jsonMyLearningColumnObj.getString("InterestAreas");
+
+            }
+
+            // connectionstateAccept
+            if (jsonMyLearningColumnObj.has("NotaMember")) {
+
+                peopleListingModel.notaMember = jsonMyLearningColumnObj.getInt("NotaMember");
+
+            }
+
+            peopleListingModel.tabID = "All";
+            peopleListingModel.siteID = appUserModel.getSiteIDValue();
+            peopleListingModel.mainSiteUserID = appUserModel.getUserIDValue();
+            peopleListingModel.siteURL = appUserModel.getSiteURL();
+
+
+            peopleListingModelList.add(peopleListingModel);
+        }
+
+
+        if (peopleListingModelList.size() == pageSize) {
+            pageIndex = 2;
+        } else {
+            pageIndex = peopleListingModelList.size() / pageSize;
+            pageIndex = pageIndex + 1;
+        }
+
+        return peopleListingModelList;
     }
 
 }

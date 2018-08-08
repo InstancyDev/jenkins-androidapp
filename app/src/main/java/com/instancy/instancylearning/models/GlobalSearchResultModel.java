@@ -58,7 +58,6 @@ public class GlobalSearchResultModel implements Serializable {
     public String viewProfileLink = "";
     public String waitListLink = "";
     public String joinURL = "";
-    public int siteId = 0;
     public String sCOID = "";
     public String authorWithLink = "";
     public String destinationLink = "";
@@ -83,7 +82,7 @@ public class GlobalSearchResultModel implements Serializable {
     public String startPage = "";
     public String suggestwithFriendLink = "";
 
-
+    public int contextMenuId=0;
     public int userid = -1;
     public int siteID = -1;
     public String siteurl = "";

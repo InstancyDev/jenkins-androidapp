@@ -56,7 +56,7 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
         globalSearchResultModelList = new ArrayList<>();
         for (int i = 0; i < gLobalSearchSelectedModelList.size(); i++) {
 
-            String paramsString = appUserModel.getWebAPIUrl() + "search/GetGlobalSearchResults?pageIndex=1&pageSize=10&searchStr=" + queryString +
+            String paramsString = appUserModel.getWebAPIUrl() + "mobilelms/GetGlobalSearchResults?pageIndex=1&pageSize=10&searchStr=" + queryString +
                     "&source=0&type=0&fType=&fValue=&sortBy=PublishedDate&sortType=desc&keywords=&ComponentID=225&ComponentInsID=4021&UserID=" + appUserModel.getUserIDValue() +
                     "&SiteID=" + appUserModel.getSiteIDValue() +
                     "&OrgUnitID=" + appUserModel.getSiteIDValue() +
@@ -160,9 +160,11 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
                         globalSearchResultModel.componentName = selectedModel.componentName;
                         globalSearchResultModel.componentID = selectedModel.componentID;
                         globalSearchResultModel.componentInstanceID = selectedModel.componentInstancID;
-                        globalSearchResultModel.siteId = selectedModel.siteID;
+                        globalSearchResultModel.siteID = selectedModel.siteID;
                         globalSearchResultModel.menuID = selectedModel.menuId;
                         globalSearchResultModel.headerName = selectedModel.componentName + " - " + selectedModel.siteName;
+                        globalSearchResultModel.contextMenuId=selectedModel.contextMenuId;
+
 
                         if (resultList.has("Title")) {
                             globalSearchResultModel.title = resultList.getString("Title");

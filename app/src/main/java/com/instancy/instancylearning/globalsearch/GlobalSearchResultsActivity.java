@@ -26,37 +26,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.GlobalSearchResultSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.DataCallback;
 import com.instancy.instancylearning.interfaces.GlobalSearchResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.GLobalSearchSelectedModel;
-import com.instancy.instancylearning.models.GlobalSearchCategoryModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModel;
-import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static com.instancy.instancylearning.models.GlobalSearchResultModel.fetchCategoriesData;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -85,13 +73,13 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     RelativeLayout globalHeaderLayout;
     LinearLayout bottomBtnLayout;
-
+    TextView nodataLabel;
     CheckBox chxSelectedCategory;
     TextView bottomLine;
     String queryString = "";
     List<GLobalSearchSelectedModel> gLobalSearchSelectedModelList = null;
     GlobalSearchResultSynchTask globalSearchResultSynchTask;
-    DataCallback dataCallback;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,7 +99,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         chxSelectedCategory.setVisibility(View.GONE);
         bottomBtnLayout.setVisibility(View.GONE);
         bottomLine.setVisibility(View.GONE);
-
+        nodataLabel = (TextView) findViewById(R.id.nodata_label);
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
 
@@ -153,15 +141,10 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         chxListview.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
-
                 final GlobalSearchResultModel expandedListText = (GlobalSearchResultModel) searchAdapter.getChild(groupPosition, childPosition);
-
-//                SideMenusModel sideMenusModel=db.getSideMenuModelForGlobalSearch(expandedListText.siteId,expandedListText.menuID);
-
-                 Toast.makeText(GlobalSearchResultsActivity.this, "groupPosition: " + groupPosition + "childPosition: " + childPosition, Toast.LENGTH_SHORT).show();
-
+//              Toast.makeText(GlobalSearchResultsActivity.this, "groupPosition: " + groupPosition + "childPosition: " + childPosition, Toast.LENGTH_SHORT).show();
+                selectedFragment(expandedListText);
                 return false;
-
             }
         });
 
@@ -190,11 +173,47 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
+    public void selectedFragment(GlobalSearchResultModel expandedListText) {
+
+        SideMenusModel sideMenusModel = db.getSideMenuModelForGlobalSearch(expandedListText.siteID, expandedListText.contextMenuId);
+
+        if (sideMenusModel.isDataFound() && !sideMenusModel.contextMenuId.equalsIgnoreCase("0")) {
+            Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, GlobalCatalogActivity.class);
+            intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+            intentDetail.putExtra("query", queryString);
+//        intentDetail.putExtra("SKILLID", skillModelList.get(position).skillID);
+            intentDetail.putExtra("ISFROMGLOBAL", true);
+            startActivity(intentDetail);
+
+        } else {
+
+            Toast.makeText(GlobalSearchResultsActivity.this, " Menu Not configured ", Toast.LENGTH_SHORT).show();
+
+        }
+
+//        SideMenusModel sideMenusModel = createSideMenuModel(expandedListText);
+
+    }
+
+    public SideMenusModel createSideMenuModel(GlobalSearchResultModel expandedListText) {
+        SideMenusModel sideMenusModel = new SideMenusModel();
+
+        sideMenusModel.setMenuId(expandedListText.menuID);
+        sideMenusModel.setComponentId("" + expandedListText.componentID);
+        sideMenusModel.setRepositoryId("" + expandedListText.componentInstanceID);
+        sideMenusModel.setDisplayName(expandedListText.componentName);
+        sideMenusModel.setSiteID(expandedListText.siteID);
+        sideMenusModel.setContextMenuId("" + expandedListText.contextMenuId);
+        sideMenusModel.setParameterStrings("");
+
+
+        return sideMenusModel;
+    }
+
     public void refreshCatagories(Boolean isRefreshed) {
         if (!isRefreshed) {
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
-
 
         if (gLobalSearchSelectedModelList != null && gLobalSearchSelectedModelList.size() > 0) {
 
@@ -316,6 +335,10 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         if (expandableListDetail != null && expandableListDetail.size() > 0) {
             for (int i = 0; i < expandableListDetail.size(); i++)
                 chxListview.expandGroup(i);
+        }
+
+        if (expandableListDetail.size() == 0) {
+            nodataLabel.setText(getResources().getString(R.string.no_data));
         }
     }
 }

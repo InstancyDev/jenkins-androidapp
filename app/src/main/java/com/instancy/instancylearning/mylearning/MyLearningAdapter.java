@@ -544,20 +544,22 @@ public class MyLearningAdapter extends BaseAdapter {
                 holder.btnDownload.setVisibility(View.VISIBLE);
                 holder.circleProgressBar.setVisibility(View.GONE);
             }
-
-
-//              File extStore = Environment.getExternalStorageDirectory();
-            File myFile = new File(myLearningModel.get(position).getOfflinepath());
-
-            if (myFile.exists()) {
-                holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-                holder.btnDownload.setEnabled(false);
-
+            if (uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
+                holder.btnDownload.setVisibility(View.GONE);
+                holder.circleProgressBar.setVisibility(View.GONE);
             } else {
-                holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
-                holder.btnDownload.setEnabled(true);
+                File myFile = new File(myLearningModel.get(position).getOfflinepath());
 
+                if (myFile.exists()) {
+                    holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
+                    holder.btnDownload.setEnabled(false);
+
+                } else {
+                    holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
+                    holder.btnDownload.setEnabled(true);
+                }
             }
+//              File extStore = Environment.getExternalStorageDirectory();
         }
 
         holder.txtCourseStatus.setVisibility(View.VISIBLE);

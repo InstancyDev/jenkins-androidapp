@@ -35,6 +35,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.GLobalSearchSelectedModel;
 import com.instancy.instancylearning.models.GlobalSearchCategoryModel;
+import com.instancy.instancylearning.models.GlobalSearchResultModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -51,6 +52,7 @@ import java.util.List;
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.fetchCategoriesData;
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.getSelectedModelList;
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.isAllCheckedBoolMethod;
+import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.isParentComponentExists;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -185,7 +187,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                 if (((CheckBox) v).isChecked()) {
                     checkAllBool = true;
                     try {
-                        expandableListDetail = fetchCategoriesData(responseReceived, true);
+                        expandableListDetail = fetchCategoriesData(responseReceived, true, sideMenusModel);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -196,7 +198,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
                     checkAllBool = false;
                     try {
-                        expandableListDetail = fetchCategoriesData(responseReceived, false);
+                        expandableListDetail = fetchCategoriesData(responseReceived, false, sideMenusModel);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -223,7 +225,10 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
-
+        chxSelectedCategory.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
+        chxAll.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
+        chxSelectedCategory.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        chxAll.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
     }
 
     public void updateListView(boolean isListClicked) {
@@ -303,7 +308,13 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
                         Log.d(TAG, "notifySuccess: " + response);
                         try {
-                            expandableListDetail = fetchCategoriesData(response, false);
+                            expandableListDetail = fetchCategoriesData(response, false, sideMenusModel);
+                            boolean parentExistss = isParentComponentExists(response, sideMenusModel);
+                            if (!parentExistss) {
+                                chxSelectedCategory.setVisibility(View.GONE);
+                                checkSelectedBool = false;
+
+                            }
                             expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
                             responseReceived = response;
                             updateListView(true);
@@ -375,6 +386,18 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
     public void checkEverything(String queryString) {
         List<GLobalSearchSelectedModel> gLobalSearchSelectedModelList = getSelectedModelList(expandableListDetail);
+
+        if (checkSelectedBool) {
+            GLobalSearchSelectedModel gLobalSearchSelectedModel = new GLobalSearchSelectedModel();
+            gLobalSearchSelectedModel.menuId = sideMenusModel.getMenuId();
+            gLobalSearchSelectedModel.siteID = Integer.parseInt(appUserModel.getSiteIDValue());
+            gLobalSearchSelectedModel.componentID = Integer.parseInt(sideMenusModel.getComponentId());
+            gLobalSearchSelectedModel.siteName = appUserModel.getSiteName();
+            gLobalSearchSelectedModel.componentName = sideMenusModel.getContextTitle();
+            gLobalSearchSelectedModel.componentInstancID = Integer.parseInt(sideMenusModel.getRepositoryId());
+            gLobalSearchSelectedModel.contextMenuId = Integer.parseInt(sideMenusModel.getContextMenuId());
+            gLobalSearchSelectedModelList.add(gLobalSearchSelectedModel);
+        }
 
         if (checkSelectedBool || gLobalSearchSelectedModelList.size() > 0) {
             Intent intent = new Intent(GlobalSearchActivity.this, GlobalSearchResultsActivity.class);

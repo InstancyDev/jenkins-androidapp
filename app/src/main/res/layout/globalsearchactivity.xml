@@ -8,6 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true">
+
         <include layout="@layout/globalcheckcell" />
     </RelativeLayout>
 
@@ -22,7 +23,15 @@
         android:focusable="true"
         android:groupIndicator="@null"
         android:padding="1dp" />
-
+    <TextView
+        android:id="@+id/nodata_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="24sp" />
     <LinearLayout
         android:id="@+id/filter_btn_layout"
         android:layout_width="match_parent"

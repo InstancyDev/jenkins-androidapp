@@ -3,6 +3,15 @@ package com.instancy.instancylearning.models;
 import java.io.Serializable;
 
 public class SideMenusModel implements Serializable {
+    public int getSiteID() {
+        return siteID;
+    }
+
+    public void setSiteID(int siteID) {
+        this.siteID = siteID;
+    }
+
+    public int siteID;
     public int menuId;
     public String displayName;
     public int displayOrder;
@@ -20,6 +29,7 @@ public class SideMenusModel implements Serializable {
     public String parentMenuId = "";
     public String parameterStrings = "";
     public int isSubMenuExists = 0;
+    public boolean isDataFound = false;
 
     public int getWebMenuId() {
         return webMenuId;
@@ -30,6 +40,14 @@ public class SideMenusModel implements Serializable {
     }
 
     public int webMenuId = 0;
+
+    public boolean isDataFound() {
+        return isDataFound;
+    }
+
+    public void setDataFound(boolean dataFound) {
+        isDataFound = dataFound;
+    }
 
     public SideMenusModel() {
 

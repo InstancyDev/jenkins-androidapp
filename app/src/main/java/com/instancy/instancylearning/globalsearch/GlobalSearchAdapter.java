@@ -1,9 +1,9 @@
 package com.instancy.instancylearning.globalsearch;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +13,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
+
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.models.GlobalSearchCategoryModel;
@@ -26,8 +25,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
 
 /**
  * Created by Upendranath on 10/10/2017 Working on Instancy-Playground-Android.
@@ -137,6 +134,9 @@ public class GlobalSearchAdapter extends BaseExpandableListAdapter {
         holder.bottomLine.setVisibility(View.GONE);
 
         holder.txtTitle.setText(expandedListText.displayName);
+
+        holder.txtTitle.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
+        holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         holder.txtTitle.setChecked(expandedListText.chxBoxChecked);
 //        Log.d("CHX", "getChildView: " + expandedListText.chxBoxChecked + " @ " + childPosition);

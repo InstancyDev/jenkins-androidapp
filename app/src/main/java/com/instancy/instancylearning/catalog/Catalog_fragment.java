@@ -168,10 +168,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
+
     boolean isFromCatogories = false;
     boolean isFromPeopleListing = false;
     boolean isFromMyCompetency = false;
     boolean isReportEnabled = true;
+    boolean isFromNotification = false;
+    boolean isFromGlobalSearch = false;
+
     WebAPIClient webAPIClient;
 
     int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
@@ -215,7 +219,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     @BindView(R.id.fabVideo)
     FloatingActionButton fabVideo;
 
-    boolean isFromNotification = false;
 
     String contentIDFromNotification = "";
 
@@ -226,13 +229,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     String skillID = "";
     String skillName = "";
 
-
+    String queryString = "";
 
     public Catalog_fragment() {
 
 
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -270,6 +272,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
 
+            isFromGlobalSearch = bundle.getBoolean("ISFROMGLOBAL", false);
+
             isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
 
             isFromPeopleListing = bundle.getBoolean("ISFROMPEOPELLISTING", false);
@@ -291,6 +295,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 skillID = bundle.getString("SKILLID");
                 skillName = bundle.getString("TITLENAME");
+            }
+
+            if (isFromGlobalSearch) {
+                queryString = bundle.getString("query");
             }
 
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
@@ -377,10 +385,24 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         vollyService.getJsonObjResponseVolley("PEOPLELISTINGCATALOG", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
-    public void refreshMyCompetencyCatalog() {
+    public void refreshMyCompetencyCatalog(boolean isLoadMore) {
 
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1" + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=Skills&fValue=" + skillID;
+        if (!isLoadMore) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+        String paramsString = "";
+
+        if (isFromMyCompetency) {
+            paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1" + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=Skills&fValue=" + skillID;
+
+        } else {
+
+
+            //  FilterCondition=8,9,10,11,14,20,21,26,27,28,36,50,52,70,646,102,689,693&SortCondition=c.PublishedDate%20desc,c.name&RecordCount=200&OrgUnitID=374&userid=13608&Type=All&ComponentID=1&CartID=&Locale=en-us&SiteID=374&CategoryCompID=19&SearchText=Learning&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=3131&AuthorID=0
+
+            paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1" + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=" + queryString + "&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
+
+        }
 
         vollyService.getJsonObjResponseVolley("MYCMPTCY", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
 
@@ -431,7 +453,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (response != null) {
                         try {
 
-                            catalogModelsList = generateCatalogForPeopleListing(response);
+                            if (isFromGlobalSearch) {
+                                catalogModelsList.addAll(generateCatalogForPeopleListing(response));
+                                totalRecordsCount = countOfTotalRecords(response);
+                            } else {
+                                catalogModelsList = generateCatalogForPeopleListing(response);
+                            }
 
                             if (catalogModelsList.size() > 0) {
                                 catalogAdapter.refreshList(catalogModelsList);
@@ -607,7 +634,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         if (!isSearching) {
                             progressBar.setVisibility(View.VISIBLE);
                             if (isNetworkConnectionAvailable(getContext(), -1)) {
-                                refreshCatalog(true);
+                                if (isFromGlobalSearch) {
+                                    refreshMyCompetencyCatalog(true);
+                                } else {
+                                    refreshCatalog(true);
+                                }
+
                             } else {
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -629,8 +661,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public void onLoadMore(int page, int totalItemsCount) {
 //                Log.d(TAG, "onLoadMore: called page " + page);
                 Log.d(TAG, "onLoadMore: called totalItemsCount" + totalItemsCount);
-
-
             }
         });
 
@@ -639,9 +669,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             BACKTOMAINSITE = 0;
         }
 
-        if (isFromMyCompetency) {
+        if (isFromMyCompetency || isFromGlobalSearch) {
             swipeRefreshLayout.setEnabled(false);
-            refreshMyCompetencyCatalog();
+            refreshMyCompetencyCatalog(false);
             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
 
         } else if (!isFromPeopleListing) {
@@ -672,6 +702,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (allowAddContentType.length() > 0) {
             fabActionMenusInitilization();
         }
+        if (isFromGlobalSearch) {
+            uploadFloatMenu.setVisibility(View.GONE);
+        }
+
 
         return rootView;
     }
@@ -801,7 +835,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
-        if (isFromMyCompetency) {
+        if (isFromMyCompetency || isFromGlobalSearch) {
             item_search.setVisible(false);
         }
         itemInfo.setVisible(false);
@@ -813,7 +847,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
-
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
@@ -2735,6 +2768,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         }
+
+        if (myLearningModelList.size() == pageSize) {
+            pageIndex = 2;
+        } else {
+            pageIndex = myLearningModelList.size() / pageSize;
+            pageIndex = pageIndex + 1;
+        }
+
 
         return myLearningModelList;
     }

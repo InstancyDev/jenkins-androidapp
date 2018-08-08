@@ -32,8 +32,9 @@ public class GlobalSearchCategoryModel implements Serializable {
     public int componentInstanceID = -1;
     public String siteName = "";
     public String displayName = "";
+    public int contextMenuId = 0;
 
-    public static HashMap<String, List<GlobalSearchCategoryModel>> fetchCategoriesData(String response, boolean valueChecked) throws JSONException {
+    public static HashMap<String, List<GlobalSearchCategoryModel>> fetchCategoriesData(String response, boolean valueChecked, SideMenusModel sidemenuModel) throws JSONException {
         HashMap<String, List<GlobalSearchCategoryModel>> expandableListDetail = new HashMap<String, List<GlobalSearchCategoryModel>>();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -57,12 +58,27 @@ public class GlobalSearchCategoryModel implements Serializable {
                         model.contextTitle = object.optString("ContextTitle");
                         model.siteName = object.optString("SiteName");
                         model.displayName = object.optString("DisplayName");
-//                        model.chxBoxChecked = object.optBoolean("Check", false);
+                        model.contextMenuId = object.optInt("NativeCompID", 0);
                         model.chxBoxChecked = valueChecked;
                         advancedFilterModelList.add(i, model);
 
                     }
                 }
+
+
+                if (advancedFilterModelList.size() > 0) {
+
+                    for (int j = 0; j < advancedFilterModelList.size(); j++) {
+
+
+                        if (sidemenuModel.getSiteID() == advancedFilterModelList.get(j).siteID && Integer.parseInt(sidemenuModel.getComponentId()) == advancedFilterModelList.get(j).componentID && Integer.parseInt(sidemenuModel.getRepositoryId()) == advancedFilterModelList.get(j).componentInstanceID) {
+                            advancedFilterModelList.remove(j);
+                            break;
+                        }
+                    }
+
+                }
+
 
 //                HashMap<String, List<GlobalSearchCategoryModel>> studlistGrouped =
 //                        studlist.stream().collect(Collectors.groupingBy(w -> w.stud_location));
@@ -71,10 +87,12 @@ public class GlobalSearchCategoryModel implements Serializable {
                     String siteName = globalSearchCategoryModel.siteName;
                     if (expandableListDetail.containsKey(siteName)) {
                         List<GlobalSearchCategoryModel> list = expandableListDetail.get(siteName);
+
                         list.add(globalSearchCategoryModel);
 
                     } else {
                         List<GlobalSearchCategoryModel> list = new ArrayList<GlobalSearchCategoryModel>();
+
                         list.add(globalSearchCategoryModel);
                         expandableListDetail.put(siteName, list);
                     }
@@ -158,11 +176,40 @@ public class GlobalSearchCategoryModel implements Serializable {
                         gLobalSearchSelectedModel.componentName = listGlobal.get(i).displayName;
                         gLobalSearchSelectedModel.componentInstancID = listGlobal.get(i).componentInstanceID;
                         gLobalSearchSelectedModel.menuId = listGlobal.get(i).menuID;
+                        gLobalSearchSelectedModel.contextMenuId = listGlobal.get(i).contextMenuId;
                         gLobalSearchSelectedModelList.add(gLobalSearchSelectedModel);
                     }
                 }
         }
         return gLobalSearchSelectedModelList;
+    }
+
+    public static boolean isParentComponentExists(String response, SideMenusModel sideMenusModel) throws JSONException {
+        boolean isParentExist = false;
+        JSONObject jsonObject = new JSONObject(response);
+
+        if (jsonObject.has("SearchComponents")) {
+
+            JSONArray jsonArray = jsonObject.getJSONArray("SearchComponents");
+            if (jsonArray.length() > 0) {
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject object = jsonArray.getJSONObject(i);
+                    if (object.has("DisplayName")) {
+                        GlobalSearchCategoryModel model = new GlobalSearchCategoryModel();
+                        model.componentID = object.optInt("ComponentID");
+                        model.siteID = object.optInt("SiteID");
+                        model.componentInstanceID = object.optInt("ComponentInstanceID");
+                        if (sideMenusModel.getSiteID() == model.siteID && Integer.parseInt(sideMenusModel.getComponentId()) == model.componentID && Integer.parseInt(sideMenusModel.getRepositoryId()) == model.componentInstanceID) {
+                            isParentExist = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return isParentExist;
     }
 
 }

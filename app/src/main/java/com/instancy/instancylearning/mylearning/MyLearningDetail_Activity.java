@@ -382,21 +382,26 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             } else {
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
                     btnDownload.setVisibility(View.GONE);
                     circleProgressBar.setVisibility(View.GONE);
                 } else {
-                    File myFile = new File(myLearningModel.getOfflinepath());
 
-                    if (myFile.exists()) {
-                        btnDownload.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-                        btnDownload.setEnabled(false);
-                        isFileExist = true;
+                    if (uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
+                        btnDownload.setVisibility(View.GONE);
+                        circleProgressBar.setVisibility(View.GONE);
                     } else {
+                        File myFile = new File(myLearningModel.getOfflinepath());
 
-                        btnDownload.setTextColor(getResources().getColor(R.color.colorBlack));
-                        btnDownload.setEnabled(true);
-                        isFileExist = false;
+                        if (myFile.exists()) {
+                            btnDownload.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
+                            btnDownload.setEnabled(false);
+                            isFileExist = true;
+                        } else {
+
+                            btnDownload.setTextColor(getResources().getColor(R.color.colorBlack));
+                            btnDownload.setEnabled(true);
+                            isFileExist = false;
 //                        if (!appController.isAlreadyViewd()) {
 //                            ViewTooltip
 //                                    .on(btnDownload)
@@ -407,10 +412,12 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                                    .show();
 //                        }
 
-                    }
+                        }
 
 //                    btnDownload.setVisibility(View.GONE);
-                    circleProgressBar.setVisibility(View.GONE);
+                        circleProgressBar.setVisibility(View.GONE);
+                    }
+
                 }
                 progressBar.setVisibility(View.VISIBLE);
                 txtCourseStatus.setVisibility(View.VISIBLE);
@@ -1143,7 +1150,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
                 } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
 
-                    if (uiSettingsModel.isAllowExpiredEventsSubscription()  && returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
+                    if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
 
 //                            addExpiredEventToMyLearning(myLearningDetalData, position);
                         try {

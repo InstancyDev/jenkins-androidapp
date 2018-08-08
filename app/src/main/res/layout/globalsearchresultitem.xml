@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:id="@+id/cellview"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:focusable="true"
     android:orientation="vertical"
     android:gravity="center_horizontal"
@@ -172,7 +172,7 @@
                         android:textColor="@color/colorGray"
                         android:textSize="10sp" />
                     <TextView
-                        android:id="@+id/txt_line"
+                        android:id="@+id/txt_linesitename"
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:focusable="false"

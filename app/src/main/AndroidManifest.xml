@@ -228,6 +228,11 @@
             android:name=".globalsearch.GlobalSearchResultsActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".globalsearch.GlobalCatalogActivity"
+            android:screenOrientation="portrait"></activity>
+
+
 
         <!-- Push Notification  Services-->
 

@@ -15,6 +15,7 @@ public class GLobalSearchSelectedModel implements Serializable {
     public int menuId = -1;
     public String componentName = "";
     public String siteName = "";
+    public int contextMenuId = 0;
 
 
 }

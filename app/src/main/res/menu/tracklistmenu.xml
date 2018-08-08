@@ -10,5 +10,4 @@
         android:title="filter"
         app:showAsAction="always|collapseActionView" />
 
-
 </menu>
