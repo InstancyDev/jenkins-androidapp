@@ -31,6 +31,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -66,6 +67,7 @@ import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -83,6 +85,8 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
+import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
@@ -120,9 +124,9 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     @BindView(R.id.fab_fourm_button)
     FloatingActionButton floatingActionButton;
 
-    boolean isFromNotification = false;
+    boolean isFromNotification = false, isFromGlobalSearch = false;
 
-    String contentIDFromNotification = "";
+    String contentIDFromNotification = "", queryString = "";
     String topicID = "";
 
     boolean isPrivilageForDiscussion = false;
@@ -156,17 +160,21 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
 
             isFromNotification = bundle.getBoolean("ISFROMNOTIFICATIONS");
-
+            isFromGlobalSearch = bundle.getBoolean("ISFROMGLOBAL", false);
             if (isFromNotification) {
 
                 contentIDFromNotification = bundle.getString("TOPICID");
                 topicID = bundle.getString("CONTENTID");
             }
 
+            if (isFromGlobalSearch) {
+                queryString = bundle.getString("query");
+
+            }
+
         }
 
         isPrivilageForDiscussion = db.isPrivilegeExistsFor(434);
-
 
     }
 
@@ -176,8 +184,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
-
+        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue() + "&SearchText=" + queryString, appUserModel.getAuthHeaders());
     }
 
     void initVolleyCallback() {
@@ -190,8 +197,14 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                 if (requestType.equalsIgnoreCase("FOURMSLIST")) {
                     if (response != null) {
                         try {
-                            db.injectDiscussionFourmList(response);
-                            injectFromDbtoModel();
+                            if (isFromGlobalSearch) {
+                                discussionForumModelList = createDiscussionFourmList(response);
+                                discussionFourmAdapter.refreshList(discussionForumModelList);
+                            } else {
+                                db.injectDiscussionFourmList(response);
+                                injectFromDbtoModel();
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -266,6 +279,10 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             floatingActionButton.setVisibility(View.VISIBLE);
         }
 
+        if (isFromGlobalSearch) {
+            swipeRefreshLayout.setEnabled(false);
+        }
+
         floatingActionButton.setImageDrawable(d);
 
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -281,6 +298,165 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         });
 
         return rootView;
+    }
+
+
+    public List<DiscussionForumModel> createDiscussionFourmList(JSONObject jsonObject) throws JSONException {
+
+        List<DiscussionForumModel> discussionForumModelList1 = new ArrayList<>();
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            DiscussionForumModel discussionForumModel = new DiscussionForumModel();
+
+            //active
+            if (jsonMyLearningColumnObj.has("active")) {
+
+                discussionForumModel.active = jsonMyLearningColumnObj.get("active").toString();
+            }
+            // attachfile
+            if (jsonMyLearningColumnObj.has("attachfile")) {
+
+                discussionForumModel.attachfile = jsonMyLearningColumnObj.get("attachfile").toString();
+
+            }
+            // author
+            if (jsonMyLearningColumnObj.has("author")) {
+
+                discussionForumModel.author = jsonMyLearningColumnObj.get("author").toString();
+
+            }
+            // createduserid
+            if (jsonMyLearningColumnObj.has("createduserid")) {
+
+                discussionForumModel.createduserid = jsonMyLearningColumnObj.get("createduserid").toString();
+
+            }
+            // createnewtopic
+
+            if (jsonMyLearningColumnObj.has("createnewtopic")) {
+
+                discussionForumModel.createnewtopic = jsonMyLearningColumnObj.get("createnewtopic").toString();
+
+            }
+
+            // description
+            if (jsonMyLearningColumnObj.has("description")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("description").toString());
+
+                discussionForumModel.descriptionValue = result.toString();
+
+            }
+
+            if (jsonMyLearningColumnObj.has("displayorder")) {
+                discussionForumModel.displayorder = jsonMyLearningColumnObj.get("displayorder").toString();
+
+            }
+
+            // existing
+            if (jsonMyLearningColumnObj.has("existing")) {
+
+                discussionForumModel.existing = jsonMyLearningColumnObj.get("existing").toString();
+
+            }
+            // forumname
+            if (jsonMyLearningColumnObj.has("forumname")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("forumname").toString());
+
+                discussionForumModel.forumname = result.toString();
+
+            }
+
+            // isprivate
+            if (jsonMyLearningColumnObj.has("isprivate")) {
+
+                discussionForumModel.isprivate = jsonMyLearningColumnObj.get("isprivate").toString();
+
+            }
+            // likeposts
+            if (jsonMyLearningColumnObj.has("likeposts")) {
+
+                discussionForumModel.likeposts = jsonMyLearningColumnObj.get("likeposts").toString();
+
+            }
+            // moderation
+            if (jsonMyLearningColumnObj.has("moderation")) {
+
+                discussionForumModel.moderation = jsonMyLearningColumnObj.get("moderation").toString();
+
+            }
+            // name
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                discussionForumModel.name = jsonMyLearningColumnObj.get("name").toString();
+            }
+            // nooftopics
+            if (jsonMyLearningColumnObj.has("nooftopics")) {
+
+                discussionForumModel.nooftopics = jsonMyLearningColumnObj.get("nooftopics").toString();
+
+            }
+            // parentforumid
+            if (jsonMyLearningColumnObj.has("parentforumid")) {
+
+                discussionForumModel.parentforumid = jsonMyLearningColumnObj.get("parentforumid").toString();
+
+            }
+            // requiressubscription
+            if (jsonMyLearningColumnObj.has("requiressubscription")) {
+
+                discussionForumModel.requiressubscription = jsonMyLearningColumnObj.get("requiressubscription").toString();
+
+            }
+            // sendemail
+            if (jsonMyLearningColumnObj.has("sendemail")) {
+
+                discussionForumModel.sendemail = jsonMyLearningColumnObj.get("sendemail").toString();
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                discussionForumModel.siteid = jsonMyLearningColumnObj.get("siteid").toString();
+
+            }
+            // totalposts
+            if (jsonMyLearningColumnObj.has("totalposts")) {
+
+                discussionForumModel.totalposts = jsonMyLearningColumnObj.get("totalposts").toString();
+
+            }
+
+            // forumid
+            if (jsonMyLearningColumnObj.has("forumid")) {
+
+                int fourmID = Integer.parseInt(jsonMyLearningColumnObj.get("forumid").toString());
+
+                discussionForumModel.forumid = fourmID;
+
+            }
+
+            // publishedDate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("createddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                discussionForumModel.createddate = formattedDate;
+
+            }
+
+            discussionForumModelList1.add(discussionForumModel);
+        }
+        return discussionForumModelList1;
     }
 
 

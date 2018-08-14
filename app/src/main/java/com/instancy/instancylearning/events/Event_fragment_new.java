@@ -969,7 +969,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 //                    v.getContext().startActivity(intentDetail);
 //                   context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
-
                 }
 
 
@@ -1020,7 +1019,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                     }
 
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
-
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {

@@ -76,6 +76,7 @@ import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
 
 /**
@@ -913,7 +914,7 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
                         ex.printStackTrace();
                     }
 
-                    if (valueName.contains("null")) {
+                    if (!isValidString(valueName)) {
                         valueName = "";
 //                    continue;
                     }

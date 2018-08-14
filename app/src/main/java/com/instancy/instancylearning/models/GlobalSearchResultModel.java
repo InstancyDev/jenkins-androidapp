@@ -95,29 +95,29 @@ public class GlobalSearchResultModel implements Serializable {
     public String siteName = "";
     public String displayName = "";
 
-    public static HashMap<String, List<GlobalSearchResultModel>> fetchCategoriesData(List<GlobalSearchResultModel> advancedFilterModelList) {
-        HashMap<String, List<GlobalSearchResultModel>> expandableListDetail = new HashMap<String, List<GlobalSearchResultModel>>();
-
-
-//                HashMap<String, List<GlobalSearchCategoryModel>> studlistGrouped =
-//                        studlist.stream().collect(Collectors.groupingBy(w -> w.stud_location));
-
-        for (GlobalSearchResultModel globalSearchCategoryModel : advancedFilterModelList) {
-            String headerName = globalSearchCategoryModel.headerName;
-            if (expandableListDetail.containsKey(headerName)) {
-                List<GlobalSearchResultModel> list = expandableListDetail.get(headerName);
-                list.add(globalSearchCategoryModel);
-
-            } else {
-                List<GlobalSearchResultModel> list = new ArrayList<GlobalSearchResultModel>();
-                list.add(globalSearchCategoryModel);
-
-                expandableListDetail.put(headerName, list);
-            }
-
-        }
-
-        return expandableListDetail;
-    }
+//    public static HashMap<String, List<GlobalSearchResultModel>> fetchCategoriesData(List<GlobalSearchResultModelNew> advancedFilterModelList) {
+//        HashMap<String, List<GlobalSearchResultModelNew>> expandableListDetail = new HashMap<String, List<GlobalSearchResultModelNew>>();
+//
+//
+////                HashMap<String, List<GlobalSearchCategoryModel>> studlistGrouped =
+////                        studlist.stream().collect(Collectors.groupingBy(w -> w.stud_location));
+//
+//        for (GlobalSearchResultModelNew globalSearchCategoryModel : advancedFilterModelList) {
+//            String headerName = globalSearchCategoryModel.headerName;
+//            if (expandableListDetail.containsKey(headerName)) {
+//                List<GlobalSearchResultModelNew> list = expandableListDetail.get(headerName);
+//                list.add(globalSearchCategoryModel);
+//
+//            } else {
+//                List<GlobalSearchResultModelNew> list = new ArrayList<GlobalSearchResultModelNew>();
+//                list.add(globalSearchCategoryModel);
+//
+//                expandableListDetail.put(headerName, list);
+//            }
+//
+//        }
+//
+//        return expandableListDetail;
+//    }
 
 }

@@ -3,27 +3,31 @@ package com.instancy.instancylearning.globalsearch;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
-import android.util.Log;
+
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.GlobalSearchCategoryModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModel;
+import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.squareup.picasso.Picasso;
 
@@ -34,6 +38,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.getFirstCaseWords;
+
 /**
  * Created by Upendranath on 10/10/2017 Working on Instancy-Playground-Android.
  */
@@ -42,12 +48,12 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
 
     private Context context;
     private List<String> expandableListTitle;
-    private HashMap<String, List<GlobalSearchResultModel>> expandableListDetail;
+    private HashMap<String, List<GlobalSearchResultModelNew>> expandableListDetail;
     UiSettingsModel uiSettingsModel;
     ExpandableListView expandableListView;
     AppUserModel appUserModel;
 
-    public GlobalSearchResultsAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<GlobalSearchResultModel>> expandableListDetail, ExpandableListView expandableListView) {
+    public GlobalSearchResultsAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<GlobalSearchResultModelNew>> expandableListDetail, ExpandableListView expandableListView) {
         this.context = context;
         this.expandableListDetail = expandableListDetail;
         this.expandableListTitle = expandableListTitle;
@@ -56,7 +62,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         appUserModel = AppUserModel.getInstance();
     }
 
-    public void refreshList(List<String> expandableListTitle, HashMap<String, List<GlobalSearchResultModel>> expandableListDetail) {
+    public void refreshList(List<String> expandableListTitle, HashMap<String, List<GlobalSearchResultModelNew>> expandableListDetail) {
 
         this.expandableListDetail = expandableListDetail;
         this.expandableListTitle = expandableListTitle;
@@ -126,7 +132,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, final View convertView, final ViewGroup parent) {
-        final GlobalSearchResultModel expandedListText = (GlobalSearchResultModel) getChild(groupPosition, childPosition);
+        final GlobalSearchResultModelNew expandedListText = (GlobalSearchResultModelNew) getChild(groupPosition, childPosition);
 
         LayoutInflater inflater;
         View vi = convertView;
@@ -147,58 +153,37 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         }
 
         holder.cellView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtTitle.setText(expandedListText.namePreFix + "" + expandedListText.title);
-        holder.txtCourse.setText(expandedListText.contentType);
-        holder.txtShortDesc.setText(expandedListText.shortDescription);
-        holder.txtLongDesc.setText(expandedListText.longDescription);
-        holder.txtAuthor.setText(expandedListText.authorName);
+        holder.txtTitle.setText(expandedListText.name);
+        holder.txtCourse.setText(expandedListText.contenttype);
+        holder.txtShortDesc.setText(expandedListText.shortdescription);
+        holder.txtLongDesc.setText(expandedListText.longdescription);
+        holder.txtAuthor.setText(expandedListText.authordisplayname);
 
         holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCourse.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtLongDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAvaSeats.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtFotor.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         holder.txtFotor.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         holder.txtTitle.setFocusable(false);
 
-
-        if (expandedListText.longDescription.length() == 0) {
+        if (expandedListText.longdescription.length() == 0 || expandedListText.longdescription == null) {
             holder.txtLongDesc.setVisibility(View.GONE);
         }
-        if (expandedListText.shortDescription.length() == 0) {
+        if (expandedListText.shortdescription.length() == 0 || expandedListText.shortdescription == null) {
             holder.txtShortDesc.setVisibility(View.GONE);
         }
 
-        if (expandedListText.ratingID.length() == 0) {
-            holder.ratingBar.setVisibility(View.GONE);
-        } else {
-            holder.ratingBar.setVisibility(View.VISIBLE);
-            try {
-                int ratingInt = Integer.parseInt(expandedListText.ratingID);
-                holder.ratingBar.setRating(ratingInt);
-            } catch (NumberFormatException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        if (expandedListText.contextMenuId == 10) {
-            holder.txtAvaSeats.setVisibility(View.GONE);
-            holder.txtSiteName.setVisibility(View.GONE);
-            holder.txtSiteLine.setVisibility(View.GONE);
-            holder.txtAutLine.setVisibility(View.GONE);
-
-        }
-
-        String imgUrl = appUserModel.getSiteURL() + expandedListText.thumbnailImagePath;
-
-        Picasso.with(vi.getContext()).load(imgUrl).placeholder(vi.getResources().getDrawable(R.drawable.cellimage)).into(holder.imageThumb);
+        holder.ratingBar.setRating(expandedListText.ratingid);
 
         final View finalVi = vi;
         holder.btnContextMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GlobalMethods.globalSearchContextMenu(finalVi,childPosition,holder.btnContextMenu,"");
+
+                ((GlobalSearchResultsActivity) finalVi.getContext()).globalSearchContextMenu(finalVi, childPosition, holder.btnContextMenu, expandedListText);
 
             }
         });
@@ -224,7 +209,83 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
             }
 
         }
+        String imgUrl = appUserModel.getSiteURL() + "/Content/SiteFiles/Images/" + expandedListText.contenttypethumbnail;
 
+        switch (expandedListText.contextMenuId) {
+            case 1:// mylearning
+                holder.txtAvaSeats.setVisibility(View.GONE);
+                holder.txtAutLine.setVisibility(View.GONE);
+                break;
+            case 2://catalog
+                holder.txtAvaSeats.setVisibility(View.GONE);
+                holder.txtAutLine.setVisibility(View.GONE);
+                break;
+            case 8:// events
+                holder.txtAvaSeats.setText("Avaliable Seats :" + expandedListText.availableseats);
+                break;
+            case 4://Discussion forum
+                holder.ratingBar.setVisibility(View.GONE);
+                holder.txtLongDesc.setVisibility(View.GONE);
+                holder.txtAvaSeats.setVisibility(View.GONE);
+                holder.txtSiteName.setVisibility(View.GONE);
+                holder.txtSiteLine.setVisibility(View.GONE);
+                holder.txtAutLine.setVisibility(View.GONE);
+                holder.txtLongDesc.setVisibility(View.GONE);
+                holder.txtShortDesc.setVisibility(View.GONE);
+                if (expandedListText.objecttypeid == 17) {
+                    holder.txtTitle.setText("Discussion topic: " + expandedListText.name);
+                } else {
+                    holder.txtTitle.setText("Discussion forum: " + expandedListText.name);
+                }
+                break;
+            case 5:// askexpert
+                holder.ratingBar.setVisibility(View.GONE);
+                holder.txtLongDesc.setVisibility(View.GONE);
+                holder.txtAvaSeats.setVisibility(View.GONE);
+                holder.txtSiteName.setVisibility(View.GONE);
+                holder.txtSiteLine.setVisibility(View.GONE);
+                holder.txtAutLine.setVisibility(View.GONE);
+                holder.txtAuthor.setText("Asked by: " + expandedListText.authordisplayname + " ");
+                holder.txtShortDesc.setText("Asked on: " + expandedListText.createddate + " ");
+                break;
+            case 10:// people listing
+                holder.txtAvaSeats.setVisibility(View.GONE);
+                holder.txtSiteName.setVisibility(View.GONE);
+                holder.txtSiteLine.setVisibility(View.GONE);
+                holder.txtAutLine.setVisibility(View.GONE);
+                holder.ratingBar.setVisibility(View.GONE);
+                holder.txtLongDesc.setVisibility(View.GONE);
+//                imgUrl = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + expandedListText.contenttypethumbnail;
+
+                break;
+            default:
+                holder.ratingBar.setVisibility(View.GONE);
+                holder.txtAvaSeats.setVisibility(View.GONE);
+                holder.txtAutLine.setVisibility(View.GONE);
+        }
+
+
+//        if (expandedListText.contextMenuId == 10) {
+//            if (expandedListText.authordisplayname != null) {
+//
+//                ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+//
+//                String displayNameDrawable = getFirstCaseWords(expandedListText.authordisplayname);
+//                int color = generator.getColor(displayNameDrawable);
+//
+//                TextDrawable drawable = TextDrawable.builder()
+//                        .buildRect(displayNameDrawable, color);
+//
+//                holder.imageThumb.setBackground(drawable);
+//
+//            } else {
+//                holder.imageThumb.setBackground(vi.getResources().getDrawable(R.drawable.cellimage));
+//
+//            }
+//        } else {
+        Picasso.with(vi.getContext()).load(imgUrl).placeholder(vi.getResources().getDrawable(R.drawable.cellimage)).into(holder.imageThumb);
+
+//        }
         return vi;
     }
 

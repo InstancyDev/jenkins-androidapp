@@ -150,6 +150,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
 
+    boolean isFromGlobalSearch = false;
+
 
     @Nullable
     @BindView(R.id.fab_comment_button)
@@ -180,6 +182,11 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         discussionTopicModel = (DiscussionTopicModel) getIntent().getSerializableExtra("topicModel");
+        isFromGlobalSearch = getIntent().getBooleanExtra("ISGLOBALSEARCH", false);
+        if (isFromGlobalSearch) {
+
+            swipeRefreshLayout.setEnabled(false);
+        }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +

@@ -6,20 +6,16 @@
         android:id="@+id/ctx_view"
         android:orderInCategory="100"
         android:title="View" />
+
     <item
-        android:id="@+id/ctx_detail"
+        android:id="@+id/ctx_buy"
         android:orderInCategory="100"
-        android:title="Details" />
+        android:title="Buy" />
 
     <item
         android:id="@+id/ctx_join"
         android:orderInCategory="100"
         android:title="Join" />
-
-    <item
-        android:id="@+id/ctx_addtocalender"
-        android:orderInCategory="100"
-        android:title="@string/btn_txt_add_to_calendar" />
 
     <item
         android:id="@+id/ctx_relatedcontent"
@@ -32,19 +28,14 @@
         android:title="Add" />
 
     <item
-        android:id="@+id/ctx_buy"
-        android:orderInCategory="100"
-        android:title="Buy" />
-
-    <item
         android:id="@+id/ctx_enroll"
         android:orderInCategory="100"
         android:title="Enroll" />
 
     <item
-        android:id="@+id/ctx_profile"
+        android:id="@+id/ctx_detail"
         android:orderInCategory="100"
-        android:title="View Profile" />
+        android:title="Details" />
 
     <item
         android:id="@+id/ctx_addtomy"
@@ -52,14 +43,31 @@
         android:title="Add to My Connections" />
 
     <item
-        android:id="@+id/ctx_disc"
+        android:id="@+id/ctx_profile"
         android:orderInCategory="100"
-        android:title="go to forum" />
+        android:title="View Profile" />
 
     <item
-        android:id="@+id/ctx_ask"
+        android:id="@+id/ctx_disc"
         android:orderInCategory="100"
-        android:title="go to topic" />
+        android:title="Go to this forum" />
+
+    <item
+        android:id="@+id/ctx_topic"
+        android:orderInCategory="100"
+        android:title="Go to this topic" />
+
+    <item
+        android:id="@+id/ctx_answer"
+        android:orderInCategory="100"
+        android:title="Go to this question" />
+
+
+    <item
+        android:id="@+id/ctx_cancel"
+        android:orderInCategory="100"
+        android:title="Cancel" />
+
 
 </menu>
 

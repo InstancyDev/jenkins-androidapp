@@ -77,6 +77,7 @@ public class GlobalCatalogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("SIDEMENUMODEL");
+
         skillID = getIntent().getStringExtra("SKILLID");
         String titleName = getIntent().getStringExtra("TITLENAME");
         query = getIntent().getStringExtra("query");
@@ -87,19 +88,7 @@ public class GlobalCatalogActivity extends AppCompatActivity {
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
         if (savedInstanceState == null) {
-//            Fragment newFragment = new Catalog_fragment();
 
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("sidemenumodel", sideMenusModel);
-//            bundle.putSerializable("SKILLID", skillID);
-//            bundle.putSerializable("TITLENAME", titleName);
-//            bundle.putSerializable("ISFROMGLOBAL", true);
-//            bundle.putBoolean("ISFROMCATEGORIES", false);
-//            bundle.putBoolean("ISFROMNOTIFICATIONS", false);
-//            bundle.putBoolean("ISFROMMYCOMPETENCY", false);
-//            newFragment.setArguments(bundle);
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//            fragmentManager.beginTransaction().add(CONTENT_VIEW_ID, newFragment).commit();
             attachFragmentToActivity(sideMenusModel, titleName, "");
         }
 

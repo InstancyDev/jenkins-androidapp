@@ -883,7 +883,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
     public void updateEnrolledEvent() {
 
-
         if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
             Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
             iconFirst.setBackground(viewIcon);
@@ -1162,8 +1161,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     } else {
                         addToMyLearningCheckUser(myLearningModel, false);
                     }
-
-
                 }
                 break;
             case R.id.btntxt_download_detail:

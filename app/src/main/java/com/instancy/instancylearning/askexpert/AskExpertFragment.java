@@ -154,6 +154,11 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     String contentIDFromNotification = "";
 
+
+    boolean isFromGlobalSearch = false;
+
+    String queryText = "";
+
 //    List<AskExpertCategoriesModel> askExpertCategoriesModels = null;
 
     List<AskExpertSkillsModel> askExpertSkillsModelList = null;
@@ -200,6 +205,15 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                 contentIDFromNotification = bundle.getString("CONTENTID");
             }
 
+
+            isFromGlobalSearch = bundle.getBoolean("ISFROMGLOBAL");
+
+            if (isFromGlobalSearch) {
+
+                queryText = bundle.getString("query");
+            }
+
+
         }
 
 
@@ -210,7 +224,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQandA?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&QuestionID=0&QuestionTypeID=1&SkillID=-1&RecordCount=0&SearchText=";
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetAskQandA?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&QuestionID=0&QuestionTypeID=1&SkillID=-1&RecordCount=0&SearchText=" + queryText;
 
         vollyService.getJsonObjResponseVolley("ASKQS", parmStringUrl, appUserModel.getAuthHeaders());
 
@@ -371,6 +385,10 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             injectFromDbtoModel();
         }
 
+        if (isFromGlobalSearch){
+            swipeRefreshLayout.setEnabled(false);
+        }
+
         initilizeView();
         fabActionMenusInitilization();
 
@@ -502,6 +520,10 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
+        if (isFromGlobalSearch) {
+            item_search.setVisible(false);
+        }
+
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -763,7 +785,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     public void attachFragment(AskExpertQuestionModel askExpertQuestionModel) {
 
-        List<AskExpertAnswerModel> askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
+
 
         Intent intentDetail = new Intent(context, AskExpertsAnswersActivity.class);
         intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);

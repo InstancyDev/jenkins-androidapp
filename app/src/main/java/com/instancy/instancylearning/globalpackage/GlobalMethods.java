@@ -29,13 +29,18 @@ import android.widget.Toast;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.globalsearch.GlobalSearchResultsActivity;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.mainactivities.AdvancedWebCourseLaunch;
 import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
+import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
+import com.instancy.instancylearning.models.GlobalSearchResultModel;
+import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
@@ -58,6 +63,7 @@ import java.util.Calendar;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.convertStringToLong;
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
@@ -1166,124 +1172,6 @@ public class GlobalMethods {
     }
 
 
-//    public static void catalogContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
-//
-//        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
-//        //Inflating the Popup using xml file
-//        popup.getMenuInflater().inflate(R.menu.catalog_contextmenu, popup.getMenu());
-//        //registering popup with OnMenuItemClickListene
-//        databaseH = new DatabaseHandler(v.getContext());
-//        Menu menu = popup.getMenu();
-//
-//        menu.getItem(0).setVisible(false);//view
-//        menu.getItem(1).setVisible(false);//add
-//        menu.getItem(2).setVisible(false);//buy
-//        menu.getItem(3).setVisible(false);//detail
-//        menu.getItem(4).setVisible(false);//delete
-//
-////        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
-//
-//        if (myLearningDetalData.getAddedToMylearning() == 1) {
-//            menu.getItem(0).setVisible(true);
-//            menu.getItem(1).setVisible(false);
-//            menu.getItem(2).setVisible(false);
-//            menu.getItem(3).setVisible(true);
-//
-//            if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-//
-//                File myFile = new File(myLearningDetalData.getOfflinepath());
-//
-//                if (myFile.exists()) {
-//
-//                    menu.getItem(4).setVisible(true);
-//
-//                } else {
-//
-//                    menu.getItem(4).setVisible(false);
-//                }
-//            }
-//
-//        } else {
-//            if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
-//                menu.getItem(0).setVisible(false);
-//                menu.getItem(1).setVisible(true);
-//                menu.getItem(2).setVisible(false);
-//                menu.getItem(3).setVisible(true);
-//
-//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-//
-//                    File myFile = new File(myLearningDetalData.getOfflinepath());
-//
-//                    if (myFile.exists()) {
-//
-//                        menu.getItem(4).setVisible(true);
-//
-//                    } else {
-//
-//                        menu.getItem(4).setVisible(false);
-//                    }
-//                }
-//            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
-//                menu.getItem(0).setVisible(false);
-//                menu.getItem(1).setVisible(true);
-//                menu.getItem(3).setVisible(true);
-//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-//
-//                    File myFile = new File(myLearningDetalData.getOfflinepath());
-//
-//                    if (myFile.exists()) {
-//
-//                        menu.getItem(4).setVisible(true);
-//
-//                    } else {
-//
-//                        menu.getItem(4).setVisible(false);
-//                    }
-//
-//                }
-//            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
-//                menu.getItem(0).setVisible(false);
-//                menu.getItem(2).setVisible(true);
-//                menu.getItem(3).setVisible(true);
-//                menu.getItem(1).setVisible(false);
-//            }
-//        }
-//
-//        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//            public boolean onMenuItemClick(MenuItem item) {
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-//                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
-//                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-////                    v.getContext().startActivity(intentDetail);
-//                    v.getContext().startActivity(intentDetail);
-////                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-////                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("View")) {
-////                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-////                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-////                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("Add")) {
-//
-//                }
-//                return true;
-//            }
-//        });
-//        popup.show();//showing popup menu
-//
-//    }
-
-
     public static void launchCoursePreviewViewFromGlobalClass(MyLearningModel myLearningModel, Context context) {
 
 
@@ -1445,27 +1333,829 @@ public class GlobalMethods {
         }
     }
 
-    public static void globalSearchContextMenu(final View v, final int position, ImageButton btnselected, final String typeFrom) {
+//    public static void launchCourseForGlobalSearch(GlobalSearchResultModelNew myLearningModel, Context context) {
+//
+//        databaseH = new DatabaseHandler(context);
+//        PreferencesManager.initializeInstance(context);
+//        String userLoginId = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERLOGINID);
+//        String userName = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERNAME);
+//
+//        String offlinePath = "";
+//
+//        if (myLearningModel.objecttypeid == 10 && myLearningModel.isListView.equalsIgnoreCase("true")) {
+//            Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
+//            intentDetail.putExtra("myLearningDetalData", myLearningModel);
+//            intentDetail.putExtra("ISTRACKLIST", true);
+//            ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
+//        } else {
+//            if (isNetworkConnectionAvailable(context, -1)) {
+//                String urlForView = "";
+//
+//                if (myLearningModel.objecttypeid == 11 || myLearningModel.objecttypeid == 14 || myLearningModel.objecttypeid == 21 || myLearningModel.objecttypeid == 36 || myLearningModel.objecttypeid == 28) {
+//
+//
+//                    if (myLearningModel.status.equalsIgnoreCase("Not Started") || myLearningModel.status.equalsIgnoreCase("")) {
+//
+//                        CMIModel model = new CMIModel();
+//                        model.set_datecompleted("");
+//                        model.set_siteId("" + myLearningModel.siteid);
+//                        model.set_userId(Integer.parseInt(myLearningModel.userID));
+//                        model.set_startdate(GetCurrentDateTime());
+//                        model.set_scoId(myLearningModel.scoid);
+//                        model.set_isupdate("false");
+//                        model.set_status("In Progress");
+//                        model.set_seqNum("0");
+//                        model.set_timespent("");
+//                        model.set_objecttypeid("" + myLearningModel.objecttypeid);
+//                        model.set_contentId(myLearningModel.contentid);
+//                        model.set_sitrurl(myLearningModel.siteurl);
+//                        databaseH = new DatabaseHandler(context);
+//                        databaseH.injectIntoCMITable(model, "false");
+//
+////                        int attempts = databaseH.getLatestAttempt(myLearningModel);
+//
+//                        LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
+//
+//                        learnerSessionModel.setSiteID("" + myLearningModel.siteid);
+//                        learnerSessionModel.setUserID(myLearningModel.userID);
+//                        learnerSessionModel.setScoID("" + myLearningModel.scoid);
+//                        learnerSessionModel.setAttemptNumber("" + 1);
+//                        learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
+//
+//                        databaseH.insertUserSession(learnerSessionModel);
+//
+//                    }
+//
+//                }
+//                databaseH = new DatabaseHandler(context);
+//                JSONObject jsonObject = new JSONObject();
+//                try {
+//                    jsonObject = databaseH.gettTinCanConfigurationValues("" + myLearningModel.siteid);
+//                    Log.d(TAG, "TIN CAN OPTIONS: " + jsonObject);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//                String lrsEndPoint = "";
+//                String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+//                String lrsAuthorizationKey = "";
+//                String enabletincanSupportforco = "";
+//                String enabletincanSupportforao = "";
+//                String enabletincanSupportforlt = "";
+//                String isTinCan = "";
+//                String autKey = "";
+//                try {
+//
+//                    if (jsonObject.length() != 0) {
+//                        lrsEndPoint = jsonObject.getString("lrsendpoint");
+//                        autKey = jsonObject.getString("base64lrsAuthKey");
+//                        enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
+//                        enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
+//                        enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
+//                        isTinCan = jsonObject.getString("istincan");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                byte[] encrpt = new byte[0];
+//                try {
+//                    encrpt = autKey.getBytes("UTF-8");
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//                String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
+//                lrsAuthorizationKey = "Basic " + base64;
+////                      String basicNewKey=base64.replace("\n","");
+//                if (myLearningModel.objecttypeid == 8 || myLearningModel.objecttypeid == 9 || myLearningModel.objecttypeid == 10) {
+//
+//                    urlForView = myLearningModel.siteurl + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage + "?nativeappURL=true" + "&CourseName=" + myLearningModel.contenttype + "&ContentID=" + myLearningModel.contentid + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&CanTrack=Yes&SCOID=" + myLearningModel.scoid + "&trackinguserid=" + myLearningModel.userID;
+//
+//                    if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
+//
+//                        if (myLearningModel.objecttypeid == 8 && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
+//
+//                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+//
+//                        } else if (myLearningModel.objecttypeid == 9 && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
+//                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+//
+//                        } else if (myLearningModel.objecttypeid == 10 && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
+//                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+//
+//                        }
+//                    }
+//                } else if (myLearningModel.objecttypeid == 11 || myLearningModel.objecttypeid == 14 || myLearningModel.objecttypeid == 21 || myLearningModel.objecttypeid == 36) //14 21 36
+//                {
+//
+//                    if (myLearningModel.objecttypeid == 11 && isValidString(myLearningModel.jwvideokey)) {
+//
+////                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+//
+//                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.jwvideokey + "-" + myLearningModel.cloudmediaplayerkey + ".html";
+//
+//                    } else {
+//                        urlForView = myLearningModel.siteurl + "/Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage;
+//                    }
+//
+//
+//                } else if (myLearningModel.objecttypeid == 28) {
+//
+//                    urlForView = myLearningModel.startpage;
+//                } else if (myLearningModel.objecttypeid == 26) {
+//
+//                    urlForView = myLearningModel.siteurl + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage + "&CourseName=" + myLearningModel.name + "&ContentID=" + myLearningModel.contentid + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&CanTrack=Yes&SCOID=" + myLearningModel.scoid + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.userID;
+//
+//
+//                } else if (myLearningModel.objecttypeid == 27) {
+//                    urlForView = myLearningModel.siteurl + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.startpage + "&CourseName=" + myLearningModel.name + "&ContentID=" + myLearningModel.contentid + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&SCOID=" + myLearningModel.scoid + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.userID;
+//
+//                } else if (myLearningModel.objecttypeid == 102) {
+//                    String encodedString = "";
+//
+//                    try {
+//                        encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+//
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                    urlForView = myLearningModel.siteurl + "Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.name + "&ContentID=" + myLearningModel.contentid + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&CanTrack=YES" + "&nativeappURL=true";
+//
+//                } else if (myLearningModel.objecttypeid == 52) {
+//                    String cerName = myLearningModel.contentid + "_Certificate";
+//                    urlForView = myLearningModel.siteurl + "/content/sitefiles/" + myLearningModel.siteid + "/UserCertificates/" + myLearningModel.userID + "/" + cerName + ".pdf";
+//
+//                } else if (myLearningModel.objecttypeid == 688) {
+//
+//
+//                } else if (myLearningModel.objecttypeid == 20) {
+//
+//                    urlForView = myLearningModel.siteurl + "/content/PublishFiles/" + myLearningModel.folderpath + "/glossary_english.html";
+//
+//                } else {
+//
+//
+//                }
+//                String encodedStr = "";
+//                if (myLearningModel.objecttypeid == 102 || myLearningModel.objecttypeid == 28) {
+//                    encodedStr = replace(urlForView);
+//                } else {
+//                    encodedStr = replace(urlForView.toLowerCase());
+//                }
+//
+//
+//                Log.d("DBG", "launchCourseView: " + encodedStr);
+//                if (encodedStr.endsWith(".pdf")) {
+//                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+//                    pdfIntent.putExtra("PDF_URL", encodedStr);
+//                    pdfIntent.putExtra("ISONLINE", "YES");
+//                    pdfIntent.putExtra("PDF_FILENAME", myLearningModel.name);
+//                    pdfIntent.putExtra("myLearningDetalData", myLearningModel);
+////                        context.startActivity(pdfIntent);
+//                    ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
+//
+//                } else if (encodedStr.toLowerCase().contains(".ppt")
+//                        || encodedStr.toLowerCase().contains(".pptx")) {
+//
+//                    encodedStr = encodedStr.replace("file://", "");
+//
+//
+//                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+//                    iWeb.putExtra("COURSE_URL", src);
+//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+//
+//                } else if (encodedStr.toLowerCase().contains(".doc")
+//                        || encodedStr.toLowerCase().contains(".docx")) {
+//
+//                    encodedStr = encodedStr.replace("file://", "");
+//
+//
+//                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+//                    iWeb.putExtra("COURSE_URL", src);
+//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+//
+//
+//                } else if (encodedStr.toLowerCase().contains(".xlsx")
+//                        || encodedStr.toLowerCase().contains(".xls")) {
+//                    encodedStr = encodedStr.replace("file://", "");
+//
+//                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+//                    iWeb.putExtra("COURSE_URL", src);
+//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+//                } else if (offlinePath.toLowerCase().contains(".mpp")) {
+//                    offlinePath = offlinePath.replace("file://", "");
+//                    try {
+//                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                    File file = new File(offlinePath);
+//                    Intent intent4 = new Intent();
+//                    intent4.setAction(android.content.Intent.ACTION_VIEW);
+//                    intent4.setDataAndType(
+//                            Uri.fromFile(file),
+//                            "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
+//
+//                    try {
+//                        context.startActivity(intent4);
+//                    } catch (ActivityNotFoundException e) {
+//
+//                        Toast toast = Toast.makeText(context,
+//                                context.getString(R.string.toast_no_application_mpp),
+//                                Toast.LENGTH_LONG);
+//                        toast.setGravity(Gravity.CENTER, 0, 0);
+//                        toast.show();
+//
+//                    }
+//
+//                } else if (encodedStr.toLowerCase().contains(".visio")
+//                        || encodedStr.toLowerCase().contains(".vsd")) {
+//                    encodedStr = encodedStr.replace("file://", "");
+//
+//                    try {
+//                        encodedStr = URLDecoder.decode(offlinePath, "UTF-8");
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                    File file = new File(encodedStr);
+//                    Intent intent4 = new Intent();
+//                    intent4.setAction(android.content.Intent.ACTION_VIEW);
+//                    intent4.setDataAndType(
+//                            Uri.fromFile(file),
+//                            "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
+//
+//                    try {
+//                        context.startActivity(intent4);
+//                    } catch (ActivityNotFoundException e) {
+//
+//                        Toast toast = Toast.makeText(context,
+//                                context.getString(R.string.toast_no_application_mpp),
+//                                Toast.LENGTH_LONG);
+//                        toast.setGravity(Gravity.CENTER, 0, 0);
+//                        toast.show();
+//
+//
+//                    }
+//
+//                } else if (encodedStr.toLowerCase().contains(".txt")) {
+//
+//                    try {
+//
+//                        encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                    File file = new File(encodedStr);
+//                    Intent intent4 = new Intent();
+//                    intent4.setAction(android.content.Intent.ACTION_VIEW);
+//                    intent4.setDataAndType(Uri.fromFile(file), "text/plain");
+//                    try {
+//                        context.startActivity(intent4);
+//
+//                    } catch (ActivityNotFoundException e) {
+//
+//                        Toast toast = Toast.makeText(context,
+//                                context.getString(R.string.toast_no_application_txt),
+//                                Toast.LENGTH_LONG);
+//                        toast.setGravity(Gravity.CENTER, 0, 0);
+//                        toast.show();
+//                    }
+//
+//                } else if (myLearningModel.objecttypeid == 70) {
+//
+////                    relatedContentView(myLearningModel, context);
+//
+//                } else if (myLearningModel.objecttypeid == 688) {
+//
+//
+//                } else {
+//
+//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+//                    iWeb.putExtra("COURSE_URL", encodedStr);
+//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+//                }
+//            } else {
+//
+//                showToast(context, "The content has not been downloaded for offline View. Please download it when you are in online");
+//            }
+//        }
+//    }
 
-        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.global_contextmenu, popup.getMenu());
-        //registering popup with OnMenuItemClickListene
+    public static void launchCourseForGlobalSearch(MyLearningModel myLearningModel, Context context) {
 
-//        Menu menu = popup.getMenu();
+        databaseH = new DatabaseHandler(context);
+        PreferencesManager.initializeInstance(context);
+        String userLoginId = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERLOGINID);
+        String userName = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERNAME);
 
-//        menu.getItem(0).setVisible(false);
-//        menu.getItem(1).setVisible(false);
-//        menu.getItem(3).setVisible(false);
-//        menu.getItem(4).setVisible(false);
-//        menu.getItem(5).setVisible(false);// reports
-//        menu.getItem(6).setVisible(false);
-//        menu.getItem(7).setVisible(false);
-//        menu.getItem(8).setVisible(false); // related content
-//        menu.getItem(9).setVisible(false); // cancel
-//        menu.getItem(10).setVisible(false);
+        String offlinePath = "";
 
-        popup.show();//showing popup menu
+        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
+            Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
+            intentDetail.putExtra("myLearningDetalData", myLearningModel);
+            intentDetail.putExtra("ISTRACKLIST", true);
+            ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
+        } else
+
+        {
+            if (isNetworkConnectionAvailable(context, -1)) {
+                String urlForView = "";
+
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+
+
+                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started") || myLearningModel.getStatus().equalsIgnoreCase("")) {
+
+                        CMIModel model = new CMIModel();
+                        model.set_datecompleted("");
+                        model.set_siteId(myLearningModel.getSiteID());
+                        model.set_userId(Integer.parseInt(myLearningModel.getUserID()));
+                        model.set_startdate(GetCurrentDateTime());
+                        model.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
+                        model.set_isupdate("false");
+                        model.set_status("In Progress");
+                        model.set_seqNum("0");
+                        model.set_timespent("");
+                        model.set_objecttypeid(myLearningModel.getObjecttypeId());
+                        model.set_contentId(myLearningModel.getContentID());
+                        model.set_sitrurl(myLearningModel.getSiteURL());
+                        databaseH = new DatabaseHandler(context);
+                        databaseH.injectIntoCMITable(model, "false");
+
+                        int attempts = databaseH.getLatestAttempt(myLearningModel);
+
+                        LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
+
+                        learnerSessionModel.setSiteID(myLearningModel.getSiteID());
+                        learnerSessionModel.setUserID(myLearningModel.getUserID());
+                        learnerSessionModel.setScoID(myLearningModel.getScoId());
+                        learnerSessionModel.setAttemptNumber("" + (attempts + 1));
+                        learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
+
+                        databaseH.insertUserSession(learnerSessionModel);
+
+                    }
+
+                }
+                databaseH = new DatabaseHandler(context);
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject = databaseH.gettTinCanConfigurationValues(myLearningModel.getSiteID());
+                    Log.d(TAG, "TIN CAN OPTIONS: " + jsonObject);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                String lrsEndPoint = "";
+                String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+                String lrsAuthorizationKey = "";
+                String enabletincanSupportforco = "";
+                String enabletincanSupportforao = "";
+                String enabletincanSupportforlt = "";
+                String isTinCan = "";
+                String autKey = "";
+                try {
+
+                    if (jsonObject.length() != 0) {
+                        lrsEndPoint = jsonObject.getString("lrsendpoint");
+                        autKey = jsonObject.getString("base64lrsAuthKey");
+                        enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
+                        enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
+                        enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
+                        isTinCan = jsonObject.getString("istincan");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                byte[] encrpt = new byte[0];
+                try {
+                    encrpt = autKey.getBytes("UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
+                lrsAuthorizationKey = "Basic " + base64;
+//                      String basicNewKey=base64.replace("\n","");
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+
+                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
+
+                    if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
+
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
+
+                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+
+                        } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
+                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+
+                        } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
+                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+
+                        }
+                    }
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
+                {
+
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && isValidString(myLearningModel.getJwvideokey())) {
+
+//                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+
+                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html";
+
+                    } else {
+                        urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+                    }
+
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+
+                    urlForView = myLearningModel.getStartPage();
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
+
+                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
+                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                    String encodedString = "";
+
+                    try {
+                        encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
+                    String cerName = myLearningModel.getContentID() + "_Certificate";
+                    urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getSiteID() + "/UserCertificates/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("20")) {
+
+                    urlForView = myLearningModel.getSiteURL() + "/content/PublishFiles/" + myLearningModel.getFolderPath() + "/glossary_english.html";
+
+                } else {
+
+
+                }
+                String encodedStr = "";
+                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+                    encodedStr = replace(urlForView);
+                } else {
+                    encodedStr = replace(urlForView.toLowerCase());
+                }
+
+
+                Log.d("DBG", "launchCourseView: " + encodedStr);
+                if (encodedStr.endsWith(".pdf")) {
+                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+                    pdfIntent.putExtra("PDF_URL", encodedStr);
+                    pdfIntent.putExtra("ISONLINE", "YES");
+                    pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
+                    pdfIntent.putExtra("myLearningDetalData", myLearningModel);
+//                        context.startActivity(pdfIntent);
+                    ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
+
+                } else if (encodedStr.toLowerCase().contains(".ppt")
+                        || encodedStr.toLowerCase().contains(".pptx")) {
+
+                    encodedStr = encodedStr.replace("file://", "");
+
+//                        try {
+//
+//                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+//                        } catch (UnsupportedEncodingException e) {
+//                            e.printStackTrace();
+//                        }
+//                        File file = new File(encodedStr);
+//                        Intent intent2 = new Intent();
+//                        intent2.setAction(android.content.Intent.ACTION_VIEW);
+//                        intent2.setDataAndType(
+//                                Uri.fromFile(file),
+//                                "application/mspowerpoint,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation");
+//                        try {
+//                            context.startActivity(intent2);
+//
+//                        } catch (ActivityNotFoundException e) {
+//
+//                            Toast toast = Toast.makeText(context,
+//                                    context.getString(R.string.toast_no_application_pp),
+//                                    Toast.LENGTH_LONG);
+//                            toast.setGravity(Gravity.CENTER, 0, 0);
+//                            toast.show();
+//
+//                        }
+
+                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                    iWeb.putExtra("COURSE_URL", src);
+                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+
+                } else if (encodedStr.toLowerCase().contains(".doc")
+                        || encodedStr.toLowerCase().contains(".docx")) {
+
+                    encodedStr = encodedStr.replace("file://", "");
+//                        try {
+//
+//                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+//                        } catch (UnsupportedEncodingException e) {
+//                            e.printStackTrace();
+//                        }
+//                        File file = new File(encodedStr);
+//
+//                        Intent intent3 = new Intent();
+//                        intent3.setAction(android.content.Intent.ACTION_VIEW);
+//                        intent3.setDataAndType(
+//                                Uri.fromFile(file),
+//                                "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+//                        try {
+//                            context.startActivity(intent3);
+//
+//                        } catch (ActivityNotFoundException e) {
+//
+//                            Toast toast = Toast.makeText(context,
+//                                    context.getString(R.string.toast_no_application_word),
+//                                    Toast.LENGTH_LONG);
+//                            toast.setGravity(Gravity.CENTER, 0, 0);
+//                            toast.show();
+//                        }
+
+//                        String doc = "<iframe src='http://docs.google.com/viewer?url=" + encodedStr + "'" +
+//                                "width = '100%' height = '100%'" +
+//                                "style = 'border: none;' ></iframe > ";
+
+//                        String  src="http://docs.google.com/gview?embedded=true&url=http://ccidahra.com/wp-content/uploads/2016/03/sample.ppt";
+
+                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                    iWeb.putExtra("COURSE_URL", src);
+                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+
+
+                } else if (encodedStr.toLowerCase().contains(".xlsx")
+                        || encodedStr.toLowerCase().contains(".xls")) {
+                    encodedStr = encodedStr.replace("file://", "");
+
+//                        try {
+//
+//                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+//                        } catch (UnsupportedEncodingException e) {
+//                            e.printStackTrace();
+//                        }
+//                        File file = new File(offlinePath);
+//                        Intent intent4 = new Intent();
+//                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+//                        intent4.setDataAndType(
+//                                Uri.fromFile(file),
+//                                "application/excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//                        try {
+//                            context.startActivity(intent4);
+//
+//                        } catch (ActivityNotFoundException e) {
+//
+//                            Toast toast = Toast.makeText(context,
+//                                    context.getString(R.string.toast_no_application_excel),
+//                                    Toast.LENGTH_LONG);
+//                            toast.setGravity(Gravity.CENTER, 0, 0);
+//                            toast.show();
+//
+//                        }
+
+                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                    iWeb.putExtra("COURSE_URL", src);
+                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                } else if (offlinePath.toLowerCase().contains(".mpp")) {
+                    offlinePath = offlinePath.replace("file://", "");
+                    try {
+                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    File file = new File(offlinePath);
+                    Intent intent4 = new Intent();
+                    intent4.setAction(android.content.Intent.ACTION_VIEW);
+                    intent4.setDataAndType(
+                            Uri.fromFile(file),
+                            "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
+
+                    try {
+                        context.startActivity(intent4);
+                    } catch (ActivityNotFoundException e) {
+
+                        Toast toast = Toast.makeText(context,
+                                context.getString(R.string.toast_no_application_mpp),
+                                Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+                    }
+
+                } else if (encodedStr.toLowerCase().contains(".visio")
+                        || encodedStr.toLowerCase().contains(".vsd")) {
+                    encodedStr = encodedStr.replace("file://", "");
+
+                    try {
+                        encodedStr = URLDecoder.decode(offlinePath, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    File file = new File(encodedStr);
+                    Intent intent4 = new Intent();
+                    intent4.setAction(android.content.Intent.ACTION_VIEW);
+                    intent4.setDataAndType(
+                            Uri.fromFile(file),
+                            "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
+
+                    try {
+                        context.startActivity(intent4);
+                    } catch (ActivityNotFoundException e) {
+
+                        Toast toast = Toast.makeText(context,
+                                context.getString(R.string.toast_no_application_mpp),
+                                Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+
+
+                    }
+
+                } else if (encodedStr.toLowerCase().contains(".txt")) {
+
+                    try {
+
+                        encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    File file = new File(encodedStr);
+                    Intent intent4 = new Intent();
+                    intent4.setAction(android.content.Intent.ACTION_VIEW);
+                    intent4.setDataAndType(Uri.fromFile(file), "text/plain");
+                    try {
+                        context.startActivity(intent4);
+
+                    } catch (ActivityNotFoundException e) {
+
+                        Toast toast = Toast.makeText(context,
+                                context.getString(R.string.toast_no_application_txt),
+                                Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+
+                    relatedContentView(myLearningModel, context);
+
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+
+
+                } else {
+
+                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                    iWeb.putExtra("COURSE_URL", encodedStr);
+                    iWeb.putExtra("myLearningDetalData", myLearningModel);
+                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                }
+            } else {
+
+                showToast(context, "The content has not been downloaded for offline View. Please download it when you are in online");
+            }
+        }
+    }
+
+
+    public static MyLearningModel convertGlobalModelToMylearningModel(GlobalSearchResultModelNew globalSearchResultModelNew, AppUserModel appUserModel) {
+        MyLearningModel myLearningModel = new MyLearningModel();
+
+
+        if (globalSearchResultModelNew == null)
+            return null;
+
+
+        myLearningModel.setUserID(globalSearchResultModelNew.userID);
+        myLearningModel.setUserName(globalSearchResultModelNew.userID);
+        myLearningModel.setSiteID("" + globalSearchResultModelNew.siteid);
+        myLearningModel.setSiteURL(globalSearchResultModelNew.siteurl);
+        myLearningModel.setSiteName(globalSearchResultModelNew.sitename);
+        myLearningModel.setContentID(globalSearchResultModelNew.contentid);
+        myLearningModel.setObjectId(globalSearchResultModelNew.objectid);
+        myLearningModel.setCourseName(globalSearchResultModelNew.name);
+        myLearningModel.setAuthor(globalSearchResultModelNew.authordisplayname);
+        myLearningModel.setPresenter(globalSearchResultModelNew.presenter);
+        myLearningModel.setShortDes(globalSearchResultModelNew.shortdescription);
+        myLearningModel.setLongDes(globalSearchResultModelNew.longdescription);
+        myLearningModel.setImageData(globalSearchResultModelNew.contenttypethumbnail);
+        myLearningModel.setMediaName(globalSearchResultModelNew.medianame);
+        myLearningModel.setCreatedDate(globalSearchResultModelNew.createddate);
+        myLearningModel.setStartPage(globalSearchResultModelNew.startpage);
+
+        myLearningModel.setObjecttypeId("" + globalSearchResultModelNew.objecttypeid);
+        myLearningModel.setLocationName(globalSearchResultModelNew.location);
+        myLearningModel.setScoId("" + globalSearchResultModelNew.scoid);
+        myLearningModel.setParticipantUrl(globalSearchResultModelNew.participanturl);
+        myLearningModel.setStatus(globalSearchResultModelNew.status);
+        myLearningModel.setPassword(appUserModel.getPassword());
+        myLearningModel.setDisplayName(globalSearchResultModelNew.name);
+        myLearningModel.setIsListView("false");
+        myLearningModel.setIsDownloaded("false");
+        myLearningModel.setCourseAttempts("0");
+        myLearningModel.setAddedToMylearning(globalSearchResultModelNew.isaddedtomylearning);
+        myLearningModel.setEventContentid(globalSearchResultModelNew.contentid);
+        myLearningModel.setRelatedContentCount("" + globalSearchResultModelNew.relatedconentcount);
+        myLearningModel.setDurationEndDate(globalSearchResultModelNew.duration);
+        myLearningModel.setRatingId("" + globalSearchResultModelNew.ratingid);
+        myLearningModel.setIsExpiry("false");
+        myLearningModel.setMediatypeId(globalSearchResultModelNew.mediatypeid);
+        myLearningModel.setDateAssigned(globalSearchResultModelNew.createddate);
+        myLearningModel.setKeywords(globalSearchResultModelNew.keywords);
+        myLearningModel.setDownloadURL(globalSearchResultModelNew.downloadfile);
+        myLearningModel.setOfflinepath("");
+        myLearningModel.setPresenter(globalSearchResultModelNew.presenter);
+        myLearningModel.setEventAddedToCalender(false);
+        myLearningModel.setTimeZone(globalSearchResultModelNew.timezone);
+        myLearningModel.setJoinurl("");
+        myLearningModel.setTypeofevent(globalSearchResultModelNew.typeofevent);
+        myLearningModel.setViewType("" + globalSearchResultModelNew.viewtype);
+        myLearningModel.setProgress("inprogress");
+
+        myLearningModel.setMemberShipLevel(globalSearchResultModelNew.membershiplevel);
+
+        myLearningModel.setMembershipname(globalSearchResultModelNew.membershipname);
+
+        myLearningModel.setFolderPath(globalSearchResultModelNew.folderpath);
+
+        myLearningModel.setJwvideokey(globalSearchResultModelNew.jwvideokey);
+
+        myLearningModel.setCloudmediaplayerkey(globalSearchResultModelNew.cloudmediaplayerkey);
+
+        myLearningModel.setPublishedDate(formatDate(globalSearchResultModelNew.publisheddate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
+
+
+        myLearningModel.setEventstartTime(globalSearchResultModelNew.eventstartdatedisplay);
+        myLearningModel.setEventendTime(globalSearchResultModelNew.eventenddatedisplay);
+
+        myLearningModel.setEventstartUtcTime(globalSearchResultModelNew.eventstartdatetime);
+
+        myLearningModel.setEventendUtcTime(globalSearchResultModelNew.eventenddatetime);
+
+
+        return myLearningModel;
+    }
+
+
+    public static SideMenusModel convertGlobalModelToSideMenuModel(GlobalSearchResultModelNew globalSearchResultModelNew) {
+        SideMenusModel sideMenusModel = new SideMenusModel();
+
+        if (globalSearchResultModelNew == null)
+            return null;
+
+
+        sideMenusModel.setMenuId(globalSearchResultModelNew.menuID);
+        sideMenusModel.setDisplayName(globalSearchResultModelNew.componentName);
+        sideMenusModel.setDisplayOrder(0);
+        sideMenusModel.setImage("");
+        sideMenusModel.setDataFound(true);
+        sideMenusModel.setIsOfflineMenu("");
+        sideMenusModel.setIsEnabled("");
+        sideMenusModel.setContextTitle(globalSearchResultModelNew.componentName);
+        sideMenusModel.setContextMenuId("" + globalSearchResultModelNew.contextMenuId);
+        sideMenusModel.setRepositoryId("" + globalSearchResultModelNew.componentInstanceID);
+        sideMenusModel.setLandingPageType("");
+        sideMenusModel.setCategoryStyle("");
+        sideMenusModel.setComponentId("" + globalSearchResultModelNew.componentid);
+        sideMenusModel.setConditions("");
+        sideMenusModel.setParentMenuId("" + globalSearchResultModelNew.menuID);
+        sideMenusModel.setParameterStrings("");
+        sideMenusModel.setSiteID(globalSearchResultModelNew.siteid);
+
+
+        return sideMenusModel;
     }
 
 

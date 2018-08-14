@@ -1943,12 +1943,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public SideMenusModel getSideMenuModelForGlobalSearch(int siteId, int contextmenuid) {
+    public SideMenusModel getSideMenuModelForGlobalSearch(int siteId, int menuid) {
 
         SideMenusModel sideMenusModel = new SideMenusModel();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSelQuery = "SELECT * from " + TBL_NATIVEMENUS + " WHERE contextmenuid =" + contextmenuid  + " AND siteid = " + siteId;
+        String strSelQuery = "SELECT * from " + TBL_NATIVEMENUS + " WHERE menuid =" + menuid  + " AND siteid = " + siteId;
 
 
         try {

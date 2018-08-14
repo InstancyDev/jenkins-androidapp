@@ -72,6 +72,7 @@ import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.instancy.instancylearning.advancedfilters.AdvancedFilterActivity;
+import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
@@ -876,7 +877,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem menuItem) {
                     isSearching = true;
-                    return true;
+                    gotoGlobalSearch();
+                    return false;
                 }
 
                 @Override
@@ -930,7 +932,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
+//                    item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
@@ -1336,6 +1338,15 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
     }
+
+    public void gotoGlobalSearch() {
+
+        Intent intent = new Intent(context, GlobalSearchActivity.class);
+        intent.putExtra("sideMenusModel", sideMenusModel);
+        startActivity(intent);
+
+    }
+
 
     public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
 

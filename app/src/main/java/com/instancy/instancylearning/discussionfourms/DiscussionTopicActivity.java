@@ -143,6 +143,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
 
     boolean isFromNotification = false;
+    boolean isFromGlobalSearch = false;
 
 
     String topicID = "";
@@ -171,12 +172,17 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         isFromNotification = getIntent().getBooleanExtra("NOTIFICATION", false);
 
+        isFromGlobalSearch = getIntent().getBooleanExtra("ISGLOBALSEARCH", false);
 
         if (isFromNotification) {
 
             topicID = getIntent().getStringExtra("TOPICID");
         }
 
+        if (isFromGlobalSearch) {
+
+            swipeRefreshLayout.setEnabled(false);
+        }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -189,9 +195,6 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         discussionTopicModels = new ArrayList<DiscussionTopicModel>();
 
-//        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
-//        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
-//        appUserModel.setUserIDValue(preferencesManager.getStringValue(StaticValues.KEY_USERID));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -278,12 +281,12 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                     if (response != null) {
 
 
-                    try {
-                        db.injectDiscussionTopicsList(response, discussionForumModel);
-                        injectFromDbtoModel();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                        try {
+                            db.injectDiscussionTopicsList(response, discussionForumModel);
+                            injectFromDbtoModel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } else {
 
                         nodata_Label.setText(getResources().getString(R.string.no_data));
