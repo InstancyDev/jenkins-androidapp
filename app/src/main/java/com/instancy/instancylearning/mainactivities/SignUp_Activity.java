@@ -85,14 +85,13 @@ public class SignUp_Activity extends AppCompatActivity {
         if (uiSettingsModel.isEnableAzureSSOForLearner()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> Login </font>"));
-            url = appDefaultUrl + "nativemobile/Sign%20in";
+            url = appDefaultUrl + "fromnative/true";
         } else {
             url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true";
             getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
         }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-
 
         webView.setWebViewClient(new WebViewClient() {
             @Override

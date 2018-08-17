@@ -91,7 +91,6 @@ import static com.instancy.instancylearning.globalpackage.GlobalMethods.relatedC
 import static com.instancy.instancylearning.models.GlobalSearchResultModelNew.fetchCategoriesData;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
-import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 
@@ -1242,7 +1241,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                                 AlertDialog alert = builder.create();
                                 alert.show();
                             }
-
+                            refreshCatagories(true);
                         } else {
                             Toast toast = Toast.makeText(GlobalSearchResultsActivity.
                                             this, "Unable to process request",
@@ -1258,7 +1257,12 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         VolleyLog.d(TAG, "Error: " + error.getMessage());
-
+                        Toast toast = Toast.makeText(GlobalSearchResultsActivity.
+                                        this, "Unable to process request",
+                                Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+//                        refreshCatagories(true);
                     }
                 }) {
                     @Override

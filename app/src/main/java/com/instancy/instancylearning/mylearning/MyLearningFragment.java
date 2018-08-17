@@ -690,8 +690,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 isSearching = true;
-                gotoGlobalSearch();
-                return false;
+//                gotoGlobalSearch();
+                return true;
             }
 
             @Override

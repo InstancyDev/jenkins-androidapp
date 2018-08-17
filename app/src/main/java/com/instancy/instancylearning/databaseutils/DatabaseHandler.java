@@ -738,325 +738,325 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         }
 
 // old COLOR THEMES
-//                            if (jsonObject.has("table1")) {
-//                            JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
-//                            if (jsonTableOne.size() > 0) {
-//
-//                                for (int i = 0; i < jsonTableOne.size(); i++) {
-//                                    JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
-//
-//                                    if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#APP_BACKGROUNDCOLOR#")) {
-//                                        uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#App_backgrndText#")) {
-//                                        uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADER_BACKGROUNDCOLOR#")) {
-//                                        uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#NativeApp_Header_Text#")) {
-//                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_BG_COLOR#")) {
-//                                        uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_TEXT_COLOR#")) {
-//                                        uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_SL_BG_COLOR#")) {
-//                                        uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_SL_TEXT_COLOR#")) {
-//                                        uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADER_BG_COLOR#")) {
-//                                        uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#HEADER_TEXT_COLOR#")) {
-//                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_HEADER_BGCOLOR#")) {
-//                                        uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_HEADER_TEXT_COLOR#")) {
-//                                        uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_BG_ALTERNATIVECOLOR#")) {
-//                                        uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#MENU_BG_SELECT_TEXTCOLOR#")) {
-//                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#Button_Background_Color#")) {
-//                                        uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#Button_Text_Color#")) {
-//                                        uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#FileUplad_BUTTON#")) {
-//                                        uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#LIST_BG_COLOR#")) {
-//                                        uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#LIST_BORDER_COLOR#")) {
-//                                        uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#NativeLogin_Page_Background#")) {
-//                                        uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    } else if (uisettingsJsonOjb
-//                                            .get("csseditingpalceholdername")
-//                                            .getAsString()
-//                                            .equals("#NativeAppLogin_Page_Text#")) {
-//                                        uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
-//                                                "csseditingpalceholdervalue")
-//                                                .getAsString()
-//                                                .substring(0, 7));
-//                                    }
-//
-//                                }
-//
-//                            }
-//
-//                        }
-
-                        {
-                            /// new code
                             if (jsonObject.has("table1")) {
-                                JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
-                                if (jsonTableOne.size() > 0) {
+                            JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
+                            if (jsonTableOne.size() > 0) {
 
-                                    for (int i = 0; i < jsonTableOne.size(); i++) {
-                                        JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
+                                for (int i = 0; i < jsonTableOne.size(); i++) {
+                                    JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
 
-                                        if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                    if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#APP_BACKGROUNDCOLOR#")) {
+                                        uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#SITE_BACKGROUND#")) {
-                                            uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                            uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#App_backgrndText#")) {
+                                        uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#SITETEXT_COLOR#")) {
-                                            uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                            uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#HEADER_BACKGROUNDCOLOR#")) {
+                                        uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#MENU_BACKGROUND#")) {
-                                            uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#NativeApp_Header_Text#")) {
+                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#MENUTEXT_COLOR#")) {
-                                            uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_BG_COLOR#")) {
+                                        uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#MENUSLT_BACKGROUND#")) {
-                                            uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_TEXT_COLOR#")) {
+                                        uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#MENUSLT_COLOR#")) {
-                                            uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                            uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_SL_BG_COLOR#")) {
+                                        uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#HEADER_BACKGROUND#")) {
-                                            uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-
-                                            uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-
-                                        } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_SL_TEXT_COLOR#")) {
+                                        uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#HEADERTEXT_COLOR#")) {
-                                            uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-
-                                            uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#HEADER_BG_COLOR#")) {
+                                        uiSettingsModel.setHeaderBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#MENUSEPARATOR_COLOR#")) {
-                                            uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#HEADER_TEXT_COLOR#")) {
+                                        uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#BUTTON_BACKGROUND#")) {
-                                            uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                            uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_HEADER_BGCOLOR#")) {
+                                        uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#BUTTONTEXT_COLOR#")) {
-                                            uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
-                                                    "textcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-
-                                        } else if (uisettingsJsonOjb
-                                                .get("csseditingpalceholdername")
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_HEADER_TEXT_COLOR#")) {
+                                        uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
                                                 .getAsString()
-                                                .equals("#LOGO_BACKGROUND#")) {
-                                            uiSettingsModel.setAppLogoBackgroundColor(uisettingsJsonOjb.get(
-                                                    "bgcolor")
-                                                    .getAsString()
-                                                    .substring(0, 7));
-
-                                        }
-
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_BG_ALTERNATIVECOLOR#")) {
+                                        uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#MENU_BG_SELECT_TEXTCOLOR#")) {
+                                        uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#Button_Background_Color#")) {
+                                        uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#Button_Text_Color#")) {
+                                        uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#FileUplad_BUTTON#")) {
+                                        uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#LIST_BG_COLOR#")) {
+                                        uiSettingsModel.setListBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#LIST_BORDER_COLOR#")) {
+                                        uiSettingsModel.setListBorderColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#NativeLogin_Page_Background#")) {
+                                        uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
+                                    } else if (uisettingsJsonOjb
+                                            .get("csseditingpalceholdername")
+                                            .getAsString()
+                                            .equals("#NativeAppLogin_Page_Text#")) {
+                                        uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+                                                "csseditingpalceholdervalue")
+                                                .getAsString()
+                                                .substring(0, 7));
                                     }
+
                                 }
 
                             }
 
+                        }
 
+                        {
+                            /// new code
+//                            if (jsonObject.has("table1")) {
+//                                JsonArray jsonTableOne = jsonObject.get("table1").getAsJsonArray();
+//                                if (jsonTableOne.size() > 0) {
+//
+//                                    for (int i = 0; i < jsonTableOne.size(); i++) {
+//                                        JsonObject uisettingsJsonOjb = jsonTableOne.get(i).getAsJsonObject();
+//
+//                                        if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#SITE_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setAppLoginBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#SITETEXT_COLOR#")) {
+//                                            uiSettingsModel.setAppTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setAppLoginTextolor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENU_BACKGROUND#")) {
+//                                            uiSettingsModel.setMenuBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUTEXT_COLOR#")) {
+//                                            uiSettingsModel.setMenuTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUSLT_BACKGROUND#")) {
+//                                            uiSettingsModel.setSelectedMenuBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUSLT_COLOR#")) {
+//                                            uiSettingsModel.setSelectedMenuTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setMenuBGSelectTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#HEADER_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppHeaderColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                            uiSettingsModel.setMenuHeaderBGColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        } else if (uisettingsJsonOjb.get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#HEADERTEXT_COLOR#")) {
+//                                            uiSettingsModel.setAppHeaderTextColor(uisettingsJsonOjb.get("textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                            uiSettingsModel.setMenuHeaderTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#MENUSEPARATOR_COLOR#")) {
+//                                            uiSettingsModel.setMenuBGAlternativeColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#BUTTON_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppButtonBgColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                            uiSettingsModel.setFileUploadButtonColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#BUTTONTEXT_COLOR#")) {
+//                                            uiSettingsModel.setAppButtonTextColor(uisettingsJsonOjb.get(
+//                                                    "textcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        } else if (uisettingsJsonOjb
+//                                                .get("csseditingpalceholdername")
+//                                                .getAsString()
+//                                                .equals("#LOGO_BACKGROUND#")) {
+//                                            uiSettingsModel.setAppLogoBackgroundColor(uisettingsJsonOjb.get(
+//                                                    "bgcolor")
+//                                                    .getAsString()
+//                                                    .substring(0, 7));
+//
+//                                        }
+//
+//                                    }
+//                                }
+//
+//                            }
+//
+//
                         }
 
 
@@ -1948,7 +1948,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SideMenusModel sideMenusModel = new SideMenusModel();
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSelQuery = "SELECT * from " + TBL_NATIVEMENUS + " WHERE menuid =" + menuid  + " AND siteid = " + siteId;
+        String strSelQuery = "SELECT * from " + TBL_NATIVEMENUS + " WHERE menuid =" + menuid + " AND siteid = " + siteId;
 
 
         try {
