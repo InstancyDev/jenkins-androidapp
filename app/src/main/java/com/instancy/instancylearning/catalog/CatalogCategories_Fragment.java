@@ -430,7 +430,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectCatalogData(response, true,1);
+                            db.injectCatalogData(response, true, 1);
                             refreshMethod();
 //                            categoryButtonModelList1 = new ArrayList<>();
 //                            categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());

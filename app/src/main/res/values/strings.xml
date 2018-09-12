@@ -13,9 +13,9 @@
 
     <!--<string name="app_name"> AEIpara TI </string>-->
 
-    <string name="app_name"> Development </string>
+    <!--<string name="app_name"> Development </string>-->
 
-    <!--<string name="app_name">SEAC</string>-->
+    <string name="app_name">SEAC</string>
 
     <!--<string name="app_name">HealthHelp IE</string>-->
 

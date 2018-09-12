@@ -270,15 +270,6 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         });
 
 
-//        TextView sortAwasomeIcon = (TextView) convertView
-//                .findViewById(R.id.sortawasome);
-//
-//        FontManager.markAsIconContainer(convertView.findViewById(R.id.sortawasome), iconFon);
-//        if (groupPosition == 0) {
-//            sortAwasomeIcon.setVisibility(View.VISIBLE);
-//        } else {
-//            sortAwasomeIcon.setVisibility(View.GONE);
-//        }
         txtContentTitle.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
         return convertView;
     }

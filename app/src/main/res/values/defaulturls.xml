@@ -14,8 +14,8 @@
           <string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string> -->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
-    <string name="app_default_url">http://staging.instancysoft.com/</string>
-    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
+    <!--<string name="app_default_url">http://staging.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
     <!--&lt;!&ndash;for app  development place&ndash;&gt;-->
     <!--<string name="app_default_url">http://mobileapp.instancysoft.com/</string>-->
@@ -111,7 +111,7 @@
     <!--<string name="app_default_url">http://esperanza.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-    <!--<string name="app_default_url">https://seac.instancy.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
+    <string name="app_default_url">http://seac.instancy.com/</string>
+    <string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>
 
 </resources>

@@ -95,7 +95,6 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
     }
 
 
-
     public CompetencyCatSkillAdapter(Context ctx, int resource, List<CompetencyCategoryModel> mainMenuList, String jobTagId, AppUserModel appUserModel, SideMenusModel sideMenusModel) {
 
         this.ctx = ctx;
@@ -236,8 +235,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
             holder.btnContextMenu.setVisibility(View.INVISIBLE);
 
-        }
-else {
+        } else {
             holder.btnContextMenu.setVisibility(View.VISIBLE);
 
         }
