@@ -52,11 +52,13 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.askexpert.AskQuestionActivity;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.ChatActivity;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
@@ -86,6 +88,7 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
+import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.StaticValues.REFRESH_PEOPLE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -162,6 +165,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     boolean isSearching = false;
     boolean userScrolled = false;
 
+    boolean isaskQuestionEnabled = false;
+
     ProgressBar progressBar;
 
 //    SideMenusModel catalogSideMenuModel;
@@ -235,6 +240,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 //        signalAService = SignalAService.newInstance(context);
 //        signalAService.startSignalA();
+        isaskQuestionEnabled = db.isPrivilegeExistsFor(StaticValues.ASKEXPERTPREVILAGEID);
     }
 
     public void refreshPeopleListing(Boolean isRefreshed) {
@@ -643,7 +649,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 isSearching = true;
-                return true;
+                if (uiSettingsModel.isGlobasearch()) {
+                    gotoGlobalSearch();
+                    return false;
+                } else {
+                    return true;
+                }
             }
 
             @Override
@@ -652,6 +663,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 return true;
             }
         });
+    }
+
+    public void gotoGlobalSearch() {
+
+        Intent intent = new Intent(context, GlobalSearchActivity.class);
+        intent.putExtra("sideMenusModel", sideMenusModel);
+        startActivity(intent);
 
     }
 
@@ -686,7 +704,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
+//                item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
 //                Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
@@ -812,6 +830,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         menu.getItem(5).setVisible(false);//send message
         menu.getItem(6).setVisible(false);//add to my connection
         menu.getItem(7).setVisible(false);
+        menu.getItem(8).setVisible(false);
 
         if (peopleListingModel.viewProfileAction) {
             menu.getItem(0).setVisible(true);
@@ -844,6 +863,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         if (peopleListingModel.viewProfileAction) {
             menu.getItem(0).setVisible(true);
+        }
+
+
+        if (isaskQuestionEnabled && TABBALUE.equals("Experts")) {
+            menu.getItem(8).setVisible(true);
+
         }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -937,9 +962,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //                    Toast.makeText(context, "Ignore Connection", Toast.LENGTH_SHORT).show();
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Cancel")) {
+                if (item.getTitle().toString().equalsIgnoreCase("Ask a question")) {
 
-
+                    askAQuestionMethod(peopleListingModel);
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Add to My Connections")) {//
@@ -956,6 +981,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         });
         popup.show();//showing popup menu
 
+    }
+
+    public void askAQuestionMethod(PeopleListingModel peopleListingModel) {
+        Intent intentDetail = new Intent(context, AskQuestionActivity.class);
+        intentDetail.putExtra("EXPERTS", true);
+        intentDetail.putExtra("EXPERTID", peopleListingModel.askaQuestion);
+        startActivity(intentDetail);
     }
 
     @Override
@@ -1300,6 +1332,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 peopleListingModel.notaMember = jsonMyLearningColumnObj.getInt("NotaMember");
 
             }
+
+
+
 
             peopleListingModel.tabID = "All";
             peopleListingModel.siteID = appUserModel.getSiteIDValue();

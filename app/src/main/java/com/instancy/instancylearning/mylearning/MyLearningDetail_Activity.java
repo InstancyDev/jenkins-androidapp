@@ -387,7 +387,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     circleProgressBar.setVisibility(View.GONE);
                 } else {
 
-                    if (uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0")) {
+                    if (uiSettingsModel.getMyLearningContentDownloadType().equalsIgnoreCase("0")) {
                         btnDownload.setVisibility(View.GONE);
                         circleProgressBar.setVisibility(View.GONE);
                     } else {

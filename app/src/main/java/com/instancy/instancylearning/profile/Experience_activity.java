@@ -336,11 +336,11 @@ public class Experience_activity extends AppCompatActivity {
 
 //        boolean isLEssthaM = isGreaterM(fromMonthInt, toMonthInt);
 
-        if (jobRoleStr.length() < 2) {
+        if (jobRoleStr.length() < 1) {
             Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
-        } else if (companyStr.length() < 2) {
+        } else if (companyStr.length() < 1) {
             Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
-        } else if (locationStr.length() < 2) {
+        } else if (locationStr.length() < 1) {
             Toast.makeText(this, "Enter location", Toast.LENGTH_SHORT).show();
         } else if (fromYInt == 0) {
             Toast.makeText(this, "Select from date", Toast.LENGTH_SHORT).show();

@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -41,13 +42,16 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -101,7 +105,6 @@ public class Personalinfo_activity extends AppCompatActivity {
     ArrayList<String> degreeTitleList;
 
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +116,8 @@ public class Personalinfo_activity extends AppCompatActivity {
         ButterKnife.bind(this);
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         svProgressHUD = new SVProgressHUD(context);
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -147,11 +152,8 @@ public class Personalinfo_activity extends AppCompatActivity {
             if (i == 1) {
 //                countriesWebApiCall(appUserModel.getUserIDValue());
 
-                degreeTitleList=db.fetchCountriesName(appUserModel.getSiteIDValue(),"25");
-
-//                profileEditAdapter.refreshCountries(degreeTitleList);
-
-
+                degreeTitleList = db.fetchCountriesName(appUserModel.getSiteIDValue(), "25");
+//              profileEditAdapter.refreshCountries(degreeTitleList);
             }
 
         } else {
@@ -160,7 +162,6 @@ public class Personalinfo_activity extends AppCompatActivity {
         assert bottomLayout != null;
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
-
 
     public int returnHide() {
         int returnValue = 0;
@@ -188,17 +189,17 @@ public class Personalinfo_activity extends AppCompatActivity {
                     if (response != null) {
 
                         try {
-                           JSONArray jsonArray = response.getJSONArray("table5");
+                            JSONArray jsonArray = response.getJSONArray("table5");
 
                             Log.d(TAG, "Volley JSON post" + jsonArray.length());
 
                             db.injectProfielFieldOptions(jsonArray);
 
-                            degreeTitleList=db.fetchCountriesName(appUserModel.getSiteIDValue(),"25");
+                            degreeTitleList = db.fetchCountriesName(appUserModel.getSiteIDValue(), "25");
 
 //                            profileEditAdapter.refreshCountries(degreeTitleList);
 
-                            Log.d(TAG, "notifySuccess: "+degreeTitleList.size());
+                            Log.d(TAG, "notifySuccess: " + degreeTitleList.size());
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -313,7 +314,7 @@ public class Personalinfo_activity extends AppCompatActivity {
 
         for (int i = 0; i < profileConfigsModelist.size(); i++) {
 
-            if (profileConfigsModelist.get(i).iseditable.equalsIgnoreCase("true")){
+            if (profileConfigsModelist.get(i).iseditable.equalsIgnoreCase("true")) {
                 if (profileConfigsModelist.get(i).isrequired.contains("true") && profileConfigsModelist.get(i).valueName.length() == 0) {
 
                     Log.d(TAG, "validateNewForumCreation:  required " + profileConfigsModelist.get(i).valueName);
@@ -341,13 +342,19 @@ public class Personalinfo_activity extends AppCompatActivity {
 
 //            jsonObject.put(keyString, valueString);
 
+//            if (valueString.equalsIgnoreCase("male")) {
+//                valueString = "1";
+//            }
+//            if (valueString.equalsIgnoreCase("female")) {
+//                valueString = "0";
+//            }
+
             if (i == profileConfigsModelist.size() - 1) {
 
                 finalString = finalString + keyString + "='" + valueString + "'";
             } else {
                 finalString = finalString + keyString + "='" + valueString + "',";
             }
-
 
         }
 
@@ -402,9 +409,9 @@ public class Personalinfo_activity extends AppCompatActivity {
                 if (s.contains("success")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \nYou have successfully added the "+groupName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \nYou have successfully added the " + groupName, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \nYou have successfully updated the "+groupName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Success! \nYou have successfully updated the " + groupName, Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {

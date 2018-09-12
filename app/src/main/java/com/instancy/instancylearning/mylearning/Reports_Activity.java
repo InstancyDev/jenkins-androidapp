@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Html;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +20,14 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+
 import com.android.volley.VolleyError;
+
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.IResult;
+
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -115,6 +119,8 @@ public class Reports_Activity extends AppCompatActivity {
 
     String typeFrom = "";
 
+    boolean isFromProgressReport = false;
+
     View header;
 
     @Override
@@ -146,6 +152,7 @@ public class Reports_Activity extends AppCompatActivity {
         vollyService = new VollyService(resultCallback, context);
         learningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
         typeFrom = (String) getIntent().getStringExtra("typeFrom");
+        isFromProgressReport = getIntent().getBooleanExtra("FROMPG", false);
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -162,13 +169,14 @@ public class Reports_Activity extends AppCompatActivity {
         }
 
         if (isNetworkConnectionAvailable(this, -1)) {
+//            if (isFromProgressReport) {
+//                getDownloadedMobileTrackingData();
+//            } else {
             getDownloadedMobileContentMetaData();
-
+//            }
         } else {
             injectFromDbtoModel();
-
         }
-
     }
 
     public void getDownloadedMobileContentMetaData() {
@@ -198,6 +206,7 @@ public class Reports_Activity extends AppCompatActivity {
                 if (requestType.equalsIgnoreCase("DMCD")) {
                     Log.d(TAG, "notifySuccess: DMCD" + response);
                     try {
+
                         db.insertTrackObjectsForReports(response, learningModel);
 
                     } catch (JSONException e) {
@@ -256,7 +265,7 @@ public class Reports_Activity extends AppCompatActivity {
 
             }
 
-            reportDetail = db.getReportForContent(learningModel, isEvent, typeFrom);
+            reportDetail = db.getReportForContent(learningModel, isEvent, typeFrom, isFromProgressReport);
 
         } else if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
@@ -300,7 +309,6 @@ public class Reports_Activity extends AppCompatActivity {
 
         if (reportDetail != null) {
             updateUI(reportDetail);
-
         }
 
         svProgressHUD.dismiss();

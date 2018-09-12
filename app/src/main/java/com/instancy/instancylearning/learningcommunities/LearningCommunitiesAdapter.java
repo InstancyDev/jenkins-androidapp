@@ -143,7 +143,6 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
             communitiesModelList.clear();
         }
 
-
         if (charText.length() == 0) {
             communitiesModelList.addAll(searchList);
         } else {

@@ -3,32 +3,37 @@ package com.instancy.instancylearning.progressreports;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.SimpleDateFormat;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.FloatingActionButton;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.PopupMenu;
+
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
+import android.util.Base64;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,45 +44,64 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
+import android.widget.ExpandableListView;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.CreateNewForumActivity;
-import com.instancy.instancylearning.discussionfourms.DiscussionFourmAdapter;
 import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.ProgressChartsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.mylearning.Reports_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import mg.yra.lib.trackingring.DataEntry;
+import mg.yra.lib.trackingring.DataSet;
+import mg.yra.lib.trackingring.TrackingRingView;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
+import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 /**
@@ -93,12 +117,14 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
-    @BindView(R.id.swipemylearning)
+    @BindView(R.id.swipeprogress)
     SwipeRefreshLayout swipeRefreshLayout;
-    @BindView(R.id.discussionfourmlist)
-    ListView discussionFourmlistView;
-    DiscussionFourmAdapter discussionFourmAdapter;
-    List<DiscussionForumModel> discussionForumModelList = null;
+    @BindView(R.id.progress_expandlist)
+    ExpandableListView progressExpandList;
+    ProgressReportAdapter progressReportAdapter;
+    List<ProgressReportModel> progressReportModelList = null;
+    List<ProgressChartsModel.ContentStatusModel> contentStatusModelList = null;
+    List<ProgressChartsModel.ContentTypesModel> contentTypesModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -109,20 +135,16 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
 
-    @Nullable
-    @BindView(R.id.fab_fourm_button)
-    FloatingActionButton floatingActionButton;
-
     boolean isFromNotification = false;
 
     String contentIDFromNotification = "";
     String topicID = "";
 
-    boolean isPrivilageForDiscussion = false;
+    TextView txtContentScore;
 
-    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
-    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
-    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
+    PieChart mChart, contentChart;
+
+    TrackingRingView ringcharts;
 
     public ProgressReportfragment() {
 
@@ -158,8 +180,6 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
         }
 
-        isPrivilageForDiscussion = db.isPrivilegeExistsFor(434);
-
 
     }
 
@@ -169,7 +189,17 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        vollyService.getJsonObjResponseVolley("FOURMSLIST", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForums?SiteID=" + appUserModel.getSiteIDValue(), appUserModel.getAuthHeaders());
+//        String parmStringUrl = appUserModel.getWebAPIUrl() + "/ConsolidatedProgressReport/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
+//
+//        vollyService.getStringResponseVolley("PRGLIST", parmStringUrl, appUserModel.getAuthHeaders());
+
+        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
+
+        vollyService.getStringResponseVolley("PRGLIST", parmStringUrl, "A459QN8B57:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrH57");
+
+
+//        W x H x D: 189 cm x 90 cm x 221 cm (6 ft 2 in x 2 ft 11 in x 7 ft 3 in) :
+//       Length: 75 inch, Width: 72 inch, Thickness: 5 inch (6 ft 3 in x 6 ft x 5 in)
 
     }
 
@@ -180,14 +210,9 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("FOURMSLIST")) {
+                if (requestType.equalsIgnoreCase("PRGLIST")) {
                     if (response != null) {
-                        try {
-                            db.injectDiscussionFourmList(response);
-                            injectFromDbtoModel();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -208,6 +233,25 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+                if (requestType.equalsIgnoreCase("PRGLIST")) {
+                    if (response != null) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            JSONObject jsonObject = jsonArray.getJSONObject(0);
+                            progressReportModelList = generateProgressReport(jsonObject);
+                            progressReportAdapter.refreshList(progressReportModelList);
+                            generateContentAverageScore(jsonObject);
+                            contentStatusModelList = generateContentStatusModelList(jsonObject);
+                            contentTypesModelList = generateContentTypesModelList(jsonObject);
+                            updateChartsData(progressReportModelList.size());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
 
@@ -221,6 +265,120 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         };
     }
 
+    public void updateChartsData(int contentCount) {
+
+        // content count
+        txtContentScore.setText("" + contentCount);
+
+        // content status chart
+        mChart.getDescription().setEnabled(false);
+        mChart.setExtraOffsets(5, 10, 5, 5);
+        mChart.setDragDecelerationFrictionCoef(0.95f);
+        mChart.setDrawHoleEnabled(false);
+        mChart.setTransparentCircleColor(Color.WHITE);
+        // enable rotation of the chart by touch
+        mChart.setRotationEnabled(true);
+        mChart.setHighlightPerTapEnabled(true);
+        mChart.setDrawSliceText(false);
+        mChart.setUsePercentValues(false);
+        mChart.setCenterTextColor(Color.WHITE);
+
+        // add a selection listener
+        Legend l = mChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(0f);
+        l.setYOffset(0f);
+
+        mChart.setEntryLabelColor(Color.BLACK);
+        mChart.setEntryLabelTextSize(12f);
+        ArrayList<PieEntry> yvalues = new ArrayList<PieEntry>();
+
+        if (contentStatusModelList != null && contentStatusModelList.size() > 0) {
+            for (int k = 0; k < contentStatusModelList.size(); k++) {
+                yvalues.add(new PieEntry(contentStatusModelList.get(k).contentCount, contentStatusModelList.get(k).status));
+            }
+        }
+
+        PieDataSet dataSet = new PieDataSet(yvalues, "");
+        PieData data = new PieData(dataSet);
+        // In Percentage term
+        data.setValueFormatter(new PercentFormatter());
+        // Default value
+
+        mChart.setData(data);
+        dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+        data.setValueTextSize(13f);
+        data.setValueTextColor(Color.DKGRAY);
+        mChart.animateXY(1400, 1400);
+
+        data.setValueTextSize(11f);
+        data.setValueTextColor(Color.BLACK);
+        mChart.setDrawCenterText(true);
+        mChart.setData(data);
+        // undo all highlights
+        mChart.highlightValues(null);
+        mChart.invalidate();
+
+        // content types chart
+        contentChart.getDescription().setEnabled(false);
+        contentChart.setExtraOffsets(5, 10, 5, 5);
+        contentChart.setDragDecelerationFrictionCoef(0.95f);
+        contentChart.setDrawHoleEnabled(false);
+        contentChart.setTransparentCircleColor(Color.WHITE);
+        // enable rotation of the chart by touch
+        contentChart.setRotationEnabled(true);
+        contentChart.setHighlightPerTapEnabled(true);
+        contentChart.setDrawSliceText(false);
+        contentChart.setUsePercentValues(false);
+        contentChart.setCenterTextColor(Color.BLACK);
+
+        // add a selection listener
+        Legend l1 = contentChart.getLegend();
+        l1.setVerticalAlignment(Legend.LegendVerticalAlignment.CENTER);
+        l1.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l1.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l1.setDrawInside(false);
+        l1.setXEntrySpace(7f);
+        l1.setYEntrySpace(0f);
+        l1.setYOffset(0f);
+
+        // entry label styling
+        contentChart.setEntryLabelColor(Color.BLACK);
+        contentChart.setEntryLabelTextSize(12f);
+        ArrayList<PieEntry> xvalues = new ArrayList<PieEntry>();
+        if (contentTypesModelList != null && contentTypesModelList.size() > 0) {
+            for (int k = 0; k < contentTypesModelList.size(); k++) {
+                xvalues.add(new PieEntry(contentTypesModelList.get(k).contentCount, contentTypesModelList.get(k).contentType));
+            }
+        }
+        PieDataSet dataSets = new PieDataSet(xvalues, "");
+
+        PieData datas = new PieData(dataSets);
+        // In Percentage term
+        datas.setValueFormatter(new PercentFormatter());
+
+        contentChart.setDrawHoleEnabled(false);
+        contentChart.setTransparentCircleRadius(25f);
+        contentChart.setHoleRadius(25f);
+
+        dataSets.setColors(ColorTemplate.VORDIPLOM_COLORS);
+        datas.setValueTextSize(13f);
+        datas.setValueTextColor(Color.DKGRAY);
+
+        contentChart.animateXY(1400, 1400);
+
+        datas.setValueTextSize(11f);
+        datas.setValueTextColor(Color.BLACK);
+        contentChart.setDrawCenterText(true);
+        contentChart.setData(datas);
+        contentChart.highlightValues(null);
+        contentChart.invalidate();
+
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -230,21 +388,66 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.discussionfourm_fragment, container, false);
+        View rootView = inflater.inflate(R.layout.progressreportfragment, container, false);
 
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
 
-        discussionFourmAdapter = new DiscussionFourmAdapter(getActivity(), BIND_ABOVE_CLIENT, discussionForumModelList);
-        discussionFourmlistView.setAdapter(discussionFourmAdapter);
-        discussionFourmlistView.setOnItemClickListener(this);
-        discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+        progressReportAdapter = new ProgressReportAdapter(getActivity(), progressReportModelList, progressExpandList, ProgressReportfragment.this);
+        progressExpandList.setAdapter(progressReportAdapter);
+        progressExpandList.setOnItemClickListener(this);
+        progressExpandList.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        discussionForumModelList = new ArrayList<DiscussionForumModel>();
+
+        progressExpandList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
+//                Toast.makeText(context, "groupPosition: " + groupPosition + "childPosition: " + childPosition, Toast.LENGTH_SHORT).show();
+
+                final ProgressReportChildModel progressReportModel = progressReportModelList.get(groupPosition).progressReportChildModelList.get(childPosition);
+
+//                if (view.getId() == R.id.txt_contextmenu) {
+//                    progresReportContextMenuMethod(view, progressReportModel);
+//                } else {
+                getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportModel.objectID);
+//                }
+
+
+                return true;
+            }
+        });
+
+        progressExpandList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+
+//                Toast.makeText(context, "groupPosition: " + i, Toast.LENGTH_SHORT).show();
+
+                final ProgressReportModel progressReportModel = progressReportModelList.get(i);
+
+                if (progressReportModel.progressReportChildModelList != null && progressReportModel.progressReportChildModelList.size() > 0) {
+
+                    return false;
+                } else {
+
+                    getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportModel.objectID);
+
+                    return true;
+                }
+            }
+        });
+
+        View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.progresscharts, null);
+        progressExpandList.addHeaderView(header);
+        txtContentScore = (TextView) header.findViewById(R.id.contentcount);
+        mChart = (PieChart) header.findViewById(R.id.statuschart);
+        contentChart = (PieChart) header.findViewById(R.id.contenttypechart);
+        ringcharts = (TrackingRingView) header.findViewById(R.id.ringcharts);
+        progressReportModelList = new ArrayList<ProgressReportModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);
         } else {
-            injectFromDbtoModel();
+
         }
 
         initilizeView();
@@ -255,88 +458,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
         d.setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
-        if (isPrivilageForDiscussion) {
-            floatingActionButton.setVisibility(View.INVISIBLE);
-        }
-
-        floatingActionButton.setImageDrawable(d);
-
-        floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                intentDetail.putExtra("isfromedit", false);
-                intentDetail.putExtra("forumModel", "");
-                startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-            }
-        });
 
         return rootView;
     }
 
-
-    public void injectFromDbtoModel() {
-        discussionForumModelList = db.fetchDiscussionModel(appUserModel.getSiteIDValue());
-        if (discussionForumModelList != null) {
-            discussionFourmAdapter.refreshList(discussionForumModelList);
-        } else {
-            discussionForumModelList = new ArrayList<DiscussionForumModel>();
-            discussionFourmAdapter.refreshList(discussionForumModelList);
-        }
-
-        if (discussionForumModelList.size() > 5) {
-            if (item_search != null)
-                item_search.setVisible(true);
-        } else {
-            if (item_search != null)
-                item_search.setVisible(false);
-        }
-        triggerActionForFirstItem();
-    }
-
-    public void triggerActionForFirstItem() {
-
-        if (isFromNotification) {
-            int selectedPostion = getPositionForNotification(contentIDFromNotification);
-//            discussionFourmlistView.setSelection(selectedPostion);
-
-            if (discussionForumModelList != null) {
-
-                try {
-                    attachFragment(discussionForumModelList.get(selectedPostion), isFromNotification);
-                    isFromNotification = false;
-                } catch (IndexOutOfBoundsException ex) {
-//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
-                }
-
-            } else {
-                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-    }
-
-    public int getPositionForNotification(String contentID) {
-        int position = 0;
-        int contentIntID = 0;
-        try {
-            contentIntID = Integer.parseInt(contentID);
-        } catch (NumberFormatException ex) {
-            ex.printStackTrace();
-        }
-
-        for (int k = 0; k < discussionForumModelList.size(); k++) {
-            if (discussionForumModelList.get(k).forumid == contentIntID) {
-                position = k;
-                break;
-            }
-
-        }
-
-        return position;
-    }
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
@@ -345,9 +470,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
-
         actionBar.setDisplayHomeAsUpEnabled(true);
-
     }
 
     @Override
@@ -362,6 +485,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
+        item_search.setVisible(false);
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -384,7 +508,6 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 @Override
                 public boolean onQueryTextChange(String newText) {
 
-                    discussionFourmAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
                     return true;
                 }
@@ -456,12 +579,12 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
         switch (view.getId()) {
             case R.id.card_view:
-                attachFragment(discussionForumModelList.get(position), isFromNotification);
+//                attachFragment(progressReportModelList.get(position));
                 break;
             case R.id.btn_contextmenu:
-                View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
-                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, discussionForumModelList.get(position));
+//                View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
+//                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+//                catalogContextMenuMethod(position, view, txtBtnDownload, discussionForumModelList.get(position));
                 break;
             default:
 
@@ -513,35 +636,6 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, DiscussionForumModel discussionForumModel) {
-
-        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.discussonforum, popup.getMenu());
-        //registering popup with OnMenuItemClickListene
-
-        Menu menu = popup.getMenu();
-
-        menu.getItem(0).setVisible(true);//view
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-
-                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
-                    Intent intentDetail = new Intent(context, CreateNewForumActivity.class);
-                    intentDetail.putExtra("isfromedit", true);
-                    intentDetail.putExtra("forumModel", discussionForumModelList.get(position));
-                    startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-
-                }
-                return true;
-            }
-        });
-        popup.show();//showing popup menu
-
-    }
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -557,19 +651,850 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         }
     }
 
-    public void attachFragment(DiscussionForumModel forumModel, boolean isFromNotification) {
-        Intent intentDetail = new Intent(context, DiscussionTopicActivity.class);
-        intentDetail.putExtra("forumModel", forumModel);
-        intentDetail.putExtra("NOTIFICATION", isFromNotification);
-        intentDetail.putExtra("TOPICID", topicID);
-
-        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-    }
 
     @Override
     public void onDetach() {
 
         super.onDetach();
     }
+
+    public List<ProgressChartsModel.ContentStatusModel> generateContentStatusModelList(JSONObject jsonObject) throws JSONException {
+        List<ProgressChartsModel.ContentStatusModel> contentStatusModelList1 = new ArrayList<>();
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("StatusCountData");
+
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+
+            ProgressChartsModel.ContentStatusModel contentStatusModel = new ProgressChartsModel.ContentStatusModel();
+
+            //ConnectionUserID
+            if (jsonMyLearningColumnObj.has("status")) {
+
+                contentStatusModel.status = jsonMyLearningColumnObj.getString("status");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("ContentCount")) {
+
+                contentStatusModel.contentCount = jsonMyLearningColumnObj.getInt("ContentCount");
+
+            }
+
+            contentStatusModelList1.add(contentStatusModel);
+        }
+        return contentStatusModelList1;
+    }
+
+
+    public List<ProgressChartsModel.ContentTypesModel> generateContentTypesModelList(JSONObject jsonObject) throws JSONException {
+        List<ProgressChartsModel.ContentTypesModel> contentStatusModelList1 = new ArrayList<>();
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("ContentCountData");
+
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            ProgressChartsModel.ContentTypesModel contentStatusModel = new ProgressChartsModel.ContentTypesModel();
+
+            //ConnectionUserID
+            if (jsonMyLearningColumnObj.has("ContentType")) {
+
+                contentStatusModel.contentType = jsonMyLearningColumnObj.getString("ContentType");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("ContentCount")) {
+
+                contentStatusModel.contentCount = jsonMyLearningColumnObj.getInt("ContentCount");
+
+            }
+
+            contentStatusModelList1.add(contentStatusModel);
+        }
+        return contentStatusModelList1;
+    }
+
+    public void generateContentAverageScore(JSONObject jsonObject) throws JSONException {
+
+        List<ProgressChartsModel.ContentTypesModel> contentStatusModelList1 = new ArrayList<>();
+
+        JSONArray jsonTable = jsonObject.getJSONArray("ScoreCount");
+        JSONArray jsonTableAr = jsonObject.getJSONArray("ScoreMaxCount");
+
+        int overAllScore = jsonTable.getJSONObject(0).getInt("overallscore");
+
+        int scoreMax = jsonTableAr.getJSONObject(0).getInt("ScoreMax");
+
+
+        // ringcharts function
+        final List<DataEntry> entrie = new ArrayList<>();
+        entrie.add(new DataEntry(scoreMax, "" + scoreMax, context.getResources().getColor(R.color.colorInGreen), Color.LTGRAY));
+        entrie.add(new DataEntry(overAllScore, "" + overAllScore, context.getResources().getColor(R.color.colorOutTealGreen), Color.LTGRAY));
+        final DataSet datasets = new DataSet(entrie);
+        ringcharts.setDataSet(datasets);
+    }
+
+    public List<ProgressReportModel> generateProgressReport(JSONObject jsonObject) throws
+            JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("ParentData");
+
+        List<ProgressReportModel> progressReportModelList = new ArrayList<>();
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+
+            ProgressReportModel progressReportModel = new ProgressReportModel();
+
+            //ConnectionUserID
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                progressReportModel.userid = jsonMyLearningColumnObj.getString("userid");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("orgname")) {
+
+                progressReportModel.orgname = jsonMyLearningColumnObj.get("orgname").toString();
+
+            }
+
+            // JobTitle
+            if (jsonMyLearningColumnObj.has("contenttitle")) {
+
+                progressReportModel.contenttitle = jsonMyLearningColumnObj.get("contenttitle").toString();
+
+            }
+            // MainOfficeAddress
+            if (jsonMyLearningColumnObj.has("ObjectTypeID")) {
+
+                progressReportModel.objectTypeID = jsonMyLearningColumnObj.getString("ObjectTypeID");
+
+            }
+
+            // MemberProfileImage
+            if (jsonMyLearningColumnObj.has("contenttype")) {
+                progressReportModel.contenttype = jsonMyLearningColumnObj.getString("contenttype");
+
+            }
+
+            // UserDisplayname
+            if (jsonMyLearningColumnObj.has("AssignedOn")) {
+
+                progressReportModel.assignedOn = jsonMyLearningColumnObj.getString("AssignedOn");
+
+            }
+            // connectionstate
+            if (jsonMyLearningColumnObj.has("TargetDate")) {
+
+                progressReportModel.targetDate = jsonMyLearningColumnObj.getString("TargetDate");
+
+            }
+            // connectionstateAccept
+            if (jsonMyLearningColumnObj.has("Status")) {
+
+                progressReportModel.status = jsonMyLearningColumnObj.get("Status").toString();
+
+            }
+
+
+            // AcceptAction
+            if (jsonMyLearningColumnObj.has("datestarted")) {
+
+                progressReportModel.datestarted = jsonMyLearningColumnObj.getString("datestarted");
+
+
+            }
+
+            // IgnoreAction
+            if (jsonMyLearningColumnObj.has("datecompleted")) {
+
+                progressReportModel.datecompleted = jsonMyLearningColumnObj.getString("datecompleted");
+
+            }
+
+
+            // InterestAreas
+            if (jsonMyLearningColumnObj.has("SCOID")) {
+
+                progressReportModel.SCOID = jsonMyLearningColumnObj.getString("SCOID");
+
+            }
+
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("ObjectID")) {
+
+                progressReportModel.objectID = jsonMyLearningColumnObj.getString("ObjectID");
+
+            }
+
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("overallscore")) {
+
+                progressReportModel.overScore = jsonMyLearningColumnObj.getString("overallscore");
+
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("skillname")) {
+
+                progressReportModel.skillname = jsonMyLearningColumnObj.getString("skillname");
+
+            }
+
+            // categoryname
+            if (jsonMyLearningColumnObj.has("categoryname")) {
+                progressReportModel.categoryname = jsonMyLearningColumnObj.getString("categoryname");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("jobrolename")) {
+
+                progressReportModel.jobrolename = jsonMyLearningColumnObj.getString("jobrolename");
+
+            }
+
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("categoryID")) {
+
+                progressReportModel.categoryID = jsonMyLearningColumnObj.getString("categoryID");
+
+            }
+            // ObjectID here one more loop
+            if (jsonMyLearningColumnObj.has("ChildData")) {
+
+                String responseChild = jsonMyLearningColumnObj.get("ChildData").toString();
+
+                if (isValidString(responseChild)) {
+                    JSONArray jsonArray = jsonMyLearningColumnObj.getJSONArray("ChildData");
+
+                    if (jsonArray != null && jsonArray.length() > 0) {
+
+                        progressReportModel.progressReportChildModelList = getChildDataFor(jsonArray);
+                    }
+                }
+
+            }
+
+            progressReportModelList.add(progressReportModel);
+        }
+
+        List<ProgressChartsModel.ContentStatusModel> contentStatusModel = new ArrayList<>();
+
+        JSONArray contentStatusAry = jsonObject.getJSONArray("StatusCountData");
+
+
+        return progressReportModelList;
+    }
+
+    public List<ProgressReportChildModel> getChildDataFor(JSONArray jsonTableAry) throws
+            JSONException {
+
+        List<ProgressReportChildModel> progressReportModelList = new ArrayList<>();
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            ProgressReportChildModel progressReportModel = new ProgressReportChildModel();
+
+            //ConnectionUserID
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                progressReportModel.userid = jsonMyLearningColumnObj.getString("userid");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("orgname")) {
+
+                progressReportModel.orgname = jsonMyLearningColumnObj.get("orgname").toString();
+
+            }
+
+            // JobTitle
+            if (jsonMyLearningColumnObj.has("contenttitle")) {
+
+                progressReportModel.contenttitle = jsonMyLearningColumnObj.get("contenttitle").toString();
+
+            }
+            // MainOfficeAddress
+            if (jsonMyLearningColumnObj.has("ObjectTypeID")) {
+
+                progressReportModel.objectTypeID = jsonMyLearningColumnObj.getString("ObjectTypeID");
+
+            }
+
+            // MemberProfileImage
+            if (jsonMyLearningColumnObj.has("contenttype")) {
+                progressReportModel.contenttype = jsonMyLearningColumnObj.getString("contenttype");
+
+            }
+
+            // UserDisplayname
+            if (jsonMyLearningColumnObj.has("AssignedOn")) {
+
+                progressReportModel.assignedOn = jsonMyLearningColumnObj.getString("AssignedOn");
+
+            }
+            // connectionstate
+            if (jsonMyLearningColumnObj.has("TargetDate")) {
+
+                progressReportModel.targetDate = jsonMyLearningColumnObj.getString("TargetDate");
+
+            }
+            // connectionstateAccept
+            if (jsonMyLearningColumnObj.has("Status")) {
+
+                progressReportModel.status = jsonMyLearningColumnObj.get("Status").toString();
+
+            }
+
+
+            // AcceptAction
+            if (jsonMyLearningColumnObj.has("datestarted")) {
+
+                progressReportModel.datestarted = jsonMyLearningColumnObj.getString("datestarted");
+
+
+            }
+
+            // IgnoreAction
+            if (jsonMyLearningColumnObj.has("datecompleted")) {
+
+                progressReportModel.datecompleted = jsonMyLearningColumnObj.getString("datecompleted");
+
+            }
+
+
+            // InterestAreas
+            if (jsonMyLearningColumnObj.has("SCOID")) {
+
+                progressReportModel.SCOID = jsonMyLearningColumnObj.getString("SCOID");
+
+            }
+
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("ObjectID")) {
+
+                progressReportModel.objectID = jsonMyLearningColumnObj.getString("ObjectID");
+
+            }
+
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("overallscore")) {
+
+                progressReportModel.overScore = jsonMyLearningColumnObj.getString("overallscore");
+
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("skillname")) {
+
+                progressReportModel.skillname = jsonMyLearningColumnObj.getString("skillname");
+
+            }
+
+            // categoryname
+            if (jsonMyLearningColumnObj.has("categoryname")) {
+                progressReportModel.categoryname = jsonMyLearningColumnObj.getString("categoryname");
+            }
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("jobrolename")) {
+
+                progressReportModel.jobrolename = jsonMyLearningColumnObj.getString("jobrolename");
+
+            }
+
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("categoryID")) {
+
+                progressReportModel.categoryID = jsonMyLearningColumnObj.getString("categoryID");
+
+            }
+
+            progressReportModelList.add(progressReportModel);
+        }
+
+
+        return progressReportModelList;
+    }
+
+    public void getMobileGetMobileContentMetaData(final String siteUrl, final String contentID) {
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
+                + siteUrl + "&ContentID=" + contentID + "&userid="
+                + appUserModel.getUserIDValue() + "&DelivoryMode=1";
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "getMobileGetMobileContentMetaData : " + urlStr);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObj) {
+
+                        Log.d(TAG, "getMobileGetMobileContentMetaData response : " + jsonObj);
+                        if (jsonObj.length() != 0) {
+
+                            try {
+                                MyLearningModel learningModel = getMylearningModel(jsonObj);
+                                openReportsActivity(learningModel);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        svProgressHUD.dismiss();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void openReportsActivity(MyLearningModel myLearningModel) {
+
+        if (myLearningModel.getUserID().length() > 0 && !myLearningModel.getUserID().equalsIgnoreCase("-1")) {
+
+            db.injectMyLearningIntoTable(myLearningModel, false, true);
+
+            Intent intentReports = new Intent(context, Reports_Activity.class);
+            intentReports.putExtra("myLearningDetalData", myLearningModel);
+            intentReports.putExtra("typeFrom", "");
+            intentReports.putExtra("FROMPG", true);
+            startActivity(intentReports);
+
+        } else {
+            Toast.makeText(context, "No record found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public MyLearningModel getMylearningModel(JSONObject jsonObject) throws JSONException {
+
+        Log.d("saveNewlySubscribed DB", " " + jsonObject);
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
+        // for deleting records in table for respective table
+
+        MyLearningModel myLearningModel = new MyLearningModel();
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
+
+            //sitename
+            if (jsonMyLearningColumnObj.has("sitename")) {
+
+                myLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
+            }
+            // siteurl
+            if (jsonMyLearningColumnObj.has("siteurl")) {
+
+                myLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
+
+            }
+            // siteid
+            if (jsonMyLearningColumnObj.has("siteid")) {
+
+                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("siteid").toString());
+
+            }
+            // userid
+            if (jsonMyLearningColumnObj.has("userid")) {
+
+                myLearningModel.setUserID(jsonMyLearningColumnObj.get("userid").toString());
+
+            }
+            // coursename
+
+
+            if (jsonMyLearningColumnObj.has("name")) {
+
+                myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
+
+            }
+
+            // shortdes
+            if (jsonMyLearningColumnObj.has("shortdescription")) {
+
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
+
+                myLearningModel.setShortDes(result.toString());
+
+            }
+
+            String authorName = "";
+            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
+                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
+
+            }
+
+            if (authorName.length() != 0) {
+                myLearningModel.setAuthor(authorName);
+            } else {
+                // author
+                if (jsonMyLearningColumnObj.has("author")) {
+
+                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
+
+                }
+            }
+
+            // contentID
+            if (jsonMyLearningColumnObj.has("contentid")) {
+
+                myLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
+
+            }
+            // createddate
+            if (jsonMyLearningColumnObj.has("createddate")) {
+
+                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
+
+            }
+            // displayName
+
+            myLearningModel.setDisplayName(appUserModel.getDisplayName());
+            // durationEndDate
+            if (jsonMyLearningColumnObj.has("durationenddate")) {
+
+                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
+
+            }
+            // objectID
+            if (jsonMyLearningColumnObj.has("objectid")) {
+
+                myLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
+
+            }
+            // thumbnailimagepath
+            if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
+
+                String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
+
+
+                if (isValidString(imageurl)) {
+
+                    myLearningModel.setThumbnailImagePath(imageurl);
+                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    myLearningModel.setImageData(imagePathSet);
+
+
+                } else {
+                    if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
+                        String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
+                        if (isValidString(imageurlContentType)) {
+                            String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
+                            myLearningModel.setImageData(imagePathSet);
+
+                        }
+                    }
+
+
+                }
+                // relatedcontentcount
+                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
+
+                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
+
+                }
+                // isDownloaded
+                if (jsonMyLearningColumnObj.has("isdownloaded")) {
+
+                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
+
+                }
+                // courseattempts
+                if (jsonMyLearningColumnObj.has("courseattempts")) {
+
+                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
+
+                }
+                // objecttypeid
+                if (jsonMyLearningColumnObj.has("objecttypeid")) {
+
+                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
+
+                }
+                // scoid
+                if (jsonMyLearningColumnObj.has("scoid")) {
+
+                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
+
+                }
+                // startpage
+                if (jsonMyLearningColumnObj.has("startpage")) {
+
+                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
+
+                }
+                // status
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+                // userName
+                myLearningModel.setUserName(appUserModel.getUserName());
+                // longdes
+                if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+
+//                    myLearningModel.setShortDes(result.toString());
+                    myLearningModel.setLongDes(result.toString());
+
+                }
+                // typeofevent
+                if (jsonMyLearningColumnObj.has("viewtype")) {
+
+                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("viewtype").toString());
+
+                    myLearningModel.setTypeofevent(typeoFEvent);
+
+                }
+
+                // medianame
+                if (jsonMyLearningColumnObj.has("medianame")) {
+                    String medianame = "";
+
+                    if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                        if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
+                            medianame = "Assessment(Test)";
+
+                        } else {
+                            medianame = jsonMyLearningColumnObj.get("medianame").toString();
+                        }
+                    } else {
+                        if (myLearningModel.getTypeofevent() == 2) {
+                            medianame = "Event (Online)";
+
+
+                        } else if (myLearningModel.getTypeofevent() == 1) {
+                            medianame = "Event (Face to Face)";
+
+                        }
+                    }
+
+                    myLearningModel.setMediaName(medianame);
+
+                }       // ratingid
+                if (jsonMyLearningColumnObj.has("ratingid")) {
+
+                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
+
+                }
+                // publishedDate
+                if (jsonMyLearningColumnObj.has("publisheddate")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("publisheddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setPublishedDate(formattedDate);
+
+                }
+
+                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventstartTime(formattedDate);
+                }
+                // eventenddatedisplay
+                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+
+                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                    myLearningModel.setEventendTime(formattedDate);
+                }
+                // mediatypeid
+                if (jsonMyLearningColumnObj.has("mediatypeid")) {
+
+                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+
+                }
+                // dateassigned
+                if (jsonMyLearningColumnObj.has("dateassigned")) {
+
+                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+
+                }
+                // keywords
+                if (jsonMyLearningColumnObj.has("seokeywords")) {
+
+                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
+
+                }
+                // eventcontentid
+                if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+
+                }
+                // eventAddedToCalender
+                myLearningModel.setEventAddedToCalender(false);
+
+                // isExpiry
+                myLearningModel.setIsExpiry("false");
+
+                // locationname
+                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
+
+                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
+
+                }
+                // timezone
+                if (jsonMyLearningColumnObj.has("timezone")) {
+
+                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
+
+                }
+                // participanturl
+                if (jsonMyLearningColumnObj.has("participanturl")) {
+
+                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
+
+                }
+                // password
+
+                myLearningModel.setPassword(appUserModel.getPassword());
+
+                // isListView
+                if (jsonMyLearningColumnObj.has("bit5")) {
+
+                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
+
+                }
+
+                // joinurl
+                if (jsonMyLearningColumnObj.has("joinurl")) {
+
+                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+
+                }
+
+                // offlinepath
+                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
+                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
+                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
+                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                    String downloadDestFolderPath = context.getExternalFilesDir(null)
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
+
+                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
+
+                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
+                }
+//
+                // wresult
+                if (jsonMyLearningColumnObj.has("wresult")) {
+
+                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
+
+                }
+                // wmessage
+                if (jsonMyLearningColumnObj.has("wmessage")) {
+
+                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
+
+                }
+
+                // presenter
+                if (jsonMyLearningColumnObj.has("presentername")) {
+
+                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presentername").toString());
+
+                }
+
+                //membershipname
+                if (jsonMyLearningColumnObj.has("membershipname")) {
+
+                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
+
+                }
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("membershiplevel")) {
+
+//                    myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
+
+                    String memberShip = jsonMyLearningColumnObj.getString("membershiplevel");
+                    int memberInt = 1;
+                    if (isValidString(memberShip)) {
+                        memberInt = Integer.parseInt(memberShip);
+                    } else {
+                        memberInt = 1;
+                    }
+                    myLearningModel.setMemberShipLevel(memberInt);
+
+
+                }
+
+
+                //membershiplevel
+                if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.getString("folderpath"));
+
+                }
+
+                //jwvideokey
+                if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                    if (isValidString(jwKey)) {
+                        myLearningModel.setJwvideokey(jwKey);
+                    } else {
+                        myLearningModel.setJwvideokey("");
+                    }
+
+                }
+
+                //cloudmediaplayerkey
+                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                    if (isValidString(jwKey)) {
+                        myLearningModel.setCloudmediaplayerkey(jwKey);
+                    } else {
+                        myLearningModel.setCloudmediaplayerkey("");
+                    }
+                }
+
+
+                //sitename
+                if (jsonMyLearningColumnObj.has("progress")) {
+
+                    myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
+                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+
+                    }
+                } else {
+                    myLearningModel.setStatus("Not Started");
+                }
+
+            }
+
+        }
+
+        return myLearningModel;
+    }
+
 
 }

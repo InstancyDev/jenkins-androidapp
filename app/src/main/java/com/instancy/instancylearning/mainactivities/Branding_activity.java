@@ -95,7 +95,7 @@ public class Branding_activity extends Activity {
                 .LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         // Add image path from drawable folder.
-        imageview.setImageResource(R.drawable.cle_logo);
+//        imageview.setImageResource(R.drawable.cle_logo);
         imageview.setLayoutParams(params);
         relativelayout.addView(imageview);
 

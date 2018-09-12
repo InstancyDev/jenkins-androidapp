@@ -152,7 +152,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             typeFrom = "event";
 
         }
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView, typeFrom);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView, typeFrom,myLearningModel);
 //        expandableListView.setOnChildClickListener(this);
         // setting list adapter
         expandableListView.setAdapter(trackListExpandableAdapter);

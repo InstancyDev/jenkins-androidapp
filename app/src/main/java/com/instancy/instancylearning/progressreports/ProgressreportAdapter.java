@@ -1,216 +1,339 @@
 package com.instancy.instancylearning.progressreports;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
+import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.utils.PreferencesManager;
-import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
- * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
+ * Created by Upendranath on 5/29/2017. used tutorial
+ * http://www.journaldev.com/9942/android-expandablelistview-example-tutorial
+ * http://thedeveloperworldisyours.com/android/notifydatasetchanged/
  */
 
-public class ProgressreportAdapter extends BaseAdapter {
+public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
-    private Activity activity;
-    private LayoutInflater inflater;
-    private List<DiscussionForumModel> discussionForumModelList = null;
-    private int resource;
+    private Context context;
+    private List<ProgressReportModel> progressReportModellist;
+    ExpandableListView expandableListView;
     private UiSettingsModel uiSettingsModel;
+    Typeface iconFon;
+    ProgressReportfragment progressReportfragment;
     AppUserModel appUserModel;
-    SVProgressHUD svProgressHUD;
-    DatabaseHandler db;
-    PreferencesManager preferencesManager;
-    private String TAG = ProgressreportAdapter.class.getSimpleName();
-    private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<DiscussionForumModel> searchList;
-    AppController appcontroller;
 
-
-    public ProgressreportAdapter(Activity activity, int resource, List<DiscussionForumModel> discussionForumModelList) {
-        this.activity = activity;
-        this.discussionForumModelList = discussionForumModelList;
-        this.searchList = new ArrayList<DiscussionForumModel>();
-        this.resource = resource;
-        this.notifyDataSetChanged();
+    public ProgressReportAdapter(Context context, List<ProgressReportModel> progressReportModellist, ExpandableListView expandableListView, ProgressReportfragment progressReportfragment) {
+        this.context = context;
+        this.progressReportModellist = progressReportModellist;
+        this.expandableListView = expandableListView;
         uiSettingsModel = UiSettingsModel.getInstance();
+        iconFon = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        this.progressReportfragment = progressReportfragment;
         appUserModel = AppUserModel.getInstance();
-        svProgressHUD = new SVProgressHUD(activity);
-        db = new DatabaseHandler(activity);
-        preferencesManager = PreferencesManager.getInstance();
-        appUserModel = AppUserModel.getInstance();
-
-        appcontroller = AppController.getInstance();
-
     }
 
-    public void refreshList(List<DiscussionForumModel> myLearningModel) {
-        this.discussionForumModelList = myLearningModel;
-        this.searchList = new ArrayList<DiscussionForumModel>();
-        this.searchList.addAll(myLearningModel);
+    public void refreshList(List<ProgressReportModel> progressReportModellist) {
+        this.progressReportModellist = progressReportModellist;
         this.notifyDataSetChanged();
     }
 
     @Override
-    public int getCount() {
-        return discussionForumModelList != null ? discussionForumModelList.size() : 0;
+    public int getGroupCount() {
+        return this.progressReportModellist != null ? progressReportModellist.size() : 0;
+
     }
 
     @Override
-    public Object getItem(int position) {
-        return discussionForumModelList.get(position);
+    public int getChildrenCount(int groupPosition) {
+
+        return this.progressReportModellist.get(groupPosition).progressReportChildModelList != null ? progressReportModellist.get(groupPosition).progressReportChildModelList.size() : 0;
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
+    public Object getGroup(int groupPosition) {
+        return this.progressReportModellist.get(groupPosition);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public View getView(final int position, View convertView, final ViewGroup parent) {
+    public Object getChild(int groupPosition, int childPosition) {
+        return "";
+    }
 
-        ViewHolder holder;
+    @Override
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
+    }
 
-        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.discussionfourmcell, null);
-        holder = new ViewHolder(convertView);
-        holder.parent = parent;
-        holder.getPosition = position;
-        holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtName.setText(discussionForumModelList.get(position).name);
-        holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
-        holder.txtAuthor.setText("Moderator: " + discussionForumModelList.get(position).author + " ");
-        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
+    @Override
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
+    }
 
-        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
-        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
 
-        holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtLastUpdate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+    @Override
+    public View getGroupView(final int groupPosition, boolean isExpanded, View convertView, final ViewGroup parent) {
 
-        holder.txtTopicsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        final ProgressReportModel listTitle = (ProgressReportModel) getGroup(groupPosition);
 
-        if (discussionForumModelList.get(position).descriptionValue.isEmpty()) {
-            holder.txtShortDisc.setVisibility(View.GONE);
-        } else {
-            holder.txtShortDisc.setVisibility(View.VISIBLE);
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) this.context.
+                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.progressreportscell, null);//lbczzcw
         }
 
-        if (discussionForumModelList.get(position).createduserid.equalsIgnoreCase(appUserModel.getUserIDValue())) {
-            holder.btnContextMenu.setVisibility(View.VISIBLE);
+        CardView cardView = (CardView) convertView
+                .findViewById(R.id.card_view);
+        TextView expIcon = (TextView) convertView
+                .findViewById(R.id.expIcon);
+
+        if (isExpanded) {
+            expIcon.setText(convertView.getResources().getString(R.string.fa_icon_angle_down));
         } else {
-            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+            expIcon.setText(convertView.getResources().getString(R.string.fa_icon_angle_right));
+
         }
 
+        if (listTitle.progressReportChildModelList != null && listTitle.progressReportChildModelList.size() > 0) {
+            cardView.setBackgroundColor(convertView.getContext().getResources().getColor(R.color.colorGray));
+            expIcon.setVisibility(View.VISIBLE);
+            FontManager.markAsIconContainer(convertView.findViewById(R.id.expIcon), iconFon);
+        } else {
 
-        String imgUrl = appUserModel.getSiteURL() + discussionForumModelList.get(position).imagedata;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+            cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+            expIcon.setVisibility(View.GONE);
+        }
+
+        final TextView txtContextmenu = (TextView) convertView
+                .findViewById(R.id.txt_contextmenu);
+
+        FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
+
+        TextView txtContentTitle = (TextView) convertView
+                .findViewById(R.id.txt_contenttitle);
 
 
+        TextView txtSiteName = (TextView) convertView
+                .findViewById(R.id.txt_sitename);
+
+        TextView txtContentType = (TextView) convertView
+                .findViewById(R.id.txt_content);
+
+        TextView txtDateStarted = (TextView) convertView
+                .findViewById(R.id.txt_datestarted);
+
+        TextView txtDateCompleted = (TextView) convertView
+                .findViewById(R.id.txt_datecompleted);
+
+        TextView txtStatus = (TextView) convertView
+                .findViewById(R.id.txt_status);
+
+
+        TextView txtScore = (TextView) convertView
+                .findViewById(R.id.txt_score);
+        txtContentTitle.setTypeface(null, Typeface.BOLD);
+
+        txtContentTitle.setText(listTitle.contenttitle);
+        txtSiteName.setText(listTitle.orgname);
+        txtContentType.setText(listTitle.contenttype);
+        txtDateStarted.setText(listTitle.datestarted);
+        txtDateCompleted.setText(listTitle.datecompleted);
+        txtStatus.setText(listTitle.status);
+        txtScore.setText(listTitle.overScore);
+
+        txtContentTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtSiteName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtContentType.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtDateStarted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtDateCompleted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtContextmenu.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        txtContextmenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final ProgressReportChildModel progressReportChildModelModel = null;
+                progresReportContextMenuMethod(txtContextmenu, listTitle, progressReportChildModelModel, false);
+
+            }
+        });
+        return convertView;
+
+    }
+
+    @Override
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, final ViewGroup parent) {
+
+        final ProgressReportChildModel progressReportModel = progressReportModellist.get(groupPosition).progressReportChildModelList.get(childPosition);
+
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) this.context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.progressreportschildcell, null);
+        }
+
+        CardView cardView = (CardView) convertView
+                .findViewById(R.id.card_view);
+
+
+        TextView txtContentTitle = (TextView) convertView
+                .findViewById(R.id.txt_contenttitle);
+
+        TextView txtSiteName = (TextView) convertView
+                .findViewById(R.id.txt_sitename);
+
+        TextView txtContentType = (TextView) convertView
+                .findViewById(R.id.txt_content);
+
+
+        TextView txtDateStarted = (TextView) convertView
+                .findViewById(R.id.txt_datestarted);
+
+
+        TextView txtDateCompleted = (TextView) convertView
+                .findViewById(R.id.txt_datecompleted);
+
+        TextView txtStatus = (TextView) convertView
+                .findViewById(R.id.txt_status);
+
+
+        TextView txtScore = (TextView) convertView
+                .findViewById(R.id.txt_score);
+
+        final TextView txtContextmenu = (TextView) convertView
+                .findViewById(R.id.txt_contextmenu);
+
+        txtContentTitle.setText(progressReportModel.contenttitle);
+        txtSiteName.setText(progressReportModel.orgname);
+        txtContentType.setText(progressReportModel.contenttype);
+        txtDateStarted.setText(progressReportModel.datestarted);
+        txtDateCompleted.setText(progressReportModel.datecompleted);
+        txtStatus.setText(progressReportModel.status);
+        txtScore.setText(progressReportModel.overScore);
+
+        FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
+
+        final View finalConvertView = convertView;
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                long packedPos = ExpandableListView.getPackedPositionForChild(groupPosition, childPosition);
+                int flatPos = expandableListView.getFlatListPosition(packedPos);
+
+//Getting the ID for our child
+                long id = expandableListView.getExpandableListAdapter().getChildId(groupPosition, childPosition);
+
+                ((ExpandableListView) parent).performItemClick(finalConvertView, flatPos, id);
+
+            }
+        });
+
+        txtContentTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtSiteName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtContentType.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtDateStarted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtDateCompleted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        txtContextmenu.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        txtContextmenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final ProgressReportModel progressReportModelNull = null;
+                progresReportContextMenuMethod(txtContextmenu, progressReportModelNull, progressReportModel, true);
+
+            }
+        });
+
+
+//        TextView sortAwasomeIcon = (TextView) convertView
+//                .findViewById(R.id.sortawasome);
+//
+//        FontManager.markAsIconContainer(convertView.findViewById(R.id.sortawasome), iconFon);
+//        if (groupPosition == 0) {
+//            sortAwasomeIcon.setVisibility(View.VISIBLE);
+//        } else {
+//            sortAwasomeIcon.setVisibility(View.GONE);
+//        }
+        txtContentTitle.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
         return convertView;
     }
 
-    public void filter(String charText) {
-        charText = charText.toLowerCase(Locale.getDefault());
-        discussionForumModelList.clear();
-        if (charText.length() == 0) {
-            discussionForumModelList.addAll(searchList);
-        } else {
-            for (DiscussionForumModel s : searchList) {
-                if (s.name.toLowerCase(Locale.getDefault()).contains(charText) || s.author.toLowerCase(Locale.getDefault()).contains(charText)) {
-                    discussionForumModelList.add(s);
+    @Override
+    public int getChildType(int groupPosition, int childPosition) {
+        return super.getChildType(groupPosition, childPosition);
+    }
+
+    @Override
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
+        return true;
+
+    }
+
+    public void progresReportContextMenuMethod(final TextView txtContextmenu, final ProgressReportModel progressReportModel, final ProgressReportChildModel progressReportChildModel, final boolean isFromChild) {
+
+        PopupMenu popup = new PopupMenu(txtContextmenu.getContext(), txtContextmenu);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.progressreport_menu, popup.getMenu());
+        //registering popup with OnMenuItemClickListene
+        Menu menu = popup.getMenu();
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+
+                if (item.getTitle().toString().equalsIgnoreCase("View Certificate")) {
+
+
                 }
+
+                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
+
+
+                    if (isNetworkConnectionAvailable(context, -1)) {
+
+                        if (isFromChild) {
+                            (progressReportfragment).getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportChildModel.objectID);
+                        } else {
+                            (progressReportfragment).getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportModel.objectID);
+
+                        }
+
+                    } else {
+
+                        Toast.makeText(context, context.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }
+
+                return true;
             }
-        }
-        notifyDataSetChanged();
+        });
+        popup.show();//showing popup menu
     }
 
-    class ViewHolder {
-
-        public int getPosition;
-        public ViewGroup parent;
-
-        public ViewHolder(View view) {
-            ButterKnife.bind(this, view);
-
-        }
-
-        @Nullable
-        @BindView(R.id.txt_name)
-        TextView txtName;
-
-        @Nullable
-        @BindView(R.id.card_view)
-        CardView card_view;
-
-        @Nullable
-        @BindView(R.id.txtShortDesc)
-        TextView txtShortDisc;
-
-        @Nullable
-        @BindView(R.id.imagethumb)
-        ImageView imgThumb;
-
-        @Nullable
-        @BindView(R.id.txtLastUpdate)
-        TextView txtLastUpdate;
-
-        @Nullable
-        @BindView(R.id.txt_author)
-        TextView txtAuthor;
-
-        @Nullable
-        @BindView(R.id.txttopics)
-        TextView txtTopicsCount;
-
-        @Nullable
-        @BindView(R.id.btn_contextmenu)
-        ImageButton btnContextMenu;
-
-        @Nullable
-        @BindView(R.id.txtcomments)
-        TextView txtCommentsCount;
-
-        @OnClick({R.id.btn_contextmenu, R.id.card_view})
-        public void actionsForMenu(View view) {
-
-            ((ListView) parent).performItemClick(view, getPosition, 0);
-
-        }
-
-    }
 }
-
-

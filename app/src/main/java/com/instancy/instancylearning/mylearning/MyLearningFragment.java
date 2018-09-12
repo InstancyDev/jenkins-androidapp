@@ -64,6 +64,7 @@ import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.globalsearch.GlobalSearchAdapter;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
+
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
@@ -100,6 +101,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.mahdi.mzip.zip.ZipArchive;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
@@ -690,8 +692,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 isSearching = true;
-//                gotoGlobalSearch();
-                return true;
+                if (uiSettingsModel.isGlobasearch()) {
+                    gotoGlobalSearch();
+                    return false;
+                } else {
+                    return true;
+                }
             }
 
             @Override
@@ -942,7 +948,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     statusCode = webAPIClient.checkFileFoundOrNot(downloadSourcePath[0], appUserModel.getAuthHeaders());
 
                     if (statusCode != 200) {
-                        downloadSourcePath[0] = learningModel.getSiteURL() + "content/downloadfiles/"
+                        downloadSourcePath[0] = learningModel.getSiteURL() + "/content/downloadfiles/"
                                 + learningModel.getContentID() + ".zip";
                         downloadThin(downloadSourcePath[0], view, learningModel, position);
 
@@ -1005,11 +1011,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();
@@ -1030,8 +1036,21 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             String unzipLocation = finalDownloadDestFolderPath;
                             UnZip d = new UnZip(zipFile,
                                     unzipLocation);
-                            File zipfile = new File(zipFile);
-                            zipfile.delete();
+//                            File zipfile = new File(zipFile);
+//                            zipfile.delete();
+//
+//                            UnzipUtility unzipper = new UnzipUtility();
+//                            try {
+//                                unzipper.unzip(zipFile, unzipLocation);
+//                            } catch (Exception ex) {
+//                                // some errors occurred
+//                                ex.printStackTrace();
+//                            }
+//
+
+//                            ZipArchive zipArchive = new ZipArchive();
+//                            zipArchive.unzip(zipFile,unzipLocation,"");
+
                         }
                         myLearningAdapter.notifyDataSetChanged();
 

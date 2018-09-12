@@ -61,4 +61,8 @@
     <color name="currentDayOfMonthColor">#33b5e5</color>
     <color name="currentDayOfMonthSelectorColor">#33b5e5</color>
 
+
+    <color name="colorInGreen">#28a745</color>
+    <color name="colorOutTealGreen">#20c997</color>
+
 </resources>

@@ -53,6 +53,7 @@ import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
+import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
@@ -574,8 +575,35 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
             });
 
+
+            item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                    if (uiSettingsModel.isGlobasearch()) {
+                        gotoGlobalSearch();
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+
+                    return true;
+                }
+            });
         }
     }
+        public void gotoGlobalSearch() {
+
+            Intent intent = new Intent(context, GlobalSearchActivity.class);
+            intent.putExtra("sideMenusModel", sideMenusModel);
+            startActivity(intent);
+
+        }
+
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();
@@ -608,7 +636,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
+//                item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
 

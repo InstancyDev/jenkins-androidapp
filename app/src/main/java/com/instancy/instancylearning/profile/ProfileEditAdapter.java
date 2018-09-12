@@ -177,10 +177,10 @@ public class ProfileEditAdapter extends BaseAdapter {
                         if (holder.getText().toLowerCase().contains("fe")) {
 
                             holder.setSelected(spnrPosition);
-                            profileConfigsModelList.get(position).valueName = "0";
+                            profileConfigsModelList.get(position).valueName = "1";
                         } else {
                             holder.setSelected(spnrPosition);
-                            profileConfigsModelList.get(position).valueName = "1";
+                            profileConfigsModelList.get(position).valueName = "0";
                         }
 
                     } else {
@@ -345,7 +345,7 @@ public class ProfileEditAdapter extends BaseAdapter {
 
     public void setSpinText(Spinner spin, String text) {
         for (int i = 0; i < spin.getAdapter().getCount(); i++) {
-            if (spin.getAdapter().getItem(i).toString().contains(text)) {
+            if (spin.getAdapter().getItem(i).toString().toLowerCase().equalsIgnoreCase(text)) {
                 spin.setSelection(i);
             }
         }

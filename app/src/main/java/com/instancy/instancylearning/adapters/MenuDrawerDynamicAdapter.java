@@ -3,14 +3,11 @@ package com.instancy.instancylearning.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
@@ -66,15 +63,6 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
 
         uiSettingsModel = UiSettingsModel.getInstance();
 
-//
-//        menubgcolor = sharedPrefs.getString("#MENU_BG_COLOR#", "#ffffff");
-//        menuslcolor = sharedPrefs.getString("#MENU_SL_BG_COLOR#", "#E2FABB");
-//        menubgalternatecolor = sharedPrefs.getString(
-//                "#MENU_BG_ALTERNATIVECOLOR#", "#ffffff");
-//
-//        menutextcolor = sharedPrefs.getString("#MENU_TEXT_COLOR#", "#000000");
-//        menusltextcolor = sharedPrefs.getString("#MENU_SL_TEXT_COLOR#",
-//                "#000000");
         iconFon = FontManager.getTypeface(ctx, FontManager.FONTAWESOME);
 
     }
@@ -239,6 +227,9 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             case "13":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_trophy));
                 break;
+            case "14":
+                fontIcon.setText(pView.getResources().getString(R.string.fa_icon_bar_chart));
+                break;
             case "9999":
                 fontIcon.setText(pView.getResources().getString(R.string.fa_icon_sign_out));
                 break;
@@ -320,6 +311,9 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 break;
             case "13":
                 fontIcon.setText(cView.getResources().getString(R.string.fa_icon_trophy));
+                break;
+            case "14":
+                fontIcon.setText(cView.getResources().getString(R.string.fa_icon_bar_chart));
                 break;
             case "9999":
                 fontIcon.setText(cView.getResources().getString(R.string.fa_icon_sign_out));

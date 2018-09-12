@@ -105,7 +105,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
         globalHeaderLayout = (RelativeLayout) findViewById(R.id.globalsearchheader);
-
+        globalHeaderLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         bottomBtnLayout = (LinearLayout) findViewById(R.id.filter_btn_layout);
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
         bottomBtnLayout.setVisibility(View.GONE);
@@ -229,6 +229,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         chxAll.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
         chxSelectedCategory.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         chxAll.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
     }
 
     public void updateListView(boolean isListClicked) {

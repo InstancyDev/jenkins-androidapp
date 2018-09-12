@@ -3,7 +3,7 @@
     android:id="@+id/login_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/colorDarkGrey">
+    android:background="@color/colorDefaultBackGround">
 
     <TextView
         android:id="@+id/id_settings_txt"
@@ -43,7 +43,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/switchlogo" />
+                android:src="@drawable/seacbanner" />
             <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout

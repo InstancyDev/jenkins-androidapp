@@ -494,11 +494,11 @@ public class Education_activity extends AppCompatActivity {
 
         }
 
-        if (schoolStr.length() < 4) {
+        if (schoolStr.length() < 1) {
             Toast.makeText(this, "Enter school", Toast.LENGTH_SHORT).show();
-        } else if (countryStr.length() < 3) {
+        } else if (countryStr.length() < 1) {
             Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
-        } else if (degreeStr.length() < 2) {
+        } else if (degreeStr.length() < 1) {
             Toast.makeText(this, "Enter degree", Toast.LENGTH_SHORT).show();
         } else if (fromYInt == 0) {
             Toast.makeText(this, "Please select from year", Toast.LENGTH_SHORT).show();

@@ -17,7 +17,7 @@ repositories {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
 // ----------------------------------for crop life----------------------------------
@@ -37,8 +37,8 @@ android {
 
 //   -----------------------for Enterprise Learning Lite app--------------------------
 //           applicationId "com.instancy.enterpriselearninglite"
-//           versionCode 28
-//           versionName "3.5"
+//           versionCode 29
+//           versionName "3.6"
 
 //  -------------------------------- for acclife app----------------------------------
 //        applicationId "com.instancy.accilifes"
@@ -52,8 +52,8 @@ android {
 
 //  -------------------------------- for trainingcompany app----------------------------------
 //        applicationId "com.instancy.trainingcompany"
-//        versionCode 18
-//        versionName "2.7"
+//        versionCode 19
+//        versionName "2.8"
 
 //  -------------------------------- for Mobile up app----------------------------------
 //        applicationId "com.instancy.mobileup"
@@ -71,8 +71,8 @@ android {
 //        versionName "1.0"
 
         applicationId "com.instancy.development"
-        versionCode 3
-        versionName "1.0(9.5.2)ReleaseEvent"
+        versionCode 2
+        versionName "1.1(9.5.2)GlobalSerarch"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -85,6 +85,15 @@ android {
 //        applicationId "com.instancy.switch"
 //        versionCode 11
 //        versionName "2.0"
+
+//        applicationId "com.instancy.esperanza"
+//        versionCode 2
+//        versionName "1.1"
+
+//        applicationId "com.instancy.seac"
+//        versionCode 2
+//        versionName "1.1"
+
 
         minSdkVersion 21
         targetSdkVersion 26
@@ -148,7 +157,10 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     //https://github.com/PhilJay/MPAndroidChart
     compile('com.crashlytics.sdk.android:crashlytics:2.9.3@aar') {
-        transitive = true;
+        transitive = true
     }
+    compile 'com.github.ghost1372:Mzip-Android:0.4.0'
+    compile 'com.github.rajyvan:TrackingRingWidget:1.0'
+
 }
 apply plugin: 'com.google.gms.google-services'

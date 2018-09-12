@@ -94,9 +94,6 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
     }
 
-    public HashMap<Integer, List<CompetencyCategoryModel>> getSubMenuList() {
-        return subMenuList;
-    }
 
 
     public CompetencyCatSkillAdapter(Context ctx, int resource, List<CompetencyCategoryModel> mainMenuList, String jobTagId, AppUserModel appUserModel, SideMenusModel sideMenusModel) {
@@ -492,6 +489,7 @@ else {
         @Nullable
         @BindView(R.id.piechart)
         PieChart mChart;
+
 
         @Nullable
         @BindView(R.id.linearLayoutscore)

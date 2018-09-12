@@ -224,10 +224,10 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     }
 
     /*
-    *
-    * all view are initilize here like binding views to class
-    *
-    * */
+     *
+     * all view are initilize here like binding views to class
+     *
+     * */
 
     public void generateNotification() {
 
@@ -272,11 +272,10 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     startActivity(intent);
 
                 } else {
-                    if (uiSettingsModel.isEnableAzureSSOForLearner())
-                    {
+                    if (uiSettingsModel.isEnableAzureSSOForLearner()) {
                         Intent intentSignup = new Intent(this, SignUp_Activity.class);
                         startActivity(intentSignup);
-                    }else {
+                    } else {
                         Intent intent = new Intent(this, Login_activity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -358,9 +357,9 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     }
 
     /*
-    *  Interface classes
-    *
-    * */
+     *  Interface classes
+     *
+     * */
     @Override
     public void preExecuteIn() {
         progressStatus = 0;
@@ -437,12 +436,11 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
             } else {
 
 
-                if (uiSettingsModel.isEnableAzureSSOForLearner())
-                {
+                if (uiSettingsModel.isEnableAzureSSOForLearner()) {
                     Intent intentSignup = new Intent(this, SignUp_Activity.class);
                     startActivity(intentSignup);
 
-                }else {
+                } else {
                     Intent intent = new Intent(this, Login_activity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

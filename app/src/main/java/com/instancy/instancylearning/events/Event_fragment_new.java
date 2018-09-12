@@ -694,6 +694,24 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             });
 
         }
+        item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                isSearching = true;
+                if (uiSettingsModel.isGlobasearch()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                isSearching = false;
+                return true;
+            }
+        });
 
     }
 
@@ -729,6 +747,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 else
                     toolbar.setVisibility(View.VISIBLE);
                 item_search.expandActionView();
+
                 break;
             case R.id.mylearning_info_help:
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
@@ -786,7 +805,14 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             case R.id.btn_contextmenu:
                 View v = myLearninglistView.getChildAt(position - myLearninglistView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
+                if (TABBALUE.equalsIgnoreCase("calendar")) {
+
+                    catalogContextMenuMethod(position, view, txtBtnDownload, contextMenuModelList.get(position), uiSettingsModel, appUserModel);
+
+                } else {
+                    catalogContextMenuMethod(position, view, txtBtnDownload, catalogModelsList.get(position), uiSettingsModel, appUserModel);
+
+                }
                 break;
             default:
 

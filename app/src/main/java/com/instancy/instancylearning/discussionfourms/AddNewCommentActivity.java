@@ -362,7 +362,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         String descriptionStr = editDescription.getText().toString().trim();
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
-        if (descriptionStr.length() < 10) {
+        if (descriptionStr.length() < 1) {
             Toast.makeText(AddNewCommentActivity.this, "Enter Comment", Toast.LENGTH_SHORT).show();
         } else {
 

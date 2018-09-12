@@ -5,86 +5,93 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import android.os.Build;
 import android.util.Log;
 
 public class UnZip {
 
-	private String _zipFile;
-	private String _location;
+    private String _zipFile;
+    private String _location;
+    private static int BUFFER_SIZE = 6 * 1024;
 
-	public UnZip(String zipFile, String location) {
-		_zipFile = zipFile;
-		_location = location;
-		ZipFile zipFileNew;
+    public UnZip(String zipFile, String location) {
+        _zipFile = zipFile;
+        _location = location;
+        ZipFile zipFileNew;
 
-		try {
-			System.out.println(" Calling unZip...");
-			zipFileNew = new ZipFile(_zipFile);
-			unzipFileIntoDirectory(zipFileNew, new File(_location));
-		} catch (Exception e) {
-			Log.d("UnZip", e.getMessage());
-		}
-	}
+        try {
+            System.out.println(" Calling unZip...");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) { // N for Nougat
+                zipFileNew = new ZipFile(_zipFile, Charset.forName("ISO-8859-1"));
+            } else {
+                zipFileNew = new ZipFile(_zipFile);
+            }
 
-	@SuppressWarnings("rawtypes")
-	public static void unzipFileIntoDirectory(ZipFile zipFile,
-			File jiniHomeParentDir) {
-		Enumeration files = zipFile.entries();
-		File f = null;
-		FileOutputStream fos = null;
+            unzipFileIntoDirectory(zipFileNew, new File(_location));
+        } catch (Exception e) {
+            Log.d("UnZip", e.getMessage());
+        }
+    }
 
-		while (files.hasMoreElements()) {
-			try {
-				ZipEntry entry = (ZipEntry) files.nextElement();
-				InputStream eis = zipFile.getInputStream(entry);
-				byte[] buffer = new byte[1024];
-				int bytesRead = 0;
+    @SuppressWarnings("rawtypes")
+    public static void unzipFileIntoDirectory(ZipFile zipFile,
+                                              File jiniHomeParentDir) {
+        Enumeration files = zipFile.entries();
+        File f = null;
+        FileOutputStream fos = null;
 
-				// //Log.d("getAbsolute Path " ,
-				// jiniHomeParentDir.getAbsolutePath());
-				// f = new File(jiniHomeParentDir.getAbsolutePath() +
-				// File.separator + entry.getName());
-				String strFileName = entry.getName();
-				if (strFileName.contains("\\")) {
-					strFileName = strFileName.replace("\\", "/");
-				}
+        while (files.hasMoreElements()) {
+            try {
+                ZipEntry entry = (ZipEntry) files.nextElement();
+                InputStream eis = zipFile.getInputStream(entry);
+                byte[] buffer = new byte[BUFFER_SIZE];
+                int bytesRead = 0;
 
-				f = new File(jiniHomeParentDir.getAbsolutePath() + "/"
-						+ strFileName);
+                Log.d("getAbsolute Path ", jiniHomeParentDir.getAbsolutePath());
+                // f = new File(jiniHomeParentDir.getAbsolutePath() +
+                // File.separator + entry.getName());
+                String strFileName = entry.getName();
+                if (strFileName.contains("\\")) {
+                    strFileName = strFileName.replace("\\", "/");
+                }
 
-				// //Log.d("After updated file name ", f.getName());
-				if (entry.isDirectory()) {
-					f.mkdirs();
-					continue;
-				} else {
-					f.getParentFile().mkdirs();
-					f.createNewFile();
-				}
+                f = new File(jiniHomeParentDir.getAbsolutePath() + "/"
+                        + strFileName);
 
-				fos = new FileOutputStream(f);
+                // //Log.d("After updated file name ", f.getName());
+                if (entry.isDirectory()) {
+                    f.mkdirs();
+                    continue;
+                } else {
+                    f.getParentFile().mkdirs();
+                    f.createNewFile();
+                }
 
-				while ((bytesRead = eis.read(buffer)) != -1) {
-					fos.write(buffer, 0, bytesRead);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				continue;
-			} finally {
-				if (fos != null) {
-					try {
-						fos.close();
-					} catch (IOException e) {
-						Log.d("[unzipFileIntoDirectory] IOEXCepton : ",
-								e.getMessage());
+                fos = new FileOutputStream(f);
 
-					}
-				}
-			}
-		}
-	}
+                while ((bytesRead = eis.read(buffer)) != -1) {
+                    fos.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        Log.d("[] IOEXCepton : ",
+                                e.getMessage());
+
+                    }
+                }
+            }
+        }
+    }
 
 }

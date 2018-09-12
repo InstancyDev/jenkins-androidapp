@@ -94,7 +94,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     boolean autoLaunch = true;
     String typeFrom;
     boolean isReportEnabled = true;
-    public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView, String typeFrom) {
+    MyLearningModel myLearningModel;
+
+    public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView, String typeFrom,MyLearningModel myLearningModel) {
         this._context = context;
         this._blockNames = blockNames;
         this._trackList = trackList;
@@ -111,6 +113,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //        mNotifyManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         appController = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
+        this.myLearningModel=myLearningModel;
     }
 
     public void refreshList(List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList) {
@@ -220,7 +223,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //            holder.btnPreview.setVisibility(View.GONE);
 
         } else {
-            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getContentDownloadType().equalsIgnoreCase("0") || trackChildList.getObjecttypeId().equalsIgnoreCase("102") || trackChildList.getObjecttypeId().equalsIgnoreCase("27")) {
+            if (trackChildList.getObjecttypeId().equalsIgnoreCase("10") && trackChildList.getIsListView().equalsIgnoreCase("true") || trackChildList.getObjecttypeId().equalsIgnoreCase("28") || uiSettingsModel.getMyLearningContentDownloadType().equalsIgnoreCase("0") || trackChildList.getObjecttypeId().equalsIgnoreCase("102") || trackChildList.getObjecttypeId().equalsIgnoreCase("27")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
             } else {
@@ -236,10 +239,12 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     holder.btnDownload.setTextColor(childView.getResources().getColor(R.color.colorBlack));
                     holder.btnDownload.setEnabled(true);
                 }
+                if (myLearningModel.getAddedToMylearning()==0){
+                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+                        holder.btnDownload.setVisibility(View.GONE);
+                    }
+                }
 
-//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
-//                    holder.btnDownload.setVisibility(View.GONE);
-//                }
 //                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 //                    if (trackChildList.getViewType().equalsIgnoreCase("1")) {
 //                        holder.btnDownload.setVisibility(View.VISIBLE);
@@ -523,7 +528,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom,isReportEnabled);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, isReportEnabled);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());

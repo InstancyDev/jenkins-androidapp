@@ -229,7 +229,19 @@ public class UiSettingsModel {
     private String appHeaderColor = "";
     private String selfRegistrationAllowed = "";
 
-    private String contentDownloadType = "";
+    private String myLearningContentDownloadType = "";
+    private String catalogContentDownloadType = "";
+
+    public boolean isGlobasearch() {
+        return isGlobasearch;
+    }
+
+    public void setGlobasearch(boolean globasearch) {
+        isGlobasearch = globasearch;
+    }
+
+    private boolean isGlobasearch = false;
+
     private String courseAppContent = "";
 
     private String enableNativeCatlog = "";
@@ -237,7 +249,7 @@ public class UiSettingsModel {
     private String nativeAppType = "";
 
     private String autodownloadsizelimit = "";
-    private String catalogContentDownloadType = "";
+
 
     private String firstTarget = "";
     private String secondTarget = "";
@@ -420,12 +432,12 @@ public class UiSettingsModel {
         this.selfRegistrationAllowed = selfRegistrationAllowed;
     }
 
-    public String getContentDownloadType() {
-        return contentDownloadType;
+    public String getMyLearningContentDownloadType() {
+        return myLearningContentDownloadType;
     }
 
-    public void setContentDownloadType(String contentDownloadType) {
-        this.contentDownloadType = contentDownloadType;
+    public void setMyLearningContentDownloadType(String myLearningContentDownloadType) {
+        this.myLearningContentDownloadType = myLearningContentDownloadType;
     }
 
     public String getCourseAppContent() {

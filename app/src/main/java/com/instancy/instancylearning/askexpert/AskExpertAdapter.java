@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -121,9 +121,11 @@ public class AskExpertAdapter extends BaseAdapter {
         if (discussionForumModelList.get(position).userID.equalsIgnoreCase(discussionForumModelList.get(position).postedUserId)) {
 
             holder.btnContextMenu.setVisibility(View.VISIBLE);
-        }
-        else {
+
+        } else {
+
             holder.btnContextMenu.setVisibility(View.INVISIBLE);
+
         }
 
         return convertView;

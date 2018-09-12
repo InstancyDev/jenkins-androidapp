@@ -138,7 +138,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     String finalfileName = "";
 
-
     public Profile_fragment() {
 
 
@@ -196,67 +195,49 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         educationModelArrayList = db.fetchUserEducationModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
         experienceModelArrayList = db.fetchUserExperienceModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
-
         String[] strAry = new String[2];
-
         strAry = extractProfileNameAndLocation(profileDetailsModel);
-
         userName.setText(strAry[0]);
         userLocation.setText(strAry[1]);
         ISPROFILENAMEORIMAGEUPDATED = 1;
         profileGroupModelList = db.fetchProfileGroupNames(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
-
         for (ProfileGroupModel grp : profileGroupModelList) {
-
             String groupID = grp.groupId;
-
             profileConfigsModelList = db.fetchUserConfigs(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue(), groupID);
-
             ContentValues cvFields = new ContentValues();
             cvFields = db.getProfileFieldsDictionary(appUserModel.getUserIDValue(), appUserModel.getSiteIDValue());
             if (cvFields != null) {
                 cvEditFields = new ContentValues();
                 cvEditFields.putAll(cvFields);
             }
-
             for (int i = 0; i < profileConfigsModelList.size(); i++) {
-
-                String keyName = profileConfigsModelList.get(i).datafieldname.toLowerCase().toLowerCase();
-
-                if (keyName.equalsIgnoreCase("picture")) {
+                if (profileConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("271")) {
                     profileConfigsModelList.remove(i);
-                    continue;
+                    break;
                 }
-
+            }
+            for (int i = 0; i < profileConfigsModelList.size(); i++) {
+                String keyName = profileConfigsModelList.get(i).datafieldname.toLowerCase().toLowerCase();
                 Log.d(TAG, "names here: " + cvFields.get(keyName));
                 String valueName = "";
                 try {
                     valueName = cvFields.get(keyName).toString();
-
                 } catch (NullPointerException ex) {
-
                     ex.printStackTrace();
                 }
-
                 if (valueName.contains("null")) {
                     valueName = "";
 //                    continue;
                 }
-
                 profileConfigsModelList.get(i).valueName = valueName;
-
                 hmGroupWiseConfigs.put(grp.groupname, profileConfigsModelList);
             }
         }
-
         if (educationModelArrayList.size() > 0 || uiSettingsModel.getAddProfileAdditionalTab().contains("education")) {
-
             ProfileGroupModel profileGroupModel = new ProfileGroupModel();
             profileGroupModel.groupId = "123";
             profileGroupModel.groupname = "Education";
-
             hmGroupWiseConfigs.put("Education", profileConfigsModelList);
-
             profileGroupModelList.add(profileGroupModel);
         }
 
@@ -635,9 +616,11 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                 boolean isPresent = db.checkChoiceTxtPresent();
 
                                 if (!isPresent) {
-                                 }
+                                    countriesWebApiCall(appUserModel.getUserIDValue());
+                                }
 
                             }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

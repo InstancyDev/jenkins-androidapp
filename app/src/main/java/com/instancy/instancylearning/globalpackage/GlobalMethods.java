@@ -197,7 +197,6 @@ public class GlobalMethods {
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-
                 offlinePath = "file://" + myLearningModel.getOfflinepath();
                 offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&cid=0&nativeappURL=true&IsInstancyContent=true";
 
@@ -1919,30 +1918,6 @@ public class GlobalMethods {
                         || encodedStr.toLowerCase().contains(".xls")) {
                     encodedStr = encodedStr.replace("file://", "");
 
-//                        try {
-//
-//                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-//                        } catch (UnsupportedEncodingException e) {
-//                            e.printStackTrace();
-//                        }
-//                        File file = new File(offlinePath);
-//                        Intent intent4 = new Intent();
-//                        intent4.setAction(android.content.Intent.ACTION_VIEW);
-//                        intent4.setDataAndType(
-//                                Uri.fromFile(file),
-//                                "application/excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//                        try {
-//                            context.startActivity(intent4);
-//
-//                        } catch (ActivityNotFoundException e) {
-//
-//                            Toast toast = Toast.makeText(context,
-//                                    context.getString(R.string.toast_no_application_excel),
-//                                    Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//
-//                        }
 
                     String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                     Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cellview"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="true"
-    android:orientation="vertical"
     android:gravity="center_horizontal"
+    android:orientation="vertical"
     android:padding="2dp">
 
     <RelativeLayout
@@ -21,8 +22,7 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:focusable="false"
-            android:scaleType="fitCenter"
-             />
+            android:scaleType="fitCenter" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -78,11 +78,11 @@
                         android:id="@+id/txt_lineatcoursename"
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
+                        android:background="@color/colorGray"
                         android:focusable="false"
                         android:maxLines="1"
                         android:padding="2dp"
                         android:text=""
-                        android:background="@color/colorGray"
                         android:textSize="10sp" />
 
                     <TextView
@@ -100,11 +100,12 @@
 
 
                 </LinearLayout>
+
                 <RelativeLayout
                     android:id="@+id/rating_layout"
-                    android:layout_below="@+id/course_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@+id/course_layout"
                     android:layout_gravity="left|center"
                     android:padding="2dp">
 
@@ -115,8 +116,7 @@
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/colorStatusInProgress"
                         android:isIndicator="true"
-                        android:rating="0"
-                        />
+                        android:rating="0" />
                 </RelativeLayout>
 
                 <TextView
@@ -168,18 +168,19 @@
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="2dp"
-                        android:text="By Upendra "
+                        android:text="      "
                         android:textColor="@color/colorGray"
                         android:textSize="10sp" />
+
                     <TextView
                         android:id="@+id/txt_linesitename"
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
+                        android:background="@color/colorGray"
                         android:focusable="false"
                         android:maxLines="1"
                         android:padding="2dp"
                         android:text=""
-                        android:background="@color/colorGray"
                         android:textSize="10sp" />
 
                     <TextView
@@ -191,9 +192,9 @@
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="2dp"
-                        android:text="switch"
                         android:textColor="@color/colorStatusOther"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        tools:text="    " />
 
                 </LinearLayout>
 

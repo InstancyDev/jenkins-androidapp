@@ -109,7 +109,6 @@ public class StaticValues {
      */
 
 
-
     public static final int DETAIL_CATALOG_CODE = 1212;
 
     public static final int COURSE_CLOSE_CODE = 9595;
@@ -313,6 +312,8 @@ public class StaticValues {
 
     public static int REPORTPREVILAGEID = 1072;
 
+
+    public static int ASKEXPERTPREVILAGEID = 1273;
 
 
     /// all app configurations

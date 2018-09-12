@@ -217,7 +217,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        imglogo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLogoBackgroundColor()));
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(imglogo);
+            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(imglogo);
 
         }
 
@@ -807,7 +807,5 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             }
         }
     }
-
-
 }
 

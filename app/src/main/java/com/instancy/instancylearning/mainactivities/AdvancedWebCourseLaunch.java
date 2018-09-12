@@ -64,6 +64,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
         if (bundle != null) {
             courseUrl = bundle.getString("COURSE_URL");
+//            courseUrl="file:///storage/emulated/0/Android/data/com.instancy.development/files/.Mydownloads/Contentdownloads/cd443d3a-fc86-4be8-9ced-bf6d911491cd/start.html?nativeappURL=true&cid=11&stid=4&lloc=10$1@2$2&lstatus=incomplete&susdata=&tbookmark=2&LtSusdata=%23pgvs_start%231;2;3;4;5;6;7;8;9;10;%23pgvs_end%23$1@%23pgvs_start%231;2;%23pgvs_end%23$2&LtQuesData=1-9@2@correct@$10@2@incorrect@$11@1@incorrect@&LtStatus=completed$1@incomplete$2&sname=Instancy%20Test&IsInstancyContent=true";
             isCloseEnable = bundle.getBoolean("ISCLOSE", false);
 
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
@@ -306,7 +307,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                            super.onReceivedError(view, errorCode, description, failingUrl);
                                            if (isOffline) {
                                                svProgressHUD.dismiss();
-                                               Log.d(TAG, "onReceivedError: from normal web " + failingUrl);
+                                               Log.d(TAG, "onReceivedError: from normal web " + failingUrl); // 703 266
                                            }
 
                                        }

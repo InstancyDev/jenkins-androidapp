@@ -58,9 +58,11 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,6 +151,9 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
     boolean allowSkills = true, allowCommunication = true;
 
+    boolean isFromExperts = false;
+    String expertID = "";
+
     List<AskExpertSkillsModel> askExpertSkillsModelList = null;
 
     @Override
@@ -158,9 +163,9 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         relativeLayout = (RelativeLayout) findViewById(R.id.layout_relative);
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
-
+        isFromExperts = getIntent().getBooleanExtra("EXPERTS", false);
         db = new DatabaseHandler(this);
-        askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
+        svProgressHUD = new SVProgressHUD(context);
 
         ButterKnife.bind(this);
 
@@ -169,13 +174,22 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        svProgressHUD = new SVProgressHUD(context);
+
 
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
+
+
+        if (!isFromExperts) {
+            askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
+        } else {
+            expertID = getIntent().getStringExtra("EXPERTID");
+            getSkillsCalatalogFrom();
+        }
+
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -195,6 +209,13 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         askExpertAdapter = new AskSkillAdapter(this, BIND_ABOVE_CLIENT, askExpertSkillsModelList);
         skillsListview.setAdapter(askExpertAdapter);
         skillsListview.setOnItemClickListener(this);
+
+    }
+
+    public void getSkillsCalatalogFrom() {
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected&ExpertID=" + expertID;
+        vollyService.getJsonObjResponseVolley("ASKQSCAT", parmStringUrl, appUserModel.getAuthHeaders());
 
     }
 
@@ -259,6 +280,20 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
             public void notifySuccess(String requestType, JSONObject response) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
+                if (requestType.equalsIgnoreCase("ASKQSCAT")) {
+                    if (response != null) {
+                        Log.d(TAG, "notifySuccess: ASKQSCAT  " + response);
+                        try {
+                            askExpertSkillsModelList = generateAskExpertsSkills(response);
+                            askExpertAdapter.refreshList(askExpertSkillsModelList);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
 
                 svProgressHUD.dismiss();
 
@@ -300,11 +335,9 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         if (descriptionStr.length() < 1) {
             Toast.makeText(this, "Please enter question", Toast.LENGTH_SHORT).show();
-        } else if (category.length()==0)
-        {
+        } else if (category.length() == 0) {
             Toast.makeText(this, "Please select skill", Toast.LENGTH_SHORT).show();
-        }
-            else {
+        } else {
 //            Map<String, String> parameters = new HashMap<String, String>();
             JSONObject parameters = new JSONObject();
 
@@ -374,7 +407,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "New forum cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "New Question cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -383,6 +416,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
+                closeForum(false);
             }
         })
 
@@ -416,9 +450,11 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         RequestQueue rQueue = Volley.newRequestQueue(context);
         rQueue.add(request);
         request.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
+                10000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
 
     }
 
@@ -523,19 +559,71 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     public String generateSkills() {
         String selectedSkills = "";
 
+        if (askExpertSkillsModelList != null) {
 
-        for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
-            if (askExpertSkillsModelList.get(s).isChecked) {
-                if (selectedSkills.length() > 0) {
-                    selectedSkills = selectedSkills.concat("," + askExpertSkillsModelList.get(s).shortSkillName);
-                } else {
-                    selectedSkills = askExpertSkillsModelList.get(s).shortSkillName;
+            for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
+                if (askExpertSkillsModelList.get(s).isChecked) {
+                    if (selectedSkills.length() > 0) {
+                        selectedSkills = selectedSkills.concat("," + askExpertSkillsModelList.get(s).shortSkillName);
+                    } else {
+                        selectedSkills = askExpertSkillsModelList.get(s).shortSkillName;
+                    }
                 }
+
+                Log.d(TAG, "generateSkills: " + selectedSkills);
+
             }
 
-            Log.d(TAG, "generateSkills: " + selectedSkills);
 
+        } else {
+            selectedSkills = "";
         }
+
         return selectedSkills;
     }
+
+    public List<AskExpertSkillsModel> generateAskExpertsSkills(JSONObject jsonObject) throws JSONException {
+
+        List<AskExpertSkillsModel> askExpertSkillsModelList1 = new ArrayList<>();
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("askskills");
+        // for deleting records in table for respective table
+
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            AskExpertSkillsModel askExpertSkillsModel = new AskExpertSkillsModel();
+            //questionid
+            if (jsonMyLearningColumnObj.has("orgunitid")) {
+
+                askExpertSkillsModel.orgUnitID = jsonMyLearningColumnObj.getString("orgunitid");
+            }
+            // response
+            if (jsonMyLearningColumnObj.has("preferrenceid")) {
+
+                askExpertSkillsModel.preferrenceID = jsonMyLearningColumnObj.get("preferrenceid").toString();
+
+            }
+            // responseid
+            if (jsonMyLearningColumnObj.has("preferrencetitle")) {
+
+                askExpertSkillsModel.preferrenceTitle = jsonMyLearningColumnObj.get("preferrencetitle").toString();
+
+            }
+            // respondeduserid
+            if (jsonMyLearningColumnObj.has("shortskillname")) {
+
+                askExpertSkillsModel.shortSkillName = jsonMyLearningColumnObj.get("shortskillname").toString();
+
+            }
+
+            askExpertSkillsModel.siteID = appUserModel.getSiteIDValue();
+
+            askExpertSkillsModelList1.add(askExpertSkillsModel);
+        }
+
+        return askExpertSkillsModelList1;
+    }
+
 }

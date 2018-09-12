@@ -43,8 +43,11 @@ import com.instancy.instancylearning.models.MyLearningModel;
 
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -55,10 +58,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -1350,6 +1356,59 @@ public class Utilities {
 
         return filter;
     }
+
+
+    /**
+     * Unzip a ZIP file, keeping the directory structure.
+     *
+     * @param zipFile
+     *     A valid ZIP file.
+     * @param destinationDir
+     *     The destination directory. It will be created if it doesn't exist.
+     * @return {@code true} if the ZIP file was successfully decompressed.
+     */
+    public static boolean unzip(File zipFile, File destinationDir) {
+          int BUFFER_SIZE = 6 * 1024;
+        ZipFile zip = null;
+        try {
+            destinationDir.mkdirs();
+            zip = new ZipFile(zipFile);
+            Enumeration<? extends ZipEntry> zipFileEntries = zip.entries();
+            while (zipFileEntries.hasMoreElements()) {
+                ZipEntry entry = zipFileEntries.nextElement();
+                String entryName = entry.getName();
+                File destFile = new File(destinationDir, entryName);
+                File destinationParent = destFile.getParentFile();
+                if (destinationParent != null && !destinationParent.exists()) {
+                    destinationParent.mkdirs();
+                }
+                if (!entry.isDirectory()) {
+                    BufferedInputStream is = new BufferedInputStream(zip.getInputStream(entry));
+                    int currentByte;
+                    byte data[] = new byte[BUFFER_SIZE];
+                    FileOutputStream fos = new FileOutputStream(destFile);
+                    BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
+                    while ((currentByte = is.read(data, 0, BUFFER_SIZE)) != 0) {
+                        dest.write(data, 0, currentByte);
+                    }
+                    dest.flush();
+                    dest.close();
+                    is.close();
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (zip != null) {
+                try {
+                    zip.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+        return true;
+    }
+
 
     //   https://github.com/RusticiSoftware/TinCanAndroid-Offline/tree/master/TinCanJava-Offline/src/com/rs
 }

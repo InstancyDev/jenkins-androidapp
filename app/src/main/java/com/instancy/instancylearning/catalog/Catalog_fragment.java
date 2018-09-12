@@ -877,8 +877,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem menuItem) {
                     isSearching = true;
-//                    gotoGlobalSearch();
-                    return true;
+                    if (uiSettingsModel.isGlobasearch()) {
+                        gotoGlobalSearch();
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
 
                 @Override

@@ -78,6 +78,7 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 
+import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
@@ -488,8 +489,32 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         }
 
-    }
+        item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
 
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+//                isSearching = true;
+                if (uiSettingsModel.isGlobasearch()) {
+                    gotoGlobalSearch();
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+//                isSearching = false;
+                return true;
+            }
+        });    }
+    public void gotoGlobalSearch() {
+
+        Intent intent = new Intent(context, GlobalSearchActivity.class);
+        intent.putExtra("sideMenusModel", sideMenusModel);
+        startActivity(intent);
+
+    }
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();
         drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
@@ -521,7 +546,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
+//                item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");

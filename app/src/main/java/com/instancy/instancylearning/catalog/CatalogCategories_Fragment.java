@@ -308,6 +308,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         addItemToBreadcrumbList("0", "All");
 
         llCatalogGridCatageory.setVisibility(View.VISIBLE);
+
         generateBreadcrumb(breadcrumbItemsList);
 
         catalogRecycler = (RecyclerView) rootView.findViewById(R.id.catalog_recycler);

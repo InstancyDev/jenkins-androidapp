@@ -1,7 +1,7 @@
 package com.instancy.instancylearning.helper;
 
 import com.android.volley.VolleyError;
-import com.google.gson.JsonObject;
+
 import com.instancy.instancylearning.models.MyLearningModel;
 
 import org.json.JSONObject;
@@ -12,11 +12,11 @@ import org.json.JSONObject;
 
 public interface IResult {
 
-    public void notifySuccess(String requestType, JSONObject response);
+    void notifySuccess(String requestType, JSONObject response);
 
-    public void notifyError(String requestType, VolleyError error);
+    void notifyError(String requestType, VolleyError error);
 
-    public void notifySuccess(String requestType, String response);
+    void notifySuccess(String requestType, String response);
 
-    public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel);
+    void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel);
 }

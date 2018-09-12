@@ -41,5 +41,11 @@
         android:orderInCategory="100"
         android:title="Cancel" />
 
+    <item
+        android:id="@+id/ctxaskaquestion"
+        android:orderInCategory="100"
+        android:title="Ask a question" />
+
+
 </menu>
 
