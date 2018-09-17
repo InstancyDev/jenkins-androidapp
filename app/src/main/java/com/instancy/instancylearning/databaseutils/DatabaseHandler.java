@@ -2654,7 +2654,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -3347,7 +3347,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -4836,7 +4836,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -5309,7 +5309,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                         String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                         String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                                + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                                + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                         String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -10435,7 +10435,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 

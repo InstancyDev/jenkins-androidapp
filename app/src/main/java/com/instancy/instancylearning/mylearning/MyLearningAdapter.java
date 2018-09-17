@@ -45,6 +45,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -853,7 +854,7 @@ public class MyLearningAdapter extends BaseAdapter {
         public ViewGroup parent;
         public DownloadInterface downloadInterface;
         public SetCompleteListner setCompleteListner;
-
+        public DownloadStart downloadStart;
 
         @Nullable
         @BindView(R.id.txtgroupName)
@@ -950,7 +951,7 @@ public class MyLearningAdapter extends BaseAdapter {
         @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
-        public ViewHolder(View view) {
+        public ViewHolder(final View view) {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(view.findViewById(R.id.btntxt_download), iconFont);
@@ -984,6 +985,17 @@ public class MyLearningAdapter extends BaseAdapter {
                     notifyDataSetChanged();
                 }
             };
+
+            downloadStart =new DownloadStart() {
+                @Override
+                public void downloadTheContent() {
+
+//                    ((ListView) parent).performItemClick(view, getPosition,  R.id.btntxt_download);
+//                    TextView btnCtxDownload = (TextView) view.findViewById(R.id.btntxt_download);
+//                    actionsForMenu(btnCtxDownload);
+                    btnDownload.performClick();
+                }
+            };
         }
 
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name})
@@ -991,7 +1003,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled,downloadStart,uiSettingsModel);
             } else {
                 if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                     ((ListView) parent).performItemClick(view, getPosition, 0);

@@ -898,6 +898,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         final String[] downloadSourcePath = {null};
 
         TextView txtBtnDownload = (TextView) view.findViewById(R.id.btntxt_download);
+
         txtBtnDownload.setEnabled(false);
 
         switch (learningModel.getObjecttypeId()) {
@@ -1011,11 +1012,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();

@@ -1076,6 +1076,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         menu.getItem(2).setVisible(false);//buy
         menu.getItem(3).setVisible(false);//detail
         menu.getItem(4).setVisible(false);//delete
+        menu.getItem(5).setVisible(false);//delete
+
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
@@ -1128,10 +1130,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (myFile.exists()) {
 
                         menu.getItem(4).setVisible(true);
+                        menu.getItem(5).setVisible(false);
 
                     } else {
 
                         menu.getItem(4).setVisible(false);
+                        menu.getItem(5).setVisible(true);
                     }
                 }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {

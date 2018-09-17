@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.globalpackage;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,6 +32,7 @@ import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalsearch.GlobalSearchResultsActivity;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.mainactivities.AdvancedWebCourseLaunch;
 import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
@@ -41,6 +43,7 @@ import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
+import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
@@ -853,7 +856,7 @@ public class GlobalMethods {
         }
     }
 
-    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled) {
+    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -875,10 +878,22 @@ public class GlobalMethods {
 
         final File myFile = new File(myLearningDetalData.getOfflinepath());
 
+        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") && myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("36") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("27")) {
+            menu.getItem(4).setVisible(false);
 
-        if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
+        } else {
+            menu.getItem(4).setVisible(true);
+        }
+        if (uiSettingsModel.getMyLearningContentDownloadType().equalsIgnoreCase("0")) {
+
+
+        }
+
+
+            if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
 
             menu.getItem(10).setVisible(true);
+            menu.getItem(4).setVisible(false);
 
         } else {
 
@@ -989,7 +1004,21 @@ public class GlobalMethods {
 
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+
+                    if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+
+//                         MyLearningFragment fragment = new MyLearningFragment();
+//                        ((MyLearningFragment) fragment).downloadTheCourse(myLearningDetalData, v, position);
+
+                        downloadStart.downloadTheContent();
+
+                    } else {
+                        showToast(v.getContext(), "No Internet");
+                    }
+
+
                 }
 
                 if (item.getItemId() == R.id.ctx_relatedcontent) {

@@ -102,7 +102,7 @@ public class AskExpertAdapter extends BaseAdapter {
         ViewHolder holder;
 
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.askexpertcell, null);
+        convertView = inflater.inflate(R.layout.askexpertnewdesigncell,null);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;

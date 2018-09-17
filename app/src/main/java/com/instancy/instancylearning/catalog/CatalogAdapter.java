@@ -318,7 +318,6 @@ public class CatalogAdapter extends BaseAdapter {
         return vi;
     }
 
-
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
         myLearningModel.clear();

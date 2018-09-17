@@ -27,5 +27,11 @@
         android:orderInCategory="100"
         android:title="Delete" />
 
+    <item
+        android:id="@+id/ctx_download"
+        android:orderInCategory="100"
+        android:title="Download" />
+
+
 </menu>
 
