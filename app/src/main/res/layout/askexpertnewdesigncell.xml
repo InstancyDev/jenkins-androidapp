@@ -85,15 +85,6 @@
                             android:textColor="@color/colorDarkGrey"
                             android:textSize="12sp" />
 
-                        <View
-
-                            android:layout_toRightOf="@+id/txt_askedby"
-                            android:id="@+id/consolidateline1"
-                            android:layout_width="1dp"
-                            android:layout_height="fill_parent"
-                            android:layout_gravity="center"
-                            android:background="@color/colorInGreen"
-                            android:padding="5dp"></View>
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -112,16 +103,7 @@
                             android:textColor="@color/colorDarkGrey"
                             android:textSize="12sp" />
 
-                        <View
-                            android:layout_toRightOf="@+id/txt_askedon"
-                            android:id="@+id/consolidateline2"
-                            android:layout_width="1dp"
-                            android:layout_height="fill_parent"
-                            android:layout_gravity="center"
-                            android:background="@color/colorDarkGrey"
-                            android:padding="5dp"></View>
                     </RelativeLayout>
-
 
                     <TextView
                         android:id="@+id/txt_lastactive"
@@ -134,7 +116,6 @@
                         android:text="Last Active:"
                         android:textColor="@color/colorDarkGrey"
                         android:textSize="12sp" />
-
 
                 </LinearLayout>
 

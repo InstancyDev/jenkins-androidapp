@@ -570,7 +570,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         catalogModelsList = new ArrayList<MyLearningModel>();
         contextMenuModelList = new ArrayList<MyLearningModel>();
 
-
         if (isFromGlobalSearch) {
             segmentedSwitch.setVisibility(View.GONE);
             refresGlobalSearchEvents(false);
@@ -883,6 +882,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             if (!myLearningDetalData.getRelatedContentCount().equalsIgnoreCase("0")) {
                 menu.getItem(0).setVisible(true);
+
             }
 
             menu.getItem(1).setVisible(false);
@@ -891,7 +891,12 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
                 menu.getItem(4).setVisible(true);
+
+                if (myLearningDetalData.getCancelWaitList() == 0) {
+                    menu.getItem(4).setVisible(false);
+                }
             }
+
 
             if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 
@@ -1040,12 +1045,35 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             }
 
                         } else {
-                            addToMyLearningCheckUser(myLearningDetalData, position, false);
+
+                            int avaliableSeats = 0;
+                            try {
+                                avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+                            } catch (NumberFormatException nf) {
+                                avaliableSeats = 0;
+                                nf.printStackTrace();
+                            }
+
+                            if (avaliableSeats > 0) {
+
+                                addToMyLearningCheckUser(myLearningDetalData, position, false);
+                            } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+
+                                Toast.makeText(context, "Wait list Api Call", Toast.LENGTH_SHORT).show();
+
+                                try {
+                                    addToWaitList(myLearningDetalData);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                addToMyLearningCheckUser(myLearningDetalData, position, false);
+                            }
+
                         }
                     }
 
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
-
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
 //                    addToMyLearningCheckUser(myLearningDetalData, position, true);
@@ -1978,7 +2006,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                     try {
 
                         if (s.contains("true")) {
-// ------------------------- old code here
 
                             getMobileGetMobileContentMetaData(catalogModel, position, false);
 
@@ -2008,7 +2035,119 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
                         }
 
-//--------------------------- old code end here
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void addToWaitList(MyLearningModel catalogModel) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+        //mandatory
+        parameters.put("WLContentID", catalogModel.getContentID());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("siteid", catalogModel.getSiteID());
+        parameters.put("locale", "en-us");
+
+        String parameterString = parameters.toString();
+        boolean isSubscribed = db.isSubscribedContent(catalogModel);
+        if (isSubscribed) {
+            Toast toast = Toast.makeText(
+                    context,
+                    context.getString(R.string.cat_add_already),
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        } else {
+            sendWaitlistEventData(parameterString, catalogModel);
+        }
+    }
+
+    public void sendWaitlistEventData(final String postData, final MyLearningModel catalogModel) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/EnrollWaitListEvent";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+                        JSONObject jsonObj = new JSONObject(s);
+                        if (jsonObj.has("IsSuccess")) {
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(jsonObj.optString("Message"))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                            // add event to android calander
+//                                            addEventToAndroidDevice(catalogModel);
+//                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+                                            injectFromDbtoModel(false);
+
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    context, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
 
                     } catch (Throwable t) {
                         Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");

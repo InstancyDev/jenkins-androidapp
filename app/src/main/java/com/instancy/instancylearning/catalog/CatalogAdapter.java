@@ -164,7 +164,26 @@ public class CatalogAdapter extends BaseAdapter {
             }
             holder.ratingBar.setVisibility(View.GONE);
             if (!myLearningModel.get(position).isCompletedEvent()) {
-                holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Available seats : " + myLearningModel.get(position).getAviliableSeats());
+                int avaliableSeats = 0;
+                try {
+                    avaliableSeats = Integer.parseInt(myLearningModel.get(position).getAviliableSeats());
+                } catch (NumberFormatException nf) {
+                    avaliableSeats = 0;
+                    nf.printStackTrace();
+                }
+
+                if (avaliableSeats > 0) {
+                    holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Available seats : " + myLearningModel.get(position).getAviliableSeats());
+
+                } else if (avaliableSeats <= 0 && myLearningModel.get(position).getWaitlistlimit() != 0 && myLearningModel.get(position).getWaitlistlimit() != myLearningModel.get(position).getWaitlistenrolls()) {
+
+                    int waitlistSeatsLeftout = myLearningModel.get(position).getWaitlistlimit() - myLearningModel.get(position).getWaitlistenrolls();
+
+                    if (waitlistSeatsLeftout>0){
+                        holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Full | Waitlist seats: " + waitlistSeatsLeftout);
+                    }
+
+                }
             }
 
         } else {
@@ -237,15 +256,13 @@ public class CatalogAdapter extends BaseAdapter {
 
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
-//        initVolleyCallback(myLearningModel.get(position), position);
-
         if (myLearningModel.get(position).getShortDes().isEmpty()) {
             holder.txtShortDisc.setVisibility(View.GONE);
         } else {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.txtPrice.setVisibility(View.GONE);
@@ -261,9 +278,9 @@ public class CatalogAdapter extends BaseAdapter {
                 holder.locationlayout.setVisibility(View.GONE);
             }
 
-             if (myLearningModel.get(position).getLocationName().length()==0) {
-                 holder.locationlayout.setVisibility(View.GONE);
-             }
+            if (myLearningModel.get(position).getLocationName().length() == 0) {
+                holder.locationlayout.setVisibility(View.GONE);
+            }
 //            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
             holder.txtTimeZone.setVisibility(View.GONE);
 

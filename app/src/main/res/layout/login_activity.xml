@@ -43,7 +43,7 @@
                 android:layout_marginBottom="1dp"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                android:src="@drawable/seacbanner" />
+                android:src="@drawable/espbanner" />
             <!--android:scaleType="fitCenter"-->
 
             <RelativeLayout
@@ -54,14 +54,15 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="12dp"
                 android:layout_marginTop="10dp">
+
                 <EditText
-                    android:textCursorDrawable="@drawable/customdrawable"
                     android:id="@+id/id_useredit"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:backgroundTint="@color/colorBlack"
+                    android:cursorVisible="true"
                     android:fontFamily="sans-serif"
-                    android:hint="Username"
+                    android:hint="@string/login_textfield_usernametextfieldplaceholder"
                     android:inputType="textEmailAddress"
                     android:maxLength="80"
                     android:maxLines="1"
@@ -71,7 +72,7 @@
                     android:text=""
                     android:textColor="@color/colorBlack"
                     android:textColorHint="@color/colorBlack"
-                    android:cursorVisible="true"
+                    android:textCursorDrawable="@drawable/customdrawable"
                     android:textSize="14sp" />
 
                 <TextView
@@ -98,14 +99,13 @@
                 android:layout_marginBottom="10dp">
 
                 <EditText
-                    android:textCursorDrawable="@drawable/customdrawable"
                     android:id="@+id/id_passwordedit"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:backgroundTint="@color/colorBlack"
-                    android:fontFamily="sans-serif"
-                    android:hint="Password"
                     android:cursorVisible="true"
+                    android:fontFamily="sans-serif"
+                    android:hint="@string/login_textfield_passwordtextfieldplaceholder"
                     android:inputType="textPassword"
                     android:maxLength="50"
                     android:maxLines="1"
@@ -114,6 +114,7 @@
                     android:text=""
                     android:textColor="@color/colorBlack"
                     android:textColorHint="@color/colorBlack"
+                    android:textCursorDrawable="@drawable/customdrawable"
                     android:textSize="14sp" />
 
                 <TextView
@@ -136,7 +137,7 @@
                     android:layout_below="@+id/id_passwordedit"
                     android:background="@android:color/transparent"
                     android:gravity="center"
-                    android:text="@string/textalert"
+                    android:text="@string/login_alertsubtitle_invalidusernameorpassword"
                     android:textColor="@color/colorStatusNotStarted"
                     android:textSize="14sp"
                     android:visibility="gone" />
@@ -150,7 +151,7 @@
                 android:layout_marginBottom="15dp"
                 android:layout_marginTop="10dp"
                 android:background="@color/colorDefault"
-                android:text="@string/label_signin"
+                android:text="@string/login_button_signinbutton"
                 android:textAllCaps="false"
                 android:textColor="@color/colorInstancyMarket"
                 android:textSize="16sp" />
@@ -185,7 +186,7 @@
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
                     android:gravity="center"
-                    android:text="@string/label_forgot"
+                    android:text="@string/login_button_forgotpasswordbutton"
                     android:textAlignment="textStart"
                     android:textAllCaps="false"
                     android:textColor="@color/colorWhite"

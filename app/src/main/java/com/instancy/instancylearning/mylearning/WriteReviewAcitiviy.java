@@ -167,10 +167,11 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
             learningModel = (MyLearningModel) bundle.getSerializable("myLearningDetalData");
 
             isEditReview = bundle.getBoolean("isEditReview");
-
+            txtCancel.setTag(2);
             if (isEditReview) {
-                txtCancel.setText("Delete");
-                txtSave.setText("Update");
+                txtCancel.setText(getResources().getString(R.string.ratinscreen_delete));
+                txtCancel.setTag(1);
+                txtSave.setText(getResources().getString(R.string.ratinscreen_update));
                 try {
 
                     editObj = new JSONObject(getIntent().getStringExtra("editObj"));
@@ -369,13 +370,12 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                 }
                 break;
             case R.id.txtcancel:
-
-                if (txtCancel.getText().toString().equalsIgnoreCase("Delete")) {
+                if ((Integer) txtCancel.getTag() == 1) {
 
 
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                    alertDialog.setCancelable(false).setTitle("Confirmation!").setMessage("Are you sure you want to delete your review?")
-                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    alertDialog.setCancelable(false).setTitle(getResources().getString(R.string.ratinscreen_alert_title)).setMessage(getResources().getString(R.string.ratinscreen_alert_subtitle))
+                            .setPositiveButton(getResources().getString(R.string.ratinscreen_alert_positive), new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialogBox, int id) {
                                     // ToDo get user input here
                                     try {
@@ -385,7 +385,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 }
-                            }).setNegativeButton("Cancel",
+                            }).setNegativeButton(getResources().getString(R.string.ratinscreen_alert_negative ),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialogBox, int id) {
                                     dialogBox.cancel();

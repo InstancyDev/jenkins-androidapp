@@ -207,6 +207,9 @@ public class Experience_activity extends AppCompatActivity {
         assert bottomLayout != null;
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        txtSave.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
+        txtCancel.setText(getResources().getString(R.string.profile_button_educationsavebutton));
+
     }
 
 

@@ -289,7 +289,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         updateDisplayNameAndImage();
 
-        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -710,12 +710,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(getResources().getString(R.string.exitapplication))
-                    .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    .setCancelable(false).setNegativeButton(getResources().getString(R.string.exitapplication_negative), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
                     dialog.dismiss();
                 }
-            }).setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            }).setPositiveButton(getResources().getString(R.string.exitapplication_positive), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     //do things
                     dialog.dismiss();
@@ -766,7 +766,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
 
-        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -805,7 +805,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
-        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -980,7 +980,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
             sideMenumodelList = new ArrayList<SideMenusModel>();
-            sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner());
+            sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
 
             hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -1055,9 +1055,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                             JSONArray jsonTableAry = response.getJSONArray("notificationsdata");
 
                             if (jsonTableAry.length() > 0) {
-                                txtBtnNotification.setText("Notifications(" + jsonTableAry.length() + ")");
+                                txtBtnNotification.setText(getResources().getString(R.string.sidemenu_button_notificationbutton) + "(" + jsonTableAry.length() + ")");
                             } else {
-                                txtBtnNotification.setText("Notifications");
+                                txtBtnNotification.setText(getResources().getString(R.string.sidemenu_button_notificationbutton));
                             }
 
                         } catch (JSONException e) {

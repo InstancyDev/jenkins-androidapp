@@ -43,6 +43,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -156,15 +157,12 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
-
         db = new DatabaseHandler(this);
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         initVolleyCallback();
-
         vollyService = new VollyService(resultCallback, getApplicationContext());
-
         appController = AppController.getInstance();
         PreferencesManager.initializeInstance(this);
         preferencesManager = PreferencesManager.getInstance();
@@ -173,7 +171,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         initilizeView();
         hideOrShowBtns();
         svProgressHUD = new SVProgressHUD(this);
-
         Bundle bundleAutoSignIn = this.getIntent().getExtras();
         if (bundleAutoSignIn != null) {
             autoSignInUserName = bundleAutoSignIn.getString(StaticValues.BUNDLE_USERNAME, "");
@@ -183,6 +180,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 isAutoSignIn = true;
             }
         }
+
+//        updateLocalization();
     }
 
     public void initilizeView() {
@@ -190,17 +189,13 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        GradientDrawable drawable = (GradientDrawable) btnLogin.getBackground();
 //        drawable.setColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
 
-
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
-
-
 
         imgPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
         editPassword.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
-
 
         setCursorColor(editPassword, Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         setCursorColor(editUserName, Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
@@ -220,7 +215,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(imglogo);
 
         }
-
 //       uncomment for backgroundcolor purpose
 
         View someView = findViewById(R.id.login_layout);
@@ -233,19 +227,16 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             window.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         }
-
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
-//            btnSignup.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
             settingTxt.setVisibility(View.INVISIBLE);
             btnSignup.setVisibility(View.INVISIBLE);
 
         } else {
 
-            settingTxt.setVisibility(View.VISIBLE);
+            settingTxt.setVisibility(View.INVISIBLE);
 
         }
-
 
         Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
         drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
@@ -285,7 +276,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         getMyCatalogData();
     }
-
 
     @OnClick({R.id.btntxt_facebook, R.id.btntxt_twitter, R.id.btntxt_linkedin, R.id.btntxt_google, R.id.id_settings_txt, R.id.id_loginbtn, R.id.btnewuser, R.id.btnforgot})
     public void socialLoginBtns(View view) {
@@ -398,9 +388,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
 
         if (userName.length() < 1) {
-            Toast.makeText(this, "  Enter Username  ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "  Enter   " + getResources().getString(R.string.login_textfield_usernametextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (passWord.length() < 1) {
-            Toast.makeText(this, "  Enter Password  ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "  Enter   " + getResources().getString(R.string.login_textfield_passwordtextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else {
 
             if (isNetworkConnectionAvailable(this, -1)) {
@@ -471,16 +461,14 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                         if (response.has("faileduserlogin")) {
 
                             try {
-                                JSONArray  jsonArray=response.getJSONArray("faileduserlogin");
-                                if ( jsonArray!=null && jsonArray.length()>0){
-                                    JSONObject innerObj=jsonArray.getJSONObject(0);
-                                    if (innerObj.has("userstatus")){
+                                JSONArray jsonArray = response.getJSONArray("faileduserlogin");
+                                if (jsonArray != null && jsonArray.length() > 0) {
+                                    JSONObject innerObj = jsonArray.getJSONObject(0);
+                                    if (innerObj.has("userstatus")) {
 
-                                        if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")){
+                                        if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")) {
                                             alertText.setVisibility(View.VISIBLE);
-                                        }
-                                        else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration"))
-                                        {
+                                        } else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration")) {
 
                                             Toast.makeText(Login_activity.this, "   Your registration is not yet approved!  ", Toast.LENGTH_LONG).show();
 
@@ -491,7 +479,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
 
 
                         } else if (response.has("successfulluserlogin")) {
@@ -807,5 +794,19 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             }
         }
     }
+
+    public void updateLocalization() {
+
+        String jsonString = "{\"en\":{\"no_games_avaliable\":\"English Name\"},\"nl\":{\"no_games_avaliable\":\"Dutch Name\"}}";
+
+        String key = "no_games_avaliable";
+        JsonLocalization.getInstance().loadFromData(jsonString);
+        String localizedName = JsonLocalization.getInstance().stringForKey(key, this);
+        Log.d("JsonLocaliztion", localizedName);
+
+        editUserName.setHint(localizedName);
+
+    }
+
 }
 

@@ -109,8 +109,8 @@ public class AskExpertAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtQuestion.setText(discussionForumModelList.get(position).userQuestion);
-        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " ");
-        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " ");
+        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " |");
+        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " |");
         holder.txtNoAnswers.setText(discussionForumModelList.get(position).answers + " Answer(s)");
 
         holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

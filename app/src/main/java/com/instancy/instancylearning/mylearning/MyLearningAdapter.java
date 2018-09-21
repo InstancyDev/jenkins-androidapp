@@ -111,7 +111,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
         preferencesManager = PreferencesManager.getInstance();
         appUserModel.getWebAPIUrl();
-          /* setup enter and exit animation */
+        /* setup enter and exit animation */
         appcontroller = AppController.getInstance();
     }
 
@@ -986,7 +986,7 @@ public class MyLearningAdapter extends BaseAdapter {
                 }
             };
 
-            downloadStart =new DownloadStart() {
+            downloadStart = new DownloadStart() {
                 @Override
                 public void downloadTheContent() {
 
@@ -1003,7 +1003,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled,downloadStart,uiSettingsModel);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel);
             } else {
                 if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
                     ((ListView) parent).performItemClick(view, getPosition, 0);

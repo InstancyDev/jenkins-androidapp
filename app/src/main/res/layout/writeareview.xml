@@ -36,7 +36,7 @@
             android:layout_marginTop="15dp"
             android:background="@drawable/edittext_border"
             android:gravity="top|start"
-            android:hint="Write your feedback here..."
+            android:hint="@string/ratinscreen_write"
             android:maxLength="1000"
             android:maxLines="100"
             android:padding="10dp" />
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="actionsBottomBtns"
-            android:text="Cancel"
+            android:text="@string/ratinscreen_cancel"
             android:textAlignment="center"
             android:textColor="@color/colorWhite" />
 
@@ -82,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="actionsBottomBtns"
-            android:text="Submit"
+            android:text="@string/ratinscreen_submit"
             android:textAlignment="center"
             android:textColor="@color/colorWhite" />
 

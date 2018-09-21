@@ -652,7 +652,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
 //            setCursorColor(txtSearch,Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getResources().getString(R.string.mylearning_search_hint));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));

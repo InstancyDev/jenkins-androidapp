@@ -279,10 +279,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         } else {
             notificationModelList = new ArrayList<NotificationModel>();
             notificationAdapter.refreshList(notificationModelList);
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getResources().getString(R.string.no_data));
         }
 
-        if (item_search!=null && notificationModelList.size() > 5) {
+        if (item_search != null && notificationModelList.size() > 5) {
             item_search.setVisible(true);
         } else {
             item_search.setVisible(false);
@@ -296,7 +296,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Notifications" + "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getResources().getString(R.string.insidesettings_tablesection_headingnotification) + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -457,9 +457,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 myCatalogExists = myCatalogAction(notificationModel.contentid);
 
             if (myLearningExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid, false,"");
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid, false, "");
             } else if (myCatalogExists) {
-                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid, false,"");
+                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid, false, "");
             } else {
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -478,10 +478,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             }
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 4, "", false,"");
+            ((SideMenu) getActivity()).homeControllClicked(true, 4, "", false, "");
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
 
-            ((SideMenu) getActivity()).homeControllClicked(true, 10, "", false,"");
+            ((SideMenu) getActivity()).homeControllClicked(true, 10, "", false, "");
 
         }
 

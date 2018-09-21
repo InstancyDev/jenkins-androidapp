@@ -28,6 +28,7 @@
         android:resizeable="true"
         android:smallScreens="true" />
 
+
     <application
         android:name=".globalpackage.AppController"
         android:allowBackup="true"
@@ -232,13 +233,11 @@
             android:name=".globalsearch.GlobalCatalogActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!-- Push Notification  issue icon -->
 
-
-        <!-- Push Notification  Services-->
-
-        <!--<meta-data-->
-        <!--android:name="com.google.firebase.messaging.default_notification_icon"-->
-        <!--android:resource="@drawable/acclife__login_logo" />-->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/notificationicon" />
 
         <service android:name=".fcm.FCMInstanceIDService">
             <intent-filter>

@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.Savepoint;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -117,7 +119,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 //        drawable.setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         btnSubmit.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-
         btnSubmit.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         imgUser.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         llForgot.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
@@ -125,6 +126,18 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         txtBody.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editResetMail.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editResetMail.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+        Drawable drawablePass = editResetMail.getBackground(); // get current EditText drawable
+        drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
+
+        Drawable drawableUser = editResetMail.getBackground(); // get current EditText drawable
+        drawableUser.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP);
+
+        if (Build.VERSION.SDK_INT > 16) {
+            editResetMail.setBackground(drawablePass); // set the new drawable to EditText
+        } else {
+            editResetMail.setBackgroundDrawable(drawablePass); // use setBackgroundDrawable
+        }
     }
 
     @OnClick({R.id.btn_submit})

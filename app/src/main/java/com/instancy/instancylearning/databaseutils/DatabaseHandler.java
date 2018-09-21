@@ -415,7 +415,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
                 + "(lrsid INTEGER PRIMARY KEY AUTOINCREMENT,LRS TEXT,url TEXT,method TEXT,data TEXT,auth TEXT,callback TEXT,lrsactor TEXT,extraHeaders TEXT,siteid INTEGER,scoid INTEGER,userid INTEGER,isupdate TEXT)");
@@ -1742,7 +1742,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @author Upendra
      */
 
-    public List<SideMenusModel> getNativeMainMenusData(boolean isAzureEnabled) {
+    public List<SideMenusModel> getNativeMainMenusData(boolean isAzureEnabled,Context context) {
         List<SideMenusModel> menuList = null;
         SideMenusModel menu = null;
         Boolean isMylearning = false;
@@ -1864,7 +1864,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             menu = new SideMenusModel();
             menu.setMenuId(5555);
-            menu.setDisplayName("Sign Out");
+            menu.setDisplayName(context.getResources().getString(R.string.side_menu_signout));
             menu.setDisplayOrder(9999);
             menu.setImage("");
             menu.setMenuImageResId(R.drawable.ic_info_black_24dp);
@@ -4289,6 +4289,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("availableseats")) {
                     myLearningModel.setAviliableSeats(jsonMyLearningColumnObj.optString("availableseats", ""));
                 }
+
+
+                //    waitlistlimit
+                if (jsonMyLearningColumnObj.has("waitlistlimit")) {
+                    myLearningModel.setWaitlistlimit(jsonMyLearningColumnObj.optInt("waitlistlimit", -1));
+                }
+
+                //    waitlistenrolls
+                if (jsonMyLearningColumnObj.has("waitlistenrolls")) {
+                    myLearningModel.setWaitlistenrolls(jsonMyLearningColumnObj.optInt("waitlistenrolls", -1));
+                }
+
+                //    cancelevent
+                if (jsonMyLearningColumnObj.has("cancelevent")) {
+                    myLearningModel.setCancelWaitList(jsonMyLearningColumnObj.optInt("cancelevent", -1));
+                }
+
                 if (isCotentExists(myLearningModel, TBL_EVENTCONTENTDATA)) {
                     continue;
                 }
@@ -4361,6 +4378,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("eventendUtctime", myLearningModel.getEventendUtcTime());
 
 
+            contentValues.put("waitlistenrolls", myLearningModel.getWaitlistenrolls());
+            contentValues.put("waitlistlimit", myLearningModel.getWaitlistlimit());
+
+            contentValues.put("cancelevent", myLearningModel.getCancelWaitList());
+
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -4416,7 +4438,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         }
 
-
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
             Cursor cursor = null;
@@ -4430,7 +4451,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setSiteID(cursor.getString(cursor
                             .getColumnIndex("siteid")));
-
 
                     myLearningModel.setSiteURL(cursor.getString(cursor
                             .getColumnIndex("siteurl")));
@@ -4456,7 +4476,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setCourseName(cursor.getString(cursor
                             .getColumnIndex("coursename")));
 
-
                     myLearningModel.setAuthor(cursor.getString(cursor
                             .getColumnIndex("author")));
 
@@ -4472,13 +4491,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setMediaName(cursor.getString(cursor
                             .getColumnIndex("medianame")));
 
-
                     myLearningModel.setCreatedDate(cursor.getString(cursor
                             .getColumnIndex("createddate")));
 
                     myLearningModel.setStartPage(cursor.getString(cursor
                             .getColumnIndex("startpage")));
-
 
                     myLearningModel.setEventstartTime(cursor.getString(cursor
                             .getColumnIndex("eventstarttime")));
@@ -4561,6 +4578,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setEventendUtcTime(cursor.getString(cursor
                             .getColumnIndex("eventendUtctime")));
+
+                    myLearningModel.setWaitlistenrolls(cursor.getInt(cursor
+                            .getColumnIndex("waitlistenrolls")));
+
+                    myLearningModel.setWaitlistlimit(cursor.getInt(cursor
+                            .getColumnIndex("waitlistlimit")));
+
+                    myLearningModel.setCancelWaitList(cursor.getInt(cursor
+                            .getColumnIndex("cancelevent")));
+
+
+
 
                     myLearningModel.setEventAddedToCalender(false);
 

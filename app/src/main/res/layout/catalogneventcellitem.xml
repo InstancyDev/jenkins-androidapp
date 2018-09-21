@@ -79,8 +79,8 @@
                         <RatingBar
                             android:id="@+id/rat_adapt_ratingbar"
                             style="?android:attr/ratingBarStyleSmall"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="82dp"
+                            android:layout_height="18dp"
                             android:backgroundTint="@color/colorStatusInProgress"
                             android:clickable="true"
                             android:isIndicator="false"

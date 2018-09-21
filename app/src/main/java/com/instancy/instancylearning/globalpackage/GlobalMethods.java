@@ -878,7 +878,7 @@ public class GlobalMethods {
 
         final File myFile = new File(myLearningDetalData.getOfflinepath());
 
-        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") && myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("36") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("27")) {
+        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") && myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("36") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("27") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
             menu.getItem(4).setVisible(false);
 
         } else {
@@ -890,7 +890,7 @@ public class GlobalMethods {
         }
 
 
-            if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
+        if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
 
             menu.getItem(10).setVisible(true);
             menu.getItem(4).setVisible(false);
@@ -976,127 +976,155 @@ public class GlobalMethods {
             menu.getItem(5).setVisible(false);
 
         }
-
-
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("details")) {
-                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
-                    intentDetail.putExtra("IFROMCATALOG", false);
-                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-                    intentDetail.putExtra("typeFrom", typeFrom);
-//                    v.getContext().startActivity(intentDetail);
-//                context.startActivity(iWeb);
-//                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                switch (item.getItemId()) {
+                    case R.id.ctx_detail:
+                        Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+                        intentDetail.putExtra("IFROMCATALOG", false);
+                        intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                        intentDetail.putExtra("typeFrom", typeFrom);
+                        ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                        break;
+                    case R.id.ctx_view:
+                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        break;
+                    case R.id.ctx_report:
+                        Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
+                        intentReports.putExtra("myLearningDetalData", myLearningDetalData);
+                        intentReports.putExtra("typeFrom", typeFrom);
+                        v.getContext().startActivity(intentReports);
+                        break;
+                    case R.id.ctx_download:
+                        if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+                            downloadStart.downloadTheContent();
+                        } else {
+                            showToast(v.getContext(), "No Internet");
+                        }
+                        break;
+                    case R.id.ctx_relatedcontent:
+                        relatedContentView(myLearningDetalData, v.getContext());
+                        break;
+                    case R.id.ctx_delete:
+                        if (isNetworkConnectionAvailable(v.getContext(), -1)) {
 
-                }
-                if (item.getItemId() == R.id.ctx_view) {
-                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                }
-                if (item.getTitle().toString().equalsIgnoreCase("Report")) {
+                            deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+                        } else {
 
-                    Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
-                    intentReports.putExtra("myLearningDetalData", myLearningDetalData);
-                    intentReports.putExtra("typeFrom", typeFrom);
-                    v.getContext().startActivity(intentReports);
-
-                }
-                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-
-                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
-
-                    if (isNetworkConnectionAvailable(v.getContext(), -1)) {
-
-//                         MyLearningFragment fragment = new MyLearningFragment();
-//                        ((MyLearningFragment) fragment).downloadTheCourse(myLearningDetalData, v, position);
-
-                        downloadStart.downloadTheContent();
-
-                    } else {
-                        showToast(v.getContext(), "No Internet");
-                    }
-
-
-                }
-
-                if (item.getItemId() == R.id.ctx_relatedcontent) {
-                    relatedContentView(myLearningDetalData, v.getContext());
-
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-
-                    if (isNetworkConnectionAvailable(v.getContext(), -1)) {
-
-                        deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-                    } else {
-
-                        Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase("Set Complete")) {
-                    Log.d("GLB", "onMenuItemClick: Set Complete ");
-                    databaseH = new DatabaseHandler(v.getContext());
+                            Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+                    case R.id.ctx_complete:
+                        databaseH = new DatabaseHandler(v.getContext());
 //                  databaseH.setCompleteMethods(v.getContext(), myLearningDetalData);
-                    File myFile = new File(myLearningDetalData.getOfflinepath());
-                    if (isNetworkConnectionAvailable(v.getContext(), -1) || myFile.exists()) {
-                        new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
-                    } else {
+                        File myFile = new File(myLearningDetalData.getOfflinepath());
+                        if (isNetworkConnectionAvailable(v.getContext(), -1) || myFile.exists()) {
+                            new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
+                        } else {
 
-                        Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase("Play")) {
-//                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase("Join")) {
-
-                    String joinUrl = myLearningDetalData.getJoinurl();
-
-                    if (joinUrl.length() > 0) {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(myLearningDetalData.getJoinurl()));
-                        v.getContext().startActivity(browserIntent);
-                    } else {
-                        Toast.makeText(v.getContext(), "No Url Found", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_add_to_calendar))) {
-
-                    downloadInterface.cancelEnrollment(false);
-                }
-                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_cancel_enrolment))) {
-
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                    builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(v.getResources().getString(R.string.eventalert))
-                            .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int i) {
-                            dialog.dismiss();
+                            Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                         }
-                    }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //do things
-                            dialog.dismiss();
-                            downloadInterface.cancelEnrollment(true);
+                        break;
+                    case R.id.ctx_play:
+                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        break;
+                    case R.id.ctx_join:
+                        String joinUrl = myLearningDetalData.getJoinurl();
 
+                        if (joinUrl.length() > 0) {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(myLearningDetalData.getJoinurl()));
+                            v.getContext().startActivity(browserIntent);
+                        } else {
+                            Toast.makeText(v.getContext(), "No Url Found", Toast.LENGTH_SHORT).show();
                         }
-                    });
-                    AlertDialog alert = builder.create();
-                    alert.show();
+                        break;
+                    case R.id.ctx_addtocalender:
+                        downloadInterface.cancelEnrollment(false);
+                        break;
+                    case R.id.ctx_cancelenrollment:
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                        builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(v.getResources().getString(R.string.eventalert))
+                                .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //do things
+                                dialog.dismiss();
+                                downloadInterface.cancelEnrollment(true);
 
-
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+                        break;
                 }
 
+//                if (item.getTitle().toString().equalsIgnoreCase("details")) {
+//                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+//                    intentDetail.putExtra("IFROMCATALOG", false);
+//                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+//                    intentDetail.putExtra("typeFrom", typeFrom);
+////                    v.getContext().startActivity(intentDetail);
+////                context.startActivity(iWeb);
+////                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+//                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+//
+//                }
+//                if (item.getItemId() == R.id.ctx_view) {
+//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase("Report")) {
+//
+//                    Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
+//                    intentReports.putExtra("myLearningDetalData", myLearningDetalData);
+//                    intentReports.putExtra("typeFrom", typeFrom);
+//                    v.getContext().startActivity(intentReports);
+//
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
+//
+//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
+//
+//                }
+//
+//                if (item.getItemId() == R.id.ctx_relatedcontent) {
+//
+//
+//                }
+//
+//                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
+//
+//
+//                }
+//
+//                if (item.getTitle().toString().equalsIgnoreCase("Set Complete")) {
+//                    Log.d("GLB", "onMenuItemClick: Set Complete ");
+//
+//
+//                }
+//
+//                if (item.getTitle().toString().equalsIgnoreCase("Play")) {
+////                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+//
+//                }
+//
+//                if (item.getTitle().toString().equalsIgnoreCase("Join")) {
+//
+//
+//                }
+//
+//                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_add_to_calendar))) {
+//
+//                    downloadInterface.cancelEnrollment(false);
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_cancel_enrolment))) {
+//
+//
+//                }
                 return true;
             }
         });

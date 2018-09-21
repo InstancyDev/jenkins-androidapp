@@ -304,7 +304,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 txtAthrIcon.setVisibility(View.GONE);
                 txtAuthor.setText(myLearningModel.getAuthor() + " ");
             }
-
+            txtDescription.setText(getResources().getString(R.string.details_label_descriptionlabel));
             txtSiteName.setText(myLearningModel.getSiteName());
             txtLongDisx.setText(myLearningModel.getShortDes());
             // apply colors
@@ -457,7 +457,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         }
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Details</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> " + getResources().getString(R.string.mylearning_actionsheet_detailsoption) + " </font>"));
 //        getSupportActionBar().setCustomView(R.layout.drawermenu_item);
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -702,6 +702,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
                         iconFirst.setBackground(viewIcon);
                         buttonFirst.setText("View");
+                        buttonFirst.setTag(1);
                         txtPrice.setVisibility(View.GONE);
                         txtPrice.setText("");
                         btnDownload.setVisibility(View.VISIBLE);
@@ -711,6 +712,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             Drawable calendar = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
                             iconFirst.setBackground(calendar);
                             buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+                            buttonFirst.setTag(4);
                         } else {
                             btnsLayout.setVisibility(View.GONE);
                         }
@@ -723,13 +725,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         if (!returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
                             iconFirst.setBackground(calendarImg);
                             buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
-
+                            buttonFirst.setTag(6);
                         } else {
 
                             if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
                                 iconFirst.setBackground(calendarImg);
                                 buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
-
+                                buttonFirst.setTag(6);
                             } else {
                                 btnsLayout.setVisibility(View.GONE);
 
@@ -742,13 +744,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
                         iconFirst.setBackground(cartIcon);
                         buttonFirst.setText("Buy");
+                        buttonFirst.setTag(3);
 
                     }
                 }
 
             } else {
-
-                buttonFirst.setText("Add");
+                buttonFirst.setTag(2);
+                buttonFirst.setText(getResources().getString(R.string.details_button_addtomylearningbutton));
                 Drawable addPlusIcon = getButtonDrawable(R.string.fa_icon_plus_circle, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(addPlusIcon);
                 if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
@@ -762,20 +765,21 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                             Drawable cartIcon = getButtonDrawable(R.string.fa_icon_plus, this, uiSettingsModel.getAppHeaderTextColor());
                             iconFirst.setBackground(cartIcon);
-                            buttonFirst.setText("Add");
-
+                            buttonFirst.setText(getResources().getString(R.string.details_button_addtomylearningbutton));
+                            buttonFirst.setTag(2);
                         } else {
 
                             Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppHeaderTextColor());
                             iconFirst.setBackground(cartIcon);
-                            buttonFirst.setText("Buy");
-
+                            buttonFirst.setText(getResources().getString(R.string.details_button_buybutton));
+                            buttonFirst.setTag(3);
                         }
                     } else {
 
                         Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
                         iconFirst.setBackground(cartIcon);
-                        buttonFirst.setText("Buy");
+                        buttonFirst.setText(getResources().getString(R.string.details_button_buybutton));
+                        buttonFirst.setTag(3);
                     }
                     txtPrice.setText("$" + myLearningModel.getPrice());
                     txtPrice.setVisibility(View.VISIBLE);
@@ -790,7 +794,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     txtPrice.setText("");
                 }
                 if (myLearningModel.getAddedToMylearning() == 1) {
-                    buttonFirst.setText("View");
+                    buttonFirst.setText(getResources().getString(R.string.details_button_viewbutton));
+                    buttonFirst.setTag(1);
                     txtPrice.setVisibility(View.GONE);
                     txtPrice.setText("");
                     Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
@@ -807,7 +812,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     btnsLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
                     Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
                     iconFirst.setBackground(calendarImg);
-                    buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+                    buttonFirst.setText(getResources().getString(R.string.details_button_addtocalendarbutton));
+                    buttonFirst.setTag(4);
                 }
 
                 if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
@@ -816,11 +822,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         whiteLine.setVisibility(View.VISIBLE);
                         Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
                         iconSecond.setBackground(relatedContent);
-                        buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
+                        buttonSecond.setText(getResources().getString(R.string.details_button_reportbutton));
+                        buttonSecond.setTag(5);
                     }
                     Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
                     iconFirst.setBackground(viewIcon);
-                    buttonFirst.setText("View");
+                    buttonFirst.setText(getResources().getString(R.string.details_button_viewbutton));
+                    buttonFirst.setTag(1);
                     txtPrice.setVisibility(View.GONE);
                     txtPrice.setText("");
                     btnDownload.setVisibility(View.VISIBLE);
@@ -834,7 +842,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("20") | myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
 
                     if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
-                        buttonSecond.setText(getResources().getString(R.string.btn_txt_setcomplete));
+                        buttonSecond.setText(getResources().getString(R.string.details_button_setcompletebutton));
+                        buttonSecond.setTag(6);
                         relativeSecond.setVisibility(View.VISIBLE);
                         whiteLine.setVisibility(View.VISIBLE);
                         Drawable relatedContent = getButtonDrawable(R.string.fa_icon_check, this, uiSettingsModel.getAppButtonTextColor());
@@ -852,7 +861,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             whiteLine.setVisibility(View.VISIBLE);
                             Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
                             iconSecond.setBackground(relatedContent);
-                            buttonSecond.setText("Report");
+                            buttonSecond.setText(getResources().getString(R.string.details_button_reportbutton));
+                            buttonSecond.setTag(5);
                         }
 
                     }
@@ -860,7 +870,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(viewIcon);
-                buttonFirst.setText("View");
+                buttonFirst.setText(getResources().getString(R.string.details_button_viewbutton));
+                buttonFirst.setTag(1);
                 txtPrice.setVisibility(View.GONE);
                 txtPrice.setText("");
                 btnDownload.setVisibility(View.VISIBLE);
@@ -886,7 +897,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
             Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
             iconFirst.setBackground(viewIcon);
-            buttonFirst.setText("View");
+            buttonFirst.setText(getResources().getString(R.string.details_button_viewbutton));
+            buttonFirst.setTag(1);
             txtPrice.setVisibility(View.GONE);
             txtPrice.setText("");
 
@@ -895,7 +907,8 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             if (!returnEventCompleted(myLearningModel.getEventendUtcTime())) {
                 Drawable calendarImg = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
                 iconFirst.setBackground(calendarImg);
-                buttonFirst.setText(getResources().getString(R.string.btn_txt_add_to_calendar));
+                buttonFirst.setText(getResources().getString(R.string.details_button_addtocalendarbutton));
+                buttonFirst.setTag(4);
             } else {
                 btnsLayout.setVisibility(View.GONE);
             }
@@ -1139,15 +1152,15 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         switch (view.getId()) {
             case R.id.view_btn_txt:
             case R.id.relativeone:
-                if (buttonFirst.getText().toString().equalsIgnoreCase("View")) {
+                if ((Integer) buttonFirst.getTag() == 1) { // View
                     GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
-                } else if (buttonFirst.getText().toString().equalsIgnoreCase("Add")) {
+                } else if ((Integer) buttonFirst.getTag() == 2) { // ADD
                     addToMyLearningCheckUser(myLearningModel, false); // false for
-                } else if (buttonFirst.getText().toString().equalsIgnoreCase("Buy")) {
+                } else if ((Integer) buttonFirst.getTag() == 3) {   // Buy
                     addToMyLearningCheckUser(myLearningModel, true);
-                } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_add_to_calendar))) {
+                } else if ((Integer) buttonFirst.getTag() == 4) {
                     GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
-                } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
+                } else if ((Integer) buttonFirst.getTag() == 6) {
 
                     if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
 
@@ -1159,7 +1172,30 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                         }
 
                     } else {
-                        addToMyLearningCheckUser(myLearningModel, false);
+
+                        int avaliableSeats = 0;
+                        try {
+                            avaliableSeats = Integer.parseInt(myLearningModel.getAviliableSeats());
+                        } catch (NumberFormatException nf) {
+                            avaliableSeats = 0;
+                            nf.printStackTrace();
+                        }
+
+                        if (avaliableSeats > 0) {
+
+                            addToMyLearningCheckUser(myLearningModel, false);
+                        } else if (avaliableSeats <= 0 && myLearningModel.getWaitlistlimit() != 0 && myLearningModel.getWaitlistlimit() != myLearningModel.getWaitlistenrolls()) {
+
+
+                            try {
+                                addToWaitList(myLearningModel);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            addToMyLearningCheckUser(myLearningModel, false);
+                        }
+
                     }
                 }
                 break;
@@ -1167,7 +1203,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 downloadTheCourse(myLearningModel, view);
                 break;
             case R.id.relativesecond:
-                if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
+                if ((Integer) buttonSecond.getTag() == 7) {
                     if (isNetworkConnectionAvailable(MyLearningDetail_Activity.this, -1)) {
                         new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
                     }
@@ -1178,6 +1214,75 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 break;
         }
     }
+
+
+//    @OnClick({R.id.relativeone, R.id.relativesecond, R.id.btntxt_download_detail})
+//    public void actionsforDetail(View view) {
+//        switch (view.getId()) {
+//            case R.id.view_btn_txt:
+//            case R.id.relativeone:
+//                if (buttonFirst.getText().toString().equalsIgnoreCase("View")) {
+//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetail_Activity.this);
+//                } else if (buttonFirst.getText().toString().equalsIgnoreCase("Add")) {
+//                    addToMyLearningCheckUser(myLearningModel, false); // false for
+//                } else if (buttonFirst.getText().toString().equalsIgnoreCase("Buy")) {
+//                    addToMyLearningCheckUser(myLearningModel, true);
+//                } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_add_to_calendar))) {
+//                    GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
+//                } else if (buttonFirst.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_enroll))) {
+//
+//                    if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
+//
+////                            addExpiredEventToMyLearning(myLearningDetalData, position);
+//                        try {
+//                            addExpiryEvets(myLearningModel);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//                    } else {
+//
+//                        int avaliableSeats = 0;
+//                        try {
+//                            avaliableSeats = Integer.parseInt(myLearningModel.getAviliableSeats());
+//                        } catch (NumberFormatException nf) {
+//                            avaliableSeats = 0;
+//                            nf.printStackTrace();
+//                        }
+//
+//                        if (avaliableSeats > 0) {
+//
+//                            addToMyLearningCheckUser(myLearningModel, false);
+//                        } else if (avaliableSeats <= 0 && myLearningModel.getWaitlistlimit() != 0 && myLearningModel.getWaitlistlimit() != myLearningModel.getWaitlistenrolls()) {
+//
+//
+//                            try {
+//                                addToWaitList(myLearningModel);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        } else {
+//                            addToMyLearningCheckUser(myLearningModel, false);
+//                        }
+//
+//                    }
+//                }
+//                break;
+//            case R.id.btntxt_download_detail:
+//                downloadTheCourse(myLearningModel, view);
+//                break;
+//            case R.id.relativesecond:
+//                if (buttonSecond.getText().toString().equalsIgnoreCase(getResources().getString(R.string.btn_txt_setcomplete))) {
+//                    if (isNetworkConnectionAvailable(MyLearningDetail_Activity.this, -1)) {
+//                        new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
+//                    }
+//                    refreshOrNo = "refresh";
+//                } else {
+//                    openReportsActivity();
+//                }
+//                break;
+//        }
+//    }
 
     public void inAppActivityCall(MyLearningModel learningModel) {
 
@@ -1592,6 +1697,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         }
     }
 
+
     public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, boolean isInApp) {
 
         if (isNetworkConnectionAvailable(this, -1)) {
@@ -1837,8 +1943,9 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                                 if (isInserted) {
                                     myLearningModel.setAddedToMylearning(1);
                                     db.updateContenToCatalog(myLearningModel);
-                                    buttonFirst.setText("View");
-                                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, MyLearningDetail_Activity.this, uiSettingsModel.getAppHeaderTextColor());
+                                    buttonFirst.setText(getResources().getString(R.string.details_button_viewbutton));
+                                    buttonFirst.setTag(1);
+                                    Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, MyLearningDetail_Activity.this, uiSettingsModel.getAppButtonTextColor());
 
                                     iconFirst.setBackground(viewIcon);
                                     refreshCatalogContent = true;
@@ -2097,11 +2204,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //            JSONObject userEditRating = jsonObject.getJSONObject("EditRating");
 
             if (jsonObject.isNull("EditRating")) {
-                btnEditReview.setText("Write a Review");
+                btnEditReview.setText(getResources().getString(R.string.details_button_writeareviewbutton));
                 isEditReview = false;
                 updateUiForRating();
             } else {
-                btnEditReview.setText("Edit Your Review");
+                btnEditReview.setText(getResources().getString(R.string.details_button_edityourreviewbutton));
                 isEditReview = true;
 
                 editObj = jsonObject.getJSONObject("EditRating");
@@ -2219,9 +2326,17 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             overallRatingbar.setRating(ratingValue);
             String ratedStyle = "Rated " + rating + " out of 5 of " + recordCount + " ratings";//
 
-            //   "EditRating" -> "{"UserName":null,"RatingID":5,"Title":null,"Description":"From Android Native App","ReviewDate":"0001-01-01T00:00:00","RatingUserID":1,"picture":null,"RatingSiteID":null,"intApprovalStatus":null,"ErrorMessage":""}"
+            String replacetheString = getResources().getString(R.string.details_label_rated);
+            replacetheString = replacetheString.replace("%.1f", rating);
+            replacetheString = replacetheString.replace("%d", "" + recordCount);
 
-            ratedOutOfTxt.setText(ratedStyle);
+
+            txtRating.setText(getResources().getString(R.string.details_label_ratingsandreviewslabel));
+            txtAvg.setText(getResources().getString(R.string.details_label_averageratinglabel));
+
+            ratedOutOfTxt.setText(replacetheString);
+
+
         }
 
 
@@ -2289,7 +2404,6 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     try {
 
                         if (s.contains("true")) {
-// ------------------------- old code here
 
                             getMobileGetMobileContentMetaData(catalogModel, false);
 
@@ -2318,7 +2432,118 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                         }
 
-//--------------------------- old code end here
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(MyLearningDetail_Activity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void addToWaitList(MyLearningModel catalogModel) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+        //mandatory
+        parameters.put("WLContentID", catalogModel.getContentID());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("siteid", catalogModel.getSiteID());
+        parameters.put("locale", "en-us");
+
+        String parameterString = parameters.toString();
+        boolean isSubscribed = db.isSubscribedContent(catalogModel);
+        if (isSubscribed) {
+            Toast toast = Toast.makeText(
+                    MyLearningDetail_Activity.this,
+                    this.getString(R.string.cat_add_already),
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        } else {
+            sendWaitlistEventData(parameterString, catalogModel);
+        }
+    }
+
+    public void sendWaitlistEventData(final String postData, final MyLearningModel catalogModel) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/EnrollWaitListEvent";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+                        JSONObject jsonObj = new JSONObject(s);
+                        if (jsonObj.has("IsSuccess")) {
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
+                            builder.setMessage(jsonObj.optString("Message"))
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+                                            // add event to android calander
+//                                            addEventToAndroidDevice(catalogModel);
+                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+
+
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    MyLearningDetail_Activity.this, "Unable to process request",
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
 
                     } catch (Throwable t) {
                         Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");

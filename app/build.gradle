@@ -70,9 +70,9 @@ android {
 //        versionCode 1
 //        versionName "1.0"
 
-        applicationId "com.instancy.development"
-        versionCode 2
-        versionName "1.1(9.5.2)GlobalSerarch"
+//        applicationId "com.instancy.development"
+//        versionCode 2
+//        versionName "1.1 servicepack 5 Release"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -86,13 +86,13 @@ android {
 //        versionCode 11
 //        versionName "2.0"
 
-//        applicationId "com.instancy.esperanza"
-//        versionCode 2
-//        versionName "1.1"
+        applicationId "com.instancy.esperanza"
+        versionCode 2
+        versionName "1.1"
 
 //        applicationId "com.instancy.seac"
-//        versionCode 2
-//        versionName "1.1"
+//        versionCode 3
+//        versionName "1.2"
 
 
         minSdkVersion 21

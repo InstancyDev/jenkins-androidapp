@@ -5,64 +5,56 @@
     <item
         android:id="@+id/ctx_play"
         android:orderInCategory="100"
-        android:title="Play" />
+        android:title="@string/mylearning_actionsheet_playoption" />
 
     <item
         android:id="@+id/ctx_view"
         android:orderInCategory="100"
-        android:title="View" />
+        android:title="@string/mylearning_actionsheet_viewoption" />
     <item
         android:id="@+id/ctx_detail"
         android:orderInCategory="100"
-        android:title="Details" />
+        android:title="@string/mylearning_actionsheet_detailsoption" />
 
     <item
         android:id="@+id/ctx_join"
         android:orderInCategory="100"
-        android:title="Join" />
+        android:title="@string/mylearning_actionsheet_joinoption" />
 
     <item
         android:id="@+id/ctx_download"
         android:orderInCategory="100"
-        android:title="Download" />
+        android:title="@string/mylearning_actionsheet_downloadoption" />
 
     <item
         android:id="@+id/ctx_report"
         android:orderInCategory="100"
-        android:title="Report" />
+        android:title="@string/mylearning_actionsheet_reportoption" />
 
     <item
         android:id="@+id/ctx_addtocalender"
         android:orderInCategory="100"
-        android:title="@string/btn_txt_add_to_calendar" />
+        android:title="@string/mylearning_actionsheet_addtocalendaroption" />
 
     <item
         android:id="@+id/ctx_complete"
         android:orderInCategory="100"
-        android:title="Set Complete" />
-
-    <!--<item-->
-        <!--android:id="@+id/ctx_relatedcontent"-->
-        <!--android:orderInCategory="100"-->
-        <!--android:title="Related Content" />-->
+        android:title="@string/mylearning_actionsheet_setcompleteoption" />
 
     <item
         android:id="@+id/ctx_relatedcontent"
         android:orderInCategory="100"
-        android:title="View" />
-
+        android:title="@string/mylearning_actionsheet_relatedcontentoption" />
 
     <item
         android:id="@+id/ctx_cancelenrollment"
         android:orderInCategory="100"
-        android:title="@string/btn_txt_cancel_enrolment" />
+        android:title="@string/mylearning_actionsheet_cancelenrollmentoption" />
 
     <item
         android:id="@+id/ctx_delete"
         android:orderInCategory="100"
-        android:title="Delete" />
-
-
+        android:title="@string/mylearning_actionsheet_deleteoption" />
 
 </menu>
 

@@ -89,9 +89,17 @@ public class FCMMessagingService extends FirebaseMessagingService {
                 .setAutoCancel(true).setWhen(0)
                 .setSound(defaultSoundUri)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(mBody))
-                .setContentIntent(pendingIntent).setBadgeIconType(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
                 .setPriority(Notification.PRIORITY_HIGH);
         notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setSmallIcon(R.drawable.ic_launcher);
+//            notificationBuilder.setColor(getResources().getColor(R.color.colorInGreen));
+        } else {
+            notificationBuilder.setSmallIcon(R.drawable.ic_launcher);
+        }
+
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert notificationManager != null;

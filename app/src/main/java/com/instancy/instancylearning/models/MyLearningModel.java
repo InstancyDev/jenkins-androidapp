@@ -31,6 +31,35 @@ public class MyLearningModel implements Serializable {
 
     boolean eventCompletedOrNot = false;
 
+    public int getWaitlistlimit() {
+        return waitlistlimit;
+    }
+
+    public void setWaitlistlimit(int waitlistlimit) {
+        this.waitlistlimit = waitlistlimit;
+    }
+
+    public int getWaitlistenrolls() {
+        return waitlistenrolls;
+    }
+
+    public void setWaitlistenrolls(int waitlistenrolls) {
+        this.waitlistenrolls = waitlistenrolls;
+    }
+
+    int waitlistlimit = -1;
+    int waitlistenrolls = -1;
+
+    public int getCancelWaitList() {
+        return cancelWaitList;
+    }
+
+    public void setCancelWaitList(int cancelWaitList) {
+        this.cancelWaitList = cancelWaitList;
+    }
+
+    int cancelWaitList = 0;
+
     String progress = "";
     String userName = "";
     String siteID = "";
