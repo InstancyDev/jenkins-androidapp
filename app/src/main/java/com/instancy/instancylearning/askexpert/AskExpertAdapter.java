@@ -102,15 +102,17 @@ public class AskExpertAdapter extends BaseAdapter {
         ViewHolder holder;
 
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.askexpertnewdesigncell,null);
+        convertView = inflater.inflate(R.layout.askexpertcell,null);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtQuestion.setText(discussionForumModelList.get(position).userQuestion);
-        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " |");
-        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " |");
+//        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " |");
+//        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " |");
+        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " ");
+        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " ");
         holder.txtNoAnswers.setText(discussionForumModelList.get(position).answers + " Answer(s)");
 
         holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

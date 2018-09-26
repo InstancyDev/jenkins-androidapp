@@ -52,8 +52,14 @@ public class FCMMessagingService extends FirebaseMessagingService {
             String mTitle = jsonObject.optString("title");
             String mBody = jsonObject.optString("body");
             //Calling method to generate notification
-            sendNotification(jsonObject, mTitle, mBody);
 
+            if (mBody.length() > 0) {
+                sendNotification(jsonObject, mTitle, mBody);
+            } else {
+                sendNotification(jsonObject, jsonObject.optString("title"), jsonObject.optString("Message "));
+            }
+
+//            {"Message":"","siteid":"374","forumid":"","contentid":"42","contextmenuid":"5"}
         }
     }
 

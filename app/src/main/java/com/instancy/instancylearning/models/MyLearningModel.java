@@ -58,6 +58,27 @@ public class MyLearningModel implements Serializable {
         this.cancelWaitList = cancelWaitList;
     }
 
+
+    public int getEnrollmentlimit() {
+        return enrollmentlimit;
+    }
+
+    public void setEnrollmentlimit(int enrollmentlimit) {
+        this.enrollmentlimit = enrollmentlimit;
+    }
+
+    public int getNoofusersenrolled() {
+        return noofusersenrolled;
+    }
+
+    public void setNoofusersenrolled(int noofusersenrolled) {
+        this.noofusersenrolled = noofusersenrolled;
+    }
+
+    int enrollmentlimit = 0;
+    int noofusersenrolled = 0;
+
+
     int cancelWaitList = 0;
 
     String progress = "";

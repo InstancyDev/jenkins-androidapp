@@ -280,10 +280,36 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
         if (myLearningModel != null) {
             txtTitle.setText(myLearningModel.getCourseName());
+
             txtCourseName.setText(myLearningModel.getMediaName());
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                int avaliableSeats = 0;
+                try {
+                    avaliableSeats = Integer.parseInt(myLearningModel.getAviliableSeats());
+                } catch (NumberFormatException nf) {
+                    avaliableSeats = 0;
+                    nf.printStackTrace();
+                }
+                if (avaliableSeats > 0) {
+                    txtCourseName.setText(myLearningModel.getMediaName() + " | Available seats : " + myLearningModel.getAviliableSeats());
 
+                } else if (avaliableSeats <= 0) {
+
+                    if (myLearningModel.getEnrollmentlimit() == myLearningModel.getNoofusersenrolled() && myLearningModel.getWaitlistlimit() == 0 || (myLearningModel.getWaitlistlimit() != -1 && myLearningModel.getWaitlistlimit() == myLearningModel.getWaitlistenrolls())) {
+
+                        txtCourseName.setText(myLearningModel.getMediaName() + " | (Enrollment Closed)");
+
+                    } else if (myLearningModel.getWaitlistlimit() != -1 && myLearningModel.getWaitlistlimit() != myLearningModel.getWaitlistenrolls()) {
+
+
+                        int waitlistSeatsLeftout = myLearningModel.getWaitlistlimit() - myLearningModel.getWaitlistenrolls();
+
+                        if (waitlistSeatsLeftout > 0) {
+                            txtCourseName.setText(myLearningModel.getMediaName() + " | Full | Waitlist seats: " + waitlistSeatsLeftout);
+                        }
+                    }
+                }
                 txtAuthor.setText(myLearningModel.getPresenter() + " ");
                 String fromDate = convertToEventDisplayDateFormat(myLearningModel.getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
                 String toDate = convertToEventDisplayDateFormat(myLearningModel.getEventendTime(), "yyyy-MM-dd hh:mm:ss");
@@ -724,8 +750,29 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     if (myLearningModel.getViewType().equalsIgnoreCase("1") || myLearningModel.getViewType().equalsIgnoreCase("2")) {
                         if (!returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
                             iconFirst.setBackground(calendarImg);
-                            buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
-                            buttonFirst.setTag(6);
+
+                            int avaliableSeats = 0;
+                            try {
+                                avaliableSeats = Integer.parseInt(myLearningModel.getAviliableSeats());
+                            } catch (NumberFormatException nf) {
+                                avaliableSeats = 0;
+                                nf.printStackTrace();
+                            }
+
+                            if (avaliableSeats > 0) {
+
+                                buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+                                buttonFirst.setTag(6);
+
+                            } else if (avaliableSeats <= 0 && myLearningModel.getWaitlistlimit() != 0 && myLearningModel.getWaitlistlimit() != myLearningModel.getWaitlistenrolls()) {
+                                buttonFirst.setText(getResources().getString(R.string.btn_txt_enroll));
+                                buttonFirst.setTag(6);
+
+                            } else {
+                                btnsLayout.setVisibility(View.GONE);
+                            }
+
+
                         } else {
 
                             if (uiSettingsModel.isAllowExpiredEventsSubscription()) {

@@ -1076,7 +1076,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         menu.getItem(2).setVisible(false);//buy
         menu.getItem(3).setVisible(false);//detail
         menu.getItem(4).setVisible(false);//delete
-        menu.getItem(5).setVisible(false);//delete
+        menu.getItem(5).setVisible(false);//download
 
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
@@ -1103,10 +1103,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 if (myFile.exists()) {
 
                     menu.getItem(4).setVisible(false);
+                    menu.getItem(5).setVisible(false);//download
 
                 } else {
 
                     menu.getItem(4).setVisible(false);
+                    menu.getItem(5).setVisible(true);//download
+
                 }
             }
 
@@ -1183,14 +1186,22 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
             }
         }
+        if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+            menu.getItem(5).setVisible(false);
+        }
+        if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+            menu.getItem(5).setVisible(true);
+//
+        }
+        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+            menu.getItem(5).setVisible(false);
+        }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
                 if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-
-//                    openDetailsPage(myLearningDetalData);
-
+                    
                     Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
                     intentDetail.putExtra("IFROMCATALOG", true);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
@@ -1211,8 +1222,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     }
                 }
                 if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
 
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        downloadTheCourse(catalogModelsList.get(position), v, position);
+                    } else {
+                        showToast(context, "No Internet");
+                    }
                 }
 
                 if (item.getTitle().toString().equalsIgnoreCase("Delete")) {

@@ -875,8 +875,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         menu.getItem(3).setVisible(false);//detail
         menu.getItem(4).setVisible(false);//cancel enrollment
 
-
-//        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
+//      boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
         if (myLearningDetalData.getAddedToMylearning() == 1) {
 
@@ -936,16 +935,16 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 menu.getItem(0).setVisible(false);
                 menu.getItem(1).setVisible(true);
                 menu.getItem(3).setVisible(true);
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
-                        menu.getItem(4).setVisible(false);
-                    }
-                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                        menu.getItem(4).setVisible(true);
-                    }
-                }
+//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//
+//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+//                        menu.getItem(4).setVisible(false);
+//                    }
+//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//
+//                        menu.getItem(4).setVisible(true);
+//                    }
+//                }
                 if (!uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
                     menu.getItem(1).setVisible(false);
                 }
@@ -988,6 +987,26 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             menu.getItem(4).setVisible(false);//cancel enrollment
         }
 
+        int avaliableSeats = 0;
+        try {
+            avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+        } catch (NumberFormatException nf) {
+            avaliableSeats = 0;
+            nf.printStackTrace();
+        }
+
+        if (avaliableSeats > 0) {
+
+            menu.getItem(1).setVisible(true);//enroll
+
+        } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+            menu.getItem(1).setVisible(true);//enroll
+
+
+        } else {
+            menu.getItem(1).setVisible(false);//enroll
+
+        }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -1001,7 +1020,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 //                   context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
                 }
-
 
                 if (item.getItemId() == R.id.ctx_view) {
 //                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
@@ -1058,8 +1076,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
                                 addToMyLearningCheckUser(myLearningDetalData, position, false);
                             } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
-
-                                Toast.makeText(context, "Wait list Api Call", Toast.LENGTH_SHORT).show();
 
                                 try {
                                     addToWaitList(myLearningDetalData);
@@ -2132,7 +2148,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                             dialog.dismiss();
                                             // add event to android calander
 //                                            addEventToAndroidDevice(catalogModel);
-//                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
                                             injectFromDbtoModel(false);
 
                                         }

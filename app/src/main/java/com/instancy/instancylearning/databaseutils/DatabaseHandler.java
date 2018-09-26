@@ -415,7 +415,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
                 + "(lrsid INTEGER PRIMARY KEY AUTOINCREMENT,LRS TEXT,url TEXT,method TEXT,data TEXT,auth TEXT,callback TEXT,lrsactor TEXT,extraHeaders TEXT,siteid INTEGER,scoid INTEGER,userid INTEGER,isupdate TEXT)");
@@ -4306,6 +4306,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setCancelWaitList(jsonMyLearningColumnObj.optInt("cancelevent", -1));
                 }
 
+                //    waitlistenrolls
+                if (jsonMyLearningColumnObj.has("enrollmentlimit")) {
+                    myLearningModel.setEnrollmentlimit(jsonMyLearningColumnObj.optInt("enrollmentlimit", -1));
+                }
+
+                //    cancelevent
+                if (jsonMyLearningColumnObj.has("noofusersenrolled")) {
+                    myLearningModel.setNoofusersenrolled(jsonMyLearningColumnObj.optInt("noofusersenrolled", -1));
+                }
+
+
                 if (isCotentExists(myLearningModel, TBL_EVENTCONTENTDATA)) {
                     continue;
                 }
@@ -4382,6 +4393,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("waitlistlimit", myLearningModel.getWaitlistlimit());
 
             contentValues.put("cancelevent", myLearningModel.getCancelWaitList());
+
+            contentValues.put("enrollmentlimit", myLearningModel.getEnrollmentlimit());
+
+            contentValues.put("noofusersenrolled", myLearningModel.getNoofusersenrolled());
+
+
 
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -4589,6 +4606,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("cancelevent")));
 
 
+                    myLearningModel.setEnrollmentlimit(cursor.getInt(cursor
+                            .getColumnIndex("enrollmentlimit")));
+
+                    myLearningModel.setNoofusersenrolled(cursor.getInt(cursor
+                            .getColumnIndex("noofusersenrolled")));
 
 
                     myLearningModel.setEventAddedToCalender(false);

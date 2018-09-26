@@ -10,6 +10,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
@@ -164,6 +165,7 @@ public class CatalogAdapter extends BaseAdapter {
             }
             holder.ratingBar.setVisibility(View.GONE);
             if (!myLearningModel.get(position).isCompletedEvent()) {
+                // write new logic
                 int avaliableSeats = 0;
                 try {
                     avaliableSeats = Integer.parseInt(myLearningModel.get(position).getAviliableSeats());
@@ -175,51 +177,88 @@ public class CatalogAdapter extends BaseAdapter {
                 if (avaliableSeats > 0) {
                     holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Available seats : " + myLearningModel.get(position).getAviliableSeats());
 
-                } else if (avaliableSeats <= 0 && myLearningModel.get(position).getWaitlistlimit() != 0 && myLearningModel.get(position).getWaitlistlimit() != myLearningModel.get(position).getWaitlistenrolls()) {
+                } else if (avaliableSeats <= 0) {
 
-                    int waitlistSeatsLeftout = myLearningModel.get(position).getWaitlistlimit() - myLearningModel.get(position).getWaitlistenrolls();
+                    if (myLearningModel.get(position).getEnrollmentlimit() == myLearningModel.get(position).getNoofusersenrolled() && myLearningModel.get(position).getWaitlistlimit() == 0 || (myLearningModel.get(position).getWaitlistlimit() != -1 && myLearningModel.get(position).getWaitlistlimit() == myLearningModel.get(position).getWaitlistenrolls())) {
 
-                    if (waitlistSeatsLeftout>0){
-                        holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Full | Waitlist seats: " + waitlistSeatsLeftout);
+                        holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | (Enrollment Closed)");
+
+                    } else if (myLearningModel.get(position).getWaitlistlimit() != -1 && myLearningModel.get(position).getWaitlistlimit() != myLearningModel.get(position).getWaitlistenrolls()) {
+
+                        int waitlistSeatsLeftout = myLearningModel.get(position).getWaitlistlimit() - myLearningModel.get(position).getWaitlistenrolls();
+
+                        if (waitlistSeatsLeftout > 0) {
+                            holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Full | Waitlist seats: " + waitlistSeatsLeftout);
+                        }
                     }
-
                 }
             }
 
-        } else {
+        } else
+
+        {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
 
-        holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
+        holder.txtShortDisc.setText(myLearningModel.get(position).
 
-        if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
+                getShortDes());
+
+        if (myLearningModel.get(position).
+
+                getSiteName().
+
+                equalsIgnoreCase(""))
+
+        {
             holder.consolidateLine.setVisibility(View.GONE);
 
-        } else {
+        } else
+
+        {
             holder.consolidateLine.setVisibility(View.VISIBLE);
         }
 
-        if (myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
+        if (myLearningModel.get(position).
+
+                getViewType().
+
+                equalsIgnoreCase("3"))
+
+        {
             holder.txtPrice.setText("$" + myLearningModel.get(position).getPrice());
 //            holder.txtPrice.setText(myLearningModel.get(position).getPrice() + " "+myLearningModel.get(position).getCurrency());
             holder.txtPrice.setVisibility(View.VISIBLE);
 //            holder.txtPriceLabel.setVisibility(View.VISIBLE);
-        } else {
+        } else
+
+        {
             holder.txtPrice.setVisibility(View.GONE);
 //            holder.txtPriceLabel.setVisibility(View.GONE);
             holder.txtPrice.setText("");
         }
 
-        if (myLearningModel.get(position).getAddedToMylearning() == 1) {
+        if (myLearningModel.get(position).
+
+                getAddedToMylearning() == 1)
+
+        {
             holder.txtPrice.setVisibility(View.GONE);
 
         }
 
-        holder.txtSiteName.setText(" " + myLearningModel.get(position).getSiteName());
+        holder.txtSiteName.setText(" " + myLearningModel.get(position).
+
+                getSiteName());
         float ratingValue = 0;
-        try {
+        try
+
+        {
             ratingValue = Float.parseFloat(myLearningModel.get(position).getRatingId());
-        } catch (NumberFormatException ex) {
+        } catch (
+                NumberFormatException ex)
+
+        {
             ex.printStackTrace();
             ratingValue = 0;
         }
@@ -227,7 +266,11 @@ public class CatalogAdapter extends BaseAdapter {
 
         holder.ratingBar.setIsIndicator(true);
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
-        stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+        stars.getDrawable(2).
+
+                setColorFilter(vi.getResources().
+
+                        getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
         Drawable progress = holder.ratingBar.getProgressDrawable();
         DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -254,15 +297,35 @@ public class CatalogAdapter extends BaseAdapter {
 
         String imgUrl = myLearningModel.get(position).getImageData();
 
-        Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+        Picasso.with(vi.getContext()).
 
-        if (myLearningModel.get(position).getShortDes().isEmpty()) {
+                load(imgUrl).
+
+                placeholder(R.drawable.cellimage).
+
+                into(holder.imgThumb);
+
+        if (myLearningModel.get(position).
+
+                getShortDes().
+
+                isEmpty())
+
+        {
             holder.txtShortDisc.setVisibility(View.GONE);
-        } else {
+        } else
+
+        {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+        if (myLearningModel.get(position).
+
+                getObjecttypeId().
+
+                equalsIgnoreCase("70"))
+
+        {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.txtPrice.setVisibility(View.GONE);
@@ -284,7 +347,9 @@ public class CatalogAdapter extends BaseAdapter {
 //            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
             holder.txtTimeZone.setVisibility(View.GONE);
 
-        } else {
+        } else
+
+        {
 
 
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
@@ -329,7 +394,11 @@ public class CatalogAdapter extends BaseAdapter {
 
 
         }
-        if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+        if (uiSettingsModel.getCatalogContentDownloadType().
+
+                equalsIgnoreCase("0"))
+
+        {
             holder.btnDownload.setVisibility(View.GONE);
         }
         return vi;
@@ -553,14 +622,6 @@ public class CatalogAdapter extends BaseAdapter {
 
         this.notifyDataSetChanged();
     }
-
-//    public static Set<Integer> findDuplicates(int[] input) {
-//        Set<Integer> duplicates = new HashSet<Integer>();
-//        for (int i = 0; i < input.length; i++) {
-//            for (int j = 1; j < input.length; j++) {
-//                if (input[i] == input[j] && i != j) {
-// duplicate element found duplicates.add(input[i]); break; } } } return duplicates; }
-
     public void filterByObjTypeId(JSONObject filterBy) {
 
         String contentType = filterBy.optString("contentype");
