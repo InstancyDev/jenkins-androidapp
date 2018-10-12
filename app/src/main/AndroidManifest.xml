@@ -173,6 +173,24 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
+            android:name=".askexpertenached.AskExpertsAnswersActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".askexpertenached.AskQuestionActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".askexpertenached.AskExpertsAskAnsCmtActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".askexpertenached.AskExpertsCommentsActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
             android:name=".wifisharing.WiFiDirectActivity"
             android:screenOrientation="portrait"></activity>
 

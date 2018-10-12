@@ -7,12 +7,10 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,7 +19,6 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
@@ -55,7 +52,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -67,7 +63,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import static com.blankj.utilcode.util.ToastUtils.getView;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
@@ -152,7 +147,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             typeFrom = "event";
 
         }
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView, typeFrom,myLearningModel);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView, typeFrom, myLearningModel);
 //        expandableListView.setOnChildClickListener(this);
         // setting list adapter
         expandableListView.setAdapter(trackListExpandableAdapter);
@@ -188,11 +183,11 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             }
 
         } else {
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
 
             if (isTraxkList) {
                 workFlowType = "onlaunch";
-                executeWorkFlowRules(workFlowType);
+//                executeWorkFlowRules(workFlowType);
             } else {
 
                 boolean isEventRules = isEventCompleted();
@@ -424,9 +419,9 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         if (isCompleted) {
 
             db.updateCMIstatus(myLearningModel, "Completed");
-            myLearningModel.setStatus("Completed");
+            myLearningModel.setStatusActual("Completed");
         }
-//        myLearningModel.setStatus("waste");
+//        myLearningModel.setStatusActual("waste");
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
@@ -459,7 +454,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
         for (int i = 0; i < trackList.size(); i++) {
 
-            if (trackList.get(i).getStatus().toLowerCase().contains("completed") || trackList.get(i).getStatus().toLowerCase().contains("failed") || trackList.get(i).getStatus().toLowerCase().contains("passed")) {
+            if (trackList.get(i).getStatusActual().toLowerCase().contains("completed") || trackList.get(i).getStatusActual().toLowerCase().contains("failed") || trackList.get(i).getStatusActual().toLowerCase().contains("passed")) {
 
                 isTraxkListCompleted = true;
 
@@ -486,7 +481,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 if (isCompleted) {
 
                     db.updateCMIstatus(myLearningModel, "Completed");
-                    myLearningModel.setStatus("Completed");
+                    myLearningModel.setStatusActual("Completed");
                 }
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
@@ -568,7 +563,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 //                        executeWorkFlowRules("onitemChange");
                     } else {
 
-                        if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
+                        if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
                             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
                                 i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true);
@@ -588,7 +583,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     }
                 } else {
 
-                    if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                         int i = -1;
 
                         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
@@ -666,7 +661,15 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     if (jsonArray.length() > 0) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String status = jsonObject.get("status").toString();
+                        String status = "";
+                        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+
+                            status = jsonObject.optString("Name").trim();
+                        } else {
+
+                            status = jsonObject.optString("status").trim();
+                        }// esperanza call
+
                         String progress = "";
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
@@ -678,8 +681,6 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         } else {
                             i = db.updateContentStatusInTrackList(myLearningModelLocal, status, progress, false);
                         }
-
-
                         if (i == 1) {
                             injectFromDbtoModel();
 //                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
@@ -708,7 +709,9 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 }
 
             }
-        };
+        }
+
+        ;
     }
 
     public void dismissSvProgress() {
@@ -1169,7 +1172,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                         .get("conditionoperator")) {
                                                     case "==":
                                                         try {
-                                                            if ((tlItem.getStatus()
+                                                            if ((tlItem.getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1188,7 +1191,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                     case "!=":
                                                         try {
                                                             if (!(tlItem
-                                                                    .getStatus()
+                                                                    .getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1223,7 +1226,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                         .get("conditionoperator")) {
                                                     case "==":
                                                         try {
-                                                            if ((tlItem.getStatus()
+                                                            if ((tlItem.getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1242,7 +1245,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                     case "!=":
                                                         try {
                                                             if (!(tlItem
-                                                                    .getStatus()
+                                                                    .getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1486,7 +1489,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                     for (int it = 0; it < coursesCount; it++) {
                                         MyLearningModel tlItem = trackListModelList
                                                 .get(it);
-                                        if (tlItem.getStatus().toLowerCase()
+                                        if (tlItem.getStatusActual().toLowerCase()
                                                 .equals("not started")) {
                                             String showStatus = "";
                                             switch (actmap.get("actiontype")) {
@@ -1622,7 +1625,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                         if (actmap.get("actionitemid").equals(
                                                 tlItem.getContentID())) {
 
-                                            if (tlItem.getStatus()
+                                            if (tlItem.getStatusActual()
                                                     .toLowerCase()
                                                     .equals("not started")) {
                                                 String showStatus = "";
@@ -1807,7 +1810,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
         if (isTraxkList) {
 
-            if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
+            if (!myLearningModel.getStatusActual().toLowerCase().contains("completed")) {
                 workFlowType = "onlaunch";
                 executeWorkFlowRules(workFlowType);
             }
@@ -2219,7 +2222,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                         .get("conditionoperator")) {
                                                     case "==":
                                                         try {
-                                                            if ((tlItem.getStatus()
+                                                            if ((tlItem.getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -2238,7 +2241,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                     case "!=":
                                                         try {
                                                             if (!(tlItem
-                                                                    .getStatus()
+                                                                    .getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -2273,7 +2276,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                         .get("conditionoperator")) {
                                                     case "==":
                                                         try {
-                                                            if ((tlItem.getStatus()
+                                                            if ((tlItem.getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -2292,7 +2295,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                                     case "!=":
                                                         try {
                                                             if (!(tlItem
-                                                                    .getStatus()
+                                                                    .getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -2536,7 +2539,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                     for (int it = 0; it < coursesCount; it++) {
                                         MyLearningModel tlItem = trackListModelList
                                                 .get(it);
-                                        if (tlItem.getStatus().toLowerCase()
+                                        if (tlItem.getStatusActual().toLowerCase()
                                                 .equals("not started")) {
                                             String showStatus = "";
                                             switch (actmap.get("actiontype")) {
@@ -2675,7 +2678,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                                         if (actmap.get("actionitemid").equals(
                                                 tlItem.getContentID())) {
 
-                                            if (tlItem.getStatus()
+                                            if (tlItem.getStatusActual()
                                                     .toLowerCase()
                                                     .equals("not started")) {
                                                 String showStatus = "";

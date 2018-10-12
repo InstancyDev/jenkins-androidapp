@@ -477,7 +477,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(imgThumb);
 
-            statusUpdate(myLearningModel.getStatus());
+            statusUpdate(myLearningModel.getStatusActual());
         } else {
             Toast.makeText(this, "Unable to fetch", Toast.LENGTH_SHORT).show();
 
@@ -888,7 +888,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("20") | myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
 
-                    if (!myLearningModel.getStatus().toLowerCase().contains("completed")) {
+                    if (!myLearningModel.getStatusActual().toLowerCase().contains("completed")) {
                         buttonSecond.setText(getResources().getString(R.string.details_button_setcompletebutton));
                         buttonSecond.setTag(6);
                         relativeSecond.setVisibility(View.VISIBLE);
@@ -976,25 +976,28 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             String progressPercent = "100";
             String statusValue = courseStatus;
             if (courseStatus.equalsIgnoreCase("Completed")) {
-                statusValue = "Completed";
+//                statusValue = "Completed";
+                statusValue = getResources().getString(R.string.status_completed);
 
             } else if (courseStatus.equalsIgnoreCase("failed")) {
 
-                statusValue = "Completed(failed)";
+//                statusValue = "Completed(failed)";
+                statusValue = getResources().getString(R.string.status_completed_failed);
             } else if (courseStatus.equalsIgnoreCase("passed")) {
 
-                statusValue = "Completed(passed)";
-
+//                statusValue = "Completed(passed)";
+                statusValue = getResources().getString(R.string.status_completed_passed);
             }
 
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusCompleted)));
             progressBar.setProgress(Integer.parseInt(progressPercent));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-//                courseStatus = trackChildList.getStatus() + " (" + trackChildList.getProgress();
+//                courseStatus = trackChildList.getStatusActual() + " (" + trackChildList.getProgress();
             displayStatus = statusValue + " (" + progressPercent;
 
         } else if (courseStatus.equalsIgnoreCase("Not Started")) {
             String progressPercent = "0";
+
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusNotStarted)));
             progressBar.setProgress(Integer.parseInt(progressPercent));
@@ -1004,6 +1007,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
         } else if (courseStatus.toLowerCase().contains("incomplete") || (courseStatus.toLowerCase().contains("inprogress")) || (courseStatus.toLowerCase().contains("in progress"))) {
             String progressPercent = "50";
             String statusValue = "In Progress";
+            statusValue = getResources().getString(R.string.status_inprogress);
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusInProgress)));
             progressBar.setProgress(Integer.parseInt(progressPercent));
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
@@ -1013,6 +1017,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
 
             String status = "Pending Review";
+            status = getResources().getString(R.string.status_pending_review);
             progressBar.setProgress(100);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = status + "(" + 100;
@@ -1020,8 +1025,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorGray)));
             String status = "";
 
-            status = courseStatus;
-
+            status = getResources().getString(R.string.status_registered);
             progressBar.setProgress(100);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorGray));
             courseStatus = status;
@@ -1030,16 +1034,13 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
             String status = "";
 
             status = courseStatus;
-
+            status = getResources().getString(R.string.status_attended);
 
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             courseStatus = status;
         } else if (courseStatus.toLowerCase().contains("Expired")) {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorStatusOther)));
-            String status = "";
-
-            status = courseStatus;
-
+            String status = getResources().getString(R.string.status_expired);
             txtCourseStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             courseStatus = status;
         } else {
@@ -1059,7 +1060,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
             txtCourseStatus.setText(displayStatus + "%)");
         }
-        myLearningModel.setStatus(courseStatus);
+        myLearningModel.setStatusActual(courseStatus);
     }
 
     void initVolleyCallback() {
@@ -1383,7 +1384,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                         }
                     } else {
-                        if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
                             i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
                             if (i == 1) {
@@ -1399,7 +1400,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     }
                 } else {
 
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                         int i = -1;
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
                         statusUpdate(getResources().getString(R.string.metadata_status_progress));
@@ -1412,7 +1413,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        statusUpdate(myLearningModel.getStatus());
+                        statusUpdate(myLearningModel.getStatusActual());
                     }
 
                 }
@@ -1429,7 +1430,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 //                    }
 //                } else {
 //
-//                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+//                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
 //                        int i = -1;
 //                        i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
 //                        if (i == 1) {
@@ -1499,7 +1500,14 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                     if (jsonArray.length() > 0) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String status = jsonObject.get("status").toString();
+                        String status = "";
+                        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+                            // esperanza call
+                            status = jsonObject.optString("Name").trim();
+                        } else {
+
+                            status = jsonObject.optString("status").trim();
+                        }
                         String progress = "";
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
@@ -1509,7 +1517,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
 //                            Toast.makeText(MyLearningDetail_Activity.this, "Status updated!", Toast.LENGTH_SHORT).show();
 
-                            myLearningModel.setStatus(status);
+                            myLearningModel.setStatusActual(status);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 statusUpdate(status);
                             }
@@ -1680,12 +1688,12 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             zipfile.delete();
                         }
 
-//                        if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+//                        if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
 //                            callMobileGetContentTrackedData(learningModel);
 //                        }
 
                         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                                 callMobileGetContentTrackedData(learningModel);
                                 callMobileGetMobileContentMetaData(learningModel);
                             } else {
@@ -1694,7 +1702,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             }
 
                         } else {
-                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                                 callMobileGetContentTrackedData(learningModel);
 
                             }

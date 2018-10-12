@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -120,7 +121,6 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         } catch (RuntimeException ex) {
-
             ex.printStackTrace();
         }
 
@@ -311,11 +311,10 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                         try {
                             expandableListDetail = fetchCategoriesData(response, false, sideMenusModel);
                             boolean parentExistss = isParentComponentExists(response, sideMenusModel);
-                            if (!parentExistss) {
-                                chxSelectedCategory.setVisibility(View.GONE);
-                                checkSelectedBool = false;
-
-                            }
+//                            if (!parentExistss) {
+//                                chxSelectedCategory.setVisibility(View.GONE);
+//                                checkSelectedBool = false;
+//                            }
                             expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
                             responseReceived = response;
                             updateListView(true);
@@ -349,6 +348,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
+//          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
             item_search.setTitle("Search");
             final SearchView searchView = (SearchView) item_search.getActionView();
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
@@ -356,6 +356,43 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
+
+//            ImageView searchClose = searchView.findViewById(android.support.v7.appcompat.R.id.home);
+//            searchClose.setImageResource(R.drawable.ic_filter_list_black_24dp);
+
+            // Set search view clear icon
+            ImageView searchIconClearView = (ImageView) searchView
+                    .findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+            if (searchIconClearView != null) {
+                Log.v("CLR", "Should Change Clear Icon here");
+
+                searchIconClearView
+                        .setImageResource(R.drawable.close);
+
+            }
+            // Does help!
+
+            final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+            upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
+
+
+//            item_search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+//
+//                @Override
+//                public boolean onMenuItemActionExpand(MenuItem menuItem) {
+//
+////                    getSupportActionBar().setHomeAsUpIndicator(upArrow);
+//
+//                    return true;
+//                }
+//
+//                @Override
+//                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+////                    getSupportActionBar().setHomeAsUpIndicator(upArrow);
+//                    return true;
+//                }
+//            });
+
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override

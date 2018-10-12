@@ -2,7 +2,6 @@ package com.instancy.instancylearning.mylearning;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,12 +10,10 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.provider.CalendarContract;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -61,17 +58,14 @@ import com.instancy.instancylearning.filter.Filter_activity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
-import com.instancy.instancylearning.globalsearch.GlobalSearchAdapter;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.FiltersApplyModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -87,13 +81,9 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -101,7 +91,6 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ir.mahdi.mzip.zip.ZipArchive;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
@@ -416,7 +405,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
             if (myLearningModelsList.size() > 0) {
 
-                if (!myLearningModelsList.get(0).getStatus().toLowerCase().contains("completed") && firstTimeVisible) {
+                if (!myLearningModelsList.get(0).getStatusActual().toLowerCase().contains("completed") && firstTimeVisible) {
 
                     if (myLearninglistView != null) {
                         myLearninglistView.performItemClick(getView(), 0, R.id.title_text);
@@ -1056,7 +1045,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         myLearningAdapter.notifyDataSetChanged();
 
                         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                                 callMobileGetContentTrackedData(learningModel);
                                 callMobileGetMobileContentMetaData(learningModel);
                             } else {
@@ -1065,7 +1054,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             }
 
                         } else {
-                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                                 callMobileGetContentTrackedData(learningModel);
 
                             }
@@ -1188,7 +1177,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                         }
                     } else {
-                        if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
                             i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
                             if (i == 1) {
@@ -1201,7 +1190,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         }
                     }
                 } else {
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                         int i = -1;
                         i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.metadata_status_progress), "50");
 
@@ -1334,7 +1323,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     if (jsonArray.length() > 0) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String status = jsonObject.get("status").toString();
+                        String status = "";
+                        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+
+                            status = jsonObject.optString("Name").trim();
+                        } else {
+
+                            status = jsonObject.optString("status").trim();
+                        }// esperanza call
+
+
                         String progress = "";
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();

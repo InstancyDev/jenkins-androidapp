@@ -59,6 +59,7 @@ public class GlobalSearchCategoryModel implements Serializable {
                         model.siteName = object.optString("SiteName");
                         model.displayName = object.optString("DisplayName");
                         model.contextMenuId = object.optInt("NativeCompID", 0);
+                        model.siteurl = object.optString("LearnerSiteURL");
                         model.chxBoxChecked = valueChecked;
                         advancedFilterModelList.add(i, model);
 

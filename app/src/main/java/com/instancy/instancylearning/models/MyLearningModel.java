@@ -103,8 +103,10 @@ public class MyLearningModel implements Serializable {
     String scoId = "";
     String startPage = "";
 
-    String status = "";
+    String statusActual = "";
+
     String statusDisplay = "";
+
     String contentType = "";
     String longDes = "";
     String mediaName = "";
@@ -571,12 +573,12 @@ public class MyLearningModel implements Serializable {
         this.startPage = startPage;
     }
 
-    public String getStatus() {
-        return status;
+    public String getStatusActual() {
+        return statusActual;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatusActual(String statusActual) {
+        this.statusActual = statusActual;
     }
 
     public String getStatusDisplay() {

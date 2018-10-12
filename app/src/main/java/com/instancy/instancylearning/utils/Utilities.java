@@ -1209,6 +1209,9 @@ public class Utilities {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date strDate = null;
 
+        if (!isValidString(eventDate))
+            return false;
+
         try {
             strDate = sdf.parse(eventDate);
         } catch (ParseException e) {
@@ -1361,14 +1364,12 @@ public class Utilities {
     /**
      * Unzip a ZIP file, keeping the directory structure.
      *
-     * @param zipFile
-     *     A valid ZIP file.
-     * @param destinationDir
-     *     The destination directory. It will be created if it doesn't exist.
+     * @param zipFile        A valid ZIP file.
+     * @param destinationDir The destination directory. It will be created if it doesn't exist.
      * @return {@code true} if the ZIP file was successfully decompressed.
      */
     public static boolean unzip(File zipFile, File destinationDir) {
-          int BUFFER_SIZE = 6 * 1024;
+        int BUFFER_SIZE = 6 * 1024;
         ZipFile zip = null;
         try {
             destinationDir.mkdirs();

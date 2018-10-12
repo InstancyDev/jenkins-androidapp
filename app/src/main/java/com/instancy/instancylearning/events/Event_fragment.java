@@ -103,12 +103,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 
 import butterknife.BindView;
@@ -1699,7 +1697,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             // values.put("allDay", 1); //If it is bithday alarm or such
             // kind (which should remind me for whole day) 0 for false, 1
             // for true
-            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
+            eventValues.put("eventStatus", eventModel.getStatusActual()); // This information is
             // sufficient for most
             // entries tentative (0),
             // confirmed (1) or canceled

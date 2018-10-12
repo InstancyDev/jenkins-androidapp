@@ -119,8 +119,8 @@ public class Personalinfo_activity extends AppCompatActivity {
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
 
-        txtSave.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
-        txtCancel.setText(getResources().getString(R.string.profile_button_educationsavebutton));
+        txtCancel.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
+        txtSave.setText(getResources().getString(R.string.profile_button_educationsavebutton));
 
         svProgressHUD = new SVProgressHUD(context);
         initVolleyCallback();

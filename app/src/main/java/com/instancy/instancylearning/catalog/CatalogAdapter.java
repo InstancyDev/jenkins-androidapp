@@ -10,10 +10,8 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,48 +23,34 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
-import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
-import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -463,10 +447,10 @@ public class CatalogAdapter extends BaseAdapter {
                         // ## Ascending order
 
                         if (isAscn) {
-                            return obj1.getStatus().compareToIgnoreCase(obj2.getStatus());
+                            return obj1.getStatusActual().compareToIgnoreCase(obj2.getStatusActual());
 
                         } else {
-                            return obj2.getStatus().compareToIgnoreCase(obj1.getStatus());
+                            return obj2.getStatusActual().compareToIgnoreCase(obj1.getStatusActual());
                         }
                     }
                 });

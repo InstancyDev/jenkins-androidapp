@@ -1,7 +1,6 @@
 package com.instancy.instancylearning.globalpackage;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,8 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -30,7 +27,6 @@ import android.widget.Toast;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalsearch.GlobalSearchResultsActivity;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
@@ -38,7 +34,6 @@ import com.instancy.instancylearning.mainactivities.AdvancedWebCourseLaunch;
 import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
-import com.instancy.instancylearning.models.GlobalSearchResultModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
 import com.instancy.instancylearning.models.LearnerSessionModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -46,7 +41,6 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
 import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
-import com.instancy.instancylearning.mylearning.MyLearningFragment;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -223,7 +217,7 @@ public class GlobalMethods {
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
                 offlinePath = "file://" + myLearningModel.getOfflinepath();
-                if (myLearningModel.getStatus().equalsIgnoreCase("Not Started") || myLearningModel.getStatus().equalsIgnoreCase("")) {
+                if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") || myLearningModel.getStatusActual().equalsIgnoreCase("")) {
 
                     CMIModel model = new CMIModel();
                     model.set_datecompleted("");
@@ -459,7 +453,7 @@ public class GlobalMethods {
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
 
-                        if (myLearningModel.getStatus().equalsIgnoreCase("Not Started") || myLearningModel.getStatus().equalsIgnoreCase("")) {
+                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") || myLearningModel.getStatusActual().equalsIgnoreCase("")) {
 
                             CMIModel model = new CMIModel();
                             model.set_datecompleted("");
@@ -889,7 +883,6 @@ public class GlobalMethods {
 
         }
 
-
         if (myFile.exists() && !myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
 
             menu.getItem(10).setVisible(true);
@@ -910,7 +903,7 @@ public class GlobalMethods {
                 menu.getItem(0).setVisible(false);
                 menu.getItem(1).setVisible(true);
             }
-            if (myLearningDetalData.getStatus().contains("completed") || myLearningDetalData.getStatus().contains("Completed")) {
+            if (myLearningDetalData.getStatusActual().contains("completed") || myLearningDetalData.getStatusActual().contains("Completed")) {
 
                 menu.getItem(7).setVisible(false);
 
@@ -927,7 +920,7 @@ public class GlobalMethods {
 
             }
 
-//            if (!myLearningDetalData.getStatus().toLowerCase().contains("completed")) {
+//            if (!myLearningDetalData.getStatusActual().toLowerCase().contains("completed")) {
 //
 //                menu.getItem(6).setVisible(true);
 //
@@ -1730,7 +1723,7 @@ public class GlobalMethods {
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
 
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started") || myLearningModel.getStatus().equalsIgnoreCase("")) {
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") || myLearningModel.getStatusActual().equalsIgnoreCase("")) {
 
                         CMIModel model = new CMIModel();
                         model.set_datecompleted("");
@@ -2111,7 +2104,7 @@ public class GlobalMethods {
         myLearningModel.setLocationName(globalSearchResultModelNew.location);
         myLearningModel.setScoId("" + globalSearchResultModelNew.scoid);
         myLearningModel.setParticipantUrl(globalSearchResultModelNew.participanturl);
-        myLearningModel.setStatus(globalSearchResultModelNew.status);
+        myLearningModel.setStatusActual(globalSearchResultModelNew.status);
         myLearningModel.setPassword(appUserModel.getPassword());
         myLearningModel.setDisplayName(globalSearchResultModelNew.name);
         myLearningModel.setIsListView("false");

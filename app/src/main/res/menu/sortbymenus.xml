@@ -1,0 +1,33 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/ctx_ssort_select"
+        android:enabled="false"
+        android:orderInCategory="100"
+        android:title="@string/ctx_sortby_select" />
+
+    <item
+        android:id="@+id/ctx_sort_activity"
+        android:orderInCategory="100"
+        android:title="@string/ctx_sortby_recent_activity" />
+
+    <item
+        android:id="@+id/ctx_sort_answers"
+        android:orderInCategory="100"
+        android:title="@string/ctx_sortby_most_answer" />
+
+    <item
+        android:id="@+id/ctx_sort_views"
+        android:orderInCategory="100"
+        android:title="@string/ctx_sortby_views" />
+
+    <item
+        android:id="@+id/ctx_sort_title"
+        android:orderInCategory="100"
+        android:title="@string/ctx_sortby_title" />
+
+
+</menu>
+

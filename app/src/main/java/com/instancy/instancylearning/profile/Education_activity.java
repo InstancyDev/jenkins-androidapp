@@ -222,8 +222,8 @@ public class Education_activity extends AppCompatActivity {
 
         }
 
-        txtSave.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
-        txtCancel.setText(getResources().getString(R.string.profile_button_educationsavebutton));
+        txtSave.setText(getResources().getString(R.string.profile_button_educationsavebutton));
+        txtCancel.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
     }
 
     public void initilizeSpinnersView() {

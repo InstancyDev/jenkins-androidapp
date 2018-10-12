@@ -1,11 +1,14 @@
 package com.instancy.instancylearning.askexpert;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -23,6 +26,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,6 +51,7 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
@@ -71,6 +76,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.toStringS;
@@ -121,6 +127,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     TextView txtSave;
 
 
+
     @Nullable
     @BindView(R.id.edit_description)
     EditText editDescription;
@@ -129,17 +136,6 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     @BindView(R.id.edit_attachment)
     EditText editAttachment;
 
-    @Nullable
-    @BindView(R.id.swtchskills)
-    Switch switchSkills;
-
-    @Nullable
-    @BindView(R.id.switchcommunication)
-    Switch switchCommunication;
-
-    @Nullable
-    @BindView(R.id.switchrelatinship)
-    Switch switchrelatinship;
 
     @Nullable
     @BindView(R.id.bottomlayout)
@@ -178,6 +174,8 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
+
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
@@ -239,27 +237,6 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //        styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 28, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelDescritpion.setText(styledDescription);
-
-        switchCommunication.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                if (bChecked) {
-                    allowCommunication = true;
-                } else {
-                    allowCommunication = false;
-                }
-            }
-        });
-        switchSkills.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                if (bChecked) {
-                    allowSkills = true;
-                } else {
-                    allowSkills = false;
-                }
-            }
-        });
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

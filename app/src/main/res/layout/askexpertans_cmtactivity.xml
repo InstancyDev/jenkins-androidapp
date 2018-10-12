@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_relative"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/txt_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Answer :" />
+
+        <EditText
+            android:id="@+id/edit_description"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@drawable/edittext_border"
+            android:gravity="top|start"
+            android:hint="Enter your Answer here..."
+            android:maxLength="1000"
+            android:maxLines="100"
+            android:padding="10dp" />
+
+        <TextView
+            android:id="@+id/txt_relaventskills"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textColor="@color/colorBlack" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <EditText
+                android:id="@+id/edit_attachment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2.0"
+                android:background="@drawable/edittext_border"
+                android:enabled="false"
+                android:padding="8dp" />
+
+            <TextView
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:padding="4dp" />
+
+            <Button
+                android:id="@+id/btnUpload"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:drawableStart="@drawable/ic_menu_camera"
+                android:padding="3dp"
+                android:text="Upload"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false" />
+
+            <TextView
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:padding="4dp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomlayout"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/txtcancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="actionsBottomBtns"
+            android:text="Cancel"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite" />
+
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite" />
+
+        <TextView
+            android:id="@+id/txtsave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="actionsBottomBtns"
+            android:text="Submit"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite" />
+
+    </LinearLayout>
+</RelativeLayout>

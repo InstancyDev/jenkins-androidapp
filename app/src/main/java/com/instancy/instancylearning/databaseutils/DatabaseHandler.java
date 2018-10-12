@@ -362,15 +362,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_NATIVEMENUS
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, menuid TEXT, displayname TEXT, displayorder INTEGER, image TEXT, isofflinemenu TEXT, isenabled TEXT, contexttitle TEXT, contextmenuid TEXT, repositoryid TEXT, landingpagetype TEXT, categorystyle TEXT, componentid TEXT, conditions TEXT, parentmenuid TEXT, parameterstrings TEXT, siteid TEXT, siteurl TEXT,webmenuid INT)");
 
-
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA_REPORTS
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
 
         //used upto here
@@ -406,11 +405,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,displaystatus TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -1742,7 +1741,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * @author Upendra
      */
 
-    public List<SideMenusModel> getNativeMainMenusData(boolean isAzureEnabled,Context context) {
+    public List<SideMenusModel> getNativeMainMenusData(boolean isAzureEnabled, Context context) {
         List<SideMenusModel> menuList = null;
         SideMenusModel menu = null;
         Boolean isMylearning = false;
@@ -2283,7 +2282,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel myLearningModel = new MyLearningModel();
             ContentValues contentValues = null;
@@ -2458,11 +2456,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
                 // status
-                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+                if (jsonMyLearningColumnObj.has("actualstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
 
                 }
+
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    myLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+
                 // userName
                 myLearningModel.setUserName(appUserModel.getUserName());
                 // longdes
@@ -2686,7 +2691,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("progress")) {
 
                     myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                         ejectRecordsinCmi(myLearningModel);
 
                     }
@@ -2783,7 +2788,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("timezone", myLearningModel.getTimeZone());
             contentValues.put("participanturl", myLearningModel.getParticipantUrl());
 //            contentValues.put("courselaunchpath", myLearningModel.getCourseName());
-            contentValues.put("status", myLearningModel.getStatus());
+            contentValues.put("status", myLearningModel.getStatusActual());
+            contentValues.put("displaystatus", myLearningModel.getStatusDisplay());
+
 //            contentValues.put("eventid", myLearningModel.getEventContentid());
             contentValues.put("islistview", myLearningModel.getIsListView());
             contentValues.put("password", myLearningModel.getPassword());
@@ -2918,8 +2925,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("scoid")));
                     myLearningModel.setParticipantUrl(cursor.getString(cursor
                             .getColumnIndex("participanturl")));
-                    myLearningModel.setStatus(cursor.getString(cursor
+                    myLearningModel.setStatusActual(cursor.getString(cursor
                             .getColumnIndex("objStatus")));
+
+                    myLearningModel.setStatusDisplay(cursor.getString(cursor
+                            .getColumnIndex("displaystatus")));
+
                     myLearningModel.setPassword(cursor.getString(cursor
                             .getColumnIndex("password")));
                     myLearningModel.setDisplayName(cursor.getString(cursor
@@ -2985,6 +2996,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventendUtcTime(cursor.getString(cursor
                             .getColumnIndex("eventendUtctime")));
 
+
                     myLearningModel.setAddedToMylearning(1);
 
                     myLearningModelList.add(myLearningModel);
@@ -3019,7 +3031,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel myLearningModel = new MyLearningModel();
 
@@ -3169,9 +3180,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
                 // status
+                if (jsonMyLearningColumnObj.has("actualstatus")) {
+
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
+
+                }
+
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                 }
 
@@ -3590,6 +3607,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("eventstartUtctime", myLearningModel.getEventstartUtcTime());
             contentValues.put("eventendUtctime", myLearningModel.getEventendUtcTime());
 
+
+
+
+
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -3828,7 +3849,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel myLearningModel = new MyLearningModel();
 
@@ -3995,9 +4015,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
                 // status
+                if (jsonMyLearningColumnObj.has("actualstatus")) {
+
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
+
+                }
+
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                 }
 
@@ -4399,7 +4425,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("noofusersenrolled", myLearningModel.getNoofusersenrolled());
 
 
-
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -4687,7 +4712,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel trackLearningModel = new MyLearningModel();
 
@@ -4932,21 +4956,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
                 // status
-                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+                if (jsonMyLearningColumnObj.has("actualstatus")) {
 
-                    String status = jsonMyLearningColumnObj.get("corelessonstatus").toString();
-                    if (!isValidString(status)) {
-                        status = "Not Started";
-                        if (status.equalsIgnoreCase("Not Started")) {
+                    String status = jsonMyLearningColumnObj.get("actualstatus").toString();
+//                    if (!isValidString(status)) {
+//                        status = "Not Started";
+//                        if (status.equalsIgnoreCase("Not Started")) {
+//
+//                            // delete usersession
+//
 
-                            // delete usersession
+//                        }
+//                    }
 
-                        }
-                    }
-
-                    trackLearningModel.setStatus(status);
+                    trackLearningModel.setStatusActual(status.trim());
 
                 }
+
+
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    trackLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+
 
                 // longdes
                 if (jsonMyLearningColumnObj.has("longdescription")) {
@@ -5192,7 +5225,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             ejectRecordsinTracklistTable(myLearningModel.getSiteID(), myLearningModel.getTrackScoid(), myLearningModel.getUserID(), true);
             for (int i = 0; i < jsonTrackList.length(); i++) {
                 JSONObject jsonMyLearningColumnObj = jsonTrackList.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
                 MyLearningModel trackLearningModel = new MyLearningModel();
                 ContentValues contentValues = null;
@@ -5289,7 +5321,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //            // siteid
 //            if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 //
-//                trackLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+//                trackLearningModel.setStatusActual(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 //
 //            }
 
@@ -5403,9 +5435,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     }
                     // status
+                    if (jsonMyLearningColumnObj.has("actualstatus")) {
+
+                        trackLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
+
+                    }
+
                     if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                        trackLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                        trackLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                     }
 
@@ -5605,7 +5643,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("timezone", trackListModel.getTimeZone());
             contentValues.put("participanturl", trackListModel.getParticipantUrl());
             contentValues.put("trackscoid", trackListModel.getTrackScoid());
-            contentValues.put("status", trackListModel.getStatus());
+            contentValues.put("status", trackListModel.getStatusActual().trim());
+            contentValues.put("displaystatus", trackListModel.getStatusDisplay());
             contentValues.put("eventid", trackListModel.getEventID());
             contentValues.put("password", trackListModel.getPassword());
             contentValues.put("displayname", trackListModel.getDisplayName());
@@ -5731,13 +5770,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("objStatus"));
 
                     if (objStatus.toLowerCase().contains("passed")) {
-                        trackListModel.setStatus("Completed (passed)");
+                        trackListModel.setStatusActual("Completed (passed)");
                     } else if (objStatus.toLowerCase().contains("failed")) {
-                        trackListModel.setStatus("Completed (failed)");
+                        trackListModel.setStatusActual("Completed (failed)");
                     } else {
 
-                        trackListModel.setStatus(objStatus);
+                        trackListModel.setStatusActual(objStatus);
                     }
+
+                    trackListModel.setStatusDisplay(cursor.getString(cursor
+                            .getColumnIndex("displaystatus")));
 
 
                     trackListModel.setPassword(cursor.getString(cursor
@@ -5750,7 +5792,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("courseattempts")));
                     trackListModel.setEventContentid(cursor.getString(cursor
                             .getColumnIndex("eventcontentid")));
-
 
                     trackListModel.setMediatypeId(cursor.getString(cursor
                             .getColumnIndex("mediatypeid")));
@@ -5941,7 +5982,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("timezone", trackListModel.getTimeZone());
             contentValues.put("participanturl", trackListModel.getParticipantUrl());
             contentValues.put("trackscoid", trackListModel.getTrackScoid());
-            contentValues.put("status", trackListModel.getStatus());
+            contentValues.put("status", trackListModel.getStatusActual());
+            contentValues.put("displaystatus", trackListModel.getStatusDisplay());
             contentValues.put("islistview", trackListModel.getIsListView());
             contentValues.put("password", trackListModel.getPassword());
             contentValues.put("displayname", trackListModel.getDisplayName());
@@ -6151,7 +6193,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             CMIModel cmiModel = new CMIModel();
 
-            //corelessonstatus
+            //actualstatus
+//            if (jsonCMiColumnObj.has("actualstatus")) {
+//
+//                String string = jsonCMiColumnObj.get("actualstatus").toString();
+//
+//                if (isValidString(string)) {
+//                    cmiModel.set_status(string);
+//                } else {
+//                    cmiModel.set_status("");
+//                }
+//
+//            }
+
             if (jsonCMiColumnObj.has("corelessonstatus")) {
 
                 String string = jsonCMiColumnObj.get("corelessonstatus").toString();
@@ -6163,6 +6217,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
 
             }
+
 //            // statusdisplayname
 //            if (jsonCMiColumnObj.has("statusdisplayname")) {
 //
@@ -6187,7 +6242,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 //                cmiModel.set_location(jsonCMiColumnObj.get("corelessonlocation").toString());
 
-
                 String string = jsonCMiColumnObj.get("corelessonlocation").toString();
 
                 if (isValidString(string)) {
@@ -6195,8 +6249,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 } else {
                     cmiModel.set_location("");
                 }
-
-
             }
 
             // author
@@ -8126,7 +8178,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 }
             }
         } catch (Exception e) {
-            Log.d("Insertstudentresponse s ", e.getMessage());
+            Log.d(" s ", e.getMessage());
         }
 
         cursor.close();
@@ -10009,7 +10061,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String paramsString = "ContentID="
                         + learningModel.getContentID() + "&UserID=" + learningModel.getUserID()
-                        + "&ScoId=" + learningModel.getScoId();
+                        + "&ScoId=" + learningModel.getScoId()+"&SiteID="+learningModel.getSiteID();
 
                 paramsString = paramsString.replace(" ", "%20");
 
@@ -10181,7 +10233,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             MyLearningModel myLearningModel = new MyLearningModel();
             ContentValues contentValues = null;
@@ -10334,11 +10385,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 }
                 // status
-                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+                if (jsonMyLearningColumnObj.has("actualstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
 
                 }
+
+                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+
+                    myLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+
+                }
+
                 // userName
                 myLearningModel.setUserName(appUserModel.getUserName());
                 // longdes
@@ -10576,11 +10634,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (jsonMyLearningColumnObj.has("progress")) {
 
                     myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                         ejectRecordsinCmi(myLearningModel);
                     }
                 } else {
-                    myLearningModel.setStatus("Not Started");
+                    myLearningModel.setStatusActual("Not Started");
                 }
 
                 getTrackScoIdsAndDeleteCMI(myLearningModel);
@@ -10930,7 +10988,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public List<SignUpConfigsModel> fetchUserSignConfigs() {
+    public List<SignUpConfigsModel> fetchUserSignConfigs(Context context) {
 
 
         List<SignUpConfigsModel> signUpConfigsModelList = new ArrayList<>();
@@ -10965,7 +11023,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                         SignUpConfigsModel confirmPasswordModel = new SignUpConfigsModel();
                         confirmPasswordModel.datafieldname = "ConfirmPassword";
-                        confirmPasswordModel.displaytext = "Confirm Password";
+                        confirmPasswordModel.displaytext = context.getResources().getString(R.string.confirm_password);
                         confirmPasswordModel.isrequired = "true";
                         confirmPasswordModel.attributeconfigid = "-1";
                         signUpConfigsModelList.add(confirmPasswordModel);
@@ -13299,8 +13357,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void updateEventAddedToMyLearningInEventCatalog(MyLearningModel myLearningModel, int statusValue) {
-        String strUpdateML = "UPDATE " + TBL_EVENTCONTENTDATA + " SET isaddedtomylearning='"
-                + statusValue + "' WHERE siteid ='" + myLearningModel.getSiteID() + "' AND userid ='"
+        String strUpdateML = "UPDATE " + TBL_EVENTCONTENTDATA + " SET isaddedtomylearning="
+                + statusValue + ", waitlistenrolls = " + myLearningModel.getWaitlistenrolls() + "  WHERE siteid ='" + myLearningModel.getSiteID() + "' AND userid ='"
                 + myLearningModel.getUserID() + "' AND siteurl='" + myLearningModel.getSiteURL() + "' AND contentid='" + myLearningModel.getContentID() + "'";
 
         try {
@@ -13320,7 +13378,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             DiscussionForumModel discussionForumModel = new DiscussionForumModel();
 
@@ -13641,7 +13698,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             DiscussionTopicModel discussionTopicModel = new DiscussionTopicModel();
 
@@ -13866,7 +13922,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             DiscussionCommentsModel discussionCommentsModel = new DiscussionCommentsModel();
 
@@ -14082,7 +14137,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             CommunitiesModel communitiesModel = new CommunitiesModel();
 
@@ -14336,7 +14390,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             PeopleListingModel peopleListingModel = new PeopleListingModel();
 
@@ -14716,7 +14769,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             NotificationModel notificationModel = new NotificationModel();
 
@@ -15167,7 +15219,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
 
             AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
 

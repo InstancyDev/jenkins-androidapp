@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -24,6 +25,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -80,7 +82,6 @@ import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 
-import com.instancy.instancylearning.mycompetency.SkillModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -853,6 +854,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
+            txtSearch.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+
+            searchView.setBackgroundColor(Color.RED);
+
+//            searchView.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorBlack)));
 
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -1108,7 +1114,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 } else {
 
                     menu.getItem(4).setVisible(false);
-                    menu.getItem(5).setVisible(true);//download
+//                    menu.getItem(5).setVisible(true);//download
 
                 }
             }
@@ -1138,7 +1144,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     } else {
 
                         menu.getItem(4).setVisible(false);
-                        menu.getItem(5).setVisible(true);
+//                        menu.getItem(5).setVisible(true);
                     }
                 }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
@@ -1152,7 +1158,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (myFile.exists()) {
 
                         menu.getItem(4).setVisible(true);
-
+                        menu.getItem(5).setVisible(false);
                     } else {
 
                         menu.getItem(4).setVisible(false);
@@ -1190,8 +1196,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             menu.getItem(5).setVisible(false);
         }
         if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-            menu.getItem(5).setVisible(true);
-//
+            File myFile = new File(myLearningDetalData.getOfflinepath());
+            if (myFile.exists()) {
+                menu.getItem(5).setVisible(false);
+            } else {
+                menu.getItem(5).setVisible(true);
+            }
         }
         if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
             menu.getItem(5).setVisible(false);
@@ -1201,7 +1211,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public boolean onMenuItemClick(MenuItem item) {
 
                 if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-                    
+
                     Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
                     intentDetail.putExtra("IFROMCATALOG", true);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
@@ -1843,7 +1853,18 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (jsonArray.length() > 0) {
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        String status = jsonObject.get("status").toString();
+                        String status = "";
+
+
+                        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+
+                            status = jsonObject.optString("Name").trim();
+                        } else {
+
+                            status = jsonObject.optString("status").trim();
+                        }// esperanza call
+
+
                         if (status.contains("failed to get statusObject reference not set to an instance of an object.")) {
                             status = "In Progress";
                         }
@@ -2152,7 +2173,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         catalogAdapter.notifyDataSetChanged();
 
                         if (learningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                                 callMobileGetContentTrackedData(learningModel);
                                 callMobileGetMobileContentMetaData(learningModel);
                             } else {
@@ -2161,7 +2182,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             }
 
                         } else {
-                            if (!learningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                            if (!learningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                                 callMobileGetContentTrackedData(learningModel);
 
                             }
@@ -2517,7 +2538,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 // status
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                 }
 

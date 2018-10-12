@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="actionsBottomBtns"
-            android:text="@string/btn_txt_signup"
+            android:text="@string/login_button_signupbutton"
             android:textAlignment="center"
             android:textColor="@color/colorWhite" />
 

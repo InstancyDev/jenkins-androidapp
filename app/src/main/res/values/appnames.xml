@@ -9,7 +9,7 @@
     <string name="tracktech">Tracktech lifeskills</string>
 
     <string name="trainingcompany">Training Company Lite</string>
-    <string name="cle_academy">CropLife Online Dealer Training</string>
+    <string name="cle_academy">CLE</string>
 
     <string name="acclife">Online Lifeskills</string>
 
@@ -24,5 +24,7 @@
     <string name="healthhelp">HealthHelp IE</string>
 
     <string name="mciswitchinstitute"> MCI Institute Switch </string>
+
+    <string name="app_esperanza"> AEI para Ti </string>
 
 </resources>

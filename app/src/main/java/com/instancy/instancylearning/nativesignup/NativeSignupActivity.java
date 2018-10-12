@@ -145,7 +145,9 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getResources().getString(R.string.btn_txt_signup) + "</font>"));
+                getResources().getString(R.string.login_button_signupbutton) + "</font>"));
+
+
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -175,7 +177,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
                 intentSocial.putExtra("ATTACHMENT", true);
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, termsUrl);
-                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Terms of use");
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, getResources().getString(R.string.terms_of_use));
                 startActivity(intentSocial);
 
             }
@@ -315,7 +317,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     public void injectFromDbToModel(JSONArray termsWebAry, JSONArray signUpConfigAry) {
 
-        signUpConfigsModelList = db.fetchUserSignConfigs();
+        signUpConfigsModelList = db.fetchUserSignConfigs(context);
 
         if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
             nativeSignupAdapter.refreshList(signUpConfigsModelList);
@@ -444,7 +446,7 @@ public class NativeSignupActivity extends AppCompatActivity {
         for (int i = 0; i < signUpConfigsModelList.size(); i++) {
             if (signUpConfigsModelList.get(i).isrequired.contains("true") && signUpConfigsModelList.get(i).valueName.length() == 0) {
                 Log.d(TAG, "validateNewForumCreation:  required " + signUpConfigsModelList.get(i).valueName);
-                Toast.makeText(context, "Enter " + signUpConfigsModelList.get(i).displaytext, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getResources().getString(R.string.enter_validation) + " " + signUpConfigsModelList.get(i).displaytext, Toast.LENGTH_SHORT).show();
                 isValidationCompleted = false;
                 break;
             } else {
@@ -453,7 +455,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
                     if (!passwordStr.equalsIgnoreCase(signUpConfigsModelList.get(i).valueName)) {
                         isValidationCompleted = false;
-                        Toast.makeText(context, "Password doesn't match", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getResources().getString(R.string.passwd_validation), Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
@@ -465,15 +467,18 @@ public class NativeSignupActivity extends AppCompatActivity {
                     isValidationCompleted = true;
                 } else {
                     isValidationCompleted = false;
-                    Toast.makeText(context, "Email is not valid", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getResources().getString(R.string.email_validation), Toast.LENGTH_SHORT).show();
                 }
             }
 
             if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("6")) {
                 passwordStr = signUpConfigsModelList.get(i).valueName;
-            } else {
-                passwordStr = uiSettingsModel.getCommonPasswordValue();
             }
+//            else {
+//                passwordStr = uiSettingsModel.getCommonPasswordValue();
+//            }
+
+
         }
 
         String finalString = "";
@@ -527,7 +532,7 @@ public class NativeSignupActivity extends AppCompatActivity {
                     Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(context, "Accept terms of use ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getResources().getString(R.string.accept_terms), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -619,11 +624,19 @@ public class NativeSignupActivity extends AppCompatActivity {
                 JSONObject userObj = usersignupdetailsAry.getJSONObject(0);
                 Toast.makeText(context, "" + userObj.optString("message"), Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(NativeSignupActivity.this, Login_activity.class);
+
+                if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+
+                    String userNames = userObj.getString("login");
+
+                }
+
                 if (userObj.getString("action").equalsIgnoreCase("selfregistration")) {
                     String userNames = userObj.getString("login");
+                    String pwsdValue = userObj.getString("pwd");
                     Bundle bundle = new Bundle();
                     bundle.putString(BUNDLE_USERNAME, userNames);
-                    bundle.putString(BUNDLE_PASSWORD, passwordStr);
+                    bundle.putString(BUNDLE_PASSWORD, pwsdValue);
                     loginIntent.putExtras(bundle);
                     startActivity(loginIntent);
                 } else {
@@ -641,7 +654,20 @@ public class NativeSignupActivity extends AppCompatActivity {
     private void getSignUpDetails() {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
+
+//        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=es-es&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
+
+        String urlStr = "";
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+
+            urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=es-es&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
+
+        } else {
+
+            urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
+
+        }// esperanza call
+
 
         urlStr = urlStr.replaceAll(" ", "%20");
 

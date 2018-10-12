@@ -600,6 +600,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 fragment = new DiscussionFourm_fragment();
                 break;
             case 5:
+//                fragment = new com.instancy.instancylearning.askexpertenached.AskExpertFragment();
                 fragment = new AskExpertFragment();
                 break;
             case 9:

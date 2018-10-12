@@ -45,7 +45,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +55,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -64,7 +62,6 @@ import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
@@ -82,7 +79,6 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1242,7 +1238,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 // status
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                 }
                 // userName
@@ -1482,11 +1478,11 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 if (jsonMyLearningColumnObj.has("progress")) {
 
                     myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
-                    if (myLearningModel.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
 
                     }
                 } else {
-                    myLearningModel.setStatus("Not Started");
+                    myLearningModel.setStatusActual("Not Started");
                 }
 
             }

@@ -95,7 +95,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(this);
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Forgot Password</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getResources().getString(R.string.login_button_forgotpasswordbutton) + "</font>"));
         initilizeView(uiSettingsModel);
 
         try {

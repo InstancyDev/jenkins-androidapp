@@ -77,6 +77,7 @@ import com.instancy.instancylearning.catalog.CatalogAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
+import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
@@ -699,6 +700,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 isSearching = true;
                 if (uiSettingsModel.isGlobasearch()) {
+                    gotoGlobalSearch();
                     return false;
                 } else {
                     return true;
@@ -711,6 +713,14 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 return true;
             }
         });
+
+    }
+
+    public void gotoGlobalSearch() {
+
+        Intent intent = new Intent(context, GlobalSearchActivity.class);
+        intent.putExtra("sideMenusModel", sideMenusModel);
+        startActivity(intent);
 
     }
 
@@ -762,7 +772,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public void onRefresh() {
 
@@ -776,6 +785,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
+    //
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
 
         HashMap<String, String> responMap = null;
@@ -935,6 +945,8 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 menu.getItem(0).setVisible(false);
                 menu.getItem(1).setVisible(true);
                 menu.getItem(3).setVisible(true);
+
+
 //                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 //
 //                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
@@ -994,19 +1006,47 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             avaliableSeats = 0;
             nf.printStackTrace();
         }
+        if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
+//        if (avaliableSeats <= 0) {
+//            if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+//                menu.getItem(1).setVisible(true);//enroll
+//
+//            } else if (avaliableSeats > 0) {
+//
+//                menu.getItem(1).setVisible(true);//enroll
+//
+//            }else {
+//
+////                menu.getItem(1).setVisible(false);//enroll
+//
+//            }
+//        }
 
-        if (avaliableSeats > 0) {
+            if (avaliableSeats > 0) {
 
-            menu.getItem(1).setVisible(true);//enroll
+                menu.getItem(1).setVisible(true);//enroll
 
-        } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
-            menu.getItem(1).setVisible(true);//enroll
+            } else if (avaliableSeats <= 0) {
+
+                if (myLearningDetalData.getEnrollmentlimit() == myLearningDetalData.getNoofusersenrolled() && myLearningDetalData.getWaitlistlimit() == 0 || (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() == myLearningDetalData.getWaitlistenrolls())) {
+
+                    menu.getItem(1).setVisible(false);//enroll
 
 
-        } else {
-            menu.getItem(1).setVisible(false);//enroll
+                } else if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+
+                    int waitlistSeatsLeftout = myLearningDetalData.getWaitlistlimit() - myLearningDetalData.getWaitlistenrolls();
+
+                    if (waitlistSeatsLeftout > 0) {
+
+
+                    }
+                }
+            }
+
 
         }
+
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -1161,6 +1201,17 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                             dialog.dismiss();
                                             // add event to android calander
 //                                            addEventToAndroidDevice(myLearningDetalData);
+
+
+                                            int avaliableSeats = 0;
+                                            try {
+                                                avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+                                                avaliableSeats = avaliableSeats - 1;
+                                                myLearningDetalData.setAviliableSeats("" + avaliableSeats);
+                                            } catch (NumberFormatException nf) {
+                                                avaliableSeats = 0;
+                                                nf.printStackTrace();
+                                            }
                                             db.updateEventAddedToMyLearningInEventCatalog(myLearningDetalData, 1);
                                             injectFromDbtoModel(true);
 
@@ -1904,7 +1955,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             // values.put("allDay", 1); //If it is bithday alarm or such
             // kind (which should remind me for whole day) 0 for false, 1
             // for true
-            eventValues.put("eventStatus", eventModel.getStatus()); // This information is
+            eventValues.put("eventStatus", eventModel.getStatusActual()); // This information is
             // sufficient for most
             // entries tentative (0),
             // confirmed (1) or canceled
@@ -2139,6 +2190,14 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         JSONObject jsonObj = new JSONObject(s);
                         if (jsonObj.has("IsSuccess")) {
 
+                            int waitlistEnrolls = catalogModel.getWaitlistenrolls() + 1;
+
+                            catalogModel.setWaitlistenrolls(waitlistEnrolls);
+
+                            Log.d(TAG, "onResponse: " + catalogModel.getWaitlistenrolls());
+                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+                            injectFromDbtoModel(false);
+
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             builder.setMessage(jsonObj.optString("Message"))
                                     .setCancelable(false)
@@ -2146,10 +2205,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
                                             dialog.dismiss();
-                                            // add event to android calander
-//                                            addEventToAndroidDevice(catalogModel);
-                                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
-                                            injectFromDbtoModel(false);
 
                                         }
                                     });
@@ -2404,7 +2459,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 // status
                 if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                    myLearningModel.setStatus(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
                 }
 

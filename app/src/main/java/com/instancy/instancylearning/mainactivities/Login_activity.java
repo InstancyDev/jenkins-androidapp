@@ -234,7 +234,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         } else {
 
-            settingTxt.setVisibility(View.INVISIBLE);
+            settingTxt.setVisibility(View.VISIBLE);
 
         }
 
@@ -386,11 +386,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         String userName = editUserName.getText().toString().trim();
         String passWord = editPassword.getText().toString().trim();
 
-
         if (userName.length() < 1) {
-            Toast.makeText(this, "  Enter   " + getResources().getString(R.string.login_textfield_usernametextfieldplaceholder), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.enter_validation) + " " + getResources().getString(R.string.login_textfield_usernametextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (passWord.length() < 1) {
-            Toast.makeText(this, "  Enter   " + getResources().getString(R.string.login_textfield_passwordtextfieldplaceholder), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.enter_validation) + " " + getResources().getString(R.string.login_textfield_passwordtextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else {
 
             if (isNetworkConnectionAvailable(this, -1)) {
@@ -600,10 +599,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void hideOrShowBtns() {
 
-//        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.development)))) {
-//
-//            settingTxt.setVisibility(View.VISIBLE);
-//        }
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza)))) {
+
+            settingTxt.setVisibility(View.INVISIBLE);
+        }
 
         if (uiSettingsModel.getIsFaceBook().equalsIgnoreCase("false")) {
             btnFacebook.setVisibility(View.GONE);
@@ -640,7 +639,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
 
             btnSignup.setVisibility(View.VISIBLE);
-            btnSignup.setText(uiSettingsModel.getSignUpName());
+            btnSignup.setText(getResources().getString(R.string.login_button_signupbutton));
 
         } else {
             btnSignup.setVisibility(View.INVISIBLE);

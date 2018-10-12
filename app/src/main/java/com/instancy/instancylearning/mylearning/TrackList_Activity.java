@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
@@ -63,8 +62,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-
-import butterknife.BindView;
 
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
@@ -343,9 +340,9 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         if (isCompleted) {
 
             db.updateCMIstatus(myLearningModel, "Completed");
-            myLearningModel.setStatus("Completed");
+            myLearningModel.setStatusActual("Completed");
         }
-        myLearningModel.setStatus("waste");
+        myLearningModel.setStatusActual("waste");
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
@@ -379,7 +376,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
         for (int i = 0; i < trackList.size(); i++) {
 
-            if (trackList.get(i).getStatus().toLowerCase().contains("completed") || trackList.get(i).getStatus().toLowerCase().contains("failed") || trackList.get(i).getStatus().toLowerCase().contains("passed")) {
+            if (trackList.get(i).getStatusActual().toLowerCase().contains("completed") || trackList.get(i).getStatusActual().toLowerCase().contains("failed") || trackList.get(i).getStatusActual().toLowerCase().contains("passed")) {
 
                 isTraxkListCompleted = true;
                 break;
@@ -405,7 +402,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                 if (isCompleted) {
 
                     db.updateCMIstatus(myLearningModel, "Completed");
-                    myLearningModel.setStatus("Completed");
+                    myLearningModel.setStatusActual("Completed");
                 }
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
@@ -486,7 +483,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
                     } else {
 
-                        if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
+                        if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
 
                             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
@@ -509,7 +506,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                     }
                 } else {
 
-                    if (myLearningModelLocal.getStatus().equalsIgnoreCase("Not Started")) {
+                    if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                         int i = -1;
                         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
                             i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",true);
@@ -1025,7 +1022,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                                         .get("conditionoperator")) {
                                                     case "==":
                                                         try {
-                                                            if ((tlItem.getStatus()
+                                                            if ((tlItem.getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1044,7 +1041,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                                     case "!=":
                                                         try {
                                                             if (!(tlItem
-                                                                    .getStatus()
+                                                                    .getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1079,7 +1076,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                                         .get("conditionoperator")) {
                                                     case "==":
                                                         try {
-                                                            if ((tlItem.getStatus()
+                                                            if ((tlItem.getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1098,7 +1095,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                                     case "!=":
                                                         try {
                                                             if (!(tlItem
-                                                                    .getStatus()
+                                                                    .getStatusActual()
                                                                     .toLowerCase())
                                                                     .contains(conmap
                                                                             .get("conditionresult")
@@ -1342,7 +1339,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                     for (int it = 0; it < coursesCount; it++) {
                                         MyLearningModel tlItem = trackListModelList
                                                 .get(it);
-                                        if (tlItem.getStatus().toLowerCase()
+                                        if (tlItem.getStatusActual().toLowerCase()
                                                 .equals("not started")) {
                                             String showStatus = "";
                                             switch (actmap.get("actiontype")) {
@@ -1478,7 +1475,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                                         if (actmap.get("actionitemid").equals(
                                                 tlItem.getContentID())) {
 
-                                            if (tlItem.getStatus()
+                                            if (tlItem.getStatusActual()
                                                     .toLowerCase()
                                                     .equals("not started")) {
                                                 String showStatus = "";

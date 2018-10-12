@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.models;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Upendranath on 12/12/2017.
@@ -17,4 +18,9 @@ public class AskExpertQuestionModel implements Serializable {
     public String questionCategories = "";
     public String siteID = "";
     public String postedUserId = "";
+    public String lastActive = "";
+    public int noOfViews = 0;
+    public String skillsString=null;
+    public List<String> skillsTagsList = null;
+
 }

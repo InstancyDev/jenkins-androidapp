@@ -24,7 +24,7 @@
         <EditText
             android:id="@+id/edit_description"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="180dp"
             android:background="@drawable/edittext_border"
             android:gravity="top|start"
             android:hint="Enter your Question here..."
@@ -39,6 +39,7 @@
             android:padding="5dp"
             android:text="Select the relevent skills :"
             android:textColor="@color/colorBlack" />
+
     </LinearLayout>
 
     <ListView
@@ -52,99 +53,7 @@
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:padding="8dp"
-        android:scrollbars="none"> </ListView>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:weightSum="3">
-
-            <Switch
-                android:id="@+id/swtchskills"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:padding="10dp"
-                android:switchPadding="10dp"
-                android:text="CT" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-                android:padding="15dp" />
-
-            <Switch
-                android:id="@+id/switchcommunication"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:padding="10dp"
-                android:switchPadding="10dp"
-                android:text="MRI" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-                android:padding="15dp" />
-
-            <Switch
-                android:id="@+id/switchrelatinship"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:padding="10dp"
-                android:switchPadding="10dp"
-                android:text="Ultrasound" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-                android:padding="10dp" />
-
-            <Switch
-                android:id="@+id/switchrelatins"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:padding="10dp"
-                android:switchPadding="10dp"
-                android:text="Vascular Lab" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-                android:padding="10dp" />
-
-            <Switch
-                android:id="@+id/switchxray"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:padding="10dp"
-                android:switchPadding="10dp"
-                android:text="X - ray" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorGray"
-                android:padding="10dp" />
-
-        </LinearLayout>
-
-    </ScrollView>
-
+        android:scrollbars="none"></ListView>
 
     <LinearLayout
         android:id="@+id/bottomlayout"

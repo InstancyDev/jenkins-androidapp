@@ -150,6 +150,8 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,8 +179,11 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         askExpertAnswerAdapter = new AskExpertAnswerAdapter(this, BIND_ABOVE_CLIENT, askExpertAnswerModelList);
         askExpertsListView.setAdapter(askExpertAnswerAdapter);
+
         askExpertsListView.setOnItemClickListener(this);
         askExpertsListView.setEmptyView(findViewById(R.id.nodata_label));
+
+
 
         askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
 

@@ -1,7 +1,6 @@
 package com.instancy.instancylearning.mainactivities;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -213,7 +212,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                if (url.contains("blank.html?ioscourseclose=true&cid")) {
                                                    databaseHandler.saveCourseClose(url, myLearningModel);
                                                    if (url.contains("lstatus=completed")) {
-                                                       myLearningModel.setStatus("Completed");
+                                                       myLearningModel.setStatusActual("Completed");
                                                    }
                                                    Intent intent = getIntent();
                                                    intent.putExtra("myLearningDetalData", myLearningModel);

@@ -14,7 +14,7 @@
         android:id="@+id/chxaccepttrms"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="I agree to" />
+        android:text="@string/i_agree_to" />
 
     <TextView
         android:id="@+id/termsTxt"
@@ -24,7 +24,7 @@
         android:layout_alignBottom="@+id/chxaccepttrms"
         android:layout_marginLeft="2dp"
         android:layout_toEndOf="@+id/chxaccepttrms"
-        android:text="Terms of Use"
+        android:text="@string/terms_of_use"
         android:textColor="@color/colorStatusOther" />
 
 </RelativeLayout>
