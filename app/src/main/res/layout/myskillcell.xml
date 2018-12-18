@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    android:padding="15dp">
+
+    <RelativeLayout
+        android:id="@+id/morebtnlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <ImageButton
+            android:id="@+id/btn_contextmenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_more_vert_black_24dp" />
+
+        <TextView
+            android:id="@+id/lbSkill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@android:color/transparent"
+            android:gravity="left"
+            android:text="Skill:"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtSkill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_toEndOf="@+id/lbSkill"
+            android:background="@android:color/transparent"
+            android:gravity="left"
+            android:text="relationship"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutscore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/morebtnlayout"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/txtself"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="Self-Assessment:"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+
+        <Spinner
+            android:id="@+id/spnrScore"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/txtself"
+            android:layout_weight="1"
+            android:background="@drawable/spinnerdrawable"
+            android:padding="10dp"> </Spinner>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

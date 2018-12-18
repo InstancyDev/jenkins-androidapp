@@ -364,12 +364,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 startActivity(intentSocial);
                 break;
             case 5:
-                // uncomment for web signup
-//                Intent intentSignup = new Intent(this, SignUp_Activity.class);
-                Intent intentSignup = new Intent(this, NativeSignupActivity.class);
-//                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://www.mci-institute.com");
-//                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Azure");
-                startActivity(intentSignup);
+
+                signUpMethodForMemberShipOrNativeSignUp();
                 break;
             case 6:
                 Intent intentForgot = new Intent(this, ForgotPasswordActivity.class);
@@ -380,6 +376,30 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         }
 
     }
+
+
+    public void signUpMethodForMemberShipOrNativeSignUp() {
+
+        if (uiSettingsModel.isEnableMemberShipConfig() && uiSettingsModel.isEnableIndidvidualPurchaseConfig()) {
+            // uncomment for web signup
+//                Intent intentSignup = new Intent(this, SignUp_Activity.class);
+            Intent intentSignup = new Intent(this, NativeSignupActivity.class);
+//                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://www.mci-institute.com");
+//                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Azure");
+            startActivity(intentSignup);
+
+        } else {
+            // uncomment for web signup
+            Intent intentSignup = new Intent(this, SignUp_Activity.class);
+            intentSignup.putExtra(StaticValues.KEY_SOCIALLOGIN, appUserModel.getSiteURL() + "Sign%20Up/profiletype/selfregistration/nativeapp/true");
+            intentSignup.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Membership");
+            startActivity(intentSignup);
+
+        }
+
+
+    }
+
 
     public void loginMethod() throws JSONException {
 

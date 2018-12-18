@@ -36,15 +36,17 @@ public class GetSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> {
     protected Void doInBackground(String... params) {
         int i = 10;
         publishProgress(i);
-        String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0],true);
+//        String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0],true);
+        String tempWebApiUrl = webAPIClient.getSiteAPIDetailsForDigi(params[0], true);
 
         if (tempWebApiUrl.length() != 0) {
             i = i + 10;
             publishProgress(i);
-            webAPIClient.getAPIAuthDetails(params[0], tempWebApiUrl,true);
+            webAPIClient.getAPIAuthDetails(params[0], tempWebApiUrl, true);
+//            webAPIClient.getAPIAuthDetailsForDigi(params[0], tempWebApiUrl,true);
             i = i + 10;
             publishProgress(i);
-            db.getSiteSettingsServer(tempWebApiUrl, params[0],true);
+            db.getSiteSettingsServer(tempWebApiUrl, params[0], true);
             i = i + 10;
             publishProgress(i);
             db.getNativeMenusFromServer(tempWebApiUrl, params[0]);
@@ -53,7 +55,7 @@ public class GetSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> {
             db.getSiteTinCanDetails(tempWebApiUrl, params[0]);
             i = i + 10;
             publishProgress(i);
-            db.downloadSplashImages(params[0]);
+//            db.downloadSplashImages(params[0]);
             i = i + 10;
             publishProgress(i);
             UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();

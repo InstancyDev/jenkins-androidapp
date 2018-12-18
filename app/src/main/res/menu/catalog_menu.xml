@@ -3,6 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
+
+    <item
+        android:id="@+id/ctx_wishlist"
+        android:icon="@drawable/filter_icon"
+        android:orderInCategory="100"
+        android:title="WishList"
+        android:visible="false"
+        app:showAsAction="always|collapseActionView" />
+
+
     <item
         android:id="@+id/catalog_search"
         android:orderInCategory="100"

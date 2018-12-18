@@ -39,7 +39,6 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.mainactivities.Login_activity;
-import com.instancy.instancylearning.mainactivities.SignUp_Activity;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;

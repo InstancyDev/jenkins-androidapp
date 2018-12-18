@@ -571,17 +571,17 @@ public class MyLearningAdapter extends BaseAdapter {
             if (statusFromModel.equalsIgnoreCase("Completed")) {
 
 //                statusFromModel = "Completed";
-                statusFromModel =vi.getContext().getString(R.string.status_completed);
+                statusFromModel = vi.getContext().getString(R.string.status_completed);
 
 
             } else if (statusFromModel.equalsIgnoreCase("failed")) {
 
 //                statusFromModel = "Completed(failed)";
-                statusFromModel =vi.getContext().getString(R.string.status_completed_failed);
+                statusFromModel = vi.getContext().getString(R.string.status_completed_failed);
             } else if (statusFromModel.equalsIgnoreCase("passed")) {
 
 //                statusFromModel = "Completed(passed)";
-                statusFromModel =vi.getContext().getString(R.string.status_completed_passed);
+                statusFromModel = vi.getContext().getString(R.string.status_completed_passed);
             }
 
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
@@ -602,10 +602,10 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (statusFromModel.equalsIgnoreCase("incomplete")) {
 //                status = "In Progress ";
-                status =vi.getContext().getString(R.string.status_inprogress);
+                status = vi.getContext().getString(R.string.status_inprogress);
             } else if (statusFromModel.length() == 0) {
 //                status = "In Progress ";
-                status =vi.getContext().getString(R.string.status_inprogress);
+                status = vi.getContext().getString(R.string.status_inprogress);
             } else {
                 status = statusFromModel;
 
@@ -618,7 +618,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "Pending Review";
 
-            status =vi.getContext().getString(R.string.status_pending_review);
+            status = vi.getContext().getString(R.string.status_pending_review);
 
             holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
@@ -628,7 +628,7 @@ public class MyLearningAdapter extends BaseAdapter {
             String status = "";
 
 //            status = statusFromModel;
-            status =vi.getContext().getString(R.string.status_registered);
+            status = vi.getContext().getString(R.string.status_registered);
             holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorGray));
             courseStatus = status;
@@ -638,7 +638,7 @@ public class MyLearningAdapter extends BaseAdapter {
 
 //            status = statusFromModel;
 
-            status =vi.getContext().getString(R.string.status_attended);
+            status = vi.getContext().getString(R.string.status_attended);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
             courseStatus = status;
         } else if (statusFromModel.toLowerCase().contains("Expired")) {
@@ -646,7 +646,7 @@ public class MyLearningAdapter extends BaseAdapter {
             String status = "";
 
 //            status = statusFromModel;
-            status =vi.getContext().getString(R.string.status_expired);
+            status = vi.getContext().getString(R.string.status_expired);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
             courseStatus = status;
         } else {
@@ -897,11 +897,19 @@ public class MyLearningAdapter extends BaseAdapter {
 
                 @Override
                 public void cancelEnrollment(boolean isCancel) {
-
                     Log.d(TAG, "cancelEnrollment:  in adapter method ");
-
                     eventInterface.cancelEnrollment(myLearningDetalData, isCancel);
                     notifyDataSetChanged();
+                }
+
+                @Override
+                public void addToArchive(boolean added) {
+                    Log.d(TAG, "addToArchive:  in adapter method ");
+                    try {
+                        addToArchiveApiCall(getPosition, added);
+                    } catch (JSONException e) {
+                        e.printStackTrace();//
+                    }
                 }
             };
 
@@ -1052,6 +1060,73 @@ public class MyLearningAdapter extends BaseAdapter {
 
     }
 
+
+    public void addToArchiveApiCall(int position, boolean isArchived) throws
+            JSONException {
+        int arch = 0;
+        if (isArchived) {
+            arch = 1;
+        } else {
+            arch = 0;
+        }
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("ContentID", myLearningModel.get(position).getContentID());
+        parameters.put("IsArchived", arch);
+        parameters.put("UserID", appUserModel.getUserIDValue());
+
+        final String parameterString = parameters.toString();
+
+        String urlString = appUserModel.getWebAPIUrl() + "/catalog/UpdateMyLearningArchive";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return parameterString.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(activity);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
 
 }
 

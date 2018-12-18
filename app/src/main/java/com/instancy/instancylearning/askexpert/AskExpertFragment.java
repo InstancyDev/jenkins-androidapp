@@ -101,6 +101,7 @@ import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_AS
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 
+import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -580,7 +581,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
         intent.putExtra("sideMenusModel", sideMenusModel);
-        startActivity(intent);
+        startActivityForResult(intent, GLOBAL_SEARCH);
 
     }
 
@@ -633,6 +634,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+            queryText="";
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -809,13 +811,26 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                 }
             }
         }
+
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                queryText = data.getStringExtra("queryString");
+                if (queryText.length() > 0) {
+
+                    refreshCatalog(true);
+
+                }
+
+            }
+        }
+
     }
 
     public void attachFragment(AskExpertQuestionModel askExpertQuestionModel) {
 
 
         Intent intentDetail = new Intent(context, AskExpertsAnswersActivity.class);
-        intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);
+        intentDetail.putExtra("AskExpertQuestionModelDg", askExpertQuestionModel);
 
         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
 

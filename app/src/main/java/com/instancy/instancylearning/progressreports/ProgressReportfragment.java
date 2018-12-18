@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -58,8 +59,12 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.Utils;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -67,6 +72,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.interfaces.ReportSummeryResponseListner;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -92,10 +98,12 @@ import mg.yra.lib.trackingring.DataSet;
 import mg.yra.lib.trackingring.TrackingRingView;
 
 import static android.app.Activity.RESULT_OK;
+import static com.github.mikephil.charting.utils.ColorTemplate.rgb;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -142,6 +150,12 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
     TrackingRingView ringcharts;
 
+    ReportSummeryResponseListner reportSummeryResponseListner = null;
+
+    public static final int[] MATERIAL_COLORS_CHARTS = {
+            rgb("#2ecc71"), rgb("#f1c40f"), rgb("#e74c3c"), rgb("#3498db"), rgb("#00ffff"), rgb("#2196F3"), rgb("#E91E63"), rgb("#009688"), rgb("#4CAF50"), rgb("#FFEB3B"), rgb("#607D8B"), rgb("#FF9800"), rgb("#FF5722"), rgb("#795548"), rgb("#3F51B5"), rgb("#F44336"), rgb("#CDDC39"), rgb("#E91E63")
+    };
+
     public ProgressReportfragment() {
 
 
@@ -173,26 +187,17 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 contentIDFromNotification = bundle.getString("TOPICID");
                 topicID = bundle.getString("CONTENTID");
             }
-
         }
-
-
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-//        String parmStringUrl = appUserModel.getWebAPIUrl() + "/ConsolidatedProgressReport/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
-//
-//        vollyService.getStringResponseVolley("PRGLIST", parmStringUrl, appUserModel.getAuthHeaders());
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
 
-        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
-
-        vollyService.getStringResponseVolley("PRGLIST", parmStringUrl, "A459QN8B57:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrH57");
-
+        vollyService.getStringResponseVolley("PRGLIST", parmStringUrl, appUserModel.getAuthHeaders());
 
 //        W x H x D: 189 cm x 90 cm x 221 cm (6 ft 2 in x 2 ft 11 in x 7 ft 3 in) :
 //       Length: 75 inch, Width: 72 inch, Thickness: 5 inch (6 ft 3 in x 6 ft x 5 in)
@@ -206,13 +211,6 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
 
-                if (requestType.equalsIgnoreCase("PRGLIST")) {
-                    if (response != null) {
-
-                    } else {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                }
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -248,6 +246,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
+
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
 
@@ -289,6 +288,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         l.setYEntrySpace(0f);
         l.setYOffset(0f);
 
+
         mChart.setEntryLabelColor(Color.BLACK);
         mChart.setEntryLabelTextSize(12f);
         ArrayList<PieEntry> yvalues = new ArrayList<PieEntry>();
@@ -305,12 +305,13 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         data.setValueFormatter(new PercentFormatter());
         // Default value
 
+
         mChart.setData(data);
-        dataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+        dataSet.setColors(MATERIAL_COLORS_CHARTS);
         data.setValueTextSize(13f);
         data.setValueTextColor(Color.DKGRAY);
         mChart.animateXY(1400, 1400);
-
+        data.setValueFormatter(new MyValueFormatter());
         data.setValueTextSize(11f);
         data.setValueTextColor(Color.BLACK);
         mChart.setDrawCenterText(true);
@@ -341,6 +342,8 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         l1.setXEntrySpace(7f);
         l1.setYEntrySpace(0f);
         l1.setYOffset(0f);
+        l1.setWordWrapEnabled(true);
+
 
         // entry label styling
         contentChart.setEntryLabelColor(Color.BLACK);
@@ -360,13 +363,19 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         contentChart.setDrawHoleEnabled(false);
         contentChart.setTransparentCircleRadius(25f);
         contentChart.setHoleRadius(25f);
+//        contentChart.getLegend().setEnabled(false);
 
-        dataSets.setColors(ColorTemplate.VORDIPLOM_COLORS);
+
+        dataSets.setColors(MATERIAL_COLORS_CHARTS);
+
         datas.setValueTextSize(13f);
+
         datas.setValueTextColor(Color.DKGRAY);
+
 
         contentChart.animateXY(1400, 1400);
 
+        datas.setValueFormatter(new MyValueFormatter());
         datas.setValueTextSize(11f);
         datas.setValueTextColor(Color.BLACK);
         contentChart.setDrawCenterText(true);
@@ -402,11 +411,13 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
                 final ProgressReportChildModel progressReportModel = progressReportModelList.get(groupPosition).progressReportChildModelList.get(childPosition);
 
-//                if (view.getId() == R.id.txt_contextmenu) {
+                if (view.getId() == R.id.txt_contextmenu) {
 //                    progresReportContextMenuMethod(view, progressReportModel);
-//                } else {
-                getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportModel.objectID);
-//                }
+                } else {
+                    ProgressReportModel reportModel = convertChildtoGroupModel(progressReportModel);
+                    openReportsActivity(reportModel);
+
+                }
 
 
                 return true;
@@ -425,8 +436,8 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
                     return false;
                 } else {
+                    openReportsActivity(progressReportModel);
 
-                    getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportModel.objectID);
 
                     return true;
                 }
@@ -636,15 +647,6 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
-
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
-                if (refresh) {
-                    refreshCatalog(true);
-                }
-            }
-        }
     }
 
 
@@ -719,15 +721,21 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         JSONArray jsonTable = jsonObject.getJSONArray("ScoreCount");
         JSONArray jsonTableAr = jsonObject.getJSONArray("ScoreMaxCount");
 
-        int overAllScore = jsonTable.getJSONObject(0).getInt("overallscore");
+        int overAllScore = 0;
+        int scoreMax = 0;
 
-        int scoreMax = jsonTableAr.getJSONObject(0).getInt("ScoreMax");
+        if (jsonTable != null && jsonTable.length() > 0) {
+            overAllScore = jsonTable.getJSONObject(0).getInt("overallscore");
+        }
 
+        if (jsonTableAr != null && jsonTableAr.length() > 0) {
+            scoreMax = jsonTableAr.getJSONObject(0).getInt("ScoreMax");
+        }
 
         // ringcharts function
         final List<DataEntry> entrie = new ArrayList<>();
-        entrie.add(new DataEntry(scoreMax, "" + scoreMax, context.getResources().getColor(R.color.colorInGreen), Color.LTGRAY));
-        entrie.add(new DataEntry(overAllScore, "" + overAllScore, context.getResources().getColor(R.color.colorOutTealGreen), Color.LTGRAY));
+        entrie.add(new DataEntry(overAllScore, "" + overAllScore, context.getResources().getColor(R.color.colorInGreen), Color.LTGRAY));
+        entrie.add(new DataEntry(scoreMax, "" + scoreMax, context.getResources().getColor(R.color.colorOutTealGreen), Color.LTGRAY));
         final DataSet datasets = new DataSet(entrie);
         ringcharts.setDataSet(datasets);
     }
@@ -856,6 +864,8 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 progressReportModel.categoryID = jsonMyLearningColumnObj.getString("categoryID");
 
             }
+
+            progressReportModel.siteID = appUserModel.getUserIDValue();
             // ObjectID here one more loop
             if (jsonMyLearningColumnObj.has("ChildData")) {
 
@@ -1005,491 +1015,56 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
             }
 
+            progressReportModel.siteID = appUserModel.getSiteIDValue();
+
             progressReportModelList.add(progressReportModel);
         }
-
 
         return progressReportModelList;
     }
 
-    public void getMobileGetMobileContentMetaData(final String siteUrl, final String contentID) {
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
-                + siteUrl + "&ContentID=" + contentID + "&userid="
-                + appUserModel.getUserIDValue() + "&DelivoryMode=1";
 
-        urlStr = urlStr.replaceAll(" ", "%20");
-        Log.d(TAG, "getMobileGetMobileContentMetaData : " + urlStr);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObj) {
+    public void openReportsActivity(ProgressReportModel progressReportModel) {
 
-                        Log.d(TAG, "getMobileGetMobileContentMetaData response : " + jsonObj);
-                        if (jsonObj.length() != 0) {
 
-                            try {
-                                MyLearningModel learningModel = getMylearningModel(jsonObj);
-                                openReportsActivity(learningModel);
+        Intent intentReports = new Intent(context, ProgressReportsActivity.class);
+        intentReports.putExtra("progressReportModel", progressReportModel);
+        startActivity(intentReports);
 
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        svProgressHUD.dismiss();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-//                        Log.e("Error: ", error.getMessage());
-                        svProgressHUD.dismiss();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                return headers;
-            }
-        };
-
-        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void openReportsActivity(MyLearningModel myLearningModel) {
-
-        if (myLearningModel.getUserID().length() > 0 && !myLearningModel.getUserID().equalsIgnoreCase("-1")) {
-
-            db.injectMyLearningIntoTable(myLearningModel, false, true);
-
-            Intent intentReports = new Intent(context, Reports_Activity.class);
-            intentReports.putExtra("myLearningDetalData", myLearningModel);
-            intentReports.putExtra("typeFrom", "");
-            intentReports.putExtra("FROMPG", true);
-            startActivity(intentReports);
-
-        } else {
-            Toast.makeText(context, "No record found", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public MyLearningModel getMylearningModel(JSONObject jsonObject) throws JSONException {
-
-        Log.d("saveNewlySubscribed DB", " " + jsonObject);
-
-        JSONArray jsonTableAry = jsonObject.getJSONArray("table");
-        // for deleting records in table for respective table
-
-        MyLearningModel myLearningModel = new MyLearningModel();
-
-        for (int i = 0; i < jsonTableAry.length(); i++) {
-            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
-
-            //sitename
-            if (jsonMyLearningColumnObj.has("sitename")) {
-
-                myLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
-            }
-            // siteurl
-            if (jsonMyLearningColumnObj.has("siteurl")) {
-
-                myLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
-
-            }
-            // siteid
-            if (jsonMyLearningColumnObj.has("siteid")) {
-
-                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("siteid").toString());
-
-            }
-            // userid
-            if (jsonMyLearningColumnObj.has("userid")) {
-
-                myLearningModel.setUserID(jsonMyLearningColumnObj.get("userid").toString());
-
-            }
-            // coursename
-
-
-            if (jsonMyLearningColumnObj.has("name")) {
-
-                myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
-
-            }
-
-            // shortdes
-            if (jsonMyLearningColumnObj.has("shortdescription")) {
-
-
-                Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
-
-                myLearningModel.setShortDes(result.toString());
-
-            }
-
-            String authorName = "";
-            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
-                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
-
-            }
-
-            if (authorName.length() != 0) {
-                myLearningModel.setAuthor(authorName);
-            } else {
-                // author
-                if (jsonMyLearningColumnObj.has("author")) {
-
-                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
-
-                }
-            }
-
-            // contentID
-            if (jsonMyLearningColumnObj.has("contentid")) {
-
-                myLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
-
-            }
-            // createddate
-            if (jsonMyLearningColumnObj.has("createddate")) {
-
-                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
-
-            }
-            // displayName
-
-            myLearningModel.setDisplayName(appUserModel.getDisplayName());
-            // durationEndDate
-            if (jsonMyLearningColumnObj.has("durationenddate")) {
-
-                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
-
-            }
-            // objectID
-            if (jsonMyLearningColumnObj.has("objectid")) {
-
-                myLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
-
-            }
-            // thumbnailimagepath
-            if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
-
-                String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
-
-
-                if (isValidString(imageurl)) {
-
-                    myLearningModel.setThumbnailImagePath(imageurl);
-                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
-                    myLearningModel.setImageData(imagePathSet);
-
-
-                } else {
-                    if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
-                        String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
-                        if (isValidString(imageurlContentType)) {
-                            String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
-                            myLearningModel.setImageData(imagePathSet);
-
-                        }
-                    }
-
-
-                }
-                // relatedcontentcount
-                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
-
-                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
-
-                }
-                // isDownloaded
-                if (jsonMyLearningColumnObj.has("isdownloaded")) {
-
-                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
-
-                }
-                // courseattempts
-                if (jsonMyLearningColumnObj.has("courseattempts")) {
-
-                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
-
-                }
-                // objecttypeid
-                if (jsonMyLearningColumnObj.has("objecttypeid")) {
-
-                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
-
-                }
-                // scoid
-                if (jsonMyLearningColumnObj.has("scoid")) {
-
-                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
-
-                }
-                // startpage
-                if (jsonMyLearningColumnObj.has("startpage")) {
-
-                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
-
-                }
-                // status
-                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
-
-                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("corelessonstatus").toString());
-
-                }
-                // userName
-                myLearningModel.setUserName(appUserModel.getUserName());
-                // longdes
-                if (jsonMyLearningColumnObj.has("longdescription")) {
-
-                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
-
-//                    myLearningModel.setShortDes(result.toString());
-                    myLearningModel.setLongDes(result.toString());
-
-                }
-                // typeofevent
-                if (jsonMyLearningColumnObj.has("viewtype")) {
-
-                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("viewtype").toString());
-
-                    myLearningModel.setTypeofevent(typeoFEvent);
-
-                }
-
-                // medianame
-                if (jsonMyLearningColumnObj.has("medianame")) {
-                    String medianame = "";
-
-                    if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                        if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
-                            medianame = "Assessment(Test)";
-
-                        } else {
-                            medianame = jsonMyLearningColumnObj.get("medianame").toString();
-                        }
-                    } else {
-                        if (myLearningModel.getTypeofevent() == 2) {
-                            medianame = "Event (Online)";
-
-
-                        } else if (myLearningModel.getTypeofevent() == 1) {
-                            medianame = "Event (Face to Face)";
-
-                        }
-                    }
-
-                    myLearningModel.setMediaName(medianame);
-
-                }       // ratingid
-                if (jsonMyLearningColumnObj.has("ratingid")) {
-
-                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
-
-                }
-                // publishedDate
-                if (jsonMyLearningColumnObj.has("publisheddate")) {
-
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("publisheddate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setPublishedDate(formattedDate);
-
-                }
-
-                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
-
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setEventstartTime(formattedDate);
-                }
-                // eventenddatedisplay
-                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
-
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setEventendTime(formattedDate);
-                }
-                // mediatypeid
-                if (jsonMyLearningColumnObj.has("mediatypeid")) {
-
-                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
-
-                }
-                // dateassigned
-                if (jsonMyLearningColumnObj.has("dateassigned")) {
-
-                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
-
-                }
-                // keywords
-                if (jsonMyLearningColumnObj.has("seokeywords")) {
-
-                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
-
-                }
-                // eventcontentid
-                if (jsonMyLearningColumnObj.has("eventcontentid")) {
-
-                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
-
-                }
-                // eventAddedToCalender
-                myLearningModel.setEventAddedToCalender(false);
-
-                // isExpiry
-                myLearningModel.setIsExpiry("false");
-
-                // locationname
-                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
-
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
-
-                }
-                // timezone
-                if (jsonMyLearningColumnObj.has("timezone")) {
-
-                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
-
-                }
-                // participanturl
-                if (jsonMyLearningColumnObj.has("participanturl")) {
-
-                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
-
-                }
-                // password
-
-                myLearningModel.setPassword(appUserModel.getPassword());
-
-                // isListView
-                if (jsonMyLearningColumnObj.has("bit5")) {
-
-                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
-
-                }
-
-                // joinurl
-                if (jsonMyLearningColumnObj.has("joinurl")) {
-
-                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
-
-                }
-
-                // offlinepath
-                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
-                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
-                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
-                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
-                    String downloadDestFolderPath = context.getExternalFilesDir(null)
-                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
-
-                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
-
-                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
-                }
-//
-                // wresult
-                if (jsonMyLearningColumnObj.has("wresult")) {
-
-                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
-
-                }
-                // wmessage
-                if (jsonMyLearningColumnObj.has("wmessage")) {
-
-                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
-
-                }
-
-                // presenter
-                if (jsonMyLearningColumnObj.has("presentername")) {
-
-                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presentername").toString());
-
-                }
-
-                //membershipname
-                if (jsonMyLearningColumnObj.has("membershipname")) {
-
-                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
-
-                }
-                //membershiplevel
-                if (jsonMyLearningColumnObj.has("membershiplevel")) {
-
-//                    myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
-
-                    String memberShip = jsonMyLearningColumnObj.getString("membershiplevel");
-                    int memberInt = 1;
-                    if (isValidString(memberShip)) {
-                        memberInt = Integer.parseInt(memberShip);
-                    } else {
-                        memberInt = 1;
-                    }
-                    myLearningModel.setMemberShipLevel(memberInt);
-
-
-                }
-
-
-                //membershiplevel
-                if (jsonMyLearningColumnObj.has("folderpath")) {
-
-                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.getString("folderpath"));
-
-                }
-
-                //jwvideokey
-                if (jsonMyLearningColumnObj.has("jwvideokey")) {
-
-                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
-
-                    if (isValidString(jwKey)) {
-                        myLearningModel.setJwvideokey(jwKey);
-                    } else {
-                        myLearningModel.setJwvideokey("");
-                    }
-
-                }
-
-                //cloudmediaplayerkey
-                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
-
-                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
-
-                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
-
-                    if (isValidString(jwKey)) {
-                        myLearningModel.setCloudmediaplayerkey(jwKey);
-                    } else {
-                        myLearningModel.setCloudmediaplayerkey("");
-                    }
-                }
-
-
-                //sitename
-                if (jsonMyLearningColumnObj.has("progress")) {
-
-                    myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
-                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
-
-                    }
-                } else {
-                    myLearningModel.setStatusActual("Not Started");
-                }
-
-            }
+    public ProgressReportModel convertChildtoGroupModel(ProgressReportChildModel progressReportChildModel) {
+
+        ProgressReportModel progressReportModel = new ProgressReportModel();
+
+        if (progressReportChildModel != null) {
+
+            progressReportModel.siteID = progressReportChildModel.siteID;
+            progressReportModel.jobrolID = progressReportChildModel.jobrolID;
+            progressReportModel.userid = progressReportChildModel.userid;
+            progressReportModel.skillname = progressReportChildModel.skillname;
+            progressReportModel.gradedColor = progressReportChildModel.gradedColor;
+            progressReportModel.contenttitle = progressReportChildModel.contenttitle;
+            progressReportModel.targetDate = progressReportChildModel.targetDate;
+            progressReportModel.objectTypeID = progressReportChildModel.objectTypeID;
+            progressReportModel.childData = progressReportChildModel.childData;
+            progressReportModel.overScore = progressReportChildModel.overScore;
+            progressReportModel.objectID = progressReportChildModel.objectID;
+            progressReportModel.cartID = progressReportChildModel.cartID;
+            progressReportModel.datecompleted = progressReportChildModel.datecompleted;
+            progressReportModel.categoryname = progressReportChildModel.categoryname;
+            progressReportModel.orgname = progressReportChildModel.orgname;
+            progressReportModel.datestarted = progressReportChildModel.datestarted;
+            progressReportModel.contenttype = progressReportChildModel.contenttype;
+            progressReportModel.status = progressReportChildModel.status;
+            progressReportModel.assignedOn = progressReportChildModel.assignedOn;
+            progressReportModel.jobrolename = progressReportChildModel.jobrolename;
+            progressReportModel.SCOID = progressReportChildModel.SCOID;
+            progressReportModel.categoryID = progressReportChildModel.categoryID;
+            progressReportModel.seqId = progressReportChildModel.seqId;
 
         }
-
-        return myLearningModel;
+        return progressReportModel;
     }
 
 

@@ -33,6 +33,9 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.Utilities;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -215,7 +218,8 @@ public class NativeSettings extends AppCompatActivity {
 
                                 if (isValidUrl(newUrl)) {
                                     if (isNetworkConnectionAvailable(context, -1)) {
-                                        resetUrlWebCall(newUrl);
+//                                        resetUrlWebCall(newUrl);
+                                        resetUrlWebCallForDigi(newUrl);
                                     } else {
                                         Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                                     }
@@ -286,6 +290,62 @@ public class NativeSettings extends AppCompatActivity {
             }
         });
     }
+
+
+    public void resetUrlWebCallForDigi(final String newUrl) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String requestURL = "http://angularbasicapi.instancysoft.com/api/Authentication/GetAPIAuth?AppURL=" + newUrl;
+
+        VolleySingleton.stringRequests(requestURL, new StringResultListner<String>() {
+            @Override
+            public void getResult(String result) {
+                if (!result.isEmpty()) {
+                    //do what you need with the result...
+
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(result);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    String webApiUrl = jsonObject.optString("WebAPIUrl");
+
+                    LogUtils.d(TAG, "Result web api " + webApiUrl);
+
+                    if (isValidUrl(webApiUrl)) {
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            preferencesManager.setStringValue(newUrl, StaticValues.KEY_SITEURL);
+
+
+                            Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
+                            intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intentBranding);
+
+                        } else {
+                            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        }
+
+                    } else {
+                        Toast.makeText(context, "Invalid Url " + webApiUrl, Toast.LENGTH_SHORT).show();
+
+                    }
+
+                    svProgressHUD.dismiss();
+                }
+            }
+
+            @Override
+            public void getError(String error) {
+                LogUtils.e(TAG, "Result error " + error);
+                Toast.makeText(context, "Invalid Request ", Toast.LENGTH_SHORT).show();
+                svProgressHUD.dismiss();
+            }
+        });
+    }
+
 
     public String getSiteAPIDetails(String result) {
 

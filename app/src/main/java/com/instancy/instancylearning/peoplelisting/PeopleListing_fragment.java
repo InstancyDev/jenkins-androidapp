@@ -86,9 +86,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import info.hoang8f.android.segmented.SegmentedGroup;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.REFRESH_PEOPLE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -194,7 +196,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         preferencesManager = PreferencesManager.getInstance();
 //        chatService = ChatService.newInstance(context);
 
-
         vollyService = new VollyService(resultCallback, context);
 
         sideMenusModel = null;
@@ -250,7 +251,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             }
 
-            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
+            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize+"&SearchText="+queryString;
 
             vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
         } else {
@@ -561,15 +562,22 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             pageIndex = pageIndex + 1;
         }
 
-        if (peopleListingModelList.size() > 5) {
-            if (item_search != null) {
-                item_search.setVisible(true);
-            }
-        } else {
-            if (item_search != null) {
-                item_search.setVisible(false);
-            }
+//        if (peopleListingModelList.size() > 5) {
+//            if (item_search != null) {
+//                item_search.setVisible(true);
+//            }
+//        } else {
+//            if (item_search != null) {
+//                item_search.setVisible(false);
+//            }
+//        }
+
+        if (uiSettingsModel.isGlobasearch() && queryString.length() > 0) {
+
+            peopleListingAdapter.filter(queryString);
+
         }
+
     }
 
     public void initilizeView() {
@@ -669,7 +677,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
         intent.putExtra("sideMenusModel", sideMenusModel);
-        startActivity(intent);
+        startActivityForResult(intent, GLOBAL_SEARCH);
 
     }
 
@@ -725,6 +733,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     public void onRefresh() {
         pageIndex = 1;
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+            queryString="";
             refreshPeopleListing(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -993,6 +1002,20 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                queryString = data.getStringExtra("queryString");
+                if (queryString.length() > 0) {
+
+                    refreshPeopleListing(true);
+
+                }
+
+            }
+        }
+
+
     }
 
     public void removeConnectionAction(PeopleListingModel peopleListingModel) {
@@ -1332,8 +1355,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 peopleListingModel.notaMember = jsonMyLearningColumnObj.getInt("NotaMember");
 
             }
-
-
 
 
             peopleListingModel.tabID = "All";

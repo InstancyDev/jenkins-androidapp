@@ -143,6 +143,101 @@ public class WebAPIClient {
         }
     }
 
+    public void getAPIAuthDetailsForDigi(String siteUrl, String strAPIURL, boolean isMainSite) {
+
+        String requestURL = "https://masterapi.instancy.com//api//Authentication/GetAPIAuth?AppURL=" + siteUrl;
+
+
+        Log.d("AUTH", "getAPIAuthDetails: " + requestURL);
+        inputStream = null;
+        httpURLConnection = null;
+
+        try {
+            URL url = new URL(requestURL);
+
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+
+            int statusCode = httpURLConnection.getResponseCode();
+
+
+            if (statusCode == 200) {
+
+                inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
+
+                String result = Utilities.convertStreamToString(inputStream);
+
+                JSONObject jsonObject = new JSONObject(result);
+
+                String webAuth = jsonObject.getString("basicAuth");
+
+                Log.d("Auth details " + isMainSite, result);
+
+                if (isMainSite) {
+                    preferencesManager.setStringValue(webAuth, StaticValues.KEY_AUTHENTICATION);
+                } else {
+                    preferencesManager.setStringValue(webAuth, StaticValues.SUB_KEY_AUTHENTICATION);
+                }
+
+            } else {
+                Log.e("getAuthDetails",
+                        "No response from site.\nUsing default API key.");
+            }
+
+        } catch (Exception e) {
+            Log.e("getAuthDetails", e.getMessage());
+        }
+    }
+
+    public String getSiteAPIDetailsForDigi(String siteUrl, boolean isMainSite) {
+//        String requestURL = "https://masterapi.instancy.com//api//Authentication/GetAPIAuth?AppURL=" + siteUrl;
+        String requestURL = "http://angularbasicapi.instancysoft.com/api/Authentication/GetAPIAuth?AppURL=" + siteUrl;
+
+        String webApiUrl = "";
+        Log.d("AUTH", "getAPIAuthDetails: " + requestURL);
+        inputStream = null;
+        httpURLConnection = null;
+
+        try {
+            URL url = new URL(requestURL);
+
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+
+            int statusCode = httpURLConnection.getResponseCode();
+
+
+            if (statusCode == 200) {
+
+                inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
+
+                String result = Utilities.convertStreamToString(inputStream);
+
+                JSONObject jsonObject = new JSONObject(result);
+
+                webApiUrl = jsonObject.getString("WebAPIUrl");
+
+                Log.d("Auth details " + isMainSite, result);
+
+                Log.d("webapiurl", webApiUrl);
+                if (isMainSite) {
+                    preferencesManager.setStringValue(webApiUrl, StaticValues.KEY_WEBAPIURL);
+                } else {
+                    preferencesManager.setStringValue(webApiUrl, StaticValues.SUB_KEY_WEBAPIURL);
+                }
+
+
+            } else {
+                Log.e("getAuthDetails",
+                        "No response from site.\nUsing default API key.");
+            }
+
+        } catch (Exception e) {
+            Log.e("getAuthDetails", e.getMessage());
+        }
+
+        return webApiUrl;
+    }
+
+
     public InputStream callWebAPIMethod(String webAPIURL,
                                         String controllerName, String actionName, String authentication,
                                         String paramsString) {

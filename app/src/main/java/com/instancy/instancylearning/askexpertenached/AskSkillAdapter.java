@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 
@@ -38,7 +39,7 @@ public class AskSkillAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<AskExpertSkillsModel> askExpertSkillsModelList = null;
+    private List<AskExpertSkillsModelDg> askExpertSkillsModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -47,14 +48,14 @@ public class AskSkillAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = AskSkillAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<AskExpertSkillsModel> searchList;
+    private List<AskExpertSkillsModelDg> searchList;
     AppController appcontroller;
 
 
-    public AskSkillAdapter(Activity activity, int resource, List<AskExpertSkillsModel> askExpertSkillsModelList) {
+    public AskSkillAdapter(Activity activity, int resource, List<AskExpertSkillsModelDg> askExpertSkillsModelList) {
         this.activity = activity;
         this.askExpertSkillsModelList = askExpertSkillsModelList;
-        this.searchList = new ArrayList<AskExpertSkillsModel>();
+        this.searchList = new ArrayList<AskExpertSkillsModelDg>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -68,10 +69,10 @@ public class AskSkillAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<AskExpertSkillsModel> myLearningModel) {
-        this.askExpertSkillsModelList = myLearningModel;
-        this.searchList = new ArrayList<AskExpertSkillsModel>();
-        this.searchList.addAll(myLearningModel);
+    public void refreshList(List<AskExpertSkillsModelDg> askExpertSkillsModelList) {
+        this.askExpertSkillsModelList = askExpertSkillsModelList;
+        this.searchList = new ArrayList<AskExpertSkillsModelDg>();
+        this.searchList.addAll(askExpertSkillsModelList);
         this.notifyDataSetChanged();
     }
 
@@ -103,24 +104,28 @@ public class AskSkillAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.switchSkill.setText(askExpertSkillsModelList.get(position).shortSkillName);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
+            holder.switchSkill.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
+        }
+
+
+        holder.switchSkill.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                askExpertSkillsModelList.get(position).isChecked = isChecked;
+            }
+        });
 
         if (askExpertSkillsModelList.get(position).isChecked) {
             holder.switchSkill.setChecked(true);
             holder.switchSkill.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                holder.switchSkill.setThumbTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-                holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-            }
 
         } else {
             holder.switchSkill.setChecked(false);
             holder.switchSkill.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                holder.switchSkill.setThumbTintList(ColorStateList.valueOf(convertView.getResources().getColor(R.color.colorGray)));
-                holder.switchSkill.setTrackTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-            }
         }
+
 
         return convertView;
     }

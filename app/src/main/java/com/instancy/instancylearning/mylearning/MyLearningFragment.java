@@ -98,6 +98,7 @@ import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
@@ -130,9 +131,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     Context context;
     Toolbar toolbar;
     Menu search_menu;
-    MenuItem item_search;
+    MenuItem item_search, itemArchive;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "", searchText = "";
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
     CmiSynchTask cmiSynchTask;
@@ -151,11 +152,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     EventInterface eventInterface = null;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
 
     boolean isSearching = false;
     boolean userScrolled = false;
-
+    boolean isArchived = false;
+    int isArchi = 0;
     ProgressBar progressBar;
 
     public MyLearningFragment() {
@@ -216,6 +218,24 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             // No such key
             sortBy = "";
         }
+
+
+        // added extra parameters
+        if (responMap != null && responMap.containsKey("ddlSortList")) {
+            ddlSortList = responMap.get("ddlSortList");
+        } else {
+            // No such key
+            ddlSortList = "publisheddate";
+        }
+
+        if (responMap != null && responMap.containsKey("ddlSortType")) {
+            ddlSortType = responMap.get("ddlSortType");
+        } else {
+            // No such key
+            ddlSortType = "asc";
+        }
+
+
         if (responMap != null && responMap.containsKey("FilterContentType")) {
             filterContentType = responMap.get("FilterContentType");
         } else {
@@ -244,10 +264,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 + "&UserID="
                 + appUserModel.getUserIDValue()
                 + "&Type=" + consolidationType
-                + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=&SiteID="
+                + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=" + searchText + "&SiteID="
                 + appUserModel.getSiteIDValue()
-                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&CompInsID=" + sideMenusModel.getRepositoryId();
-        vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&CompInsID=" + sideMenusModel.getRepositoryId() + "&sortType=" + ddlSortType + "&sortby=" + ddlSortList + "&IsArchieve=" + isArchi;
+
+
+        vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
 
     void initVolleyCallback() {
@@ -371,19 +393,19 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             pageIndex = myLearningModelsList.size() / pageSize;
             pageIndex = pageIndex + 1;
         }
-
-        if (myLearningModelsList.size() > 5) {
-            if (item_search != null) {
-                item_search.setVisible(true);
-            }
-
-        } else {
-
-            if (item_search != null) {
-                item_search.setVisible(false);
-            }
-
-        }
+//        Comment this for globalsearch
+//        if (myLearningModelsList.size() > 5) {
+//            if (item_search != null) {
+//                item_search.setVisible(true);
+//            }
+//
+//        } else {
+//
+//            if (item_search != null) {
+//                item_search.setVisible(false);
+//            }
+//
+//        }
 
         new CountDownTimer(1000, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -396,7 +418,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }.start();
 
-
+        svProgressHUD.dismiss();
     }
 
     public void triggerActionForFirstItem() {
@@ -621,6 +643,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+        itemArchive = menu.findItem(R.id.ctx_archive);
+        itemArchive.setVisible(true);
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             itemInfo.setVisible(true);
@@ -646,7 +670,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
-
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
@@ -665,11 +688,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         }
 
+        if (itemArchive != null) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
+            itemArchive.setIcon(filterDrawable);
+            itemArchive.setTitle("Archive");
+        }
+
         if (item_filter != null) {
             Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
             item_filter.setIcon(filterDrawable);
             item_filter.setTitle("Filter");
-
         }
 
         if (itemInfo != null) {
@@ -745,7 +773,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 break;
             case R.id.mylearning_filter:
                 filterApiCall();
-
+                break;
+            case R.id.ctx_archive:
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    isArchivedCall();
+                }else {
+                    showToast(context, "No Internet");
+                }
                 break;
 
         }
@@ -756,8 +790,26 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
         intent.putExtra("sideMenusModel", sideMenusModel);
-        startActivity(intent);
+        startActivityForResult(intent, GLOBAL_SEARCH);
 
+    }
+
+    public void isArchivedCall() {
+// itemsearchIcon
+
+        if (isArchived) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
+            itemArchive.setIcon(filterDrawable);
+            isArchived = false;
+            isArchi = 0;
+        } else {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_leanpub, context, uiSettingsModel.getAppHeaderTextColor());
+            itemArchive.setIcon(filterDrawable);
+            isArchived = true;
+            isArchi = 1;
+        }
+
+        refreshMyLearning(true);
     }
 
     public HashMap<String, String> generateHashMap(String[] conditionsArray) {
@@ -787,6 +839,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             pageIndex = 1;
+            searchText = "";
             refreshMyLearning(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -1270,6 +1323,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 if (refresh) {
 //                        initilizeRatingsListView();
 //                    injectFromDbtoModel();
+                    refreshMyLearning(true);
+
+                }
+
+            }
+        }
+
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                searchText = data.getStringExtra("queryString");
+                if (searchText.length() > 0) {
+
                     refreshMyLearning(true);
 
                 }

@@ -441,6 +441,8 @@ public class GlobalMethods {
             /// ONLINEVIEW
         } else {
 
+            boolean isAngularLaunch = true;
+
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
                 Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
                 intentDetail.putExtra("myLearningDetalData", myLearningModel);
@@ -508,7 +510,14 @@ public class GlobalMethods {
                     try {
 
                         if (jsonObject.length() != 0) {
-                            lrsEndPoint = jsonObject.getString("lrsendpoint");
+//
+                            if (isAngularLaunch) {
+                                String lrsString = jsonObject.getString("lrsendpoint");
+                                lrsEndPoint = lrsString.replace("/", "~");
+                            } else {
+                                lrsEndPoint = jsonObject.getString("lrsendpoint");
+                            }
+
                             autKey = jsonObject.getString("base64lrsAuthKey");
                             enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
                             enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
@@ -530,7 +539,12 @@ public class GlobalMethods {
 //                      String basicNewKey=base64.replace("\n","");
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
+
+                        if (isAngularLaunch) {
+                            urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappURL=true";
+                        } else { // normal Launch
+                            urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
+                        }
 
                         if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
 
@@ -559,17 +573,27 @@ public class GlobalMethods {
                             urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
                         }
 
-
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
                         urlForView = myLearningModel.getStartPage();
-                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) { // scorm content
 
-                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+                        if (isAngularLaunch) {
 
+                            urlForView = myLearningModel.getSiteURL() + "/ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//" + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappurl=true";
+
+                        } else {// normal launch
+                            urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+                        }
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
-                        urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+                        if (isAngularLaunch) {
+                            urlForView = myLearningModel.getSiteURL() + "/ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//ismobilecontentview/true/ContentPath/~" + myLearningModel.getStartPage() + "?nativeappurl=true";
+
+                        } else {// normal launch
+                            urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+
+                        }
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                         String encodedString = "";
@@ -602,7 +626,8 @@ public class GlobalMethods {
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
                         encodedStr = replace(urlForView);
                     } else {
-                        encodedStr = replace(urlForView.toLowerCase());
+//                        encodedStr = replace(urlForView.toLowerCase());// commented for digimedica
+                        encodedStr = replace(urlForView);
                     }
 
 
@@ -621,30 +646,6 @@ public class GlobalMethods {
 
                         encodedStr = encodedStr.replace("file://", "");
 
-//                        try {
-//
-//                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-//                        } catch (UnsupportedEncodingException e) {
-//                            e.printStackTrace();
-//                        }
-//                        File file = new File(encodedStr);
-//                        Intent intent2 = new Intent();
-//                        intent2.setAction(android.content.Intent.ACTION_VIEW);
-//                        intent2.setDataAndType(
-//                                Uri.fromFile(file),
-//                                "application/mspowerpoint,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation");
-//                        try {
-//                            context.startActivity(intent2);
-//
-//                        } catch (ActivityNotFoundException e) {
-//
-//                            Toast toast = Toast.makeText(context,
-//                                    context.getString(R.string.toast_no_application_pp),
-//                                    Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//
-//                        }
 
                         String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                         Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
@@ -656,34 +657,7 @@ public class GlobalMethods {
                             || encodedStr.toLowerCase().contains(".docx")) {
 
                         encodedStr = encodedStr.replace("file://", "");
-//                        try {
-//
-//                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-//                        } catch (UnsupportedEncodingException e) {
-//                            e.printStackTrace();
-//                        }
-//                        File file = new File(encodedStr);
-//
-//                        Intent intent3 = new Intent();
-//                        intent3.setAction(android.content.Intent.ACTION_VIEW);
-//                        intent3.setDataAndType(
-//                                Uri.fromFile(file),
-//                                "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-//                        try {
-//                            context.startActivity(intent3);
-//
-//                        } catch (ActivityNotFoundException e) {
-//
-//                            Toast toast = Toast.makeText(context,
-//                                    context.getString(R.string.toast_no_application_word),
-//                                    Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//                        }
 
-//                        String doc = "<iframe src='http://docs.google.com/viewer?url=" + encodedStr + "'" +
-//                                "width = '100%' height = '100%'" +
-//                                "style = 'border: none;' ></iframe > ";
 
 //                        String  src="http://docs.google.com/gview?embedded=true&url=http://ccidahra.com/wp-content/uploads/2016/03/sample.ppt";
 
@@ -698,30 +672,6 @@ public class GlobalMethods {
                             || encodedStr.toLowerCase().contains(".xls")) {
                         encodedStr = encodedStr.replace("file://", "");
 
-//                        try {
-//
-//                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-//                        } catch (UnsupportedEncodingException e) {
-//                            e.printStackTrace();
-//                        }
-//                        File file = new File(offlinePath);
-//                        Intent intent4 = new Intent();
-//                        intent4.setAction(android.content.Intent.ACTION_VIEW);
-//                        intent4.setDataAndType(
-//                                Uri.fromFile(file),
-//                                "application/excel,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//                        try {
-//                            context.startActivity(intent4);
-//
-//                        } catch (ActivityNotFoundException e) {
-//
-//                            Toast toast = Toast.makeText(context,
-//                                    context.getString(R.string.toast_no_application_excel),
-//                                    Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//
-//                        }
 
                         String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                         Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
@@ -869,6 +819,16 @@ public class GlobalMethods {
         menu.getItem(8).setVisible(false); // related content
         menu.getItem(9).setVisible(false); // cancel
         menu.getItem(10).setVisible(false);
+        menu.getItem(11).setVisible(false);
+        menu.getItem(12).setVisible(false);
+
+        if (myLearningDetalData.isArchived()) {
+            menu.getItem(11).setVisible(false);
+            menu.getItem(12).setVisible(true);
+        } else {
+            menu.getItem(11).setVisible(true);
+            menu.getItem(12).setVisible(false);
+        }
 
         final File myFile = new File(myLearningDetalData.getOfflinepath());
 
@@ -1054,6 +1014,12 @@ public class GlobalMethods {
                         AlertDialog alert = builder.create();
                         alert.show();
                         break;
+                    case R.id.ctx_addtoarchive:
+                        downloadInterface.addToArchive(true);
+                        break;
+                    case R.id.ctx_removearchive:
+                        downloadInterface.addToArchive(false);
+                        break;
                 }
 
 //                if (item.getTitle().toString().equalsIgnoreCase("details")) {
@@ -1127,8 +1093,10 @@ public class GlobalMethods {
     public static void deleteDownloadedFile(View v, MyLearningModel myLearningModel, DownloadInterface downloadInterface) {
 
         File myFile = new File(myLearningModel.getOfflinepath());
+        String parentFilePath = myFile.getParent();
+        File parentFile = new File(parentFilePath);
         if (myFile.exists()) {
-            myFile.delete();
+            deleteDirectory(parentFile);
             if (downloadInterface != null) {
                 downloadInterface.deletedTheContent(1);
                 Toast.makeText(v.getContext(), "     Successfully deleted.    ", Toast.LENGTH_LONG).show();
@@ -1141,6 +1109,42 @@ public class GlobalMethods {
 
         }
     }
+
+    public static boolean deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            if (files == null) {
+                return true;
+            }
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
+            }
+        }
+        return (path.delete());
+    }
+
+
+//    public static boolean deleteDirectory(String parentFile) {
+//        File path = new File(parentFile);
+//        if (path.exists()) {
+//            File[] files = path.listFiles();
+//            if (files == null) {
+//                return true;
+//            }
+//            for (int i = 0; i < files.length; i++) {
+//                if (files[i].isDirectory()) {
+//                    files[i].delete();
+//                } else {
+//                    files[i].delete();
+//                }
+//            }
+//        }
+//        return (path.delete());
+//    }
 
 
     public void downloadJwContentOffline(Context context, MyLearningModel learningModel) {
@@ -1382,324 +1386,6 @@ public class GlobalMethods {
         }
     }
 
-//    public static void launchCourseForGlobalSearch(GlobalSearchResultModelNew myLearningModel, Context context) {
-//
-//        databaseH = new DatabaseHandler(context);
-//        PreferencesManager.initializeInstance(context);
-//        String userLoginId = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERLOGINID);
-//        String userName = PreferencesManager.getInstance().getStringValue(StaticValues.KEY_USERNAME);
-//
-//        String offlinePath = "";
-//
-//        if (myLearningModel.objecttypeid == 10 && myLearningModel.isListView.equalsIgnoreCase("true")) {
-//            Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
-//            intentDetail.putExtra("myLearningDetalData", myLearningModel);
-//            intentDetail.putExtra("ISTRACKLIST", true);
-//            ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
-//        } else {
-//            if (isNetworkConnectionAvailable(context, -1)) {
-//                String urlForView = "";
-//
-//                if (myLearningModel.objecttypeid == 11 || myLearningModel.objecttypeid == 14 || myLearningModel.objecttypeid == 21 || myLearningModel.objecttypeid == 36 || myLearningModel.objecttypeid == 28) {
-//
-//
-//                    if (myLearningModel.status.equalsIgnoreCase("Not Started") || myLearningModel.status.equalsIgnoreCase("")) {
-//
-//                        CMIModel model = new CMIModel();
-//                        model.set_datecompleted("");
-//                        model.set_siteId("" + myLearningModel.siteid);
-//                        model.set_userId(Integer.parseInt(myLearningModel.userID));
-//                        model.set_startdate(GetCurrentDateTime());
-//                        model.set_scoId(myLearningModel.scoid);
-//                        model.set_isupdate("false");
-//                        model.set_status("In Progress");
-//                        model.set_seqNum("0");
-//                        model.set_timespent("");
-//                        model.set_objecttypeid("" + myLearningModel.objecttypeid);
-//                        model.set_contentId(myLearningModel.contentid);
-//                        model.set_sitrurl(myLearningModel.siteurl);
-//                        databaseH = new DatabaseHandler(context);
-//                        databaseH.injectIntoCMITable(model, "false");
-//
-////                        int attempts = databaseH.getLatestAttempt(myLearningModel);
-//
-//                        LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
-//
-//                        learnerSessionModel.setSiteID("" + myLearningModel.siteid);
-//                        learnerSessionModel.setUserID(myLearningModel.userID);
-//                        learnerSessionModel.setScoID("" + myLearningModel.scoid);
-//                        learnerSessionModel.setAttemptNumber("" + 1);
-//                        learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
-//
-//                        databaseH.insertUserSession(learnerSessionModel);
-//
-//                    }
-//
-//                }
-//                databaseH = new DatabaseHandler(context);
-//                JSONObject jsonObject = new JSONObject();
-//                try {
-//                    jsonObject = databaseH.gettTinCanConfigurationValues("" + myLearningModel.siteid);
-//                    Log.d(TAG, "TIN CAN OPTIONS: " + jsonObject);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//
-//                String lrsEndPoint = "";
-//                String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
-//                String lrsAuthorizationKey = "";
-//                String enabletincanSupportforco = "";
-//                String enabletincanSupportforao = "";
-//                String enabletincanSupportforlt = "";
-//                String isTinCan = "";
-//                String autKey = "";
-//                try {
-//
-//                    if (jsonObject.length() != 0) {
-//                        lrsEndPoint = jsonObject.getString("lrsendpoint");
-//                        autKey = jsonObject.getString("base64lrsAuthKey");
-//                        enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
-//                        enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
-//                        enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
-//                        isTinCan = jsonObject.getString("istincan");
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                byte[] encrpt = new byte[0];
-//                try {
-//                    encrpt = autKey.getBytes("UTF-8");
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//                String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
-//                lrsAuthorizationKey = "Basic " + base64;
-////                      String basicNewKey=base64.replace("\n","");
-//                if (myLearningModel.objecttypeid == 8 || myLearningModel.objecttypeid == 9 || myLearningModel.objecttypeid == 10) {
-//
-//                    urlForView = myLearningModel.siteurl + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage + "?nativeappURL=true" + "&CourseName=" + myLearningModel.contenttype + "&ContentID=" + myLearningModel.contentid + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&CanTrack=Yes&SCOID=" + myLearningModel.scoid + "&trackinguserid=" + myLearningModel.userID;
-//
-//                    if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
-//
-//                        if (myLearningModel.objecttypeid == 8 && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
-//
-//                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
-//
-//                        } else if (myLearningModel.objecttypeid == 9 && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
-//                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
-//
-//                        } else if (myLearningModel.objecttypeid == 10 && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
-//                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
-//
-//                        }
-//                    }
-//                } else if (myLearningModel.objecttypeid == 11 || myLearningModel.objecttypeid == 14 || myLearningModel.objecttypeid == 21 || myLearningModel.objecttypeid == 36) //14 21 36
-//                {
-//
-//                    if (myLearningModel.objecttypeid == 11 && isValidString(myLearningModel.jwvideokey)) {
-//
-////                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
-//
-//                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.jwvideokey + "-" + myLearningModel.cloudmediaplayerkey + ".html";
-//
-//                    } else {
-//                        urlForView = myLearningModel.siteurl + "/Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage;
-//                    }
-//
-//
-//                } else if (myLearningModel.objecttypeid == 28) {
-//
-//                    urlForView = myLearningModel.startpage;
-//                } else if (myLearningModel.objecttypeid == 26) {
-//
-//                    urlForView = myLearningModel.siteurl + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage + "&CourseName=" + myLearningModel.name + "&ContentID=" + myLearningModel.contentid + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&CanTrack=Yes&SCOID=" + myLearningModel.scoid + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.userID;
-//
-//
-//                } else if (myLearningModel.objecttypeid == 27) {
-//                    urlForView = myLearningModel.siteurl + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.startpage + "&CourseName=" + myLearningModel.name + "&ContentID=" + myLearningModel.contentid + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&SCOID=" + myLearningModel.scoid + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.userID;
-//
-//                } else if (myLearningModel.objecttypeid == 102) {
-//                    String encodedString = "";
-//
-//                    try {
-//                        encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
-////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
-//
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    urlForView = myLearningModel.siteurl + "Content/PublishFiles/" + myLearningModel.folderpath + "/" + myLearningModel.startpage + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.name + "&ContentID=" + myLearningModel.contentid + "&ObjectTypeID=" + myLearningModel.objecttypeid + "&CanTrack=YES" + "&nativeappURL=true";
-//
-//                } else if (myLearningModel.objecttypeid == 52) {
-//                    String cerName = myLearningModel.contentid + "_Certificate";
-//                    urlForView = myLearningModel.siteurl + "/content/sitefiles/" + myLearningModel.siteid + "/UserCertificates/" + myLearningModel.userID + "/" + cerName + ".pdf";
-//
-//                } else if (myLearningModel.objecttypeid == 688) {
-//
-//
-//                } else if (myLearningModel.objecttypeid == 20) {
-//
-//                    urlForView = myLearningModel.siteurl + "/content/PublishFiles/" + myLearningModel.folderpath + "/glossary_english.html";
-//
-//                } else {
-//
-//
-//                }
-//                String encodedStr = "";
-//                if (myLearningModel.objecttypeid == 102 || myLearningModel.objecttypeid == 28) {
-//                    encodedStr = replace(urlForView);
-//                } else {
-//                    encodedStr = replace(urlForView.toLowerCase());
-//                }
-//
-//
-//                Log.d("DBG", "launchCourseView: " + encodedStr);
-//                if (encodedStr.endsWith(".pdf")) {
-//                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
-//                    pdfIntent.putExtra("PDF_URL", encodedStr);
-//                    pdfIntent.putExtra("ISONLINE", "YES");
-//                    pdfIntent.putExtra("PDF_FILENAME", myLearningModel.name);
-//                    pdfIntent.putExtra("myLearningDetalData", myLearningModel);
-////                        context.startActivity(pdfIntent);
-//                    ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
-//
-//                } else if (encodedStr.toLowerCase().contains(".ppt")
-//                        || encodedStr.toLowerCase().contains(".pptx")) {
-//
-//                    encodedStr = encodedStr.replace("file://", "");
-//
-//
-//                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
-//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-//                    iWeb.putExtra("COURSE_URL", src);
-//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-//
-//                } else if (encodedStr.toLowerCase().contains(".doc")
-//                        || encodedStr.toLowerCase().contains(".docx")) {
-//
-//                    encodedStr = encodedStr.replace("file://", "");
-//
-//
-//                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
-//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-//                    iWeb.putExtra("COURSE_URL", src);
-//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-//
-//
-//                } else if (encodedStr.toLowerCase().contains(".xlsx")
-//                        || encodedStr.toLowerCase().contains(".xls")) {
-//                    encodedStr = encodedStr.replace("file://", "");
-//
-//                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
-//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-//                    iWeb.putExtra("COURSE_URL", src);
-//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-//                } else if (offlinePath.toLowerCase().contains(".mpp")) {
-//                    offlinePath = offlinePath.replace("file://", "");
-//                    try {
-//                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    File file = new File(offlinePath);
-//                    Intent intent4 = new Intent();
-//                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-//                    intent4.setDataAndType(
-//                            Uri.fromFile(file),
-//                            "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
-//
-//                    try {
-//                        context.startActivity(intent4);
-//                    } catch (ActivityNotFoundException e) {
-//
-//                        Toast toast = Toast.makeText(context,
-//                                context.getString(R.string.toast_no_application_mpp),
-//                                Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        toast.show();
-//
-//                    }
-//
-//                } else if (encodedStr.toLowerCase().contains(".visio")
-//                        || encodedStr.toLowerCase().contains(".vsd")) {
-//                    encodedStr = encodedStr.replace("file://", "");
-//
-//                    try {
-//                        encodedStr = URLDecoder.decode(offlinePath, "UTF-8");
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    File file = new File(encodedStr);
-//                    Intent intent4 = new Intent();
-//                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-//                    intent4.setDataAndType(
-//                            Uri.fromFile(file),
-//                            "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
-//
-//                    try {
-//                        context.startActivity(intent4);
-//                    } catch (ActivityNotFoundException e) {
-//
-//                        Toast toast = Toast.makeText(context,
-//                                context.getString(R.string.toast_no_application_mpp),
-//                                Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        toast.show();
-//
-//
-//                    }
-//
-//                } else if (encodedStr.toLowerCase().contains(".txt")) {
-//
-//                    try {
-//
-//                        encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    File file = new File(encodedStr);
-//                    Intent intent4 = new Intent();
-//                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-//                    intent4.setDataAndType(Uri.fromFile(file), "text/plain");
-//                    try {
-//                        context.startActivity(intent4);
-//
-//                    } catch (ActivityNotFoundException e) {
-//
-//                        Toast toast = Toast.makeText(context,
-//                                context.getString(R.string.toast_no_application_txt),
-//                                Toast.LENGTH_LONG);
-//                        toast.setGravity(Gravity.CENTER, 0, 0);
-//                        toast.show();
-//                    }
-//
-//                } else if (myLearningModel.objecttypeid == 70) {
-//
-////                    relatedContentView(myLearningModel, context);
-//
-//                } else if (myLearningModel.objecttypeid == 688) {
-//
-//
-//                } else {
-//
-//                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-//                    iWeb.putExtra("COURSE_URL", encodedStr);
-//                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-//                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-//                }
-//            } else {
-//
-//                showToast(context, "The content has not been downloaded for offline View. Please download it when you are in online");
-//            }
-//        }
-//    }
-
     public static void launchCourseForGlobalSearch(MyLearningModel myLearningModel, Context context) {
 
         databaseH = new DatabaseHandler(context);
@@ -1742,19 +1428,14 @@ public class GlobalMethods {
                         databaseH.injectIntoCMITable(model, "false");
 
                         int attempts = databaseH.getLatestAttempt(myLearningModel);
-
                         LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
-
                         learnerSessionModel.setSiteID(myLearningModel.getSiteID());
                         learnerSessionModel.setUserID(myLearningModel.getUserID());
                         learnerSessionModel.setScoID(myLearningModel.getScoId());
                         learnerSessionModel.setAttemptNumber("" + (attempts + 1));
                         learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
-
                         databaseH.insertUserSession(learnerSessionModel);
-
                     }
-
                 }
                 databaseH = new DatabaseHandler(context);
                 JSONObject jsonObject = new JSONObject();
@@ -1765,7 +1446,6 @@ public class GlobalMethods {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
                 String lrsEndPoint = "";
                 String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
@@ -1891,30 +1571,6 @@ public class GlobalMethods {
 
                     encodedStr = encodedStr.replace("file://", "");
 
-//                        try {
-//
-//                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-//                        } catch (UnsupportedEncodingException e) {
-//                            e.printStackTrace();
-//                        }
-//                        File file = new File(encodedStr);
-//                        Intent intent2 = new Intent();
-//                        intent2.setAction(android.content.Intent.ACTION_VIEW);
-//                        intent2.setDataAndType(
-//                                Uri.fromFile(file),
-//                                "application/mspowerpoint,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation");
-//                        try {
-//                            context.startActivity(intent2);
-//
-//                        } catch (ActivityNotFoundException e) {
-//
-//                            Toast toast = Toast.makeText(context,
-//                                    context.getString(R.string.toast_no_application_pp),
-//                                    Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//
-//                        }
 
                     String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                     Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
@@ -1926,30 +1582,7 @@ public class GlobalMethods {
                         || encodedStr.toLowerCase().contains(".docx")) {
 
                     encodedStr = encodedStr.replace("file://", "");
-//                        try {
-//
-//                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-//                        } catch (UnsupportedEncodingException e) {
-//                            e.printStackTrace();
-//                        }
-//                        File file = new File(encodedStr);
-//
-//                        Intent intent3 = new Intent();
-//                        intent3.setAction(android.content.Intent.ACTION_VIEW);
-//                        intent3.setDataAndType(
-//                                Uri.fromFile(file),
-//                                "application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-//                        try {
-//                            context.startActivity(intent3);
-//
-//                        } catch (ActivityNotFoundException e) {
-//
-//                            Toast toast = Toast.makeText(context,
-//                                    context.getString(R.string.toast_no_application_word),
-//                                    Toast.LENGTH_LONG);
-//                            toast.setGravity(Gravity.CENTER, 0, 0);
-//                            toast.show();
-//                        }
+
 
 //                        String doc = "<iframe src='http://docs.google.com/viewer?url=" + encodedStr + "'" +
 //                                "width = '100%' height = '100%'" +
@@ -2099,7 +1732,7 @@ public class GlobalMethods {
         myLearningModel.setMediaName(globalSearchResultModelNew.medianame);
         myLearningModel.setCreatedDate(globalSearchResultModelNew.createddate);
         myLearningModel.setStartPage(globalSearchResultModelNew.startpage);
-
+        myLearningModel.setAviliableSeats(globalSearchResultModelNew.availableseats);
         myLearningModel.setObjecttypeId("" + globalSearchResultModelNew.objecttypeid);
         myLearningModel.setLocationName(globalSearchResultModelNew.location);
         myLearningModel.setScoId("" + globalSearchResultModelNew.scoid);
@@ -2149,7 +1782,6 @@ public class GlobalMethods {
 
         myLearningModel.setEventendUtcTime(globalSearchResultModelNew.eventenddatetime);
 
-
         return myLearningModel;
     }
 
@@ -2159,7 +1791,6 @@ public class GlobalMethods {
 
         if (globalSearchResultModelNew == null)
             return null;
-
 
         sideMenusModel.setMenuId(globalSearchResultModelNew.menuID);
         sideMenusModel.setDisplayName(globalSearchResultModelNew.componentName);
@@ -2178,10 +1809,6 @@ public class GlobalMethods {
         sideMenusModel.setParentMenuId("" + globalSearchResultModelNew.menuID);
         sideMenusModel.setParameterStrings("");
         sideMenusModel.setSiteID(globalSearchResultModelNew.siteid);
-
-
         return sideMenusModel;
     }
-
-
 }

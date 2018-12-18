@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
@@ -49,6 +50,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.fetchCategoriesData;
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.getSelectedModelList;
@@ -93,6 +95,8 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
     SideMenusModel sideMenusModel = null;
 
+    Toolbar toolbar;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +104,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         appUserModel = AppUserModel.getInstance();
         db = new DatabaseHandler(this);
         uiSettingsModel = UiSettingsModel.getInstance();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         svProgressHUD = new SVProgressHUD(this);
@@ -112,13 +117,18 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         bottomBtnLayout.setVisibility(View.GONE);
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'></font>"));
+        toolbar.setVisibility(View.VISIBLE);
+        toolbar.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'></font>"));
+//        toolbar.setTitle("My Toolbar");
+
+        setSupportActionBar(toolbar);
+
 
         try {
-            final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+            Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         } catch (RuntimeException ex) {
             ex.printStackTrace();
@@ -186,8 +196,11 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             public void onClick(View v) {
                 if (((CheckBox) v).isChecked()) {
                     checkAllBool = true;
+                    chxSelectedCategory.setChecked(true);
+                    checkSelectedBool = true;
                     try {
                         expandableListDetail = fetchCategoriesData(responseReceived, true, sideMenusModel);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -195,7 +208,8 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
                     updateListView(true);
                 } else {
-
+                    chxSelectedCategory.setChecked(false);
+                    checkSelectedBool = false;
                     checkAllBool = false;
                     try {
                         expandableListDetail = fetchCategoriesData(responseReceived, false, sideMenusModel);
@@ -311,10 +325,10 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                         try {
                             expandableListDetail = fetchCategoriesData(response, false, sideMenusModel);
                             boolean parentExistss = isParentComponentExists(response, sideMenusModel);
-//                            if (!parentExistss) {
-//                                chxSelectedCategory.setVisibility(View.GONE);
-//                                checkSelectedBool = false;
-//                            }
+                            if (!parentExistss) {
+                                chxSelectedCategory.setVisibility(View.GONE);
+                                checkSelectedBool = false;
+                            }
                             expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
                             responseReceived = response;
                             updateListView(true);
@@ -355,7 +369,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             txtSearch.setHint("Search..");
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
-            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
+//            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
 
 //            ImageView searchClose = searchView.findViewById(android.support.v7.appcompat.R.id.home);
 //            searchClose.setImageResource(R.drawable.ic_filter_list_black_24dp);
@@ -363,11 +377,12 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             // Set search view clear icon
             ImageView searchIconClearView = (ImageView) searchView
                     .findViewById(android.support.v7.appcompat.R.id.search_close_btn);
-            if (searchIconClearView != null) {
-                Log.v("CLR", "Should Change Clear Icon here");
 
-                searchIconClearView
-                        .setImageResource(R.drawable.close);
+            searchView.setFocusable(true);
+
+            if (searchIconClearView != null) {
+
+                searchIconClearView.setImageResource(R.drawable.close);
 
             }
             // Does help!
@@ -416,7 +431,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                     return true;
                 }
             });
-
+            searchView.setIconified(false);
         }
 
         return true;
@@ -432,21 +447,65 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             gLobalSearchSelectedModel.componentID = Integer.parseInt(sideMenusModel.getComponentId());
             gLobalSearchSelectedModel.siteName = appUserModel.getSiteName();
             gLobalSearchSelectedModel.componentName = sideMenusModel.getContextTitle();
-            gLobalSearchSelectedModel.componentInstancID = Integer.parseInt(sideMenusModel.getRepositoryId());
             gLobalSearchSelectedModel.contextMenuId = Integer.parseInt(sideMenusModel.getContextMenuId());
+
+            try {
+                gLobalSearchSelectedModel.componentInstancID = Integer.parseInt(sideMenusModel.getRepositoryId());
+            } catch (NumberFormatException formatExc) {
+                gLobalSearchSelectedModel.componentInstancID = 0;
+            }
+
+
             gLobalSearchSelectedModelList.add(gLobalSearchSelectedModel);
         }
 
-        if (checkSelectedBool || gLobalSearchSelectedModelList.size() > 0) {
-            Intent intent = new Intent(GlobalSearchActivity.this, GlobalSearchResultsActivity.class);
-            intent.putExtra("queryString", queryString);
-            intent.putExtra("globalsearchlist", (Serializable) gLobalSearchSelectedModelList);
+        Intent intent = new Intent(GlobalSearchActivity.this, GlobalSearchResultsActivity.class);
+        intent.putExtra("queryString", queryString);
+        intent.putExtra("globalsearchlist", (Serializable) gLobalSearchSelectedModelList);
+
+        if (checkSelectedBool && gLobalSearchSelectedModelList.size() > 1) {
+
             startActivity(intent);
+
+        } else if (gLobalSearchSelectedModelList.size() >= 1 && !checkSelectedBool) {
+
+            startActivity(intent);
+
+        } else if (checkSelectedBool) {
+
+//            Toast.makeText(this, "Single component selected ", Toast.LENGTH_SHORT).show();
+
+            gotoParentObj(queryString);
 
         } else {
 
             Toast.makeText(this, getString(R.string.alert_nocat_selected), Toast.LENGTH_SHORT).show();
         }
+
+//            if (checkSelectedBool || gLobalSearchSelectedModelList.size() > 0) {
+//            Intent intent = new Intent(GlobalSearchActivity.this, GlobalSearchResultsActivity.class);
+//            intent.putExtra("queryString", queryString);
+//            intent.putExtra("globalsearchlist", (Serializable) gLobalSearchSelectedModelList);
+//            startActivity(intent);
+//
+//        } else if (checkSelectedBool) {
+//
+//            Toast.makeText(this, "Single component selected ", Toast.LENGTH_SHORT).show();
+//
+//        } else {
+//
+//            Toast.makeText(this, getString(R.string.alert_nocat_selected), Toast.LENGTH_SHORT).show();
+//        }
+    }
+
+    public void gotoParentObj(String queryString) {
+
+        Intent intent = getIntent();
+        intent.putExtra("queryString", queryString);
+        setResult(RESULT_OK, intent);
+        finish();
+
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

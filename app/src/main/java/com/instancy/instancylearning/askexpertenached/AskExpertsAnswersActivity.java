@@ -1,12 +1,13 @@
 package com.instancy.instancylearning.askexpertenached;
 
-import android.annotation.SuppressLint;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -16,7 +17,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -24,9 +24,8 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
@@ -36,8 +35,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -55,8 +52,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.DiscussionCommentsActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
@@ -64,17 +59,20 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
-import com.instancy.instancylearning.models.AskExpertQuestionModel;
-import com.instancy.instancylearning.models.DiscussionTopicModel;
+import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UpvotersModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +81,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_ASKRESPONSES;
+import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_ASKRESPONSES_DIGI;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
-import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
@@ -100,31 +99,30 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
-    DatabaseHandler db;
-    List<AskExpertAnswerModel> askExpertAnswerModelList = null;
+    AskExpertDbTables db;
+    List<AskExpertAnswerModelDg> askExpertAnswerModelList = null;
     ResultListner resultListner = null;
-    AskExpertQuestionModel askExpertQuestionModel;
+    AskExpertQuestionModelDg askExpertQuestionModel;
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
     UiSettingsModel uiSettingsModel;
     AskExpertAnswerAdapter askExpertAnswerAdapter;
 
-    ListView lv_languages;
     BottomSheetDialog bottomSheetDialog;
 
     boolean refreshAnswers = false;
 
     UpvotersAdapter upvotersAdapter;
 
-    List<UpvotersModel> upvotersModelList;
-
+    List<AskExpertUpVoters> upvotersModelList;
 
     @Nullable
     @BindView(R.id.askexpertslistview)
     ListView askExpertsListView;
 
     View header;
+
     View footor;
 
     @Nullable
@@ -143,6 +141,12 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
 
+    SideMenusModel sideMenusModel;
+
+    TextView txtNoAnswers;
+
+    boolean nextLevel = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,10 +155,10 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
         appController = AppController.getInstance();
-        db = new DatabaseHandler(this);
+        db = new AskExpertDbTables(this);
         ButterKnife.bind(this);
         swipeRefreshLayout.setOnRefreshListener(this);
-
+        initVolleyCallback();
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
@@ -162,13 +166,18 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         topicheader.setVisibility(View.GONE);
 
-        upvotersAdapter = new UpvotersAdapter(this, upvotersModelList);
 
         header = (View) getLayoutInflater().inflate(R.layout.askexpertcell_en, null);
         footor = (View) getLayoutInflater().inflate(R.layout.no_data_layout, null);
 
         vollyService = new VollyService(resultCallback, context);
-        askExpertQuestionModel = (AskExpertQuestionModel) getIntent().getSerializableExtra("AskExpertQuestionModel");
+
+        nextLevel = getIntent().getBooleanExtra("nextLevel", false);
+
+
+        askExpertQuestionModel = (AskExpertQuestionModelDg) getIntent().getSerializableExtra("AskExpertQuestionModelDg");
+
+        sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sidemenumodel");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -177,10 +186,8 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         askExpertAnswerAdapter = new AskExpertAnswerAdapter(this, BIND_ABOVE_CLIENT, askExpertAnswerModelList);
         askExpertsListView.setAdapter(askExpertAnswerAdapter);
         askExpertsListView.setOnItemClickListener(this);
-//        askExpertsListView.setEmptyView(findViewById(R.id.nodata_label));
-//        askExpertsListView.addHeaderView(header);
         askExpertsListView.addFooterView(footor);
-        askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
+        askExpertAnswerModelList = new ArrayList<AskExpertAnswerModelDg>();
         askExpertsListView.addHeaderView(header, null, false);
 
         try {
@@ -192,8 +199,10 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
             ex.printStackTrace();
         }
+
         initilizeHeaderView(header);
-        injectFromDbtoModel();
+
+        noDataLabel.setVisibility(View.INVISIBLE);
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
         View customNav = LayoutInflater.from(this).inflate(R.layout.iconcomment, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
@@ -204,91 +213,176 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                openCommentView();
-                openCommentAndAnswerActivity(false);
+                openCommentAndAnswerActivity(false, -1);
 
             }
         });
         floatingActionButton.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        if (appUserModel.getUserIDValue().equalsIgnoreCase(askExpertQuestionModel.postedUserId)) {
+
+
+        if (isValidString(askExpertQuestionModel.answerBtnWithLink)) {
+            floatingActionButton.setVisibility(View.VISIBLE);
+        } else {
             floatingActionButton.setVisibility(View.INVISIBLE);
         }
+
+//        if (db.isPrivilegeExistsFor(StaticValues.REPLYTOQUESTION)) {
+//            floatingActionButton.setVisibility(View.VISIBLE);
+//        } else {
+//            floatingActionButton.setVisibility(View.INVISIBLE);
+//        }
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+            refreshForAnswers(false);
+        } else {
+            injectFromDbtoModel();
+        }
+
     }
 
-    public void openCommentAndAnswerActivity(boolean isFrom) {
+    public void askCommentFromAnswerActivity(AskExpertAnswerModelDg askExpertAnswerModelDg) {
 
         Intent intentDetail = new Intent(context, AskExpertsAskAnsCmtActivity.class);
-        intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);
-        intentDetail.putExtra("ISCOMMENT", false);
-        startActivity(intentDetail);
-
-    }
-
-
-    public void openCommentsActivity(boolean isFrom) {
-
-        Intent intentDetail = new Intent(context, AskExpertsCommentsActivity.class);
-        intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);
+        intentDetail.putExtra("AskExpertAnswerModelDg", askExpertAnswerModelDg);
+        intentDetail.putExtra("ISASKANSWER", false);
+        intentDetail.putExtra("EDIT", false);
         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
 
     }
 
+    public void openCommentAndAnswerActivity(boolean isEdit, int position) {
+
+        Intent intentDetail = new Intent(context, AskExpertsAskAnsCmtActivity.class);
+        if (position != -1) {
+            AskExpertAnswerModelDg answerModelDg = askExpertAnswerModelList.get(position);
+            intentDetail.putExtra("EDIT", isEdit);
+            intentDetail.putExtra("AskExpertAnswerModelDg", answerModelDg);
+        }
+        intentDetail.putExtra("AskExpertQuestionModelDg", askExpertQuestionModel);
+        intentDetail.putExtra("ISASKANSWER", true);
+        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+    }
+
+    public void refreshForAnswers(Boolean isRefreshed) {
+        if (!isRefreshed) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+
+//        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetAsktheExpertData?intSiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
+
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetUserQuestionsResponses?UserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&ComponentID=" + sideMenusModel.getComponentId() + "&intQuestionID=" + askExpertQuestionModel.questionID;
+
+        vollyService.getStringResponseVolley("GetUserQuestionsResponses", parmStringUrl, appUserModel.getAuthHeaders());
+
+    }
+
+
+    public void openCommentsActivity(boolean isFrom, AskExpertAnswerModelDg askExpertAnswerModel) {
+
+        Intent intentDetail = new Intent(context, AskExpertsCommentsActivity.class);
+        intentDetail.putExtra("AskExpertQuestionModelDg", askExpertQuestionModel);
+        intentDetail.putExtra("askExpertAnswerModel", askExpertAnswerModel);
+        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+
+    }
 
     public void initilizeHeaderView(View view) {
 
-//        @Nullable
-//        @BindView(R.id.card_view)
-//        CardView card_view;
-
         ImageButton btnContextMenu = (ImageButton) view.findViewById(R.id.btn_contextmenu);
         TextView txtAllActivites = (TextView) view.findViewById(R.id.txt_all_activites);
-        TextView txtNoAnswers = (TextView) view.findViewById(R.id.txtno_answers);
+        txtNoAnswers = (TextView) view.findViewById(R.id.txtno_answers);
         TextView txtQuestion = (TextView) view.findViewById(R.id.txt_question);
+        TextView txtDescription = (TextView) view.findViewById(R.id.txt_description);
+        TextView txtNoViews = (TextView) view.findViewById(R.id.txtno_views);
+        CardView card_view = (CardView) view.findViewById(R.id.card_view);
 
         ImageView imagethumb = (ImageView) view.findViewById(R.id.imagethumb);
 
         CustomFlowLayout tagsSkills = (CustomFlowLayout) view.findViewById(R.id.cflBreadcrumb);
 
-
         btnContextMenu.setVisibility(View.INVISIBLE);
         txtQuestion.setText(askExpertQuestionModel.userQuestion);
-        txtAllActivites.setText("Asked by: " + askExpertQuestionModel.username + " ");
+        txtAllActivites.setText("Asked by: " + askExpertQuestionModel.userName + " ");
 
-        txtAllActivites.setText("Asked by: " + askExpertQuestionModel.username + "   |   " + "Asked on: " + askExpertQuestionModel.postedDate + "   |   " + "Last active: " + askExpertQuestionModel.postedDate);
+        txtAllActivites.setText("Asked by: " + askExpertQuestionModel.userName + "   |   " + "Asked on: " + askExpertQuestionModel.postedDate + "   |   " + "Last active: " + askExpertQuestionModel.postedDate);
 
-        txtNoAnswers.setText(askExpertQuestionModel.answers + " Answer(s)");
+        txtNoAnswers.setText(askExpertQuestionModel.totalAnswers + " Answer(s)");
+        txtNoViews.setText(askExpertQuestionModel.totalViews + " Views");
+        txtDescription.setText(askExpertQuestionModel.userQuestionDescription);
+
         txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtNoAnswers.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtAllActivites.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtNoViews.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-//        imagethumb.setVisibility(View.GONE);
-//        card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
+        if (askExpertQuestionModel.userQuestionImage.length() > 0) {
+
+            String imgUrl = appUserModel.getSiteURL() + askExpertQuestionModel.userQuestionImagePath;
+            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(imagethumb);
+
+            imagethumb.setVisibility(View.VISIBLE);
+
+        } else {
+
+            imagethumb.setVisibility(View.GONE);
+
+        }
 
         List<ContentValues> breadcrumbItemsList = null;
 
         breadcrumbItemsList = new ArrayList<ContentValues>();
-        breadcrumbItemsList = generateTagsList(10);
+
+
+        if (askExpertQuestionModel.questionCategoriesArray != null && askExpertQuestionModel.questionCategoriesArray.size() > 0) {
+            breadcrumbItemsList = generateTagsList(askExpertQuestionModel.questionCategoriesArray);
+        } else {
+            askExpertQuestionModel.questionCategoriesArray = getArrayListFromString(askExpertQuestionModel.questionCategories);
+            breadcrumbItemsList = generateTagsList(askExpertQuestionModel.questionCategoriesArray);
+        }
 
         generateBreadcrumb(breadcrumbItemsList, tagsSkills, this);
 
     }
 
+    public List<String> getArrayListFromString(String questionCategoriesString) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (questionCategoriesString.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
+
+        return questionCategoriesArray;
+
+    }
+
 
     public void injectFromDbtoModel() {
-        askExpertAnswerModelList = db.fetchAskExpertAnswersModelList("" + askExpertQuestionModel.questionID);
+        askExpertAnswerModelList = db.fetchAnswersForQuestion("" + askExpertQuestionModel.questionID, askExpertQuestionModel.totalViews);
         if (askExpertAnswerModelList != null) {
             askExpertAnswerAdapter.refreshList(askExpertAnswerModelList);
             noDataLabel.setVisibility(View.INVISIBLE);
             footor.setVisibility(View.GONE);
         } else {
-            askExpertAnswerModelList = new ArrayList<AskExpertAnswerModel>();
+            askExpertAnswerModelList = new ArrayList<AskExpertAnswerModelDg>();
             askExpertAnswerAdapter.refreshList(askExpertAnswerModelList);
             noDataLabel.setVisibility(View.INVISIBLE);
             footor.setVisibility(View.VISIBLE);
         }
 
-//        txtNoAnswers.setText(askExpertAnswerModelList.size() + " Answer(s)");
+        txtNoAnswers.setText(askExpertAnswerModelList.size() + " Answer(s)");
+
+        if (nextLevel) {
+            if (askExpertAnswerModelList != null && askExpertAnswerModelList.size() > 0) {
+                openCommentsActivity(false, askExpertAnswerModelList.get(0));
+            }
+
+        }
+
     }
 
     @Override
@@ -332,8 +426,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
-//            refreshMyLearning(true);
-
+            refreshForAnswers(true);
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -350,9 +443,10 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         if (requestCode == FORUM_CREATE_NEW_FORUM && resultCode == RESULT_OK && data != null) {
 
             if (data != null) {
-                boolean refresh = data.getBooleanExtra("NEWFORUM", false);
+                boolean refresh = data.getBooleanExtra("NEWCMNT", false);
                 if (refresh) {
-//                    refreshMyLearning(false);
+                    refreshAnswers = true;
+                    refreshForAnswers(true);
                 }
             }
         }
@@ -377,26 +471,128 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 break;
             case R.id.btn_contextmenu:
                 View v = askExpertsListView.getChildAt(position - askExpertsListView.getFirstVisiblePosition());
-                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
-                catalogContextMenuMethod(position, view, txtBtnDownload, askExpertAnswerModelList.get(position));
+                catalogContextMenuMethod(position, view, askExpertAnswerModelList.get(position));
                 break;
             case R.id.txtTotalUpvoters:
-                showUpvoters();
+                showUpvoters(askExpertAnswerModelList.get(position).responseID);
                 break;
             case R.id.txtComment:
-                openCommentAndAnswerActivity(false);
+                askCommentFromAnswerActivity(askExpertAnswerModelList.get(position));
                 break;
             case R.id.txtComments:
-                openCommentsActivity(false);
+                openCommentsActivity(false, askExpertAnswerModelList.get(position));
+                break;
+            case R.id.txtUpvote:
+                try {
+                    callCommentLikeApi(askExpertAnswerModelList.get(position), true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case R.id.txtDownnvote:
+                try {
+                    callCommentLikeApi(askExpertAnswerModelList.get(position), false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
             default:
 
         }
+    }
+
+    public void callCommentLikeApi(final AskExpertAnswerModelDg answerModel, boolean isUpOrDown) throws JSONException {
+        int isLiked = 0;
+        if (isUpOrDown) {
+            isLiked = 1;
+        } else {
+            isLiked = 0;
+        }
+
+        JSONObject parameters = new JSONObject();
+
+        parameters.put("intUserID", appUserModel.getUserIDValue());
+        parameters.put("strObjectID", "" + answerModel.responseID);
+        parameters.put("intTypeID", 3);
+        parameters.put("blnIsLiked", isLiked);
+
+        String parameterString = parameters.toString();
+        Log.d(TAG, "validateNewForumCreation: " + parameterString);
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+
+            sendNewLikeDataToServer(parameterString);
+
+        } else {
+            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final AskExpertAnswerModel askExpertAnswerModel) {
+    public void sendNewLikeDataToServer(final String postData) {
 
-        PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/InsertContentLikes";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                refreshForAnswers(true);
+
+            }
+        }, new Response.ErrorListener()
+
+        {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(AskExpertsAnswersActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new
+
+                DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void catalogContextMenuMethod(final int position, final View v, final AskExpertAnswerModelDg askExpertAnswerModel) {
+
+        PopupMenu popup = new PopupMenu(this, v);
 
         //Inflating the Popup using xml file
         popup.getMenuInflater().inflate(R.menu.askexpertmenu, popup.getMenu());
@@ -405,41 +601,44 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         Menu menu = popup.getMenu();
 
         menu.getItem(0).setVisible(true);//delete
+        menu.getItem(1).setVisible(true);// ctx_edit
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.ctx_delete:
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                        alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the Answer :")
+                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    public void onClick(final DialogInterface dialogBox, int id) {
+                                        // ToDo get user input here
+                                        deleteAnswerFromServer(askExpertAnswerModel);
+                                    }
+                                }).setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialogBox, int id) {
+                                        dialogBox.cancel();
+                                    }
+                                });
 
-                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-
-                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                    alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the answer :")
-                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                                public void onClick(final DialogInterface dialogBox, int id) {
-                                    // ToDo get user input here
-                                    deleteAnswerFromServer(askExpertAnswerModel);
-                                }
-                            }).setNegativeButton("Cancel",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialogBox, int id) {
-                                    dialogBox.cancel();
-                                }
-                            });
-
-                    AlertDialog alertDialogAndroid = alertDialog.create();
-                    alertDialogAndroid.show();
+                        AlertDialog alertDialogAndroid = alertDialog.create();
+                        alertDialogAndroid.show();
+                        break;
+                    case R.id.ctx_edit:
+                        openCommentAndAnswerActivity(true, position);
                 }
                 return true;
+
             }
         });
         popup.show();//showing popup menu
 
+
     }
 
-    public void deleteAnswerFromServer(final AskExpertAnswerModel answerModel) {
+    public void deleteAnswerFromServer(final AskExpertAnswerModelDg answerModel) {
 
-        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteAskResponse?ResponseID=" + answerModel.responseid;
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/DeleteUserResponses?ResponseID=" + answerModel.responseID + "&UserResponseImage=" + answerModel.userResponseImage;
 
         final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
             @Override
@@ -447,11 +646,12 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 
-                if (s.contains("success")) {
+                if (s.contains("2")) {
 
                     Toast.makeText(context, " Success! \nAnswer has been successfully deleted ", Toast.LENGTH_SHORT).show();
                     refreshAnswers = true;
-                    deleteAnswerFromLocalDB(answerModel);
+//                    db.deleteAnswerFromLocalDB(answerModel);
+                    refreshForAnswers(true);
                 } else {
 
                     Toast.makeText(context, "Answer cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
@@ -484,22 +684,6 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 5000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-    }
-
-    public void deleteAnswerFromLocalDB(AskExpertAnswerModel askExpertAnswerModel) {
-
-        try {
-            String strDelete = "DELETE FROM " + TBL_ASKRESPONSES + " WHERE  siteID ='"
-                    + appUserModel.getSiteIDValue() + "' AND responseid  ='" + askExpertAnswerModel.responseid + "'";
-            db.executeQuery(strDelete);
-
-            injectFromDbtoModel();
-
-        } catch (SQLiteException sqlEx) {
-
-            sqlEx.printStackTrace();
-        }
 
     }
 
@@ -537,17 +721,15 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     }
 
 
-    public List<ContentValues> generateTagsList(int position) {
+    public List<ContentValues> generateTagsList(List<String> skillSets) {
         List<ContentValues> tagsList = new ArrayList<>();
 
-        for (int i = 1; i < position; i++) {
+        for (int i = 0; i < skillSets.size(); i++) {
             ContentValues cvBreadcrumbItem = new ContentValues();
             cvBreadcrumbItem.put("categoryid", i);
-            cvBreadcrumbItem.put("categoryname", "Skill " + i);
+            cvBreadcrumbItem.put("categoryname", skillSets.get(i));
             tagsList.add(cvBreadcrumbItem);
-
         }
-
 
         return tagsList;
     }
@@ -588,7 +770,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(arrowView, iconFont);
 
-            arrowView.setText(Html.fromHtml("<font color='" + context.getResources().getColor(R.color.colorInGreen) + "'><medium><b>"
+            arrowView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppTextColor() + "'><medium><b>"
                     + context.getResources().getString(R.string.fa_icon_angle_right) + "</b></big> </font>"));
 
             arrowView.setTextSize(12);
@@ -603,7 +785,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 //            textView.setText(Html.fromHtml("<font color='" + context.getResources().getColor(R.color.colorInGreen) + "'><big><b>"
 //                    + categoryName + "</b></small>  </font>"));
 
-            textView.setText(Html.fromHtml("<font color='" + context.getResources().getColor(R.color.colorInGreen) + "'><small>"
+            textView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppTextColor() + "'><small>"
                     + categoryName + "</small>  </font>"));
 
             textView.setGravity(Gravity.CENTER | Gravity.CENTER);
@@ -625,14 +807,77 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
     }
 
-    private void showUpvoters() {
-        View view = getLayoutInflater().inflate(R.layout.askexpertsupvotersbottomsheet, null);
-        ListView lv_languages = (ListView) view.findViewById(R.id.lv_languages);
+    private void showUpvoters(int responseID) {
 
-        lv_languages.setAdapter(upvotersAdapter);
-        bottomSheetDialog = new BottomSheetDialog(this);
-        bottomSheetDialog.setContentView(view);
-        bottomSheetDialog.show();
+        upvotersModelList = db.fetchUpvotersist(responseID);
+
+        if (upvotersModelList != null && upvotersModelList.size() > 0) {
+            View view = getLayoutInflater().inflate(R.layout.askexpertsupvotersbottomsheet, null);
+            ListView lv_languages = (ListView) view.findViewById(R.id.lv_languages);
+            upvotersAdapter = new UpvotersAdapter(this, upvotersModelList);
+            lv_languages.setAdapter(upvotersAdapter);
+            TextView txtCountVoted = view.findViewById(R.id.txtCountVoted);
+            txtCountVoted.setText(upvotersModelList.size() + " Upvoters");
+            bottomSheetDialog = new BottomSheetDialog(this);
+            bottomSheetDialog.setContentView(view);
+            bottomSheetDialog.show();
+        } else {
+            Toast.makeText(context, "0 voted", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+
+                swipeRefreshLayout.setRefreshing(false);
+                svProgressHUD.dismiss();
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+
+                if (requestType.equalsIgnoreCase("GetUserQuestionsResponses")) {
+                    if (response != null) {
+                        try {
+                            db.injectAsktheExpertsAnswers(response);
+                            db.injectUpVoters(response);
+                            injectFromDbtoModel();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
+                swipeRefreshLayout.setRefreshing(false);
+                svProgressHUD.dismiss();
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+                svProgressHUD.dismiss();
+            }
+        };
     }
 
 

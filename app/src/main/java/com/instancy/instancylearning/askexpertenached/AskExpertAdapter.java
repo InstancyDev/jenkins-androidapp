@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,6 +32,7 @@ import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +52,7 @@ public class AskExpertAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<AskExpertQuestionModel> askExpertQuestionModelList = null;
+    private List<AskExpertQuestionModelDg> askExpertQuestionModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -58,15 +61,15 @@ public class AskExpertAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = AskExpertAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<AskExpertQuestionModel> searchList;
+    private List<AskExpertQuestionModelDg> searchList;
     AppController appcontroller;
     TagClicked tagClicked;
 
 
-    public AskExpertAdapter(Activity activity, int resource, List<AskExpertQuestionModel> askExpertQuestionModelList, TagClicked tagClicked) {
+    public AskExpertAdapter(Activity activity, int resource, List<AskExpertQuestionModelDg> askExpertQuestionModelList, TagClicked tagClicked) {
         this.activity = activity;
         this.askExpertQuestionModelList = askExpertQuestionModelList;
-        this.searchList = new ArrayList<AskExpertQuestionModel>();
+        this.searchList = new ArrayList<AskExpertQuestionModelDg>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -80,9 +83,9 @@ public class AskExpertAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<AskExpertQuestionModel> myLearningModel) {
+    public void refreshList(List<AskExpertQuestionModelDg> myLearningModel) {
         this.askExpertQuestionModelList = myLearningModel;
-        this.searchList = new ArrayList<AskExpertQuestionModel>();
+        this.searchList = new ArrayList<AskExpertQuestionModelDg>();
         this.searchList.addAll(myLearningModel);
         this.notifyDataSetChanged();
     }
@@ -116,16 +119,44 @@ public class AskExpertAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtQuestion.setText(askExpertQuestionModelList.get(position).userQuestion);
-        holder.txtAllActivites.setText("Asked by: " + askExpertQuestionModelList.get(position).username + "   |   " + "Asked on: " + askExpertQuestionModelList.get(position).postedDate + "   |   " + "Last active: " + askExpertQuestionModelList.get(position).postedDate);
-        holder.txtNoAnswers.setText(askExpertQuestionModelList.get(position).answers + " Answer(s)");
+        holder.txtAllActivites.setText("Asked by: " + askExpertQuestionModelList.get(position).userName + "   |   " + "Asked on: " + askExpertQuestionModelList.get(position).postedDate + "   |   " + "Last active: " + askExpertQuestionModelList.get(position).postedDate);
+        holder.txtNoAnswers.setText(askExpertQuestionModelList.get(position).totalAnswers + " Answer(s)");
+        holder.txtNoViews.setText(askExpertQuestionModelList.get(position).totalViews + " Views");
+        holder.txtDescription.setText(askExpertQuestionModelList.get(position).userQuestionDescription);
+
         holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAllActivites.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         holder.txtNoAnswers.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtNoViews.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
 //        holder.tagsSkills.setVisibility(View.GONE);
 
+        if (askExpertQuestionModelList.get(position).userQuestionImage.length() > 0) {
 
-        if (askExpertQuestionModelList.get(position).userID.equalsIgnoreCase(askExpertQuestionModelList.get(position).postedUserId)) {
+            String imgUrl = appUserModel.getSiteURL() + askExpertQuestionModelList.get(position).userQuestionImagePath;
+            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imageThumb);
+
+            holder.imageThumb.setVisibility(View.VISIBLE);
+
+        } else {
+
+            holder.imageThumb.setVisibility(View.GONE);
+
+        }
+//
+        if (askExpertQuestionModelList.get(position).userQuestionDescription.length() > 1) {
+
+            holder.txtDescription.setVisibility(View.VISIBLE);
+
+        } else {
+
+            holder.txtDescription.setVisibility(View.GONE);
+
+        }
+
+        if (Integer.parseInt(appUserModel.getUserIDValue()) == askExpertQuestionModelList.get(position).createduserID) {
 
             holder.btnContextMenu.setVisibility(View.VISIBLE);
 
@@ -138,24 +169,22 @@ public class AskExpertAdapter extends BaseAdapter {
         List<ContentValues> breadcrumbItemsList = null;
 
         breadcrumbItemsList = new ArrayList<ContentValues>();
-        breadcrumbItemsList = generateTagsList(position);
+        breadcrumbItemsList = generateTagsList(askExpertQuestionModelList.get(position).questionCategoriesArray);
 
         generateBreadcrumb(breadcrumbItemsList, holder.tagsSkills, convertView.getContext());
 
         return convertView;
     }
 
-    public List<ContentValues> generateTagsList(int position) {
+    public List<ContentValues> generateTagsList(List<String> skillSets) {
         List<ContentValues> tagsList = new ArrayList<>();
 
-        for (int i = 1; i < position; i++) {
+        for (int i = 0; i < skillSets.size(); i++) {
             ContentValues cvBreadcrumbItem = new ContentValues();
             cvBreadcrumbItem.put("categoryid", i);
-            cvBreadcrumbItem.put("categoryname", "Skill " + i);
+            cvBreadcrumbItem.put("categoryname", skillSets.get(i));
             tagsList.add(cvBreadcrumbItem);
-
         }
-
 
         return tagsList;
     }
@@ -166,8 +195,8 @@ public class AskExpertAdapter extends BaseAdapter {
         if (charText.length() == 0) {
             askExpertQuestionModelList.addAll(searchList);
         } else {
-            for (AskExpertQuestionModel s : searchList) {
-                if (s.userQuestion.toLowerCase(Locale.getDefault()).contains(charText) || s.username.toLowerCase(Locale.getDefault()).contains(charText)) {
+            for (AskExpertQuestionModelDg s : searchList) {
+                if (s.userQuestion.toLowerCase(Locale.getDefault()).contains(charText) || s.userName.toLowerCase(Locale.getDefault()).contains(charText)) {
                     askExpertQuestionModelList.add(s);
                 }
             }
@@ -196,10 +225,22 @@ public class AskExpertAdapter extends BaseAdapter {
         @BindView(R.id.txt_all_activites)
         TextView txtAllActivites;
 
+        @Nullable
+        @BindView(R.id.txt_description)
+        TextView txtDescription;
+
+        @Nullable
+        @BindView(R.id.imagethumb)
+        ImageView imageThumb;
 
         @Nullable
         @BindView(R.id.txtno_answers)
         TextView txtNoAnswers;
+
+
+        @Nullable
+        @BindView(R.id.txtno_views)
+        TextView txtNoViews;
 
         @Nullable
         @BindView(R.id.btn_contextmenu)
@@ -209,7 +250,7 @@ public class AskExpertAdapter extends BaseAdapter {
         @BindView(R.id.cflBreadcrumb)
         CustomFlowLayout tagsSkills;
 
-        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.txtno_answers})
+        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.txtno_answers, R.id.txtno_views})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);
@@ -235,7 +276,7 @@ public class AskExpertAdapter extends BaseAdapter {
 
                 String categoryName = tv.getText().toString();
 
-                tagClicked.tagClickedInterface();
+                tagClicked.tagClickedInterface(categoryName);
 
             }
         };
@@ -253,7 +294,7 @@ public class AskExpertAdapter extends BaseAdapter {
             Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(arrowView, iconFont);
 
-            arrowView.setText(Html.fromHtml("<font color='" + context.getResources().getColor(R.color.colorInGreen) + "'><medium><b>"
+            arrowView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppTextColor()  + "'><medium><b>"
                     + context.getResources().getString(R.string.fa_icon_angle_right) + "</b></big> </font>"));
 
             arrowView.setTextSize(12);
@@ -268,7 +309,7 @@ public class AskExpertAdapter extends BaseAdapter {
 //            textView.setText(Html.fromHtml("<font color='" + context.getResources().getColor(R.color.colorInGreen) + "'><big><b>"
 //                    + categoryName + "</b></small>  </font>"));
 
-            textView.setText(Html.fromHtml("<font color='" + context.getResources().getColor(R.color.colorInGreen) + "'><small>"
+            textView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppTextColor() + "'><small>"
                     + categoryName + "</small>  </font>"));
 
             textView.setGravity(Gravity.CENTER | Gravity.CENTER);
@@ -295,42 +336,72 @@ public class AskExpertAdapter extends BaseAdapter {
 //        Collections.sort(myLearningModel, Collections.reverseOrder());
 
         switch (configid) {
-
-            case "1":
-                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModel>() {
+            case "0":
+                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModelDg>() {
 
                     @Override
-                    public int compare(AskExpertQuestionModel obj1, AskExpertQuestionModel obj2) {
+                    public int compare(AskExpertQuestionModelDg obj1, AskExpertQuestionModelDg obj2) {
                         // ## Ascending order
                         if (isAscn) {
-                            return obj1.createdDate.compareToIgnoreCase(obj2.createdDate);
+                            return obj1.lastActivatedDateFormat.compareToIgnoreCase(obj2.lastActivatedDateFormat);
 
                         } else {
-                            return obj2.createdDate.compareToIgnoreCase(obj1.createdDate);
+                            return obj2.lastActivatedDateFormat.compareToIgnoreCase(obj1.lastActivatedDateFormat);
                         }
                     }
                 });
+
+                break;
+            case "1":
+                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModelDg>()
+
+                {
+
+                    @Override
+                    public int compare(AskExpertQuestionModelDg obj1, AskExpertQuestionModelDg obj2) {
+                        // ## Ascending order
+                        if (isAscn) {
+
+                            return Integer.compare(obj1.totalAnswers, obj2.totalAnswers);
+
+                        } else {
+                            return Integer.compare(obj2.totalAnswers, obj1.totalAnswers);
+                        }
+
+                    }
+
+
+                });
+
                 break;
             case "2":
-                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModel>() {
+                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModelDg>()
 
+                {
                     @Override
-                    public int compare(AskExpertQuestionModel obj1, AskExpertQuestionModel obj2) {
+                    public int compare(AskExpertQuestionModelDg obj1, AskExpertQuestionModelDg obj2) {
                         // ## Ascending order
+
                         if (isAscn) {
-                            return obj1.answers.compareToIgnoreCase(obj2.answers);
+
+                            return Integer.compare(obj2.totalViews, obj1.totalViews);
 
                         } else {
-                            return obj2.answers.compareToIgnoreCase(obj1.answers);
+
+                            return Integer.compare(obj1.totalViews, obj2.totalViews);
                         }
 
                     }
                 });
+
                 break;
             case "3":
-                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModel>() {
+                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModelDg>()
+
+                {
+
                     @Override
-                    public int compare(AskExpertQuestionModel obj1, AskExpertQuestionModel obj2) {
+                    public int compare(AskExpertQuestionModelDg obj1, AskExpertQuestionModelDg obj2) {
                         // ## Ascending order
 
                         if (isAscn) {
@@ -341,22 +412,7 @@ public class AskExpertAdapter extends BaseAdapter {
                         }
                     }
                 });
-                break;
-            case "4":
-                Collections.sort(askExpertQuestionModelList, new Comparator<AskExpertQuestionModel>() {
 
-                    @Override
-                    public int compare(AskExpertQuestionModel obj1, AskExpertQuestionModel obj2) {
-                        // ## Ascending order
-
-                        if (isAscn) {
-                            return obj1.userQuestion.compareToIgnoreCase(obj2.userQuestion);
-
-                        } else {
-                            return obj2.userQuestion.compareToIgnoreCase(obj1.userQuestion);
-                        }
-                    }
-                });
                 break;
             case "default":
                 break;

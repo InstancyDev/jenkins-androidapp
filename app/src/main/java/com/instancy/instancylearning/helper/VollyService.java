@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.helper;
 
+import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
@@ -40,6 +41,7 @@ public class VollyService {
 
 
     public VollyService() {
+
     }
 
     public VollyService(IResult resultCallback, Context context) {
@@ -51,6 +53,8 @@ public class VollyService {
 
     public void getJsonObjResponseVolley(final String requestType, String url, final String authHeaders) {
         try {
+
+            url =url.replaceAll(" ","%20");
 
             Log.d(TAG, "getJsonObjResponseVolley: " + url);
             final JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -186,7 +190,12 @@ public class VollyService {
                     if (volleyError.networkResponse != null && volleyError.networkResponse.data != null) {
                         VolleyError error = new VolleyError(new String(volleyError.networkResponse.data));
                         volleyError = error;
-                        Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
+                        try {
+
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                     //   Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
 
                     }
                     return volleyError;

@@ -65,6 +65,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.mainactivities.NativeSettings;
+import com.instancy.instancylearning.mainactivities.SignUp_Activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -723,6 +724,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                             Drawable relatedContent = getButtonDrawable(R.string.fa_icon_bar_chart, this, uiSettingsModel.getAppButtonTextColor());
                             iconSecond.setBackground(relatedContent);
                             buttonSecond.setText(getResources().getString(R.string.btn_txt_report));
+                            buttonSecond.setTag(5);
                         }
 
                         Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
@@ -788,10 +790,22 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
 
                     } else if (myLearningModel.getViewType().equalsIgnoreCase("3")) {
 
-                        Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
-                        iconFirst.setBackground(cartIcon);
-                        buttonFirst.setText("Buy");
-                        buttonFirst.setTag(3);
+                        if (!returnEventCompleted(myLearningModel.getEventendUtcTime())) {
+                            Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
+                            if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
+
+                                iconFirst.setBackground(cartIcon);
+                                buttonFirst.setText("Buy");
+                                buttonFirst.setTag(3);
+                            }
+                        } else {
+                            btnsLayout.setVisibility(View.GONE);
+                        }
+// Uncomment this if required
+//                        Drawable cartIcon = getButtonDrawable(R.string.fa_icon_cart_plus, this, uiSettingsModel.getAppButtonTextColor());
+//                        iconFirst.setBackground(cartIcon);
+//                        buttonFirst.setText("Buy");
+//                        buttonFirst.setTag(3);
 
                     }
                 }
@@ -1205,7 +1219,11 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 } else if ((Integer) buttonFirst.getTag() == 2) { // ADD
                     addToMyLearningCheckUser(myLearningModel, false); // false for
                 } else if ((Integer) buttonFirst.getTag() == 3) {   // Buy
-                    addToMyLearningCheckUser(myLearningModel, true);
+                    if (uiSettingsModel.isEnableIndidvidualPurchaseConfig() && uiSettingsModel.isEnableMemberShipConfig() && myLearningModel.getGoogleProductID() == null) {
+                        gotoMemberShipView(myLearningModel);
+                    } else {
+                        addToMyLearningCheckUser(myLearningModel, true);
+                    }
                 } else if ((Integer) buttonFirst.getTag() == 4) {
                     GlobalMethods.addEventToDeviceCalendar(myLearningModel, this);
                 } else if ((Integer) buttonFirst.getTag() == 6) {
@@ -1261,6 +1279,16 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 }
                 break;
         }
+    }
+
+    public void gotoMemberShipView(MyLearningModel learningModel) {
+
+        Intent intentSignup = new Intent(this, SignUp_Activity.class);
+        intentSignup.putExtra(StaticValues.KEY_SOCIALLOGIN, appUserModel.getSiteURL() + "Join/nativeapp/true/membership/true/userid/" + learningModel.getUserID() + "/siteid/" + learningModel.getSiteID());
+        intentSignup.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Membership");
+        startActivity(intentSignup);
+//        http://mayur.instancysoft.com/Sign%20Up/profiletype/selfregistration/nativeapp/true
+//        http://mayur.instancysoft.com/Join/nativeapp/true/membership/true/userid/2/siteid/374
     }
 
 

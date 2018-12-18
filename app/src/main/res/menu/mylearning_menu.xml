@@ -4,12 +4,21 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/mylearning_search"
+        android:id="@+id/ctx_archive"
+        android:icon="@drawable/filter_icon"
         android:orderInCategory="100"
+        android:title="Archive"
+        android:visible="false"
+        app:showAsAction="always|collapseActionView" />
+
+    <item
+        android:id="@+id/mylearning_search"
         android:icon="@drawable/search"
+        android:orderInCategory="100"
         android:title="search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
+
     <item
         android:id="@+id/mylearning_filter"
         android:icon="@drawable/filter_icon"
@@ -23,6 +32,7 @@
         android:orderInCategory="100"
         android:title="filter"
         app:showAsAction="always|collapseActionView" />
+
 
     <!--<item-->
     <!--android:id="@+id/action_search"-->

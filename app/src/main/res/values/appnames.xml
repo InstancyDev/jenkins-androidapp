@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
     <string name="crop_life">CropLife Online Dealer Training</string>
+
     <string name="instancy_lite">Instancy Lite</string>
 
     <string name="learnup">Learn Up - Learn on your phone</string>
+
     <string name="tracktech">Tracktech lifeskills</string>
 
     <string name="trainingcompany">Training Company Lite</string>
+
     <string name="cle_academy">CLE</string>
 
     <string name="acclife">Online Lifeskills</string>

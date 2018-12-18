@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="3dp"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:layout_marginTop="3dp"
+    android:padding="5dp"
+    app:cardCornerRadius="5dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/reportTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical|fill_horizontal"
+            android:maxLines="2"
+            android:padding="2dp"
+            android:text="Report: Coranary terenary"
+            android:textColor="@color/colorBlack"
+            android:textSize="20sp"
+            android:typeface="sans" />
+
+        <View
+            android:id="@+id/gapLine"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_gravity="center"
+            android:background="@color/colorGray"
+            android:padding="5dp"></View>
+
+        <TextView
+            android:id="@+id/reportSubTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical|fill_horizontal"
+            android:maxLines="2"
+            android:padding="2dp"
+            android:text="Coranary terenary"
+            android:textColor="@color/colorBlack"
+            android:textSize="18sp"
+            android:typeface="sans" />
+
+        <LinearLayout
+            android:id="@+id/layout_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/lbStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="left"
+                android:maxLines="1"
+                android:text="Status: "
+                android:textColor="@color/colorBlack"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txtStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="left"
+                android:maxLines="1"
+                android:text="In Progress"
+                android:textColor="@color/colorStatusInProgress"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtAssignedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Assigned Date: 11/12/2018 11:45:14 PM"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtTargetDate"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Target Date: 11/12/2018 11:45:14 PM"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtDateStarted"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Date Started: 11/12/2018 11:45:14 PM"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtDateCompleted"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Date Completed: 11/12/2018 11:45:14 PM"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtTimeSpent"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Time Spent: 09 min 10 sec"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtTimeAccessedInThisPeriod"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="# Times Accessed in This Period: 2"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtTimeAttemptInThisPeriod"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="#Times Attempts in This Period: 2"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtScore"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="Score: 2"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txtPercentCompleted"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="%Completed: "
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+
+        <View
+            android:id="@+id/gapLine2"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_gravity="center"
+            android:background="@color/colorGray"
+            android:padding="9dp"></View>
+
+        <TextView
+            android:id="@+id/txtDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="left"
+            android:maxLines="1"
+            android:padding="6dp"
+            android:text="Details"
+            android:textColor="@color/colorBlack"
+            android:textSize="20sp" />
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

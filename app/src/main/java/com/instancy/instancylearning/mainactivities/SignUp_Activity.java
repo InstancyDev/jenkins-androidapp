@@ -87,7 +87,8 @@ public class SignUp_Activity extends AppCompatActivity {
             getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> Login </font>"));
             url = appDefaultUrl + "fromnative/true";
         } else {
-            url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true";
+//            url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true"; old login data
+            url = appDefaultUrl + "Sign%20Up/profiletype/selfregistration/nativeapp/true";
             getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> </font>"));
         }
 
@@ -118,6 +119,9 @@ public class SignUp_Activity extends AppCompatActivity {
                 } else if (url.toLowerCase().contains("success/false")) {
 
                     Toast.makeText(SignUp_Activity.this, "Sign up failed..!!", Toast.LENGTH_SHORT).show();
+                } else if (url.toLowerCase().contains("Sign In")) {
+
+                    finish();
                 }
 
                 if (url.contains("&registrationcomplete=true")) {

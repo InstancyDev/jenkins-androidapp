@@ -21,6 +21,16 @@ public class MyLearningModel implements Serializable {
 
     boolean completedEvent = false;
 
+    public boolean isArchived() {
+        return isArchived;
+    }
+
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+    boolean isArchived = false;
+
     public boolean isEventCompletedOrNot() {
         return eventCompletedOrNot;
     }
@@ -135,6 +145,16 @@ public class MyLearningModel implements Serializable {
     String wresult = "";
     String wmessage = "";
     String presenter = "";
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    String startDate = "";
 
     public String getGroupName() {
         return groupName;

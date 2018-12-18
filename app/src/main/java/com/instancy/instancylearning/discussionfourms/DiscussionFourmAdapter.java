@@ -21,14 +21,13 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
-import com.instancy.instancylearning.helper.FontManager;
-import com.instancy.instancylearning.interfaces.DownloadInterface;
+
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
-import com.instancy.instancylearning.models.MyLearningModel;
+
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.instancy.instancylearning.utils.StaticValues;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

@@ -7,6 +7,12 @@
         android:orderInCategory="100"
         android:title="Edit" />
 
+    <item
+        android:id="@+id/ctx_delete"
+        android:orderInCategory="100"
+        android:visible="false"
+        android:title="Delete" />
+
 
 </menu>
 

@@ -3,6 +3,7 @@ package com.instancy.instancylearning.myskills;
 import org.json.JSONArray;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Upendranath on 6/8/2017 Working on InstancyLearning.
@@ -10,32 +11,11 @@ import java.io.Serializable;
 
 public class MySkillModel implements Serializable {
 
-
     public String skillName = "";
-    public String skillID = "";
-    public String prefCategoryID = "";
-    public String jobRoleID = "";
-    public String skillDescription = "";
-    public String requiredProfValues = "";
-    public String userPictureURL = "";
-    public String managerPictureURL = "";
-    public String contentAuthorPictureURL = "";
-    public double requiredProficiency = 0.0;
-    public int requiredScore = 0;
-    public String valueName = "";
-    public double gapScore = 0.0;
-    public double weightedAverage = 0.0;
-    public int userScore = 0;
-    public int managerScore = 0;
-    public double contentAuthorScore = 0.0;
-    public JSONArray requiredProfArys = null;
-    public String viewContent = "true";
-    
-    public String weightedAverageStr = "";
-    public String managerScoreStr = "";
-    public String userScoreStr = "";
-    public String contentAuthorScoreStr = "";
-
-    public String managerEvaluation = "";
+    public int siteID = 374;
+    public int userId = 0;
+    public JSONArray skilCount = null;
+    public List<SkillCountModel> skillCountModelList = null;
 
 }
+

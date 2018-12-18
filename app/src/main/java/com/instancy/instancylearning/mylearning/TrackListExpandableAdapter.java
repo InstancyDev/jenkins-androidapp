@@ -514,6 +514,11 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 public void cancelEnrollment(boolean cancelIt) {
 
                 }
+
+                @Override
+                public void addToArchive(boolean added) {
+
+                }
             };
 
             setCompleteListner = new SetCompleteListner() {
@@ -685,11 +690,11 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
 

@@ -115,6 +115,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
@@ -306,7 +307,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 filterContentType = "";
                 sortBy = "c.name%20asc";
 
-                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList;
+                paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=" + queryString + "&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList;
 
             } else {
 
@@ -320,7 +321,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 //                    startDateStr = uiSettingsModel.getcCEventStartdate();
 //                }
 
-                paramsString = "FilterCondition=&SortCondition=" + ddlSortList + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1" + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=calendarview&pageIndex=1&pageSize=10&sortType=" + ddlSortType + "sortby" + ddlSortList + "&StartDate=" + startDateStr + "&EndDate=" + endDateStr;
+                paramsString = "FilterCondition=&SortCondition=" + ddlSortList + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&FilterID=-1&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=&CatalogPreferenceID=5&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=" + queryString + "&DateOfMyLastAccess=&SingleBranchExpand=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1" + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AdditionalParams=calendarview&pageIndex=1&pageSize=10&sortType=" + ddlSortType + "sortby" + ddlSortList + "&StartDate=" + startDateStr + "&EndDate=" + endDateStr;
 
             }
             vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
@@ -399,6 +400,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             catalogModelsList.addAll(generateCatalogForPeopleListing(response));
                             totalRecordsCount = countOfTotalRecords(response);
                             catalogAdapter.refreshList(catalogModelsList);
+                            if (totalRecordsCount == 0) {
+                                nodata_Label.setText(getResources().getString(R.string.no_data));
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -592,6 +596,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE, ddlSortList, ddlSortType);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
+            progressBar.setVisibility(View.GONE);
         } else {
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
@@ -619,6 +624,13 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             }
 
         }
+
+        if (uiSettingsModel.isGlobasearch() && queryString.length() > 0) {
+
+            catalogAdapter.filter(queryString);
+
+        }
+
         dismissSvProgress();
     }
 
@@ -720,7 +732,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
         intent.putExtra("sideMenusModel", sideMenusModel);
-        startActivity(intent);
+        startActivityForResult(intent, GLOBAL_SEARCH);
 
     }
 
@@ -755,7 +767,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
-                item_search.expandActionView();
+//                item_search.expandActionView();
 
                 break;
             case R.id.mylearning_info_help:
@@ -776,6 +788,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     public void onRefresh() {
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+            queryString = "";
             pageIndex = 1;
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
@@ -946,7 +959,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 menu.getItem(1).setVisible(true);
                 menu.getItem(3).setVisible(true);
 
-
 //                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
 //
 //                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
@@ -968,9 +980,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
                 menu.getItem(0).setVisible(false);
-                menu.getItem(2).setVisible(true);
                 menu.getItem(3).setVisible(true);
                 menu.getItem(1).setVisible(false);
+                if (returnEventCompleted(myLearningDetalData.getEventendUtcTime()) && uiSettingsModel.isAllowExpiredEventsSubscription()) {// uncomment here if required
+                    menu.getItem(2).setVisible(true);
+                }
             }
 
         }
@@ -983,7 +997,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 if (!myLearningDetalData.getRelatedContentCount().equalsIgnoreCase("0")) {
                     menu.getItem(0).setVisible(true);
                     menu.getItem(1).setVisible(false);//enroll
-
                 }
             } else {
                 if (myLearningDetalData.getViewType().equalsIgnoreCase("2") && uiSettingsModel.isAllowExpiredEventsSubscription()) {
@@ -1024,7 +1037,10 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             if (avaliableSeats > 0) {
 
-                menu.getItem(1).setVisible(true);//enroll
+                if (myLearningDetalData.getAddedToMylearning() == 0) {// remove thi if condition if required
+                    menu.getItem(1).setVisible(true);//enroll
+
+                }
 
             } else if (avaliableSeats <= 0) {
 
@@ -1595,6 +1611,19 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             }
 
         }
+
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                queryString = data.getStringExtra("queryString");
+                if (queryString.length() > 0) {
+
+                    refreshCatalog(true);
+
+                }
+
+            }
+        }
+
 
     }
 

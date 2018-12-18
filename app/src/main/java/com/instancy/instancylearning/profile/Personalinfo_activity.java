@@ -401,7 +401,6 @@ public class Personalinfo_activity extends AppCompatActivity {
     public void sendNewOrUpdatedEducationDetailsDataToServer(final String postData) {
         String apiURL = "";
 
-
         apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileUpdateUserProfile?studId=" + appUserModel.getUserIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {

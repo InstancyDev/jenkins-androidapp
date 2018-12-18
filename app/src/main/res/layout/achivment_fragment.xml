@@ -9,17 +9,29 @@
         android:id="@+id/spnrGame"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:visibility="invisible"
-        android:padding="10dp"> </Spinner>
+        android:padding="10dp"
+        android:visibility="invisible"></Spinner>
 
     <RelativeLayout
         android:id="@+id/achivmentheader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:visibility="gone">
 
         <include layout="@layout/achivmentscard" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/otherGamesHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:visibility="gone">
+
+        <include layout="@layout/othergameheader" />
 
     </RelativeLayout>
 
@@ -34,7 +46,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-
             <ExpandableListView
                 android:id="@+id/achivmentexpandlist"
                 android:layout_width="match_parent"
@@ -44,6 +55,17 @@
                 android:dividerHeight="1sp"
                 android:focusable="true"
                 android:groupIndicator="@null"> </ExpandableListView>
+
+            <ListView
+                android:id="@+id/otherGamesListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="10dp"
+                android:padding="6dp"
+                android:scrollbars="none"
+                android:visibility="gone"> </ListView>
+
 
             <TextView
                 android:id="@+id/nodata_label"

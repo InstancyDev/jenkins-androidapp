@@ -130,6 +130,8 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
         FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
 
+        txtContextmenu.setVisibility(View.GONE);
+
         TextView txtContentTitle = (TextView) convertView
                 .findViewById(R.id.txt_contenttitle);
 
@@ -179,6 +181,8 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
             }
         });
+
+
         return convertView;
 
     }
@@ -269,7 +273,7 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
             }
         });
 
-
+        txtContextmenu.setVisibility(View.GONE);
         txtContentTitle.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
         return convertView;
     }
@@ -303,21 +307,14 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
                 if (item.getTitle().toString().equalsIgnoreCase("Details")) {
 
-
                     if (isNetworkConnectionAvailable(context, -1)) {
 
-                        if (isFromChild) {
-                            (progressReportfragment).getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportChildModel.objectID);
-                        } else {
-                            (progressReportfragment).getMobileGetMobileContentMetaData(appUserModel.getSiteURL(), progressReportModel.objectID);
 
-                        }
 
                     } else {
 
                         Toast.makeText(context, context.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
                     }
-
 
                 }
 

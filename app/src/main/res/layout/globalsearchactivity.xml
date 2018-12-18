@@ -4,12 +4,33 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/toolbarlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="3dp">
+
+        <include layout="@layout/toolbar" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
         android:id="@+id/globalsearchheader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
+        android:layout_below="@+id/toolbarlayout">
 
         <include layout="@layout/globalcheckcell" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/globalsearchresults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/globalsearchheader"
+        android:visibility="gone">
+
+        <include layout="@layout/skillheader" />
     </RelativeLayout>
 
     <ExpandableListView
@@ -17,12 +38,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/filter_btn_layout"
-        android:layout_below="@+id/globalsearchheader"
+        android:layout_below="@+id/globalsearchresults"
         android:background="@drawable/filter_key"
         android:choiceMode="singleChoice"
         android:focusable="true"
         android:groupIndicator="@null"
         android:padding="1dp" />
+
     <TextView
         android:id="@+id/nodata_label"
         android:layout_width="fill_parent"
@@ -32,6 +54,7 @@
         android:text=""
         android:textAlignment="center"
         android:textSize="24sp" />
+
     <LinearLayout
         android:id="@+id/filter_btn_layout"
         android:layout_width="match_parent"

@@ -171,7 +171,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
 
         vollyService = new VollyService(resultCallback, context);
-        askExpertQuestionModel = (AskExpertQuestionModel) getIntent().getSerializableExtra("AskExpertQuestionModel");
+        askExpertQuestionModel = (AskExpertQuestionModel) getIntent().getSerializableExtra("AskExpertQuestionModelDg");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +

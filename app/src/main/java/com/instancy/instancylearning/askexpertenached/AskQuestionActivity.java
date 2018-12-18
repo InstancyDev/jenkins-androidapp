@@ -3,15 +3,18 @@ package com.instancy.instancylearning.askexpertenached;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteException;
+
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
+
+import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +26,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
+
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,12 +34,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CompoundButton;
+
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,27 +50,35 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+
+
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.google.gson.JsonObject;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.askexpertenached.AskSkillAdapter;
-import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+
+
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
+
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.ResultListner;
+
+import com.instancy.instancylearning.interfaces.Service;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.AskExpertQuestionModel;
-import com.instancy.instancylearning.models.AskExpertSkillsModel;
+
+
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,10 +87,23 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
-import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+
+import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
+
+import static com.instancy.instancylearning.utils.Utilities.getRealPathFromURI;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.toRequestBody;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
@@ -96,21 +122,18 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     AskSkillAdapter askExpertAdapter;
 
     String arryStr[];
+    View header;
+    AskExpertDbTables db;
 
-    DatabaseHandler db;
-    ResultListner resultListner = null;
+    Service service;
 
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     UiSettingsModel uiSettingsModel;
 
     @Nullable
-    @BindView(R.id.txt_description)
+    @BindView(R.id.txt_question)
     TextView labelTitle;
-
-    @Nullable
-    @BindView(R.id.txt_relaventskills)
-    TextView labelDescritpion;
 
     @Nullable
     @BindView(R.id.txtbrowse)
@@ -124,11 +147,13 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     @BindView(R.id.txtsave)
     TextView txtSave;
 
-
     @Nullable
     @BindView(R.id.edit_description)
     EditText editDescription;
 
+    @Nullable
+    @BindView(R.id.edit_question)
+    EditText editQuestion;
 
     @Nullable
     @BindView(R.id.bottomlayout)
@@ -143,13 +168,23 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     Button btnUpload;
 
     @Nullable
+    @BindView(R.id.attachedimg)
+    ImageView attachmentThumb;
+
+    @Nullable
     @BindView(R.id.askexpertsskillslistview)
     ListView skillsListview;
 
     boolean isFromExperts = false;
+    boolean isEdit = false;
     String expertID = "";
 
-    List<AskExpertSkillsModel> askExpertSkillsModelList = null;
+    private int GALLERY = 1;
+
+    String topicID = "", finalfileName = "", finalPath = "";
+    Uri contentURIFinal;
+    List<AskExpertSkillsModelDg> askExpertSkillsModelList = null;
+    AskExpertQuestionModelDg askExpertQuestionModelDg = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -159,7 +194,13 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
         isFromExperts = getIntent().getBooleanExtra("EXPERTS", false);
-        db = new DatabaseHandler(this);
+        isEdit = getIntent().getBooleanExtra("EDIT", false);
+
+        if (isEdit) {
+            askExpertQuestionModelDg = (AskExpertQuestionModelDg) getIntent().getSerializableExtra("askExpertQuestionModel");
+        }
+
+        db = new AskExpertDbTables(this);
         svProgressHUD = new SVProgressHUD(context);
 
         ButterKnife.bind(this);
@@ -168,26 +209,30 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-
+        header = (View) getLayoutInflater().inflate(R.layout.skillheader, null);
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
 
-        btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_thumbs_o_up), null, null, null);
+        btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
         btnUpload.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnUpload.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnUpload.setPadding(10, 2, 2, 2);
+        btnUpload.setTag(0);
+        attachmentThumb.setVisibility(View.GONE);
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
 
 
         if (!isFromExperts) {
-            askExpertSkillsModelList = db.fetchAskExpertSkillsModelList();
+            askExpertSkillsModelList = db.fetchAskExpertSkillsList();
+            if (isEdit) {
+                updateEditSkils();
+            }
         } else {
             expertID = getIntent().getStringExtra("EXPERTID");
             getSkillsCalatalogFrom();
         }
-
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -207,8 +252,23 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         askExpertAdapter = new AskSkillAdapter(this, BIND_ABOVE_CLIENT, askExpertSkillsModelList);
         skillsListview.setAdapter(askExpertAdapter);
         skillsListview.setOnItemClickListener(this);
+        skillsListview.addHeaderView(header, null, false);
+
+        // Multipart
+
+        BasicAuthInterceptor interceptor = new BasicAuthInterceptor(appUserModel.getAuthHeaders());
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        // Change base URL to your upload server URL.
+        service = new Retrofit.Builder().baseUrl(appUserModel.getWebAPIUrl() + "/MobileLMS/InsertNewUserQuestion/").client(client).build().create(Service.class);
+
+        if (isEdit) {
+            updateUiForEditQuestion();
+        }
 
     }
+
 
     public void getSkillsCalatalogFrom() {
         svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
@@ -217,13 +277,34 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
     }
 
+    public void updateUiForEditQuestion() {
+        editQuestion.setText(askExpertQuestionModelDg.userQuestion);
+        editDescription.setText(askExpertQuestionModelDg.userQuestionDescription);
+
+        if (askExpertQuestionModelDg.userQuestionImagePath.length() > 0) {
+
+            String imgUrl = appUserModel.getSiteURL() + askExpertQuestionModelDg.userQuestionImagePath;
+            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
+            attachmentThumb.setVisibility(View.VISIBLE);
+            editAttachment.setText("");
+            changeBtnValue(true);
+
+        } else {
+
+            attachmentThumb.setVisibility(View.GONE);
+
+        }
+
+    }
+
     public void initilizeHeaderView() {
 
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        TextView txtDescription = (TextView) header.findViewById(R.id.txt_relaventskills);
 
         SpannableString styledTitle
-                = new SpannableString("*Question");
+                = new SpannableString("*Question:");//Question
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -231,12 +312,12 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         labelTitle.setText(styledTitle);
 
         SpannableString styledDescription
-                = new SpannableString("*Select the relevant skills :");
+                = new SpannableString("*Select the relevant skills:");
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //        styledDescription.setSpan(new ForegroundColorSpan(Color.BLACK), 1, 28, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        labelDescritpion.setText(styledDescription);
+        txtDescription.setText(styledDescription);
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
@@ -252,6 +333,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
                         Log.d(TAG, "notifySuccess: ASKQSCAT  " + response);
                         try {
                             askExpertSkillsModelList = generateAskExpertsSkills(response);
+
                             askExpertAdapter.refreshList(askExpertSkillsModelList);
 
                         } catch (JSONException e) {
@@ -295,135 +377,153 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     public void validateNewForumCreation() throws JSONException {
 
         String category = "";
+        String categoryIds = "";
 
         category = generateSkills();
+        categoryIds = generateSkillsIds();
+
+
+        AskExpertQuestionModelDg questionModelDg = new AskExpertQuestionModelDg();
 
         String descriptionStr = editDescription.getText().toString().trim();
+        String questionStr = editQuestion.getText().toString().trim();
 
-        if (descriptionStr.length() < 1) {
+        boolean isAttachmentRmoved = false;
+        int editQuestionId = -1;
+
+        if (isEdit && (Integer) btnUpload.getTag() == 0) {
+            isAttachmentRmoved = true;
+
+//            finalfileName="";
+        }
+
+        if (isEdit && contentURIFinal == null) {
+            finalfileName = askExpertQuestionModelDg.userQuestionImage;
+            isAttachmentRmoved = false;
+        }
+
+        if (isEdit) {
+            editQuestionId = askExpertQuestionModelDg.questionID;
+            questionModelDg.questionID = editQuestionId;
+            questionModelDg.categoriesIDs = categoryIds;
+        }
+
+        if (questionStr.length() < 1) {
             Toast.makeText(this, "Please enter question", Toast.LENGTH_SHORT).show();
         } else if (category.length() == 0) {
             Toast.makeText(this, "Please select skill", Toast.LENGTH_SHORT).show();
         } else {
-//            Map<String, String> parameters = new HashMap<String, String>();
-            JSONObject parameters = new JSONObject();
-
-            parameters.put("aintQuestionTypeID", "1");
-            parameters.put("aintUserID", appUserModel.getUserIDValue());
-            parameters.put("astrQuestionCategories", "" + category);
-            parameters.put("astrUserEmail", appUserModel.getUserLoginId());
-            parameters.put("astrUserName", appUserModel.getUserName());
-            parameters.put("astrUserQuestion", descriptionStr);
+            questionModelDg.userQuestion = questionStr;
+            questionModelDg.questionCategories = category;
+            Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
+            parameters.put("UserID", toRequestBody(appUserModel.getUserIDValue()));
+            parameters.put("SiteID", toRequestBody(appUserModel.getSiteIDValue()));
+            parameters.put("UserEmail", toRequestBody(appUserModel.getUserLoginId()));
+            parameters.put("UserName", toRequestBody(appUserModel.getUserName()));
+            parameters.put("QuestionTypeID", toRequestBody("1"));
+            parameters.put("UserQuestion", toRequestBody(questionStr));
+            parameters.put("UserQuestionDesc", toRequestBody(descriptionStr));
+            parameters.put("UseruploadedImageName", toRequestBody(finalfileName));
+            parameters.put("skills", toRequestBody(category));
+            parameters.put("SeletedSkillIds", toRequestBody(categoryIds));
+            parameters.put("EditQueID", toRequestBody("" + editQuestionId));
+            parameters.put("IsRemoveEditimage", toRequestBody("" + isAttachmentRmoved));
 
             String parameterString = parameters.toString();
             Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
             if (isNetworkConnectionAvailable(this, -1)) {
 
-                String replaceDataString = parameterString.replace("\"", "\\\"");
-                String addQuotes = ('"' + replaceDataString + '"');
-
-                sendNewForumDataToServer(addQuotes, descriptionStr, category);
+                uploadFileThroughMultiPart(parameters, contentURIFinal, questionModelDg);
 
             } else {
+
                 Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+
             }
         }
     }
 
-    public void sendNewForumDataToServer(final String postData, final String questionData, final String category) {
+    private void uploadFileThroughMultiPart(Map<String, RequestBody> parameters, Uri fileUri, final AskExpertQuestionModelDg questionModelDg) {
+        // create upload service client
 
-        final String dateString = getCurrentDateTime("yyyy/MM/dd");
-
-        final String dateStringSec = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
-
+        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+        // use the FileUtils to get the actual file by uri
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostNewAskQuestion?siteUrl=" + appUserModel.getSiteURL();
+        MultipartBody.Part body = null;
+        if (finalfileName.length() > 0 && fileUri != null) {
+            File file = new File(finalPath);
 
-        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            // create RequestBody instance from file
+            RequestBody requestFile =
+                    RequestBody.create(
+                            MediaType.parse(getContentResolver().getType(fileUri)),
+                            file
+                    );
+
+            // MultipartBody.Part is used to send also the actual file name
+            body = MultipartBody.Part.createFormData("Image", file.getName(), requestFile);
+
+        }
+
+        // finally, execute the request
+//        Call<ResponseBody> call = service.upload(description, body);
+        Call<ResponseBody> call = service.uploadFileWithPartMap(parameters, body);
+        call.enqueue(new Callback<ResponseBody>() {
+
             @Override
-            public void onResponse(String s) {
-                svProgressHUD.dismiss();
-                Log.d(TAG, "onResponse: " + s);
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
 
-                if (s.contains("success")) {
+                Toast.makeText(context, "Success! \nYour new Question has been successfully posted.", Toast.LENGTH_SHORT).show();
 
-                    Toast.makeText(context, "Success! \nYour new Question has been successfully posted.", Toast.LENGTH_SHORT).show();
-                    AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
-                    String replaceString = s.replace("##", "=");
-                    String[] strSplitvalues = replaceString.split("=");
+                try {
 
-                    String replyID = "";
-                    if (strSplitvalues.length > 1) {
-                        replyID = strSplitvalues[1].replace("\"", "");
-                        Log.d(TAG, "onResponse: " + replyID);
-                        askExpertQuestionModel.questionID = Integer.parseInt(replyID);
-                        askExpertQuestionModel.postedDate = dateString;
-                        askExpertQuestionModel.username = appUserModel.getUserName();
-                        askExpertQuestionModel.userID = appUserModel.getUserIDValue();
-                        askExpertQuestionModel.userQuestion = questionData;
-                        askExpertQuestionModel.postedDate = dateString;
-                        askExpertQuestionModel.createdDate = dateStringSec;
-                        askExpertQuestionModel.siteID = appUserModel.getSiteIDValue();
-                        askExpertQuestionModel.questionCategories = category;
+                    String responseRecieved = response.body().string();
+                    Log.v("Upload", "success responseRecieved" + responseRecieved);
+                    // Add Your Logic
+                    //  {"Table":[{"Column1":51.0}]}
 
-                        insertSingleAsktheExpertAnswerDataIntoSqLite(askExpertQuestionModel);
+                    if (responseRecieved != null && responseRecieved.length() > 0) {
+
+                        JSONObject jsonObject = new JSONObject(responseRecieved);
+
+                        if (jsonObject != null && jsonObject.length() > 0) {
+                            JSONArray jsonArray = jsonObject.getJSONArray("Table");
+                            if (jsonArray != null && jsonArray.length() > 0) {
+
+                                JSONObject columnObj = jsonArray.getJSONObject(0);
+                                Log.d(TAG, "onResponse: QuestionId " + columnObj.getInt("Column1"));
+
+                                questionModelDg.questionID = columnObj.getInt("Column1");
+                                try {
+                                    callSendExpertMails(questionModelDg);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+
                     }
 
-                    closeForum(true);
-                } else {
-
-                    Toast.makeText(context, "New Question cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
-                closeForum(false);
-            }
-        })
-
-        {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
+                closeForum(true);
 
             }
 
             @Override
-            public byte[] getBody() throws AuthFailureError {
-                return postData.getBytes();
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+                Toast.makeText(context, "New Question cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                svProgressHUD.dismiss();
             }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
-
-                return headers;
-            }
-
-        };
-
-        RequestQueue rQueue = Volley.newRequestQueue(context);
-        rQueue.add(request);
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                10000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-
+        });
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -447,11 +547,38 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         return wrapDrawable;
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (data != null) {
+            Uri contentURI = data.getData();
+            try {
+                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+                final String fileName = getFileNameFromPath(contentURI, this);
+//                final String mimeType = getMimeTypeFromUri(contentURI);
+                Log.d(TAG, "onActivityResult: " + fileName);
+//                bitmapAttachment = bitmap;
+                editAttachment.setText(fileName);
+                attachmentThumb.setImageBitmap(bitmap);
+                btnUpload.setTag(1);
+//                uploadFile(contentURI);
+                finalPath = getRealPathFromURI(context, contentURI);
+                contentURIFinal = contentURI;
+                if (fileName.length() > 0) {
+                    changeBtnValue(true);
+                } else {
+                    changeBtnValue(false);
+                }
+                finalfileName = fileName;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(AskQuestionActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+
+            }
+        }
 
     }
 
@@ -476,6 +603,12 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
             case R.id.txtcancel:
                 finish();
                 break;
+            case R.id.btnUpload:
+                if ((Integer) btnUpload.getTag() == 0) {
+                    choosePhotoFromGallary();
+                } else {
+                    changeBtnValue(false);
+                }
         }
 
     }
@@ -485,27 +618,6 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         intent.putExtra("NEWQS", refresh);
         setResult(RESULT_OK, intent);
         finish();
-    }
-
-    public void insertSingleAsktheExpertAnswerDataIntoSqLite(AskExpertQuestionModel askExpertQuestionModel) {
-
-        String insertStr = "INSERT INTO ASKQUESTIONS (questionid, userid, username, userquestion, posteddate, createddate, answers,questioncategories,siteid ) VALUES (" +
-                "" + askExpertQuestionModel.questionID +
-                "," + askExpertQuestionModel.userID +
-                ",'" + askExpertQuestionModel.username +
-                "','" + askExpertQuestionModel.userQuestion +
-                "','" + askExpertQuestionModel.postedDate +
-                "','" + askExpertQuestionModel.createdDate +
-                "'," + 0 +
-                ",'" + askExpertQuestionModel.questionCategories +
-                "'," + askExpertQuestionModel.siteID +
-                ")";
-        try {
-            db.executeQuery(insertStr);
-            closeForum(true);
-        } catch (SQLiteException sqlEx) {
-            sqlEx.printStackTrace();
-        }
     }
 
     @Override
@@ -548,9 +660,62 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         return selectedSkills;
     }
 
-    public List<AskExpertSkillsModel> generateAskExpertsSkills(JSONObject jsonObject) throws JSONException {
 
-        List<AskExpertSkillsModel> askExpertSkillsModelList1 = new ArrayList<>();
+    public String generateSkillsIds() {
+        String selectedSkills = "";
+
+        if (askExpertSkillsModelList != null) {
+
+            for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
+                if (askExpertSkillsModelList.get(s).isChecked) {
+                    if (selectedSkills.length() > 0) {
+                        selectedSkills = selectedSkills.concat("," + askExpertSkillsModelList.get(s).preferrenceID);
+                    } else {
+                        selectedSkills = askExpertSkillsModelList.get(s).preferrenceID;
+                    }
+                }
+
+                Log.d(TAG, "generateSkills: " + selectedSkills);
+
+            }
+
+
+        } else {
+            selectedSkills = "";
+        }
+
+        return selectedSkills;
+    }
+
+
+    public void updateEditSkils() {
+
+        if (askExpertQuestionModelDg.questionCategoriesArray != null && askExpertQuestionModelDg.questionCategoriesArray.size() > 0) {
+
+            for (int k = 0; k < askExpertQuestionModelDg.questionCategoriesArray.size(); k++) {
+
+                if (askExpertSkillsModelList != null && askExpertSkillsModelList.size() > 0) {
+
+                    for (int s = 0; s < askExpertSkillsModelList.size(); s++) {
+
+                        if (askExpertQuestionModelDg.questionCategoriesArray.get(k).equalsIgnoreCase(askExpertSkillsModelList.get(s).preferrenceTitle)) {
+
+                            askExpertSkillsModelList.get(s).isChecked = true;
+                        }
+
+                    }
+
+                }
+
+            }
+            Log.d(TAG, "updateEditSkils: " + askExpertSkillsModelList.size());
+        }
+    }
+
+
+    public List<AskExpertSkillsModelDg> generateAskExpertsSkills(JSONObject jsonObject) throws JSONException {
+
+        List<AskExpertSkillsModelDg> askExpertSkillsModelList1 = new ArrayList<>();
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("askskills");
         // for deleting records in table for respective table
@@ -559,7 +724,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         for (int i = 0; i < jsonTableAry.length(); i++) {
             JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
 
-            AskExpertSkillsModel askExpertSkillsModel = new AskExpertSkillsModel();
+            AskExpertSkillsModelDg askExpertSkillsModel = new AskExpertSkillsModelDg();
             //questionid
             if (jsonMyLearningColumnObj.has("orgunitid")) {
 
@@ -607,5 +772,48 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         return d;
     }
 
+    public void changeBtnValue(boolean isAttachmentFound) {
+
+        if (isAttachmentFound) {
+            btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
+            btnUpload.setText("Remove");
+            attachmentThumb.setVisibility(View.VISIBLE);
+            btnUpload.setTag(1);
+        } else {
+            editAttachment.setText("");
+            btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
+            btnUpload.setTag(0);
+            btnUpload.setText("Upload");
+            attachmentThumb.setVisibility(View.GONE);
+            finalfileName = "";
+        }
+        btnUpload.setPadding(10, 2, 2, 2);
+
+    }
+
+    public void choosePhotoFromGallary() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(galleryIntent, GALLERY);
+    }
+
+
+    public void callSendExpertMails(AskExpertQuestionModelDg questionModelDg) throws JSONException {
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+
+
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/SendExpertMails?intQuestionID=" + questionModelDg.questionID + "&UserId=" + appUserModel.getUserIDValue() + "&localeid=en-us&MailSubject=&userQuestion=" + questionModelDg.userQuestion + "&intSiteID=" + appUserModel.getSiteIDValue() + "&Questionskills=" + questionModelDg.questionCategories;
+
+            parmStringUrl = parmStringUrl.replaceAll(" ", "%20");
+
+            vollyService.getJsonObjResponseVolley("SendExpertMails", parmStringUrl, appUserModel.getAuthHeaders());
+
+        } else {
+            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
 }

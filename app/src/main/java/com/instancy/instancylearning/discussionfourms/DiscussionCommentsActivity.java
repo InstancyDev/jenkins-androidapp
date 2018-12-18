@@ -454,15 +454,13 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         switch (view.getId()) {
             case R.id.btn_contextmenu:
-//                View v = discussionFourmlistView.getChildAt(i - discussionFourmlistView.getFirstVisiblePosition());
                 ImageButton txtBtnDownload = (ImageButton) view.findViewById(R.id.btn_contextmenu);
                 catalogContextMenuMethod(i, view, txtBtnDownload, discussionCommentsModelList.get(i));
                 break;
             case R.id.btn_attachment:
-//                Toast.makeText(context, "attachment" + discussionCommentsModelList.get(i).attachment, Toast.LENGTH_SHORT).show();
                 intentSocial.putExtra("ATTACHMENT", true);
                 intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, discussionCommentsModelList.get(i).attachment);
-                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, discussionTopicModel.displayName);//9963014569
+                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, discussionTopicModel.displayName);
                 startActivity(intentSocial);
             default:
         }

@@ -79,11 +79,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             } else {
                 isOffline = false;
             }
-//            if (savedInstanceState != null) {
-//                adWebView.restoreState(savedInstanceState);
-//            } else {
-//                adWebView.loadUrl(courseUrl);
-//            }
+
 
             if (savedInstanceState == null) {
                 adWebView.loadUrl(courseUrl);
@@ -164,8 +160,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                        @Override
                                        public void onLoadResource(WebView view, String url) {
                                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
-                                               if (url.toLowerCase().contains(
-                                                       ".html?ioscourseclose=true")) {
+                                               if (url.toLowerCase().contains(".html?ioscourseclose=true")) {
                                                    adWebView.stopLoading();
                                                    finish();
 
@@ -192,6 +187,17 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                }
 
                                            }
+
+                                           if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                                               if (url.toLowerCase().contains("blank.html?ioscourseclose=true")) {
+                                                   closeCourse();
+                                                   adWebView.stopLoading();
+                                                   finish();
+
+                                               }
+
+                                           }
+
                                        }
 
                                        @Override
@@ -199,37 +205,34 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                            Log.d(TAG, "shouldOverrideUrlLoading: from normal web " + url);
                                            url = url.toLowerCase();
 
-//                                           if (url.contains("iosobjectclose=true")) {
-//                                               databaseHandler.saveCourseClose(url, myLearningModel);
-//                                               return true;
-//                                           }
-
                                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-                                               if (url.contains("iosobjectclose=true")) {
+                                               if (url.toLowerCase().contains("iosobjectclose=true")) {
                                                    databaseHandler.saveCourseClose(url, myLearningModel);
                                                    return true;
                                                }
-                                               if (url.contains("blank.html?ioscourseclose=true&cid")) {
+                                               if (url.toLowerCase().contains("blank.html?ioscourseclose=true&cid")) {
                                                    databaseHandler.saveCourseClose(url, myLearningModel);
-                                                   if (url.contains("lstatus=completed")) {
+                                                   if (url.toLowerCase().contains("lstatus=completed")) {
                                                        myLearningModel.setStatusActual("Completed");
                                                    }
-                                                   Intent intent = getIntent();
-                                                   intent.putExtra("myLearningDetalData", myLearningModel);
-                                                   setResult(RESULT_OK, intent);
+//                                                   Intent intent = getIntent();
+//                                                   intent.putExtra("myLearningDetalData", myLearningModel);
+//                                                   setResult(RESULT_OK, intent);
+                                                   closeCourse();
                                                    view.stopLoading();
                                                    finish();
                                                    return true;
-                                               } else if (url.contains("blank.html?ioscourseclose=true")) {
+                                               } else if (url.toLowerCase().contains("blank.html?ioscourseclose=true")) {
 
                                                    if (!isOffline && myLearningModel.getObjecttypeId().equalsIgnoreCase("9")) {
                                                        databaseHandler.saveCourseClose(url, myLearningModel);
                                                    }
 
 
-                                                   Intent intent = getIntent();
-                                                   intent.putExtra("myLearningDetalData", myLearningModel);
-                                                   setResult(RESULT_OK, intent);
+//                                                   Intent intent = getIntent();
+//                                                   intent.putExtra("myLearningDetalData", myLearningModel);
+//                                                   setResult(RESULT_OK, intent);
+                                                   closeCourse();
                                                    view.stopLoading();
                                                    finish();
                                                    return true;
@@ -243,9 +246,10 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                            }
 
                                            if (url.contains("logoff")) {
-                                               Intent intent = getIntent();
-                                               intent.putExtra("myLearningDetalData", myLearningModel);
-                                               setResult(RESULT_OK, intent);
+//                                               Intent intent = getIntent();
+//                                               intent.putExtra("myLearningDetalData", myLearningModel);
+//                                               setResult(RESULT_OK, intent);
+                                               closeCourse();
                                                view.stopLoading();
                                                finish();
 
@@ -260,27 +264,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //                                           }
                                            return false;
                                        }
-
-//                                       @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-//                                       @Override
-//                                       public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-//                                           String urlReq = request.getUrl().toString();
-//                                           Log.d(TAG, "shouldOverrideUrlLoading: newmwthod " + urlReq);
-//                                           urlReq = urlReq.toLowerCase();
-//                                           if (urlReq.contains("ioscourseclose") || urlReq.contains("/logoff") || urlReq.contains("home.html")) {
-//                                               Intent intent = getIntent();
-//                                               intent.putExtra("myLearningDetalData", myLearningModel);
-//                                               setResult(RESULT_OK, intent);
-//                                               view.stopLoading();
-//                                               finish();
-//                                               return false;
-//                                           } else if (urlReq.contains("iosobjectclose=true")) {
-//
-//                                               databaseHandler.saveCourseClose(urlReq, myLearningModel);
-//                                               return true;
-//                                           }
-//                                           return false;
-//                                       }
 
                                        @Override
                                        public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -306,7 +289,11 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                            super.onReceivedError(view, errorCode, description, failingUrl);
                                            if (isOffline) {
                                                svProgressHUD.dismiss();
-                                               Log.d(TAG, "onReceivedError: from normal web " + failingUrl); // 703 266
+                                               Log.d(TAG, "onReceivedError: from normal web " + failingUrl);
+                                           }
+                                           if (failingUrl.toLowerCase().contains("blank.html?ioscourseclose=true")){
+                                               view.stopLoading();
+                                               finish();
                                            }
 
                                        }
@@ -343,6 +330,14 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             adWebView.destroy();
             adWebView.pauseTimers();
         }
+
+    }
+
+    public void closeCourse(){
+
+        Intent intent = getIntent();
+        intent.putExtra("myLearningDetalData", myLearningModel);
+        setResult(RESULT_OK, intent);
 
     }
 

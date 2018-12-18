@@ -56,5 +56,18 @@
         android:orderInCategory="100"
         android:title="@string/mylearning_actionsheet_deleteoption" />
 
+    <item
+        android:id="@+id/ctx_addtoarchive"
+        android:orderInCategory="100"
+        android:title="@string/mylearning_actionsheet_addtoarchive"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/ctx_removearchive"
+        android:orderInCategory="100"
+        android:title="@string/mylearning_actionsheet_removefromarchive"
+        android:visible="false" />
+
+
 </menu>
 

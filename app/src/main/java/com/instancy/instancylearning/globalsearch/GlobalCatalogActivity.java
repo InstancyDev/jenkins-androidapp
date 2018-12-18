@@ -1,6 +1,6 @@
 package com.instancy.instancylearning.globalsearch;
 
-import android.content.Intent;
+
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -14,19 +14,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.askexpert.AskExpertFragment;
-import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
+import com.instancy.instancylearning.askexpertenached.AskExpertFragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
-import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
-import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
+import com.instancy.instancylearning.discussionfourmsenached.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment_new;
-import com.instancy.instancylearning.gameficitation.LeaderboardFragment;
-import com.instancy.instancylearning.gameficitation.MyAchivementsFragment;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
@@ -35,13 +30,9 @@ import com.instancy.instancylearning.learningcommunities.LearningCommunities_fra
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mycompetency.MyCompetencyFragment;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
-import com.instancy.instancylearning.notifications.Notifications_fragment;
 import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
-import com.instancy.instancylearning.progressreports.ProgressReportfragment;
-import com.instancy.instancylearning.settings.SettingsInnerFragment;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
 
@@ -63,7 +54,9 @@ public class GlobalCatalogActivity extends AppCompatActivity {
     UiSettingsModel uiSettingsModel;
     SideMenusModel sideMenusModel;
 
-    String skillID,query;
+    String skillID, query, contentID, folderId, answerId;
+
+    boolean nextLevel = false, nextLevel2 = false;
 
     private static final int CONTENT_VIEW_ID = 10101010;
 
@@ -81,6 +74,13 @@ public class GlobalCatalogActivity extends AppCompatActivity {
         skillID = getIntent().getStringExtra("SKILLID");
         String titleName = getIntent().getStringExtra("TITLENAME");
         query = getIntent().getStringExtra("query");
+        nextLevel = getIntent().getBooleanExtra("nextLevel", false);
+        nextLevel2 = getIntent().getBooleanExtra("nextLevel2", false);
+
+        contentID = getIntent().getStringExtra("CONTENTID");
+        folderId = getIntent().getStringExtra("FOLDERID");
+
+        answerId = getIntent().getStringExtra("ANSWERID");
 
         FrameLayout frame = new FrameLayout(this);
         frame.setId(CONTENT_VIEW_ID);
@@ -97,7 +97,6 @@ public class GlobalCatalogActivity extends AppCompatActivity {
         uiSettingsModel = UiSettingsModel.getInstance();
 
         preferencesManager = PreferencesManager.getInstance();
-
 
         Typeface iconFont = FontManager.getTypeface(this, FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(findViewById(R.id.button_chatbox_send), iconFont);
@@ -133,7 +132,7 @@ public class GlobalCatalogActivity extends AppCompatActivity {
 //                if (sideMenusModel.getLandingPageType().equalsIgnoreCase("1")) {
 //                    fragment = new CatalogCategories_Fragment();
 //                } else {
-                    fragment = new Catalog_fragment();
+                fragment = new Catalog_fragment();
 //                }
                 break;
             case "3":
@@ -177,8 +176,12 @@ public class GlobalCatalogActivity extends AppCompatActivity {
             bundle.putSerializable("TITLENAME", titleName);
             bundle.putSerializable("ISFROMGLOBAL", true);
             bundle.putString("TOPICID", topicID);
-            bundle.putString("CONTENTID", "");
+            bundle.putString("CONTENTID", contentID);
+            bundle.putString("FOLDERID", folderId);
+            bundle.putString("ANSWERID", answerId);
             bundle.putString("query", query);
+            bundle.putBoolean("nextLevel", nextLevel);
+            bundle.putBoolean("nextLevel2", nextLevel2);
 
             fragment.setArguments(bundle);
             FragmentManager fragmentManager = getSupportFragmentManager();

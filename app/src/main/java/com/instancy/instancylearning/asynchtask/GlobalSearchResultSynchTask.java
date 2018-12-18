@@ -213,6 +213,8 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
 
                         globalSearchResultModel.eventenddatedisplay = formatDate(endDisplayDate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
+
+
                         globalSearchResultModel.eventstartdatetime = formatDate(startDate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
                         globalSearchResultModel.eventenddatetime = formatDate(endDate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");

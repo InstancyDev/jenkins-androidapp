@@ -36,6 +36,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.getFirstCaseWords;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -45,7 +46,7 @@ public class UpvotersAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<UpvotersModel> upvotersModelList = null;
+    private List<AskExpertUpVoters> upvotersModelList = null;
 
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -55,7 +56,7 @@ public class UpvotersAdapter extends BaseAdapter {
     private String TAG = UpvotersAdapter.class.getSimpleName();
 
 
-    public UpvotersAdapter(Activity activity, List<UpvotersModel> upvotersModelList) {
+    public UpvotersAdapter(Activity activity, List<AskExpertUpVoters> upvotersModelList) {
         this.activity = activity;
         this.upvotersModelList = upvotersModelList;
 
@@ -67,13 +68,16 @@ public class UpvotersAdapter extends BaseAdapter {
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
 
-
     }
 
+    public void refreshList(List<AskExpertUpVoters> upvotersModelList) {
+        this.upvotersModelList = upvotersModelList;
+        this.notifyDataSetChanged();
+    }
 
     @Override
     public int getCount() {
-        return upvotersModelList != null ? upvotersModelList.size() : 25;
+        return upvotersModelList != null ? upvotersModelList.size() : 0;
     }
 
     @Override
@@ -98,34 +102,32 @@ public class UpvotersAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-//        holder.txtUserName.setText(upvotersModelList.get(position).userName);
-
+        holder.txtUserName.setText(upvotersModelList.get(position).userName);
         holder.txtUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtUserJobTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        if (isValidString(upvotersModelList.get(position).jobTitle)) {
+            holder.txtUserJobTitle.setText(upvotersModelList.get(position).jobTitle);
+        }
 
-//        String imagePath = upvotersModelList.get(position).userImage;
+        String displayNameDrawable = getFirstCaseWords(upvotersModelList.get(position).userName);
 
-//        String displayNameDrawable = getFirstCaseWords(upvotersModelList.get(position).userName);
+        if (upvotersModelList.get(position).picture.length() > 2) {
+            String imgUrl = appUserModel.getSiteURL() + upvotersModelList.get(position).picture;
+            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
 
-//        if (imagePath.length() > 2) {
-//            String imgUrl = upvotersModelList.get(position).userImage + upvotersModelList.get(position).userImage;
-//
-//            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
-//
-//        } else {
-//
-//            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
-//// generate random color
-////        int color1 = generator.getRandomColor();
-//// generate color based on a key (same key returns the same color), useful for list/grid views
-//            int color = generator.getColor(displayNameDrawable);
-//
-//            TextDrawable drawable = TextDrawable.builder()
-//                    .buildRound(displayNameDrawable, color);
-//
-//            holder.imgThumb.setBackground(drawable);
-//
-//        }
+        } else {
+
+            ColorGenerator generator = ColorGenerator.MATERIAL; // or use DEFAULT
+
+            int color = generator.getColor(displayNameDrawable);
+
+            TextDrawable drawable = TextDrawable.builder()
+                    .buildRound(displayNameDrawable, color);
+
+            holder.imgThumb.setBackground(drawable);
+
+        }
 
         return convertView;
     }
@@ -148,6 +150,10 @@ public class UpvotersAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.txtUserName)
         TextView txtUserName;
+
+        @Nullable
+        @BindView(R.id.txtUserJobTitle)
+        TextView txtUserJobTitle;
 
         @Nullable
         @BindView(R.id.card_view)

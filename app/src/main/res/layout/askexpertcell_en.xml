@@ -41,7 +41,7 @@
                     android:gravity="center_vertical|fill_horizontal"
                     android:maxLines="100"
                     android:padding="1dp"
-                    android:text="How do you define sales effectiveness"
+                    android:text="How do you define sales "
                     android:textColor="@color/colorBlack"
                     android:textSize="14sp"
                     android:textStyle="bold"
@@ -71,13 +71,12 @@
                     android:layout_below="@+id/txt_description"
                     android:orientation="horizontal"
                     android:visibility="visible">
-
                     <include layout="@layout/askexpertstagslayout" />
                 </LinearLayout>
 
                 <ImageView
                     android:id="@+id/imagethumb"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="150dp"
                     android:layout_below="@+id/lltagslayout"
                     android:adjustViewBounds="true"

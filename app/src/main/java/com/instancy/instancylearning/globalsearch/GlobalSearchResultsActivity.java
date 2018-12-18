@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -45,11 +46,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.askexpert.AskExpertsAnswersActivity;
+import com.instancy.instancylearning.askexpertenached.AskExpertQuestionModelDg;
+import com.instancy.instancylearning.askexpertenached.AskExpertsAnswersActivity;
+import com.instancy.instancylearning.askexpertenached.AskExpertsCommentsActivity;
 import com.instancy.instancylearning.asynchtask.GlobalSearchResultSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.DiscussionCommentsActivity;
-import com.instancy.instancylearning.discussionfourms.DiscussionTopicActivity;
+import com.instancy.instancylearning.discussionfourmsenached.DiscussionCommentsActivity;
+import com.instancy.instancylearning.discussionfourmsenached.DiscussionForumModelDg;
+import com.instancy.instancylearning.discussionfourmsenached.DiscussionTopicActivity;
+import com.instancy.instancylearning.discussionfourmsenached.DiscussionTopicModelDg;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
@@ -78,6 +83,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +97,11 @@ import static com.instancy.instancylearning.globalpackage.GlobalMethods.relatedC
 import static com.instancy.instancylearning.models.GlobalSearchResultModelNew.fetchCategoriesData;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.Utilities.formatDate;
+import static com.instancy.instancylearning.utils.Utilities.fromHtml;
+import static com.instancy.instancylearning.utils.Utilities.fromHtmlToString;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 
 /**
@@ -125,6 +135,9 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     List<GLobalSearchSelectedModel> gLobalSearchSelectedModelList = null;
     GlobalSearchResultSynchTask globalSearchResultSynchTask;
 
+    TextView globalSearchResult;
+
+    RelativeLayout globalsearchresultLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,6 +149,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         svProgressHUD = new SVProgressHUD(this);
+        initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
         globalHeaderLayout = (RelativeLayout) findViewById(R.id.globalsearchheader);
         bottomBtnLayout = (LinearLayout) findViewById(R.id.filter_btn_layout);
@@ -145,10 +159,12 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         bottomBtnLayout.setVisibility(View.GONE);
         bottomLine.setVisibility(View.GONE);
         nodataLabel = (TextView) findViewById(R.id.nodata_label);
+
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
 
         gLobalSearchSelectedModelList = (List<GLobalSearchSelectedModel>) getIntent().getSerializableExtra("globalsearchlist");
+
         queryString = getIntent().getStringExtra("queryString");
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -167,6 +183,13 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
         chxListview = (ExpandableListView) findViewById(R.id.chxlistview);
 
+
+        globalsearchresultLayout = (RelativeLayout) findViewById(R.id.globalsearchresults);
+        globalsearchresultLayout.setVisibility(View.VISIBLE);
+
+        globalSearchResult = (TextView) findViewById(R.id.txt_relaventskills);
+
+        globalSearchResult.setText("SearchResult");
 
         // Construct our adapter, using our own layout and myTeams
 
@@ -188,7 +211,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
             public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
                 final GlobalSearchResultModelNew expandedListText = (GlobalSearchResultModelNew) searchAdapter.getChild(groupPosition, childPosition);
 //              Toast.makeText(GlobalSearchResultsActivity.this, "groupPosition: " + groupPosition + "childPosition: " + childPosition, Toast.LENGTH_SHORT).show();
-                selectedFragment(expandedListText);
+                selectedFragment(expandedListText, false, false);
                 return false;
             }
         });
@@ -218,25 +241,38 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
-    public void selectedFragment(GlobalSearchResultModelNew expandedListText) {
+    public void selectedFragment(GlobalSearchResultModelNew globalSearchResultModel, boolean nextLevel, boolean nextLevel2) {
 
 //        SideMenusModel sideMenusModel = db.getSideMenuModelForGlobalSearch(expandedListText.siteid, expandedListText.menuID);
 
-        SideMenusModel sideMenusModel = convertGlobalModelToSideMenuModel(expandedListText);
+        SideMenusModel sideMenusModel = convertGlobalModelToSideMenuModel(globalSearchResultModel);
 
         if (sideMenusModel.isDataFound() && !sideMenusModel.contextMenuId.equalsIgnoreCase("0")) {
             Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, GlobalCatalogActivity.class);
             intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
             intentDetail.putExtra("query", queryString);
             intentDetail.putExtra("ISFROMGLOBAL", true);
+            intentDetail.putExtra("nextLevel", nextLevel);
+            intentDetail.putExtra("nextLevel2", nextLevel2);
+
+            intentDetail.putExtra("CONTENTID", globalSearchResultModel.contentid);
+            intentDetail.putExtra("FOLDERID", globalSearchResultModel.folderid);
+
+            if (globalSearchResultModel.objecttypeid == 653) {
+                intentDetail.putExtra("FOLDERID", globalSearchResultModel.folderid);
+                intentDetail.putExtra("ANSWERID", globalSearchResultModel.startpage);
+
+            } else if (globalSearchResultModel.objecttypeid == 654) {
+                intentDetail.putExtra("CONTENTID", globalSearchResultModel.startpage);
+                intentDetail.putExtra("ANSWERID", globalSearchResultModel.contentid);
+            }
             startActivity(intentDetail);
 
         } else {
 
-            MyLearningModel myLearningDetalData = convertGlobalModelToMylearningModel(expandedListText, appUserModel);
+            MyLearningModel myLearningDetalData = convertGlobalModelToMylearningModel(globalSearchResultModel, appUserModel);
 
-
-            checkUserLogin(myLearningDetalData, false, true, expandedListText);
+            checkUserLogin(myLearningDetalData, false, true, globalSearchResultModel);
 
         }
 
@@ -383,6 +419,15 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult inneractivity:");
+
+
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
+            boolean refresh = data.getBooleanExtra("REFRESH", false);
+            if (refresh) {
+                refreshCatagories(true);
+            }
+        }
+
     }
 
     @Override
@@ -406,7 +451,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         db = new DatabaseHandler(v.getContext());
 //        SideMenusModel sideMenusModel = db.getSideMenuModelForGlobalSearch(globalSearchResultModel.siteid, globalSearchResultModel.contextMenuId);
 
-        SideMenusModel sideMenusModel = convertGlobalModelToSideMenuModel(globalSearchResultModel);
+        final SideMenusModel sideMenusModel = convertGlobalModelToSideMenuModel(globalSearchResultModel);
 
         String typeMore = "0";
 
@@ -449,6 +494,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
         //AskExpert
         menu.getItem(11).setVisible(false);// go to question
+        menu.getItem(13).setVisible(false);// go to response
+
         switch (typeMore) {
             case "1":
                 // mylearning
@@ -476,20 +523,35 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 if (globalSearchResultModel.relatedconentcount > 0)
                     menu.getItem(3).setVisible(true);// related content
                 if (globalSearchResultModel.isaddedtomylearning == 0) {
-                    if (globalSearchResultModel.viewtype == 1 || globalSearchResultModel.viewtype == 2) {
-                        menu.getItem(5).setVisible(true);//Enroll
-                    }
+                    menu.getItem(3).setVisible(false);
                     if (returnEventCompleted(globalSearchResultModel.eventenddatetime) && uiSettingsModel.isAllowExpiredEventsSubscription()) {
                         menu.getItem(5).setVisible(true);//Enroll
+
                     } else {
+                        menu.getItem(5).setVisible(false);
+                    }
+                    if (globalSearchResultModel.viewtype == 1 || globalSearchResultModel.viewtype == 2) {
+                        if (!returnEventCompleted(globalSearchResultModel.eventstartdatetime)) {
+                            menu.getItem(5).setVisible(true);//Enroll
+                            menu.getItem(3).setVisible(false);
+                        } else {
+                            if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
+                                menu.getItem(5).setVisible(true);//Enroll
+                                menu.getItem(3).setVisible(false);
+
+                            }
+                        }
+                    } else {
+                        if (!returnEventCompleted(globalSearchResultModel.eventstartdatetime)) {
+                            menu.getItem(12).setVisible(true);
+                            if (globalSearchResultModel.viewtype == 3) {
+                                menu.getItem(1).setVisible(true);//buy
+                            }
+                        }
 
                     }
-                } else {
-                    if (!returnEventCompleted(globalSearchResultModel.eventstartdatetime)) {
-                        menu.getItem(12).setVisible(true);
-                    }
                 }
-                menu.getItem(6).setVisible(true);//Detail
+                    menu.getItem(6).setVisible(true);//Detail
                 break;
             case "4":
                 //Discussion forum
@@ -502,7 +564,14 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 break;
             case "5":
                 // askexpert
-                menu.getItem(11).setVisible(true);// go to question
+
+                if (globalSearchResultModel.objecttypeid == 653) {
+                    menu.getItem(11).setVisible(true);// go to question
+                }
+                if (globalSearchResultModel.objecttypeid == 654) {
+                    menu.getItem(13).setVisible(true);// go to response
+                }
+
                 break;
             case "10":
                 // people listing
@@ -528,6 +597,9 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                     case R.id.ctx_join:
                         Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
                         break;
+                    case R.id.ctx_buy:
+                        Toast.makeText(GlobalSearchResultsActivity.this, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
+                        break;
                     case R.id.ctx_relatedcontent:
                         relatedContentView(myLearningDetalData, GlobalSearchResultsActivity.this);
                         break;
@@ -547,13 +619,22 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         gotoProfile(globalSearchResultModel);
                         break;
                     case R.id.ctx_disc:
-                        gotoDiscForum(globalSearchResultModel);
+//                        gotoDiscForum(globalSearchResultModel);
+                        getForumList(sideMenusModel, globalSearchResultModel, false);
                         break;
                     case R.id.ctx_topic:
-                        gotoDiscTopic(globalSearchResultModel);
+//                        gotoDiscTopic(globalSearchResultModel);
+                        getForumList(sideMenusModel, globalSearchResultModel, true);
                         break;
                     case R.id.ctx_answer:
-                        gotoQuestion(globalSearchResultModel);
+//                        gotoQuestionDetail(globalSearchResultModel, true);
+                        getUserQuestionDetails(globalSearchResultModel, sideMenusModel, false);
+//                        selectedFragment(globalSearchResultModel, true, false);
+                        break;
+                    case R.id.ctx_comments:
+//                        gotoAnswerDetail(globalSearchResultModel, true);
+//                        selectedFragment(globalSearchResultModel, true, true);
+                        getUserQuestionDetails(globalSearchResultModel, sideMenusModel, true);
                         break;
                 }
                 return true;
@@ -575,16 +656,40 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
+    public void gotoAnswerDetail(GlobalSearchResultModelNew resultModel, boolean nextLevel) {
 
-    public void gotoQuestion(GlobalSearchResultModelNew resultModel) {
-        //  http://stmciapi.instancysoft.com/api//MobileLMS/GetForumComments?SiteID=374&ForumID=155&TopicID=45d3e3a3-da4b-4d80-bc40-6d5b7ecf7928
+        AskExpertQuestionModelDg askExpertQuestionModel = convertGlobalToQuestionModel(resultModel);
 
-        AskExpertQuestionModel askExpertQuestionModel = convertGlobalToQuestionModel(resultModel);
+        Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, AskExpertsCommentsActivity.class);
+        intentDetail.putExtra("AskExpertQuestionModelDg", askExpertQuestionModel);
+        intentDetail.putExtra("ISGLOBALSEARCH", true);
+//        intentDetail.putExtra("nextLevel", nextLevel);
+        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+
+
+    }
+
+    public void getQuestionDetails(GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
+
+        //      public AskTheExpertDTO GetUserQuestionDetails(int intUserId, int intSiteID, int intQuestionID, int ComponentInsID, int ComponentID)
+
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetUserQuestionDetails?intUserId=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&intQuestionID=" + globalSearchResultModelNew.folderid + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&ComponentID=" + sideMenusModel.getComponentId();
+
+        vollyService.getStringResponseVolley("GetUserQuestionDetails", parmStringUrl, appUserModel.getAuthHeaders());
+
+    }
+
+
+    public void gotoQuestionDetail(AskExpertQuestionModelDg askExpertQuestionModel, boolean nextLevel, SideMenusModel sideMenusModel) {
+
 
         Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, AskExpertsAnswersActivity.class);
-        intentDetail.putExtra("AskExpertQuestionModel", askExpertQuestionModel);
+        intentDetail.putExtra("AskExpertQuestionModelDg", askExpertQuestionModel);
         intentDetail.putExtra("ISGLOBALSEARCH", true);
-        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+        intentDetail.putExtra("sidemenumodel", sideMenusModel);
+
+        intentDetail.putExtra("nextLevel", nextLevel);
+        startActivity(intentDetail);
 
     }
 
@@ -592,7 +697,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     public void gotoDiscTopic(GlobalSearchResultModelNew resultModel) {
         //  http://stmciapi.instancysoft.com/api//MobileLMS/GetForumComments?SiteID=374&ForumID=155&TopicID=45d3e3a3-da4b-4d80-bc40-6d5b7ecf7928
 
-        DiscussionTopicModel topicModel = convertGlobalToDiscussionTopicModel(resultModel);
+        DiscussionTopicModelDg topicModel = convertGlobalToDiscussionTopicModel(resultModel);
 
         Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, DiscussionCommentsActivity.class);
         intentDetail.putExtra("topicModel", topicModel);
@@ -601,15 +706,16 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         //
     }
 
-    public void gotoDiscForum(GlobalSearchResultModelNew resultModel) {
+    public void gotoDiscForum(boolean nextLevel, DiscussionForumModelDg discussionForumModel, String topicID) {
 // http://stmciapi.instancysoft.com/api//MobileLMS/GetForumTopics?ForumID=155
 
-        DiscussionForumModel discussionForumModel = convertGlobalToDiscussionForum(resultModel);
 
         Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, DiscussionTopicActivity.class);
         intentDetail.putExtra("forumModel", discussionForumModel);
         intentDetail.putExtra("NOTIFICATION", false);
         intentDetail.putExtra("ISGLOBALSEARCH", true);
+        intentDetail.putExtra("nextLevel", nextLevel);
+        intentDetail.putExtra("TOPICID", topicID);
 
         startActivity(intentDetail);
     }
@@ -658,19 +764,19 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public AskExpertQuestionModel convertGlobalToQuestionModel(GlobalSearchResultModelNew resultModel) {
-        AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
+    public AskExpertQuestionModelDg convertGlobalToQuestionModel(GlobalSearchResultModelNew resultModel) {
+        AskExpertQuestionModelDg askExpertQuestionModel = new AskExpertQuestionModelDg();
 
         if (resultModel == null) {
 
             return null;
         }
 
-        askExpertQuestionModel.siteID = "" + resultModel.siteid;
+        askExpertQuestionModel.siteID = resultModel.siteid;
 
-        askExpertQuestionModel.userID = resultModel.userID;
+        askExpertQuestionModel.userID = Integer.parseInt(resultModel.userID);
 
-        askExpertQuestionModel.username = resultModel.authordisplayname;
+        askExpertQuestionModel.userName = resultModel.authordisplayname;
 
         askExpertQuestionModel.userQuestion = resultModel.name;
 
@@ -680,94 +786,96 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
         askExpertQuestionModel.createdDate = resultModel.createddate;
 
-        askExpertQuestionModel.answers = "";
+
+        askExpertQuestionModel.userQuestionDescription = resultModel.longdescription;
 
         askExpertQuestionModel.questionCategories = resultModel.longdescription;
+
 
         return askExpertQuestionModel;
     }
 
-    public DiscussionForumModel convertGlobalToDiscussionForum(GlobalSearchResultModelNew resultModel) {
-        DiscussionForumModel discussionForumModel = new DiscussionForumModel();
+    public DiscussionForumModelDg convertGlobalToDiscussionForum(GlobalSearchResultModelNew resultModel) {
+        DiscussionForumModelDg discussionForumModel = new DiscussionForumModelDg();
 
         if (resultModel == null) {
 
             return null;
         }
 
-        discussionForumModel.siteid = "" + resultModel.siteid;
+        discussionForumModel.siteID = resultModel.siteid;
 
         discussionForumModel.name = resultModel.name;
 
-        discussionForumModel.createddate = resultModel.createddate;
+        discussionForumModel.createdDate = resultModel.createddate;
 
         discussionForumModel.author = resultModel.authordisplayname;
 
-        discussionForumModel.nooftopics = "0";
+        discussionForumModel.noOfTopics = 0;
 
-        discussionForumModel.totalposts = "0";
+        discussionForumModel.totalPosts = 0;
 
-        discussionForumModel.existing = "";
+        discussionForumModel.existing = 0;
 
-        discussionForumModel.descriptionValue = resultModel.longdescription;
+        discussionForumModel.description = resultModel.longdescription;
 
-        discussionForumModel.isprivate = "";
+        discussionForumModel.isPrivate = false;
 
-        discussionForumModel.active = "";
+        discussionForumModel.active = false;
 
-        discussionForumModel.createduserid = "" + resultModel.createduserid;
+        discussionForumModel.createdUserID = resultModel.createduserid;
 
-        discussionForumModel.parentforumid = "";
+        discussionForumModel.parentForumID = 0;
 
-        discussionForumModel.displayorder = "" + resultModel.objecttypeid;
+        discussionForumModel.displayOrder = 0;
 
-        discussionForumModel.requiressubscription = "";
+        discussionForumModel.requiresSubscription = false;
 
-        discussionForumModel.createnewtopic = "";
+        discussionForumModel.createNewTopic = false;
 
-        discussionForumModel.attachfile = "";
+        discussionForumModel.attachFile = false;
 
-        discussionForumModel.likeposts = "";
+        discussionForumModel.likePosts = false;
 
-        discussionForumModel.sendemail = "";
+        discussionForumModel.sendEmail = false;
 
-        discussionForumModel.moderation = "";
+        discussionForumModel.moderation = false;
 
-        discussionForumModel.imagedata = "";
+        discussionForumModel.dfProfileImage = "";
 
-        discussionForumModel.forumid = Integer.parseInt(resultModel.folderid);
+        discussionForumModel.forumID = Integer.parseInt(resultModel.folderid);
 
-        discussionForumModel.forumname = resultModel.name;
+        discussionForumModel.name = resultModel.name;
 
         return discussionForumModel;
     }
 
 
-    public DiscussionTopicModel convertGlobalToDiscussionTopicModel(GlobalSearchResultModelNew resultModel) {
-        DiscussionTopicModel discussionTopicModel = new DiscussionTopicModel();
+    public DiscussionTopicModelDg convertGlobalToDiscussionTopicModel(GlobalSearchResultModelNew resultModel) {
+        DiscussionTopicModelDg discussionTopicModel = new DiscussionTopicModelDg();
 
         if (resultModel == null) {
 
             return null;
         }
 
-        discussionTopicModel.siteid = "" + resultModel.siteid;
+        discussionTopicModel.siteId = resultModel.siteid;
 
         discussionTopicModel.name = resultModel.name;
 
-        discussionTopicModel.createddate = resultModel.createddate;
+        discussionTopicModel.createdDate = resultModel.createddate;
 
-        discussionTopicModel.createduserid = "" + resultModel.createduserid;
+        discussionTopicModel.createdUserID = resultModel.createduserid;
 
-        discussionTopicModel.imagedata = "";
+        discussionTopicModel.uploadedImageName = "";
 
-        discussionTopicModel.forumid = resultModel.folderid;
+        discussionTopicModel.forumId = Integer.parseInt(resultModel.folderid);
 
-        discussionTopicModel.topicid = resultModel.contentid;
+        discussionTopicModel.contentID = resultModel.contentid;
 
-        discussionTopicModel.longdescription = resultModel.longdescription;
+        discussionTopicModel.longDescription = resultModel.longdescription;
 
-        discussionTopicModel.latestreplyby = resultModel.authordisplayname;
+        discussionTopicModel.latestReplyBy = resultModel.authordisplayname;
 
         return discussionTopicModel;
     }
@@ -826,6 +934,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                                             db.ejectEventsFromDownloadData(eventModel);
                                             db.updateEventAddedToMyLearningInEventCatalog(eventModel, 0);
 //                                            injectFromDbtoModel(true);
+                                            refreshCatagories(true);
                                         }
                                     });
                             AlertDialog alert = builder.create();
@@ -840,6 +949,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                     public void onErrorResponse(VolleyError error) {
 //                        Log.e("Error: ", error.getMessage());
                         svProgressHUD.dismiss();
+//                        refreshCatagories(true);
                     }
                 }) {
             @Override
@@ -851,7 +961,14 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
             }
         };
 
-        VolleySingleton.getInstance(GlobalSearchResultsActivity.this).addToRequestQueue(jsonObjectRequest);
+//        VolleySingleton.getInstance(GlobalSearchResultsActivity.this).addToRequestQueue(jsonObjectRequest);
+
+        RequestQueue rQueue = Volley.newRequestQueue(this);
+        rQueue.add(jsonObjectRequest);
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
 
@@ -1278,6 +1395,346 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
             }
         }
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                if (requestType.equalsIgnoreCase("GetUserQuestionDetails")) {
+                    Toast.makeText(GlobalSearchResultsActivity.this, "Unable to fetch Question Details", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+
+                if (requestType.equalsIgnoreCase("GetUserQuestionDetails")) {
+                    if (response != null) {
+                        try {
+                            AskExpertQuestionModelDg askExpertQuestionModelDg = getQuestionModel(response);
+                            if (askExpertQuestionModelDg != null) {
+//                                gotoQuestionDetail(askExpertQuestionModelDg, false);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+
+                    }
+                }
+
+                svProgressHUD.dismiss();
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+                svProgressHUD.dismiss();
+            }
+        };
+    }
+
+    public AskExpertQuestionModelDg getQuestionModel(String responseStr) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject(responseStr);
+
+        AskExpertQuestionModelDg askExpertsQuestionModel = new AskExpertQuestionModelDg();
+        JSONArray jsonTableAry = jsonObject.getJSONArray("QuestionList");
+
+        // for deleting records in table for respective table
+
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            askExpertsQuestionModel.questionID = jsonMyLearningColumnObj.optInt("QuestionID");
+            askExpertsQuestionModel.userID = jsonMyLearningColumnObj.optInt("UserID");
+            askExpertsQuestionModel.userName = jsonMyLearningColumnObj.optString("UserName");
+
+            askExpertsQuestionModel.userQuestion = fromHtmlToString(jsonMyLearningColumnObj.get("UserQuestion").toString());
+
+            askExpertsQuestionModel.postedDate = jsonMyLearningColumnObj.optString("PostedDate");
+            askExpertsQuestionModel.createdDate = jsonMyLearningColumnObj.optString("CreatedDate");
+            askExpertsQuestionModel.totalAnswers = jsonMyLearningColumnObj.optInt("Answers");
+            askExpertsQuestionModel.questionCategories = jsonMyLearningColumnObj.optString("QuestionCategories");
+
+            askExpertsQuestionModel.userQuestionDescription = fromHtmlToString(jsonMyLearningColumnObj.get("UserQuestionDescription").toString());
+
+            askExpertsQuestionModel.userQuestionImage = jsonMyLearningColumnObj.optString("UserQuestionImage");
+            askExpertsQuestionModel.lastActivatedDate = jsonMyLearningColumnObj.optString("LastActivatedDate");
+            askExpertsQuestionModel.totalViews = jsonMyLearningColumnObj.optInt("Views");
+            askExpertsQuestionModel.objectID = jsonMyLearningColumnObj.optString("ObjectID");
+            askExpertsQuestionModel.userImage = jsonMyLearningColumnObj.optString("UserImage");
+            askExpertsQuestionModel.actionsLink = jsonMyLearningColumnObj.optString("ActionsLink");
+            askExpertsQuestionModel.userQuestionImagePath = jsonMyLearningColumnObj.optString("UserQuestionImagePath");
+            askExpertsQuestionModel.answerBtnWithLink = jsonMyLearningColumnObj.optString("AnswerBtnWithLink");
+
+        }
+        return askExpertsQuestionModel;
+    }
+
+    public void getUserQuestionDetails(GlobalSearchResultModelNew globalSearchResultModelNew, final SideMenusModel sideMenusModel, final boolean newxtLevel) {
+        //      public AskTheExpertDTO GetUserQuestionDetails(int intUserId, int intSiteID, int intQuestionID, int ComponentInsID, int ComponentID)
+
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetUserQuestionDetails?intUserId=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&intQuestionID=" + globalSearchResultModelNew.folderid + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&ComponentID=" + sideMenusModel.getComponentId();
+
+
+        Log.d(TAG, "main login : " + parmStringUrl);
+
+        parmStringUrl = parmStringUrl.replaceAll(" ", "%20");
+
+        StringRequest stringRequest = new StringRequest(parmStringUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        svProgressHUD.dismiss();
+                        Log.d("Response: ", " " + response);
+
+                        if (response != null) {
+                            try {
+                                AskExpertQuestionModelDg askExpertQuestionModelDg = getQuestionModel(response);
+                                if (askExpertQuestionModelDg != null) {
+                                    gotoQuestionDetail(askExpertQuestionModelDg, newxtLevel, sideMenusModel);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+
+
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+                        Toast.makeText(GlobalSearchResultsActivity.this, "Unable to fetch Question Details", Toast.LENGTH_SHORT).show();
+
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(GlobalSearchResultsActivity.this).addToRequestQueue(stringRequest);
+    }
+
+
+    public void getForumList(SideMenusModel sideMenusModel, GlobalSearchResultModelNew globalSearchResultModelNew, boolean nextLevel) {
+
+        //    http://digimedicaapi.instancysoft.com/api/DiscussionForums/GetCourseDiscussionContentID?strContentID=&intForumID=7&intUserID=1&intSiteID=374&strLocale=en-us
+
+        if (nextLevel) {
+            queryString = "";
+        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumList";
+
+        JSONObject parameters = new JSONObject();
+
+        try {
+            parameters.put("intUserID", appUserModel.getUserIDValue());
+            parameters.put("intSiteID", appUserModel.getSiteIDValue());
+            parameters.put("strLocale", "en-us");
+            parameters.put("strSearchText", queryString);
+            parameters.put("intCompID", sideMenusModel.getComponentId());
+            parameters.put("intCompInsID", sideMenusModel.getRepositoryId());
+            parameters.put("intShowPrivateForums", "0");
+            parameters.put("strSortCondition", "CreatedDate%20Desc");
+            parameters.put("sortby", "");
+            parameters.put("sorttype", "");
+            parameters.put("pageIndex", "1");
+            parameters.put("pageSize", 100);
+            parameters.put("RecordsCount", 0);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        getStringResponseFromPostMethod(parameterString, urlStr, globalSearchResultModelNew, nextLevel);
+    }
+
+
+    public void getStringResponseFromPostMethod(final String postData, String apiURL, final GlobalSearchResultModelNew globalSearchResultModelNew, final boolean nextLevel) {
+
+        byte[] encrpt = new byte[0];
+        try {
+            encrpt = postData.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        final byte[] finalEncrpt = encrpt;
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String _response) {
+
+                Log.d(TAG, "onResponse: " + _response);
+
+
+//                gotoDiscForum(globalSearchResultModelNew, nextLevel);
+                try {
+
+                    int forumId = Integer.parseInt(globalSearchResultModelNew.folderid);
+
+                    DiscussionForumModelDg forumModelDg = getForumModel(_response, forumId);
+
+                    if (forumModelDg != null) {
+                        gotoDiscForum(nextLevel, forumModelDg, globalSearchResultModelNew.contentid);
+                    } else {
+                        Toast.makeText(GlobalSearchResultsActivity.this, "Unable to fetch forum details", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return finalEncrpt;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public DiscussionForumModelDg getForumModel(String responseStr, int forumId) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject(responseStr);
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("forumList");
+
+        // for deleting records in table for respective table
+
+        DiscussionForumModelDg discussionForumModel = null;
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+
+            if (forumId == jsonMyLearningColumnObj.optInt("ForumID")) {
+                discussionForumModel = new DiscussionForumModelDg();
+                discussionForumModel.forumID = jsonMyLearningColumnObj.optInt("ForumID");
+                discussionForumModel.name = jsonMyLearningColumnObj.optString("Name");
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.optString("Description"));
+                discussionForumModel.description = result.toString();
+
+                discussionForumModel.parentForumID = jsonMyLearningColumnObj.optInt("ParentForumID");
+                discussionForumModel.displayOrder = jsonMyLearningColumnObj.optInt("DisplayOrder");
+
+                String formattedDate = formatDate(jsonMyLearningColumnObj.optString("CreatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                discussionForumModel.createdDate = formattedDate;
+
+                discussionForumModel.siteID = jsonMyLearningColumnObj.optInt("SiteID");
+                discussionForumModel.createdUserID = jsonMyLearningColumnObj.optInt("CreatedUserID");
+
+                discussionForumModel.active = jsonMyLearningColumnObj.optBoolean("Active");
+                discussionForumModel.requiresSubscription = jsonMyLearningColumnObj.optBoolean("RequiresSubscription");
+                discussionForumModel.createNewTopic = jsonMyLearningColumnObj.optBoolean("CreateNewTopic");
+                discussionForumModel.attachFile = jsonMyLearningColumnObj.optBoolean("AttachFile");
+                discussionForumModel.likePosts = jsonMyLearningColumnObj.optBoolean("LikePosts");
+                discussionForumModel.sendEmail = jsonMyLearningColumnObj.optBoolean("SendEmail");
+                discussionForumModel.moderation = jsonMyLearningColumnObj.optBoolean("Moderation");
+                discussionForumModel.isPrivate = jsonMyLearningColumnObj.optBoolean("IsPrivate");
+
+                String authorName = jsonMyLearningColumnObj.optString("Author");
+                if (isValidString(authorName)) {
+                    discussionForumModel.author = authorName;
+                }
+
+                discussionForumModel.noOfTopics = jsonMyLearningColumnObj.optInt("NoOfTopics");
+                discussionForumModel.totalPosts = jsonMyLearningColumnObj.optInt("TotalPosts");
+                discussionForumModel.existing = jsonMyLearningColumnObj.optInt("Existing");
+                discussionForumModel.totalLikes = jsonMyLearningColumnObj.optInt("TotalLikes");
+                discussionForumModel.dfProfileImage = jsonMyLearningColumnObj.optString("DFProfileImage");
+                discussionForumModel.dfUpdateTime = jsonMyLearningColumnObj.optString("DFUpdateTime");
+                discussionForumModel.dfChangeUpdateTime = jsonMyLearningColumnObj.optString("DFChangeUpdateTime");
+                discussionForumModel.forumThumbnailPath = jsonMyLearningColumnObj.optString("ForumThumbnailPath");
+                discussionForumModel.descriptionWithLimit = jsonMyLearningColumnObj.optString("DescriptionWithLimit");
+                discussionForumModel.moderatorID = jsonMyLearningColumnObj.optInt("ModeratorID");
+                discussionForumModel.updatedAuthor = jsonMyLearningColumnObj.optString("UpdatedAuthor");
+
+                String updatedDate = formatDate(jsonMyLearningColumnObj.optString("UpdatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+
+                discussionForumModel.updatedDate = updatedDate;
+
+                discussionForumModel.moderatorName = jsonMyLearningColumnObj.optString("ModeratorName");
+
+                String moderatorName = jsonMyLearningColumnObj.optString("ModeratorName");
+                if (isValidString(moderatorName)) {
+                    discussionForumModel.moderatorName = moderatorName;
+                }
+
+                discussionForumModel.allowShare = jsonMyLearningColumnObj.optBoolean("AllowShare");
+                discussionForumModel.descriptionWithoutLimit = jsonMyLearningColumnObj.optString("DescriptionWithoutLimit");
+
+
+            }
+
+
+        }
+        return discussionForumModel;
     }
 
 }

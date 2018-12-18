@@ -105,7 +105,6 @@ public class GlobalSearchAdapter extends BaseExpandableListAdapter {
 
         listTitleTextView.setText(listTitle);
 
-
         return convertView;
 
     }

@@ -187,7 +187,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
             if (isTraxkList) {
                 workFlowType = "onlaunch";
-//                executeWorkFlowRules(workFlowType);
+                executeWorkFlowRules(workFlowType);
             } else {
 
                 boolean isEventRules = isEventCompleted();
@@ -317,8 +317,8 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 //                            executeWorkFlowRules("");
                             if (isTraxkList) {
                                 workFlowType = "onitemChange";
-                                Log.d(TAG, "executeWorkFlowRules: workflowtype cmi update" + workFlowType);
-                                executeWorkFlowRules(workFlowType);
+//                                Log.d(TAG, "executeWorkFlowRules: workflowtype cmi update" + workFlowType);
+//                                executeWorkFlowRules(workFlowType);
                                 svProgressHUD.dismiss();
                             } else {
                                 svProgressHUD.dismiss();
@@ -417,9 +417,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             isCompleted = onTrackListClose(myLearningModel, trackListModelList);
         }
         if (isCompleted) {
-
+            completedTheTrack();
             db.updateCMIstatus(myLearningModel, "Completed");
             myLearningModel.setStatusActual("Completed");
+            myLearningModel.setStatusDisplay(getResources().getString(R.string.status_completed));
         }
 //        myLearningModel.setStatusActual("waste");
         Intent intent = getIntent();
@@ -479,9 +480,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 }
 
                 if (isCompleted) {
-
+                    completedTheTrack();
                     db.updateCMIstatus(myLearningModel, "Completed");
                     myLearningModel.setStatusActual("Completed");
+                    myLearningModel.setStatusDisplay(getResources().getString(R.string.status_completed));
                 }
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
@@ -504,6 +506,20 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         }
         return true;
     }
+
+    public void completedTheTrack() {
+
+
+        String paramsString = "ContentID="
+                + myLearningModel.getContentID() + "&UserID=" + myLearningModel.getUserID()
+                + "&ScoId=" + myLearningModel.getScoId() + "&SiteID=" + myLearningModel.getSiteID();
+
+        paramsString = paramsString.replace(" ", "%20");
+
+        vollyService.getStringResponseVolley("COMPLETESTATUS", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileSetStatusCompleted?" + paramsString, appUserModel.getAuthHeaders());
+
+    }
+
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();

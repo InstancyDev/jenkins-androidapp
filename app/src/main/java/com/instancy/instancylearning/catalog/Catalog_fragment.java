@@ -78,6 +78,7 @@ import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.mainactivities.SignUp_Activity;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
@@ -129,6 +130,7 @@ import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
@@ -162,7 +164,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     Context context;
     Toolbar toolbar;
     Menu search_menu;
-    MenuItem item_search;
+    MenuItem item_search, itemWishList;
+
+    boolean isWishlisted = false;
+    int isWsh = 0;
+
     SideMenusModel sideMenusModel = null;
     String filterContentType = "", consolidationType = "all", sortBy = "", allowAddContentType = "", ddlSortList = "", ddlSortType = "";
     ResultListner resultListner = null;
@@ -373,9 +379,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 // uncomment after MCI
         sortBy = "c.publisheddate%20desc,c.name";
 
-        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList;
+        String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=200&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=" + consolidationType + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=" + queryString + "&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&ddlSortType=" + ddlSortType + "&ddlSortList=" + ddlSortList + "&iswishlistcontent=" + isWsh;
 
         vollyService.getJsonObjResponseVolley("CATALOGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+
     }
 
     public void refreshPeopleListingCatalog(String authorID) {
@@ -385,6 +392,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         String paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=" + sideMenusModel.getComponentId() + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=" + authorID;
 
         vollyService.getJsonObjResponseVolley("PEOPLELISTINGCATALOG", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
+
     }
 
     public void refreshMyCompetencyCatalog(boolean isLoadMore) {
@@ -398,7 +406,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1" + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0&fType=Skills&fValue=" + skillID;
 
         } else {
-
 
             //  FilterCondition=8,9,10,11,14,20,21,26,27,28,36,50,52,70,646,102,689,693&SortCondition=c.PublishedDate%20desc,c.name&RecordCount=200&OrgUnitID=374&userid=13608&Type=All&ComponentID=1&CartID=&Locale=en-us&SiteID=374&CategoryCompID=19&SearchText=Learning&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=3131&AuthorID=0
 
@@ -458,6 +465,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             if (isFromGlobalSearch) {
                                 catalogModelsList.addAll(generateCatalogForPeopleListing(response));
                                 totalRecordsCount = countOfTotalRecords(response);
+                                if (totalRecordsCount == 0) {
+                                    nodata_Label.setText(getResources().getString(R.string.no_data));
+                                }
                             } else {
                                 catalogModelsList = generateCatalogForPeopleListing(response);
                             }
@@ -763,23 +773,28 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             pageIndex = pageIndex + 1;
         }
 
-        if (catalogModelsList.size() > 5) {
-            if (item_search != null) {
-                item_search.setVisible(true);
-            }
-        } else {
-            if (item_search != null) {
-                item_search.setVisible(false);
-            }
+//        if (catalogModelsList.size() > 5) {
+//            if (item_search != null) {
+//                item_search.setVisible(true);
+//            }
+//        } else {
+//            if (item_search != null) {
+//                item_search.setVisible(false);
+//            }
 
-        }
+//        }
 
         triggerActionForFirstItem();
 
         membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
-    }
+        if (uiSettingsModel.isGlobasearch() && queryString.length() > 0) {
 
+            catalogAdapter.filter(queryString);
+
+        }
+
+    }
 
     public void triggerActionForFirstItem() {
 
@@ -836,6 +851,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+
+        itemWishList = menu.findItem(R.id.ctx_archive);
+        itemWishList.setVisible(true);
 
         if (isFromMyCompetency || isFromGlobalSearch) {
             item_search.setVisible(false);
@@ -910,6 +928,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             Drawable myIcon = getResources().getDrawable(R.drawable.help);
             itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
         }
+
+        if (itemWishList != null) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_heart, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWishList.setIcon(filterDrawable);
+            itemWishList.setTitle("WishList");
+
+        }
+
     }
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
@@ -953,10 +979,34 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             case R.id.mylearning_filter:
                 filterApiCall();
                 break;
-
+            case R.id.ctx_archive:
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    isWishListCall();
+                } else {
+                    showToast(context, "No Internet");
+                }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void isWishListCall() {
+
+        if (isWishlisted) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_heart, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWishList.setIcon(filterDrawable);
+            isWishlisted = false;
+            isWsh = 0;
+            pageIndex = 1;
+        } else {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_book, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWishList.setIcon(filterDrawable);
+            isWishlisted = true;
+            isWsh = 1;
+            pageIndex = 1;
+        }
+
+        refreshCatalog(true);
     }
 
 
@@ -964,6 +1014,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onRefresh() {
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             pageIndex = 1;
+            queryString = "";
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -1068,7 +1119,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
+    public void catalogContextMenuMethod(final int position, final View v, ImageButton btnselected, final MyLearningModel myLearningDetalData, final UiSettingsModel uiSettingsModel, final AppUserModel userModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -1077,12 +1128,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Menu menu = popup.getMenu();
 
-        menu.getItem(0).setVisible(false);//view
-        menu.getItem(1).setVisible(false);//add
-        menu.getItem(2).setVisible(false);//buy
-        menu.getItem(3).setVisible(false);//detail
-        menu.getItem(4).setVisible(false);//delete
-        menu.getItem(5).setVisible(false);//download
+        menu.getItem(0).setVisible(false);//view  ctx_view
+        menu.getItem(1).setVisible(false);//add   ctx_add
+        menu.getItem(2).setVisible(false);//buy    ctx_buy
+        menu.getItem(3).setVisible(false);//detail ctx_detail
+        menu.getItem(4).setVisible(false);//delete  ctx_delete
+        menu.getItem(5).setVisible(false);//download ctx_download
+        menu.getItem(6).setVisible(false);//addwishlist  ctx_addtowishlist
+        menu.getItem(7).setVisible(false);//rmwishlist  ctx_removefromwishlist
 
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
@@ -1203,71 +1256,134 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 menu.getItem(5).setVisible(true);
             }
         }
+        if (myLearningDetalData.isArchived()) {
+            menu.getItem(6).setVisible(true);//download
+        } else {
+            menu.getItem(7).setVisible(true);//download
+
+        }
+
         if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
             menu.getItem(5).setVisible(false);
         }
 
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.ctx_view:
+                        if (myLearningDetalData.getAddedToMylearning() == 0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
+                            GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-
-                    Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
-                    intentDetail.putExtra("IFROMCATALOG", true);
-                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-                    ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
-
-                }
-                if (item.getTitle().toString().equalsIgnoreCase("View")) {
-
-                    if (myLearningDetalData.getAddedToMylearning() == 0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
-                        GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
-                    } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
-
-                        GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
+                            GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
 
 
-                    } else {
-                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                    }
-                }
-                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-
-                    if (isNetworkConnectionAvailable(context, -1)) {
-                        downloadTheCourse(catalogModelsList.get(position), v, position);
-                    } else {
-                        showToast(context, "No Internet");
-                    }
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-//                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-
-                }
-                if (item.getTitle().toString().equalsIgnoreCase("Add")) {
-
-                    if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime())) {
-
-                        try {
-                            addExpiryEvets(myLearningDetalData, position);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } else {
+                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                         }
+                        break;
+                    case R.id.ctx_add:
+                        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime())) {
 
-                    } else {
-                        addToMyLearningCheckUser(myLearningDetalData, position, false);
-                    }
+                            try {
+                                addExpiryEvets(myLearningDetalData, position);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            addToMyLearningCheckUser(myLearningDetalData, position, false);
+                        }
+                        break;
+                    case R.id.ctx_buy:
+                        if (uiSettingsModel.isEnableIndidvidualPurchaseConfig() && uiSettingsModel.isEnableMemberShipConfig() && myLearningDetalData.getGoogleProductID() == null) {
+
+                            gotoMemberShipView(myLearningDetalData);
+
+                        } else {
+                            addToMyLearningCheckUser(myLearningDetalData, position, true);
+                        }
+                        break;
+                    case R.id.ctx_detail:
+                        Intent intentDetail = new Intent(getContext(), MyLearningDetail_Activity.class);
+                        intentDetail.putExtra("IFROMCATALOG", true);
+                        intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                        ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+                        break;
+                    case R.id.ctx_delete:
+
+                        break;
+                    case R.id.ctx_download:
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            downloadTheCourse(catalogModelsList.get(position), v, position);
+                        } else {
+                            showToast(context, "No Internet");
+                        }
+                        break;
+                    case R.id.ctx_addtowishlist:
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            try {
+                                addToWishListApiCall(catalogModelsList.get(position));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            showToast(context, "No Internet");
+                        }
+                        break;
+                    case R.id.ctx_removefromwishlist:
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            removeFromWishList(catalogModelsList.get(position).getContentID());
+                        } else {
+                            showToast(context, "No Internet");
+                        }
+                        break;
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
-                    addToMyLearningCheckUser(myLearningDetalData, position, true);
-
-                }
+//                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
+//
+//
+//
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase("View")) {
+//
+//
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
+//
+//
+//                }
+//
+//                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
+////                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+//
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase("Add")) {
+//
+//
+//
+//                }
+//                if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
+//
+//
+//                }
                 return true;
             }
         });
         popup.show();//showing popup menu
 
+    }
+
+
+    public void gotoMemberShipView(MyLearningModel learningModel) {
+
+        Intent intentSignup = new Intent(context, SignUp_Activity.class);
+        intentSignup.putExtra(StaticValues.KEY_SOCIALLOGIN, appUserModel.getSiteURL() + "Join/nativeapp/true/membership/true/userid/" + learningModel.getUserID() + "/siteid/" + learningModel.getSiteID());
+        intentSignup.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Membership");
+        startActivity(intentSignup);
+//        http://mayur.instancysoft.com/Sign%20Up/profiletype/selfregistration/nativeapp/true
+//        http://mayur.instancysoft.com/Join/nativeapp/true/membership/true/userid/2/siteid/374
     }
 
     public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position, boolean isInapp) {
@@ -1376,7 +1492,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
         intent.putExtra("sideMenusModel", sideMenusModel);
-        startActivity(intent);
+        startActivityForResult(intent, GLOBAL_SEARCH);
 
     }
 
@@ -1805,6 +1921,18 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
 
+        }
+
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                queryString = data.getStringExtra("queryString");
+                if (queryString.length() > 0) {
+
+                    refreshCatalog(true);
+
+                }
+
+            }
         }
 
 
@@ -2954,5 +3082,76 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
+    public void addToWishListApiCall(MyLearningModel learningModel) throws
+            JSONException {
+        String addedDate = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+        JSONObject parameters = new JSONObject();
+        parameters.put("ContentID", learningModel.getContentID());
+        parameters.put("AddedDate", addedDate);
+        parameters.put("UserID", appUserModel.getUserIDValue());
+
+        final String parameterString = parameters.toString();
+
+        String urlString = appUserModel.getWebAPIUrl() + "/Catalog/AddToWishList";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return parameterString.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
+    public void removeFromWishList(String contentID) {
+
+        //    http://angular6api.instancysoft.com/api/WishList/DeleteItemFromWishList?ContentID=d2e3b4de-94f5-42db-8806-85400cc7e3f8&instUserID=1
+
+        String paramsString = "ContentID=" + contentID + "&instUserID=" + appUserModel.getUserIDValue();
+
+        vollyService.getJsonObjResponseVolley("WISHLIST", appUserModel.getWebAPIUrl() + "/WishList/DeleteItemFromWishList?" + paramsString, appUserModel.getAuthHeaders());
+
+    }
 
 }

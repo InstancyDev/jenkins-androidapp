@@ -40,6 +40,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -49,7 +51,7 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<AskExpertAnswerModel> askExpertAnswerModelList = null;
+    private List<AskExpertAnswerModelDg> askExpertAnswerModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
@@ -58,14 +60,14 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     private String TAG = AskExpertAnswerAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<AskExpertAnswerModel> searchList;
+    private List<AskExpertAnswerModelDg> searchList;
     AppController appcontroller;
 
 
-    public AskExpertAnswerAdapter(Activity activity, int resource, List<AskExpertAnswerModel> askExpertAnswerModelList) {
+    public AskExpertAnswerAdapter(Activity activity, int resource, List<AskExpertAnswerModelDg> askExpertAnswerModelList) {
         this.activity = activity;
         this.askExpertAnswerModelList = askExpertAnswerModelList;
-        this.searchList = new ArrayList<AskExpertAnswerModel>();
+        this.searchList = new ArrayList<AskExpertAnswerModelDg>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -79,9 +81,9 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<AskExpertAnswerModel> discussionTopicModelList) {
-        this.askExpertAnswerModelList = discussionTopicModelList;
-        this.searchList = new ArrayList<AskExpertAnswerModel>();
+    public void refreshList(List<AskExpertAnswerModelDg> askExpertAnswerModelList) {
+        this.askExpertAnswerModelList = askExpertAnswerModelList;
+        this.searchList = new ArrayList<AskExpertAnswerModelDg>();
         this.searchList.addAll(askExpertAnswerModelList);
         this.notifyDataSetChanged();
     }
@@ -114,36 +116,62 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        holder.txtName.setText(askExpertAnswerModelList.get(position).respondedusername);
-        holder.txtAnsweredOn.setText("Answered on: " + askExpertAnswerModelList.get(position).responsedate);
+        holder.txtName.setText(askExpertAnswerModelList.get(position).respondedUserName);
+        holder.txtDaysAgo.setText(" Answered on: " + askExpertAnswerModelList.get(position).daysAgo);
         holder.txtMessage.setText(askExpertAnswerModelList.get(position).response + " ");
+        holder.txtTotalViews.setText(askExpertAnswerModelList.get(position).viewsCount + " Views");
+        holder.txtComments.setText("Comments " + askExpertAnswerModelList.get(position).commentCount);
+        holder.txtUpvote.setText("Upvote " + askExpertAnswerModelList.get(position).upvotesCount);
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtAnsweredOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtDaysAgo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtMessage.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtUpvote.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtDownnvote.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtTotalUpvoters.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtComment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtComments.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        if (askExpertAnswerModelList.get(position).userID.equalsIgnoreCase(askExpertAnswerModelList.get(position).respondeduserid)) {
+        if (Integer.parseInt(appUserModel.getUserIDValue()) == askExpertAnswerModelList.get(position).respondedUserId) {
             holder.btnContextMenu.setVisibility(View.VISIBLE);
         } else {
-            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);// INVISIBLE
         }
 
-        assert holder.txtUpvote != null;
-        assert holder.txtUpvote != null;
-        holder.txtUpvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_thumbs_o_up), null, null, null);
+        if (askExpertAnswerModelList.get(position).isLikedStr.equalsIgnoreCase("null")) {
+            holder.txtUpvote.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            holder.txtDownnvote.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            holder.txtUpvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_thumbs_o_up, uiSettingsModel.getAppTextColor()), null, null, null);
+            holder.txtDownnvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_thumbs_o_down, uiSettingsModel.getAppTextColor()), null, null, null);
+        } else if (askExpertAnswerModelList.get(position).isLikedStr.equalsIgnoreCase("true")) {
+            holder.txtUpvote.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+            holder.txtDownnvote.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        assert holder.txtDownnvote != null;
-        holder.txtDownnvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_thumbs_o_down), null, null, null);
+            holder.txtUpvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_thumbs_o_up, uiSettingsModel.getAppButtonBgColor()), null, null, null);
+            holder.txtDownnvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_thumbs_o_down, uiSettingsModel.getAppTextColor()), null, null, null);
+
+        } else if (askExpertAnswerModelList.get(position).isLikedStr.equalsIgnoreCase("false")) {
+            holder.txtUpvote.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+            holder.txtDownnvote.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+            holder.txtUpvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_thumbs_o_up, uiSettingsModel.getAppTextColor()), null, null, null);
+            holder.txtDownnvote.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_thumbs_o_down, uiSettingsModel.getAppButtonBgColor()), null, null, null);
+        }
+
 
         assert holder.txtComment != null;
         holder.txtComment.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_comments), null, null, null);
 
-//        assert holder.txtComments != null;
-//        holder.txtComments.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_question), null, null, null);
+        String userImgUrl = appUserModel.getSiteURL() + askExpertAnswerModelList.get(position).picture;
+        String atchimgUrl = appUserModel.getSiteURL() + askExpertAnswerModelList.get(position).userResponseImagePath;
 
+        if (isValidString(askExpertAnswerModelList.get(position).userResponseImagePath)) {
+            holder.attachedImg.setVisibility(View.VISIBLE);
+            Picasso.with(convertView.getContext()).load(atchimgUrl).placeholder(R.drawable.cellimage).into(holder.attachedImg);
+        } else {
+            holder.attachedImg.setVisibility(View.GONE);
+        }
 
-        String imgUrl = appUserModel.getSiteURL() + askExpertAnswerModelList.get(position).imageData;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+        Picasso.with(convertView.getContext()).load(userImgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 
         return convertView;
     }
@@ -154,8 +182,8 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         if (charText.length() == 0) {
             askExpertAnswerModelList.addAll(searchList);
         } else {
-            for (AskExpertAnswerModel s : searchList) {
-                if (s.response.toLowerCase(Locale.getDefault()).contains(charText) || s.respondedusername.toLowerCase(Locale.getDefault()).contains(charText)) {
+            for (AskExpertAnswerModelDg s : searchList) {
+                if (s.response.toLowerCase(Locale.getDefault()).contains(charText) || s.respondedUserName.toLowerCase(Locale.getDefault()).contains(charText)) {
                     askExpertAnswerModelList.add(s);
                 }
             }
@@ -181,12 +209,17 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         ImageView imgThumb;
 
         @Nullable
+        @BindView(R.id.attachedimg)
+        ImageView attachedImg;
+
+
+        @Nullable
         @BindView(R.id.txt_name)
         TextView txtName;
 
         @Nullable
-        @BindView(R.id.txtansweredon)
-        TextView txtAnsweredOn;
+        @BindView(R.id.txtDaysAgo)
+        TextView txtDaysAgo;
 
         @Nullable
         @BindView(R.id.txtmessage)
@@ -212,12 +245,16 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         @BindView(R.id.txtComments)
         TextView txtComments;
 
+
+        @Nullable
+        @BindView(R.id.txtTotalViews)
+        TextView txtTotalViews;
+
         @Nullable
         @BindView(R.id.txtTotalUpvoters)
         TextView txtTotalUpvoters;
 
-
-        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.txtTotalUpvoters, R.id.txtComment, R.id.txtComments})
+        @OnClick({R.id.btn_contextmenu, R.id.card_view, R.id.txtTotalUpvoters, R.id.txtComment, R.id.txtComments, R.id.txtUpvote, R.id.txtDownnvote})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

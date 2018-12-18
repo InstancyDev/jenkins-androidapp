@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_relative"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomlayout"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="*Title" />
+
+            <EditText
+                android:id="@+id/edit_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_border"
+                android:hint="Enter title here..."
+                android:maxLength="100"
+                android:maxLines="1"
+                android:padding="10dp" />
+
+            <TextView
+                android:id="@+id/txt_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="Description:" />
+
+            <EditText
+                android:id="@+id/edit_description"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@drawable/edittext_border"
+                android:gravity="top|start"
+                android:hint="Enter description here..."
+                android:maxLength="1000"
+                android:maxLines="100"
+                android:padding="10dp" />
+
+            <TextView
+                android:id="@+id/txtModerator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Moderator"
+                android:textColor="@color/colorBlack" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="42dp"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <EditText
+                    android:id="@+id/editModerator"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2.0"
+                    android:background="@drawable/edittext_border"
+                    android:enabled="false"
+                    android:padding="8dp" />
+
+                <Button
+                    android:id="@+id/btnSelect"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.0"
+                    android:text="Select"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorBlack" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/attachedimg"
+                    android:layout_width="120dp"
+                    android:layout_height="70dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="43dp"
+                    android:adjustViewBounds="true"
+                    android:background="@android:color/transparent"
+                    android:padding="2dp"
+                    android:scaleType="fitXY" />
+
+                <EditText
+                    android:id="@+id/edit_attachment"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2.0"
+                    android:background="@drawable/edittext_border"
+                    android:enabled="false"
+                    android:padding="8dp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btnUpload"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:drawableStart="@drawable/ic_menu_camera"
+                    android:onClick="actionsBottomBtns"
+                    android:padding="3dp"
+                    android:text="Upload"
+                    android:textAlignment="viewStart"
+                    android:textAllCaps="false" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/txtCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Categories"
+                android:textColor="@color/colorBlack" />
+
+            <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:background="@drawable/edit_round_drawable"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:weightSum="5"-->
+            <!--android:visibility="visible">-->
+
+            <!--<LinearLayout-->
+            <!--android:id="@+id/lltagslayout"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_weight="4.3"-->
+            <!--android:background="@drawable/edit_round_drawable"-->
+            <!--android:touchscreenBlocksFocus="false"-->
+
+            <!--android:visibility="visible">-->
+            <!--<include layout="@layout/askexpertstagslayout" />-->
+
+            <!--</LinearLayout>-->
+
+            <!--<TextView-->
+            <!--android:id="@+id/txtCategoriesCount"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight=".7"-->
+            <!--android:padding="5dp"-->
+            <!--android:visibility="gone"-->
+            <!--android:text=""-->
+            <!--android:textColor="@color/colorBlack" />-->
+
+            <!--</LinearLayout>-->
+
+            <RelativeLayout
+                android:id="@+id/tagsRelative"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:background="@drawable/edit_round_drawable"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:id="@+id/lltagslayout"
+                    android:layout_width="300dp"
+                    android:layout_height="32dp"
+                    android:touchscreenBlocksFocus="false"
+                    android:visibility="visible">
+
+                    <include layout="@layout/askexpertstagslayout" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtCategoriesName"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:text="Categories"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/clearLayout"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/txtCategoriesCount"
+                        android:layout_width="40dp"
+                        android:layout_height="match_parent"
+                        android:padding="2dp"
+                        android:text=""
+                        android:textColor="@color/colorBlack"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/txtCategoriesClear"
+                        android:layout_width="60dp"
+                        android:layout_height="match_parent"
+                        android:padding="2dp"
+                        android:text="Clear"
+                        android:textColor="@color/colorBlack"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/txtSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Settings"
+                android:textColor="@color/colorBlack" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:weightSum="3">
+
+                <Switch
+                    android:id="@+id/swtchnewtopic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Allow users to create new topic" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:padding="15dp" />
+
+                <Switch
+                    android:id="@+id/switchattachfiles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Allow users to attach files with posts" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:padding="15dp" />
+
+                <Switch
+                    android:id="@+id/switchemailnotifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Send email notification to users for new topics " />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:padding="10dp" />
+
+                <Switch
+                    android:id="@+id/switchLikeorComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Allow users to like a topic or comment" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:padding="15dp" />
+
+                <Switch
+                    android:id="@+id/switchShare"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Allow users to share with connections or people" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:padding="15dp" />
+
+                <Switch
+                    android:id="@+id/switchPintopic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Allow users to pin the topic" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:padding="10dp" />
+
+                <TextView
+                    android:id="@+id/txtPrivacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Privacy"
+                    android:textColor="@color/colorBlack" />
+
+                <Switch
+                    android:id="@+id/switchPrivacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:checked="true"
+                    android:padding="10dp"
+                    android:switchPadding="10dp"
+                    android:text="Private Forum" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottomlayout"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/txtcancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="actionsBottomBtns"
+            android:text="Cancel"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite" />
+
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorWhite" />
+
+        <TextView
+            android:id="@+id/txtsave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="actionsBottomBtns"
+            android:text="Create"
+            android:textAlignment="center"
+            android:textColor="@color/colorWhite" />
+
+    </LinearLayout>
+
+</RelativeLayout>

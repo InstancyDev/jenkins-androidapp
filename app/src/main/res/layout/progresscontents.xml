@@ -40,7 +40,7 @@
                 android:layout_alignParentTop="true"
                 android:gravity="center"
                 android:padding="3dp"
-                android:text="21"
+                android:text="0"
                 android:textColor="@color/black"
                 android:textSize="70dp" />
 

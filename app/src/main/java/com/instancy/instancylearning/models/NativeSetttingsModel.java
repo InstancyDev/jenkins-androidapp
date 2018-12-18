@@ -51,7 +51,6 @@ public class NativeSetttingsModel {
     public static HashMap<String, List<String>> getFilterData() {
         HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
 
-
         List<String> filtersBy = new ArrayList<String>();
         filtersBy.add("Source ");
         filtersBy.add("Type ");

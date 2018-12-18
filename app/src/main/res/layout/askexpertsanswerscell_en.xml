@@ -24,25 +24,6 @@
             android:orientation="horizontal"
             android:weightSum="4">
 
-            <RelativeLayout
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:padding="2dp">
-
-                <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/imagethumb"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_gravity="center"
-                    android:background="@drawable/user_placeholder"
-                    app:civ_border_color="@color/colorWhite"
-                    app:civ_border_width="1dp" />
-
-
-            </RelativeLayout>
-
 
             <RelativeLayout
                 android:id="@+id/relattitle"
@@ -50,8 +31,29 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3.8">
 
+                <RelativeLayout
+                    android:id="@+id/profileImgLay"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:padding="2dp">
+
+                    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/imagethumb"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_gravity="center"
+                        android:background="@drawable/user_placeholder"
+                        app:civ_border_color="@color/colorWhite"
+                        app:civ_border_width="1dp" />
+
+
+                </RelativeLayout>
+
 
                 <LinearLayout
+                    android:layout_toRightOf="@+id/profileImgLay"
                     android:id="@+id/username_lyt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -78,10 +80,10 @@
 
 
                     <TextView
-                        android:layout_marginTop="0dp"
-                        android:id="@+id/txtAskedWhen"
+                        android:id="@+id/txtDaysAgo"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="0dp"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:lineSpacingExtra="1dp"
@@ -91,7 +93,6 @@
                         android:textColor="@color/colorDarkGrey"
                         android:textSize="10sp"
                         android:visibility="visible" />
-
 
                 </LinearLayout>
 
@@ -117,20 +118,35 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/txtansweredon"
+                    android:layout_marginLeft="36dp"
+                    android:text="jhgiasdgvijsadgfnsjliadgnflaksj gnkdjasng ikn gasjksdagnf"
                     android:ellipsize="end"
                     android:gravity="left"
                     android:maxLines="100"
                     android:padding="2dp"
-                    android:text="asdakjhkjnf ahfkjaldnfkjahf nahfjnafiuhn  a filuh nlkajhfn lijkanfliu hoian ,kjniuh  iu 9isn lksbuisdhn skjnsiufh ;onkj"
                     android:textColor="@color/colorGray"
                     android:textSize="12sp" />
 
+                <ImageView
+                    android:layout_marginLeft="30dp"
+
+                    android:id="@+id/attachedimg"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_below="@+id/txtmessage"
+                    android:adjustViewBounds="true"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:padding="2dp"
+                    android:src="@drawable/cellimage" />
 
                 <LinearLayout
                     android:id="@+id/activites_lyt"
+                    android:layout_marginLeft="6dp"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/txtmessage"
+                    android:layout_below="@+id/attachedimg"
                     android:orientation="horizontal"
                     android:padding="2dp">
 
@@ -139,10 +155,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="6 Views "
+                        android:text="0 Views"
                         android:textAlignment="viewStart"
                         android:textColor="@color/colorBlack"
-                        android:textSize="10sp" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -151,7 +167,7 @@
                         android:text="  |  "
                         android:textAlignment="center"
                         android:textColor="@color/colorBlack"
-                        android:textSize="10sp" />
+                        android:textSize="12sp" />
 
 
                     <TextView
@@ -162,8 +178,7 @@
                         android:text="View Upvoters"
                         android:textAlignment="viewStart"
                         android:textColor="@color/colorBlack"
-                        android:textSize="10sp" />
-
+                        android:textSize="13sp" />
 
                 </LinearLayout>
 
@@ -174,7 +189,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/activites_lyt"
                     android:orientation="horizontal"
-                    android:padding="2dp"
+                    android:padding="1dp"
                     android:weightSum="4">
 
                     <TextView
@@ -192,7 +207,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="| "
+                        android:text="|"
                         android:textAlignment="center"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
@@ -204,7 +219,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.2"
                         android:gravity="center"
-                        android:text="Downvote 0"
+                        android:text="Downvote"
                         android:textAlignment="viewStart"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
@@ -213,7 +228,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="| "
+                        android:text="|"
                         android:textAlignment="center"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
@@ -233,7 +248,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="| "
+                        android:text="|  "
                         android:textAlignment="center"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />
@@ -244,7 +259,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight=".9"
                         android:gravity="center"
-                        android:text="Comments 1"
+                        android:text="Comments"
                         android:textAlignment="viewStart"
                         android:textColor="@color/colorBlack"
                         android:textSize="10sp" />

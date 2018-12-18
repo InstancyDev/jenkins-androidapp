@@ -172,6 +172,8 @@
             android:name=".askexpert.AskQuestionActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!-- enached-->
+
         <activity
             android:name=".askexpertenached.AskExpertsAnswersActivity"
             android:screenOrientation="portrait"></activity>
@@ -188,6 +190,48 @@
         <activity
             android:name=".askexpertenached.AskExpertsCommentsActivity"
             android:screenOrientation="portrait"></activity>
+
+        <!--enached discussion forum-->
+
+        <activity
+            android:name=".discussionfourmsenached.DiscussionTopicActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".discussionfourmsenached.DiscussionCommentsActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".discussionfourmsenached.DiscussionRepliesActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".discussionfourmsenached.CreateNewForumActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".discussionfourmsenached.DiscussionModeratorListActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".discussionfourmsenached.CreateNewTopicActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".discussionfourmsenached.AddNewCommentActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".discussionfourmsenached.AddReplyActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".discussionfourmsenached.DiscussionforumCategories"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
 
         <activity
@@ -239,8 +283,14 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name=".globalsearch.GlobalSearchActivity"
+            android:name=".myskills.MySkillsAddListActivity"
             android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".globalsearch.GlobalSearchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
 
         <activity
@@ -250,6 +300,12 @@
         <activity
             android:name=".globalsearch.GlobalCatalogActivity"
             android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".progressreports.ProgressReportsActivity"
+            android:screenOrientation="portrait"></activity>
+
 
         <!-- Push Notification  issue icon -->
 

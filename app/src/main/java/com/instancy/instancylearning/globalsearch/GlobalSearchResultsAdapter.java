@@ -38,7 +38,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.getFirstCaseWords;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 10/10/2017 Working on Instancy-Playground-Android.
@@ -68,7 +70,6 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         this.expandableListTitle = expandableListTitle;
         this.notifyDataSetChanged();
     }
-
 
     @Override
     public int getGroupCount() {
@@ -139,7 +140,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         final ViewHolder holder;
         if (vi == null) {
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            vi = inflater.inflate(R.layout.globalsearchresultitem, null);
+            vi = inflater.inflate(R.layout.globalsearchresultitem_en, null);
             holder = new ViewHolder(vi);
             holder.childPosition = childPosition;
             holder.groupPosition = groupPosition;
@@ -154,27 +155,25 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
 
         holder.cellView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtTitle.setText(expandedListText.name);
-        holder.txtCourse.setText(expandedListText.contenttype);
-        holder.txtShortDesc.setText(expandedListText.shortdescription);
-        holder.txtLongDesc.setText(expandedListText.longdescription);
-        holder.txtAuthor.setText(expandedListText.authordisplayname);
+
+        if (isValidString(expandedListText.authordisplayname)) {
+            holder.txtAuthor.setText("Author Name: " + expandedListText.authordisplayname);
+        } else {
+            holder.txtAuthor.setText(expandedListText.sitename);
+        }
+
 
         holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtCourse.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtShortDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtLongDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtAvaSeats.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCreatedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtStartDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtEndDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtAskedby.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtdateCreated.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtFotor.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         holder.txtFotor.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        holder.txtTitle.setFocusable(false);
 
-        if (expandedListText.longdescription.length() == 0 || expandedListText.longdescription == null) {
-            holder.txtLongDesc.setVisibility(View.GONE);
-        }
-        if (expandedListText.shortdescription.length() == 0 || expandedListText.shortdescription == null) {
-            holder.txtShortDesc.setVisibility(View.GONE);
-        }
+        holder.txtTitle.setFocusable(false);
 
         holder.ratingBar.setRating(expandedListText.ratingid);
 
@@ -211,57 +210,76 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         }
         String imgUrl = appUserModel.getSiteURL() + "/Content/SiteFiles/Images/" + expandedListText.contenttypethumbnail;
 
+
         switch (expandedListText.contextMenuId) {
             case 1:// mylearning
-                holder.txtAvaSeats.setVisibility(View.GONE);
-                holder.txtAutLine.setVisibility(View.GONE);
+                holder.txtStartDate.setVisibility(View.GONE);
+                holder.txtCreatedOn.setVisibility(View.GONE);
+                holder.txtEndDate.setVisibility(View.GONE);
+                holder.txtEndDate.setVisibility(View.GONE);
+                holder.txtdateCreated.setText("Date Created :" + expandedListText.createddate);
+                holder.txtAskedby.setText("Content type: " + expandedListText.contenttype);
                 break;
             case 2://catalog
-                holder.txtAvaSeats.setVisibility(View.GONE);
-                holder.txtAutLine.setVisibility(View.GONE);
+                holder.txtStartDate.setVisibility(View.GONE);
+                holder.txtCreatedOn.setVisibility(View.GONE);
+                holder.txtEndDate.setVisibility(View.GONE);
+                holder.txtdateCreated.setText("Date Created :" + expandedListText.createddate);
+                holder.txtAskedby.setText("Content type: " + expandedListText.contenttype);
                 break;
             case 8:// events
-                holder.txtAvaSeats.setText("Avaliable Seats :" + expandedListText.availableseats);
+                holder.txtCreatedOn.setVisibility(View.GONE);
+                holder.txtdateCreated.setVisibility(View.GONE);
+                holder.txtdateCreated.setText("Date Created :" + expandedListText.createddate);
+                holder.txtAskedby.setText("Content type: " + expandedListText.contenttype);
+
+                holder.txtEndDate.setText("End date:" + expandedListText.eventenddatedisplay);
+                String fromStartDate = convertToEventDisplayDateFormat(expandedListText.eventstartdatedisplay, "yyyy-MM-dd hh:mm:ss");
+
+                String fromEndDate = convertToEventDisplayDateFormat(expandedListText.eventenddatedisplay, "yyyy-MM-dd hh:mm:ss");
+
+                holder.txtStartDate.setText("Start date:" + fromStartDate);
+
+                holder.txtEndDate.setText("End date:" + fromEndDate);
+
+                holder.txtAuthor.setText("Facilitator :" + expandedListText.authordisplayname);
+//                holder.txtAskedby.setText("Avaliable Seats :" + expandedListText.availableseats);
                 break;
             case 4://Discussion forum
                 holder.ratingBar.setVisibility(View.GONE);
-                holder.txtLongDesc.setVisibility(View.GONE);
-                holder.txtAvaSeats.setVisibility(View.GONE);
-                holder.txtSiteName.setVisibility(View.GONE);
-                holder.txtSiteLine.setVisibility(View.GONE);
-                holder.txtAutLine.setVisibility(View.GONE);
-                holder.txtLongDesc.setVisibility(View.GONE);
-                holder.txtShortDesc.setVisibility(View.GONE);
-                if (expandedListText.objecttypeid == 17) {
-                    holder.txtTitle.setText("Discussion topic: " + expandedListText.name);
-                } else {
-                    holder.txtTitle.setText("Discussion forum: " + expandedListText.name);
+                holder.txtStartDate.setVisibility(View.GONE);
+                holder.txtCreatedOn.setVisibility(View.GONE);
+                holder.txtEndDate.setVisibility(View.GONE);
+                holder.txtAskedby.setVisibility(View.GONE);
+                if (expandedListText.objecttypeid == 17) { // topic
+                    holder.txtAuthor.setText("Posted By : " + expandedListText.authordisplayname);
+                    holder.txtdateCreated.setText("Date created: " + expandedListText.createddate);
+                } else {  // forum
+
+                    holder.txtAuthor.setText("Moderator :" + expandedListText.authordisplayname);
+                    holder.txtdateCreated.setText("Date created: " + expandedListText.createddate);
                 }
                 break;
             case 5:// askexpert
                 holder.ratingBar.setVisibility(View.GONE);
-                holder.txtLongDesc.setVisibility(View.GONE);
-                holder.txtAvaSeats.setVisibility(View.GONE);
-                holder.txtSiteName.setVisibility(View.GONE);
-                holder.txtSiteLine.setVisibility(View.GONE);
-                holder.txtAutLine.setVisibility(View.GONE);
-                holder.txtAuthor.setText("Asked by: " + expandedListText.authordisplayname + " ");
-                holder.txtShortDesc.setText("Asked on: " + expandedListText.createddate + " ");
+                holder.txtAuthor.setVisibility(View.GONE);
+                holder.txtStartDate.setVisibility(View.GONE);
+                holder.txtEndDate.setVisibility(View.GONE);
+                holder.txtCreatedOn.setVisibility(View.GONE);
+                holder.txtAskedby.setText("Asked by: " + expandedListText.authordisplayname + " ");
+                holder.txtdateCreated.setText("Date created: " + expandedListText.createddate + " ");
                 break;
             case 10:// people listing
-                holder.txtAvaSeats.setVisibility(View.GONE);
-                holder.txtSiteName.setVisibility(View.GONE);
-                holder.txtSiteLine.setVisibility(View.GONE);
-                holder.txtAutLine.setVisibility(View.GONE);
                 holder.ratingBar.setVisibility(View.GONE);
-                holder.txtLongDesc.setVisibility(View.GONE);
+                holder.txtStartDate.setVisibility(View.GONE);
+                holder.txtEndDate.setVisibility(View.GONE);
+                holder.txtCreatedOn.setVisibility(View.GONE);
+                holder.txtdateCreated.setVisibility(View.GONE);
 //                imgUrl = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + expandedListText.contenttypethumbnail;
-
                 break;
             default:
                 holder.ratingBar.setVisibility(View.GONE);
-                holder.txtAvaSeats.setVisibility(View.GONE);
-                holder.txtAutLine.setVisibility(View.GONE);
+
         }
 
 
@@ -309,34 +327,43 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         @BindView(R.id.imagethumb)
         ImageView imageThumb;
 
-        @Nullable
-        @BindView(R.id.txt_title_name)
-        TextView txtTitle;
-
-        @Nullable
-        @BindView(R.id.txt_coursename)
-        TextView txtCourse;
-
-        @Nullable
-        @BindView(R.id.txtShortDesc)
-        TextView txtShortDesc;
-
-        @Nullable
-        @BindView(R.id.txtLongDesc)
-        TextView txtLongDesc;
-
-        @Nullable
-        @BindView(R.id.txt_author)
-        TextView txtAuthor;
-
 
         @Nullable
         @BindView(R.id.cellview)
         LinearLayout cellView;
 
+        @Nullable
+        @BindView(R.id.txt_title_name)
+        TextView txtTitle;
 
         @Nullable
-        @BindView(R.id.rat_adapt_ratingbar)
+        @BindView(R.id.txtAuthor)
+        TextView txtAuthor;
+
+        @Nullable
+        @BindView(R.id.txtCreatedOn)
+        TextView txtCreatedOn;
+
+        @Nullable
+        @BindView(R.id.txtStartDate)
+        TextView txtStartDate;
+
+        @Nullable
+        @BindView(R.id.txtEndDate)
+        TextView txtEndDate;
+
+
+        @Nullable
+        @BindView(R.id.txtAskedby)
+        TextView txtAskedby;
+
+        @Nullable
+        @BindView(R.id.txtdateCreated)
+        TextView txtdateCreated;
+
+
+        @Nullable
+        @BindView(R.id.ratingBar)
         RatingBar ratingBar;
 
 
@@ -344,21 +371,6 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
         @BindView(R.id.footortxt)
         TextView txtFotor;
 
-        @Nullable
-        @BindView(R.id.txt_avaliableseats)
-        TextView txtAvaSeats;
-
-        @Nullable
-        @BindView(R.id.txt_sitename)
-        TextView txtSiteName;
-
-        @Nullable
-        @BindView(R.id.txt_lineatcoursename)
-        TextView txtAutLine;
-
-        @Nullable
-        @BindView(R.id.txt_linesitename)
-        TextView txtSiteLine;
 
         @Nullable
         @BindView(R.id.btn_contextmenu)

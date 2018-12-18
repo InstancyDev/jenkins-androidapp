@@ -32,6 +32,17 @@
         android:orderInCategory="100"
         android:title="Download" />
 
+    <item
+        android:id="@+id/ctx_addtowishlist"
+        android:orderInCategory="100"
+        android:title="@string/catalog_actionsheet_addtowishlist"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/ctx_removefromwishlist"
+        android:orderInCategory="100"
+        android:title="@string/catalog_actionsheet_removefromwishlist"
+        android:visible="false" />
 
 </menu>
 

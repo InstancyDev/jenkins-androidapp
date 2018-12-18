@@ -86,6 +86,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -547,6 +548,10 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
 
+        if (isFromGlobalSearch) {
+            item_search.setVisible(false);
+        }
+
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -600,7 +605,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
             Intent intent = new Intent(context, GlobalSearchActivity.class);
             intent.putExtra("sideMenusModel", sideMenusModel);
-            startActivity(intent);
+            startActivityForResult(intent, GLOBAL_SEARCH);
 
         }
 
@@ -654,6 +659,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
+            queryString="";
             refreshCatalog(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -766,6 +772,18 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                 }
             }
         }
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                queryString = data.getStringExtra("queryString");
+                if (queryString.length() > 0) {
+
+                    refreshCatalog(true);
+
+                }
+
+            }
+        }
+
     }
 
     public void attachFragment(DiscussionForumModel forumModel, boolean isFromNotification) {

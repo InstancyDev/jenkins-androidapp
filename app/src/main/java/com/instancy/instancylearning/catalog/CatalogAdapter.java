@@ -378,12 +378,10 @@ public class CatalogAdapter extends BaseAdapter {
 
 
         }
-        if (uiSettingsModel.getCatalogContentDownloadType().
-
-                equalsIgnoreCase("0"))
-
-        {
+        if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+//            if (myLearningModel.get(position).getViewType().equalsIgnoreCase("3") && myLearningModel.get(position).getAddedToMylearning() != 0) {
             holder.btnDownload.setVisibility(View.GONE);
+//            }
         }
         return vi;
     }
@@ -606,6 +604,7 @@ public class CatalogAdapter extends BaseAdapter {
 
         this.notifyDataSetChanged();
     }
+
     public void filterByObjTypeId(JSONObject filterBy) {
 
         String contentType = filterBy.optString("contentype");
@@ -739,12 +738,16 @@ public class CatalogAdapter extends BaseAdapter {
 
                 }
 
+                @Override
+                public void addToArchive(boolean added) {
+
+                }
+
             };
         }
 
         @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.card_view})
         public void actionsForMenu(View view) {
-
 
             ((ListView) parent).performItemClick(view, getPosition, 0);
 

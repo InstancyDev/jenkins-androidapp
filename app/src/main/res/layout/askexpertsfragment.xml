@@ -36,24 +36,24 @@
         android:orientation="horizontal"
         android:weightSum="2">
 
-
         <TextView
-            android:textStyle="bold"
-            android:layout_weight="1"
             android:id="@+id/skillTxt"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="3"
             android:gravity="center"
             android:padding="2dp"
             android:text="All"
             android:textAlignment="center"
             android:textColor="@color/colorBlack"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/sortbyTxt"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
             android:padding="2dp"

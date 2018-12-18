@@ -41,7 +41,7 @@ import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.discussionfourms.DiscussionFourm_fragment;
+import com.instancy.instancylearning.discussionfourmsenached.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment_new;
 import com.instancy.instancylearning.gameficitation.LeaderboardFragment;
 import com.instancy.instancylearning.gameficitation.MyAchivementsFragment;
@@ -59,6 +59,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.MyCompetencyFragment;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.myskills.MySkillFragment;
 import com.instancy.instancylearning.notifications.Notifications_fragment;
 import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
@@ -584,7 +585,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case 3:
                 fragment = new Profile_fragment();
-//                fragment = new LeaderboardFragment();
                 break;
             case 7:
                 fragment = new Webpage_fragment();
@@ -597,21 +597,26 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 fragment = new Event_fragment_new();
                 break;
             case 4:
-                fragment = new DiscussionFourm_fragment();
+//                fragment = new DiscussionFourm_fragment();
+                fragment = new com.instancy.instancylearning.discussionfourmsenached.DiscussionFourm_fragment();
                 break;
             case 5:
-//                fragment = new com.instancy.instancylearning.askexpertenached.AskExpertFragment();
-                fragment = new AskExpertFragment();
+                fragment = new com.instancy.instancylearning.askexpertenached.AskExpertFragment();
+//                fragment = new AskExpertFragment();
                 break;
             case 9:
-//                fragment = new MyAchivementsFragment(); //
                 fragment = new LearningCommunities_fragment();
                 break;
             case 10:
                 fragment = new PeopleListing_fragment();
+//                fragment = new MyAchivementsFragment();
                 break;
             case 11:
-                fragment = new MyCompetencyFragment();
+                if (uiSettingsModel.isEnableSkillstobeMappedwithJobRoles()) {
+                    fragment = new MyCompetencyFragment();
+                } else {
+                    fragment = new MySkillFragment();
+                }
                 break;
             case 12:
                 fragment = new LeaderboardFragment();
@@ -758,7 +763,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             } else {
 
             }
-
         }
     }
 

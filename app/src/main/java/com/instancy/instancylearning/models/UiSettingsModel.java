@@ -42,6 +42,38 @@ public class UiSettingsModel {
 //
 //    private String defaultTextColor = "#ffffff";
 
+
+    public boolean isEnableSkillstobeMappedwithJobRoles() {
+        return enableSkillstobeMappedwithJobRoles;
+    }
+
+    public void setEnableSkillstobeMappedwithJobRoles(boolean enableSkillstobeMappedwithJobRoles) {
+        this.enableSkillstobeMappedwithJobRoles = enableSkillstobeMappedwithJobRoles;
+    }
+
+    public boolean enableSkillstobeMappedwithJobRoles;
+
+    public boolean isEnableMemberShipConfig() {
+        return enableMemberShipConfig;
+    }
+
+    public void setEnableMemberShipConfig(boolean enableMemberShipConfig) {
+        this.enableMemberShipConfig = enableMemberShipConfig;
+    }
+
+    public boolean isEnableIndidvidualPurchaseConfig() {
+        return enableIndidvidualPurchaseConfig;
+    }
+
+    public void setEnableIndidvidualPurchaseConfig(boolean enableIndidvidualPurchaseConfig) {
+        this.enableIndidvidualPurchaseConfig = enableIndidvidualPurchaseConfig;
+    }
+
+    private boolean enableMemberShipConfig = false;
+
+    private boolean enableIndidvidualPurchaseConfig = false;
+
+
     public String getAutoLaunchMyLearningFirst() {
         return autoLaunchMyLearningFirst;
     }
@@ -249,7 +281,6 @@ public class UiSettingsModel {
     private String nativeAppType = "";
 
     private String autodownloadsizelimit = "";
-
 
     private String firstTarget = "";
     private String secondTarget = "";

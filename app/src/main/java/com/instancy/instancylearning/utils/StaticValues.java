@@ -120,6 +120,8 @@ public class StaticValues {
 
     public static final int FORUM_CREATE_NEW_FORUM = 2111;
 
+    public static final int GALLERYCLOSED = 8888;
+
     public static final int INNER_FILTER_CLOSE = 2121;
 
     public static final int COURSE_CLOSE_FROM_WEBSCREEN_CODE = 8888;
@@ -129,6 +131,9 @@ public class StaticValues {
     public static final int EDUCATION_ACT = 1010;
 
     public static final int EXPERIENCE_ACT = 10101;
+
+
+    public static final int GLOBAL_SEARCH = 1001;
 
     /**
      * Start course launch activity of media content for result with this code.
@@ -312,10 +317,54 @@ public class StaticValues {
 
     public static int REPORTPREVILAGEID = 1072;
 
+    public static int PRIVATEPREVILAGEISALLOWED = 1055;
 
     public static int ASKEXPERTPREVILAGEID = 1273;
+
+    public static int REPLYTOQUESTION = 980;
+
+    public static int CREATEFORUM = 434;
+
+    public static int DELETEFORUM = 436;
+
+    public static int EDITFORUM = 457;
+
+
+    public static int DELETETOPIC = 441;
+
+    public static int EDITTOPIC = 437;
+
+    public static int CREATETOPIC = 435;
 
 
     /// all app configurations
 
+
+//    enum UserPrivileges : Int {
+//
+//        case CreateForum = 434
+//        case EditForum = 457
+//        case DeleteForum = 436
+//
+//        case CreateTopic = 435
+//        case EditTopic = 437
+//        case DeleteTopic = 441
+//        case MoveTopic = 438
+//
+//        case CreateReply = 439
+//        case EditReply = 709
+//        case DeleteReply = 710
+//
+//        case DeleteQuestion = 979
+//        case ReplyQuestion = 980
+//
+//        case CatalogDeleteDownload = 1165
+//        case CatalogShareContent = 1166
+//        case MyLearningDeleteDownload = 1167
+//        case MyLearningShareContent = 1168
+//
+//        case ShowReportButton = 1072
+//
+//    }
+//
 }

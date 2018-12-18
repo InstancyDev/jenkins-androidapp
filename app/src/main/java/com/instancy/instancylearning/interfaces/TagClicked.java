@@ -6,6 +6,6 @@ package com.instancy.instancylearning.interfaces;
 
 public interface TagClicked {
 
-    void tagClickedInterface();
+    void tagClickedInterface(String skillName);
 
 }

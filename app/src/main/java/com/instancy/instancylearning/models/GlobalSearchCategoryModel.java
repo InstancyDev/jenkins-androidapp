@@ -80,10 +80,6 @@ public class GlobalSearchCategoryModel implements Serializable {
 
                 }
 
-
-//                HashMap<String, List<GlobalSearchCategoryModel>> studlistGrouped =
-//                        studlist.stream().collect(Collectors.groupingBy(w -> w.stud_location));
-
                 for (GlobalSearchCategoryModel globalSearchCategoryModel : advancedFilterModelList) {
                     String siteName = globalSearchCategoryModel.siteName;
                     if (expandableListDetail.containsKey(siteName)) {

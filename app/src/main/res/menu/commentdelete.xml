@@ -2,10 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
+
+
     <item
         android:id="@+id/ctx_delete"
         android:orderInCategory="100"
         android:title="Delete" />
+
+    <item
+        android:id="@+id/ctx_edit"
+        android:visible="false"
+        android:orderInCategory="100"
+        android:title="Edit" />
 
 
 </menu>

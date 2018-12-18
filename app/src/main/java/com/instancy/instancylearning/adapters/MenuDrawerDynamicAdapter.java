@@ -171,11 +171,11 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
             expTxtIcon.setText(pView.getResources().getString(R.string.fa_icon_angle_up));
         } else {
 
-            if (parentPosition % 2 == 0) {
-                pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-            } else {
+//            if (parentPosition % 2 == 0) {
+//                pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//            } else {
                 pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
-            }
+//            }
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             expTxtIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
@@ -347,13 +347,13 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
                 fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             } else {
-                if (parentPosition % 2 == 0) {
+//                if (parentPosition % 2 == 0) {
                     cView.setBackgroundColor(Color
                             .parseColor(uiSettingsModel.getMenuBGColor()));
-                } else {
-                    cView.setBackgroundColor(Color
-                            .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
-                }
+//                } else {
+//                    cView.setBackgroundColor(Color
+//                            .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
+//                }
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
                 fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             }

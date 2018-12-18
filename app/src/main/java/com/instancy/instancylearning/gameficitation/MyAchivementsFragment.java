@@ -46,6 +46,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.Ach_UserBadges;
 import com.instancy.instancylearning.models.Ach_UserLevel;
 import com.instancy.instancylearning.models.Ach_UserOverAllData;
@@ -56,10 +57,9 @@ import com.instancy.instancylearning.models.GamificationModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mycompetency.CompetencyCatSkillActivity;
-import com.instancy.instancylearning.mycompetency.CompetencyJobRoleAdapter;
-import com.instancy.instancylearning.mycompetency.CompetencyJobRoles;
+import com.instancy.instancylearning.mycompetency.OtherGameModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -67,7 +67,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -76,13 +75,14 @@ import butterknife.ButterKnife;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 /**
  * Created by Upendranath on 5/19/2017.
  */
 
-public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
 
     String TAG = MyAchivementsFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -98,6 +98,12 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
     @BindView(R.id.achivmentexpandlist)
     ExpandableListView achExpandList;
 
+    @BindView(R.id.otherGamesListView)
+    ListView otherGamesListView;
+
+    OtherGamesAdapter otherGamesAdapter;
+
+    List<OtherGameModel> otherGameModelList = null;
 
     @Nullable
     @BindView(R.id.spnrGame)
@@ -113,6 +119,26 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
     @Nullable
     @BindView(R.id.achivmentheader)
     RelativeLayout achiveheader;
+
+    @Nullable
+    @BindView(R.id.otherGamesHeader)
+    RelativeLayout otherGamesHeader;
+
+    @Nullable
+    @BindView(R.id.txtCredits)
+    TextView txtCredits;
+
+    @Nullable
+    @BindView(R.id.txtCertificate)
+    TextView txtCertificate;
+
+    @Nullable
+    @BindView(R.id.lbCredits)
+    TextView lbCredits;
+
+    @Nullable
+    @BindView(R.id.lbCertificate)
+    TextView lbCertificate;
 
     @Nullable
     @BindView(R.id.imageachived)
@@ -190,6 +216,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         if (!isRefreshed) {
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
+//        String urlStr = appUserModel.getWebAPIUrl() + "/Mobilelms/GetGameList";
         String urlStr = appUserModel.getWebAPIUrl() + "/LeaderBoard/GetGameList";
 
         JSONObject parameters = new JSONObject();
@@ -197,11 +224,16 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         //mandatory
 
         try {
+
             parameters.put("Locale", "en-us");
             parameters.put("SiteID", appUserModel.getSiteIDValue());
             parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
             parameters.put("ComponentID", sideMenusModel.getComponentId());
             parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("LeaderByGroup", "");
+            parameters.put("GameID", -1);
+            parameters.put("fromAchievement", true);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -212,6 +244,14 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     }
 
+    public void getAchivmentsByGameIDForOther(String gameID) {
+
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MyAchievementr/MyCreditCertificate?UserID=" + appUserModel.getUserIDValue();
+
+        vollyService.getJsonObjResponseVolley("ACHIVBOARDOTHER", urlStr, appUserModel.getAuthHeaders());
+
+    }
 
     public void getAchivmentsByGameID(String gameID) {
 
@@ -220,19 +260,22 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         JSONObject parameters = new JSONObject();
 
+//,,,jsonobject = Optional(["GameID": 1, "UserID": "1", "ComponentID": 293, "SiteID": "374", "Locale": "en-us", "ComponentInsID": 4202])
 
         try {
             parameters.put("Locale", "en-us");
             parameters.put("SiteID", appUserModel.getSiteIDValue());
-            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
-            parameters.put("ComponentID", sideMenusModel.getComponentId());
+//            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+//            parameters.put("ComponentID", sideMenusModel.getComponentId());
             parameters.put("GameID", gameID);
             parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("ComponentInsID", 4202);
+            parameters.put("ComponentID", 293);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         String parameterString = parameters.toString();
-
+        Log.d(TAG, "getAchivmentsByGameID: " + parameters);
 
         vollyService.getStringResponseFromPostMethod(parameterString, "ACHIVBOARD", urlStr);
 
@@ -245,6 +288,24 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             public void notifySuccess(String requestType, JSONObject response) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
+
+                if (requestType.equalsIgnoreCase("ACHIVBOARDOTHER")) {
+
+                    if (response != null && response.length() > 0) {
+
+                        Log.d(TAG, requestType + " : " + response);
+                        try {
+                            otherGamesListView.setVisibility(View.VISIBLE);
+                            achExpandList.setVisibility(View.GONE);
+                            achiveheader.setVisibility(View.GONE);
+                            otherGamesHeader.setVisibility(View.VISIBLE);
+                            otherGamesAdapter.refreshList(generateOtherModellist(response));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -274,7 +335,12 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                                 db.injectGameslist(jsonArray);
                                 JSONObject object = jsonArray.getJSONObject(0);
                                 gameId = object.getString("GameID");
-                                getAchivmentsByGameID(gameId);
+//                                getAchivmentsByGameID(gameId);
+                                if (gameId.equalsIgnoreCase("-1"))
+                                    getAchivmentsByGameIDForOther(gameId);
+                                else
+                                    getAchivmentsByGameID(gameId);
+
                                 updateGameSpinner();
                             } else {
                                 svProgressHUD.dismiss();
@@ -321,6 +387,57 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         };
     }
 
+    public List<OtherGameModel> generateOtherModellist(JSONObject response) throws JSONException {
+        List<OtherGameModel> otherGameModellocList = new ArrayList<>();
+        otherGameModelList = new ArrayList<>();
+
+        JSONArray jsonArray = response.getJSONArray("Table");
+
+        if (jsonArray != null && jsonArray.length() > 0) {
+            for (int j = 0; j < jsonArray.length(); j++) {
+                JSONObject columnObj = jsonArray.getJSONObject(j);
+
+                OtherGameModel otherGameModel = new OtherGameModel();
+                otherGameModel.contentID = columnObj.optString("ContentID");
+                otherGameModel.name = columnObj.optString("Name");
+                otherGameModel.decimal2 = columnObj.optDouble("Decimal2");
+                otherGameModel.certificateID = columnObj.optString("CertificateID");
+                otherGameModel.coreLessonStatus = columnObj.optString("CoreLessonStatus");
+                otherGameModel.scoreRaw = columnObj.optString("ScoreRaw");
+                otherGameModel.certificatePercentage = columnObj.optString("CertificatePercentage");
+                otherGameModel.certificatePage = columnObj.optString("CertificatePage");
+                otherGameModel.certifyviewlink = columnObj.optString("certifyviewlink");
+                otherGameModel.certifycountwebapilevel = columnObj.optInt("certifycountwebapilevel");
+                otherGameModellocList.add(otherGameModel);
+                otherGameModelList.add(otherGameModel);
+            }
+
+        }
+
+        JSONArray jsonArray1 = response.getJSONArray("Table1");
+
+        JSONArray jsonArray2 = response.getJSONArray("Table2");
+
+        String creditScore = "0", certificates = "0";
+
+        if (jsonArray1 != null && jsonArray1.length() > 0) {
+            JSONObject jsonObject = jsonArray1.getJSONObject(0);
+
+            certificates = jsonObject.optString("certificatecount");
+        }
+
+        if (jsonArray2 != null && jsonArray2.length() > 0) {
+            JSONObject jsonObject = jsonArray2.getJSONObject(0);
+            creditScore = jsonObject.optString("creditsum");
+
+        }
+
+
+        updateOtherGameBoard(creditScore, certificates);
+
+        return otherGameModellocList;
+    }
+
     public void updateGameSpinner() {
 
         final ArrayList<String> gamesList = db.fetchGames();
@@ -343,7 +460,10 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 gameId = db.getGamesID(gamesList.get(spnrPosition));
 
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
-                    getAchivmentsByGameID(gameId);
+                    if (gameId.equalsIgnoreCase("-1"))
+                        getAchivmentsByGameIDForOther(gameId);
+                    else
+                        getAchivmentsByGameID(gameId);
                 } else {
                     injectFromDbtoModel();
 //                    Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -358,7 +478,6 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         });
 
-
     }
 
     @Override
@@ -367,8 +486,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.achivment_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
@@ -406,6 +524,8 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         initilizeView();
 
+        initilizeOtherGameView();
+
         Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
         View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
@@ -414,7 +534,6 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         return rootView;
     }
-
 
     public void injectFromDbtoModel() {
         achiveheader.setVisibility(View.VISIBLE);
@@ -473,7 +592,26 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 achExpandList.expandGroup(i);
         }
 
+        if (gameId.equalsIgnoreCase("-1")) {
+            otherGamesListView.setVisibility(View.VISIBLE);
+            achExpandList.setVisibility(View.GONE);
+            achiveheader.setVisibility(View.GONE);
+            otherGamesHeader.setVisibility(View.VISIBLE);
+        } else {
+            otherGamesListView.setVisibility(View.GONE);
+            achExpandList.setVisibility(View.VISIBLE);
+            achiveheader.setVisibility(View.VISIBLE);
+            otherGamesHeader.setVisibility(View.GONE);
+        }
     }
+
+    public void updateOtherGameBoard(String credits, String certificates) {
+
+        txtCredits.setText(credits);
+        txtCertificate.setText(certificates);
+
+    }
+
 
     public void updateLeaderBoard(Ach_UserOverAllData achUserOverAllData1) {
 
@@ -493,6 +631,19 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         txtLevel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtPoints.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+    }
+
+    public void initilizeOtherGameView() {
+
+        otherGamesAdapter = new OtherGamesAdapter(context, BIND_ABOVE_CLIENT, otherGameModelList);
+        otherGamesListView.setAdapter(otherGamesAdapter);
+        otherGamesListView.setOnItemClickListener(this);
+        otherGamesListView.setVisibility(View.GONE);
+
+        lbCertificate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        lbCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtCertificate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
     }
 
     public void initilizeView() {
@@ -572,4 +723,23 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         super.onDetach();
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Intent intentSocial = new Intent(context, SocialWebLoginsActivity.class);
+        switch (view.getId()) {
+            case R.id.txtCertificate:
+                Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                String urlForCertificate = appUserModel.getSiteURL() + "content/sitefiles/" + appUserModel.getSiteIDValue() + "/UserCertificates/" + otherGameModelList.get(i).certificateID + ".pdf";
+
+                if (isValidString(otherGameModelList.get(i).certificateID)) {
+                    intentSocial.putExtra("ATTACHMENT", true);
+                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, urlForCertificate);
+                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, otherGameModelList.get(i).certificatePage);
+                    startActivity(intentSocial);
+                }
+
+                Log.d(TAG, "onItemClick: " + urlForCertificate);
+                break;
+        }
+    }
 }

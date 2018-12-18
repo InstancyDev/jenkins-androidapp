@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +68,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 
@@ -103,6 +106,20 @@ public class Utilities {
             result = Html.fromHtml(html);
         }
         return result;
+    }
+
+
+    public static String fromHtmlToString(String html) {
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(html);
+        }
+
+        String resultWithReplace = result.toString().replaceAll("\n\n", "\n");
+
+        return resultWithReplace;
     }
 
     /**
@@ -238,6 +255,34 @@ public class Utilities {
 
         SimpleDateFormat preFormat = new SimpleDateFormat(currentFormat);
         SimpleDateFormat postFormater = new SimpleDateFormat("EEEE, MMM d, yyyy");
+        String newDate = null;
+        try {
+            newDate = postFormater.format(preFormat.parse(dateTime));
+        } catch (Exception e) {
+            Log.d("In getCurrentDateTime", e.getMessage());
+        }
+        return newDate;
+    }
+
+
+    public static String convertDateToSortDateFormat(String dateTime) {
+
+        SimpleDateFormat preFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat postFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String newDate = null;
+        try {
+            newDate = postFormater.format(preFormat.parse(dateTime));
+        } catch (Exception e) {
+            Log.d("In getCurrentDateTime", e.getMessage());
+        }
+        return newDate;
+    }
+
+
+    public static String convertDateToSortDateFormatUpdated(String dateTime) {
+
+        SimpleDateFormat preFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat postFormater = new SimpleDateFormat("dd/MM/yyyy");
         String newDate = null;
         try {
             newDate = postFormater.format(preFormat.parse(dateTime));
@@ -911,6 +956,28 @@ public class Utilities {
         return mimeType;
     }
 
+    public static String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+
+    // This method  converts String to RequestBody
+    public static RequestBody toRequestBody(String value) {
+        RequestBody body = RequestBody.create(MediaType.parse("text/plain"), value);
+        return body;
+    }
+
     public static String toStringS(Object[] a) {
         if (a == null)
             return "";
@@ -1412,4 +1479,20 @@ public class Utilities {
 
 
     //   https://github.com/RusticiSoftware/TinCanAndroid-Offline/tree/master/TinCanJava-Offline/src/com/rs
+
+    @SuppressLint("ResourceAsColor")
+    public static Drawable getDrawableFromStringWithColor(Context context, int resourceID, String colorString) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconimage, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.imageicon);
+        iconText.setTextColor(Color.parseColor(colorString));
+        iconText.setText(resourceID);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.imageicon), iconFont);
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
+
+
 }
