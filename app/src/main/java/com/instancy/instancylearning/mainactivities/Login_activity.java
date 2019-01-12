@@ -212,7 +212,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        imglogo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLogoBackgroundColor()));
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(imglogo);
+            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(getResources().getDrawable(R.drawable.youbottom)).into(imglogo);
 
         }
 //       uncomment for backgroundcolor purpose
@@ -227,7 +227,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             window.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         }
-        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.healthhelp)))) {
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.younextyou)))) {
 
             settingTxt.setVisibility(View.INVISIBLE);
             btnSignup.setVisibility(View.INVISIBLE);
@@ -380,22 +380,22 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void signUpMethodForMemberShipOrNativeSignUp() {
 
-        if (uiSettingsModel.isEnableMemberShipConfig() && uiSettingsModel.isEnableIndidvidualPurchaseConfig()) {
-            // uncomment for web signup
+//        if (uiSettingsModel.isEnableMemberShipConfig() && uiSettingsModel.isEnableIndidvidualPurchaseConfig()) {
+        // uncomment for web signup
 //                Intent intentSignup = new Intent(this, SignUp_Activity.class);
-            Intent intentSignup = new Intent(this, NativeSignupActivity.class);
+        Intent intentSignup = new Intent(this, NativeSignupActivity.class);
 //                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://www.mci-institute.com");
 //                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Azure");
-            startActivity(intentSignup);
+        startActivity(intentSignup);
 
-        } else {
-            // uncomment for web signup
-            Intent intentSignup = new Intent(this, SignUp_Activity.class);
-            intentSignup.putExtra(StaticValues.KEY_SOCIALLOGIN, appUserModel.getSiteURL() + "Sign%20Up/profiletype/selfregistration/nativeapp/true");
-            intentSignup.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Membership");
-            startActivity(intentSignup);
-
-        }
+//        } else {
+//            // uncomment for web signup
+//            Intent intentSignup = new Intent(this, SignUp_Activity.class);
+//            intentSignup.putExtra(StaticValues.KEY_SOCIALLOGIN, appUserModel.getSiteURL() + "Sign%20Up/profiletype/selfregistration/nativeapp/true");
+//            intentSignup.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Membership");
+//            startActivity(intentSignup);
+//
+//        }
 
 
     }
@@ -818,7 +818,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
         String jsonString = "{\"en\":{\"no_games_avaliable\":\"English Name\"},\"nl\":{\"no_games_avaliable\":\"Dutch Name\"}}";
 
-        String key = "no_games_avaliable";
+        String key = getResources().getString(R.string.alert_text_event_add_success);
         JsonLocalization.getInstance().loadFromData(jsonString);
         String localizedName = JsonLocalization.getInstance().stringForKey(key, this);
         Log.d("JsonLocaliztion", localizedName);

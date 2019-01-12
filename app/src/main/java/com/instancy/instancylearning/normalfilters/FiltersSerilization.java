@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.advancedfilters;
+package com.instancy.instancylearning.normalfilters;
 
 
 import com.instancy.instancylearning.models.NativeSetttingsModel;
@@ -36,14 +36,14 @@ public class FiltersSerilization {
         public boolean isSelected = false;
     }
 
-//    public static HashMap<String, List<FilterModel>> getFilterData(JSONObject jsonObject) throws JSONException {
-//        HashMap<String, List<FilterModel>> expandableListDetail = new HashMap<String, List<FilterModel>>();
+//    public static HashMap<String, List<ContentFilterByModel>> getFilterData(JSONObject jsonObject) throws JSONException {
+//        HashMap<String, List<ContentFilterByModel>> expandableListDetail = new HashMap<String, List<ContentFilterByModel>>();
 //
 //        if (jsonObject.has("filtersortby")) {
 //
 //            JSONArray jsonArray = jsonObject.getJSONArray("filtersortby");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("Sort By", filterModelList);
@@ -53,7 +53,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filtersorttype")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filtersorttype");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("Sort Type", filterModelList);
@@ -65,7 +65,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbycategory")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbycategory");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Category", filterModelList);
@@ -76,7 +76,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbygroup")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbygroup");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Group", filterModelList);
@@ -88,7 +88,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbycontenttype")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbycontenttype");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Content Type", filterModelList);
@@ -100,7 +100,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbysource")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbysource");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Source", filterModelList);
@@ -113,7 +113,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbytype")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbytype");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Type", filterModelList);
@@ -126,7 +126,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbyskills")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbyskills");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Skills", filterModelList);
@@ -138,7 +138,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("jobrolesinfo")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("jobrolesinfo");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //                expandableListDetail.put("By Job Roles", filterModelList);
 //            }
@@ -228,7 +228,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbygroup")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbygroup");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Group", filterModelList);
@@ -240,7 +240,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbycontenttype")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbycontenttype");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Content Type", filterModelList);
@@ -252,7 +252,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbysource")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbysource");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Source", filterModelList);
@@ -265,7 +265,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbytype")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbytype");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Type", filterModelList);
@@ -278,7 +278,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("filterbyskills")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("filterbyskills");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //
 //                expandableListDetail.put("By Skills", filterModelList);
@@ -290,7 +290,7 @@ public class FiltersSerilization {
 //        if (jsonObject.has("jobrolesinfo")) {
 //            JSONArray jsonArray = jsonObject.getJSONArray("jobrolesinfo");
 //            if (jsonArray.length() > 0) {
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 //
 //                expandableListDetail.put("By Job Roles", filterModelList);
 //            }

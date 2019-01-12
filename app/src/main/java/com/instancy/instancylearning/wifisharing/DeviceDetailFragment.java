@@ -32,7 +32,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -160,7 +160,7 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    Utils.getInstance().showToast("Camera/Storage permission Denied");
+//                    Utilitys.getInstance().showToast("Camera/Storage permission Denied");
                 }
                 return;
             }
@@ -201,7 +201,7 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
 
             //first check for file storage permission
             if (!PermissionsAndroid.getInstance().checkWriteExternalStoragePermission(getActivity())) {
-                Utils.getInstance().showToast("Please enable storage Permission from application storage option");
+//                Utilitys.getInstance().showToast("Please enable storage Permission from application storage option");
                 return;
             }
 
@@ -342,7 +342,7 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
                 Log.d(CommonMethods.Tag, "Server: Socket opened");
                 Socket client = serverSocket.accept();
 
-                Utils.d("Client's InetAddresssss  ", "" + client.getInetAddress());
+//                Utilitys.d("Client's InetAddresssss  ", "" + client.getInetAddress());
 
                 WiFiClientIp = client.getInetAddress().getHostAddress();
                 ObjectInputStream ois = new ObjectInputStream(
@@ -393,8 +393,7 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
                             }
                         };
                         handler.post(r);
-                        Utils.d("FileName got from socket on other side->>> ",
-                                obj.getFileName());
+                   //     Utilitys.d("FileName got from socket on other side->>> ",obj.getFileName());
                     }
 
                     final File f = new File(

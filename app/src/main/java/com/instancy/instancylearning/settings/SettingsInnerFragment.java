@@ -34,6 +34,7 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
@@ -46,6 +47,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.LocalizationSelectionActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 
 
@@ -135,18 +137,32 @@ public class SettingsInnerFragment extends Fragment {
 
         expandableListDetail = NativeSetttingsModel.getData(true);
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        settingsInnerAdapter = new SettingsInnerAdapter(context, expandableListTitle, expandableListDetail);
+        settingsInnerAdapter = new SettingsInnerAdapter(context, expandableListTitle, expandableListDetail, settingsExpandList);
         settingsExpandList.setAdapter(settingsInnerAdapter);
-
 
         settingsExpandList.expandGroup(0);
         settingsExpandList.expandGroup(1);
         settingsExpandList.expandGroup(2);
 
+        settingsExpandList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
+
+                Intent intentDetail = new Intent(context, LocalizationSelectionActivity.class);
+
+                startActivity(intentDetail);
+
+
+                return false;
+            }
+        });
+
+
         initilizeView();
 
         return rootView;
     }
+
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
@@ -158,9 +174,7 @@ public class SettingsInnerFragment extends Fragment {
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-
     }
-
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();

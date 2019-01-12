@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -28,9 +29,9 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail;
+    ExpandableListView expandableListView;
 
-
-    public SettingsInnerAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<String>> expandableListDetail) {
+    public SettingsInnerAdapter(Context context, List<String> expandableListTitle, HashMap<String, List<String>> expandableListDetail, ExpandableListView expandableListView) {
         this.context = context;
         this.expandableListDetail = expandableListDetail;
         this.expandableListTitle = expandableListTitle;
@@ -93,7 +94,7 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, final ViewGroup parent) {
         final String expandedListText = (String) getChild(groupPosition, childPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
@@ -103,7 +104,7 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
 
         Switch switchSkill = (Switch) convertView.findViewById(R.id.swtchskills);
 
-
+        switchSkill.setEnabled(false);
         TextView labelTxt = (TextView) convertView
                 .findViewById(R.id.languagelabel);
 
@@ -119,9 +120,23 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
 
             labelTxt.setText(expandedListText);
 
+//            labelTxt.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//
+//                    long packedPos = ExpandableListView.getPackedPositionForChild(groupPosition, childPosition);
+//
+//                    int flatPos = expandableListView.getFlatListPosition(packedPos);
+//
+////Getting the ID for our child
+//                    long id = expandableListView.getExpandableListAdapter().getChildId(groupPosition, childPosition);
+//
+//                    ((ExpandableListView) parent).performItemClick(view, flatPos, id);
+//
+//                }
+//            });
 
         }
-
 
         switchSkill.setText(expandedListText);
 

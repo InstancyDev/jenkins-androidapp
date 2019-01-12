@@ -168,7 +168,7 @@
         android:background="@color/colorWhite"
         android:padding="3dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/digibanner"
+        android:src="@drawable/youbottom"
         android:visibility="visible" />
 
 </LinearLayout>

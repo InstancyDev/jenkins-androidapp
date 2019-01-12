@@ -11,11 +11,9 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
+
 import android.os.Build;
 import android.os.Environment;
 import android.os.Vibrator;
@@ -45,8 +43,8 @@ import java.util.TimeZone;
  * Created by anuj.sharma on 1/12/2017.
  */
 
-public class Utils {
-    private static Utils ourInstance = new Utils();
+public class Utilitys {
+    private static Utilitys ourInstance = new Utilitys();
     /*
     *  -----------  Font Style Code
     * */
@@ -54,10 +52,10 @@ public class Utils {
     //    ----------- Set Font Cal
 //    Calligrapher calligrapher;
 
-    private Utils() {
+    private Utilitys() {
     }
 
-    public static Utils getInstance() {
+    public static Utilitys getInstance() {
         return ourInstance;
     }
 
@@ -326,13 +324,13 @@ public class Utils {
    */
     private Vibrator vibrator;
 
-    public void generateNotificationSound(Context ctx) {
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        vibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
-        // Vibrate for 500 milliseconds
-        vibrator.vibrate(500);
-        //play sound
-        Ringtone r = RingtoneManager.getRingtone(ctx, alarmSound);
-        r.play();
-    }
+//    public void generateNotificationSound(Context ctx) {
+//        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//        vibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
+//        // Vibrate for 500 milliseconds
+//        vibrator.vibrate(500);
+//        //play sound
+//        Ringtone r = RingtoneManager.getRingtone(ctx, alarmSound);
+//        r.play();
+//    }
 }

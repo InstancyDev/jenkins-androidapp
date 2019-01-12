@@ -76,7 +76,6 @@ import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
-import com.instancy.instancylearning.wifisharing.WiFiDirectNewActivity;
 import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -1202,7 +1201,7 @@ public class MyLearningDetail_Activity extends AppCompatActivity implements Bill
                 finish();
                 return true;
             case R.id.atn_direct_enable:
-                startActivity(new Intent(this, WiFiDirectNewActivity.class));
+              //  startActivity(new Intent(this, WiFiDirectNewActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

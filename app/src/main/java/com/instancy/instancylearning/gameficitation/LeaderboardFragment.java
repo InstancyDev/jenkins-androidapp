@@ -134,7 +134,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
 
     public void refreshGameList(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
         JSONObject parameters = new JSONObject();
@@ -198,7 +198,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
-
+                svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("GAMESLIST")) {
                     Log.d(TAG, requestType + " : " + response);
 //                    [{"GameID":1,"GameName":"Ergonomics Challenge"}]

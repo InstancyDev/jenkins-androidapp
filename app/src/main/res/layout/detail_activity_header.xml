@@ -11,19 +11,37 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent">
 
-        <ImageView
-            android:id="@+id/imagethumb"
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:padding="2dp"
-            android:src="@drawable/cellimage" />
+        <RelativeLayout
+            android:id="@+id/imgLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imagethumb"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:padding="2dp"
+                android:src="@drawable/cellimage" />
+
+            <ImageView
+                android:id="@+id/imgPlay"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_centerInParent="true"
+                android:background="@android:color/transparent"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:visibility="invisible"
+                android:src="@drawable/playbtn" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imagethumb"
+            android:layout_below="@+id/imgLayout"
             android:background="@android:color/transparent"
             android:orientation="horizontal"
             android:padding="5dp"

@@ -233,7 +233,6 @@ public class ChatActivity extends AppCompatActivity {
 
         signalAService = SignalAService.newInstance(getApplicationContext());
         signalAService.communicator = communicator;
-
     }
 
     public void initilizeView() {
@@ -263,9 +262,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
     }
-
 
     public void refreshPeopleListing(Boolean isFirstLoad) {
         if (isNetworkConnectionAvailable(this, -1)) {

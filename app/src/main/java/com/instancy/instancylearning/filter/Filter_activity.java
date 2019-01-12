@@ -18,7 +18,7 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.advancedfilters.FiltersSerilization;
+import com.instancy.instancylearning.normalfilters.FiltersSerilization;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -99,7 +99,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
 //
 //            JSONObject jsonObject = db.fetchFilterObject(appUserModel,isFromMylearning);
 //            if (jsonObject != null) {
-//                HashMap<String, List<FiltersSerilization.FilterModel>> hashMap = FiltersSerilization.getFilterData(jsonObject);
+//                HashMap<String, List<FiltersSerilization.ContentFilterByModel>> hashMap = FiltersSerilization.getFilterData(jsonObject);
 //                Log.d(TAG, "getFiltersFromDB: " + hashMap.get("Sort By"));
 //
 //                expandableListDetail = FiltersSerilization.getFilterData(jsonObject);

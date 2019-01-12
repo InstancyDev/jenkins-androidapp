@@ -119,6 +119,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     ListView discussionFourmlistView;
     DiscussionFourmAdapter discussionFourmAdapter;
     List<DiscussionForumModelDg> discussionForumModelList = null;
+    List<DiscussionForumModelDg> originalForumList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -386,6 +387,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         discussionForumModelList = new ArrayList<DiscussionForumModelDg>();
+        originalForumList = new ArrayList<DiscussionForumModelDg>();
         discussionFourmAdapter = new DiscussionFourmAdapter(getActivity(), BIND_ABOVE_CLIENT, discussionForumModelList, isAbleToDelete, isAbleToEdit);
         discussionFourmlistView.setAdapter(discussionFourmAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
@@ -501,16 +503,18 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
     public void injectFromDbtoModel() {
 
-
         discussionForumModelList = db.fetchDiscussionForums(appUserModel.getSiteIDValue(), isPrivateForum);
         if (discussionForumModelList != null) {
             discussionFourmAdapter.refreshList(discussionForumModelList);
             nodata_Label.setText("");
+            originalForumList = discussionForumModelList;
         } else {
             discussionForumModelList = new ArrayList<DiscussionForumModelDg>();
             discussionFourmAdapter.refreshList(discussionForumModelList);
             nodata_Label.setText(getResources().getString(R.string.no_data));
+            originalForumList = discussionForumModelList;
         }
+
 
 //        if (discussionForumModelList.size() > 5 && !isFromGlobalSearch) {
 //            if (item_search != null)
@@ -850,7 +854,8 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                     List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
                     selectedCategories = (List<ContentValues>) data.getExtras().getSerializable("selectedCategories");
                     Log.d(TAG, "selectedCategories: " + selectedCategories.size());
-                    discussionFourmAdapter.refreshList(getDiscussionForumListCategories(selectedCategories));
+                    discussionForumModelList = getDiscussionForumListCategories(selectedCategories);
+                    discussionFourmAdapter.refreshList(discussionForumModelList);
 
                     if (selectedCategories != null && selectedCategories.size() > 0) {
                         generateBreadcrumb(selectedCategories);
@@ -875,17 +880,16 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
             for (int i = 0; i < categoryIds.size(); i++) {
 
-                for (int j = 0; j < discussionForumModelList.size(); j++) {
+                for (int j = 0; j < originalForumList.size(); j++) {
 
-                    if (discussionForumModelList.get(j).categoriesIDArray != null && discussionForumModelList.get(j).categoriesIDArray.size() > 0) {
-                        for (int k = 0; k < discussionForumModelList.get(j).categoriesIDArray.size(); k++) {
+                    if (originalForumList.get(j).categoriesIDArray != null && originalForumList.get(j).categoriesIDArray.size() > 0) {
+                        for (int k = 0; k < originalForumList.get(j).categoriesIDArray.size(); k++) {
 
-                            if (categoryIds.get(i).get("categoryid").toString().equalsIgnoreCase(discussionForumModelList.get(j).categoriesIDArray.get(k))) {
+                            if (categoryIds.get(i).get("categoryid").toString().equalsIgnoreCase(originalForumList.get(j).categoriesIDArray.get(k))) {
 
-                                discussionForumModelDgs.add(discussionForumModelList.get(j));
+                                discussionForumModelDgs.add(originalForumList.get(j));
 
                             }
-
 
                         }
 
@@ -894,13 +898,16 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
             }
 
-
         }
 
         Set<DiscussionForumModelDg> hs = new HashSet<>();
         hs.addAll(discussionForumModelDgs);
         discussionForumModelDgs.clear();
         discussionForumModelDgs.addAll(hs);
+
+        if (discussionForumModelDgs.size() == 0) {
+            nodata_Label.setText(getResources().getString(R.string.no_data));
+        }
 
         return discussionForumModelDgs;
     }
@@ -1118,9 +1125,18 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
 
             breadcrumbItemsList.remove(level);
+
+            discussionForumModelList = getDiscussionForumListCategories(breadcrumbItemsList);
+            discussionFourmAdapter.refreshList(discussionForumModelList);
         }
 
-        discussionFourmAdapter.refreshList(getDiscussionForumListCategories(breadcrumbItemsList));
+        if (breadcrumbItemsList != null && breadcrumbItemsList.size() == 0) {
+
+            clearCategory();
+
+
+        }
+
 
     }
 

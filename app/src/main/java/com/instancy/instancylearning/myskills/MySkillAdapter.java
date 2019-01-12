@@ -20,8 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,12 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.formatter.PercentFormatter;
+
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.catalogfragment.CatalogFragmentActivity;
 import com.instancy.instancylearning.helper.FontManager;
@@ -49,7 +42,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.CompetencyCategoryModel;
-import com.instancy.instancylearning.mycompetency.SkillModel;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,15 +75,18 @@ public class MySkillAdapter extends BaseExpandableListAdapter {
     IResult resultCallback = null;
     JSONArray requiredScore = null;
 
+    ExpandableListView expandableListView;
+
     public void refreshList(List<MySkillModel> skillModelList, JSONArray requiredScore) {
         this.skillModelList = skillModelList;
         this.notifyDataSetChanged();
         iconFon = FontManager.getTypeface(ctx, FontManager.FONTAWESOME);
         this.requiredScore = requiredScore;
+
     }
 
     // Up
-    public MySkillAdapter(Context ctx, List<MySkillModel> mainMenuList, String jobTagId, AppUserModel appUserModel, SideMenusModel sideMenusModel) {
+    public MySkillAdapter(Context ctx, List<MySkillModel> mainMenuList, String jobTagId, AppUserModel appUserModel, SideMenusModel sideMenusModel, ExpandableListView expandableListView) {
 
         this.ctx = ctx;
         this.appUserModel = appUserModel;
@@ -98,7 +94,7 @@ public class MySkillAdapter extends BaseExpandableListAdapter {
         this.jobTagId = jobTagId;
         uiSettingsModel = UiSettingsModel.getInstance();
         scoreList = new ArrayList<>();
-
+        this.expandableListView = expandableListView;
         vollyService = new VollyService(resultCallback, ctx);
     }
 
@@ -497,74 +493,18 @@ public class MySkillAdapter extends BaseExpandableListAdapter {
 
         @OnClick({R.id.btn_contextmenu})
         public void actionsForMenu(View view) {
-            SkillCountModel childSkillModel = skillModelList.get(getGroupPosition).skillCountModelList.get(getPosition);
-            mySkillContextMenu(view, getPosition,childSkillModel);
+//            SkillCountModel childSkillModel = skillModelList.get(getGroupPosition).skillCountModelList.get(getPosition);
+//            mySkillContextMenu(view, getPosition, childSkillModel);
 
+            long packedPos = ExpandableListView.getPackedPositionForChild(getGroupPosition, getPosition);
+            int flatPos = expandableListView.getFlatListPosition(packedPos);
+
+//Getting the ID for our child
+            long id = expandableListView.getExpandableListAdapter().getChildId(getGroupPosition, getPosition);
+
+            ((ExpandableListView) parent).performItemClick(view, flatPos, id);
         }
 
-    }
-
-    public void mySkillContextMenu(final View v, final int position, final SkillCountModel skillCountModel) {
-
-        PopupMenu popup = new PopupMenu(v.getContext(), v);
-        //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.myskillcontextmenu, popup.getMenu());
-        //registering popup with OnMenuItemClickListene
-
-        Menu menu = popup.getMenu();
-
-        menu.getItem(0).setVisible(true);
-        menu.getItem(1).setVisible(true);
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-
-
-                switch (item.getItemId()) {
-                    case R.id.ctx_viewcontent:
-                        Intent intentDetail = new Intent(ctx, CatalogFragmentActivity.class);
-                        intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
-                        intentDetail.putExtra("TITLENAME", skillModelList.get(position).skillName);
-//                        intentDetail.putExtra("SKILLID", skillModelList.get(position).sk);
-                        intentDetail.putExtra("ISFROMMYCOMPETENCY", true);
-                        ctx.startActivity(intentDetail);
-                        break;
-                    case R.id.ctx_delete:
-                        if (isNetworkConnectionAvailable(ctx, -1)) {
-
-                            deleteMySkill(skillCountModel.prefCatID);
-
-                        } else {
-
-                            Toast.makeText(ctx, ctx.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-                        }
-
-                        break;
-
-                }
-
-                return true;
-            }
-        });
-        popup.show();//showing popup menu
-    }
-
-    public void deleteMySkill(int preferrenceID) {
-
-        String urlStr = appUserModel.getWebAPIUrl() + "/MySkills/DeleteSkills";
-
-        JSONObject parameters = new JSONObject();
-
-        try {
-            parameters.put("PreferrenceID", preferrenceID);
-            parameters.put("UserID", appUserModel.getUserIDValue());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String parameterString = parameters.toString();
-
-        vollyService.getStringResponseFromPostMethod(parameterString, "DeleteSkills", urlStr);
     }
 
 }

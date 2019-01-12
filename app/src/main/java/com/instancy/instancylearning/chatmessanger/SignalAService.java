@@ -3,6 +3,8 @@ package com.instancy.instancylearning.chatmessanger;
 import android.content.Context;
 import android.content.OperationApplicationException;
 
+import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.instancy.instancylearning.interfaces.Communicator;
@@ -12,6 +14,7 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.zsoft.signala.hubs.HubConnection;
 import com.zsoft.signala.hubs.HubInvokeCallback;
 import com.zsoft.signala.hubs.HubOnDataCallback;
+import com.zsoft.signala.hubs.HubProxy;
 import com.zsoft.signala.hubs.IHubProxy;
 import com.zsoft.signala.transport.StateBase;
 import com.zsoft.signala.transport.longpolling.LongPollingTransport;
@@ -23,6 +26,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import microsoft.aspnet.signalr.client.Credentials;
+import microsoft.aspnet.signalr.client.http.Request;
+
 
 /**
  * Created by gongguopei87@gmail.com on 2015/8/13.
@@ -33,6 +39,7 @@ public class SignalAService {
     String TAG = SignalAService.class.getSimpleName();
 
     protected HubConnection con = null;
+
 
     protected IHubProxy hub = null;
 
@@ -56,7 +63,11 @@ public class SignalAService {
         preferencesManager = PreferencesManager.getInstance();
         name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         try {
-            initConnection();
+            try {
+                initConnection();
+            } catch (NullPointerException ex) {
+                ex.printStackTrace();
+            }
         } catch (OperationApplicationException e) {
             e.printStackTrace();
         }
@@ -71,10 +82,14 @@ public class SignalAService {
     }
 
     private void initConnection() throws OperationApplicationException {
+//        String url = "http://yournextuapi.instancysoft.com/signalr/"; //appUserModel.getWebAPIUrl();
 
-        String url = appUserModel.getSiteURL();
+        String url = "http://192.168.11.162/WebApi/signalr/";
 
-        con = new HubConnection(url.toString(), context, new LongPollingTransport()) {
+        String base64EncodedCredentials = Base64.encodeToString("A459QN8BU4:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrHMr".getBytes(), Base64.NO_WRAP);
+
+
+        con = new HubConnection(url, context, new LongPollingTransport()) {
 
             @Override
             public void OnStateChanged(StateBase oldState, StateBase newState) {
@@ -85,6 +100,7 @@ public class SignalAService {
 //                        Toast.makeText(context, "Connected", Toast.LENGTH_LONG).show();
                         connectionID = con.getConnectionId();
                         loginMethod();
+//                        testMethod();
                         break;
                     case Disconnected:
 //                        Toast.makeText(context, "Disconnected", Toast.LENGTH_LONG).show();
@@ -97,37 +113,48 @@ public class SignalAService {
 
         };
 
-        hub = con.CreateHubProxy("chat");
-
+        hub = con.CreateHubProxy("ChatHub");
+        con.addHeader("Authorization", "basic " + base64EncodedCredentials);
         hub.On("SendPrivateMessage", new HubOnDataCallback() {
             @Override
             public void OnReceived(JSONArray args) {
-
-//                Log.d(TAG, "OnReceived: " + args);
-
                 communicator.messageRecieved(args);
-
             }
 
 
         });
+
+        hub.On("NewOnlineUser", new HubOnDataCallback() {
+            @Override
+            public void OnReceived(JSONArray args) {
+                Log.d(TAG, "OnReceived: " + args);
+            }
+
+        });
+
     }
 
-    public void loginMethod() {
+
+    void loginMethod() {
 
         JSONObject jsonObject = new JSONObject();
 
         JSONArray array = new JSONArray();
         try {
-            jsonObject.put("ChatuserName", name);
-            jsonObject.put("ChatSiteID", appUserModel.getSiteIDValue());
+
+            jsonObject.put("UserID", appUserModel.getUserIDValue());
+            jsonObject.put("FullName", name);
+            jsonObject.put("ProfPic", "content/sitefiles/profile.jpg");
+            jsonObject.put("SiteID", appUserModel.getSiteIDValue());
+            jsonObject.put("isOnline", true);
             jsonObject.put("ChatUserID", appUserModel.getUserIDValue());
-            jsonObject.put("ChatProfilepath", "content/sitefiles/profile.jpg");
+            jsonObject.put("ConnectionId", connectionID);
+            jsonObject.put("ConnectionAcceptID", -1);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
         array.put(jsonObject);
-
         HubInvokeCallback callback = new HubInvokeCallback() {
             @Override
             public void OnResult(boolean succeeded, String response) {
@@ -137,12 +164,43 @@ public class SignalAService {
 
             @Override
             public void OnError(Exception ex) {
-                Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "OnError: HubInvokeCallback  " + ex.getMessage());
+//                Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "OnError: HubInvokeCallback  " + ex.getMessage());
             }
         };
-        hub.Invoke("Login", array, callback);
+        hub.Invoke("otherOnlineUser", array, callback);
     }
+
+    void testMethod() {
+
+        JSONObject jsonObject = new JSONObject();
+
+        JSONArray array = new JSONArray();
+        try {
+
+            jsonObject.put("name", connectionID);
+            jsonObject.put("message", -1);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        array.put(jsonObject);
+        HubInvokeCallback callback = new HubInvokeCallback() {
+            @Override
+            public void OnResult(boolean succeeded, String response) {
+//                Log.d(TAG, "OnResult: HubInvokeCallback  " + response);
+                preferencesManager.setStringValue(response, StaticValues.CHAT_LIST);
+            }
+
+            @Override
+            public void OnError(Exception ex) {
+//                Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "OnError: HubInvokeCallback  " + ex.getMessage());
+            }
+        };
+        hub.Invoke("SendToAll", array, callback);
+    }
+
 
     public void startSignalA() {
         if (con != null)
@@ -154,7 +212,7 @@ public class SignalAService {
             con.Stop();
     }
 
-    public void sendMessage(String buddyID, String messageStr,String attachemnt) {
+    public void sendMessage(String buddyID, String messageStr, String attachemnt) {
 
         HubInvokeCallback callback = new HubInvokeCallback() {
             @Override
@@ -166,7 +224,7 @@ public class SignalAService {
 
             @Override
             public void OnError(Exception ex) {
-                Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                //   Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
 //                Log.d(TAG, "OnError: HubInvokeCallback  sendMessage " + ex.getMessage());
             }
         };

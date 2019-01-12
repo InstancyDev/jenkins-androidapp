@@ -127,7 +127,7 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
-            android:name=".advancedfilters.AdvancedFilterActivity"
+            android:name=".normalfilters.AdvancedFilterActivity"
             android:screenOrientation="portrait"></activity>
 
 
@@ -307,6 +307,50 @@
             android:screenOrientation="portrait"></activity>
 
 
+        <activity
+            android:name=".localization.LocalizationSelectionActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <!--Advenced filters activity-->
+        <activity
+            android:name=".advancedfilters_mylearning.ContentFilterByActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".advancedfilters_mylearning.FilterBySelectedCategoryActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".advancedfilters_mylearning.SelectedActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".advancedfilters_mylearning.InstructorActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".advancedfilters_mylearning.AllFiltersActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".advancedfilters_mylearning.RatingRadioActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".advancedfilters_mylearning.SortActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".advancedfilters_mylearning.DurationPriceActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <activity
+            android:name=".advancedfilters_mylearning.DateSelectionRadioActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!-- Push Notification  issue icon -->
 
         <meta-data
@@ -367,7 +411,11 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a80963795d57613b811a880699912ca0d5dc6b95" />
-
+        <service
+            android:name=".chatmessanger.SignalRService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

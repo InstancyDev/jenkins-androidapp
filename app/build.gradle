@@ -72,7 +72,11 @@ android {
 
         applicationId "com.instancy.development"
         versionCode 2
-        versionName "Cycle2fixes"
+        versionName "1.0.4"
+
+//        applicationId "com.instancy.younextyou"
+//        versionCode 2
+//        versionName "1.0.1"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -179,6 +183,7 @@ dependencies {
     compile 'com.github.ghost1372:Mzip-Android:0.4.0'
     compile 'com.github.rajyvan:TrackingRingWidget:1.0'
     compile 'com.github.McoyJiang:ListVideoManager:v1.0'
+    compile 'com.appyvet:materialrangebar:1.4.4'
 
 }
 apply plugin: 'com.google.gms.google-services'

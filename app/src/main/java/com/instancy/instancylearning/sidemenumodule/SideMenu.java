@@ -2,9 +2,12 @@ package com.instancy.instancylearning.sidemenumodule;
 
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -14,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
@@ -40,6 +44,8 @@ import com.instancy.instancylearning.catalog.CatalogCategories_Fragment;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.SendMessage_fragment;
 import com.instancy.instancylearning.chatmessanger.SignalAService;
+import com.instancy.instancylearning.chatmessanger.SignalAServiceMicrosoft;
+
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourmsenached.DiscussionFourm_fragment;
 import com.instancy.instancylearning.events.Event_fragment_new;
@@ -181,6 +187,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     ActionBarDrawerToggle toggle;
     UiSettingsModel uiSettingsModel;
     SignalAService signalAService;
+    SignalAServiceMicrosoft signalAServiceMicrosoft;
     public Toolbar toolbar;
 
     SideMenusModel homeModel, tempHomeModel;
@@ -190,6 +197,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     RelativeLayout drawerHeaderView;
     public View logoView;
+
+    //    private SignalRService mService;
+    private boolean mBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -258,7 +268,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
         notificationLayout.setVisibility(View.VISIBLE);
-        settingsLayout.setVisibility(View.GONE);
+        settingsLayout.setVisibility(View.VISIBLE);
         settingsLayout.setOnClickListener(this);
         updateBottomButtonColor();
 
@@ -314,10 +324,18 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
                     sendMessageLayout.setVisibility(View.GONE);
                 } else {
-                    sendMessageLayout.setVisibility(View.GONE);
+                    sendMessageLayout.setVisibility(View.VISIBLE);
+
                 }
-//                signalAService = SignalAService.newInstance(this);
-//                signalAService.startSignalA();
+                signalAService = SignalAService.newInstance(this);
+                signalAService.startSignalA();
+
+//                signalAServiceMicrosoft = SignalAServiceMicrosoft.newInstance(this);
+//                signalAServiceMicrosoft.startSignalA();
+
+//                Intent intent = new Intent();
+//                intent.setClass(this, SignalRService.class);
+//                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
             }
             i++;
         }
@@ -487,8 +505,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.bottom_ecommerce).into(bottomLogo);
-            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
+//            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.younextyoubanner).into(bottomLogo);
+//            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
         }
 
     }
@@ -691,8 +709,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         notificationLayout.setVisibility(View.VISIBLE);
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(bottomLogo);
-            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
+//            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(bottomLogo);
+//            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
         }
 
     }
@@ -1149,4 +1167,24 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         return sideMenusModel;
     }
+
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
+//    private final ServiceConnection mConnection = new ServiceConnection() {
+//
+//        @Override
+//        public void onServiceConnected(ComponentName className,
+//                                       IBinder service) {
+//            // We've bound to SignalRService, cast the IBinder and get SignalRService instance
+//            SignalRService.LocalBinder binder = (SignalRService.LocalBinder) service;
+//            mService = binder.getService();
+//            mBound = true;
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName arg0) {
+//            mBound = false;
+//        }
+//    };
 }

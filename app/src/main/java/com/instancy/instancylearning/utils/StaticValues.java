@@ -118,6 +118,8 @@ public class StaticValues {
 
     public static final int FILTER_CLOSE_CODE = 1234;
 
+    public static final int FILTER_CLOSE_CODE_ADV = 1203;
+
     public static final int FORUM_CREATE_NEW_FORUM = 2111;
 
     public static final int GALLERYCLOSED = 8888;

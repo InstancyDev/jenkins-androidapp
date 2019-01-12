@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -25,7 +24,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -73,7 +71,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-import com.instancy.instancylearning.advancedfilters.AdvancedFilterActivity;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFiltersActivity;
+
+import com.instancy.instancylearning.advancedfilters_mylearning.ApplyFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByModel;
+import com.instancy.instancylearning.normalfilters.AdvancedFilterActivity;
 import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.UnZip;
@@ -113,7 +116,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -130,6 +135,7 @@ import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE_ADV;
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
@@ -170,7 +176,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     int isWsh = 0;
 
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "", allowAddContentType = "", ddlSortList = "", ddlSortType = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", allowAddContentType = "", ddlSortList = "", ddlSortType = "", contentFilterType = "";
     ResultListner resultListner = null;
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
@@ -186,9 +192,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     WebAPIClient webAPIClient;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
     boolean isSearching = false;
     boolean userScrolled = false;
+
+    boolean isDigimedica = true;
 
     ProgressBar progressBar;
 
@@ -239,10 +247,16 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     String queryString = "";
 
+    List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+
+    ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+
     public Catalog_fragment() {
 
 
     }
+
+    HashMap<String, String> responMap = null;
 
     @Override
     public void onAttach(Context context) {
@@ -275,7 +289,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         webAPIClient = new WebAPIClient(context);
 
         sideMenusModel = null;
-        HashMap<String, String> responMap = null;
+//        HashMap<String, String> responMap = null;
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
@@ -369,6 +383,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             allowAddContentType = responMap.get("AllowAddContentType");
 
         }
+
+        if (responMap != null && responMap.containsKey("ContentFilterBy")) {
+            contentFilterType = responMap.get("ContentFilterBy");
+        } else {
+            // No such key
+            contentFilterType = "";
+        }
+
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -410,12 +432,63 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             //  FilterCondition=8,9,10,11,14,20,21,26,27,28,36,50,52,70,646,102,689,693&SortCondition=c.PublishedDate%20desc,c.name&RecordCount=200&OrgUnitID=374&userid=13608&Type=All&ComponentID=1&CartID=&Locale=en-us&SiteID=374&CategoryCompID=19&SearchText=Learning&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=3131&AuthorID=0
 
             paramsString = "FilterCondition=" + filterContentType + "&SortCondition=" + sortBy + "&RecordCount=150&OrgUnitID=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Type=All" + "&ComponentID=1" + "&CartID=&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&CategoryCompID=19&SearchText=" + queryString + "&DateOfMyLastAccess=&GoogleValues=&IsAdvanceSearch=false&ContentID=&Createduserid=-1&SearchPartial=1&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&AuthorID=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize;
-
         }
 
         vollyService.getJsonObjResponseVolley("MYCMPTCY", appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
 
     }
+
+    public void getMobileCatalogObjectsData(Boolean isRefreshed) {
+
+        if (!isRefreshed) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsData";
+
+        JSONObject parameters = new JSONObject();
+
+        try {
+
+            parameters.put("pageIndex", pageIndex);
+            parameters.put("pageSize", pageSize);
+            parameters.put("SearchText", queryString);
+            parameters.put("ContentID", "");
+            parameters.put("sortBy", "");
+            parameters.put("ComponentID", sideMenusModel.getComponentId());
+            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+            parameters.put("AdditionalParams", "");
+            parameters.put("SelectedTab", "");
+            parameters.put("AddtionalFilter", "");
+            parameters.put("LocationFilter", "");
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("SiteID", appUserModel.getSiteIDValue());
+            parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
+            parameters.put("Locale", "en-us");
+            parameters.put("groupBy", applyFilterModel.groupBy);
+            parameters.put("categories", applyFilterModel.categories);
+            parameters.put("objecttypes", applyFilterModel.objectTypes);
+            parameters.put("skillcats", applyFilterModel.skillCats);
+            parameters.put("skills", applyFilterModel.skills);
+            parameters.put("jobroles", applyFilterModel.jobRoles);
+            parameters.put("solutions", applyFilterModel.solutions);
+            parameters.put("keywords", "");
+            parameters.put("ratings", applyFilterModel.ratings);
+            parameters.put("pricerange", applyFilterModel.priceRange);
+            parameters.put("eventdate", "");
+            parameters.put("certification", "");
+            parameters.put("duration", applyFilterModel.duration);
+            parameters.put("instructors", applyFilterModel.instructors);
+            parameters.put("iswishlistcontent", isWsh);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "CATALOGDATA", urlStr);
+    }
+
 
     void initVolleyCallback() {
         resultCallback = new IResult() {
@@ -428,7 +501,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     if (response != null) {
                         try {
                             db.injectCatalogData(response, false, pageIndex);
-
                             totalRecordsCount = countOfTotalRecords(response);
                             injectFromDbtoModel();
                         } catch (JSONException e) {
@@ -516,11 +588,23 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     } else {
 
                         Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
-
                     }
-
                 }
 
+                if (requestType.equalsIgnoreCase("WISHLIST")) {
+
+                    if (response != null) {
+
+                        if (isDigimedica) {
+                            getMobileCatalogObjectsData(true);
+                        } else {
+                            refreshCatalog(true);
+                        }
+
+                    } else {
+
+                    }
+                }
 
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
@@ -541,13 +625,30 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     nodata_Label.setText(getResources().getString(R.string.no_data));
                 }
-
-
             }
 
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+
+                if (requestType.equalsIgnoreCase("CATALOGDATA")) {
+                    if (response != null) {
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            db.injectCatalogData(jsonObj, false, pageIndex);
+                            totalRecordsCount = countOfTotalRecords(jsonObj);
+                            injectFromDbtoModel();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
+
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
 
@@ -608,14 +709,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-
         final View footerView = ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmore, null, false);
         myLearninglistView.addFooterView(footerView);
         progressBar = (ProgressBar) footerView.findViewById(R.id.loadMoreProgressBar);
 
-
         myLearninglistView.setOnScrollListener(new EndlessScrollListener() {
-
 
             @Override
             public void onScrollStateChanged(AbsListView arg0, int scrollState) {
@@ -649,7 +747,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                 if (isFromGlobalSearch) {
                                     refreshMyCompetencyCatalog(true);
                                 } else {
-                                    refreshCatalog(true);
+                                    if (isDigimedica) {
+                                        getMobileCatalogObjectsData(true);
+                                    } else {
+                                        refreshCatalog(true);
+                                    }
                                 }
 
                             } else {
@@ -691,8 +793,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 catalogModelsList = new ArrayList<MyLearningModel>();
 //                if (isNetworkConnectionAvailable(getContext(), -1) && CATALOG_FRAGMENT_OPENED_FIRSTTIME == 0) {
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
-
-                    refreshCatalog(false);
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(false);
+                    } else {
+                        refreshCatalog(false);
+                    }
                 } else {
                     injectFromDbtoModel();
                 }
@@ -860,7 +965,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
+
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -968,7 +1074,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
                     toolbar.setVisibility(View.VISIBLE);
-//                    item_search.expandActionView();
                 break;
             case R.id.mylearning_info_help:
                 Log.d(TAG, "onOptionsItemSelected :mylearning_info_help ");
@@ -977,7 +1082,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 catalogAdapter.notifyDataSetChanged();
                 break;
             case R.id.mylearning_filter:
-                filterApiCall();
+//              filterApiCall();
+                advancedFilters();
                 break;
             case R.id.ctx_archive:
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
@@ -1006,7 +1112,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             pageIndex = 1;
         }
 
-        refreshCatalog(true);
+        if (isDigimedica) {
+            getMobileCatalogObjectsData(true);
+        } else {
+            refreshCatalog(true);
+        }
     }
 
 
@@ -1015,7 +1125,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             pageIndex = 1;
             queryString = "";
-            refreshCatalog(true);
+            if (isDigimedica) {
+                getMobileCatalogObjectsData(true);
+            } else {
+                refreshCatalog(true);
+            }
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -1256,13 +1370,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 menu.getItem(5).setVisible(true);
             }
         }
-        if (myLearningDetalData.isArchived()) {
-            menu.getItem(6).setVisible(true);//download
-        } else {
-            menu.getItem(7).setVisible(true);//download
+        if (myLearningDetalData.getAddedToMylearning() == 0) {
 
+            if (myLearningDetalData.isArchived()) {
+                menu.getItem(6).setVisible(true);//isWishListed
+            } else {
+                menu.getItem(7).setVisible(true);//removeWishListed
+            }
         }
-
         if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
             menu.getItem(5).setVisible(false);
         }
@@ -1341,33 +1456,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         break;
 
                 }
-//                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
-//
-//
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("View")) {
-//
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-//
-//
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-////                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("Add")) {
-//
-//
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
-//
-//
-//                }
+
                 return true;
             }
         });
@@ -1928,14 +2017,36 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 queryString = data.getStringExtra("queryString");
                 if (queryString.length() > 0) {
 
-                    refreshCatalog(true);
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(true);
+                    } else {
+                        refreshCatalog(true);
+                    }
 
                 }
 
             }
         }
 
+        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
+            if (data != null) {
+                boolean isApplied = data.getBooleanExtra("APPLY", false);
+                if (isApplied) {
 
+                    contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
+
+                    applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
+                    Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(true);
+                    } else {
+                        refreshCatalog(true);
+                    }
+
+                }
+            }
+        }
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
@@ -2019,6 +2130,192 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         };
     }
+
+    public List<AllFilterModel> getAllFilterModelList() {
+
+        List<AllFilterModel> allFilterModelList = new ArrayList<>();
+
+        AllFilterModel advFilterModel = new AllFilterModel();
+        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryID = 1;
+        allFilterModelList.add(advFilterModel);
+
+        if (responMap != null && responMap.containsKey("EnableGroupby")) {
+            String enableGroupby = responMap.get("EnableGroupby");
+            if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
+                AllFilterModel groupFilterModel = new AllFilterModel();
+                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryID = 2;
+                if (responMap != null && responMap.containsKey("ddlGroupby")) {
+
+                    String ddlGroupby = responMap.get("ddlGroupby");
+                    Log.d(TAG, "getAllFilterModelList: " + ddlGroupby);
+                    groupFilterModel.groupArrayList = getArrayListFromString(ddlGroupby);
+                    if (groupFilterModel.groupArrayList != null && groupFilterModel.groupArrayList.size() > 0) {
+                        allFilterModelList.add(groupFilterModel);
+                    }
+                }
+
+            }
+        }
+
+        AllFilterModel sortFilterModel = new AllFilterModel();
+        sortFilterModel.categoryName = "Sort By";
+        sortFilterModel.categoryID = 3;
+        allFilterModelList.add(sortFilterModel);
+
+        return allFilterModelList;
+    }
+
+
+    public List<ContentFilterByModel> generateContentFilters() {
+        List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+        if (contentFilterType != null && contentFilterType.length() > 0) {
+
+            List<String> filterCategoriesArray = getArrayListFromString(contentFilterType);
+
+            if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
+                for (int i = 0; i < filterCategoriesArray.size(); i++) {
+                    ContentFilterByModel contentFilterByModel = new ContentFilterByModel();
+
+                    switch (filterCategoriesArray.get(i)) {
+                        case "categories":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "cat";
+                            contentFilterByModel.categoryDisplayName = "Category";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "skills":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "skills";
+                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "objecttypeid":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "bytype";
+                            contentFilterByModel.categoryDisplayName = "Content Types";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "jobroles":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "jobroles";
+                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "solutions":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "tag";
+                            contentFilterByModel.categoryDisplayName = "Solutions";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "rating":
+                            if (responMap != null && responMap.containsKey("ShowrRatings")) {
+                                String showrRatings = responMap.get("ShowrRatings");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+                                    contentFilterByModel.categoryName = "Show Ratings";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "rate";
+                                    contentFilterByModel.categoryDisplayName = "Rating";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "eventduration":
+                            if (responMap != null && responMap.containsKey("SprateEvents")) {
+                                String showrRatings = responMap.get("SprateEvents");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+
+                                    contentFilterByModel.categoryName = "SprateEvents";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "duration";
+                                    contentFilterByModel.categoryDisplayName = "Duration";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "ecommerceprice":
+                            if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+                                String showrRatings = responMap.get("EnableEcommerce");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+                                    contentFilterByModel.categoryName = "EnableEcommerce";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "priceRange";
+                                    contentFilterByModel.categoryDisplayName = "PriceRange";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "instructor":
+                            contentFilterByModel.categoryName = "Instructor";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "inst";
+                            contentFilterByModel.categoryDisplayName = "Instructor";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "certificate":
+                            break;
+                        case "eventdates":
+                            contentFilterByModel.categoryName = "Event dates";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "eventdates";
+                            contentFilterByModel.categoryDisplayName = "eventdates";
+                            contentFilterByModel.goInside = false;
+                            break;
+
+                    }
+                    if (contentFilterByModel.categoryID.length() != 0) {
+                        contentFilterByModelList.add(contentFilterByModel);
+                    }
+                }
+            }
+        }
+        return contentFilterByModelList;
+
+    }
+
+    public List<String> getArrayListFromString(String questionCategoriesString) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (questionCategoriesString.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
+
+        return questionCategoriesArray;
+
+    }
+
+    public void advancedFilters() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            if (contentFilterByModelList.size() == 0) {
+                contentFilterByModelList = generateContentFilters();
+            }
+
+            List<AllFilterModel> allFilterModelList = getAllFilterModelList();
+
+            if (contentFilterByModelList != null && contentFilterByModelList.size() > 0) {
+                Intent intent = new Intent(context, AllFiltersActivity.class);
+                intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intent.putExtra("isFrom", 0);
+                intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
+                intent.putExtra("allFilterModelList", (Serializable) allFilterModelList);
+                startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
+            }
+        } else {
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
 
     public void filterApiCall() {
 
@@ -2484,7 +2781,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (REFRESH == 1) {
             if (isNetworkConnectionAvailable(getContext(), -1)) {
-                refreshCatalog(true);
+                if (isDigimedica) {
+                    getMobileCatalogObjectsData(true);
+                } else {
+                    refreshCatalog(true);
+                }
             } else {
                 injectFromDbtoModel();
             }
@@ -3099,6 +3400,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
+                if (s != null && s.length() > 2) {
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(true);
+                    } else {
+                        refreshCatalog(true);
+                    }
+                }
+
             }
         }, new Response.ErrorListener() {
             @Override

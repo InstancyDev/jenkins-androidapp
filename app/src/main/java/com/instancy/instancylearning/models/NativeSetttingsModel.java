@@ -128,7 +128,7 @@ public class NativeSetttingsModel {
                 FilterModel model = new FilterModel();
                 model.id = "1";
                 model.name = "Category";
-//                List<FilterModel> filterModelList = new ArrayList<FilterModel>();
+//                List<ContentFilterByModel> filterModelList = new ArrayList<ContentFilterByModel>();
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     FilterInnerModel filterInnerModel = new FilterInnerModel();

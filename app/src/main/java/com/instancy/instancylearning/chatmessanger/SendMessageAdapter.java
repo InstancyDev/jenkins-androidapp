@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,20 +46,20 @@ public class SendMessageAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
-    private List<PeopleListingModel> peopleListingModelList = null;
+    private List<ChatListModel> chatListModelList = null;
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
     private String TAG = SendMessageAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
-    private List<PeopleListingModel> searchList;
+    private List<ChatListModel> searchList;
 
 
-    public SendMessageAdapter(Activity activity, int resource, List<PeopleListingModel> peopleListingModelList) {
+    public SendMessageAdapter(Activity activity, int resource, List<ChatListModel> chatListModelList) {
         this.activity = activity;
-        this.peopleListingModelList = peopleListingModelList;
-        this.searchList = new ArrayList<PeopleListingModel>();
+        this.chatListModelList = chatListModelList;
+        this.searchList = new ArrayList<ChatListModel>();
         this.resource = resource;
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -68,21 +69,21 @@ public class SendMessageAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<PeopleListingModel> peopleListingModelList) {
-        this.peopleListingModelList = peopleListingModelList;
-        this.searchList = new ArrayList<PeopleListingModel>();
+    public void refreshList(List<ChatListModel> peopleListingModelList) {
+        this.chatListModelList = peopleListingModelList;
+        this.searchList = new ArrayList<ChatListModel>();
         this.searchList.addAll(peopleListingModelList);
         this.notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return peopleListingModelList != null ? peopleListingModelList.size() : 0;
+        return chatListModelList != null ? chatListModelList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return peopleListingModelList.get(position);
+        return chatListModelList.get(position);
     }
 
     @Override
@@ -96,21 +97,24 @@ public class SendMessageAdapter extends BaseAdapter {
 
         ViewHolder holder;
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.sendmessagecell, parent, false);
+        convertView = inflater.inflate(R.layout.sendmessageencell, parent, false);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        holder.txtName.setText(peopleListingModelList.get(position).userDisplayname);
-        holder.txtStatus.setText(peopleListingModelList.get(position).chatUserStatus);
+        holder.txtName.setText(chatListModelList.get(position).fullName);
+//        holder.txtRole.setText(chatListModelList.get(position).connectionStatus);
+        holder.txtRole.setText(chatListModelList.get(position).role);
+        holder.txtPlace.setText(chatListModelList.get(position).country);
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        holder.txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtPlace.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        String imagePath = peopleListingModelList.get(position).memberProfileImage;
+        String imagePath = chatListModelList.get(position).profPic;
 
-        int unreadCount = peopleListingModelList.get(position).chatCount;
+        int unreadCount = chatListModelList.get(position).unReadCount;
 
         if (unreadCount == 0) {
             holder.unreadCountTxt.setVisibility(View.GONE);
@@ -125,11 +129,10 @@ public class SendMessageAdapter extends BaseAdapter {
                     .buildRound("" + unreadCount, color);
             holder.unreadCountTxt.setBackground(drawable);
         }
-
-        String displayNameDrawable = getFirstCaseWords(peopleListingModelList.get(position).userDisplayname);
+        String displayNameDrawable = getFirstCaseWords(chatListModelList.get(position).fullName);
 
         if (imagePath.length() > 2) {
-            String imgUrl = peopleListingModelList.get(position).siteURL + peopleListingModelList.get(position).memberProfileImage;
+            String imgUrl = appUserModel.getSiteURL() + chatListModelList.get(position).profPic;
 
             Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
 
@@ -185,13 +188,16 @@ public class SendMessageAdapter extends BaseAdapter {
         CardView card_view;
 
         @Nullable
-        @BindView(R.id.txtStatus)
-        TextView txtStatus;
+        @BindView(R.id.txtRole)
+        TextView txtRole;
 
         @Nullable
         @BindView(R.id.unreadCountTxt)
         ImageView unreadCountTxt;
 
+        @Nullable
+        @BindView(R.id.txtPlace)
+        TextView txtPlace;
 
         @OnClick({R.id.card_view})
         public void actionsForMenu(View view) {

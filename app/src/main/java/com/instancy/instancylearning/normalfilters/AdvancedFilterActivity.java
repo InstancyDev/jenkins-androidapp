@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.advancedfilters;
+package com.instancy.instancylearning.normalfilters;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,11 +20,9 @@ import android.widget.ExpandableListView;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.filter.FilterAdapter;
-import com.instancy.instancylearning.filter.Filter_Inner_activity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.FiltersApplyModel;
-import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -126,7 +124,7 @@ public class AdvancedFilterActivity extends AppCompatActivity implements View.On
 //
 //                if (groupPosition == 1) {
 //
-//                    FiltersSerilization.FilterModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
+//                    FiltersSerilization.ContentFilterByModel filterModel = expandableListDetail.get("Filter By").get(childPosition);
 //                    Log.d(TAG, "onChildClick: " + filterModel.name);
 //
 //
@@ -189,7 +187,6 @@ public class AdvancedFilterActivity extends AppCompatActivity implements View.On
         });
 
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

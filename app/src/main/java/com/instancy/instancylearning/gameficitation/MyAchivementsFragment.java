@@ -214,7 +214,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     public void refreshGameList(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 //        String urlStr = appUserModel.getWebAPIUrl() + "/Mobilelms/GetGameList";
         String urlStr = appUserModel.getWebAPIUrl() + "/LeaderBoard/GetGameList";

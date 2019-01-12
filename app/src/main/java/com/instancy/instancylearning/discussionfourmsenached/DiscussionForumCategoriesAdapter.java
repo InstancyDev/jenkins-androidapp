@@ -57,6 +57,7 @@ public class DiscussionForumCategoriesAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+
     @Override
     public int getCount() {
         return discussionCategoriesModelList != null ? discussionCategoriesModelList.size() : 0;

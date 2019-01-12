@@ -31,6 +31,8 @@ public class SideMenusModel implements Serializable {
     public int isSubMenuExists = 0;
     public boolean isDataFound = false;
 
+
+
     public int getWebMenuId() {
         return webMenuId;
     }

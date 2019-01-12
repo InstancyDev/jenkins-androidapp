@@ -150,7 +150,9 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
         chxListview.setOnItemClickListener(this);
 
         discussionCategoriesModelList = db.fetchDiscussionCategories(appUserModel.getSiteIDValue());
-        discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+        if (discussionCategoriesModelList != null && discussionCategoriesModelList.size() > 0) {
+            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+        }
 
         checkBoxFunctionality();
 
@@ -183,6 +185,8 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         getMenuInflater().inflate(R.menu.globalsearchmenu, menu);
         MenuItem item_search = menu.findItem(R.id.globalsearch);
+
+        item_search.setVisible(false);
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -300,7 +304,6 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
     }
 
-
     public List<ContentValues> getSelectedCategories() {
 
         List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
@@ -377,11 +380,12 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
     }
 
     public void updateListViewAtPosition(boolean isChecked, int position) {
+
         if (discussionCategoriesModelList != null && discussionCategoriesModelList.size() > 0) {
             discussionCategoriesModelList.get(position).isSelected = isChecked;
             discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
         }
-        if (isALLChecked()){
+        if (isALLChecked()) {
             chxAll.setChecked(true);
             checkAllBool = true;
             chxAll.setText("Uncheck all");
@@ -420,7 +424,6 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
                     checkAllBool = false;
                     chxAll.setText("Check all");
                 }
-
                 break;
             default:
 

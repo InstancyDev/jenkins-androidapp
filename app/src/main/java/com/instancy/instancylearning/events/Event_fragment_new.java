@@ -72,6 +72,10 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFiltersActivity;
+import com.instancy.instancylearning.advancedfilters_mylearning.ApplyFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByModel;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.catalog.CatalogAdapter;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -96,6 +100,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,6 +120,7 @@ import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.EVENT_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE_ADV;
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
@@ -125,6 +131,7 @@ import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTimeInDate;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.getLastDateOfMonth;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
@@ -153,23 +160,21 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
     @BindView(R.id.mylearninglistview)
     ListView myLearninglistView;
-
+    boolean isDigimedica = true;
     CatalogAdapter catalogAdapter;
     List<MyLearningModel> catalogModelsList = null;
     List<MyLearningModel> contextMenuModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
-    Menu search_menu;
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "", contentFilterType = "";
     ResultListner resultListner = null;
     CmiSynchTask cmiSynchTask;
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
-    boolean isFromCatogories = false;
 
     boolean isFromGlobalSearch = false;
     String queryString = "";
@@ -193,7 +198,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
     String TABBALUE = "upcoming";
     String startDateStr = "", endDateStr = "";
-
+    HashMap<String, String> responMap = null;
 
     private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
@@ -201,8 +206,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
     private SimpleDateFormat dateFormatToSendserver = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
 
-
     private SimpleDateFormat getyearAndMonth = new SimpleDateFormat("MM-yyyy", Locale.getDefault());
+
+    List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+
+    ApplyFilterModel applyFilterModel = new ApplyFilterModel();
 
     public Event_fragment_new() {
 
@@ -237,7 +245,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         billingProcessor = new BillingProcessor(context, apiKey, this);
 
         sideMenusModel = null;
-        HashMap<String, String> responMap = null;
+
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
@@ -291,6 +299,12 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             ddlSortType = "asc";
         }
 
+        if (responMap != null && responMap.containsKey("ContentFilterBy")) {
+            contentFilterType = responMap.get("ContentFilterBy");
+        } else {
+            // No such key
+            contentFilterType = "";
+        }
 
     }
 
@@ -359,16 +373,111 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     }
 
 
+    public void getMobileCatalogObjectsData(Boolean isRefreshed) {
+
+        if (!isRefreshed) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsData";
+
+        JSONObject parameters = new JSONObject();
+        if (!TABBALUE.equalsIgnoreCase("calendar")) {
+
+            filterContentType = "%20C.ObjectTypeID%20=%2070%20And%20C.bit4%20Is%20null%20";
+            sortBy = "c.name%20asc";
+
+            try {
+
+                parameters.put("pageIndex", pageIndex);
+                parameters.put("pageSize", pageSize);
+                parameters.put("SearchText", queryString);
+                parameters.put("ContentID", "");
+                parameters.put("sortBy", "");
+                parameters.put("ComponentID", sideMenusModel.getComponentId());
+                parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+                parameters.put("AdditionalParams", "EventComponentID=153~FilterContentType=70~eventtype=" + TABBALUE + "~HideCompleteStatus=true");
+                parameters.put("SelectedTab", "");
+                parameters.put("AddtionalFilter", "");
+                parameters.put("LocationFilter", "");
+                parameters.put("UserID", appUserModel.getUserIDValue());
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
+                parameters.put("Locale", "en-us");
+                parameters.put("groupBy", applyFilterModel.groupBy);
+                parameters.put("categories", applyFilterModel.categories);
+                parameters.put("objecttypes", applyFilterModel.objectTypes);
+                parameters.put("skillcats", applyFilterModel.skillCats);
+                parameters.put("skills", applyFilterModel.skills);
+                parameters.put("jobroles", applyFilterModel.jobRoles);
+                parameters.put("solutions", applyFilterModel.solutions);
+                parameters.put("keywords", "");
+                parameters.put("ratings", applyFilterModel.ratings);
+                parameters.put("pricerange", applyFilterModel.priceRange);
+                parameters.put("eventdate", "");
+                parameters.put("certification", "");
+                parameters.put("duration", applyFilterModel.duration);
+                parameters.put("instructors", applyFilterModel.instructors);
+                parameters.put("iswishlistcontent", "");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+
+            try {
+                parameters.put("pageIndex", pageIndex);
+                parameters.put("pageSize", pageSize);
+                parameters.put("SearchText", queryString);
+                parameters.put("ContentID", "");
+                parameters.put("sortBy", "");
+                parameters.put("ComponentID", sideMenusModel.getComponentId());
+                parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+                parameters.put("AdditionalParams", "");
+                parameters.put("SelectedTab", "");
+                parameters.put("AddtionalFilter", "");
+                parameters.put("LocationFilter", "");
+                parameters.put("UserID", appUserModel.getUserIDValue());
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
+                parameters.put("Locale", "en-us");
+                parameters.put("groupBy", "");
+                parameters.put("categories", "");
+                parameters.put("objecttypes", "");
+                parameters.put("skillcats", "");
+                parameters.put("skills", "");
+                parameters.put("jobroles", "");
+                parameters.put("solutions", "");
+                parameters.put("keywords", "");
+                parameters.put("ratings", "");
+                parameters.put("pricerange", "");
+                parameters.put("eventdate", startDateStr + "~" + endDateStr);
+                parameters.put("certification", "");
+                parameters.put("duration", "");
+                parameters.put("instructors", "");
+                parameters.put("iswishlistcontent", 0);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "CATALOGDATA", urlStr);
+    }
+
+
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + response);
-
+                svProgressHUD.dismiss();
+                swipeRefreshLayout.setRefreshing(false);
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
-
                         if (TABBALUE.equalsIgnoreCase("upcoming")) {
                             StaticValues.UPCOMINGCALLED = 1;
                         } else if (TABBALUE.equalsIgnoreCase("calendar")) {
@@ -385,15 +494,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             e.printStackTrace();
                         }
                     } else {
-
                         nodata_Label.setText(getResources().getString(R.string.no_data));
-
                     }
-
-                    svProgressHUD.dismiss();
-                    swipeRefreshLayout.setRefreshing(false);
                 }
-
                 if (requestType.equalsIgnoreCase("GLB")) {
                     if (response != null) {
                         try {
@@ -440,6 +543,33 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+                if (response != null && response.length() > 0) {
+                    if (TABBALUE.equalsIgnoreCase("upcoming")) {
+                        StaticValues.UPCOMINGCALLED = 1;
+                    } else if (TABBALUE.equalsIgnoreCase("calendar")) {
+                        pageIndex = 1;
+                        StaticValues.CALENDARCALLED = 1;
+                    } else if (TABBALUE.equalsIgnoreCase("past")) {
+                        StaticValues.PASTCALLED = 1;
+                    }
+                    JSONObject jsonObj = null;
+                    try {
+                        jsonObj = new JSONObject(response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (jsonObj != null) {
+                            db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId());
+                            totalRecordsCount = countOfTotalRecords(jsonObj);
+                        }
+                        injectFromDbtoModel(true);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    nodata_Label.setText(getResources().getString(R.string.no_data));
+                }
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
@@ -528,7 +658,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                 if (isFromGlobalSearch) {
                                     refresGlobalSearchEvents(false);
                                 } else {
-                                    refreshCatalog(true);
+                                    if (isDigimedica) {
+                                        getMobileCatalogObjectsData(true);
+                                    } else {
+                                        refreshCatalog(true);
+                                    }
                                 }
 
 
@@ -580,7 +714,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             refresGlobalSearchEvents(false);
         } else {
             if (isNetworkConnectionAvailable(getContext(), -1)) {
-                refreshCatalog(false);
+                if (isDigimedica) {
+                    getMobileCatalogObjectsData(true);
+                } else {
+                    refreshCatalog(true);
+                }
             } else {
                 injectFromDbtoModel(true);
             }
@@ -664,7 +802,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
 
         if (isFromGlobalSearch) {
             item_search.setVisible(false);
@@ -726,6 +864,14 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             }
         });
 
+        if (item_filter != null) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
+            item_filter.setIcon(filterDrawable);
+            item_filter.setTitle("Filter");
+
+        }
+
+
     }
 
     public void gotoGlobalSearch() {
@@ -777,6 +923,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 catalogAdapter.notifyDataSetChanged();
                 break;
             case R.id.mylearning_filter:
+                advancedFilters();
                 break;
 
         }
@@ -790,7 +937,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             queryString = "";
             pageIndex = 1;
-            refreshCatalog(true);
+            if (isDigimedica) {
+                getMobileCatalogObjectsData(true);
+            } else {
+                refreshCatalog(true);
+            }
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -1617,10 +1768,34 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 queryString = data.getStringExtra("queryString");
                 if (queryString.length() > 0) {
 
-                    refreshCatalog(true);
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(true);
+                    } else {
+                        refreshCatalog(true);
+                    }
 
                 }
 
+            }
+        }
+
+        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
+            if (data != null) {
+                boolean isApplied = data.getBooleanExtra("APPLY", false);
+                if (isApplied) {
+
+                    contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
+
+                    applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
+                    Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(true);
+                    } else {
+                        refreshCatalog(true);
+                    }
+
+                }
             }
         }
 
@@ -1723,7 +1898,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 nodata_Label.setText("");
                 if (StaticValues.UPCOMINGCALLED == 0) {
                     pageIndex = 1;
-                    refreshCatalog(false);
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(false);
+                    } else {
+                        refreshCatalog(false);
+                    }
                 } else {
                     injectFromDbtoModel(false);
                 }
@@ -1737,16 +1916,14 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 YearTitle.setVisibility(View.VISIBLE);
                 StaticValues.UPCOMINGCALLED = 0;
                 StaticValues.PASTCALLED = 0;
-//                String todayD = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
-//                onDayClick(getCurrentDateTimeInDate(todayD));
                 TABBALUE = "calendar";
                 nodata_Label.setText("");
                 getStartDateandEndDate(true);
-//                if (StaticValues.CALENDARCALLED == 0) {
-                refreshCatalog(false);
-//                } else {
-//                    injectFromDbtoModel(false);
-//                }
+                if (isDigimedica) {
+                    getMobileCatalogObjectsData(false);
+                } else {
+                    refreshCatalog(false);
+                }
                 break;
             case R.id.pastbtn:
                 upBtn.setTypeface(null, Typeface.NORMAL);
@@ -1759,7 +1936,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 nodata_Label.setText("");
                 if (StaticValues.PASTCALLED == 0) {
                     pageIndex = 1;
-                    refreshCatalog(false);
+                    if (isDigimedica) {
+                        getMobileCatalogObjectsData(false);
+                    } else {
+                        refreshCatalog(false);
+                    }
                 } else {
                     injectFromDbtoModel(false);
                 }
@@ -1905,7 +2086,11 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             startDateStr = start.replace(" ", "%20");
             endDateStr = endDate.replace(" ", "%20");
             if (!tabClicked) {
-                refreshCatalog(false);
+                if (isDigimedica) {
+                    getMobileCatalogObjectsData(false);
+                } else {
+                    refreshCatalog(false);
+                }
             }
         }
 
@@ -2766,9 +2951,191 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             pageIndex = pageIndex + 1;
         }
 
-
         return myLearningModelList;
     }
 
+    public void advancedFilters() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            if (contentFilterByModelList.size() == 0) {
+                contentFilterByModelList = generateContentFilters();
+            }
+
+            List<AllFilterModel> allFilterModelList = getAllFilterModelList();
+
+            if (contentFilterByModelList != null && contentFilterByModelList.size() > 0) {
+                Intent intent = new Intent(context, AllFiltersActivity.class);
+                intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intent.putExtra("isFrom", 0);
+                intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
+                intent.putExtra("allFilterModelList", (Serializable) allFilterModelList);
+                startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
+            }
+        } else {
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+
+    public List<AllFilterModel> getAllFilterModelList() {
+
+        List<AllFilterModel> allFilterModelList = new ArrayList<>();
+
+        AllFilterModel advFilterModel = new AllFilterModel();
+        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryID = 1;
+        allFilterModelList.add(advFilterModel);
+
+        if (responMap != null && responMap.containsKey("EnableGroupby")) {
+            String enableGroupby = responMap.get("EnableGroupby");
+            if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
+                AllFilterModel groupFilterModel = new AllFilterModel();
+                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryID = 2;
+                if (responMap != null && responMap.containsKey("ddlGroupby")) {
+
+                    String ddlGroupby = responMap.get("ddlGroupby");
+                    Log.d(TAG, "getAllFilterModelList: " + ddlGroupby);
+                    groupFilterModel.groupArrayList = getArrayListFromString(ddlGroupby);
+                    if (groupFilterModel.groupArrayList != null && groupFilterModel.groupArrayList.size() > 0) {
+                        allFilterModelList.add(groupFilterModel);
+                    }
+                }
+
+            }
+        }
+//        AllFilterModel sortFilterModel = new AllFilterModel();
+//        sortFilterModel.categoryName = "Sort By";
+//        sortFilterModel.categoryID = 3;
+//        allFilterModelList.add(sortFilterModel);
+
+        return allFilterModelList;
+    }
+
+    public List<String> getArrayListFromString(String questionCategoriesString) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (questionCategoriesString.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
+
+        return questionCategoriesArray;
+
+    }
+
+    public List<ContentFilterByModel> generateContentFilters() {
+        List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+        if (contentFilterType != null && contentFilterType.length() > 0) {
+
+            List<String> filterCategoriesArray = getArrayListFromString(contentFilterType);
+
+            if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
+                for (int i = 0; i < filterCategoriesArray.size(); i++) {
+                    ContentFilterByModel contentFilterByModel = new ContentFilterByModel();
+
+                    switch (filterCategoriesArray.get(i)) {
+                        case "categories":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "cat";
+                            contentFilterByModel.categoryDisplayName = "Category";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "skills":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "skills";
+                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "objecttypeid":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "bytype";
+                            contentFilterByModel.categoryDisplayName = "Content Types";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "jobroles":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "jobroles";
+                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "solutions":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "tag";
+                            contentFilterByModel.categoryDisplayName = "Solutions";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "rating":
+                            if (responMap != null && responMap.containsKey("ShowrRatings")) {
+                                String showrRatings = responMap.get("ShowrRatings");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+                                    contentFilterByModel.categoryName = "Show Ratings";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "rate";
+                                    contentFilterByModel.categoryDisplayName = "Rating";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "eventduration":
+                            if (responMap != null && responMap.containsKey("SprateEvents")) {
+                                String showrRatings = responMap.get("SprateEvents");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+
+                                    contentFilterByModel.categoryName = "SprateEvents";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "duration";
+                                    contentFilterByModel.categoryDisplayName = "Duration";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "ecommerceprice":
+                            if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+                                String showrRatings = responMap.get("EnableEcommerce");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+                                    contentFilterByModel.categoryName = "EnableEcommerce";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "priceRange";
+                                    contentFilterByModel.categoryDisplayName = "PriceRange";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "instructor":
+                            contentFilterByModel.categoryName = "Instructor";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "inst";
+                            contentFilterByModel.categoryDisplayName = "Instructor";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "certificate":
+                            break;
+                        case "eventdates":
+                            contentFilterByModel.categoryName = "Event dates";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "eventdates";
+                            contentFilterByModel.categoryDisplayName = "eventdates";
+                            contentFilterByModel.goInside = false;
+                            break;
+
+                    }
+                    if (contentFilterByModel.categoryID.length() != 0) {
+                        contentFilterByModelList.add(contentFilterByModel);
+                    }
+                }
+            }
+        }
+        return contentFilterByModelList;
+
+    }
 
 }

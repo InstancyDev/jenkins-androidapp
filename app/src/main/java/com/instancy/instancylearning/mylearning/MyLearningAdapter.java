@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
@@ -667,7 +668,24 @@ public class MyLearningAdapter extends BaseAdapter {
 
         Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
+        String thumbUrl = myLearningModel.get(position).getSiteURL() + "/Content/SiteFiles/ContentTypeIcons/" + myLearningModel.get(position).getContentTypeImagePath();
+
+        Picasso.with(vi.getContext()).
+                load(thumbUrl).
+                into(holder.fabbtnthumb);
+
+        holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorWhite)));
+
+//        holder.fabbtnthumb.setVisibility(View.VISIBLE);
+
 //        holder.btnContextMenu.setImageTintList(ColorStateList.valueOf(Color.parseColor("#ff0000")));
+
+        if (myLearningModel.get(position).getIsRequired() == 1) {
+            holder.lbRequired.setVisibility(View.VISIBLE);
+        } else {
+            holder.lbRequired.setVisibility(View.INVISIBLE);
+        }
+
 
         final float oldRating = ratingValue;
 
@@ -874,6 +892,13 @@ public class MyLearningAdapter extends BaseAdapter {
         @BindView(R.id.locationlayout)
         LinearLayout locationlayout;
 
+        @Nullable
+        @BindView(R.id.fabbtnthumb)
+        FloatingActionButton fabbtnthumb;
+
+        @Nullable
+        @BindView(R.id.lbRequired)
+        TextView lbRequired;
 
         @Nullable
         @BindView(R.id.circle_progress)

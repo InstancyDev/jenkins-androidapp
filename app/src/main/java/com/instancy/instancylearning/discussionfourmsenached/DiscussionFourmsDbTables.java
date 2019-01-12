@@ -10,6 +10,7 @@ import android.text.Spanned;
 import android.util.Log;
 
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.localization.LocalizationSelectionModel;
 import com.instancy.instancylearning.models.AppUserModel;
 
 import org.json.JSONArray;
@@ -1096,8 +1097,6 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
 
         return discussionCategoriesModellist;
     }
-
-
 }
 
 

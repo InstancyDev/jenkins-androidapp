@@ -51,7 +51,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.advancedfilters.AdvancedFilterActivity;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFiltersActivity;
+import com.instancy.instancylearning.advancedfilters_mylearning.ApplyFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByModel;
+import com.instancy.instancylearning.normalfilters.AdvancedFilterActivity;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.filter.Filter_activity;
@@ -83,7 +87,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -98,6 +104,7 @@ import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE_ADV;
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
@@ -133,7 +140,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     Menu search_menu;
     MenuItem item_search, itemArchive;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "", searchText = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "", searchText = "", contentFilterType = "";
     ResultListner resultListner = null;
     WebAPIClient webAPIClient;
     CmiSynchTask cmiSynchTask;
@@ -152,13 +159,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     EventInterface eventInterface = null;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 50;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+
+    boolean isDigimedica = true;
 
     boolean isSearching = false;
     boolean userScrolled = false;
     boolean isArchived = false;
     int isArchi = 0;
     ProgressBar progressBar;
+    HashMap<String, String> responMap = null;
+    List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+    ApplyFilterModel applyFilterModel = new ApplyFilterModel();
 
     public MyLearningFragment() {
 
@@ -188,7 +200,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         sideMenusModel = null;
         webAPIClient = new WebAPIClient(context);
-        HashMap<String, String> responMap = null;
+
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
@@ -242,6 +254,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             // No such key
             filterContentType = "";
         }
+
+        if (responMap != null && responMap.containsKey("ContentFilterBy")) {
+            contentFilterType = responMap.get("ContentFilterBy");
+        } else {
+            // No such key
+            contentFilterType = "";
+        }
+
     }
 
     @Override
@@ -254,7 +274,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
         String paramsString = "FilterCondition=" + filterContentType +
@@ -267,7 +286,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=" + searchText + "&SiteID="
                 + appUserModel.getSiteIDValue()
                 + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0" + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&CompInsID=" + sideMenusModel.getRepositoryId() + "&sortType=" + ddlSortType + "&sortby=" + ddlSortList + "&IsArchieve=" + isArchi;
-
 
         vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
     }
@@ -348,6 +366,30 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+
+                if (requestType.equalsIgnoreCase("MYLEARNINGDATA")) {
+                    if (response != null) {
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+                            db.injectMyLearningData(jsonObj, pageIndex);
+                            totalRecordsCount = countOfTotalRecords(jsonObj);
+                            if (totalRecordsCount == 0) {
+                                myLearningModelsList = new ArrayList<MyLearningModel>();
+                                myLearningAdapter.refreshList(myLearningModelsList);
+                                nodata_Label.setText(getResources().getString(R.string.no_data));
+                            } else {
+                                injectFromDbtoModel();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
@@ -374,7 +416,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     public void injectFromDbtoModel() {
 //          myLearningModelsList.clear();
-
         myLearningModelsList = db.fetchMylearningModel();
         if (myLearningModelsList != null) {
 //            Log.d(TAG, "dataLoaded: " + myLearningModelsList.size());
@@ -535,7 +576,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         if (!isSearching) {
                             progressBar.setVisibility(View.VISIBLE);
                             if (isNetworkConnectionAvailable(getContext(), -1)) {
-                                refreshMyLearning(true);
+                                if (isDigimedica) {
+                                    getMobileMyCatalogObjectsNew(true);
+                                } else {
+                                    refreshMyLearning(true);
+                                }
                             } else {
                                 progressBar.setVisibility(View.GONE);
                                 Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -591,8 +636,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         if (isNetworkConnectionAvailable(getContext(), -1) && MYLEARNING_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
-            refreshMyLearning(false);
-
+//            refreshMyLearning(false);
+            if (isDigimedica) {
+                getMobileMyCatalogObjectsNew(false);
+            } else {
+                refreshMyLearning(false);
+            }
         } else {
 //            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
             injectFromDbtoModel();
@@ -652,7 +701,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             itemInfo.setVisible(false);
         }
 
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
+
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
@@ -684,8 +734,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     return true;
                 }
             });
-
-
         }
 
         if (itemArchive != null) {
@@ -772,12 +820,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 myLearningAdapter.notifyDataSetChanged();
                 break;
             case R.id.mylearning_filter:
-                filterApiCall();
+//                filterApiCall();
+                advancedFilters();
                 break;
             case R.id.ctx_archive:
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
                     isArchivedCall();
-                }else {
+                } else {
                     showToast(context, "No Internet");
                 }
                 break;
@@ -795,21 +844,25 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     public void isArchivedCall() {
-// itemsearchIcon
-
         if (isArchived) {
             Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
             isArchived = false;
             isArchi = 0;
+            pageIndex = 1;
         } else {
             Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_leanpub, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
             isArchived = true;
             isArchi = 1;
+            pageIndex = 1;
         }
 
-        refreshMyLearning(true);
+        if (isDigimedica) {
+            getMobileMyCatalogObjectsNew(true);
+        } else {
+            refreshMyLearning(true);
+        }
     }
 
     public HashMap<String, String> generateHashMap(String[] conditionsArray) {
@@ -840,7 +893,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             pageIndex = 1;
             searchText = "";
-            refreshMyLearning(true);
+            if (isDigimedica) {
+                getMobileMyCatalogObjectsNew(true);
+            } else {
+                refreshMyLearning(true);
+            }
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -1273,7 +1330,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             } else {
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
                 if (refresh) {
-                    refreshMyLearning(true);
+
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
                 }
 
             }
@@ -1321,9 +1383,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
                 if (refresh) {
-//                        initilizeRatingsListView();
-//                    injectFromDbtoModel();
-                    refreshMyLearning(true);
+
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
 
                 }
 
@@ -1335,12 +1400,36 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 searchText = data.getStringExtra("queryString");
                 if (searchText.length() > 0) {
 
-                    refreshMyLearning(true);
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
 
                 }
-
             }
         }
+
+        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
+            if (data != null) {
+                boolean isApplied = data.getBooleanExtra("APPLY", false);
+                if (isApplied) {
+
+                    contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
+
+                    applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
+                    Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
+
+                }
+            }
+        }
+
 
     }
 
@@ -1517,20 +1606,254 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         return totalRecs;
     }
-//    public void getUpdatedDataAfterReviewToContent(MyLearningModel learningModel) {
-//
-//        String paramsString = "FilterCondition=" + filterContentType +
-//                "&SortCondition=" + sortBy +
-//                "&RecordCount=0&OrgUnitID="
-//                + appUserModel.getSiteIDValue()
-//                + "&UserID="
-//                + appUserModel.getUserIDValue()
-//                + "&Type=" + consolidationType
-//                + "&FilterID=-1&ComponentID=3&Locale=en-us&SearchText=&SiteID="
-//                + appUserModel.getSiteIDValue()
-//                + "&PreferenceID=-1&CategoryCompID=19&DateOfMyLastAccess=&SingleBranchExpand=false&GoogleValues=&DeliveryMode=1&GroupJoin=0";
-//        vollyService.getJsonObjResponseVolley("MYLEARNINGDATA", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileMyCatalogObjectsNew?" + paramsString, appUserModel.getAuthHeaders());
-//    }
+
+    public void advancedFilters() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            if (contentFilterByModelList.size() == 0) {
+                contentFilterByModelList = generateContentFilters();
+            }
+
+            List<AllFilterModel> allFilterModelList = getAllFilterModelList();
+
+            if (contentFilterByModelList != null && contentFilterByModelList.size() > 0) {
+                Intent intent = new Intent(context, AllFiltersActivity.class);
+                intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intent.putExtra("isFrom", 0);
+                intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
+                intent.putExtra("allFilterModelList", (Serializable) allFilterModelList);
+                startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
+            }
+        } else {
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
 
 
+    public List<AllFilterModel> getAllFilterModelList() {
+
+        List<AllFilterModel> allFilterModelList = new ArrayList<>();
+
+        AllFilterModel advFilterModel = new AllFilterModel();
+        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryID = 1;
+        allFilterModelList.add(advFilterModel);
+
+        if (responMap != null && responMap.containsKey("EnableGroupby")) {
+            String enableGroupby = responMap.get("EnableGroupby");
+            if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
+                AllFilterModel groupFilterModel = new AllFilterModel();
+                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryID = 2;
+                groupFilterModel.isGroup = true;
+                if (responMap != null && responMap.containsKey("ddlGroupby")) {
+                    String ddlGroupby = responMap.get("ddlGroupby");
+                    Log.d(TAG, "getAllFilterModelList: " + ddlGroupby);
+                    groupFilterModel.groupArrayList = getArrayListFromString(ddlGroupby);
+                    if (groupFilterModel.groupArrayList != null && groupFilterModel.groupArrayList.size() > 0) {
+                        allFilterModelList.add(groupFilterModel);
+                    }
+                }
+            }
+        }
+
+//        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
+//            String enableSortby = responMap.get("EnableFilterSort");
+//            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+//                AllFilterModel sortFilterModel = new AllFilterModel();
+//                sortFilterModel.categoryName = "Sort By";
+//                sortFilterModel.categoryID = 3;
+//                allFilterModelList.add(sortFilterModel);
+//            }
+//        }
+
+        AllFilterModel sortFilterModel = new AllFilterModel();
+        sortFilterModel.categoryName = "Sort By";
+        sortFilterModel.categoryID = 3;
+        allFilterModelList.add(sortFilterModel);
+
+        return allFilterModelList;
+    }
+
+    public List<ContentFilterByModel> generateContentFilters() {
+        List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+        if (contentFilterType != null && contentFilterType.length() > 0) {
+
+            List<String> filterCategoriesArray = getArrayListFromString(contentFilterType);
+
+            if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
+                for (int i = 0; i < filterCategoriesArray.size(); i++) {
+                    ContentFilterByModel contentFilterByModel = new ContentFilterByModel();
+
+                    switch (filterCategoriesArray.get(i)) {
+                        case "categories":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "cat";
+                            contentFilterByModel.categoryDisplayName = "Category";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "skills":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "skills";
+                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "objecttypeid":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "bytype";
+                            contentFilterByModel.categoryDisplayName = "Content Types";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "jobroles":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "jobroles";
+                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "solutions":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "tag";
+                            contentFilterByModel.categoryDisplayName = "Solutions";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "rating":
+                            if (responMap != null && responMap.containsKey("ShowrRatings")) {
+                                String showrRatings = responMap.get("ShowrRatings");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+                                    contentFilterByModel.categoryName = "Show Ratings";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "rate";
+                                    contentFilterByModel.categoryDisplayName = "Rating";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "eventduration":
+                            if (responMap != null && responMap.containsKey("SprateEvents")) {
+                                String showrRatings = responMap.get("SprateEvents");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+
+                                    contentFilterByModel.categoryName = "SprateEvents";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "duration";
+                                    contentFilterByModel.categoryDisplayName = "Duration";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "ecommerceprice":
+                            if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+                                String showrRatings = responMap.get("EnableEcommerce");
+                                if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
+                                    contentFilterByModel.categoryName = "EnableEcommerce";
+                                    contentFilterByModel.categoryIcon = "";
+                                    contentFilterByModel.categoryID = "priceRange";
+                                    contentFilterByModel.categoryDisplayName = "PriceRange";
+                                    contentFilterByModel.goInside = false;
+                                }
+                            }
+                            break;
+                        case "instructor":
+                            contentFilterByModel.categoryName = "Instructor";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "inst";
+                            contentFilterByModel.categoryDisplayName = "Instructor";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "certificate":
+                            break;
+                        case "eventdates":
+                            contentFilterByModel.categoryName = "Event dates";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "eventdates";
+                            contentFilterByModel.categoryDisplayName = "eventdates";
+                            contentFilterByModel.goInside = false;
+                            break;
+
+                    }
+                    if (contentFilterByModel.categoryID.length() != 0) {
+                        contentFilterByModelList.add(contentFilterByModel);
+                    }
+                }
+//                ContentFilterByModel contentFilterByModel = new ContentFilterByModel();
+//                contentFilterByModel.categoryName = "EnableEcommerce";
+//                contentFilterByModel.categoryIcon = "";
+//                contentFilterByModel.categoryID = "priceRange";
+//                contentFilterByModel.categoryDisplayName = "PriceRange";
+//                contentFilterByModelList.add(contentFilterByModel);
+//                contentFilterByModel.goInside = false;
+
+            }
+        }
+        return contentFilterByModelList;
+
+    }
+
+    public List<String> getArrayListFromString(String questionCategoriesString) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (questionCategoriesString.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
+
+        return questionCategoriesArray;
+
+    }
+
+
+    public void getMobileMyCatalogObjectsNew(Boolean isRefreshed) {
+
+        if (!isRefreshed) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileMyCatalogObjectsData";
+
+        JSONObject parameters = new JSONObject();
+
+        try {
+
+            parameters.put("pageIndex", pageIndex);
+            parameters.put("pageSize", pageSize);
+            parameters.put("SearchText", searchText);
+            parameters.put("source", 0);
+            parameters.put("type", 0);
+            parameters.put("sortBy", ddlSortList);
+            parameters.put("ComponentID", sideMenusModel.getComponentId());
+            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+            parameters.put("HideComplete", "false");
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("SiteID", appUserModel.getSiteIDValue());
+            parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
+            parameters.put("Locale", "en-us");
+            parameters.put("groupBy", applyFilterModel.groupBy);
+            parameters.put("categories", applyFilterModel.categories);
+            parameters.put("objecttypes", applyFilterModel.objectTypes);
+            parameters.put("skillcats", applyFilterModel.skillCats);
+            parameters.put("skills", applyFilterModel.skills);
+            parameters.put("jobroles", applyFilterModel.jobRoles);
+            parameters.put("solutions", applyFilterModel.solutions);
+            parameters.put("ratings", applyFilterModel.ratings);
+            parameters.put("keywords", "");
+            parameters.put("pricerange", applyFilterModel.priceRange);
+            parameters.put("duration", applyFilterModel.duration);
+            parameters.put("instructors", applyFilterModel.instructors);
+            parameters.put("IsArchived", isArchi);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "MYLEARNINGDATA", urlStr);
+    }
 }

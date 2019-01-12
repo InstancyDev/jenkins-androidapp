@@ -19,6 +19,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,6 +42,7 @@ import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.google.gson.JsonObject;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.catalogfragment.CatalogFragmentActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
@@ -150,7 +152,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
             svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MySkills/GetSkilsData?SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue();
+        String urlStr = appUserModel.getWebAPIUrl() + "/MySkills/GetSkilsData?SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId();
 
         vollyService.getStringResponseVolley("GetSkilsData", urlStr, appUserModel.getAuthHeaders());
 
@@ -266,7 +268,19 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         refreshMySkills(true);
                     }
                 }
+                if (requestType.equalsIgnoreCase("DeleteSkills")) {
+                    if (response != null && response.length() > 0) {
 
+                        Log.d(TAG, "notifySuccess: " + response);
+
+                        if (response.equalsIgnoreCase("4")) {
+                            refreshMySkills(true);
+                        } else {
+                            Toast.makeText(context, "Unable to Delete the selected skill", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }
 
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
@@ -350,25 +364,25 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         mySkillModelList = new ArrayList<MySkillModel>();
-        mySkillAdapter = new MySkillAdapter(getActivity(), mySkillModelList, "", appUserModel, sideMenusModel);
+        mySkillAdapter = new MySkillAdapter(getActivity(), mySkillModelList, "", appUserModel, sideMenusModel, mySkillExpList);
         mySkillExpList.setAdapter(mySkillAdapter);
         mySkillExpList.setOnItemClickListener(this);
         mySkillExpList.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
         mySkillExpList.addHeaderView(header, null, false);
-//        mySkillExpList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
-//                switch (view.getId()) {
-//                    case R.id.btn_contextmenu:
-//                        Log.d(TAG, "onChildClick: ");
-//                        break;
-//
-//
-//                }
-//                return false;
-//            }
-//        });
+        mySkillExpList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
+                switch (view.getId()) {
+                    case R.id.btn_contextmenu:
+                        SkillCountModel childSkillModel = mySkillModelList.get(i).skillCountModelList.get(i1);
+                        mySkillContextMenu(view, i, childSkillModel);
+                        break;
+
+                }
+                return false;
+            }
+        });
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshMySkills(false);
         } else {
@@ -625,7 +639,6 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 //    }
 
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO Add your menu entries here
@@ -731,4 +744,67 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
             }
         }
     }
+
+    public void mySkillContextMenu(final View v, final int position, final SkillCountModel skillCountModel) {
+
+        PopupMenu popup = new PopupMenu(v.getContext(), v);
+        //Inflating the Popup using xml file
+        popup.getMenuInflater().inflate(R.menu.myskillcontextmenu, popup.getMenu());
+        //registering popup with OnMenuItemClickListene
+
+        Menu menu = popup.getMenu();
+
+        menu.getItem(0).setVisible(true);
+        menu.getItem(1).setVisible(true);
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+
+
+                switch (item.getItemId()) {
+                    case R.id.ctx_viewcontent:
+                        Intent intentDetail = new Intent(context, CatalogFragmentActivity.class);
+                        intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+                        intentDetail.putExtra("TITLENAME", mySkillModelList.get(position).skillName);
+//                        intentDetail.putExtra("SKILLID", skillModelList.get(position).sk);
+                        intentDetail.putExtra("ISFROMMYCOMPETENCY", true);
+                        startActivity(intentDetail);
+                        break;
+                    case R.id.ctx_delete:
+                        if (isNetworkConnectionAvailable(context, -1)) {
+                            deleteMySkill(skillCountModel.prefCatID);
+                        } else {
+
+                            Toast.makeText(context, context.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        }
+
+                        break;
+
+                }
+
+                return true;
+            }
+        });
+        popup.show();//showing popup menu
+    }
+
+
+    public void deleteMySkill(int preferrenceID) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MySkills/DeleteSkills";
+
+        JSONObject parameters = new JSONObject();
+
+        try {
+            parameters.put("PreferrenceID", preferrenceID);
+            parameters.put("UserID", appUserModel.getUserIDValue());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "DeleteSkills", urlStr);
+    }
+
 }

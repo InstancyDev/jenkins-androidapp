@@ -1,4 +1,4 @@
-package com.instancy.instancylearning.advancedfilters;
+package com.instancy.instancylearning.normalfilters;
 
 import java.io.Serializable;
 

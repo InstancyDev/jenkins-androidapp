@@ -2,6 +2,7 @@ package com.instancy.instancylearning.catalog;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -10,6 +11,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -282,18 +284,19 @@ public class CatalogAdapter extends BaseAdapter {
         String imgUrl = myLearningModel.get(position).getImageData();
 
         Picasso.with(vi.getContext()).
-
                 load(imgUrl).
-
                 placeholder(R.drawable.cellimage).
-
                 into(holder.imgThumb);
 
-        if (myLearningModel.get(position).
+        String thumbUrl = myLearningModel.get(position).getSiteURL() + "/Content/SiteFiles/ContentTypeIcons/" + myLearningModel.get(position).getContentTypeImagePath();
 
-                getShortDes().
+        Picasso.with(vi.getContext()).
+                load(thumbUrl).
+                into(holder.fabbtnthumb);
 
-                isEmpty())
+        holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorWhite)));
+        holder.fabbtnthumb.setVisibility(View.VISIBLE);
+        if (myLearningModel.get(position).getShortDes().isEmpty())
 
         {
             holder.txtShortDisc.setVisibility(View.GONE);
@@ -715,6 +718,10 @@ public class CatalogAdapter extends BaseAdapter {
         @BindView(R.id.locationlayout)
         LinearLayout locationlayout;
 
+
+        @Nullable
+        @BindView(R.id.fabbtnthumb)
+        FloatingActionButton fabbtnthumb;
 
         @Nullable
         @BindView(R.id.circle_progress)

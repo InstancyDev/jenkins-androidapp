@@ -10,10 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.advancedfilters.AdvancedFilterModel;
-import com.instancy.instancylearning.advancedfilters.FiltersSerilization;
+import com.instancy.instancylearning.normalfilters.AdvancedFilterModel;
 import com.instancy.instancylearning.helper.FontManager;
-import com.instancy.instancylearning.models.NativeSetttingsModel;
 
 import java.util.Collections;
 import java.util.HashMap;

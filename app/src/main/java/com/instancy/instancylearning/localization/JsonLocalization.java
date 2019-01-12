@@ -105,7 +105,7 @@ public class JsonLocalization {
 
         String valueName = "";
 
-        valueName = ctx.getResources().getString(ctx.getResources().getIdentifier(keyName, "string",ctx.getApplicationInfo().packageName));
+        valueName = ctx.getResources().getString(ctx.getResources().getIdentifier(keyName, "string", ctx.getApplicationInfo().packageName));
 
         return valueName;
     }

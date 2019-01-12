@@ -13,7 +13,8 @@
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="4dp">
 
         <TextView
             android:id="@+id/txtgroupName"
@@ -28,21 +29,60 @@
             android:textSize="20sp"
             android:typeface="sans" />
 
-        <ImageView
-            android:id="@+id/imagethumb"
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
+        <RelativeLayout
+            android:id="@+id/imgLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/txtgroupName"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:clickable="true"
-            android:padding="2dp"
-            android:src="@drawable/cellimage" />
+            android:padding="6dp">
+
+            <ImageView
+                android:id="@+id/imagethumb"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:padding="2dp"
+                android:src="@drawable/cellimage" />
+
+            <TextView
+                android:id="@+id/lbRequired"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:background="@color/colorRed"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="2dp"
+                android:text="Required"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp"
+                android:typeface="sans" />
+
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabbtnthumb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="39dp"
+                android:layout_marginTop="175dp"
+                android:padding="2dp"
+                android:scaleType="fitXY"
+                app:borderWidth="0dp"
+                app:elevation="6dp"
+                app:layout_anchor="@+id/imagethumb"
+                app:layout_anchorGravity="right|end|bottom" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/imagethumb"
+            android:layout_below="@+id/imgLayout"
             android:orientation="horizontal"
             android:padding="5dp"
             android:weightSum="3">

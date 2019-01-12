@@ -4,7 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -17,10 +19,12 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,19 +34,25 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 
+import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.models.AppUserModel;
 
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -54,6 +64,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -64,6 +76,7 @@ import butterknife.ButterKnife;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 
@@ -77,7 +90,10 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     String TAG = SendMessage_fragment.class.getSimpleName();
     AppUserModel appUserModel;
 
+    VollyService vollyService;
     IResult resultCallback = null;
+    ResultListner resultListner = null;
+
     SVProgressHUD svProgressHUD;
     DatabaseHandler db;
 
@@ -86,12 +102,13 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
     SendMessageAdapter chatMessageAdapter;
     List<PeopleListingModel> peopleListingModelList = null;
+    List<ChatListModel> chatListModelList = null;
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
     Menu search_menu;
     MenuItem item_search;
-    ResultListner resultListner = null;
+
 
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
@@ -103,6 +120,10 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     String userStatus = "";
 
     Communicator communicator;
+
+    @Nullable
+    @BindView(R.id.spnrRoles)
+    Spinner spnrRoles;
 
     public SendMessage_fragment() {
 
@@ -119,7 +140,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-
     }
 
     public void addMessageCountToUserList(JSONArray messageReceived) throws JSONException {
@@ -132,12 +152,16 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 }
             }
         }
-        chatMessageAdapter.refreshList(peopleListingModelList);
+//        chatMessageAdapter.refreshList(peopleListingModelList);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        initVolleyCallback();
+        vollyService = new VollyService(resultCallback, context);
+
         communicator = new Communicator() {
             @Override
             public void messageRecieved(JSONArray messageReceived) {
@@ -153,7 +177,10 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         signalAService = SignalAService.newInstance(context);
         signalAService.stopSignalA();
         signalAService.communicator = communicator;
+
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -162,19 +189,22 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
         ButterKnife.bind(this, rootView);
 
-
         peopleListingModelList = new ArrayList<PeopleListingModel>();
         try {
             generateUserChatList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        chatMessageAdapter = new SendMessageAdapter(getActivity(), BIND_ABOVE_CLIENT, peopleListingModelList);
+        chatListModelList = new ArrayList<ChatListModel>();
+        chatMessageAdapter = new SendMessageAdapter(getActivity(), BIND_ABOVE_CLIENT, chatListModelList);
         usersChatListView.setAdapter(chatMessageAdapter);
         usersChatListView.setOnItemClickListener(this);
         usersChatListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
         initilizeView();
+        getChatConnectionUserList();
+        updateGameSpinner();
+
+
         return rootView;
     }
 
@@ -234,6 +264,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
         }
 
+
     }
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
@@ -260,9 +291,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-
             case R.id.mylearning_search:
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     circleReveal(R.id.toolbar, 1, true, true);
                 else
@@ -279,7 +308,8 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        ChatListModel chatListModel = (ChatListModel) parent.getItemAtPosition(position);
+        PeopleListingModel peopleListingModel = convertTopeopleModel(chatListModel);
         switch (view.getId()) {
             case R.id.btntxt_download:
                 if (isNetworkConnectionAvailable(context, -1)) {
@@ -289,12 +319,44 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 break;
             case R.id.card_view:
                 Intent intentDetail = new Intent(context, ChatActivity.class);
-                intentDetail.putExtra("peopleListingModel", peopleListingModelList.get(position));
+                intentDetail.putExtra("peopleListingModel", peopleListingModel);
                 startActivity(intentDetail);
-                peopleListingModelList.get(position).chatCount = 0;
+                // peopleListingModelList.get(position).chatCount = 0;
                 break;
             default:
         }
+    }
+
+    public PeopleListingModel convertTopeopleModel(ChatListModel chatListModel) {
+        PeopleListingModel peopleListingModel = new PeopleListingModel();
+
+
+//        public int userID = 0;
+//        public String fullName = "";
+//        public int unReadCount = 0;
+//        public String profPic = "";
+//        public String sendDateTime = "";
+//        public String country = "";
+//        public int myConid = 0;
+//        public int connectionStatus = 0;
+//        public int roleID = 0;
+//        public int siteID = 374;
+//        public int userStatus = 0;
+//        public String role = "";
+//        public int rankNo = 0;
+//        public int archivedUserID = -1;
+//        public String latestMessage = "";
+//        public String jobTitle = "";
+//
+        peopleListingModel.userDisplayname = chatListModel.fullName;
+        peopleListingModel.chatConnectionUserId = "" + chatListModel.myConid;
+        peopleListingModel.userID = "" + chatListModel.userID;
+        peopleListingModel.memberProfileImage = chatListModel.profPic;
+        peopleListingModel.chatUserStatus = "Online"; //+chatListModel.connectionStatus;
+        peopleListingModel.chatCount = chatListModel.unReadCount;
+
+
+        return peopleListingModel;
     }
 
     @Override
@@ -306,6 +368,73 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onDestroy() {
         super.onDestroy();
+        signalAService.stopSignalA();
+    }
+
+    public void getChatConnectionUserList() {
+        JSONObject parameters = new JSONObject();
+        try {
+            parameters.put("FromUserID", appUserModel.getUserIDValue());
+            parameters.put("intSiteiD", appUserModel.getSiteIDValue());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        String urlString = appUserModel.getWebAPIUrl() + "Chat/GetChatConnectionUserList";
+        vollyService.getStringResponseFromPostMethod(parameterString, "GetChatConnectionUserList", urlString);
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
+                    if (response != null) {
+
+                    } else {
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+//                Log.d(TAG, "Volley String post" + response);
+                svProgressHUD.dismiss();
+                if (requestType.equalsIgnoreCase("GetChatConnectionUserList")) {
+                    if (response != null) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            if (jsonObject != null) {
+                                chatListModelList = generateOnlineUsersList(jsonObject);
+                                chatMessageAdapter.refreshList(chatListModelList);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+
+                    }
+                }
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+                svProgressHUD.dismiss();
+            }
+        };
     }
 
 
@@ -345,12 +474,10 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
-
 
     @Override
     public void onDetach() {
@@ -381,14 +508,130 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 peopleListingModelList.add(peopleListingModel);
 
             }
-
         }
 
     }
+
+    public List<ChatListModel> generateOnlineUsersList(JSONObject jsonObject) throws JSONException {
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("Table");
+
+        List<ChatListModel> chatListModelList = new ArrayList<>();
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
+
+            ChatListModel chatListModel = new ChatListModel();
+
+            chatListModel.userID = jsonColumnObj.optInt("UserID");
+            chatListModel.fullName = jsonColumnObj.optString("FullName");
+            chatListModel.unReadCount = jsonColumnObj.optInt("UnReadCount");
+            chatListModel.profPic = jsonColumnObj.optString("ProfPic");
+            chatListModel.sendDateTime = jsonColumnObj.optString("SendDateTime");
+            chatListModel.country = jsonColumnObj.optString("Country");
+            chatListModel.myConid = jsonColumnObj.optInt("Myconid");
+            chatListModel.connectionStatus = jsonColumnObj.optInt("ConnectionStatus");
+            chatListModel.roleID = jsonColumnObj.optInt("RoleID");
+            chatListModel.siteID = jsonColumnObj.optInt("SiteID");
+            chatListModel.userStatus = jsonColumnObj.optInt("UserStatus");
+            chatListModel.role = jsonColumnObj.optString("Role");
+            chatListModel.rankNo = jsonColumnObj.optInt("RankNo");
+            chatListModel.archivedUserID = jsonColumnObj.optInt("ArchivedUserID");
+            chatListModel.latestMessage = jsonColumnObj.optString("LatestMessage");
+            chatListModel.jobTitle = jsonColumnObj.optString("JobTitle");
+
+            if (chatListModel.connectionStatus == 1 && chatListModel.userStatus == 1 && appUserModel.getSiteIDValue().equalsIgnoreCase("" + chatListModel.siteID)) {
+                if (chatListModel.roleID == 8 || chatListModel.roleID == 6 || chatListModel.roleID == 12) {
+                    boolean isDuplicate = false;
+                    for (int j = 0; j < chatListModelList.size(); j++) {
+                        if (chatListModelList.get(j).userID == chatListModel.userID) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                    if (!isDuplicate)
+                        chatListModelList.add(chatListModel);
+                }
+            }
+        }
+
+        return chatListModelList;
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
         signalAService.stopSignalA();
+    }
+
+    public void updateGameSpinner() {
+
+        final ArrayList<String> userRolesList = getRolesList();
+        final ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, userRolesList);
+        spnrRoles.setAdapter(spinnerAdapter);
+        spnrRoles.setSelection(0, true);
+        spnrRoles.setVisibility(View.VISIBLE);
+        View v = spnrRoles.getSelectedView();
+        ((TextView) v).setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        spnrRoles.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppTextColor())));
+
+        spnrRoles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
+                                       long id) {
+
+                Log.d(TAG, "onItemSelected: gamesList " + userRolesList.get(spnrPosition));
+
+// (item.RoleID == 12 Manager || item.RoleID == 8 admin|| item.RoleID == 16 groupadmin
+
+                switch (spnrPosition) {
+                    case 0:
+                        chatMessageAdapter.refreshList(chatListModelList);
+                        break;
+                    case 1://16
+                        chatMessageAdapter.refreshList(getSelectedRoleList(16));
+                        break;
+                    case 2://8
+                        chatMessageAdapter.refreshList(getSelectedRoleList(8));
+                        break;
+                    case 3://12
+                        chatMessageAdapter.refreshList(getSelectedRoleList(12));
+                        break;
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+
+        });
+
+    }
+
+    public List<ChatListModel> getSelectedRoleList(int roleID) {
+        List<ChatListModel> chatListModelList1 = new ArrayList<>();
+        for (int i = 0; i < chatListModelList.size(); i++) {
+            if (roleID == chatListModelList.get(i).roleID) {
+                chatListModelList1.add(chatListModelList.get(i));
+            }
+        }
+        return chatListModelList1;
+    }
+
+    public ArrayList<String> getRolesList() {
+
+        ArrayList<String> userRoles = new ArrayList<>();
+
+        userRoles.add("All");
+        userRoles.add("Group Admin");
+        userRoles.add("Admin");
+        userRoles.add("Manager");
+
+
+        return userRoles;
     }
 }

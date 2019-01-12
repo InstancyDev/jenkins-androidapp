@@ -290,10 +290,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         } else {
             btnUpload.setTag(0);
             isUpdateForum = false;
-
             clearCategory();
-
-
         }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));

@@ -171,7 +171,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     ProgressBar progressBar;
 
-//    SideMenusModel catalogSideMenuModel;
 
     boolean isFromGlobalSearch = false;
 
@@ -194,7 +193,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
-//        chatService = ChatService.newInstance(context);
 
         vollyService = new VollyService(resultCallback, context);
 
@@ -251,7 +249,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
             }
 
-            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize+"&SearchText="+queryString;
+            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&SearchText=" + queryString;
 
             vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
         } else {
@@ -733,7 +731,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     public void onRefresh() {
         pageIndex = 1;
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            queryString="";
+            queryString = "";
             refreshPeopleListing(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -932,7 +930,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
                         signalAService = SignalAService.newInstance(context);
                         signalAService.startSignalA();
-
 
                     } else {
                         Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
@@ -1172,7 +1169,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     }
 
     public int countOfTotalRecords(JSONObject jsonObject) throws JSONException {
-
 
         int totalRecs = 0;
 

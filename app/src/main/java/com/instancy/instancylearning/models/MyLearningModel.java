@@ -31,6 +31,16 @@ public class MyLearningModel implements Serializable {
 
     boolean isArchived = false;
 
+    public int getIsRequired() {
+        return isRequired;
+    }
+
+    public void setIsRequired(int isRequired) {
+        this.isRequired = isRequired;
+    }
+
+    int isRequired = 0;
+
     public boolean isEventCompletedOrNot() {
         return eventCompletedOrNot;
     }
@@ -136,6 +146,16 @@ public class MyLearningModel implements Serializable {
     String password = "";
     String isListView = "";
     String thumbnailImagePath = "";
+
+    public String getContentTypeImagePath() {
+        return contentTypeImagePath;
+    }
+
+    public void setContentTypeImagePath(String contentTypeImagePath) {
+        this.contentTypeImagePath = contentTypeImagePath;
+    }
+
+    String contentTypeImagePath = "";
 
     String contentExpire = "";
     String joinurl = "";

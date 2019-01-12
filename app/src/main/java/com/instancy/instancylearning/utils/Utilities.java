@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -32,6 +33,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -1494,5 +1496,19 @@ public class Utilities {
         return d;
     }
 
+    public static Drawable getDrawableForStars(float resourceID, Context context) {
+
+        View customNav = LayoutInflater.from(context).inflate(R.layout.sortrating, null);
+        RatingBar ratingDrawable = (RatingBar) customNav.findViewById(R.id.ratingDrawable);
+
+        ratingDrawable.setRating(resourceID);
+
+        LayerDrawable stars = (LayerDrawable) ratingDrawable.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(context.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
 
 }
