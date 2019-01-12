@@ -126,6 +126,8 @@ public class ChatActivity extends AppCompatActivity {
 
         setContentView(R.layout.chat_activity);
         appUserModel = AppUserModel.getInstance();
+//        appUserModel.setAuthHeaders("A459QN8BU4:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrHMr");
+//        appUserModel.setWebAPIUrl("http://192.168.11.162/WebApi/");
         svProgressHUD = new SVProgressHUD(this);
 
         uiSettingsModel = UiSettingsModel.getInstance();
@@ -227,7 +229,11 @@ public class ChatActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                // Log.d(TAG, "messageRecieved: " + messageReceived);
+            }
+
+            @Override
+            public void userOnline(boolean isSingle,JSONArray objReceived) {
+                Log.d(TAG, "messageRecieved: " + objReceived);
             }
         };
 

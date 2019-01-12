@@ -595,6 +595,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
                 Toast.makeText(context, "Receive in Chat List " + messageReceived, Toast.LENGTH_SHORT).show();
             }
+
+            @Override
+            public void userOnline(boolean isSingle,JSONArray objReceived) {
+
+            }
         };
 
 

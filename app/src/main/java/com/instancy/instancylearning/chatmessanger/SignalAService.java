@@ -5,7 +5,7 @@ import android.content.OperationApplicationException;
 
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
+
 
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -14,7 +14,6 @@ import com.instancy.instancylearning.utils.StaticValues;
 import com.zsoft.signala.hubs.HubConnection;
 import com.zsoft.signala.hubs.HubInvokeCallback;
 import com.zsoft.signala.hubs.HubOnDataCallback;
-import com.zsoft.signala.hubs.HubProxy;
 import com.zsoft.signala.hubs.IHubProxy;
 import com.zsoft.signala.transport.StateBase;
 import com.zsoft.signala.transport.longpolling.LongPollingTransport;
@@ -25,9 +24,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import microsoft.aspnet.signalr.client.Credentials;
-import microsoft.aspnet.signalr.client.http.Request;
 
 
 /**
@@ -60,6 +56,8 @@ public class SignalAService {
     private SignalAService(Context context) {
         this.context = context;
         appUserModel = AppUserModel.getInstance();
+//        appUserModel.setAuthHeaders("A459QN8BU4:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrHMr");
+//        appUserModel.setWebAPIUrl("http://192.168.11.162/WebApi/");
         preferencesManager = PreferencesManager.getInstance();
         name = preferencesManager.getStringValue(StaticValues.KEY_USERNAME);
         try {
@@ -82,12 +80,13 @@ public class SignalAService {
     }
 
     private void initConnection() throws OperationApplicationException {
-//        String url = "http://yournextuapi.instancysoft.com/signalr/"; //appUserModel.getWebAPIUrl();
+        //    String url = "http://yournextuapi.instancysoft.com/signalr/"; //appUserModel.getWebAPIUrl();
 
         String url = "http://192.168.11.162/WebApi/signalr/";
 
-        String base64EncodedCredentials = Base64.encodeToString("A459QN8BU4:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrHMr".getBytes(), Base64.NO_WRAP);
+//        String base64EncodedCredentials = Base64.encodeToString("A459QN8BU4:jTV1fyibJgicZtGfZy7EMKOYk67I1GhvgJqgrHMr".getBytes(), Base64.NO_WRAP);
 
+        String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
 
         con = new HubConnection(url, context, new LongPollingTransport()) {
 
@@ -127,11 +126,28 @@ public class SignalAService {
         hub.On("NewOnlineUser", new HubOnDataCallback() {
             @Override
             public void OnReceived(JSONArray args) {
-                Log.d(TAG, "OnReceived: " + args);
+                Log.d(TAG, "OnReceived:  NewOnlineUser" + args);
+
             }
 
         });
 
+        hub.On("UpdateOnlineUserList", new HubOnDataCallback() {
+            @Override
+            public void OnReceived(JSONArray args) {
+                Log.d(TAG, "OnReceived: UpdateOnlineUserList " + args);
+                if (args != null) {
+                    communicator.userOnline(true,args);
+                }
+            }
+        });
+        hub.On("StatusChanged", new HubOnDataCallback() {
+            @Override
+            public void OnReceived(JSONArray args) {
+                Log.d(TAG, "OnReceived: StatusChanged " + args);
+            }
+
+        });
     }
 
 
@@ -159,7 +175,7 @@ public class SignalAService {
             @Override
             public void OnResult(boolean succeeded, String response) {
 //                Log.d(TAG, "OnResult: HubInvokeCallback  " + response);
-                preferencesManager.setStringValue(response, StaticValues.CHAT_LIST);
+                // preferencesManager.setStringValue(response, StaticValues.CHAT_LIST);
             }
 
             @Override
@@ -236,4 +252,30 @@ public class SignalAService {
 
         hub.Invoke("SendPrivateMessage", args, callback);
     }
+
+    public void newOnlineUser(String buddyID, String messageStr, String attachemnt) {
+
+        HubInvokeCallback callback = new HubInvokeCallback() {
+            @Override
+            public void OnResult(boolean succeeded, String response) {
+//                Toast.makeText(context, response, Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, "OnResult: HubInvokeCallback sendMessage  " + response);
+
+            }
+
+            @Override
+            public void OnError(Exception ex) {
+                //   Toast.makeText(context, "Error: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, "OnError: HubInvokeCallback  sendMessage " + ex.getMessage());
+            }
+        };
+        List<String> args = new ArrayList<String>(2);
+        args.add(buddyID);
+        args.add(messageStr);
+        args.add("true");
+        args.add(attachemnt);
+
+        hub.Invoke("NewOnlineUser", args, callback);
+    }
+
 }

@@ -7,12 +7,10 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,21 +19,19 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColorWithSize;
 import static com.instancy.instancylearning.utils.Utilities.getFirstCaseWords;
 
 /**
@@ -111,10 +107,9 @@ public class SendMessageAdapter extends BaseAdapter {
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtRole.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtPlace.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
         String imagePath = chatListModelList.get(position).profPic;
-
         int unreadCount = chatListModelList.get(position).unReadCount;
+
 
         if (unreadCount == 0) {
             holder.unreadCountTxt.setVisibility(View.GONE);
@@ -147,6 +142,13 @@ public class SendMessageAdapter extends BaseAdapter {
                     .buildRound(displayNameDrawable, color);
             holder.imgThumb.setBackground(drawable);
         }
+
+        if (chatListModelList.get(position).connectionStatus == 1) {
+            holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle, "#008000"));
+        } else {
+            holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle_o,"#008000"));
+        }
+
         return convertView;
     }
 
@@ -178,6 +180,10 @@ public class SendMessageAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.imagethumb)
         ImageView imgThumb;
+
+        @Nullable
+        @BindView(R.id.statusImg)
+        ImageView statusImg;
 
         @Nullable
         @BindView(R.id.txtPeople)

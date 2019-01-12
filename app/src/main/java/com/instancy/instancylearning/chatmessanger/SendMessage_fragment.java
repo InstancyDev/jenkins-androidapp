@@ -64,8 +64,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -76,7 +74,7 @@ import butterknife.ButterKnife;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.isValidString;
+
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 
@@ -173,12 +171,28 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                     e.printStackTrace();
                 }
             }
+
+            @Override
+            public void userOnline(boolean isSingle,JSONArray objReceived) {
+                    communicator.userOnline(isSingle,objReceived);
+            }
         };
         signalAService = SignalAService.newInstance(context);
-        signalAService.stopSignalA();
+//        signalAService.stopSignalA();
         signalAService.communicator = communicator;
+    }
 
 
+    public void updateUserOnline(JSONArray onlineUserObj) throws JSONException {
+    //    [{"SendDateTime":"0001-01-01T00:00:00","SiteID":374,"UnReadCount":0,"UserID":1,"ProfPic":"\/Content\/SiteFiles\/374\/ProfileImages\/1_381.gif","FullName":"Instancy Admin","Country":null,"Myconid":0,"ConnectionStatus":0,"RoleID":0,"UserStatus":0,"Role":null,"friendsList":null,"ConnectionId":"a471fa59-e092-4b56-942f-c700f97f60cf","isOnline":true,"ConnectionAcceptID":-1}]
+        if (chatListModelList.size() > 0) {
+            for (int i = 0; i < chatListModelList.size(); i++) {
+                Log.d(TAG, "updateUserOnline: "+onlineUserObj);
+
+
+            }
+        }
+//        chatMessageAdapter.refreshList(peopleListingModelList);
     }
 
 

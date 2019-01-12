@@ -56,6 +56,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.NetworkChangeReceiver;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
+import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -187,6 +188,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     ActionBarDrawerToggle toggle;
     UiSettingsModel uiSettingsModel;
     SignalAService signalAService;
+    Communicator communicator;
     SignalAServiceMicrosoft signalAServiceMicrosoft;
     public Toolbar toolbar;
 
@@ -327,8 +329,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     sendMessageLayout.setVisibility(View.VISIBLE);
 
                 }
-                signalAService = SignalAService.newInstance(this);
-                signalAService.startSignalA();
+
+
+                startSignalService();
 
 //                signalAServiceMicrosoft = SignalAServiceMicrosoft.newInstance(this);
 //                signalAServiceMicrosoft.startSignalA();
@@ -472,6 +475,24 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     }
 
+    public void startSignalService() {
+
+        communicator = new Communicator() {
+            @Override
+            public void messageRecieved(JSONArray messageReceived) {
+
+            }
+
+            @Override
+            public void userOnline(boolean isSingle,JSONArray objReceived) {
+                Log.d(TAG, "messageRecieved: " + objReceived);
+            }
+        };
+
+        signalAService = SignalAService.newInstance(this);
+        signalAService.communicator = communicator;
+        signalAService.startSignalA();
+    }
 
     public void updateDisplayNameAndImage() {
 

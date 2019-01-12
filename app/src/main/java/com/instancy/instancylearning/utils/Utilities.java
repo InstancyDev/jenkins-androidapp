@@ -1511,4 +1511,21 @@ public class Utilities {
         return d;
     }
 
+    @SuppressLint("ResourceAsColor")
+    public static Drawable getDrawableFromStringWithColorWithSize(Context context, int resourceID, String colorString) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.iconimage, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.imageicon);
+        iconText.setTextColor(Color.parseColor(colorString));
+        iconText.setText(resourceID);
+        iconText.setTextSize(20);
+        iconText.setTypeface(iconText.getTypeface(), Typeface.BOLD);
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.imageicon), iconFont);
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
+
+
 }
