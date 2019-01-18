@@ -39,11 +39,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.askexpertenached.BasicAuthInterceptor;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
+import com.instancy.instancylearning.interfaces.Service;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
@@ -58,17 +60,29 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
+import static com.instancy.instancylearning.utils.Utilities.getRealPathFromURI;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.toRequestBody;
 
 /**
  * Created by Upendranath on 5/19/2017.
@@ -80,40 +94,26 @@ public class ChatActivity extends AppCompatActivity {
 
 
     String TAG = ChatActivity.class.getSimpleName();
-
     AppUserModel appUserModel;
     VollyService vollyService;
     IResult resultCallback = null;
     SVProgressHUD svProgressHUD;
     PreferencesManager preferencesManager;
-
     PeopleListingModel peopleListingModel;
-    TextView userName, userLocation;
-
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-
     SignalAService signalAService;
-
     Button btnSent, btnAttachment;
-
     EditText messageEdit;
-
     // Chat Integration here
-
-    private static final int TOTAL_MESSAGES_COUNT = 100;
-
     private RecyclerView mMessageRecycler;
-
     private ChatListAdapter chatListAdapter;
-
     private List<BaseMessage> mMessageList;
-
     Communicator communicator;
-
     private int GALLERY = 1;
-    Bitmap bitmapAttachment = null;
-    String endocedImageStr = "";
+    Service service;
+    String finalfileName = "", finalPath = "";
+    Uri contentURIFinal;
 
     public ChatActivity() {
 
@@ -149,7 +149,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String message = messageEdit.getText().toString().trim();
 
-                sendMessageToServer(message, peopleListingModel, "");
+                sendMessageToServer(message, peopleListingModel);
 
             }
         });
@@ -214,8 +214,18 @@ public class ChatActivity extends AppCompatActivity {
         // chat load methods
 
         refreshPeopleListing(true);
-    }
 
+
+        // Multipart
+
+        BasicAuthInterceptor interceptor = new BasicAuthInterceptor(appUserModel.getAuthHeaders());
+//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        // Change base URL to your upload server URL.
+        service = new Retrofit.Builder().baseUrl(appUserModel.getWebAPIUrl() + "Chat/InsertUserChatData/").client(client).build().create(Service.class);
+
+    }
 
     public void chatInitilization() {
 
@@ -228,15 +238,13 @@ public class ChatActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
 
             @Override
-            public void userOnline(boolean isSingle,JSONArray objReceived) {
+            public void userOnline(int typeUpdate, JSONArray objReceived) {
                 Log.d(TAG, "messageRecieved: " + objReceived);
             }
         };
-
         signalAService = SignalAService.newInstance(getApplicationContext());
         signalAService.communicator = communicator;
     }
@@ -450,7 +458,11 @@ public class ChatActivity extends AppCompatActivity {
 
     public void generateReceiveConversition(JSONArray jsonArray) throws JSONException {
 
-        if (jsonArray.length() > 0) {
+        //     {"ReceiverConnectionID":"b7ee996f-78d2-4047-81b4-3bd9cb1cf6ec","Message":"test hi","AttachmentName":"","AttachmentPath":"","ReceiverUserID":1,"FromMobile":false,"SenderConnectionID":"4104582b-364b-49bb-b6cc-b003c4396c53","SenderFullName":"Richard Parker","SenderProfPic":"\/Content\/SiteFiles\/374\/ProfileImages\/8_Will Smith.jpg","SenderUserID":8,"SentDateTime":"2019-01-16T16:27:40"}
+
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+        if (jsonObject != null) {
 
             BaseMessage baseMessage = new BaseMessage();
 
@@ -460,19 +472,21 @@ public class ChatActivity extends AppCompatActivity {
 
             baseMessage.toUserID = peopleListingModel.userID;
 
-            baseMessage.messageChat = jsonArray.getString(2);
+            baseMessage.messageChat = jsonObject.optString("Message");
 
-            baseMessage.attachemnt = jsonArray.getString(5);
+            baseMessage.attachemnt = jsonObject.optString("AttachmentPath");
 
             baseMessage.markAsRead = "true";
 
-            baseMessage.fromUserName = jsonArray.getString(1);
+            baseMessage.fromUserName = jsonObject.optString("SenderFullName");
 
             baseMessage.toUsername = appUserModel.getUserName();
 
             baseMessage.profilePic = peopleListingModel.memberProfileImage;
 
-            baseMessage.sentDate = jsonArray.getString(6);
+            baseMessage.sentDate = formatDate(jsonObject.optString("SentDateTime"), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+
+//            baseMessage.sentDate = jsonObject.optString("SentDateTime");
 
             baseMessage.itsMe = false;
 
@@ -482,99 +496,29 @@ public class ChatActivity extends AppCompatActivity {
         mMessageRecycler.scrollToPosition(chatListAdapter.getItemCount() - 1);
     }
 
-    public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel, String attachment) {
+    public void sendMessageToServer(String messageStr, PeopleListingModel peopleListingModel) {
 
-        String dateString = getCurrentDateTime("dd/MM/yyyy HH:mm:ss.SSS");
-        JSONObject jsonObject = new JSONObject();
+        String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss aa");
 
-        try {
-            jsonObject.put("FromUserID", appUserModel.getUserIDValue());
-            jsonObject.put("ToUserID", peopleListingModel.userID);
-            jsonObject.put("Message", messageStr);
-            jsonObject.put("Attachment", attachment);
-            jsonObject.put("SendDateTime", dateString);
-            jsonObject.put("MarkAsRead", "false");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        String parameterString = jsonObject.toString();
+        Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
+        parameters.put("FromUserID", toRequestBody(appUserModel.getUserIDValue()));
+        parameters.put("ToUserID", toRequestBody(peopleListingModel.userID));
+        parameters.put("Message", toRequestBody(messageStr));
+        parameters.put("SendDateTime", toRequestBody(dateString));
+        parameters.put("MarkAsRead", toRequestBody("false"));
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
-//            String replaceDataString = parameterString.replace("\"", "\\\"");
-//            String addQuotes = ('"' + replaceDataString + '"');
+            uploadFileThroughMultiPart(parameters, contentURIFinal);
 
-            sendNewChatDataToServer(jsonObject.toString(), messageStr, attachment);
         } else {
             Toast.makeText(this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    public void sendNewChatDataToServer(final String postData, final String message, final String attachment) {
-
-        String urlString = appUserModel.getWebAPIUrl() + "/Chat/InsertChatObjectDetails";
-
-        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String s) {
-                svProgressHUD.dismiss();
-//                Log.d(TAG, "onResponse: " + s);
-
-                if (s.contains("1")) {
-                    signalAService.sendMessage("" + peopleListingModel.chatConnectionUserId, message, attachment);
-                    generateNewConversation(peopleListingModel, message, attachment);
-                    messageEdit.setText("");
-                } else {
-
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
-            }
-        })
-
-        {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-
-            }
-
-            @Override
-            public byte[] getBody() throws com.android.volley.AuthFailureError {
-                return postData.getBytes();
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
-                return headers;
-            }
-
-        };
-
-        RequestQueue rQueue = Volley.newRequestQueue(this);
-        rQueue.add(request);
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-    }
-
     public void generateNewConversation(PeopleListingModel peopleListingModel, String message, String attachment) {
-
+        messageEdit.setText("");
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         BaseMessage baseMessage = new BaseMessage();
@@ -632,235 +576,72 @@ public class ChatActivity extends AppCompatActivity {
                 Uri contentURI = data.getData();
                 try {
                     final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
-
                     final String fileName = getFileNameFromPath(contentURI, this);
-                    final String mimeType = getMimeTypeFromUri(contentURI);
+//                final String mimeType = getMimeTypeFromUri(contentURI);
                     Log.d(TAG, "onActivityResult: " + fileName);
-                    bitmapAttachment = bitmap;
-
-                    new CountDownTimer(1000, 1000) {
-                        public void onTick(long millisUntilFinished) {
-                        }
-
-                        public void onFinish() {
-                            endocedImageStr = convertToBase64(bitmapAttachment);
-                            try {
-                                encodeAttachment(appUserModel.getUserIDValue(), peopleListingModel.userID, fileName);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-//                            uploadAttachmentToServer(fileName, bitmap, mimeType);
-
-                        }
-                    }.start();
-
+                    finalPath = getRealPathFromURI(ChatActivity.this, contentURI);
+                    contentURIFinal = contentURI;
+                    finalfileName = fileName;
+                    sendMessageToServer("", peopleListingModel);
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(ChatActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
 
                 }
             }
-
-        }
-
-    }
-//    https://www.survivingwithandroid.com/2013/05/android-http-downlod-upload-multipart.html
-
-    private String convertToBase64(Bitmap bitmap) {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-
-        byte[] byteArrayImage = baos.toByteArray();
-
-        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.NO_WRAP);
-
-        return encodedImage;
-    }
-
-
-//    public void uploadAttachmentToServerMultipart(String fileName, Bitmap bitmapAttachments, String mimeType) {
-//        byte[] multipartBody = new byte[0];
-//        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-//        try {
-//
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            if (bitmapAttachments != null) {
-//                bitmapAttachments.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
-//            }
-//
-//            byte[] fileByteArray = byteArrayOutputStream.toByteArray();
-//
-//            ByteArrayOutputStream byteArrayOutputStream2 = new ByteArrayOutputStream();
-//            DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream2);
-//            try {
-//                // the first file
-//                buildPart(dataOutputStream, fileByteArray, fileName);
-//                // send multipart form data necesssary after file data
-//                dataOutputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-//                Map<String, String> params = new HashMap<>();
-//                params.put("filename", fileName);
-//                params.put("strSiteID", appUserModel.getSiteIDValue());
-//                params.put("strfromUserId", appUserModel.getUserIDValue());
-//                params.put("strtoUserId", peopleListingModel.userID);
-////                params.put("fileData", fileByteArray.toString());
-//                dataOutputStream.writeBytes(params.toString());
-//                // pass to multipart body
-//                multipartBody = byteArrayOutputStream2.toByteArray();
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            String url = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadSendMessageAttachment";
-//            MultipartRequest multipartRequest = new MultipartRequest(url, base64EncodedCredentials, mimeType, multipartBody, new Response.Listener<NetworkResponse>() {
-//                @Override
-//                public void onResponse(NetworkResponse response) {
-//                    Toast.makeText(ChatActivity.this, "completed", Toast.LENGTH_SHORT).show();
-//
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    try {
-//                        Toast.makeText(ChatActivity.this, "Error", Toast.LENGTH_SHORT).show();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-//
-//            VolleySingleton.getInstance(ChatActivity.this).addToRequestQueue(multipartRequest);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-
-//    private void buildPart(DataOutputStream dataOutputStream, byte[] fileData, String fileName) throws IOException {
-//        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-////        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; filename=\""
-////                + fileName + "\"" + lineEnd);
-//        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\"; fileData=\""
-//                + fileName + "\"" + lineEnd);
-//
-//        dataOutputStream.writeBytes(lineEnd);
-//
-//        ByteArrayInputStream fileInputStream = new ByteArrayInputStream(fileData);
-//        int bytesAvailable = fileInputStream.available();
-//
-//        int maxBufferSize = 1024 * 1024;
-//        int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-//        byte[] buffer = new byte[bufferSize];
-//
-//        // read file and write it into form...
-//        int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-//
-//        while (bytesRead > 0) {
-//            dataOutputStream.write(buffer, 0, bufferSize);
-//            bytesAvailable = fileInputStream.available();
-//            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-//            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-//        }
-//
-//        dataOutputStream.writeBytes(lineEnd);
-//    }
-
-    public void encodeAttachment(String fromUserId, String toUserID, String fileName) throws JSONException {
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        });
-        if (bitmapAttachment != null) {
-            endocedImageStr = convertToBase64(bitmapAttachment);
-        }
-
-        if (endocedImageStr.length() < 10) {
-            Toast.makeText(ChatActivity.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
-        } else {
-
-            Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
-
-            if (isNetworkConnectionAvailable(this, -1)) {
-
-                String replaceDataString = endocedImageStr.replace("\"", "\\\"");
-                String addQuotes = ('"' + replaceDataString + '"');
-                sendChatAttachmentDataToServer(addQuotes, fromUserId, toUserID, fileName);
-
-            } else {
-                Toast.makeText(ChatActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
-    public void sendChatAttachmentDataToServer(final String postData, String fromUserId, String toUserID, final String fileName) {
+    private void uploadFileThroughMultiPart(Map<String, RequestBody> parameters, Uri fileUri) {
+        // create upload service client
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadMessageAttachmentAndroid?fileName=" + fileName + "&strSiteID=" + appUserModel.getSiteIDValue() + "&strfromUserId=" + fromUserId + "&strtoUserId=" + toUserID;
+        MultipartBody.Part body = null;
+        if (finalfileName.length() > 0 && fileUri != null) {
+            File file = new File(finalPath);
 
-        StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            // create RequestBody instance from file
+            RequestBody requestFile =
+                    RequestBody.create(
+                            MediaType.parse(getContentResolver().getType(fileUri)),
+                            file
+                    );
+
+            // MultipartBody.Part is used to send also the actual file name
+            body = MultipartBody.Part.createFormData("Image", file.getName(), requestFile);
+
+        }
+
+        // finally, execute the request
+//        Call<ResponseBody> call = service.upload(description, body);
+        Call<ResponseBody> call = service.uploadFileWithPartMap(parameters, body);
+        call.enqueue(new Callback<ResponseBody>() {
+
             @Override
-            public void onResponse(String s) {
-                svProgressHUD.dismiss();
-                Log.d(TAG, "onResponse: " + s);
-                if (s.length() > 0) {
-
-                    String attachmentStr = s.replaceAll("^\"|\"$", "");
-
-                    sendMessageToServer(fileName, peopleListingModel, attachmentStr);
-
-                } else {
-
-                    Toast.makeText(ChatActivity.this, "Attachment cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                Log.v("Upload", "success");
+                signalAService.sendMessage(peopleListingModel, messageEdit.getText().toString(), finalfileName);
+                contentURIFinal = null;
+                finalfileName = "";
+                String responseRecievedPath = null;
+                try {
+                    responseRecievedPath = response.body().string();
+                    Log.d(TAG, "onResponse: " + responseRecievedPath);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
+                responseRecievedPath = responseRecievedPath.replace("\"", "");
+                generateNewConversation(peopleListingModel, messageEdit.getText().toString(), responseRecievedPath);
             }
-        }, new Response.ErrorListener() {
+
             @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(ChatActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("Upload error:", t.getMessage());
+                Toast.makeText(ChatActivity.this, "Message cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
-        })
-
-        {
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-
-            }
-
-            @Override
-            public byte[] getBody() throws com.android.volley.AuthFailureError {
-                return postData.getBytes();
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
-
-                return headers;
-            }
-
-        };
-
-        RequestQueue rQueue = Volley.newRequestQueue(ChatActivity.this);
-        rQueue.add(request);
-        request.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
+        });
     }
+
 
 }
 

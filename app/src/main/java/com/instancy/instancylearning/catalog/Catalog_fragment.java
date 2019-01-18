@@ -196,7 +196,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isSearching = false;
     boolean userScrolled = false;
 
-    boolean isDigimedica = true;
 
     ProgressBar progressBar;
 
@@ -250,6 +249,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
 
     ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+
+    boolean isDigimedica = true;
 
     public Catalog_fragment() {
 

@@ -351,6 +351,15 @@
             android:name=".advancedfilters_mylearning.DateSelectionRadioActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".advancedfilters_mylearning.UserInfoActivity"
+            android:screenOrientation="portrait"></activity>
+
+
+        <activity
+            android:name=".advancedfilters_mylearning.CtryCmpnyActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!-- Push Notification  issue icon -->
 
         <meta-data
@@ -414,8 +423,7 @@
         <service
             android:name=".chatmessanger.SignalRService"
             android:enabled="true"
-            android:exported="true" >
-        </service>
+            android:exported="true"></service>
     </application>
 
 </manifest>

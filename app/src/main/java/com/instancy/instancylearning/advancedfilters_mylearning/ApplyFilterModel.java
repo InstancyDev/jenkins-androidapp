@@ -20,5 +20,10 @@ public class ApplyFilterModel implements Serializable {
     public String instructors = "";
     public String groupBy = "";
 
-
+    //Xtra for peoplelisting
+    public String locations = "";
+    public String userInfo = "";
+    public String company = "";
+    public String firstName = "";
+    public String lastName = "";
 }

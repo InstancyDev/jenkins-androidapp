@@ -52,6 +52,11 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.AllFiltersActivity;
+import com.instancy.instancylearning.advancedfilters_mylearning.ApplyFilterModel;
+import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByActivity;
+import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByModel;
 import com.instancy.instancylearning.askexpert.AskQuestionActivity;
 import com.instancy.instancylearning.catalog.Catalog_fragment;
 import com.instancy.instancylearning.chatmessanger.ChatActivity;
@@ -78,6 +83,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -89,10 +95,12 @@ import info.hoang8f.android.segmented.SegmentedGroup;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
 import static com.instancy.instancylearning.utils.StaticValues.BACK_STACK_ROOT_TAG;
+import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE_ADV;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.REFRESH_PEOPLE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
@@ -126,7 +134,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     Menu search_menu;
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
-    String filterContentType = "", consolidationType = "all", sortBy = "";
+    String filterContentType = "", consolidationType = "all", sortBy = "", contentFilterType = "";
+    ;
     ResultListner resultListner = null;
 
     AppController appcontroller;
@@ -176,6 +185,15 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     String queryString = "";
 
+    // Filters ADVANCED
+    List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+
+    ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+
+    boolean isDigimedica = true;
+
+    HashMap<String, String> responMap = null;
+
     public PeopleListing_fragment() {
 
 
@@ -197,7 +215,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         vollyService = new VollyService(resultCallback, context);
 
         sideMenusModel = null;
-        HashMap<String, String> responMap = null;
+
         Bundle bundle = getArguments();
         if (bundle != null) {
             sideMenusModel = (SideMenusModel) bundle.getSerializable("sidemenumodel");
@@ -237,6 +255,14 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             // No such key
             filterContentType = "";
         }
+
+        if (responMap != null && responMap.containsKey("ContentFilterBy")) {
+            contentFilterType = responMap.get("ContentFilterBy");
+        } else {
+            // No such key
+            contentFilterType = "";
+        }
+
 //        signalAService = SignalAService.newInstance(context);
 //        signalAService.startSignalA();
         isaskQuestionEnabled = db.isPrivilegeExistsFor(StaticValues.ASKEXPERTPREVILAGEID);
@@ -335,9 +361,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("REMOVEACTION")) {
                     if (response != null) {
-                        refreshPeopleListing(true);
-//                        Log.d(TAG, "notifySuccess: in  REMOVEACTION " + response);
-
+                        if (isDigimedica) {
+                            getPeopleList(true);
+                        } else {
+                            refreshPeopleListing(true);
+                        }
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
                                 .setCancelable(false)
@@ -376,7 +404,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         AlertDialog alert = builder.create();
                         alert.show();
 
-                        refreshPeopleListing(true);
+                        if (isDigimedica) {
+                            getPeopleList(false);
+                        } else {
+                            refreshPeopleListing(false);
+                        }
+
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -400,8 +433,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         AlertDialog alert = builder.create();
                         alert.show();
 
-
-                        refreshPeopleListing(true);
+                        if (isDigimedica) {
+                            getPeopleList(false);
+                        } else {
+                            refreshPeopleListing(false);
+                        }
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -409,6 +445,31 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 }
 
                 swipeRefreshLayout.setRefreshing(false);
+
+                if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
+                    if (response != null) {
+                        try {
+                            JSONObject jsonObj = new JSONObject(response);
+
+                            totalRecordsCount = countOfTotalRecords(jsonObj);
+                            if (isFromGlobalSearch) {
+                                peopleListingModelList.addAll(generateOnlinePeoplelistingModel(jsonObj));
+                                peopleListingAdapter.refreshList(peopleListingModelList);
+                            } else {
+                                db.injectPeopleListingListIntoSqLite(jsonObj, TABBALUE, pageIndex);
+                                injectFromDbtoModel();
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+
 
             }
 
@@ -478,7 +539,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                                 if (isFromGlobalSearch) {
                                     refreshPeopleListingGlobalListing(true);
                                 } else {
-                                    refreshPeopleListing(true);
+
+                                    if (isDigimedica) {
+                                        getPeopleList(true);
+                                    } else {
+                                        refreshPeopleListing(true);
+                                    }
                                 }
 
                             } else {
@@ -531,7 +597,12 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             if (isFromGlobalSearch) {
                 refreshPeopleListingGlobalListing(false);
             } else {
-                refreshPeopleListing(false);
+
+                if (isDigimedica) {
+                    getPeopleList(false);
+                } else {
+                    refreshPeopleListing(false);
+                }
             }
 
         } else {
@@ -597,11 +668,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             }
 
             @Override
-            public void userOnline(boolean isSingle,JSONArray objReceived) {
+            public void userOnline(int typeUpdate, JSONArray objReceived) {
 
             }
-        };
 
+        };
 
     }
 
@@ -615,8 +686,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
+
         itemInfo.setVisible(false);
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
 
         if (isFromGlobalSearch) {
             item_search.setVisible(false);
@@ -674,6 +746,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 return true;
             }
         });
+
+        if (item_filter != null) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
+            item_filter.setIcon(filterDrawable);
+            item_filter.setTitle("Filter");
+
+        }
     }
 
     public void gotoGlobalSearch() {
@@ -724,11 +803,142 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 peopleListingAdapter.notifyDataSetChanged();
                 break;
             case R.id.mylearning_filter:
+                advancedFilters();
                 break;
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void advancedFilters() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            if (contentFilterByModelList.size() == 0) {
+                contentFilterByModelList = generateContentFilters();
+            }
+
+            if (contentFilterByModelList != null && contentFilterByModelList.size() > 0) {
+
+                Intent intent = new Intent(context, ContentFilterByActivity.class);
+                intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intent.putExtra("allFilterModel", "");
+                intent.putExtra("isFrom", 2);
+                intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
+                startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
+
+            }
+        } else {
+            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+
+        }
+
+    }
+
+    public List<ContentFilterByModel> generateContentFilters() {
+        List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
+        if (contentFilterType != null && contentFilterType.length() > 0) {
+
+            List<String> filterCategoriesArray = getArrayListFromString(contentFilterType);
+
+            if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
+                for (int i = 0; i < filterCategoriesArray.size(); i++) {
+                    ContentFilterByModel contentFilterByModel = new ContentFilterByModel();
+                    // skills,jobroles,locations,userinfo,company
+                    switch (filterCategoriesArray.get(i)) {
+                        case "locations":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "locations";
+                            contentFilterByModel.categoryDisplayName = "Locations";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "skills":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "skills";
+                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.goInside = true;
+                            break;
+                        case "jobroles":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "jobroles";
+                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "company":
+                            contentFilterByModel.categoryName = filterCategoriesArray.get(i);
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "company";
+                            contentFilterByModel.categoryDisplayName = "Company";
+                            contentFilterByModel.goInside = false;
+                            break;
+                        case "userinfo":
+                            contentFilterByModel.categoryName = "Userinfo";
+                            contentFilterByModel.categoryIcon = "";
+                            contentFilterByModel.categoryID = "userinfo";
+                            contentFilterByModel.categoryDisplayName = "User Info";
+                            contentFilterByModel.goInside = false;
+                            break;
+                    }
+                    if (contentFilterByModel.categoryID.length() != 0) {
+                        contentFilterByModelList.add(contentFilterByModel);
+                    }
+                }
+            }
+        }
+        return contentFilterByModelList;
+
+    }
+
+    public List<AllFilterModel> getAllFilterModelList() {
+
+        List<AllFilterModel> allFilterModelList = new ArrayList<>();
+
+        AllFilterModel advFilterModel = new AllFilterModel();
+        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryID = 1;
+        allFilterModelList.add(advFilterModel);
+
+        if (responMap != null && responMap.containsKey("EnableGroupby")) {
+            String enableGroupby = responMap.get("EnableGroupby");
+            if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
+                AllFilterModel groupFilterModel = new AllFilterModel();
+                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryID = 2;
+                if (responMap != null && responMap.containsKey("ddlGroupby")) {
+
+                    String ddlGroupby = responMap.get("ddlGroupby");
+                    Log.d(TAG, "getAllFilterModelList: " + ddlGroupby);
+                    groupFilterModel.groupArrayList = getArrayListFromString(ddlGroupby);
+                    if (groupFilterModel.groupArrayList != null && groupFilterModel.groupArrayList.size() > 0) {
+                        allFilterModelList.add(groupFilterModel);
+                    }
+                }
+
+            }
+        }
+
+        AllFilterModel sortFilterModel = new AllFilterModel();
+        sortFilterModel.categoryName = "Sort By";
+        sortFilterModel.categoryID = 3;
+        allFilterModelList.add(sortFilterModel);
+
+        return allFilterModelList;
+    }
+
+    public List<String> getArrayListFromString(String questionCategoriesString) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (questionCategoriesString.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
+
+        return questionCategoriesArray;
+
     }
 
 
@@ -737,7 +947,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         pageIndex = 1;
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             queryString = "";
-            refreshPeopleListing(true);
+            if (isDigimedica) {
+                getPeopleList(true);
+            } else {
+                refreshPeopleListing(true);
+            }
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
@@ -1010,10 +1224,34 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 queryString = data.getStringExtra("queryString");
                 if (queryString.length() > 0) {
 
-                    refreshPeopleListing(true);
-
+                    if (isDigimedica) {
+                        getPeopleList(true);
+                    } else {
+                        refreshPeopleListing(true);
+                    }
                 }
 
+            }
+        }
+
+        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
+            if (data != null) {
+                boolean isApplied = data.getBooleanExtra("APPLY", false);
+                if (isApplied) {
+
+                    contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
+
+                    applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
+
+                    Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getPeopleList(true);
+                    } else {
+                        refreshPeopleListing(true);
+                    }
+
+                }
             }
         }
 
@@ -1083,7 +1321,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 .addToBackStack(backStateName)
                 .commit();
         fragmentManager.executePendingTransactions();
-
     }
 
     @Override
@@ -1105,7 +1342,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 TABBALUE = "Experts";
                 pageIndex = 1;
                 nodata_Label.setText("");
-                refreshPeopleListing(true);
+                if (isDigimedica) {
+                    getPeopleList(false);
+                } else {
+                    refreshPeopleListing(true);
+                }
                 break;
             case R.id.allPeoplebtn:
                 allPBtn.setTypeface(null, Typeface.BOLD);
@@ -1115,7 +1356,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 TABBALUE = "All";
                 pageIndex = 1;
                 nodata_Label.setText("");
-                refreshPeopleListing(true);
+                if (isDigimedica) {
+                    getPeopleList(false);
+                } else {
+                    refreshPeopleListing(true);
+                }
                 break;
             case R.id.myconnectionbtn:
                 myConBtn.setTypeface(null, Typeface.BOLD);
@@ -1125,8 +1370,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 TABBALUE = "MyConnections";
                 pageIndex = 1;
                 nodata_Label.setText("");
-                refreshPeopleListing(true);
-
+                if (isDigimedica) {
+                    getPeopleList(false);
+                } else {
+                    refreshPeopleListing(true);
+                }
                 break;
             case R.id.pendingbtn:
                 pendingBtn.setTypeface(null, Typeface.BOLD);
@@ -1136,8 +1384,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 TABBALUE = "Pending";
                 pageIndex = 1;
                 nodata_Label.setText("");
-                refreshPeopleListing(true);
-
+                if (isDigimedica) {
+                    getPeopleList(false);
+                } else {
+                    refreshPeopleListing(true);
+                }
                 break;
             default:
                 // Nothing to do
@@ -1376,6 +1627,47 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 
         return peopleListingModelList;
+    }
+
+    public void getPeopleList(Boolean isRefreshed) {
+
+        if (!isRefreshed) {
+            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/GetPeopleList";
+        JSONObject parameters = new JSONObject();
+        try {
+
+            parameters.put("AdditionalParams", "");
+            parameters.put("ComponentID", sideMenusModel.getComponentId());
+            parameters.put("ComponentInstanceID", sideMenusModel.getRepositoryId());
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("SiteID", appUserModel.getSiteIDValue());
+            parameters.put("Locale", "en-us");
+            parameters.put("sortBy", "");
+            parameters.put("sortType", "");
+            parameters.put("pageIndex", pageIndex);
+            parameters.put("pageSize", pageSize);
+            parameters.put("filterType", TABBALUE);
+            parameters.put("TabID", "");
+            parameters.put("SearchText", queryString);
+            parameters.put("contentid", "");
+            parameters.put("location", applyFilterModel.locations);
+            parameters.put("company", applyFilterModel.company);
+            parameters.put("skilllevels", applyFilterModel.skillCats);
+            parameters.put("firstname", applyFilterModel.firstName);
+            parameters.put("lastname", applyFilterModel.lastName);
+            parameters.put("skillcats", applyFilterModel.skillCats);
+            parameters.put("skills", applyFilterModel.skills);
+            parameters.put("jobroles", applyFilterModel.jobRoles);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "PEOPLELISTING", urlStr);
     }
 
 }

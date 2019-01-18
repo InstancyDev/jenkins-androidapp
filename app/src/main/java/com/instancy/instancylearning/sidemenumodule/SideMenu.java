@@ -331,7 +331,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
 
 
-                startSignalService();
+//                startSignalService();
 
 //                signalAServiceMicrosoft = SignalAServiceMicrosoft.newInstance(this);
 //                signalAServiceMicrosoft.startSignalA();
@@ -484,7 +484,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             @Override
-            public void userOnline(boolean isSingle,JSONArray objReceived) {
+            public void userOnline(int typeUpdate,JSONArray objReceived) {
                 Log.d(TAG, "messageRecieved: " + objReceived);
             }
         };

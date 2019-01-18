@@ -26,6 +26,7 @@ public class ChatListModel implements Serializable {
     public int archivedUserID = -1;
     public String latestMessage = "";
     public String jobTitle = "";
-
+    public String chatConnectionUserId = "Default";
+    public boolean chatConnectionStatus = false;
 
 }

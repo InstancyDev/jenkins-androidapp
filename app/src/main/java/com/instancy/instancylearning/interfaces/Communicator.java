@@ -8,8 +8,8 @@ import org.json.JSONArray;
 
 public interface Communicator {
 
-    public void messageRecieved(JSONArray messageReceived);
+    void messageRecieved(JSONArray messageReceived);
 
-    public void userOnline(boolean isSingle, JSONArray objReceived);
+    void userOnline(int typeUpdate, JSONArray objReceived);
 
 }

@@ -71,13 +71,17 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
         contentFilterByModelList = (List<ContentFilterByModel>) getIntent().getExtras().getSerializable("contentFilterByModelList");
 
-        allFilterModel = (AllFilterModel) getIntent().getExtras().getSerializable("allFilterModel");
-
+        String filtersTitle = "Filters";
+        if (isFromMylearning == 0) {
+            allFilterModel = (AllFilterModel) getIntent().getExtras().getSerializable("allFilterModel");
+            filtersTitle = allFilterModel.categoryName;
+        }
 
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + allFilterModel.categoryName + "</font>"));
+
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + filtersTitle + "</font>"));
 
         applyUiColor();
         try {
@@ -150,10 +154,19 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
 
         switch (v.getId()) {
             case R.id.btnApply:
-                finishTheActivity(true);
+                if (isFromMylearning == 2) {
+                    finishTheActivityForPeopleListing(true);
+                } else {
+                    finishTheActivity(true);
+                }
+
                 break;
             case R.id.btnReset:
-                finishTheActivity(false);
+                if (isFromMylearning == 2) {
+                    finishTheActivityForPeopleListing(false);
+                } else {
+                    finishTheActivity(false);
+                }
                 break;
         }
     }
@@ -196,6 +209,108 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
     }
 
 
+    public void finishTheActivityForPeopleListing(boolean isApplied) {
+        ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+        if (isApplied) {
+            applyFilterModel = generateApplyFilterModel();
+
+        } else {
+            applyFilterModel = new ApplyFilterModel();
+            contentFilterByModelList = new ArrayList<>();
+        }
+
+        if (contentFilterByModelList != null) {
+            Intent intent = getIntent();
+            intent.putExtra("APPLY", true);
+            intent.putExtra("applyFilterModel", (Serializable) applyFilterModel);
+            intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+
+            Toast.makeText(this, " select atleast one category", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    public ApplyFilterModel generateApplyFilterModel() {
+
+        ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+
+        for (int i = 0; i < contentFilterByModelList.size(); i++) {
+            // skills,jobroles,locations,userinfo,company
+            switch (contentFilterByModelList.get(i).categoryID) {
+                case "skills":
+                    applyFilterModel.skillCats = generateSelectedCategories(contentFilterByModelList.get(i), contentFilterByModelList.get(i).categoryID);
+                    applyFilterModel.skills = generateSelectedCategories(contentFilterByModelList.get(i), "sad");
+                    break;
+                case "jobroles":
+                    applyFilterModel.jobRoles = generateSelectedCategories(contentFilterByModelList.get(i), contentFilterByModelList.get(i).categoryID);
+                    break;
+                case "locations":
+                    applyFilterModel.locations = generateSelectedCategories(contentFilterByModelList.get(i), contentFilterByModelList.get(i).categoryID);
+                    break;
+                case "userinfo":
+                    applyFilterModel.firstName = contentFilterByModelList.get(i).categorySelectedFname;
+                    applyFilterModel.lastName = contentFilterByModelList.get(i).categorySelectedLname;
+                    break;
+                case "company":
+                    applyFilterModel.categories = generateSelectedCategories(contentFilterByModelList.get(i), contentFilterByModelList.get(i).categoryID);
+                    break;
+
+            }
+
+        }
+
+        return applyFilterModel;
+    }
+
+    public String generateSelectedCategories(ContentFilterByModel contentFilterByModel, String isSkills) {
+        String generatedStr = "";
+
+        if (contentFilterByModel.selectedSkillNamesArry == null || contentFilterByModel.selectedSkillNamesArry.size() == 0)
+            return "";
+
+        for (int i = 0; i < contentFilterByModel.selectedSkillNamesArry.size(); i++) {
+            if (generatedStr.length() > 0) {
+                generatedStr = generatedStr.concat("," + contentFilterByModel.selectedSkillNamesArry.get(i));
+            } else {
+                generatedStr = "" + contentFilterByModel.selectedSkillNamesArry.get(i);
+            }
+        }
+
+        if (contentFilterByModel.selectedChildSkillNamesArry == null || contentFilterByModel.selectedChildSkillNamesArry.size() == 0)
+            return generatedStr;
+
+        if (isSkills.equalsIgnoreCase("skills")) {
+            generatedStr = "";
+            for (int i = 0; i < contentFilterByModel.selectedChildSkillNamesArry.size(); i++) {
+                if (generatedStr.length() > 0) {
+                    generatedStr = generatedStr.concat("," + contentFilterByModel.selectedChildSkillNamesArry.get(i));
+                } else {
+                    generatedStr = "" + contentFilterByModel.selectedChildSkillNamesArry.get(i);
+                }
+            }
+            return generatedStr;
+        } else {
+
+            for (int i = 0; i < contentFilterByModel.selectedChildSkillNamesArry.size(); i++) {
+                if (generatedStr.length() > 0) {
+                    generatedStr = generatedStr.concat("," + contentFilterByModel.selectedChildSkillNamesArry.get(i));
+                } else {
+                    generatedStr = "" + contentFilterByModel.selectedChildSkillNamesArry.get(i);
+                }
+
+            }
+
+
+        }
+
+
+        return generatedStr;
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -221,6 +336,9 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
                                 contentFilterByModelList.get(i).categorySelectedStartDate = contentFilterByModel.categorySelectedStartDate;
                                 contentFilterByModelList.get(i).categorySelectedEndDate = contentFilterByModel.categorySelectedEndDate;
 
+                                contentFilterByModelList.get(i).categorySelectedFname = contentFilterByModel.categorySelectedFname;
+                                contentFilterByModelList.get(i).categorySelectedLname = contentFilterByModel.categorySelectedLname;
+
                                 if (contentFilterByModel.selectedChildSkillIdsArry != null && contentFilterByModel.selectedChildSkillIdsArry.size() > 0) {
 
                                     contentFilterByModelList.get(i).selectedChildSkillIdsArry = contentFilterByModel.selectedChildSkillIdsArry;
@@ -228,16 +346,59 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
 
                                 }
 
-                                contentFilterAdapter.refreshList(contentFilterByModelList);
+
+//                                contentFilterAdapter.refreshList(contentFilterByModelList);
                             }
 
                         }
 
                     }
+                    contentFilterAdapter.refreshList(contentFilterByModelList);
+
+                    if (isFromMylearning == 2) {
+//                        updateUiForSelectedFilters();
+                    }
+                }
+
+            }
+        }
+
+    }
+
+    public void updateUiForSelectedFilters() {
+
+        if (contentFilterByModelList != null && contentFilterByModelList.size() > 0) {
+            String nameSelectedCats = "";
+            Log.d(TAG, "onActivityResult: " + contentFilterByModelList.size());
+            for (int i = 0; i < contentFilterByModelList.size(); i++) {
+
+                if (contentFilterByModelList.get(i).selectedChildSkillIdsArry != null && contentFilterByModelList.get(i).selectedChildSkillIdsArry.size() > 0 || contentFilterByModelList.get(i).selectedSkillIdsArry != null && contentFilterByModelList.get(i).selectedSkillIdsArry.size() > 0) {
+
+//                    if (nameSelectedCats.length() > 0) {
+//                        nameSelectedCats = nameSelectedCats.concat("," + contentFilterByModelList.get(i).categoryDisplayName);
+//                    } else {
+//                        nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
+//                    }
+                    //      nameSelectedCats = ""+contentFilterByModelList.get(i).selectedChildSkillIdsArry.size()+contentFilterByModelList.get(i).selectedChildSkillIdsArry.size();
+                }
+
+                if (contentFilterByModelList.get(i).categorySelectedID != -1 && contentFilterByModelList.get(i).categorySelectedID > 0) {
+
+                    if (nameSelectedCats.length() > 0) {
+                        nameSelectedCats = nameSelectedCats.concat("," + contentFilterByModelList.get(i).categoryDisplayName);
+                    } else {
+                        nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
+                    }
 
                 }
 
             }
+
+            if (contentFilterByModelList != null && contentFilterByModelList.size() > 0) {
+                contentFilterByModelList.get(0).categorySelectedData = nameSelectedCats;
+                contentFilterAdapter.refreshList(contentFilterByModelList);
+            }
+
         }
 
     }
@@ -285,6 +446,27 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
                 intentD.putExtra("isFrom", 0);
                 intentD.putExtra("contentFilterByModel", (Serializable) contentFilterByModelList.get(i));
                 startActivityForResult(intentD, FILTER_CLOSE_CODE);
+                break;
+            case "userinfo":
+                Intent intentU = new Intent(this, UserInfoActivity.class);
+                intentU.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intentU.putExtra("isFrom", 0);
+                intentU.putExtra("contentFilterByModel", (Serializable) contentFilterByModelList.get(i));
+                startActivityForResult(intentU, FILTER_CLOSE_CODE);
+                break;
+            case "locations":
+                Intent intentC = new Intent(this, CtryCmpnyActivity.class);
+                intentC.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intentC.putExtra("isFrom", 0);
+                intentC.putExtra("contentFilterByModel", (Serializable) contentFilterByModelList.get(i));
+                startActivityForResult(intentC, FILTER_CLOSE_CODE);
+                break;
+            case "company":
+                Intent intentCM = new Intent(this, CtryCmpnyActivity.class);
+                intentCM.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intentCM.putExtra("isFrom", 2);
+                intentCM.putExtra("contentFilterByModel", (Serializable) contentFilterByModelList.get(i));
+                startActivityForResult(intentCM, FILTER_CLOSE_CODE);
                 break;
 
         }

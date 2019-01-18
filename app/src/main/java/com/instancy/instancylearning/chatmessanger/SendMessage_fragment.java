@@ -4,7 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -19,12 +19,11 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -107,6 +106,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     Menu search_menu;
     MenuItem item_search;
 
+    int selectedId = 0;
 
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
@@ -153,12 +153,8 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 //        chatMessageAdapter.refreshList(peopleListingModelList);
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        initVolleyCallback();
-        vollyService = new VollyService(resultCallback, context);
+    public void startSignalService() {
 
         communicator = new Communicator() {
             @Override
@@ -173,26 +169,116 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             }
 
             @Override
-            public void userOnline(boolean isSingle,JSONArray objReceived) {
-                    communicator.userOnline(isSingle,objReceived);
+            public void userOnline(int typeUpdate, JSONArray objReceived) {
+
+                switch (typeUpdate) {
+                    case 1://NewOnlineUser
+                        Log.d(TAG, "NewOnlineUser: " + objReceived);
+                        try {
+                            updateNewOnlineUser(objReceived);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case 2://UpdateOnlineUserList
+                        Log.d(TAG, "UpdateOnlineUserList: " + objReceived);
+                        try {
+                            updateOnlineUserList(objReceived);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case 3://StatusChanged
+                        Log.d(TAG, "StatusChanged: " + objReceived);
+                        try {
+                            updateStatusChanged(objReceived);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+
             }
         };
         signalAService = SignalAService.newInstance(context);
-//        signalAService.stopSignalA();
         signalAService.communicator = communicator;
+        signalAService.startSignalA();
     }
 
 
-    public void updateUserOnline(JSONArray onlineUserObj) throws JSONException {
-    //    [{"SendDateTime":"0001-01-01T00:00:00","SiteID":374,"UnReadCount":0,"UserID":1,"ProfPic":"\/Content\/SiteFiles\/374\/ProfileImages\/1_381.gif","FullName":"Instancy Admin","Country":null,"Myconid":0,"ConnectionStatus":0,"RoleID":0,"UserStatus":0,"Role":null,"friendsList":null,"ConnectionId":"a471fa59-e092-4b56-942f-c700f97f60cf","isOnline":true,"ConnectionAcceptID":-1}]
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        initVolleyCallback();
+        vollyService = new VollyService(resultCallback, context);
+        // startSignalService();
+    }
+
+
+    public void updateOnlineUserList(JSONArray onlineUserObj) throws JSONException {
+        //    [{"SendDateTime":"0001-01-01T00:00:00","SiteID":374,"UnReadCount":0,"UserID":1,"ProfPic":"\/Content\/SiteFiles\/374\/ProfileImages\/1_381.gif","FullName":"Instancy Admin","Country":null,"Myconid":0,"ConnectionStatus":0,"RoleID":0,"UserStatus":0,"Role":null,"friendsList":null,"ConnectionId":"a471fa59-e092-4b56-942f-c700f97f60cf","isOnline":true,"ConnectionAcceptID":-1}]
+
         if (chatListModelList.size() > 0) {
             for (int i = 0; i < chatListModelList.size(); i++) {
-                Log.d(TAG, "updateUserOnline: "+onlineUserObj);
+                Log.d(TAG, "updateOnlineUserList: " + onlineUserObj);
 
+                if (onlineUserObj != null && onlineUserObj.length() > 0) {
+                    JSONArray userJsonAry = onlineUserObj.getJSONArray(0);
+                    for (int k = 0; k < onlineUserObj.length(); k++) {
+                        JSONObject userJsonOnj = userJsonAry.getJSONObject(k);
+                        if (chatListModelList.get(i).userID == userJsonOnj.optInt("UserID")) {
+                            chatListModelList.get(i).unReadCount = userJsonOnj.optInt("UnReadCount");
+                            chatListModelList.get(i).chatConnectionUserId = userJsonOnj.optString("ConnectionId");
+                            chatListModelList.get(i).chatConnectionStatus = true;
+
+                        }
+                    }
+                }
 
             }
         }
-//        chatMessageAdapter.refreshList(peopleListingModelList);
+        chatMessageAdapter.refreshList(chatListModelList);
+    }
+
+    public void updateNewOnlineUser(JSONArray onlineUserObj) throws JSONException {
+        //    [{"SendDateTime":"0001-01-01T00:00:00","SiteID":374,"UnReadCount":0,"UserID":1,"ProfPic":"\/Content\/SiteFiles\/374\/ProfileImages\/1_381.gif","FullName":"Instancy Admin","Country":null,"Myconid":0,"ConnectionStatus":0,"RoleID":0,"UserStatus":0,"Role":null,"friendsList":null,"ConnectionId":"a471fa59-e092-4b56-942f-c700f97f60cf","isOnline":true,"ConnectionAcceptID":-1}]
+
+        JSONObject userJsonOnj = onlineUserObj.getJSONObject(0);
+
+        if (chatListModelList.size() > 0) {
+            for (int i = 0; i < chatListModelList.size(); i++) {
+                Log.d(TAG, "updateNewOnlineUser: " + onlineUserObj);
+                if (chatListModelList.get(i).userID == userJsonOnj.optInt("UserID")) {
+
+                    chatListModelList.get(i).unReadCount = userJsonOnj.optInt("UnReadCount");
+                    chatListModelList.get(i).chatConnectionUserId = userJsonOnj.optString("ConnectionId");
+                    chatListModelList.get(i).chatConnectionStatus = true;
+
+                }
+            }
+        }
+        chatMessageAdapter.refreshList(chatListModelList);
+    }
+
+
+    public void updateStatusChanged(JSONArray onlineUserObj) throws JSONException {
+        //    [{"SendDateTime":"0001-01-01T00:00:00","SiteID":374,"UnReadCount":0,"UserID":1,"ProfPic":"\/Content\/SiteFiles\/374\/ProfileImages\/1_381.gif","FullName":"Instancy Admin","Country":null,"Myconid":0,"ConnectionStatus":0,"RoleID":0,"UserStatus":0,"Role":null,"friendsList":null,"ConnectionId":"a471fa59-e092-4b56-942f-c700f97f60cf","isOnline":true,"ConnectionAcceptID":-1}]
+
+        JSONObject userJsonOnj = onlineUserObj.getJSONObject(0);
+
+        if (chatListModelList.size() > 0) {
+            for (int i = 0; i < chatListModelList.size(); i++) {
+                Log.d(TAG, "updateStatusChanged: " + onlineUserObj);
+                if (chatListModelList.get(i).userID == userJsonOnj.optInt("UserID")) {
+
+                    chatListModelList.get(i).chatConnectionUserId = "default";
+                    chatListModelList.get(i).chatConnectionStatus = false;
+
+                }
+            }
+        }
+        chatMessageAdapter.refreshList(chatListModelList);
     }
 
 
@@ -335,15 +421,16 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 Intent intentDetail = new Intent(context, ChatActivity.class);
                 intentDetail.putExtra("peopleListingModel", peopleListingModel);
                 startActivity(intentDetail);
+                updateCountValue(chatListModel);
                 // peopleListingModelList.get(position).chatCount = 0;
                 break;
             default:
         }
     }
 
+
     public PeopleListingModel convertTopeopleModel(ChatListModel chatListModel) {
         PeopleListingModel peopleListingModel = new PeopleListingModel();
-
 
 //        public int userID = 0;
 //        public String fullName = "";
@@ -363,10 +450,14 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 //        public String jobTitle = "";
 //
         peopleListingModel.userDisplayname = chatListModel.fullName;
-        peopleListingModel.chatConnectionUserId = "" + chatListModel.myConid;
+        peopleListingModel.chatConnectionUserId = chatListModel.chatConnectionUserId;
         peopleListingModel.userID = "" + chatListModel.userID;
         peopleListingModel.memberProfileImage = chatListModel.profPic;
-        peopleListingModel.chatUserStatus = "Online"; //+chatListModel.connectionStatus;
+        if (chatListModel.chatConnectionStatus) {
+            peopleListingModel.chatUserStatus = "Online";
+        } else {
+            peopleListingModel.chatUserStatus = "Offline";
+        }
         peopleListingModel.chatCount = chatListModel.unReadCount;
 
 
@@ -376,7 +467,28 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onResume() {
         super.onResume();
-        chatMessageAdapter.notifyDataSetChanged();
+        if (selectedId != 0) {
+            chatMessageAdapter.refreshList(getSelectedRoleList(selectedId));
+        } else {
+            chatMessageAdapter.refreshList(chatListModelList);
+        }
+
+    }
+
+    public void updateCountValue(ChatListModel chatListModel) {
+
+        if (chatListModelList != null && chatListModelList.size() > 0) {
+
+            for (int k = 0; k < chatListModelList.size(); k++) {
+
+                if (chatListModel.userID == chatListModelList.get(k).userID) {
+
+                    chatListModelList.get(k).unReadCount = 0;
+                }
+            }
+
+        }
+
     }
 
     @Override
@@ -405,13 +517,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             @Override
             public void notifySuccess(String requestType, JSONObject response) {
                 svProgressHUD.dismiss();
-                if (requestType.equalsIgnoreCase("PEOPLELISTING")) {
-                    if (response != null) {
-
-                    } else {
-
-                    }
-                }
 
             }
 
@@ -433,6 +538,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                             if (jsonObject != null) {
                                 chatListModelList = generateOnlineUsersList(jsonObject);
                                 chatMessageAdapter.refreshList(chatListModelList);
+                                startSignalService();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -495,9 +601,9 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onDetach() {
-
         super.onDetach();
     }
+
 
     public void generateUserChatList() throws JSONException {
 
@@ -553,6 +659,8 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             chatListModel.archivedUserID = jsonColumnObj.optInt("ArchivedUserID");
             chatListModel.latestMessage = jsonColumnObj.optString("LatestMessage");
             chatListModel.jobTitle = jsonColumnObj.optString("JobTitle");
+            chatListModel.chatConnectionUserId = "Default";
+            chatListModel.chatConnectionStatus = false;
 
             if (chatListModel.connectionStatus == 1 && chatListModel.userStatus == 1 && appUserModel.getSiteIDValue().equalsIgnoreCase("" + chatListModel.siteID)) {
                 if (chatListModel.roleID == 8 || chatListModel.roleID == 6 || chatListModel.roleID == 12) {
@@ -576,7 +684,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     public void onDestroyView() {
         super.onDestroyView();
 
-        signalAService.stopSignalA();
+//        signalAService.stopSignalA();
     }
 
     public void updateGameSpinner() {
@@ -593,8 +701,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         spnrRoles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition,
-                                       long id) {
+            public void onItemSelected(AdapterView<?> parent, View view, int spnrPosition, long id) {
 
                 Log.d(TAG, "onItemSelected: gamesList " + userRolesList.get(spnrPosition));
 
@@ -603,15 +710,19 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 switch (spnrPosition) {
                     case 0:
                         chatMessageAdapter.refreshList(chatListModelList);
+                        selectedId = 0;
                         break;
                     case 1://16
                         chatMessageAdapter.refreshList(getSelectedRoleList(16));
+                        selectedId = 16;
                         break;
                     case 2://8
                         chatMessageAdapter.refreshList(getSelectedRoleList(8));
+                        selectedId = 8;
                         break;
                     case 3://12
                         chatMessageAdapter.refreshList(getSelectedRoleList(12));
+                        selectedId = 12;
                         break;
                 }
 
@@ -641,9 +752,9 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         ArrayList<String> userRoles = new ArrayList<>();
 
         userRoles.add("All");
-        userRoles.add("Group Admin");
-        userRoles.add("Admin");
-        userRoles.add("Manager");
+        userRoles.add("Group Admin");//16
+        userRoles.add("Admin");//8
+        userRoles.add("Manager");//12
 
 
         return userRoles;

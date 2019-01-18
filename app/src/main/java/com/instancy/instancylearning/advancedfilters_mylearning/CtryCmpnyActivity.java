@@ -41,29 +41,30 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 9/28/2017 Working on Instancy-Playground-Android.
  */
 
-public class InstructorActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class CtryCmpnyActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
 
-    private static final String TAG = InstructorActivity.class.getSimpleName();
-    ListView listView;
-    List<InstructorModel> instructorModelList;
+    private static final String TAG = CtryCmpnyActivity.class.getSimpleName();
+
     AppUserModel appUserModel;
 
     PreferencesManager preferencesManager;
     UiSettingsModel uiSettingsModel;
+
     ContentFilterByModel contentFilterByModel;
 
-    int isFromMylearning = 0;
+    List<CtryCmpnyModel> ctryCmpnyModelList;
 
-    InstructorAdapter instructorAdapter;
+    int isForLocations = 0;
 
-    Button btnApply, btnReset;
     SideMenusModel sideMenusModel;
 
     SVProgressHUD svProgressHUD;
@@ -71,15 +72,23 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
     VollyService vollyService;
     IResult resultCallback = null;
 
+    CtryCmpnyAdapter ctryCmpnyAdapter;
 
-    //    https://github.com/shineM/TreeView
+    @BindView(R.id.lstContentFilterBy)
+    ListView listView;
+
+    @BindView(R.id.btnApply)
+    Button btnApply;
+
+    @BindView(R.id.btnReset)
+    Button btnReset;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.adv_contentbyactivity);
         appUserModel = AppUserModel.getInstance();
-
+        ButterKnife.bind(this);
         uiSettingsModel = UiSettingsModel.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
@@ -87,15 +96,17 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
 
-        isFromMylearning = getIntent().getIntExtra("isFrom", 0);
+        isForLocations = getIntent().getIntExtra("isFrom", 0);
+
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
         contentFilterByModel = (ContentFilterByModel) getIntent().getExtras().getSerializable("contentFilterByModel");
-
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contentFilterByModel.categoryName + "</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contentFilterByModel.categoryDisplayName + "</font>"));
+
         applyUiColor();
+
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -106,33 +117,13 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
 
             ex.printStackTrace();
         }
-
-        instructorModelList = new ArrayList<>();
-        listView = (ListView) findViewById(R.id.lstContentFilterBy);
-        instructorAdapter = new InstructorAdapter(this, instructorModelList, true);
-        listView.setAdapter(instructorAdapter);
-        listView.setDivider(null);
+        ctryCmpnyModelList = new ArrayList<>();
+        ctryCmpnyAdapter = new CtryCmpnyAdapter(this, ctryCmpnyModelList, true);
+        listView.setAdapter(ctryCmpnyAdapter);
         listView.setOnItemClickListener(this);
-        getIntructorList();
 
+        getPeoplePrimaryFilterData();
     }
-
-    public void getIntructorList() {
-
-        if (isNetworkConnectionAvailable(this, -1)) {
-
-
-            String urlStr = "instSiteID=" + appUserModel.getSiteIDValue() + "&instUserID=" + appUserModel.getUserIDValue();
-
-            vollyService.getStringResponseVolley("INSTRCT", appUserModel.getWebAPIUrl() + "/catalog/GetInstructorListForFilter?" + urlStr, appUserModel.getAuthHeaders());
-
-        } else {
-
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-
-        }
-    }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -148,14 +139,9 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void applyUiColor() {
-
-        btnApply = (Button) findViewById(R.id.btnApply);
         btnApply.setOnClickListener(this);
-
-        btnReset = (Button) findViewById(R.id.btnReset);
         btnReset.setOnClickListener(this);
         btnReset.setBackground(getButtonDrawable());
-
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
@@ -186,24 +172,23 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
 
         switch (v.getId()) {
             case R.id.btnApply:
-                finishTheActivity(true);
+                finishTheActivity();
                 break;
             case R.id.btnReset:
-                finishTheActivity(false);
+                finish();
                 break;
         }
     }
 
-    public void finishTheActivity(boolean isApply) {
+    public void finishTheActivity() {
 
-        if (isApply) {
-            getSelectedCategoriesValues();
-        } else {
-            contentFilterByModel.selectedSkillIdsArry = new ArrayList<>();
-        }
+        getSelectedCategoriesValues();
+
         if (contentFilterByModel != null) {
+
             Intent intent = getIntent();
-            intent.putExtra("contentFilterByModel", (Serializable) contentFilterByModel);
+            intent.putExtra("allFilterModel", (Serializable) contentFilterByModel);
+            intent.putExtra("ISFROM", 3);
             intent.putExtra("FILTER", true);
             setResult(RESULT_OK, intent);
             finish();
@@ -215,62 +200,17 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    public void getSelectedCategoriesValues() {
+    public void getPeoplePrimaryFilterData() {
 
-        if (instructorModelList != null && instructorModelList.size() > 0) {
+        if (isNetworkConnectionAvailable(this, -1)) {
 
-            for (int i = 0; i < instructorModelList.size(); i++) {
+            vollyService.getStringResponseVolley("getPeoplePrimaryFilterData", appUserModel.getWebAPIUrl() + "PeopleListing/GetPeoplePrimaryFilterData?LocalID=en-us", appUserModel.getAuthHeaders());
 
-                if (instructorModelList.get(i).isSelected) {
+        } else {
 
-                    contentFilterByModel.selectedSkillIdsArry.add("" + instructorModelList.get(i).userId);
-                    contentFilterByModel.selectedSkillNamesArry.add("" + instructorModelList.get(i).userName);
+            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
 
-                }
-            }
         }
-    }
-
-
-    public void updateSelectedArrayList(List<String> selectedValues) {
-
-        if (selectedValues != null && selectedValues.size() > 0) {
-
-            for (int i = 0; i < selectedValues.size(); i++) {
-
-                for (int j = 0; j < instructorModelList.size(); j++) {
-
-                    if (selectedValues.get(i).equalsIgnoreCase("" + instructorModelList.get(j).userId)) {
-
-                        instructorModelList.get(j).isSelected = true;
-
-                    }
-
-                }
-
-            }
-            instructorAdapter.refreshList(instructorModelList);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult inneractivity:");
-        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("INSTRCT", false);
-                if (refresh) {
-
-                    contentFilterByModel = (ContentFilterByModel) data.getExtras().getSerializable("contentFilterByModel");
-                    Log.d(TAG, "selectedCategories: " + contentFilterByModel.selectedSkillsNameString);
-
-
-                }
-
-            }
-        }
-
     }
 
     void initVolleyCallback() {
@@ -292,12 +232,13 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void notifySuccess(String requestType, String response) {
-                if (requestType.equalsIgnoreCase("INSTRCT")) {
+                if (requestType.equalsIgnoreCase("getPeoplePrimaryFilterData")) {
                     if (response != null) {
                         Log.d(TAG, "notifySuccess: " + response);
+
                         try {
-                            instructorModelList = generateFilterByModelList(response);
-                            instructorAdapter.refreshList(instructorModelList);
+                            ctryCmpnyModelList = generateModelList(response);
+                            ctryCmpnyAdapter.refreshList(ctryCmpnyModelList);
                             updateSelectedArrayList(contentFilterByModel.selectedSkillIdsArry);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -309,7 +250,6 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
                 }
 
                 svProgressHUD.dismiss();
-
             }
 
             @Override
@@ -320,24 +260,50 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
         };
     }
 
-    public List<InstructorModel> generateFilterByModelList(String responseStr) throws JSONException {
-        List<InstructorModel> instructorModels = new ArrayList<>();
+    public List<CtryCmpnyModel> generateModelList(String responseStr) throws JSONException {
+        List<CtryCmpnyModel> ctryCmpnyModelArrayList = new ArrayList<>();
 
         JSONObject jsonObject = new JSONObject(responseStr);
-        JSONArray jsonTableAry = jsonObject.getJSONArray("Table");
 
-        for (int i = 0; i < jsonTableAry.length(); i++) {
-            InstructorModel instructorModel = new InstructorModel();
-            JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
+        if (isForLocations == 2) {
 
-            instructorModel.userId = jsonColumnObj.optInt("UserID");
-            instructorModel.userName = jsonColumnObj.optString("UserName");
+            JSONArray jsonTableAry = jsonObject.getJSONArray("org");
 
-            instructorModels.add(instructorModel);
+            for (int i = 0; i < jsonTableAry.length(); i++) {
+                CtryCmpnyModel cmpnyModel = new CtryCmpnyModel();
+                JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
+                cmpnyModel.categoryId = i;
+                cmpnyModel.categoryName = jsonColumnObj.optString("Organization");
+                cmpnyModel.isSelected = false;
+                ctryCmpnyModelArrayList.add(cmpnyModel);
+            }
+        } else {
+            JSONArray jsonTableAry = jsonObject.getJSONArray("country");
+
+            for (int i = 0; i < jsonTableAry.length(); i++) {
+                CtryCmpnyModel cmpnyModel = new CtryCmpnyModel();
+                JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
+
+                cmpnyModel.categoryId = jsonColumnObj.optInt("ChoiceID");
+                cmpnyModel.categoryName = jsonColumnObj.optString("ChoiceValue");
+                cmpnyModel.isSelected = false;
+
+                ctryCmpnyModelArrayList.add(cmpnyModel);
+            }
         }
 
-        return instructorModels;
+
+        return ctryCmpnyModelArrayList;
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult inneractivity:");
+
+    }
+
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -346,22 +312,57 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
             case R.id.chxCategoryDisplayName:
                 refreshCheckedItem(view, i);
                 break;
-            case R.id.txtCategoryDisplayName:
-
-                break;
         }
+
 
     }
 
     public void refreshCheckedItem(View view, int i) {
         CheckBox checkBox = (CheckBox) view.findViewById(R.id.chxCategoryDisplayName);
         if (checkBox.isChecked()) {
-            instructorModelList.get(i).isSelected = true;
+            ctryCmpnyModelList.get(i).isSelected = true;
         } else {
-            instructorModelList.get(i).isSelected = false;
+            ctryCmpnyModelList.get(i).isSelected = false;
         }
-        instructorAdapter.refreshList(instructorModelList);
+        ctryCmpnyAdapter.refreshList(ctryCmpnyModelList);
+    }
 
+
+    public void getSelectedCategoriesValues() {
+
+        if (ctryCmpnyModelList != null && ctryCmpnyModelList.size() > 0) {
+
+            for (int i = 0; i < ctryCmpnyModelList.size(); i++) {
+
+                if (ctryCmpnyModelList.get(i).isSelected) {
+
+                    contentFilterByModel.selectedSkillIdsArry.add("" + ctryCmpnyModelList.get(i).categoryId);
+                    contentFilterByModel.selectedSkillNamesArry.add("" + ctryCmpnyModelList.get(i).categoryName);
+
+                }
+            }
+        }
+    }
+
+    public void updateSelectedArrayList(List<String> selectedValues) {
+
+        if (selectedValues != null && selectedValues.size() > 0) {
+
+            for (int i = 0; i < selectedValues.size(); i++) {
+
+                for (int j = 0; j < ctryCmpnyModelList.size(); j++) {
+
+                    if (selectedValues.get(i).equalsIgnoreCase("" + ctryCmpnyModelList.get(j).categoryId)) {
+
+                        ctryCmpnyModelList.get(j).isSelected = true;
+
+                    }
+
+                }
+
+            }
+            ctryCmpnyAdapter.refreshList(ctryCmpnyModelList);
+        }
     }
 
 }

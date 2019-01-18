@@ -33,4 +33,11 @@ public class ContentFilterByModel implements Serializable {
 
     public String categorySelectedStartDate = "";
     public String categorySelectedEndDate = "";
+
+
+    public String categorySelectedFname = "";
+    public String categorySelectedLname = "";
+
+    public String categorySelectedData = "";
+
 }

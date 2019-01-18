@@ -143,10 +143,10 @@ public class SendMessageAdapter extends BaseAdapter {
             holder.imgThumb.setBackground(drawable);
         }
 
-        if (chatListModelList.get(position).connectionStatus == 1) {
+        if (chatListModelList.get(position).chatConnectionStatus) {
             holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle, "#008000"));
         } else {
-            holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle_o,"#008000"));
+            holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle_o, "#008000"));
         }
 
         return convertView;

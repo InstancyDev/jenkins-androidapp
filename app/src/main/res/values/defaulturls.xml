@@ -118,11 +118,11 @@
     <!--<string name="app_default_url">http://seac.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://appapi.instancysoft.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://angular6.instancysoft.com/</string>-->
-    <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
-
-    <string name="app_default_url">http://yournextu.instancysoft.com/</string>
+    <string name="app_default_url">http://angular6.instancysoft.com/</string>
     <string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>
+
+    <!--<string name="app_default_url">http://yournextu.instancysoft.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
 
     <!--<string name="app_default_url">http://digimedica.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->

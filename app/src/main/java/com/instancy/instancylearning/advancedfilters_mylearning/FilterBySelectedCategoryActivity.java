@@ -477,7 +477,6 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
             filtersParents.get(i).isSelected = false;
         }
         filterByAdapter.refreshList(filtersParents);
-
     }
 
 

@@ -33,7 +33,6 @@ public class ContentFilterAdapter extends BaseAdapter {
     PreferencesManager preferencesManager;
     UiSettingsModel uiSettingsModel;
 
-
     public ContentFilterAdapter(Activity activity, List<ContentFilterByModel> contentFilterByModelList) {
         this.activity = activity;
         this.contentFilterByModelList = contentFilterByModelList;

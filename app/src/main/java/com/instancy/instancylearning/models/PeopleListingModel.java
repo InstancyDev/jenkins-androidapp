@@ -29,8 +29,11 @@ public class PeopleListingModel implements Serializable {
     public String userID = "";
     public String tabID = "";
     public String mainSiteUserID = "";
-    public String chatConnectionUserId = "Default";
     public String askaQuestion = "";
-    public String chatUserStatus = "";
     public int chatCount = 0;
+
+    public String chatConnectionUserId = "Default";
+    public String chatUserStatus = "";
+    public String attachmentPath = "";
+
 }
