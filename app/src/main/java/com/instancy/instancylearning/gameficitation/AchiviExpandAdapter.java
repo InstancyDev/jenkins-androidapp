@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.Ach_UserBadges;
 import com.instancy.instancylearning.models.Ach_UserLevel;
 import com.instancy.instancylearning.models.Ach_UserPoints;
@@ -20,6 +21,7 @@ import com.instancy.instancylearning.models.ProfileGroupModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -148,7 +150,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
         int childType = groupPosition;
 
         // We need to create a new "cell container"
-        if (convertView == null) {
+//        if (convertView == null) {
             switch (expandableListTitle.get(groupPosition).groupId) {
                 case "1":
                     convertView = inflater.inflate(R.layout.achivmentspointscell, null);
@@ -156,7 +158,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                     TextView textAwardedOn = convertView.findViewById(R.id.txt_awardedon);
                     TextView textTitle = convertView.findViewById(R.id.txt_title);
                     textCount.setText("" + achUserPointsList.get(childPosition).points);
-                    textAwardedOn.setText("Awarded on " + achUserPointsList.get(childPosition).userReceivedDate);
+                    textAwardedOn.setText(getLocalizationValue(JsonLocalekeys.filter_label_awardedon) + " " + achUserPointsList.get(childPosition).userReceivedDate);
                     textTitle.setText("" + achUserPointsList.get(childPosition).pointsDescription);
                     textCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                     textAwardedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -171,7 +173,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                     txtLevel.setText("" + achUserLevelList.get(childPosition).levelName);
                     if (achUserLevelList.get(childPosition).levelReceivedDate.length() > 0) {
 
-                        textAwarded.setText("Awarded on " + achUserLevelList.get(childPosition).levelReceivedDate);
+                        textAwarded.setText(getLocalizationValue(JsonLocalekeys.filter_label_awardedon) + " " + achUserLevelList.get(childPosition).levelReceivedDate);
 
                     } else {
                         textAwarded.setText("");
@@ -189,7 +191,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                     TextView textAwardedBadge = convertView.findViewById(R.id.txt_awardedon);
                     ImageView badgeImage = (ImageView) convertView.findViewById(R.id.imageBadge);
                     txtTitle.setText("" + achUserBadgesList.get(childPosition).badgeName);
-                    textAwardedBadge.setText("Awarded on " + achUserBadgesList.get(childPosition).badgeReceivedDate);
+                    textAwardedBadge.setText(getLocalizationValue(JsonLocalekeys.filter_label_awardedon) + " " + achUserBadgesList.get(childPosition).badgeReceivedDate);
                     textDesc.setText("" + achUserBadgesList.get(childPosition).badgeDescription);
                     String imgUrl = achUserBadgesList.get(childPosition).badgeImage;
                     Picasso.with(context).load(imgUrl).placeholder(R.drawable.badge).into(badgeImage);
@@ -206,11 +208,9 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                     // Maybe we should implement a default behaviour but it should be ok we know there are 4 child types right?
                     break;
             }
-        }
-        // We'll reuse the existing one
-        else {
-            // There is nothing to do here really we just need to set the content of view which we do in both cases
-        }
+//        } else {
+//            // There is nothing to do here really we just need to set the content of view which we do in both cases
+//        }
 
 //        switch (childType) {
 //            case CHILD_TYPE_1:
@@ -237,6 +237,11 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, context);
 
     }
 }

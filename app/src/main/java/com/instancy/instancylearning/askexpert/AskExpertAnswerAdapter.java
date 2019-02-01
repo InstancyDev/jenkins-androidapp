@@ -20,10 +20,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -109,7 +111,7 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtName.setText(askExpertAnswerModelList.get(position).respondedusername);
-        holder.txtAnsweredOn.setText("Answered on: " + askExpertAnswerModelList.get(position).responsedate);
+        holder.txtAnsweredOn.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answeredonlabel, activity)+" " + askExpertAnswerModelList.get(position).responsedate);
         holder.txtMessage.setText(askExpertAnswerModelList.get(position).response + " ");
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

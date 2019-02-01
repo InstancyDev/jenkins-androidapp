@@ -9,7 +9,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomlayout"
+        android:descendantFocusability="beforeDescendants"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:scrollbars="none">
+
 
         <LinearLayout
             android:id="@+id/linearlayout"
@@ -22,18 +26,25 @@
                 android:id="@+id/txt_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+
                 android:padding="5dp"
                 android:text="*Title" />
 
-            <EditText
-                android:id="@+id/edit_title"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/edittext_border"
-                android:hint="Enter title here..."
-                android:maxLength="100"
-                android:maxLines="1"
-                android:padding="10dp" />
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edittext_border"
+                    android:hint="Enter title here..."
+                    android:maxLength="100"
+                    android:maxLines="1"
+                    android:padding="10dp" />
+
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/txt_description"
@@ -124,7 +135,7 @@
                     android:drawableStart="@drawable/ic_menu_camera"
                     android:onClick="actionsBottomBtns"
                     android:padding="3dp"
-                    android:text="Upload"
+                    android:text="@string/asktheexpert_labelupload"
                     android:textAlignment="viewStart"
                     android:textAllCaps="false" />
 
@@ -138,38 +149,6 @@
                 android:text="Categories"
                 android:textColor="@color/colorBlack" />
 
-            <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="32dp"-->
-            <!--android:background="@drawable/edit_round_drawable"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:weightSum="5"-->
-            <!--android:visibility="visible">-->
-
-            <!--<LinearLayout-->
-            <!--android:id="@+id/lltagslayout"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="32dp"-->
-            <!--android:layout_weight="4.3"-->
-            <!--android:background="@drawable/edit_round_drawable"-->
-            <!--android:touchscreenBlocksFocus="false"-->
-
-            <!--android:visibility="visible">-->
-            <!--<include layout="@layout/askexpertstagslayout" />-->
-
-            <!--</LinearLayout>-->
-
-            <!--<TextView-->
-            <!--android:id="@+id/txtCategoriesCount"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight=".7"-->
-            <!--android:padding="5dp"-->
-            <!--android:visibility="gone"-->
-            <!--android:text=""-->
-            <!--android:textColor="@color/colorBlack" />-->
-
-            <!--</LinearLayout>-->
 
             <RelativeLayout
                 android:id="@+id/tagsRelative"
@@ -178,57 +157,81 @@
                 android:background="@drawable/edit_round_drawable"
                 android:visibility="visible">
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/lltagslayout"
                     android:layout_width="300dp"
                     android:layout_height="32dp"
-                    android:touchscreenBlocksFocus="false"
                     android:visibility="visible">
 
                     <include layout="@layout/askexpertstagslayout" />
-                </LinearLayout>
+                </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/txtCategoriesName"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
+                <RelativeLayout
+                    android:id="@+id/lytCategories"
+                    android:layout_width="wrap_content"
                     android:gravity="center"
-                    android:padding="2dp"
-                    android:text="Categories"
-                    android:textAlignment="center"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:visibility="visible" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/txtCategoriesName"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:padding="2dp"
+                        android:text="Categories"
+                        android:textAlignment="center"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/txtCategoriesIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:textAlignment="textEnd"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:visibility="visible" />
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/clearLayout"
-                    android:layout_width="100dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
+                    android:gravity="end"
                     android:orientation="horizontal"
                     android:visibility="visible">
 
                     <TextView
                         android:id="@+id/txtCategoriesCount"
-                        android:layout_width="40dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center"
                         android:padding="2dp"
                         android:text=""
+                        android:textAlignment="textEnd"
                         android:textColor="@color/colorBlack"
                         android:visibility="visible" />
 
                     <TextView
                         android:id="@+id/txtCategoriesClear"
-                        android:layout_width="60dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:gravity="center"
                         android:padding="2dp"
+                        android:paddingEnd="4dp"
                         android:text="Clear"
+                        android:textAlignment="textEnd"
                         android:textColor="@color/colorBlack"
                         android:visibility="visible" />
 
                 </LinearLayout>
-
 
             </RelativeLayout>
 

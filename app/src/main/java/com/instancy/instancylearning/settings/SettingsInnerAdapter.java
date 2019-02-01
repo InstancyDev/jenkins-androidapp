@@ -12,6 +12,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.localization.LocalizationSelectionActivity;
+import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.wifisharing.SharedPreferencesHandler;
 
 import java.util.HashMap;
 import java.util.List;
@@ -111,12 +115,12 @@ public class SettingsInnerAdapter extends BaseExpandableListAdapter {
         TextView applanguageTxt = (TextView) convertView
                 .findViewById(R.id.applanguage);
 
-        if (expandableListTitle.get(groupPosition).contains("LANGUAGE")) {
+        if (expandableListTitle.get(groupPosition).toLowerCase().contains("language")) {
             switchSkill.setVisibility(View.GONE);
             labelTxt.setVisibility(View.VISIBLE);
             applanguageTxt.setVisibility(View.VISIBLE);
 
-            applanguageTxt.setText("English");
+            applanguageTxt.setText(PreferencesManager.getInstance().getLocalizationDisplayStringValue(context.getResources().getString(R.string.locale_display_name)));
 
             labelTxt.setText(expandedListText);
 

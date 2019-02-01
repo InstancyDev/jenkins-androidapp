@@ -1,6 +1,5 @@
 package com.instancy.instancylearning.globalsearch;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -61,21 +60,18 @@ import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 
 import com.instancy.instancylearning.interfaces.GlobalSearchResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.AskExpertQuestionModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
-import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.GLobalSearchSelectedModel;
 
-import com.instancy.instancylearning.models.GlobalSearchResultModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
+import com.instancy.instancylearning.mylearning.MyLearningDetailActivity1;
 import com.instancy.instancylearning.peoplelisting.PeopleListingProfile;
-import com.instancy.instancylearning.sidemenumodule.SideMenu;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -139,6 +135,10 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     RelativeLayout globalsearchresultLayout;
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, GlobalSearchResultsActivity.this);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,7 +189,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
         globalSearchResult = (TextView) findViewById(R.id.txt_relaventskills);
 
-        globalSearchResult.setText("SearchResult");
+        globalSearchResult.setText(getLocalizationValue(JsonLocalekeys.searchresult));
 
         // Construct our adapter, using our own layout and myTeams
 
@@ -219,7 +219,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshCatagories(false);
         } else {
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -283,12 +283,16 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     public void selectedFragmentForSubsite(SideMenusModel sideMenusModel) {
 
-        Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, GlobalCatalogActivity.class);
-        intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
-        intentDetail.putExtra("query", queryString);
-        intentDetail.putExtra("ISFROMGLOBAL", true);
-        startActivity(intentDetail);
+        if (sideMenusModel.isDataFound() && !sideMenusModel.contextMenuId.equalsIgnoreCase("0")) {
+            Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, GlobalCatalogActivity.class);
+            intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
+            intentDetail.putExtra("query", queryString);
+            intentDetail.putExtra("ISFROMGLOBAL", true);
+            startActivity(intentDetail);
+        } else {
 
+            Toast.makeText(this, "No proper menu found", Toast.LENGTH_SHORT).show();
+        }
     }
 
 //    public SideMenusModel createSideMenuModel(GlobalSearchResultModel expandedListText) {
@@ -308,7 +312,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     public void refreshCatagories(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
         if (gLobalSearchSelectedModelList != null && gLobalSearchSelectedModelList.size() > 0) {
@@ -323,7 +327,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 //                        "&source=0&type=0&fType=&fValue=&sortBy=PublishedDate&sortType=desc&keywords=&ComponentID=225&ComponentInsID=4021&UserID=" + appUserModel.getUserIDValue() +
 //                        "&SiteID=" + appUserModel.getSiteIDValue() +
 //                        "&OrgUnitID=" + appUserModel.getSiteIDValue() +
-//                        "&Locale=en-us&AuthorID=-1&groupBy=PublishedDate" +
+//                        "&Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&AuthorID=-1&groupBy=PublishedDate" +
 //                        "&objComponentList=" + gLobalSearchSelectedModelList.get(i).componentID + "&intComponentSiteID=" + gLobalSearchSelectedModelList.get(i).siteID;
 //
 //
@@ -333,7 +337,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 //                    public void onSuccess(JSONObject result) {
 //                        Log.d(TAG, finalI + "onSuccess: " + result);
 //                        if (gLobalSearchSelectedModelList.size() == finalI) {
-//                            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//                            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
 //                            Log.d(TAG, "onSuccess: loop is completed ");
 //                        }
 //                    }
@@ -356,11 +360,11 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
@@ -443,7 +447,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         }
 
         if (expandableListDetail.size() == 0) {
-            nodataLabel.setText(getResources().getString(R.string.no_data));
+            nodataLabel.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
     }
 
@@ -472,6 +476,20 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
         Menu menu = popup.getMenu();
 
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_viewoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_buyoption));
+        menu.getItem(2).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_joinoption));
+        menu.getItem(3).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_relatedcontentoption));
+        menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_addoption));
+        menu.getItem(5).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_enrolloption));
+        menu.getItem(6).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_detailsoption));
+        menu.getItem(7).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_addtomyconnectionsoption));
+        menu.getItem(8).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_viewprofileoption));
+        menu.getItem(9).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_gotothisformoption));
+        menu.getItem(10).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_gotothistopicoption));
+        menu.getItem(11).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_gotothisquestionoption));
+        menu.getItem(12).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_cancelenrolloption));
+        menu.getItem(13).setTitle(getLocalizationValue(JsonLocalekeys.globalsearch_actionsheet_gotothisresponseoption));
         // Catalog
         menu.getItem(0).setVisible(false);//view
         menu.getItem(1).setVisible(false);//buy
@@ -497,6 +515,9 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         menu.getItem(13).setVisible(false);// go to response
 
         switch (typeMore) {
+            case "0":
+                Toast.makeText(this, "No proper menu found", Toast.LENGTH_SHORT).show();
+                break;
             case "1":
                 // mylearning
                 menu.getItem(0).setVisible(true);//view
@@ -551,7 +572,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
                     }
                 }
-                    menu.getItem(6).setVisible(true);//Detail
+                menu.getItem(6).setVisible(true);//Detail
                 break;
             case "4":
                 //Discussion forum
@@ -595,10 +616,10 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         launchCourseForGlobalSearch(myLearningDetalData, GlobalSearchResultsActivity.this);
                         break;
                     case R.id.ctx_join:
-                        Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.ctx_buy:
-                        Toast.makeText(GlobalSearchResultsActivity.this, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_inappserviceunavailable), Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.ctx_relatedcontent:
                         relatedContentView(myLearningDetalData, GlobalSearchResultsActivity.this);
@@ -613,7 +634,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         gotoDetailView(globalSearchResultModel);
                         break;
                     case R.id.ctx_addtomy:
-                        Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.ctx_profile:
                         gotoProfile(globalSearchResultModel);
@@ -754,7 +775,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         peopleListingModel.addToMyConnectionAction = false;
 
         peopleListingModel.userID = resultModel.folderid;
-        peopleListingModel.tabID = "All";
+        peopleListingModel.tabID = getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton);
         peopleListingModel.siteID = appUserModel.getSiteIDValue();
         peopleListingModel.mainSiteUserID = appUserModel.getUserIDValue();
         peopleListingModel.siteURL = appUserModel.getSiteURL();
@@ -884,13 +905,13 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     public void cancelEnrollment(final MyLearningModel myLearningDetalData) {
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
-        builder.setMessage(GlobalSearchResultsActivity.this.getResources().getString(R.string.canceleventmessage)).setTitle(GlobalSearchResultsActivity.this.getResources().getString(R.string.eventalert))
-                .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure))
+                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.profile_button_editprofilecancelbutton), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 dialog.dismiss();
             }
-        }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //do things
                 dialog.dismiss();
@@ -923,9 +944,9 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         if (response.contains("true")) {
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
-                            builder.setMessage(GlobalSearchResultsActivity.this.getString(R.string.event_cancelled))
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.events_alertsubtitle_youhavesuccessfullycancelledenrolledevent))
                                     .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
                                             dialog.dismiss();
@@ -1048,14 +1069,14 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
                                 if (response.contains("Login Failed")) {
                                     Toast.makeText(GlobalSearchResultsActivity.this,
-                                            "Authentication Failed. Contact site admin",
+                                            getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
                                             Toast.LENGTH_LONG)
                                             .show();
 
                                 }
                                 if (response.contains("Pending Registration")) {
 
-                                    Toast.makeText(GlobalSearchResultsActivity.this, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
+                                    Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval),
                                             Toast.LENGTH_LONG)
                                             .show();
                                 }
@@ -1127,14 +1148,14 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("SiteID", catalogModel.getSiteID());
         parameters.put("OrgUnitID", catalogModel.getSiteID());
-        parameters.put("Locale", "en-us");
+        parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
         boolean isSubscribed = db.isSubscribedContent(catalogModel);
         if (isSubscribed) {
             Toast toast = Toast.makeText(
                     GlobalSearchResultsActivity.this,
-                    getString(R.string.cat_add_already),
+                    getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel),
                     Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -1162,10 +1183,10 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                             refreshCatagories(true);
                             getMobileGetMobileContentMetaData(catalogModel, false);
 
-//                            final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetail_Activity.this);
+//                            final AlertDialog.Builder builder = new AlertDialog.Builder(MyLearningDetailActivity.this);
 //                            builder.setMessage(getString(R.string.event_add_success))
 //                                    .setCancelable(false)
-//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
 //                                        public void onClick(DialogInterface dialog, int id) {
 //                                            //do things
 //                                            dialog.dismiss();
@@ -1180,7 +1201,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
                         } else {
                             Toast toast = Toast.makeText(
-                                    GlobalSearchResultsActivity.this, "Unable to process request",
+                                    GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
                                     Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
@@ -1197,7 +1218,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(GlobalSearchResultsActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
 
             }
         })
@@ -1220,8 +1241,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -1240,7 +1261,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     public void gotoDetailView(GlobalSearchResultModelNew globalSearchResultModelNew) {
         MyLearningModel myLearningDetalData = convertGlobalModelToMylearningModel(globalSearchResultModelNew, appUserModel);
 
-        Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, MyLearningDetail_Activity.class);
+        Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, MyLearningDetailActivity1.class);
         intentDetail.putExtra("IFROMCATALOG", false);
         intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
         intentDetail.putExtra("IFROMCATALOG", true);
@@ -1265,20 +1286,20 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         if (jsonObj.length() != 0) {
                             boolean isInserted = false;
 
-                            String succesMessage = "Content Added to My Learning";
+                            String succesMessage = getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
                             if (isJoinedCommunity) {
-                                succesMessage = "This content item has been added to My Learning page. You have successfully joined the Learning Community: " + learningModel.getSiteName();
+                                succesMessage = succesMessage + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_youhavesuccessfullyjoinedcommunity) + learningModel.getSiteName();
                             }
 
                             if (learningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                                succesMessage = getResources().getString(R.string.event_add_success);
+                                succesMessage = getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
 //                                            db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
 
                             }
                             final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
                             builder.setMessage(succesMessage)
                                     .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
 //                                            refreshCatagories(true);
@@ -1318,7 +1339,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
             if (false) {
                 Toast toast = Toast.makeText(
                         GlobalSearchResultsActivity.this,
-                        GlobalSearchResultsActivity.this.getString(R.string.cat_add_already),
+                        GlobalSearchResultsActivity.this.getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel),
                         Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
@@ -1342,14 +1363,14 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 //                            catalogAdapter.notifyDataSetChanged();
 //                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
                             if (!isAutoAdd) {
-                                String succesMessage = "Content Added to My Learning";
+                                String succesMessage = getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
                                 if (isJoinedCommunity) {
-                                    succesMessage = "This content item has been added to My Learning page. You have successfully joined the Learning Community: " + myLearningDetalData.getSiteName();
+                                    succesMessage = succesMessage + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_youhavesuccessfullyjoinedcommunity) + myLearningDetalData.getSiteName();
                                 }
                                 final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
                                 builder.setMessage(succesMessage)
                                         .setCancelable(false)
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
                                                 //do things
                                                 dialog.dismiss();
@@ -1361,7 +1382,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                             refreshCatagories(true);
                         } else {
                             Toast toast = Toast.makeText(GlobalSearchResultsActivity.
-                                            this, "Unable to process request",
+                                            this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
                                     Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
@@ -1375,7 +1396,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                     public void onErrorResponse(VolleyError error) {
                         VolleyLog.d(TAG, "Error: " + error.getMessage());
                         Toast toast = Toast.makeText(GlobalSearchResultsActivity.
-                                        this, "Unable to process request",
+                                        this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
                                 Toast.LENGTH_SHORT);
                         toast.setGravity(Gravity.CENTER, 0, 0);
                         toast.show();
@@ -1411,7 +1432,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 if (requestType.equalsIgnoreCase("GetUserQuestionDetails")) {
-                    Toast.makeText(GlobalSearchResultsActivity.this, "Unable to fetch Question Details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.unable_to_fetch_question_details), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -1526,7 +1547,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                     @Override
                     public void onErrorResponse(VolleyError error) {
 //                        Log.e("Error: ", error.getMessage());
-                        Toast.makeText(GlobalSearchResultsActivity.this, "Unable to fetch Question Details", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.unable_to_fetch_question_details), Toast.LENGTH_SHORT).show();
 
                     }
                 }) {
@@ -1558,7 +1579,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         try {
             parameters.put("intUserID", appUserModel.getUserIDValue());
             parameters.put("intSiteID", appUserModel.getSiteIDValue());
-            parameters.put("strLocale", "en-us");
+            parameters.put("strLocale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("strSearchText", queryString);
             parameters.put("intCompID", sideMenusModel.getComponentId());
             parameters.put("intCompInsID", sideMenusModel.getRepositoryId());
@@ -1606,7 +1627,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                     if (forumModelDg != null) {
                         gotoDiscForum(nextLevel, forumModelDg, globalSearchResultModelNew.contentid);
                     } else {
-                        Toast.makeText(GlobalSearchResultsActivity.this, "Unable to fetch forum details", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.unable_to_fetch_forum_details), Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (JSONException e) {
@@ -1639,8 +1660,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }

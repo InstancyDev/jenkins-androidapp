@@ -54,6 +54,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
@@ -61,6 +62,7 @@ import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -129,7 +131,9 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
     @Nullable
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,CompetencyCatSkillActivity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,7 +181,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                     if (isNetworkConnectionAvailable(context, -1)) {
                         refreshChildslist(competencyCategoryModelList.get(groupPosition));
                     } else {
-                        showToast(context, "No Internet");
+                        showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                     }
 
                 }
@@ -218,17 +222,17 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
 
     public void refreshCatgory(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserPrefCatData?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&JobRoleID=" + jobRoleID;
+        String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserPrefCatData?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&JobRoleID=" + jobRoleID;
 
         vollyService.getJsonObjResponseVolley("COMPSKILLS", urlStr, appUserModel.getAuthHeaders());
 
     }
 
     public void refreshChildslist(CompetencyCategoryModel competencyCategoryModel) {
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         String urlStr = appUserModel.getWebAPIUrl() + "/CompetencyManagement/GetUserSkills?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&PrefCatid=" + competencyCategoryModel.prefCategoryID + "&JobRoleID=" + jobRoleID;
 
         vollyService.getJsonObjResponseVolley("COMPCHILD", urlStr, appUserModel.getAuthHeaders());
@@ -255,7 +259,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                             }
 
                         } else {
-                            nodata_Label.setText(getResources().getString(R.string.no_data));
+                            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                         }
                     }
                 }
@@ -286,7 +290,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -309,7 +313,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
         } else {
             competencyCategoryModelList = new ArrayList<CompetencyCategoryModel>();
             competencyCatSkillAdapter.refreshList(competencyCategoryModelList, skillModelList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
     }
 
@@ -421,7 +425,7 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
             swipeRefreshLayout.setRefreshing(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }

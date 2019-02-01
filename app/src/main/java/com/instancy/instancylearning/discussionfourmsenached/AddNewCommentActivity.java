@@ -56,10 +56,12 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Service;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -172,7 +174,10 @@ public class AddNewCommentActivity extends AppCompatActivity {
     String endocedImageStr = "";
 
     boolean isUpdateForum = false;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,AddNewCommentActivity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,7 +207,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             discussionCommentsModel = (DiscussionCommentsModelDg) getIntent().getSerializableExtra("commentModel");
             isUpdateForum = true;
             editDescription.setText(discussionCommentsModel.message);
-            txtSave.setText("Update");
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
             updateUiForEditQuestion();
         } else {
             attachmentThumb.setVisibility(View.GONE);
@@ -213,7 +218,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Add Comment" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_header_addcommenttitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -267,14 +272,14 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText("Remove");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText("Upload");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
             attachmentThumb.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -303,7 +308,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledDescription
-                = new SpannableString("*Comment");
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel));
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -315,7 +320,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        editDescription.setHint("Enter Comment here...");
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_label_entercommentlabel));
     }
 
     void initVolleyCallback() {
@@ -417,7 +422,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(AddNewCommentActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -492,7 +497,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         }
 
         if (descriptionStr.length() < 1) {
-            Toast.makeText(AddNewCommentActivity.this, "Enter Comment", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_label_entercommentlabel), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -504,7 +509,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             parameters.put("UserID", appUserModel.getUserIDValue());
             parameters.put("SiteID", appUserModel.getSiteIDValue());
             parameters.put("InvolvedUserIDList", "");
-            parameters.put("LocaleID", "en-us");
+            parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("strAttachFile", finalfileName);
             parameters.put("strReplyID", replyID);
             parameters.put("strCommentID", commentID);
@@ -515,7 +520,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             if (isNetworkConnectionAvailable(this, -1)) {
                 sendNewForumDataToServer(parameterString);
             } else {
-                Toast.makeText(AddNewCommentActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddNewCommentActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -551,7 +556,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
                         Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
                         parameters.put("intUserID", toRequestBody(appUserModel.getUserIDValue()));
                         parameters.put("intSiteID", toRequestBody(appUserModel.getSiteIDValue()));
-                        parameters.put("strLocale", toRequestBody("en-us"));
+                        parameters.put("strLocale", toRequestBody(preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))));
                         parameters.put("TopicID", toRequestBody("" + discussionTopicModel.contentID));
                         parameters.put("ReplyID", toRequestBody(replyID));
                         parameters.put("isTopic", toRequestBody("" + false));
@@ -560,14 +565,14 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
                         uploadFileThroughMultiPart(parameters, contentURIFinal);
                     } else {
-                        Toast.makeText(AddNewCommentActivity.this, "Success! \nYour comment has been successfully posted .", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commenthasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
 
                         closeForum(true);
                     }
 
                 } else {
 
-                    Toast.makeText(AddNewCommentActivity.this, "New comment cannot be posted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_unabletopostcomment), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -576,7 +581,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(AddNewCommentActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -655,7 +660,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
 
-                Toast.makeText(context, "Success! \nYour  Comment has been successfully posted.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commenthasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 closeForum(true);
             }
@@ -663,7 +668,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(context, "Comment cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_unabletopostcomment), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });

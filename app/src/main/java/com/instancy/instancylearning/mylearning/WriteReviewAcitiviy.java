@@ -53,12 +53,14 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ReviewContentModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.ApiConstants;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -132,7 +134,9 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
     @Nullable
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,WriteReviewAcitiviy.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,9 +173,9 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
             isEditReview = bundle.getBoolean("isEditReview");
             txtCancel.setTag(2);
             if (isEditReview) {
-                txtCancel.setText(getResources().getString(R.string.ratinscreen_delete));
+                txtCancel.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_deleteoption));
                 txtCancel.setTag(1);
-                txtSave.setText(getResources().getString(R.string.ratinscreen_update));
+                txtSave.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_updateoption));
                 try {
 
                     editObj = new JSONObject(getIntent().getStringExtra("editObj"));
@@ -186,9 +190,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                learningModel.getCourseName() + "</font>"));
-
-
+                getLocalizationValue(JsonLocalekeys.details_review) + "</font>"));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -374,8 +376,8 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
 
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                    alertDialog.setCancelable(false).setTitle(getResources().getString(R.string.ratinscreen_alert_title)).setMessage(getResources().getString(R.string.ratinscreen_alert_subtitle))
-                            .setPositiveButton(getResources().getString(R.string.ratinscreen_alert_positive), new DialogInterface.OnClickListener() {
+                    alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringconfirmation)).setMessage(getLocalizationValue(JsonLocalekeys.details_alertsubtitle_areyousureyouwanttodeletereview))
+                            .setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_deleteoption), new DialogInterface.OnClickListener() {
                                 public void onClick(final DialogInterface dialogBox, int id) {
                                     // ToDo get user input here
                                     try {
@@ -385,7 +387,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 }
-                            }).setNegativeButton(getResources().getString(R.string.ratinscreen_alert_negative ),
+                            }).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_cancelbutton),
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialogBox, int id) {
                                     dialogBox.cancel();
@@ -411,7 +413,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (finalRating < 1) {
-            Toast.makeText(WriteReviewAcitiviy.this, "Please provide rating for the content.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(WriteReviewAcitiviy.this, getLocalizationValue(JsonLocalekeys.mylearning_provide_rating), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -466,8 +468,8 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                     final Map<String, String> headers = new HashMap<>();
                     String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                     headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Accept", "application/json");
+//                    headers.put("Content-Type", "application/json");
+//                    headers.put("Accept", "application/json");
 
                     return headers;
                 }
@@ -490,7 +492,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (finalRating < 1) {
-            Toast.makeText(WriteReviewAcitiviy.this, "Please provide rating for the content.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(WriteReviewAcitiviy.this, getLocalizationValue(JsonLocalekeys.mylearning_provide_rating), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -544,8 +546,8 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                     final Map<String, String> headers = new HashMap<>();
                     String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                     headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Accept", "application/json");
+//                    headers.put("Content-Type", "application/json");
+//                    headers.put("Accept", "application/json");
 
                     return headers;
                 }

@@ -32,8 +32,10 @@ import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.VolleySingleton;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -84,6 +86,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     AppUserModel appUserModel;
     private SVProgressHUD svProgressHUD;
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, ForgotPasswordActivity.this);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +101,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(this);
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getResources().getString(R.string.login_button_forgotpasswordbutton) + "</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.login_button_forgotpasswordbutton) + "</font>"));
         initilizeView(uiSettingsModel);
 
         try {
@@ -156,12 +162,12 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 resetPasswordVollyCall(editResetMail.getText().toString().trim());
             } else {
 
-                Toast.makeText(this, getResources().getString(R.string.alert_text_check_connection), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection), Toast.LENGTH_SHORT).show();
             }
 
         } else {
 
-            Toast.makeText(this, getResources().getString(R.string.alert_headtext_email_notvalid), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_emailenteredisinvalid), Toast.LENGTH_SHORT).show();
 
         }
 
@@ -198,8 +204,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                                 isEmailIdCheck(jsonobj);
 
                             } else {
-
-                                Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.alert_headtext_email_notvalid), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ForgotPasswordActivity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_emailenteredisinvalid), Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {
@@ -316,10 +321,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
                             finish();
 
-                            Toast.makeText(ForgotPasswordActivity.this, getResources().getString(R.string.password_reset_link_send_success), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ForgotPasswordActivity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_passwordresetlinksenttoyourregisteredemail), Toast.LENGTH_SHORT).show();
                         } else {
 
-                            Toast.makeText(ForgotPasswordActivity.this, "Failed to Send Reset Link, Contact Site Admin", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ForgotPasswordActivity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_faliedtosendresetlinkcontactsiteadmin), Toast.LENGTH_SHORT).show();
 
                         }
                     }

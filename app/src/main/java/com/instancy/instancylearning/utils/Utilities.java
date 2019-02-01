@@ -41,6 +41,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.instancy.instancylearning.BuildConfig;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
 import com.instancy.instancylearning.models.MyLearningModel;
 
@@ -83,8 +84,8 @@ public class Utilities {
     public static void showSweetAlert(Context context) {
 
         new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE)
-                .setTitleText("Oops...")
-                .setContentText("Something went wrong!")
+                .setTitleText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.error_alerttitle_stringoops, context))
+                .setContentText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.error_alertsubtitle_somethingwentwrong, context))
                 .show();
 
 
@@ -1273,6 +1274,9 @@ public class Utilities {
 
     public static boolean returnEventCompleted(String eventDate) {
 
+        if (eventDate == null)
+            return false;
+
         boolean isCompleted = false;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1287,6 +1291,9 @@ public class Utilities {
             e.printStackTrace();
             isCompleted = false;
         }
+        if (strDate==null)
+            return false;
+
         if (new Date().after(strDate)) {
             isCompleted = true;
 

@@ -29,10 +29,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -137,13 +139,13 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
-            String urlStr = "OrgUnitID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&LocaleID=en-us";
+            String urlStr = "OrgUnitID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "";
 
             vollyService.getStringResponseVolley("SORT", appUserModel.getWebAPIUrl() + "/catalog/GetComponentSortOptions?" + urlStr, appUserModel.getAuthHeaders());
 
         } else {
 
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -173,6 +175,13 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
 
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -226,7 +235,7 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
 
         } else {
 
-            Toast.makeText(this, " select atleast one category", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.select_at_least_one_category, this), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -236,11 +245,11 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < sortModelList.size(); i++) {
 
             if (sortModelList.get(i).isSelected) {
-                allFilterModel.categorySelectedData = sortModelList.get(i).optionText;
+                allFilterModel.categorySelectedData = sortModelList.get(i).optionIdValue;
+                allFilterModel.categorySelectedDataDisplay = sortModelList.get(i).optionDisplayText;
                 allFilterModel.categorySelectedID = sortModelList.get(i).categoryID;
             }
         }
-
     }
 
 
@@ -303,13 +312,17 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
             for (int i = 0; i < sortModelList.size(); i++) {
                 RadioButton rbn = new RadioButton(this);
                 rbn.setId(sortModelList.get(i).categoryID);
-                rbn.setText(sortModelList.get(i).optionText);
+                rbn.setText(sortModelList.get(i).optionDisplayText);
                 rbn.setTextSize(20.0f);
                 rbn.setPadding(4, 20, 4, 20);
                 rbn.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
-                if (allFilterModel.categorySelectedID == sortModelList.get(i).categoryID) {
+                if (allFilterModel.categorySelectedData.equalsIgnoreCase(sortModelList.get(i).optionIdValue)) {
                     rbn.setChecked(true);
                 }
+//                if (allFilterModel.categorySelectedData == sortModelList.get(i).categoryID) {
+//                    rbn.setChecked(true);
+//                }
+//
                 radioGroup.addView(rbn);
             }
             radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -365,15 +378,14 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
             SortModel sortModel = new SortModel();
             JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
 
-            sortModel.optionText = jsonColumnObj.optString("OptionText");
-            sortModel.optionValue = jsonColumnObj.optString("OptionValue");
+            sortModel.optionDisplayText = jsonColumnObj.optString("OptionText");
+            sortModel.optionIdValue = jsonColumnObj.optString("OptionValue");
             sortModel.componentID = jsonColumnObj.optInt("ComponentID");
             sortModel.localID = jsonColumnObj.optString("LocalID");
             sortModel.categoryID = jsonColumnObj.optInt("ID");
-
+            //   DateAssigned desc
             sortModelList.add(sortModel);
         }
-
         return sortModelList;
     }
 
@@ -385,7 +397,23 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < allFilterModel.groupArrayList.size(); i++) {
 
             SortModel sortModel = new SortModel();
-            sortModel.optionText = allFilterModel.groupArrayList.get(i);
+            sortModel.optionIdValue = allFilterModel.groupArrayList.get(i);
+            switch (allFilterModel.groupArrayList.get(i)) {
+                case "DueDates":
+                    sortModel.optionDisplayText = "Due Dates";
+                    break;
+                case "Job":
+                    sortModel.optionDisplayText = "Job Roles";
+                    break;
+                case "Skills":
+                    sortModel.optionDisplayText = "Skills";
+                    break;
+                case "ContentTypes":
+                    sortModel.optionDisplayText = "Content Types";
+                    break;
+
+            }
+
             sortModel.categoryID = i;
 
             sortModelList.add(sortModel);

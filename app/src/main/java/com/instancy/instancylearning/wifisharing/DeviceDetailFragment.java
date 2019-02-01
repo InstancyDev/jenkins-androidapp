@@ -42,7 +42,9 @@ import android.widget.TextView;
 
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.WiFiTransferModal;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,7 +86,9 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
 
 
     private String pickerPath;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -116,8 +120,8 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
                     if (progressDialog != null && progressDialog.isShowing()) {
                         progressDialog.dismiss();
                     }
-                    progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel",
-                            "Connecting to :" + device.deviceAddress, true, true
+                    progressDialog = ProgressDialog.show(getActivity(),getLocalizationValue(JsonLocalekeys.pressbacktocancel),
+                            getLocalizationValue(JsonLocalekeys.connectingto) + device.deviceAddress, true, true
                     );
                     ((DeviceListFragment.DeviceActionListener) getActivity()).connect(config);
                 } else {
@@ -160,7 +164,7 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-//                    Utilitys.getInstance().showToast("Camera/Storage permission Denied");
+                    Utilitys.getInstance().showToast(getLocalizationValue(JsonLocalekeys.camera_storage_permission_denied));
                 }
                 return;
             }
@@ -185,9 +189,9 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
         // InetAddress from WifiP2pInfo struct.
         view = (TextView) mContentView.findViewById(R.id.device_info);
         if (info.groupOwnerAddress.getHostAddress() != null)
-            view.setText("Group Owner IP - " + info.groupOwnerAddress.getHostAddress());
+            view.setText(getLocalizationValue(JsonLocalekeys.groupownerIP) + info.groupOwnerAddress.getHostAddress());
         else {
-            CommonMethods.DisplayToast(getActivity(), "Host Address not found");
+            CommonMethods.DisplayToast(getActivity(), getLocalizationValue(JsonLocalekeys.hosthddressnotfound));
         }
         // After the group negotiation, we assign the group owner as the file
         // server. The file server is single threaded, single connection server
@@ -201,7 +205,7 @@ public class DeviceDetailFragment extends android.support.v4.app.Fragment implem
 
             //first check for file storage permission
             if (!PermissionsAndroid.getInstance().checkWriteExternalStoragePermission(getActivity())) {
-//                Utilitys.getInstance().showToast("Please enable storage Permission from application storage option");
+                Utilitys.getInstance().showToast(getLocalizationValue(JsonLocalekeys.enablestoragepermission));
                 return;
             }
 

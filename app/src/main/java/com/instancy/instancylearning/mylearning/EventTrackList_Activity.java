@@ -35,11 +35,13 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.interfaces.XmlDownloadListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CMIModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -50,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -105,7 +108,9 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
     AppController appController;
     UiSettingsModel uiSettingsModel;
     boolean firstTimeVisible = true;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,EventTrackList_Activity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,7 +188,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             }
 
         } else {
-//            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
 
             if (isTraxkList) {
                 workFlowType = "onlaunch";
@@ -231,7 +236,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
         if (isEvent) {
             String paramsString = "contentId=" + myLearningModel.getContentID()
                     + "&userId=" + myLearningModel.getUserID()
-                    + "&locale=en-us&siteid=" + appUserModel.getSiteIDValue()
+                    + "&locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&siteid=" + appUserModel.getSiteIDValue()
                     + "&parentcomponentid=1&categoryid=-1";
             vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileEventRelatedContentMetadata?" + paramsString, appUserModel.getAuthHeaders());
             swipeRefreshLayout.setRefreshing(false);
@@ -420,7 +425,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             completedTheTrack();
             db.updateCMIstatus(myLearningModel, "Completed");
             myLearningModel.setStatusActual("Completed");
-            myLearningModel.setStatusDisplay(getResources().getString(R.string.status_completed));
+            myLearningModel.setStatusDisplay(" "+getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel));
         }
 //        myLearningModel.setStatusActual("waste");
         Intent intent = getIntent();
@@ -483,7 +488,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     completedTheTrack();
                     db.updateCMIstatus(myLearningModel, "Completed");
                     myLearningModel.setStatusActual("Completed");
-                    myLearningModel.setStatusDisplay(getResources().getString(R.string.status_completed));
+                    myLearningModel.setStatusDisplay(getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel));
                 }
                 Intent intent = getIntent();
                 intent.putExtra("myLearningDetalData", myLearningModel);
@@ -537,7 +542,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -582,10 +587,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
                             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true);
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50", true);
 
                             } else {
-                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false);
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50", false);
                             }
                             if (i == 1) {
                                 injectFromDbtoModel();
@@ -603,10 +608,10 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                         int i = -1;
 
                         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true);
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50", true);
 
                         } else {
-                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false);
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50", false);
                         }
                     }
 //               remove if not required
@@ -801,6 +806,12 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                 DocumentBuilderFactory dbFactory = DocumentBuilderFactory
                         .newInstance();
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//                Document doc = null;
+//                try {
+//                    doc =  dBuilder.parse(fXmlFile);
+//                }catch (SAXParseException sax){
+//                    sax.printStackTrace();
+//                }
                 Document doc = dBuilder.parse(fXmlFile);
 
                 doc.getDocumentElement().normalize();

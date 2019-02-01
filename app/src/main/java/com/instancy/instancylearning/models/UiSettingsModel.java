@@ -281,7 +281,6 @@ public class UiSettingsModel {
     private String nativeAppType = "";
 
     private String autodownloadsizelimit = "";
-
     private String firstTarget = "";
     private String secondTarget = "";
 
@@ -291,6 +290,56 @@ public class UiSettingsModel {
     private String newContentAvailable = "";
     private String contentUnassigned = "";
     private String firstEvent = "";
+    private boolean EnableMultipleInstancesforEvent = false;
+
+
+    private int NumberOfRatingsRequiredToShowRating = 0; //638
+
+    public int getNumberOfRatingsRequiredToShowRating() {
+        return NumberOfRatingsRequiredToShowRating;
+    }
+
+    public void setNumberOfRatingsRequiredToShowRating(int numberOfRatingsRequiredToShowRating) {
+        NumberOfRatingsRequiredToShowRating = numberOfRatingsRequiredToShowRating;
+    }
+
+    public String getMinimimRatingRequiredToShowRating() {
+        return MinimimRatingRequiredToShowRating;
+    }
+
+    public void setMinimimRatingRequiredToShowRating(String minimimRatingRequiredToShowRating) {
+        MinimimRatingRequiredToShowRating = minimimRatingRequiredToShowRating;
+    }
+
+    public int getNoOfDaysForCourseTargetDate() {
+        return NoOfDaysForCourseTargetDate;
+    }
+
+    public void setNoOfDaysForCourseTargetDate(int noOfDaysForCourseTargetDate) {
+        NoOfDaysForCourseTargetDate = noOfDaysForCourseTargetDate;
+    }
+
+    private String MinimimRatingRequiredToShowRating = "0";  //639
+    private int NoOfDaysForCourseTargetDate = 0; //640
+
+    public int getShowEventAvailableFewSeatsLeft() {
+        return showEventAvailableFewSeatsLeft;
+    }
+
+    public void setShowEventAvailableFewSeatsLeft(int showEventAvailableFewSeatsLeft) {
+        this.showEventAvailableFewSeatsLeft = showEventAvailableFewSeatsLeft;
+    }
+
+    private int showEventAvailableFewSeatsLeft = 0;
+
+
+    public boolean isEnableMultipleInstancesforEvent() {
+        return EnableMultipleInstancesforEvent;
+    }
+
+    public void setEnableMultipleInstancesforEvent(boolean enableMultipleInstancesforEvent) {
+        EnableMultipleInstancesforEvent = enableMultipleInstancesforEvent;
+    }
 
     public String getAddProfileAdditionalTab() {
         return AddProfileAdditionalTab;

@@ -42,9 +42,11 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -103,7 +105,9 @@ public class MySkillsAddListActivity extends AppCompatActivity implements Adapte
     SwipeRefreshLayout swipeRefreshLayout;
 
     List<AddSkillModel> addSkillModelList = null;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,MySkillsAddListActivity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +136,7 @@ public class MySkillsAddListActivity extends AppCompatActivity implements Adapte
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "MySkill" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.mycompetency_label_skillheaderlabel)+ "</font>"));
         addSkillModelList = new ArrayList<AddSkillModel>();
         addSkillModelList = (List<AddSkillModel>) getIntent().getSerializableExtra("addSkillFilteredList");
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
@@ -186,10 +190,10 @@ public class MySkillsAddListActivity extends AppCompatActivity implements Adapte
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 //            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));

@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="3dp"
-            android:text="Content Types"
+            android:text="@string/mylearning_label_contenttypestitlelabel"
             android:textColor="@color/black"
             android:textSize="30dp" />
 

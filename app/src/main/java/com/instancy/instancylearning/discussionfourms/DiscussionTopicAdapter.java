@@ -22,10 +22,12 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -115,8 +117,9 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.txtAuthor.setText(discussionTopicModelList.get(position).latestreplyby + " ");
         holder.txtLastUpdate.setText(discussionTopicModelList.get(position).createddate + " ");
 
-        holder.txtTopicsCount.setText(discussionTopicModelList.get(position).noofviews + " Topic(s)");
-        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noofreplies + " Comment(s)");
+
+        holder.txtTopicsCount.setText(discussionTopicModelList.get(position).noofviews + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noofreplies+ " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
         holder.txtTopicsCount.setVisibility(View.INVISIBLE);
 
@@ -230,6 +233,10 @@ public class DiscussionTopicAdapter extends BaseAdapter {
             ((ListView) parent).performItemClick(view, getPosition, 0);
 
         }
+
+    }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
 
     }
 }

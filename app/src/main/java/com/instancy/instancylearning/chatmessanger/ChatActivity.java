@@ -46,10 +46,12 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.Service;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -119,7 +121,10 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,ChatActivity.this);
 
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -196,7 +201,7 @@ public class ChatActivity extends AppCompatActivity {
 
         } else {
 
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
 
         }
 
@@ -283,7 +288,7 @@ public class ChatActivity extends AppCompatActivity {
 //            peopleListingTabsEitherFromDatabaseOrAPI();
             if (isFirstLoad) {
 
-                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+                svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
 
             }
 
@@ -512,7 +517,7 @@ public class ChatActivity extends AppCompatActivity {
             uploadFileThroughMultiPart(parameters, contentURIFinal);
 
         } else {
-            Toast.makeText(this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -585,7 +590,7 @@ public class ChatActivity extends AppCompatActivity {
                     sendMessageToServer("", peopleListingModel);
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(ChatActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
                 }
             }

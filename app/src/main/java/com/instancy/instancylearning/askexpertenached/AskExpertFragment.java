@@ -59,10 +59,12 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.interfaces.TagClicked;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -205,10 +207,11 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     public void refreshAskQuestions(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
-//        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetAsktheExpertData?intSiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
+//        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetAsktheExpertData?intSiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&astrLocale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
 
         String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetAsktheExpertData?UserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&ComponentID=" + sideMenusModel.getComponentId() + "&intSkillID=-1&SortBy=CreatedDate%20Desc&pageIndex=1&pageSize=1000&SearchText=" + queryText;
 
@@ -246,7 +249,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             public void notifyError(String requestType, VolleyError error) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
@@ -267,7 +270,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                         }
                     } else {
 
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -378,7 +381,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         } else {
             askExpertQuestionModelList = new ArrayList<AskExpertQuestionModelDg>();
             askExpertAdapter.refreshList(askExpertQuestionModelList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
 //        List<AskExpertQuestionModelDg> askExpertQuestionModelDgList = db.fetchAskExpertsQuestions("");
@@ -406,11 +409,12 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                     attachFragment(askExpertQuestionModelList.get(selectedPostion));
                     isFromNotification = false;
                 } catch (IndexOutOfBoundsException ex) {
-//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
                 }
 
             } else {
-                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -470,11 +474,11 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 
@@ -578,7 +582,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -668,19 +672,21 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         Menu menu = popup.getMenu();
         menu.getItem(0).setVisible(true);//delete ctx_edit
         menu.getItem(1).setVisible(true);// ctx_edit
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption));//view
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));;//enroll
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.ctx_delete:
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                        alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the question :")
-                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage(getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_areyousurewanttopermanentlydeletequestion))
+                                .setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption), new DialogInterface.OnClickListener() {
                                     public void onClick(final DialogInterface dialogBox, int id) {
                                         // ToDo get user input here
                                         deleteQuestionFromServer(askExpertQuestionModel);
                                     }
-                                }).setNegativeButton("Cancel",
+                                }).setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_canceloption),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialogBox, int id) {
                                         dialogBox.cancel();
@@ -716,19 +722,20 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, " Success! \nQuestion has been successfully deleted  ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)
+                            +" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_questiondeletesuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAskQuestions(true);
 //                    deleteQuestionFromLocalDB(questionModel);
                 } else {
 
-                    Toast.makeText(context, "Question cannot be deleted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_questionauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -889,7 +896,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
             //set the title for alert dialog
-            builder.setTitle("Choose a skill in order to filter the above questions");
+            builder.setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_chooseskillinordertofilter));
 
             //set items to alert dialog. i.e. our array , which will be shown as list view in alert dialog
             builder.setItems(skillsForFilter, new DialogInterface.OnClickListener() {
@@ -907,7 +914,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
             //Creating CANCEL button in alert dialog, to dismiss the dialog box when nothing is selected
             builder.setCancelable(false)
-                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    .setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
 
                         @Override
                         public void onClick(DialogInterface dialog, int id) {
@@ -916,7 +923,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
 
                         }
-                    }).setPositiveButton("All", new DialogInterface.OnClickListener() {
+                    }).setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -931,7 +938,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
             //Showingalert dialog
             alert.show();
         } else {
-            Toast.makeText(context, " Filters not configured ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_label_filtersnotconfigured), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -944,7 +951,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         } else {
             askExpertQuestionModelList = new ArrayList<>();
             askExpertAdapter.refreshList(askExpertQuestionModelList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
         if (selectedSkillName.length() != 0) {
 
@@ -956,7 +963,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
             skillTxt.setText(selectedSkillName);
         } else {
-            skillTxt.setText("All");
+            skillTxt.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton));
             skillTxt.setTextSize(16);
         }
     }
@@ -993,4 +1000,10 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         return categoryID;
     }
+
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+
+    }
+
 }

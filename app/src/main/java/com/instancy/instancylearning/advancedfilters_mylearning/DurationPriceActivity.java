@@ -26,20 +26,20 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.instancy.instancylearning.utils.Utilities.getDrawableForStars;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -72,8 +72,6 @@ public class DurationPriceActivity extends AppCompatActivity implements View.OnC
     RelativeLayout relativeLayout;
 
     TextView lbDuration;
-
-    int endRangeValue = 0, startRangeValue = 0;
 
     //    https://github.com/shineM/TreeView
 
@@ -142,12 +140,19 @@ public class DurationPriceActivity extends AppCompatActivity implements View.OnC
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeSeekbar);
 
         relativeLayout.setVisibility(View.VISIBLE);
 
         lbDuration = (TextView) findViewById(R.id.lbDuration);
 
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -198,8 +203,7 @@ public class DurationPriceActivity extends AppCompatActivity implements View.OnC
             finish();
 
         } else {
-
-            Toast.makeText(this, " select atleast one category", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.select_at_least_one_category, this), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -211,9 +215,7 @@ public class DurationPriceActivity extends AppCompatActivity implements View.OnC
             vollyService.getStringResponseVolley("getFilterMaxOptions", appUserModel.getWebAPIUrl() + "catalog/getFilterMaxOptions?", appUserModel.getAuthHeaders());
 
         } else {
-
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, DurationPriceActivity.this), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -264,8 +266,8 @@ public class DurationPriceActivity extends AppCompatActivity implements View.OnC
 
             if (sortModelList.get(i).isSelected) {
 
-                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionText;
-                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionText;
+                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionDisplayText;
+                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionDisplayText;
 
             }
         }

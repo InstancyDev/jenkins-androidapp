@@ -15,9 +15,11 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.ReportDetail;
 import com.instancy.instancylearning.models.ReportDetailsForQuestions;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,28 +144,28 @@ public class ReportAdapter extends BaseAdapter {
             String dateStarted = reportDetailList.get(position).dateStarted;
 
             if (isValidString(dateCompleted)) {
-                holder.txtDateCompleted.setText("Date Completed: " + dateCompleted);
+                holder.txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" " + dateCompleted);
             } else {
-                holder.txtDateCompleted.setText("Date Completed: ");
+                holder.txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" ");
             }
 
 
 
             if (isValidString(dateStarted)) {
 
-                holder.txtStartDate.setText("Date Started: " + dateStarted + " ");
+                holder.txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" "+ dateStarted + " ");
             } else {
-                holder.txtStartDate.setText("Date Started: " + " ");
+                holder.txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" "+ " ");
             }
 
 
-//            holder.txtScore.setText("Score: " + reportDetailList.get(position).score + " ");
+//            holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + reportDetailList.get(position).score + " ");
 
 
             if (isValidString(reportDetailList.get(position).timeSpent)) {
-                holder.txtTimeSpent.setText("Time Spent: " + reportDetailList.get(position).timeSpent);
+                holder.txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + reportDetailList.get(position).timeSpent);
             } else {
-                holder.txtTimeSpent.setText("Time Spent: 0:00:00");
+                holder.txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) +"0:00:00");
             }
 
             String statusFromModel = reportDetailList.get(position).status;
@@ -172,11 +174,11 @@ public class ReportAdapter extends BaseAdapter {
                 if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
                     if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")){
-                        statusFromModel = "Completed (failed)";
+                        statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_failed);
                     }
 
                     if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")){
-                        statusFromModel = "Completed (passed)";
+                        statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_passed);
                     }
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
@@ -189,7 +191,7 @@ public class ReportAdapter extends BaseAdapter {
                 } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
                     reportDetailList.get(position).score = "50";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusInProgress));
-                    holder.txtStatus.setText("In Progress");
+                    holder.txtStatus.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
                 } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))  || (statusFromModel.toLowerCase().contains("grade"))) {
                     reportDetailList.get(position).score = "50";
                     statusFromModel = "Pending Review";
@@ -227,9 +229,9 @@ public class ReportAdapter extends BaseAdapter {
             }
 
             if (isValidString(reportDetailList.get(position).score)) {
-                holder.txtScore.setText("Score: " + reportDetailList.get(position).score);
+                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + reportDetailList.get(position).score);
             } else {
-                holder.txtScore.setText("Score: 0");
+                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel)+" 0");
             }
         }
 
@@ -294,6 +296,9 @@ public class ReportAdapter extends BaseAdapter {
         @BindView(R.id.lineview)
         View lineview;
 
+    }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
     }
 }
 

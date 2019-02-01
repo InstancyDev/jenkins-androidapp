@@ -146,6 +146,43 @@ public class MyLearningModel implements Serializable {
     String password = "";
     String isListView = "";
     String thumbnailImagePath = "";
+    int EventScheduleType = 0;
+    String TableofContent = "";
+    String LearningObjectives = "";
+
+    public int getTotalratings() {
+        return totalratings;
+    }
+
+    public void setTotalratings(int totalratings) {
+        this.totalratings = totalratings;
+    }
+
+    int totalratings = 0;
+
+    public String getTableofContent() {
+        return TableofContent;
+    }
+
+    public void setTableofContent(String tableofContent) {
+        TableofContent = tableofContent;
+    }
+
+    public String getLearningObjectives() {
+        return LearningObjectives;
+    }
+
+    public void setLearningObjectives(String learningObjectives) {
+        LearningObjectives = learningObjectives;
+    }
+
+    public int getEventScheduleType() {
+        return EventScheduleType;
+    }
+
+    public void setEventScheduleType(int eventScheduleType) {
+        EventScheduleType = eventScheduleType;
+    }
 
     public String getContentTypeImagePath() {
         return contentTypeImagePath;
@@ -156,6 +193,17 @@ public class MyLearningModel implements Serializable {
     }
 
     String contentTypeImagePath = "";
+
+
+    public String getThumbnailVideoPath() {
+        return thumbnailVideoPath;
+    }
+
+    public void setThumbnailVideoPath(String thumbnailVideoPath) {
+        this.thumbnailVideoPath = thumbnailVideoPath;
+    }
+
+    String thumbnailVideoPath = "";
 
     String contentExpire = "";
     String joinurl = "";

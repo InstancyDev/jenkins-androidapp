@@ -92,7 +92,7 @@
             android:gravity="left"
             android:maxLines="1"
             android:padding="3dp"
-            android:text="Assigned Date: 11/12/2018 11:45:14 PM"
+            android:text=""
             android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
@@ -105,7 +105,7 @@
             android:gravity="left"
             android:maxLines="1"
             android:padding="3dp"
-            android:text="Target Date: 11/12/2018 11:45:14 PM"
+            android:text=""
             android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
@@ -157,7 +157,7 @@
             android:gravity="left"
             android:maxLines="1"
             android:padding="3dp"
-            android:text="# Times Accessed in This Period: 2"
+            android:text=""
             android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
@@ -170,7 +170,7 @@
             android:gravity="left"
             android:maxLines="1"
             android:padding="3dp"
-            android:text="#Times Attempts in This Period: 2"
+            android:text=""
             android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 
@@ -196,7 +196,7 @@
             android:gravity="left"
             android:maxLines="1"
             android:padding="3dp"
-            android:text="%Completed: "
+            android:text=""
             android:textColor="@color/colorBlack"
             android:textSize="14sp" />
 

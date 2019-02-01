@@ -54,7 +54,7 @@ public class VollyService {
     public void getJsonObjResponseVolley(final String requestType, String url, final String authHeaders) {
         try {
 
-            url =url.replaceAll(" ","%20");
+            url = url.replaceAll(" ", "%20");
 
             Log.d(TAG, "getJsonObjResponseVolley: " + url);
             final JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -195,7 +195,7 @@ public class VollyService {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
-                     //   Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
+                        //   Log.d("logr  error =", "Status code " + volleyError.networkResponse.statusCode);
 
                     }
                     return volleyError;
@@ -255,8 +255,9 @@ public class VollyService {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+                // commented 415 Error for YounextYou
+                // headers.put("Content-Type", "application/json");
+                // headers.put("Accept", "application/json");
 
                 return headers;
             }

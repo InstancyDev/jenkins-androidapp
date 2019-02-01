@@ -9,9 +9,9 @@
     android:layout_marginLeft="0dp"
     android:layout_marginRight="0dp"
     android:layout_marginTop="3dp"
+    android:focusable="true"
     app:cardCornerRadius="0dp"
     app:cardElevation="1dp"
-    android:focusable="true"
     app:contentPadding="4dp">
 
     <RelativeLayout
@@ -41,10 +41,11 @@
 
 
             </RelativeLayout>
-<View
-    android:layout_width="3dp"
-    android:background="@android:color/transparent"
-    android:layout_height="match_parent"></View>
+
+            <View
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"></View>
 
             <RelativeLayout
                 android:id="@+id/relattitle"
@@ -64,7 +65,7 @@
                     android:gravity="center_vertical|fill_horizontal"
                     android:maxLines="2"
                     android:padding="1dp"
-                    android:text="Lisa Yow"
+                    android:text="Lisa yow"
                     android:textColor="@color/colorBlack"
                     android:textSize="18sp"
                     android:typeface="sans" />

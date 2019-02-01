@@ -24,6 +24,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -56,7 +57,10 @@ public class CatalogFragmentActivity extends AppCompatActivity {
 
 
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,CatalogFragmentActivity.this);
 
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

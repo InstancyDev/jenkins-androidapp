@@ -27,10 +27,12 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.interfaces.TagClicked;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -119,9 +121,10 @@ public class AskExpertAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtQuestion.setText(askExpertQuestionModelList.get(position).userQuestion);
-        holder.txtAllActivites.setText("Asked by: " + askExpertQuestionModelList.get(position).userName + "   |   " + "Asked on: " + askExpertQuestionModelList.get(position).postedDate + "   |   " + "Last active: " + askExpertQuestionModelList.get(position).postedDate);
-        holder.txtNoAnswers.setText(askExpertQuestionModelList.get(position).totalAnswers + " Answer(s)");
-        holder.txtNoViews.setText(askExpertQuestionModelList.get(position).totalViews + " Views");
+
+        holder.txtAllActivites.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, activity)+" "+ askExpertQuestionModelList.get(position).userName + "   |   " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedonlabel, activity)+" " + askExpertQuestionModelList.get(position).postedDate + "   |   " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_lastactivelabel, activity)+" " + askExpertQuestionModelList.get(position).postedDate);
+        holder.txtNoAnswers.setText(askExpertQuestionModelList.get(position).totalAnswers + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, activity));
+        holder.txtNoViews.setText(askExpertQuestionModelList.get(position).totalViews + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, activity));
         holder.txtDescription.setText(askExpertQuestionModelList.get(position).userQuestionDescription);
 
         holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

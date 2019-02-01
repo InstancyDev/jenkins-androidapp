@@ -25,6 +25,8 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.StaticValues;
 
 import java.util.Map;
@@ -72,13 +74,15 @@ public class Settings_activity extends PreferenceActivity implements
     SharedPreferences sharedPreferences;
 
     boolean isLogin;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,Settings_activity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         getDelegate().installViewFactory();
         getDelegate().onCreate(savedInstanceState);
         getDelegate().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getDelegate().getSupportActionBar().setTitle(getString(R.string.pref_head_preferences));
+        getDelegate().getSupportActionBar().setTitle(getLocalizationValue(JsonLocalekeys.siteurlsetting_tablesection_headingpreferences));
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.settings_activity);
         addPreferencesFromResource(R.xml.preference);
@@ -298,9 +302,9 @@ public class Settings_activity extends PreferenceActivity implements
 
                     } else {
                         new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                                .setTitleText("Are you sure?")
-                                .setContentText("Won't be able to recover this file!")
-                                .setConfirmText("Yes,delete it!")
+                                .setTitleText(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringareyousure))
+                                .setContentText(getLocalizationValue(JsonLocalekeys.settings_wont_recovertfile))
+                                .setConfirmText(getLocalizationValue(JsonLocalekeys.details_alertbutton_deletebutton))
                                 .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                                     @Override
                                     public void onClick(SweetAlertDialog sDialog) {
@@ -312,8 +316,8 @@ public class Settings_activity extends PreferenceActivity implements
                 } else {
 
                     new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                            .setTitleText(getResources().getString(R.string.alert_headtext_no_internet))
-                            .setContentText(getResources().getString(R.string.alert_text_check_connection))
+                            .setTitleText(getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet))
+                            .setContentText(getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection))
                             .show();
 
 
@@ -324,9 +328,9 @@ public class Settings_activity extends PreferenceActivity implements
             Log.d(TAG, "PREF_KEY_RESET : " + PREF_KEY_RESET);
 
             new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                    .setTitleText("Are you sure?")
-                    .setContentText("Do you want to reset the site URL!")
-                    .setConfirmText("Yes,reset it!")
+                    .setTitleText(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringareyousure))
+                    .setContentText(getLocalizationValue(JsonLocalekeys.sidemenu_button_settingsbutton))
+                    .setConfirmText(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_resetbutton))
                     .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(SweetAlertDialog sDialog) {
@@ -335,7 +339,7 @@ public class Settings_activity extends PreferenceActivity implements
                             editor.commit();
                             sDialog.dismissWithAnimation();
                         }
-                    }).setCancelText("Cancel").setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    }).setCancelText(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_cancelbutton)).setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
                 @Override
                 public void onClick(SweetAlertDialog sweetAlertDialog) {
 

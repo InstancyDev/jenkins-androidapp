@@ -19,6 +19,7 @@ public class ApplyFilterModel implements Serializable {
     public String duration = "";
     public String instructors = "";
     public String groupBy = "";
+    public String sortBy = "";
 
     //Xtra for peoplelisting
     public String locations = "";
@@ -26,4 +27,6 @@ public class ApplyFilterModel implements Serializable {
     public String company = "";
     public String firstName = "";
     public String lastName = "";
+
+    public int selectedId = -1;
 }

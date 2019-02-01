@@ -20,10 +20,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -109,11 +111,14 @@ public class AskExpertAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtQuestion.setText(discussionForumModelList.get(position).userQuestion);
-//        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " |");
-//        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " |");
-        holder.txtAskedBy.setText("Asked by: " + discussionForumModelList.get(position).username + " ");
-        holder.txtAskedOn.setText("Asked on: " + discussionForumModelList.get(position).postedDate + " ");
-        holder.txtNoAnswers.setText(discussionForumModelList.get(position).answers + " Answer(s)");
+//        holder.txtAskedBy.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, activity)+" "+ + discussionForumModelList.get(position).username + " |");
+//        holder.txtAskedOn.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedonlabel, activity)+" " + discussionForumModelList.get(position).postedDate + " |");
+
+        holder.txtAskedBy.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, activity)+" " + discussionForumModelList.get(position).username + " ");
+
+        holder.txtAskedOn.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedonlabel, activity)+" " + discussionForumModelList.get(position).postedDate + " ");
+
+        holder.txtNoAnswers.setText(discussionForumModelList.get(position).answers +JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, activity));
 
         holder.txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAskedBy.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

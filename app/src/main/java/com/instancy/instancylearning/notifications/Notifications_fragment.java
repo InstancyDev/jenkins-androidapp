@@ -68,6 +68,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -76,6 +77,7 @@ import com.instancy.instancylearning.models.NotificationModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -144,7 +146,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
 
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -168,9 +172,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
-        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"", appUserModel.getAuthHeaders());
 
     }
 
@@ -190,7 +194,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                             e.printStackTrace();
                         }
                     } else {
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -279,7 +283,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         } else {
             notificationModelList = new ArrayList<NotificationModel>();
             notificationAdapter.refreshList(notificationModelList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
         if (item_search != null && notificationModelList.size() > 5) {
@@ -296,10 +300,8 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getResources().getString(R.string.insidesettings_tablesection_headingnotification) + "</font>"));
-
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton) + "</font>"));
         actionBar.setDisplayHomeAsUpEnabled(true);
-
     }
 
     @Override
@@ -319,11 +321,11 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
@@ -396,7 +398,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -440,7 +442,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setMessage(notificationModel.message).setTitle(notificationModel.notificationtitle)
                     .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             //do things
                             dialog.dismiss();
@@ -465,7 +467,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage(notificationModel.message).setTitle(notificationModel.notificationtitle)
                         .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 //do things
                                 dialog.dismiss();
@@ -545,13 +547,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
     public void deleteAlert(final NotificationModel notificationModel) {
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-        alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the notification ?")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+        alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage(getLocalizationValue(JsonLocalekeys.notifications_label_suredeletenotificationalert))
+                .setPositiveButton(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deletetopicoption), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialogBox, int id) {
                         // ToDo get user input here
                         deleteAnswerFromServer(notificationModel);
                     }
-                }).setNegativeButton("Cancel",
+                }).setNegativeButton(getLocalizationValue(JsonLocalekeys.discussionforum_alertbutton_cancelbutton),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
                         dialogBox.cancel();
@@ -577,19 +579,19 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, " Success! \nNotification has been successfully deleted ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert)+" \n"+getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert), Toast.LENGTH_SHORT).show();
                     NOTIFICATIONVIWED = 1;
                     deleteAnswerFromLocalDB(notificationModel);
 
                 } else {
 
-                    Toast.makeText(context, "Notification cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_deletenotificationalertcontactadmin), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
 //                svProgressHUD.dismiss();
             }
         })
@@ -646,7 +648,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, " Success! \nNotification has been successfully deleted  ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert)+" \n"+getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert) , Toast.LENGTH_SHORT).show();
 
                     notificationModelList.get(position).markasread = "true";
                     notificationAdapter.notifyDataSetChanged();
@@ -654,14 +656,14 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 //                    deleteAnswerFromLocalDB(notificationModel);
                 } else {
 
-                    Toast.makeText(context, "Notification cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_deletenotificationalertcontactadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-//                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+//                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
 //                svProgressHUD.dismiss();
             }
         })

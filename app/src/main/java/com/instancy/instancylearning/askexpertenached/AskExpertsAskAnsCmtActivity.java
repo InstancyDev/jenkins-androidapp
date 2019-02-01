@@ -42,9 +42,11 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Service;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -206,8 +208,8 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
         }
         // Change base URL to your upload server URL.
 
-        labelTitle.setText(titleStr + ":");
-        editDescription.setHint("Enter your " + titleStr.toLowerCase() + " here...");
+        labelTitle.setText(getLocalizationValue(JsonLocalekeys.answers));
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.asktheexpert_label_enteryour) + titleStr.toLowerCase() + getLocalizationValue(JsonLocalekeys.asktheexpert_label_here));
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -346,14 +348,14 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText("Remove");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText("Upload");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
             attachmentThumb.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -389,7 +391,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -419,7 +421,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
         }
 
         if (messageStr.length() < 2) {
-            Toast.makeText(AskExpertsAskAnsCmtActivity.this, "Answer cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answercannotbeempty), Toast.LENGTH_SHORT).show();
         } else {
 
             Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
@@ -439,7 +441,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
                 respondToQuestion(parameters, contentURIFinal, askExpertAnswerModelDg);
 
             } else {
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
 
             }
@@ -463,7 +465,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             commentId = askExpertCommentModel.commentID;
         }
         if (messageStr.length() < 2) {
-            Toast.makeText(AskExpertsAskAnsCmtActivity.this, "Comment cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_commentcannotbeempty), Toast.LENGTH_SHORT).show();
         } else {
 
             Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
@@ -482,7 +484,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
                 commentTheAnswer(parameters, contentURIFinal);
 
             } else {
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -553,7 +555,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "Success! \nYour Answer has been successfully posted ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+ "\n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answersuccessfullyposted), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 refreshAnswers = true;
                 closeForum(refreshAnswers);
@@ -623,7 +625,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "New Answer cannot be posted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_newanswer_authenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });
@@ -659,7 +661,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "Success! \nYour Comment has been successfully posted ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this,getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_commentsuccessfullyposted), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 refreshAnswers = true;
                 closeForum(refreshAnswers);
@@ -669,7 +671,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, "New Comment cannot be posted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_newcomment_authenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });
@@ -684,7 +686,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
                     "&userId=" + appUserModel.getUserIDValue() +
                     "&response=" + answerModelDg.response +
                     "&siteId=" + appUserModel.getSiteIDValue() +
-                    "&localeId=en-us" +
+                    "&localeId="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"" +
                     "&toEmail=" + answerModelDg.userMail +
                     "&userquestion=" + askExpertQuestionModel.userQuestion +
                     "&fromEmail="+appUserModel.getUserLoginId();
@@ -694,8 +696,12 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             vollyService.getStringResponseVolley("sendMail", parmStringUrl, appUserModel.getAuthHeaders());
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
+
+    }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key, AskExpertsAskAnsCmtActivity.this);
 
     }
 

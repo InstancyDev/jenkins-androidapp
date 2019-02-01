@@ -20,16 +20,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import java.io.Serializable;
@@ -136,6 +137,13 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
 
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -211,7 +219,7 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
 
             if (sortModelList.get(i).isSelected) {
 
-                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionText;
+                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionDisplayText;
                 contentFilterByModel.categorySelectedID = sortModelList.get(i).categoryID;
 
             }
@@ -254,12 +262,12 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
 
             SortModel sortModel = new SortModel();
 
-            sortModel.optionText = i + 1.5 + " and Up";
-            sortModel.optionValue = i + 1.5 + "";
+            sortModel.optionDisplayText = i + 1.5 + " and Up";
+            sortModel.optionIdValue = i + 1.5 + "";
             sortModel.categoryID = i;
 
             try {
-                sortModel.ratingValue = Integer.valueOf(sortModel.optionValue);
+                sortModel.ratingValue = Integer.valueOf(sortModel.optionIdValue);
             } catch (NumberFormatException exp) {
                 exp.printStackTrace();
             }
@@ -276,7 +284,7 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
             for (int i = 0; i < sortModelList.size(); i++) {
                 RadioButton rbn = new RadioButton(this);
                 rbn.setId(sortModelList.get(i).categoryID);
-                rbn.setText(sortModelList.get(i).optionText);
+                rbn.setText(sortModelList.get(i).optionDisplayText);
                 rbn.setTextSize(14.0f);
                 rbn.setPadding(4, 18, 4, 18);
                 rbn.setCompoundDrawablesWithIntrinsicBounds(getDrawableForStars((float) 1.5, this), null, null, null);

@@ -39,11 +39,13 @@ import com.instancy.instancylearning.globalpackage.AppController;
 
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -98,6 +100,11 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
     List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, DiscussionforumCategories.this);
+
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +131,9 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
         btnApply = (Button) findViewById(R.id.btnApply);
         btnApply.setOnClickListener(this);
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         toolbar.setVisibility(View.VISIBLE);
@@ -151,14 +161,14 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         discussionCategoriesModelList = db.fetchDiscussionCategories(appUserModel.getSiteIDValue());
         if (discussionCategoriesModelList != null && discussionCategoriesModelList.size() > 0) {
-            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList, true);
         }
 
         checkBoxFunctionality();
 
         if (refresh) {
             getSelectedCategorylist(selectedCategories);
-            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList, true);
         }
     }
 
@@ -186,16 +196,16 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
         getMenuInflater().inflate(R.menu.globalsearchmenu, menu);
         MenuItem item_search = menu.findItem(R.id.globalsearch);
 
-        item_search.setVisible(false);
+        item_search.setVisible(true);
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 //            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
@@ -237,7 +247,7 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
             searchView.setOnCloseListener(new SearchView.OnCloseListener() {
                 @Override
                 public boolean onClose() {
-                    discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+                    discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList, false);
                     return false;
                 }
             });
@@ -299,7 +309,7 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         } else {
 
-            Toast.makeText(this, " select atleast one category", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_label_selectonecategorylabel), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -310,7 +320,7 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         if (discussionCategoriesModelList != null && discussionCategoriesModelList.size() > 0) {
 
-            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList, false);
 
             for (int i = 0; i < discussionCategoriesModelList.size(); i++) {
 
@@ -343,19 +353,19 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
         chxSelectedCategory.setVisibility(View.GONE);
         chxAll = (CheckBox) globalHeaderLayout.findViewById(R.id.chxBoxAll);
         chxAll.setVisibility(View.VISIBLE);
-        chxAll.setText("Check All");
+        chxAll.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_checkall));
         chxAll.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 if (((CheckBox) v).isChecked()) {
                     checkAllBool = true;
-                    chxAll.setText("Uncheck all");
+                    chxAll.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_uncheckall));
                     updateListView(true);
                 } else {
                     checkAllBool = false;
                     updateListView(false);
-                    chxAll.setText("Check all");
+                    chxAll.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_checkall));
                 }
 
             }
@@ -374,8 +384,8 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
                 discussionCategoriesModelList.get(i).isSelected = isChecked;
 
             }
-
-            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList, false);
+//            discussionForumCategoriesAdapter.notifyiedDataSet();
         }
     }
 
@@ -383,16 +393,14 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         if (discussionCategoriesModelList != null && discussionCategoriesModelList.size() > 0) {
             discussionCategoriesModelList.get(position).isSelected = isChecked;
-            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList);
+            discussionForumCategoriesAdapter.refreshList(discussionCategoriesModelList, false);
         }
         if (isALLChecked()) {
             chxAll.setChecked(true);
             checkAllBool = true;
-            chxAll.setText("Uncheck all");
-
+            chxAll.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_uncheckall));
         }
     }
-
 
     public boolean isALLChecked() {
         boolean isAllChecked = true;
@@ -422,7 +430,7 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
                     updateListViewAtPosition(false, i);
                     chxAll.setChecked(false);
                     checkAllBool = false;
-                    chxAll.setText("Check all");
+                    chxAll.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_checkall));
                 }
                 break;
             default:

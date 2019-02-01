@@ -44,6 +44,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.LeaderboardList;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -52,6 +53,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.CompetencyCatSkillActivity;
 import com.instancy.instancylearning.mycompetency.CompetencyJobRoleAdapter;
 import com.instancy.instancylearning.mycompetency.CompetencyJobRoles;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -108,10 +110,10 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
     UiSettingsModel uiSettingsModel;
 
     public LeaderboardFragment() {
-
-
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -134,7 +136,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
 
     public void refreshGameList(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
         JSONObject parameters = new JSONObject();
@@ -142,7 +144,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
         String urlStr = appUserModel.getWebAPIUrl() + "/LeaderBoard/GetGameList";
 
         try {
-            parameters.put("Locale", "en-us");
+            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("SiteID", appUserModel.getSiteIDValue());
             parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
             parameters.put("ComponentID", sideMenusModel.getComponentId());
@@ -164,7 +166,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
         JSONObject parameters = new JSONObject();
 
         try {
-            parameters.put("Locale", "en-us");
+            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("SiteID", appUserModel.getSiteIDValue());
             parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
             parameters.put("ComponentID", sideMenusModel.getComponentId());
@@ -192,7 +194,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
             }
 
             @Override
@@ -218,7 +220,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                                 updateGameSpinner();
                             } else {
                                 svProgressHUD.dismiss();
-                                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
                             }
 
                         } catch (JSONException e) {
@@ -226,7 +228,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                         }
 
                     } else {
-                        nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
                     }
 
                 }
@@ -284,7 +286,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                     getLeaderBoardOnGameID(gameId);
                 } else {
                     injectFromDbtoModel();
-//                    Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -347,7 +349,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
         } else {
             leaderboardListList = new ArrayList<LeaderboardList>();
             leaderBoardAdapter.refreshList(leaderboardListList);
-            nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
         }
     }
 
@@ -413,7 +415,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
             refreshGameList(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 

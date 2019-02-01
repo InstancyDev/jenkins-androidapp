@@ -24,11 +24,13 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -266,7 +268,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
                 holder.txtStartDate.setVisibility(View.GONE);
                 holder.txtEndDate.setVisibility(View.GONE);
                 holder.txtCreatedOn.setVisibility(View.GONE);
-                holder.txtAskedby.setText("Asked by: " + expandedListText.authordisplayname + " ");
+                holder.txtAskedby.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, context)+" "+ expandedListText.authordisplayname + " ");
                 holder.txtdateCreated.setText("Date created: " + expandedListText.createddate + " ");
                 break;
             case 10:// people listing

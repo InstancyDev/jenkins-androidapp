@@ -25,6 +25,22 @@
                 android:padding="2dp"
                 android:src="@drawable/cellimage" />
 
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fabbtnthumb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="39dp"
+                android:layout_marginTop="175dp"
+                android:padding="2dp"
+                android:scaleType="fitXY"
+                app:borderWidth="0dp"
+                app:elevation="6dp"
+                app:layout_anchor="@+id/imagethumb"
+                app:layout_anchorGravity="right|end|bottom" />
+
+
             <ImageView
                 android:id="@+id/imgPlay"
                 android:layout_width="120dp"
@@ -33,8 +49,8 @@
                 android:background="@android:color/transparent"
                 android:padding="2dp"
                 android:scaleType="fitCenter"
-                android:visibility="invisible"
-                android:src="@drawable/playbtn" />
+                android:src="@drawable/playbtn"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -273,9 +289,8 @@
 
                 </LinearLayout>
 
-
                 <TextView
-                    android:id="@+id/txtDescription"
+                    android:id="@+id/txtWhatYouLearnTitle"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/rating_layout"
@@ -285,10 +300,42 @@
                     android:gravity="left"
                     android:maxLines="2"
                     android:padding="2dp"
-                    android:text="Description: "
+                    android:text="What to learn"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
                     android:textColor="@color/colorGray"
-                    android:textSize="16sp"
                     android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txtWhatYouLearnText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/rating_layout"
+                    android:layout_below="@+id/txtWhatYouLearnTitle"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:padding="2dp"
+                    android:text=""
+                    android:textColor="@color/colorGray"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+
+                <TextView
+                    android:id="@+id/txtDescription"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/rating_layout"
+                    android:layout_below="@+id/txtWhatYouLearnText"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="Description: "
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                    android:textColor="@color/colorGray"
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/txtLongDesc"
@@ -300,9 +347,41 @@
                     android:ellipsize="end"
                     android:gravity="left"
                     android:padding="2dp"
-                    android:text="ssdfgdfgdfgdfgdfgdfgs drgxdfgdfgdf ldkhfsld lf sdf dlfjkasdlifua  fakjhfkauyhfasfakjhfkauyhfasfakj"
+                    android:text=""
                     android:textColor="@color/colorGray"
                     android:textSize="14sp" />
+
+
+                <TextView
+                    android:id="@+id/txtTableofContentTitle"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/rating_layout"
+                    android:layout_below="@+id/txtLongDesc"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:maxLines="2"
+                    android:padding="2dp"
+                    android:text="Table of Content: "
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                    android:textColor="@color/colorGray"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txtTableofContentText"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/rating_layout"
+                    android:layout_below="@+id/txtTableofContentTitle"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="left"
+                    android:padding="2dp"
+                    android:text=""
+                    android:textColor="@color/colorGray"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
 
 
             </RelativeLayout>
@@ -360,26 +439,28 @@
         </LinearLayout>
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/txtRating"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/detaillayoyt"
+        android:ellipsize="end"
+        android:gravity="center_vertical|fill_horizontal"
+        android:maxLines="2"
+        android:padding="2dp"
+        android:text="Ratings and Reviews"
+        android:textColor="@color/colorBlack"
+        android:textSize="18sp"
+        android:typeface="sans" />
+
+
     <RelativeLayout
         android:id="@+id/overall_ratingslayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/detaillayoyt"
+        android:layout_below="@+id/txtRating"
         android:padding="4dp"
-        android:visibility="visible">
-
-        <TextView
-            android:id="@+id/txtRating"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center_vertical|fill_horizontal"
-            android:maxLines="2"
-            android:padding="2dp"
-            android:text="Ratings and Reviews"
-            android:textColor="@color/colorBlack"
-            android:textSize="18sp"
-            android:typeface="sans" />
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/contentratinglayout"
@@ -458,15 +539,27 @@
                 android:textColor="@color/colorBlack"
                 android:textSize="14sp" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/btnReview"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:layout_below="@+id/contentratinglayout"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/edittext_border"
-            android:text="Edit Your Review"
-            android:textAllCaps="false" />
+        <!--    <Button
+                android:id="@+id/btnReview"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_below="@+id/contentratinglayout"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/edittext_border"
+                android:text="Edit Your Review"
+                android:textAllCaps="false" />-->
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnReview"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_below="@+id/overall_ratingslayout"
+        android:layout_marginTop="10dp"
+        android:background="@android:color/transparent"
+        android:padding="4dp"
+        android:text="@string/details_button_writeareviewbutton"
+        android:textAlignment="viewEnd"
+        android:textAllCaps="false" />
+
 </RelativeLayout>

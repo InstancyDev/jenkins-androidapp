@@ -84,12 +84,15 @@ import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
+import com.instancy.instancylearning.mylearning.MyLearningDetailActivity;
 
+import com.instancy.instancylearning.mylearning.MyLearningDetailActivity1;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -191,6 +194,11 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
+
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -256,7 +264,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
         String paramsString = "";
         if (!TABBALUE.equalsIgnoreCase("")) {
@@ -289,14 +297,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectEventCatalog(response,TABBALUE,1,"");
+                            db.injectEventCatalog(response, TABBALUE, 1, "");
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     } else {
 
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
 
                     }
                 }
@@ -313,12 +321,12 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("FILTER")) {
 
-                    Toast.makeText(getContext(), "Filter is not configured", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.mylearning_label_filtersnotconfigured), Toast.LENGTH_SHORT).show();
                 }
 
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
 
-                    nodata_Label.setText(getResources().getString(R.string.no_data));
+                    nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                 }
 
 
@@ -405,13 +413,13 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(),"","","");
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), "", "", "");
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
             catalogModelsList = new ArrayList<MyLearningModel>();
             catalogAdapter.refreshList(catalogModelsList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
         contextMenuModelList = new ArrayList<>();
         contextMenuModelList.addAll(catalogModelsList);
@@ -449,13 +457,13 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-        item_filter.setVisible(false);
+        item_filter.setVisible(true);
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
 
@@ -463,7 +471,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
 //            setCursorColor(txtSearch,Color.parseColor(uiSettingsModel.getAppLoginTextolor())); uncomment for cursor
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
@@ -505,7 +513,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //                isSearching = false;
                 return true;
             }
-        });    }
+        });
+    }
+
     public void gotoGlobalSearch() {
 
         Intent intent = new Intent(context, GlobalSearchActivity.class);
@@ -513,6 +523,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         startActivity(intent);
 
     }
+
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();
         drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
@@ -569,7 +580,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -596,7 +607,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             case R.id.btntxt_download:
                 if (isNetworkConnectionAvailable(context, -1)) {
                 } else {
-                    showToast(context, "No Internet");
+                    showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                 }
                 break;
             case R.id.btn_contextmenu:
@@ -666,6 +677,15 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         menu.getItem(2).setVisible(false);//buy
         menu.getItem(3).setVisible(false);//detail
         menu.getItem(4).setVisible(false);//cancel enrollment
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_viewoption));//view
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_enrolloption));
+        ;//enroll
+        menu.getItem(2).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_buyoption));
+        ;//buy
+        menu.getItem(3).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_detailsoption));
+        ;//detail
+        menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_cancelenrollmentoption));
+        ;//cancel enrollment
 
 
         Log.d(TAG, "catalogContextMenuMethod: " + menu.getItem(1).getItemId());
@@ -776,7 +796,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             public boolean onMenuItemClick(MenuItem item) {
 
                 if (item.getItemId() == R.id.ctx_detail) {
-                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetailActivity1.class);
                     intentDetail.putExtra("IFROMCATALOG", true);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
 //                    v.getContext().startActivity(intentDetail);
@@ -791,20 +811,16 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                     GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-
-                }
-
-                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_cancel_enrolment))) {
+                if (item.getItemId() == R.id.ctx_cancelenrollment) {
 
                     final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                    builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(v.getResources().getString(R.string.eventalert))
-                            .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure))
+                            .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_actionsheet_canceloption), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int i) {
                             dialog.dismiss();
                         }
-                    }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             //do things
                             dialog.dismiss();
@@ -817,7 +833,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Enroll")) {
+                if (item.getItemId() == R.id.ctx_add) {
                     if (isNetworkConnectionAvailable(context, -1)) {
                         if (myLearningDetalData.isCompletedEvent()) {
 
@@ -837,7 +853,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Buy")) {
+                if (item.getItemId() == R.id.ctx_buy) {
 //                    addToMyLearningCheckUser(myLearningDetalData, position, true);
 //
 //                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
@@ -877,7 +893,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (isSubscribed) {
                 Toast toast = Toast.makeText(
                         context,
-                        context.getString(R.string.cat_add_already),
+                        getLocalizationValue(JsonLocalekeys.catalog_label_alreadyinmylearning),
                         Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
@@ -899,9 +915,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                             getMobileGetMobileContentMetaData(myLearningDetalData, position, true);
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.event_add_success))
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " "
+                                    + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel))
                                     .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
                                             dialog.dismiss();
@@ -917,7 +934,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                         } else {
                             Toast toast = Toast.makeText(
-                                    context, "Unable to process request",
+                                    context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
                                     Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
@@ -988,14 +1005,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                                 if (response.contains("Login Failed")) {
                                     Toast.makeText(context,
-                                            "Authentication Failed. Contact site admin",
+                                            getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
                                             Toast.LENGTH_LONG)
                                             .show();
 
                                 }
                                 if (response.contains("Pending Registration")) {
 
-                                    Toast.makeText(context, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
+                                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval),
                                             Toast.LENGTH_LONG)
                                             .show();
                                 }
@@ -1076,9 +1093,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                     MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
                                     injectFromDbtoModel(isExpired);
                                     final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setMessage(context.getString(R.string.cat_add_success))
+                                    builder.setMessage(getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto)
+                                            + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel))
                                             .setCancelable(false)
-                                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //do things
                                                     dialog.dismiss();
@@ -1120,7 +1138,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //            if (isSubscribed) {
 //                Toast toast = Toast.makeText(
 //                        context,
-//                        context.getString(R.string.cat_add_already),
+//                        context.getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto)+" "+getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel),
 //                        Toast.LENGTH_SHORT);
 //                toast.setGravity(Gravity.CENTER, 0, 0);
 //                toast.show();
@@ -1144,7 +1162,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
 //                            builder.setMessage(context.getString(R.string.event_add_success))
 //                                    .setCancelable(false)
-//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
 //                                        public void onClick(DialogInterface dialog, int id) {
 //                                            //do things
 //                                            dialog.dismiss();
@@ -1160,7 +1178,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //
 //                        } else {
 //                            Toast toast = Toast.makeText(
-//                                    context, "Unable to process request",
+//                                    context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
 //                                    Toast.LENGTH_SHORT);
 //                            toast.setGravity(Gravity.CENTER, 0, 0);
 //                            toast.show();
@@ -1197,7 +1215,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //        preferencesManager.setStringValue(learningModel.getContentID(), "contentid");
 //        if (!BillingProcessor.isIabServiceAvailable(context)) {
 //
-//            Toast.makeText(context, "In-app billing service is unavailable, please upgrade Android Market/Play to version >= 3.9.16", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_inappserviceunavailable), Toast.LENGTH_SHORT).show();
 //        }
 //
 //        String testId = "android.test.purchased";
@@ -1210,10 +1228,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 //            billingProcessor.handleActivityResult(IAP_LAUNCH_FLOW_CODE, 80, intent);
 //            billingProcessor.purchase(getActivity(), originalproductid);
 //        } else {
-//            Toast.makeText(context, "Inapp id not configured in server", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_inappidnotinserver), Toast.LENGTH_SHORT).show();
 //        }
 //
-////        billingProcessor.purchase(MyLearningDetail_Activity.this, "com.foundationcourseforpersonal.managedproduct");
+////        billingProcessor.purchase(MyLearningDetailActivity.this, "com.foundationcourseforpersonal.managedproduct");
 ////        String productid = null;
 ////        productid = learningModel.getGoogleProductID();
 //
@@ -1310,7 +1328,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                             if (_response.contains("success")) {
                                 addToMyLearning(finalLearningModel, finalPosition);
                             } else {
-                                Toast.makeText(context, "Purchase failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_purchasefailed), Toast.LENGTH_SHORT).show();
                             }
                         }
                     }, new Response.ErrorListener() {
@@ -1453,7 +1471,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
                         String status = jsonObject.get("status").toString();
                         if (status.contains("failed to get statusObject reference not set to an instance of an object.")) {
-                            status = "In Progress";
+                            status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
                         }
                         String progress = "0";
                         if (jsonObject.has("progress")) {
@@ -1579,7 +1597,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
 
         if (myLearningModelList.size() == 0) {
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
         addEvents(myLearningModelList);
@@ -1736,9 +1754,9 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                         if (response.contains("true")) {
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.event_cancelled))
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.events_actionsheet_canceloption))
                                     .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
                                             dialog.dismiss();
@@ -1784,14 +1802,14 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("SiteID", catalogModel.getSiteID());
         parameters.put("OrgUnitID", catalogModel.getSiteID());
-        parameters.put("Locale", "en-us");
+        parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
         boolean isSubscribed = db.isSubscribedContent(catalogModel);
         if (isSubscribed) {
             Toast toast = Toast.makeText(
                     context,
-                    context.getString(R.string.cat_add_already),
+                    getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel),
                     Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
@@ -1820,9 +1838,10 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                             getMobileGetMobileContentMetaData(catalogModel, position, false);
 
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(context.getString(R.string.event_add_success))
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto)
+                                    + "\" " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel) + "\"")
                                     .setCancelable(false)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             //do things
                                             dialog.dismiss();
@@ -1838,7 +1857,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                         } else {
                             Toast toast = Toast.makeText(
-                                    context, "Unable to process request",
+                                    context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
                                     Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
@@ -1855,7 +1874,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
 
             }
         })
@@ -1878,8 +1897,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }

@@ -45,9 +45,11 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.rackspira.kristiawan.rackmonthpicker.RackMonthPicker;
 import com.rackspira.kristiawan.rackmonthpicker.listener.DateMonthDialogListener;
@@ -150,7 +152,9 @@ public class Experience_activity extends AppCompatActivity {
     int fromMonthInt = 0, toMonthInt = 0;
 
     UserExperienceModel userExperienceModel;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,Experience_activity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,7 +190,7 @@ public class Experience_activity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "     Experience" + "</font>"));
+               getLocalizationValue(JsonLocalekeys.profile_header_experiencetitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -207,8 +211,8 @@ public class Experience_activity extends AppCompatActivity {
         assert bottomLayout != null;
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        txtCancel.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
-        txtSave.setText(getResources().getString(R.string.profile_button_educationsavebutton));
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.profile_button_educationcancelbutton));
+        txtSave.setText(getLocalizationValue(JsonLocalekeys.profile_button_educationsavebutton));
 
     }
 
@@ -228,13 +232,14 @@ public class Experience_activity extends AppCompatActivity {
                 return true;
             case R.id.deleteItem:
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getResources().getString(R.string.removeexpmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
-                        .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setMessage(getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_deleteexperience))
+                        .setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation))
+                        .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.profile_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
                     }
-                }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                }).setPositiveButton(getLocalizationValue(JsonLocalekeys.profile_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //do things
                         dialog.dismiss();
@@ -261,7 +266,7 @@ public class Experience_activity extends AppCompatActivity {
 
         Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_trash, context, uiSettingsModel.getAppHeaderTextColor());
         itemDelete.setIcon(filterDrawable);
-        itemDelete.setTitle("Delete");
+        itemDelete.setTitle(getLocalizationValue(JsonLocalekeys.profile_button_educationdeletebutton));
 
         if (isNewRecord) {
             itemDelete.setVisible(false);
@@ -340,17 +345,17 @@ public class Experience_activity extends AppCompatActivity {
 //        boolean isLEssthaM = isGreaterM(fromMonthInt, toMonthInt);
 
         if (jobRoleStr.length() < 1) {
-            Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_experiencetitletextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (companyStr.length() < 1) {
-            Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_educationcountrynametextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (locationStr.length() < 1) {
-            Toast.makeText(this, "Enter location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_experiencelocationtextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (fromYInt == 0) {
-            Toast.makeText(this, "Select from date", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_experiencefromdatetextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (toYearInt == 0) {
-            Toast.makeText(this, "Select to date", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_experiencetodatetextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (isLEssthaY) {
-            Toast.makeText(this, "Your To year can't be earlier or same than your From year ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_selectpropertoyearvalue), Toast.LENGTH_SHORT).show();
         } else {
 
             String totalYs = totalYearStr(tillDate, fromYInt, toYearInt, fromMonthInt, toMonthInt);
@@ -391,7 +396,7 @@ public class Experience_activity extends AppCompatActivity {
             if (isNetworkConnectionAvailable(this, -1)) {
                 sendNewOrUpdatedEducationDetailsDataToServer(parameterString);
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -415,21 +420,21 @@ public class Experience_activity extends AppCompatActivity {
                 if (s.contains("true")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \nYou have successfully added the experience", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\n"+getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_experienceaddedsuccessfully), Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \nYou have successfully updated the experience", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\n"+getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_experienceprofileupdatesuccessfully), Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Experience cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_cannotpostedexperiencecontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -452,8 +457,8 @@ public class Experience_activity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -594,18 +599,18 @@ public class Experience_activity extends AppCompatActivity {
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, "Success! \nYou have successfully deleted the education", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\n"+getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_educationdeleteSuccessfully), Toast.LENGTH_SHORT).show();
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Experience cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_cannotpostedexperiencecontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -628,8 +633,8 @@ public class Experience_activity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }

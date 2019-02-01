@@ -52,6 +52,7 @@
         android:padding="6dp"
         android:text="Skills"
         android:textAlignment="textStart"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:textStyle="italic" />
 
 </LinearLayout>

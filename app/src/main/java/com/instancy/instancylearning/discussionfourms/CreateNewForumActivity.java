@@ -47,10 +47,12 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -147,7 +149,10 @@ public class CreateNewForumActivity extends AppCompatActivity {
     LinearLayout bottomLayout;
 
     boolean allowNotification = true, allowNewTopic = true, allowAttachFile = true, isUpdateForum = false;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,CreateNewForumActivity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,7 +190,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Add Forum" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_header_addforumtitlelabel) + "</font>"));
 
 //        appUserModel.setSiteURL(preferencesManager.getStringValue(StaticValues.KEY_SITEURL));
 //        appUserModel.setSiteIDValue(preferencesManager.getStringValue(StaticValues.KEY_SITEID));
@@ -211,7 +216,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         txtSettings.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledTitle
-                = new SpannableString("*Tittle");
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_newforumtitlelabel));
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -318,7 +323,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (titleStr.length() < 1) {
-            Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_textfield_newforumtitletextfieldplaceholder), Toast.LENGTH_SHORT).show();
         }
 //        else
 //            if (descriptionStr.length() < 10) {
@@ -371,7 +376,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
                 sendNewForumDataToServer(addQuotes);
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -391,18 +396,18 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour new forum has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newforumhasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "New forum cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newforumauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })

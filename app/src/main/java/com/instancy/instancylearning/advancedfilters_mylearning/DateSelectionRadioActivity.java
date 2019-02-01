@@ -34,9 +34,11 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import java.io.Serializable;
@@ -44,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 /**
@@ -83,6 +87,8 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
 
     private Date startDate, endDate;
 
+    private String EndDateStr = "", StartDateStr = "";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +109,7 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contentFilterByModel.categoryName + "</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contentFilterByModel.categoryDisplayName + "</font>"));
 
         applyUiColor();
         try {
@@ -125,7 +131,6 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
         sortModelList = generateFilterByModelList();
         dynamicRadioBtn(sortModelList);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -162,6 +167,22 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
         btnStartDate.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnEndDate.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+
+
+        if (isValidString(contentFilterByModel.categorySelectedStartDate)) {
+            btnStartDate.setText(contentFilterByModel.categorySelectedStartDate);
+        }
+
+        if (isValidString(contentFilterByModel.categorySelectedEndDate)) {
+            btnEndDate.setText(contentFilterByModel.categorySelectedEndDate);
+        }
+
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -205,6 +226,7 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void finishTheActivity(boolean isApplied) {
 
         if (isApplied) {
@@ -254,37 +276,37 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
                 } else {
                     btnEndDate.setText(dateFormatter.format(newDate.getTime()));
                     endDate = newDate.getTime();
+                    EndDateStr = dateFormatter.format(newDate.getTime());
                 }
             }
-
         }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-
         datePickerDialog.show();
-
     }
 
     public void resetAllSortings() {
         if (sortModelList != null && sortModelList.size() > 0) {
-
             contentFilterByModel.selectedSkillsCatIdString = "";
             contentFilterByModel.categorySelectedID = -1;
+            contentFilterByModel.categorySelectedEndDate = "";
+            contentFilterByModel.categorySelectedStartDate = "";
         }
     }
 
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void getSelectedCategories() {
-
         for (int i = 0; i < sortModelList.size(); i++) {
-
             if (sortModelList.get(i).isSelected) {
-
-                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionText;
+                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionIdValue;
                 contentFilterByModel.categorySelectedID = sortModelList.get(i).categoryID;
-
+                contentFilterByModel.categorySelectedStartDate = sortModelList.get(i).optionIdValue;
                 if (sortModelList.get(i).categoryID == 7) {
-                    java.text.SimpleDateFormat Dateformat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    contentFilterByModel.categorySelectedStartDate = Dateformat.format(startDate);
-                    contentFilterByModel.categorySelectedEndDate = Dateformat.format(endDate);
+                    DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                    contentFilterByModel.categorySelectedStartDate = dateFormatter.format(startDate);
+                    if (EndDateStr.length() > 0) {
+                        contentFilterByModel.categorySelectedEndDate = dateFormatter.format(endDate);
+                    } else {
+                        contentFilterByModel.categorySelectedEndDate = "";
+                    }
                 } else {
 //                    contentFilterByModel.categorySelectedStartDate = "";
 //                    contentFilterByModel.categorySelectedEndDate = "";
@@ -343,47 +365,47 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
 //        {"id":'nextmonth',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateNextMonth')},
 
         SortModel sortModelToday = new SortModel();
-        sortModelToday.optionText = "Today";
-        sortModelToday.optionValue = "today";
+        sortModelToday.optionDisplayText = "Today";
+        sortModelToday.optionIdValue = "today";
         sortModelToday.categoryID = 1;
         sortModelList.add(sortModelToday);
 
         SortModel sortModelTomorrow = new SortModel();
-        sortModelTomorrow.optionText = "Tomorrow";
-        sortModelTomorrow.optionValue = "tomorrow";
+        sortModelTomorrow.optionDisplayText = "Tomorrow";
+        sortModelTomorrow.optionIdValue = "tomorrow";
         sortModelTomorrow.categoryID = 2;
         sortModelList.add(sortModelTomorrow);
 
         SortModel sortModelThisWeek = new SortModel();
-        sortModelThisWeek.optionText = "This Week";
-        sortModelThisWeek.optionValue = "thisweek";
+        sortModelThisWeek.optionDisplayText = "This Week";
+        sortModelThisWeek.optionIdValue = "thisweek";
         sortModelThisWeek.categoryID = 3;
         sortModelList.add(sortModelThisWeek);
 
 
         SortModel sortModelNextweek = new SortModel();
-        sortModelNextweek.optionText = "Next Week";
-        sortModelNextweek.optionValue = "nextweek";
+        sortModelNextweek.optionDisplayText = "Next Week";
+        sortModelNextweek.optionIdValue = "nextweek";
         sortModelNextweek.categoryID = 4;
         sortModelList.add(sortModelNextweek);
 
 
         SortModel sortModelThismonth = new SortModel();
-        sortModelThismonth.optionText = "This Month";
-        sortModelThismonth.optionValue = "thismonth";
+        sortModelThismonth.optionDisplayText = "This Month";
+        sortModelThismonth.optionIdValue = "thismonth";
         sortModelThismonth.categoryID = 5;
         sortModelList.add(sortModelThismonth);
 
         SortModel sortModelNextmonth = new SortModel();
-        sortModelNextmonth.optionText = "This Month";
-        sortModelNextmonth.optionValue = "nextmonth";
+        sortModelNextmonth.optionDisplayText = "Next Month";
+        sortModelNextmonth.optionIdValue = "nextmonth";
         sortModelNextmonth.categoryID = 6;
         sortModelList.add(sortModelNextmonth);
 
 
         SortModel sortModelChooseDate = new SortModel();
-        sortModelChooseDate.optionText = "Choose Date";
-        sortModelChooseDate.optionValue = "choosedate";
+        sortModelChooseDate.optionDisplayText = "Choose Date";
+        sortModelChooseDate.optionIdValue = "choosedate";
         sortModelChooseDate.categoryID = 7;
         sortModelList.add(sortModelChooseDate);
 
@@ -397,14 +419,14 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
             for (int i = 0; i < sortModelList.size(); i++) {
                 RadioButton rbn = new RadioButton(this);
                 rbn.setId(sortModelList.get(i).categoryID);
-                rbn.setText(sortModelList.get(i).optionText);
+                rbn.setText(sortModelList.get(i).optionDisplayText);
                 rbn.setTextSize(16.0f);
                 rbn.setPadding(4, 18, 4, 18);
 
                 rbn.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
                 if (contentFilterByModel.categorySelectedID == sortModelList.get(i).categoryID) {
                     rbn.setChecked(true);
-
+                    sortModelList.get(i).isSelected = true;
                     if (contentFilterByModel.categorySelectedID == 7) {
                         linearDateLayout.setVisibility(View.VISIBLE);
                     } else {

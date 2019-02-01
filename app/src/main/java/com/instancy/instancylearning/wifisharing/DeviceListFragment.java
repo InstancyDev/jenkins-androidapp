@@ -34,6 +34,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,9 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
     View mContentView = null;
     private WifiP2pDevice device;
     public static String TAG = DeviceListFragment.class.getSimpleName();
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -183,7 +187,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel", "finding peers", true,
+        progressDialog = ProgressDialog.show(getActivity(),getLocalizationValue(JsonLocalekeys.pressbacktocancel), getLocalizationValue(JsonLocalekeys.finding_peers), true,
                 true, new DialogInterface.OnCancelListener() {
 
                     @Override

@@ -50,6 +50,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.nativesignup.NativeSignupActivity;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.ApiConstants;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.SweetAlert;
@@ -153,6 +154,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     VollyService vollyService;
     IResult resultCallback = null;
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, Login_activity.this);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,6 +214,15 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnSignup.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         btnForgot.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         settingTxt.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
+
+
+        editUserName.setHint(getLocalizationValue(JsonLocalekeys.login_textfield_usernametextfieldplaceholder));
+        editPassword.setHint(getLocalizationValue(JsonLocalekeys.login_textfield_passwordtextfieldplaceholder));
+
+
+        btnForgot.setText(getLocalizationValue(JsonLocalekeys.login_button_forgotpasswordbutton));
+
+        btnLogin.setText(getLocalizationValue(JsonLocalekeys.login_button_signinbutton));
 //        imglogo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLogoBackgroundColor()));
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
@@ -229,7 +243,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         }
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.younextyou)))) {
 
-            settingTxt.setVisibility(View.INVISIBLE);
+            settingTxt.setVisibility(View.VISIBLE);
             btnSignup.setVisibility(View.INVISIBLE);
 
         } else {
@@ -292,7 +306,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     methodCallByTag(1);
                 } else {
 
-                    Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btntxt_twitter:
@@ -300,7 +314,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     methodCallByTag(2);
                 } else {
 
-                    Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btntxt_facebook:
@@ -308,7 +322,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     methodCallByTag(3);
                 } else {
 
-                    Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.btntxt_linkedin:
@@ -316,7 +330,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     methodCallByTag(4);
                 } else {
 
-                    Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.id_settings_txt:
@@ -407,9 +421,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         String passWord = editPassword.getText().toString().trim();
 
         if (userName.length() < 1) {
-            Toast.makeText(this, getResources().getString(R.string.enter_validation) + " " + getResources().getString(R.string.login_textfield_usernametextfieldplaceholder), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.login_textfield_usernametextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (passWord.length() < 1) {
-            Toast.makeText(this, getResources().getString(R.string.enter_validation) + " " + getResources().getString(R.string.login_textfield_passwordtextfieldplaceholder), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.login_textfield_passwordtextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else {
 
             if (isNetworkConnectionAvailable(this, -1)) {
@@ -454,7 +468,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 } else {
                     appController.setAlreadyViewd(false);
                     preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
-                    SweetAlert.sweetAlertNoNet(Login_activity.this, getResources().getString(R.string.alert_headtext_no_internet), getResources().getString(R.string.alert_text_check_connection));
+                    SweetAlert.sweetAlertNoNet(Login_activity.this, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection));
                 }
             }
 
@@ -489,7 +503,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                             alertText.setVisibility(View.VISIBLE);
                                         } else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration")) {
 
-                                            Toast.makeText(Login_activity.this, "   Your registration is not yet approved!  ", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_youraccountisnotyetactivated), Toast.LENGTH_LONG).show();
 
                                         }
                                     }
@@ -659,7 +673,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
 
             btnSignup.setVisibility(View.VISIBLE);
-            btnSignup.setText(getResources().getString(R.string.login_button_signupbutton));
+            btnSignup.setText(getLocalizationValue(JsonLocalekeys.login_button_signupbutton));
 
         } else {
             btnSignup.setVisibility(View.INVISIBLE);
@@ -735,9 +749,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
                 if (requestType.equalsIgnoreCase("PROFILEDATA")) {
                     if (response != null) {
-
                         try {
-
                             db.InjectAllProfileDetails(response, appUserModel.getUserIDValue());
                             ISPROFILENAMEORIMAGEUPDATED = 1;
                         } catch (JSONException e) {
@@ -815,15 +827,15 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
     public void updateLocalization() {
-
-        String jsonString = "{\"en\":{\"no_games_avaliable\":\"English Name\"},\"nl\":{\"no_games_avaliable\":\"Dutch Name\"}}";
-
-        String key = getResources().getString(R.string.alert_text_event_add_success);
-        JsonLocalization.getInstance().loadFromData(jsonString);
-        String localizedName = JsonLocalization.getInstance().stringForKey(key, this);
-        Log.d("JsonLocaliztion", localizedName);
-
-        editUserName.setHint(localizedName);
+//
+//        String jsonString = "{\"en\":{\"no_games_avaliable\":\"English Name\"},\"nl\":{\"no_games_avaliable\":\"Dutch Name\"}}";
+//
+//        String key = getResources().getString(R.string.alert_text_event_add_success);
+//        JsonLocalization.getInstance().loadFromData(jsonString);
+//       // String localizedName = JsonLocalization.getInstance().stringForKey(key, this);
+//        Log.d("JsonLocaliztion", localizedName);
+//
+//        editUserName.setHint(localizedName);
 
     }
 

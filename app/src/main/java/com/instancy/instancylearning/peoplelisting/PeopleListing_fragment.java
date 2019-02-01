@@ -68,12 +68,14 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.EndlessScrollListener;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -199,6 +201,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -272,10 +278,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             if (!isRefreshed) {
 
-                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+                svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
             }
 
-            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&SearchText=" + queryString;
+            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&SearchText=" + queryString;
 
             vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
         } else {
@@ -290,10 +296,10 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             if (!isRefreshed) {
 
-                svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+                svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
             }
 
-            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&SearchText=" + queryString;
+            String paramsString = "ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&FilterType=" + TABBALUE + "&pageIndex=" + pageIndex + "&pageSize=" + pageSize + "&SearchText=" + queryString;
 
             vollyService.getJsonObjResponseVolley("PEOPLELISTING", appUserModel.getWebAPIUrl() + "/MobileLMS/GetPeopleListData?" + paramsString, appUserModel.getAuthHeaders());
         } else {
@@ -352,7 +358,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -362,6 +368,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 if (requestType.equalsIgnoreCase("REMOVEACTION")) {
                     if (response != null) {
                         if (isDigimedica) {
+                            pageIndex = 1;
                             getPeopleList(true);
                         } else {
                             refreshPeopleListing(true);
@@ -369,7 +376,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
                                 .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //do things
                                         dialog.dismiss();
@@ -394,7 +401,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
                                 .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //do things
                                         dialog.dismiss();
@@ -405,7 +412,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         alert.show();
 
                         if (isDigimedica) {
-                            getPeopleList(false);
+                            pageIndex = 1;
+                            getPeopleList(true);
                         } else {
                             refreshPeopleListing(false);
                         }
@@ -423,7 +431,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setMessage(response)
                                 .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //do things
                                         dialog.dismiss();
@@ -434,7 +442,9 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         alert.show();
 
                         if (isDigimedica) {
-                            getPeopleList(false);
+                            pageIndex = 1;
+                            getPeopleList(true);
+
                         } else {
                             refreshPeopleListing(false);
                         }
@@ -450,7 +460,6 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                     if (response != null) {
                         try {
                             JSONObject jsonObj = new JSONObject(response);
-
                             totalRecordsCount = countOfTotalRecords(jsonObj);
                             if (isFromGlobalSearch) {
                                 peopleListingModelList.addAll(generateOnlinePeoplelistingModel(jsonObj));
@@ -549,7 +558,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
                             } else {
                                 progressBar.setVisibility(View.GONE);
-                                Toast.makeText(getContext(), "   " + getString(R.string.alert_headtext_no_internet) + "   ", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "   " + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet) + "   ", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             progressBar.setVisibility(View.GONE);
@@ -591,6 +600,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         allPBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         myConBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        updateLocalazation();
         peopleListingModelList = new ArrayList<PeopleListingModel>();
 
         if (isNetworkConnectionAvailable(getContext(), -1) && REFRESH_PEOPLE == 0) {
@@ -614,6 +624,13 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         return rootView;
     }
 
+    public void updateLocalazation() {
+        pendingBtn.setText(getLocalizationValue(JsonLocalekeys.myconnections_tabbutton_pendingrequestsbutton));
+        expertsBtn.setText(getLocalizationValue(JsonLocalekeys.myconnections_tabbutton_expertssbutton));
+        allPBtn.setText(getLocalizationValue(JsonLocalekeys.myconnections_tabbutton_allpeoplesbutton));
+        myConBtn.setText(getLocalizationValue(JsonLocalekeys.myconnections_tabbutton_myconnectinsbutton));
+    }
+
     public void injectFromDbtoModel() {
         peopleListingModelList = db.fetchPeopleListModelList(TABBALUE);
         if (peopleListingModelList != null) {
@@ -621,7 +638,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         } else {
             peopleListingModelList = new ArrayList<PeopleListingModel>();
             peopleListingAdapter.refreshList(peopleListingModelList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
         if (peopleListingModelList.size() == pageSize) {
@@ -664,7 +681,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             @Override
             public void messageRecieved(JSONArray messageReceived) {
 
-                Toast.makeText(context, "Receive in Chat List " + messageReceived, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.people_label_receive_chatlist) + messageReceived, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -700,11 +717,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
 
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
@@ -955,7 +972,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -982,7 +999,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             case R.id.btntxt_download:
                 if (isNetworkConnectionAvailable(context, -1)) {
                 } else {
-                    showToast(context, "No Internet");
+                    showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                 }
                 break;
             case R.id.btn_contextmenu:
@@ -1047,7 +1064,15 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_viewprofileoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_viewcontentoption));
+        menu.getItem(2).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_acceptconnectionoption));
+        menu.getItem(3).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_removeconnectionoption));
+        menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_ignoreconnectionoption));
+        menu.getItem(5).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_sendmessageoption));
+        menu.getItem(6).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_addtomyconnectionsoption));
+        menu.getItem(7).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_canceloption));
+        menu.getItem(8).setTitle(getLocalizationValue(JsonLocalekeys.myconnections_actionsheet_askaquestionoption));
         menu.getItem(0).setVisible(false);//view profile
         menu.getItem(1).setVisible(false);//view content
         menu.getItem(2).setVisible(false);//accept connection
@@ -1100,14 +1125,14 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("View Profile")) {
+                if (item.getItemId() == R.id.ctx_play) {
                     Intent intentDetail = new Intent(context, PeopleListingProfile.class);
                     intentDetail.putExtra("peopleListingModel", peopleListingModel);
                     startActivity(intentDetail);
 
 //                    Toast.makeText(context, "View Profile", Toast.LENGTH_SHORT).show();
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
+                if (item.getItemId() == R.id.ctx_view) {
 
                     if (isNetworkConnectionAvailable(context, -1)) {
 
@@ -1115,23 +1140,23 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
                     } else {
 
-                        showToast(context, "No Internet");
+                        showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                     }
 
 
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Accept Connection")) {
+                if (item.getItemId() == R.id.ctx_detail) {
 
                     if (isNetworkConnectionAvailable(getContext(), -1)) {
                         acceptConnectionAction(peopleListingModel);
                     } else {
-                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                     }
 
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Send Message")) {
+                if (item.getItemId() == R.id.ctx_report) {
 
                     if (isNetworkConnectionAvailable(getContext(), -1)) {
 
@@ -1151,23 +1176,23 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                         signalAService.startSignalA();
 
                     } else {
-                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                     }
 
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Remove Connection")) {
+                if (item.getItemId() == R.id.ctx_join) {
 
                     if (isNetworkConnectionAvailable(getContext(), -1)) {
 
                         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setMessage(getResources().getString(R.string.removeconnectionalertmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
-                                .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        builder.setMessage(getLocalizationValue(JsonLocalekeys.myconnections_alertsubtitle_areyousurewanttoremoveconnection)).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation))
+                                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.dismiss();
                             }
-                        }).setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+                        }).setPositiveButton(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 //do things
                                 dialog.dismiss();
@@ -1180,24 +1205,24 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
 
                     } else {
-                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                     }
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Ignore Connection")) {
+                if (item.getItemId() == R.id.ctx_download) {
 //                    Toast.makeText(context, "Ignore Connection", Toast.LENGTH_SHORT).show();
 
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Ask a question")) {
+                if (item.getItemId() == R.id.ctxaskaquestion) {
 
                     askAQuestionMethod(peopleListingModel);
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Add to My Connections")) {//
+                if (item.getItemId() == R.id.ctx_addtocalender) {//
 
                     if (isNetworkConnectionAvailable(getContext(), -1)) {
-                        addConnectionAction(peopleListingModel);
+                        addConnectionAction(peopleListingModel);//BUG
                     } else {
-                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -1263,7 +1288,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         String paramsString = "SelectedObjectID="
                 + peopleListingModel.userID
                 + "&SelectAction=RemoveConnection&UserName="
-                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=en-us";
+                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "";
 
         String paramsEncodeString = paramsString.replaceAll(" ", "%20");
 
@@ -1275,7 +1300,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         String paramsString = "SelectedObjectID="
                 + peopleListingModel.userID
                 + "&SelectAction=Accept&UserName="
-                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=en-us";
+                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "";
 
         String paramsEncodeString = paramsString.replaceAll(" ", "%20");
 
@@ -1287,7 +1312,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         String paramsString = "SelectedObjectID="
                 + peopleListingModel.userID
                 + "&SelectAction=AddConnection&UserName="
-                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=en-us";
+                + peopleListingModel.userDisplayname + "&UserID=" + peopleListingModel.userID + "&mainSiteUserid=" + peopleListingModel.mainSiteUserID + "&SiteID=" + peopleListingModel.siteID + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "";
 
         String paramsEncodeString = paramsString.replaceAll(" ", "%20");
 
@@ -1343,7 +1368,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 pageIndex = 1;
                 nodata_Label.setText("");
                 if (isDigimedica) {
-                    getPeopleList(false);
+                    getPeopleList(true);
                 } else {
                     refreshPeopleListing(true);
                 }
@@ -1357,7 +1382,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 pageIndex = 1;
                 nodata_Label.setText("");
                 if (isDigimedica) {
-                    getPeopleList(false);
+                    getPeopleList(true);
                 } else {
                     refreshPeopleListing(true);
                 }
@@ -1371,7 +1396,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 pageIndex = 1;
                 nodata_Label.setText("");
                 if (isDigimedica) {
-                    getPeopleList(false);
+                    getPeopleList(true);
                 } else {
                     refreshPeopleListing(true);
                 }
@@ -1385,7 +1410,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                 pageIndex = 1;
                 nodata_Label.setText("");
                 if (isDigimedica) {
-                    getPeopleList(false);
+                    getPeopleList(true);
                 } else {
                     refreshPeopleListing(true);
                 }
@@ -1644,7 +1669,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             parameters.put("ComponentInstanceID", sideMenusModel.getRepositoryId());
             parameters.put("UserID", appUserModel.getUserIDValue());
             parameters.put("SiteID", appUserModel.getSiteIDValue());
-            parameters.put("Locale", "en-us");
+            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("sortBy", "");
             parameters.put("sortType", "");
             parameters.put("pageIndex", pageIndex);
@@ -1655,7 +1680,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             parameters.put("contentid", "");
             parameters.put("location", applyFilterModel.locations);
             parameters.put("company", applyFilterModel.company);
-            parameters.put("skilllevels", applyFilterModel.skillCats);
+            parameters.put("skilllevels", "");
             parameters.put("firstname", applyFilterModel.firstName);
             parameters.put("lastname", applyFilterModel.lastName);
             parameters.put("skillcats", applyFilterModel.skillCats);

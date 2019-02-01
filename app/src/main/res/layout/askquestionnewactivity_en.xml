@@ -93,7 +93,7 @@
                 android:drawableStart="@drawable/ic_menu_camera"
                 android:onClick="actionsBottomBtns"
                 android:padding="3dp"
-                android:text="Upload"
+                android:text="@string/asktheexpert_labelupload"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false" />
 

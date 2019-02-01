@@ -18,7 +18,7 @@ public class ProgressReportModel implements Serializable {
 //            "SeqID":-1,//detailContentModel.sequenceNumber,
 //            "TrackID":detailContentModel.trackID,
 //            "siteid":detailContentModel.siteID == "" ? "374":detailContentModel.siteID,
-//            "locale":"en-us",
+//            "locale":""+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"",
 //            "EventID":detailContentModel.trackID
 
 

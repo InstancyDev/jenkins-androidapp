@@ -26,8 +26,10 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.mcoy_jiang.videomanager.ui.McoyVideoView;
 import com.squareup.picasso.Picasso;
@@ -115,13 +117,13 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-        holder.txtName.setText(discussionCommentsModels.get(position).commentedBy);
-        holder.txtDaysAgo.setText("Commented on:" + discussionCommentsModels.get(position).commentedFromDays);
+        holder.txtName.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+discussionCommentsModels.get(position).commentedBy);
+        holder.txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentedontitlelabel)+" " + discussionCommentsModels.get(position).commentedFromDays);
         holder.txtmessage.setText(discussionCommentsModels.get(position).message);
         holder.txtmessage.setMaxLines(200);
 
-        holder.txtLikesCount.setText(discussionCommentsModels.get(position).commentLikes + " Like(s)");
-        holder.txtRepliesCount.setText(discussionCommentsModels.get(position).commentRepliesCount + " Replies");
+        holder.txtLikesCount.setText(discussionCommentsModels.get(position).commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        holder.txtRepliesCount.setText(discussionCommentsModels.get(position).commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_replys));
 
 
         assert holder.txtLike != null;
@@ -299,7 +301,10 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
         return d;
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
 
+    }
 }
 
 

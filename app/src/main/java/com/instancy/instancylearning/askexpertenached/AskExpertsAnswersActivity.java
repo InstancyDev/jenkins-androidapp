@@ -57,6 +57,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -64,6 +65,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UpvotersModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -147,6 +149,11 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
     boolean nextLevel = false;
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, AskExpertsAnswersActivity.this);
+
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -181,7 +188,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Answers" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.answers) + "</font>"));
 
         askExpertAnswerAdapter = new AskExpertAnswerAdapter(this, BIND_ABOVE_CLIENT, askExpertAnswerModelList);
         askExpertsListView.setAdapter(askExpertAnswerAdapter);
@@ -265,10 +272,10 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
     public void refreshForAnswers(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
-//        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetAsktheExpertData?intSiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
+//        String parmStringUrl = "http://angular6api.instancysoft.com/api/MobileLMS/GetAsktheExpertData?intSiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&astrLocale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
 
         String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetUserQuestionsResponses?UserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&ComponentID=" + sideMenusModel.getComponentId() + "&intQuestionID=" + askExpertQuestionModel.questionID;
 
@@ -302,12 +309,12 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         btnContextMenu.setVisibility(View.INVISIBLE);
         txtQuestion.setText(askExpertQuestionModel.userQuestion);
-        txtAllActivites.setText("Asked by: " + askExpertQuestionModel.userName + " ");
+        txtAllActivites.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.userName + " ");
 
-        txtAllActivites.setText("Asked by: " + askExpertQuestionModel.userName + "   |   " + "Asked on: " + askExpertQuestionModel.postedDate + "   |   " + "Last active: " + askExpertQuestionModel.postedDate);
+        txtAllActivites.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.userName + "   |   " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedonlabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.postedDate + "   |   " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_lastactivelabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.postedDate);
 
-        txtNoAnswers.setText(askExpertQuestionModel.totalAnswers + " Answer(s)");
-        txtNoViews.setText(askExpertQuestionModel.totalViews + " Views");
+        txtNoAnswers.setText(askExpertQuestionModel.totalAnswers + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, AskExpertsAnswersActivity.this));
+        txtNoViews.setText(askExpertQuestionModel.totalViews + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, AskExpertsAnswersActivity.this));
         txtDescription.setText(askExpertQuestionModel.userQuestionDescription);
 
         txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -374,7 +381,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             footor.setVisibility(View.VISIBLE);
         }
 
-        txtNoAnswers.setText(askExpertAnswerModelList.size() + " Answer(s)");
+        txtNoAnswers.setText(askExpertAnswerModelList.size() + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, AskExpertsAnswersActivity.this));
 
         if (nextLevel) {
             if (askExpertAnswerModelList != null && askExpertAnswerModelList.size() > 0) {
@@ -430,7 +437,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -524,7 +531,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             sendNewLikeDataToServer(parameterString);
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -547,7 +554,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(AskExpertsAnswersActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(AskExpertsAnswersActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -561,7 +568,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             }
 
             @Override
-            public byte[] getBody() throws com.android.volley.AuthFailureError {
+            public byte[] getBody() {
                 return postData.getBytes();
             }
 
@@ -570,10 +577,8 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
-
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
                 return headers;
             }
 
@@ -602,19 +607,22 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);// ctx_edit
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));
+        ;
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.ctx_delete:
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                        alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the Answer :")
-                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage("Are you sure you want to permanently delete the Answer :")
+                                .setPositiveButton(JsonLocalekeys.asktheexpert_alertbutton_deletebutton, new DialogInterface.OnClickListener() {
                                     public void onClick(final DialogInterface dialogBox, int id) {
                                         // ToDo get user input here
                                         deleteAnswerFromServer(askExpertAnswerModel);
                                     }
-                                }).setNegativeButton("Cancel",
+                                }).setNegativeButton(JsonLocalekeys.asktheexpert_alertbutton_cancelbutton,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialogBox, int id) {
                                         dialogBox.cancel();
@@ -647,21 +655,19 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("2")) {
-
-                    Toast.makeText(context, " Success! \nAnswer has been successfully deleted ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsAnswersActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAnswers = true;
 //                    db.deleteAnswerFromLocalDB(answerModel);
                     refreshForAnswers(true);
                 } else {
-
-                    Toast.makeText(context, "Answer cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsAnswersActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_authenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -817,7 +823,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             upvotersAdapter = new UpvotersAdapter(this, upvotersModelList);
             lv_languages.setAdapter(upvotersAdapter);
             TextView txtCountVoted = view.findViewById(R.id.txtCountVoted);
-            txtCountVoted.setText(upvotersModelList.size() + " Upvoters");
+            txtCountVoted.setText(upvotersModelList.size() + getLocalizationValue(JsonLocalekeys.asktheexpert_label_upvotetitlelabel));
             bottomSheetDialog = new BottomSheetDialog(this);
             bottomSheetDialog.setContentView(view);
             bottomSheetDialog.show();

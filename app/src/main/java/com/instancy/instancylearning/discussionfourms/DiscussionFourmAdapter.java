@@ -22,10 +22,12 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import com.squareup.picasso.Picasso;
@@ -112,11 +114,13 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtName.setText(discussionForumModelList.get(position).name);
         holder.txtShortDisc.setText(discussionForumModelList.get(position).descriptionValue);
-        holder.txtAuthor.setText("Moderator: " + discussionForumModelList.get(position).author + " ");
-        holder.txtLastUpdate.setText("Last update: " + discussionForumModelList.get(position).createddate + " ");
+        holder.txtAuthor.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+" " + discussionForumModelList.get(position).author + " ");
+        holder.txtLastUpdate.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel)+" " + discussionForumModelList.get(position).createddate + " ");
 
-        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " Topic(s)");
-        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts + " Comment(s)");
+        holder.txtTopicsCount.setText(discussionForumModelList.get(position).nooftopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        holder.txtCommentsCount.setText(discussionForumModelList.get(position).totalposts+ " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
+
+
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -213,6 +217,10 @@ public class DiscussionFourmAdapter extends BaseAdapter {
             ((ListView) parent).performItemClick(view, getPosition, 0);
 
         }
+
+    }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
 
     }
 }

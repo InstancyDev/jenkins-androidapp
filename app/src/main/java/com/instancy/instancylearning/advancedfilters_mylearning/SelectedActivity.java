@@ -28,10 +28,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -83,16 +85,18 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
         uiSettingsModel = UiSettingsModel.getInstance();
         preferencesManager = PreferencesManager.getInstance();
 
-
-        // Action Bar Color And Tint
-        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Filters</font>"));
-
         isFromMylearning = getIntent().getIntExtra("isFrom", 0);
         filterByModelList = new ArrayList<>();
         filterByModelList = (List<FilterByModel>) getIntent().getExtras().getSerializable("filterByModelList");
         contentFilterByModel = (ContentFilterByModel) getIntent().getExtras().getSerializable("contentFilterByModel");
+
+        String titleHeader = getIntent().getStringExtra("TITLEHEADER");
+
+        // Action Bar Color And Tint
+        UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
+
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + titleHeader + "</font>"));
 
         applyUiColor();
 
@@ -109,7 +113,7 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
         }
 
         listView = (ListView) findViewById(R.id.lstContentFilterBy);
-        filterByAdapter = new FilterByAdapter(this, filterByModelList, false);
+        filterByAdapter = new FilterByAdapter(this, filterByModelList, contentFilterByModel);
         listView.setAdapter(filterByAdapter);
         listView.setDivider(null);
         listView.setOnItemClickListener(this);
@@ -142,6 +146,13 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
 
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public void updateSelectedArrayList() {
@@ -262,7 +273,8 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
     public void getSelectedCategoriesValues() {
 
         if (filterByModelList != null && filterByModelList.size() > 0) {
-
+            contentFilterByModel.selectedChildSkillIdsArry = new ArrayList<>();
+            contentFilterByModel.selectedChildSkillNamesArry = new ArrayList<>();
             for (int i = 0; i < filterByModelList.size(); i++) {
 
                 if (filterByModelList.get(i).isSelected) {
@@ -275,6 +287,7 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
             contentFilterByModel.selectedChildSkillIdsArry = removeAllDuplicates(contentFilterByModel.selectedChildSkillIdsArry);
 
             contentFilterByModel.selectedChildSkillNamesArry = removeAllDuplicates(contentFilterByModel.selectedChildSkillNamesArry);
+
         }
     }
 
@@ -308,13 +321,13 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
                     if (selectedSkillsIds.length() > 0) {
                         selectedSkillsIds = selectedSkillsIds.concat("," + filterByModelList.get(i).categoryID);
                     } else {
-                        selectedSkillsIds = "" + filterByModelList.get(i).categoryID;
+                        selectedSkillsIds =  filterByModelList.get(i).categoryID;
                     }
 
                     if (selectedSkillsNames.length() > 0) {
                         selectedSkillsNames = selectedSkillsNames.concat("," + filterByModelList.get(i).categoryName);
                     } else {
-                        selectedSkillsNames = "" + filterByModelList.get(i).categoryName;
+                        selectedSkillsNames =  filterByModelList.get(i).categoryName;
                     }
 
                 }

@@ -17,8 +17,10 @@ import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import java.util.List;
 
@@ -300,20 +302,19 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("View Certificate")) {
+                if (item.getItemId() == R.id.ctx_viewcertificate) {
 
 
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Details")) {
+                if (item.getItemId() == R.id.ctx_details) {
 
                     if (isNetworkConnectionAvailable(context, -1)) {
 
 
-
                     } else {
 
-                        Toast.makeText(context, context.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -324,4 +325,7 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         popup.show();//showing popup menu
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, context);
+    }
 }

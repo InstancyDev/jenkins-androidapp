@@ -113,7 +113,6 @@ public class StaticValues {
 
     public static final int COURSE_CLOSE_CODE = 9595;
 
-
     public static final int DETAIL_CLOSE_CODE = 9191;
 
     public static final int FILTER_CLOSE_CODE = 1234;

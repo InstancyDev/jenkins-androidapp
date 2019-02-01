@@ -13,6 +13,7 @@ import com.instancy.instancylearning.models.GLobalSearchSelectedModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModel;
 import com.instancy.instancylearning.models.GlobalSearchResultModelNew;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,7 +64,7 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
                     "&source=0&type=0&fType=&fValue=&sortBy=PublishedDate&sortType=desc&keywords=&ComponentID=225&ComponentInsID=4021&UserID=" + appUserModel.getUserIDValue() +
                     "&SiteID=" + appUserModel.getSiteIDValue() +
                     "&OrgUnitID=" + appUserModel.getSiteIDValue() +
-                    "&Locale=en-us&AuthorID=-1&groupBy=PublishedDate" +
+                    "&Locale="+ PreferencesManager.getInstance().getLocalizationStringValue("locale_name")+"&AuthorID=-1&groupBy=PublishedDate" +
                     "&objComponentList=" + gLobalSearchSelectedModelList.get(i).componentID + "&intComponentSiteID=" + gLobalSearchSelectedModelList.get(i).siteID;
 
             Log.d(TAG, "doInBackground: " + i);

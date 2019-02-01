@@ -58,6 +58,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.home.HomeCategories_Fragment;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.learningcommunities.LearningCommunities_fragment;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -72,6 +73,7 @@ import com.instancy.instancylearning.peoplelisting.PeopleListing_fragment;
 import com.instancy.instancylearning.profile.Profile_fragment;
 import com.instancy.instancylearning.progressreports.ProgressReportfragment;
 import com.instancy.instancylearning.settings.SettingsInnerFragment;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.webpage.Webpage_fragment;
@@ -199,9 +201,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     RelativeLayout drawerHeaderView;
     public View logoView;
-
-    //    private SignalRService mService;
+    //    private SignalRService mService
     private boolean mBound = false;
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, SideMenu.this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,7 +241,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         uiSettingsModel = UiSettingsModel.getInstance();
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderTextColor() + "'>My Learning</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel) + "</font>"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Typeface iconFont = FontManager.getTypeface(getApplicationContext(), FontManager.FONTAWESOME);
@@ -274,6 +279,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         settingsLayout.setOnClickListener(this);
         updateBottomButtonColor();
 
+        txtBtnSettings.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_settingsbutton));
+        txtBtnsendMessage.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_messagingbutton));
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             logoView.setVisibility(View.GONE);
@@ -302,7 +309,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         updateDisplayNameAndImage();
 
-        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this, getLocalizationValue(JsonLocalekeys.sidemenu_table_signoutlabel));
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -484,7 +491,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             }
 
             @Override
-            public void userOnline(int typeUpdate,JSONArray objReceived) {
+            public void userOnline(int typeUpdate, JSONArray objReceived) {
                 Log.d(TAG, "messageRecieved: " + objReceived);
             }
         };
@@ -729,13 +736,12 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         sendMessagFont.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
 
         notificationLayout.setVisibility(View.VISIBLE);
+
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
 //            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(bottomLogo);
 //            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
         }
-
     }
-
 
     @Override
     public void onBackPressed() {
@@ -754,13 +760,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 //                Toast.makeText(this, "      Please click BACK again to exit.      ", Toast.LENGTH_SHORT).show();
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(getResources().getString(R.string.exitapplication))
-                    .setCancelable(false).setNegativeButton(getResources().getString(R.string.exitapplication_negative), new DialogInterface.OnClickListener() {
+            builder.setMessage(getLocalizationValue(JsonLocalekeys.exitapplication))
+                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.exitapplication_negative), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int i) {
                     dialog.dismiss();
                 }
-            }).setPositiveButton(getResources().getString(R.string.exitapplication_positive), new DialogInterface.OnClickListener() {
+            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.exitapplication_positive), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     //do things
                     dialog.dismiss();
@@ -810,7 +816,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
 
-        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this, getLocalizationValue(JsonLocalekeys.sidemenu_table_signoutlabel));
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -849,7 +855,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
         sideMenumodelList = new ArrayList<SideMenusModel>();
-        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
+        sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this, getLocalizationValue(JsonLocalekeys.sidemenu_table_signoutlabel));
 
         hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -1024,7 +1030,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             drawerHeaderView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuHeaderBGColor()));
 
             sideMenumodelList = new ArrayList<SideMenusModel>();
-            sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this);
+            sideMenumodelList = db.getNativeMainMenusData(uiSettingsModel.isEnableAzureSSOForLearner(), this, getLocalizationValue(JsonLocalekeys.sidemenu_table_signoutlabel));
 
             hmSubMenuList = new HashMap<Integer, List<SideMenusModel>>();
 
@@ -1081,7 +1087,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     public void refreshNotification() {
 
-        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=en-us", appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "", appUserModel.getAuthHeaders());
 
     }
 
@@ -1099,9 +1105,9 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                             JSONArray jsonTableAry = response.getJSONArray("notificationsdata");
 
                             if (jsonTableAry.length() > 0) {
-                                txtBtnNotification.setText(getResources().getString(R.string.sidemenu_button_notificationbutton) + "(" + jsonTableAry.length() + ")");
+                                txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton) + "(" + jsonTableAry.length() + ")");
                             } else {
-                                txtBtnNotification.setText(getResources().getString(R.string.sidemenu_button_notificationbutton));
+                                txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton));
                             }
 
                         } catch (JSONException e) {

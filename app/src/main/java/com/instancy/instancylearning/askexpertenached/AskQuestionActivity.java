@@ -65,11 +65,13 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 
 import com.instancy.instancylearning.interfaces.Service;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 
 
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -185,7 +187,10 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     Uri contentURIFinal;
     List<AskExpertSkillsModelDg> askExpertSkillsModelList = null;
     AskExpertQuestionModelDg askExpertQuestionModelDg = null;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key, this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -236,7 +241,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Ask a Question" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.asktheexpert_header_askaquestiontitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -271,7 +276,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
 
     public void getSkillsCalatalogFrom() {
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected&ExpertID=" + expertID;
         vollyService.getJsonObjResponseVolley("ASKQSCAT", parmStringUrl, appUserModel.getAuthHeaders());
 
@@ -304,7 +309,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         TextView txtDescription = (TextView) header.findViewById(R.id.txt_relaventskills);
 
         SpannableString styledTitle
-                = new SpannableString("*Question:");//Question
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.asktheexpert_label_questionlabel));//Question
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -312,7 +317,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         labelTitle.setText(styledTitle);
 
         SpannableString styledDescription
-                = new SpannableString("*Select the relevant skills:");
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.asktheexpert_label_skillslabel));
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -409,9 +414,9 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         }
 
         if (questionStr.length() < 1) {
-            Toast.makeText(this, "Please enter question", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.asktheexpert_label_questionentertitle), Toast.LENGTH_SHORT).show();
         } else if (category.length() == 0) {
-            Toast.makeText(this, "Please select skill", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.asktheexpert_label_questionskillstitle), Toast.LENGTH_SHORT).show();
         } else {
             questionModelDg.userQuestion = questionStr;
             questionModelDg.questionCategories = category;
@@ -438,7 +443,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
             } else {
 
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -475,8 +480,8 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
 
-                Toast.makeText(context, "Success! \nYour new Question has been successfully posted.", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)
+                        +" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_questionpostedsuccessfully), Toast.LENGTH_SHORT).show();
                 try {
 
                     String responseRecieved = response.body().string();
@@ -519,7 +524,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(context, "New Question cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_questionpostfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });
@@ -575,7 +580,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(AskQuestionActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskQuestionActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -776,14 +781,14 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText("Remove");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText("Upload");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
             attachmentThumb.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -804,14 +809,14 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         if (isNetworkConnectionAvailable(this, -1)) {
 
 
-            String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/SendExpertMails?intQuestionID=" + questionModelDg.questionID + "&UserId=" + appUserModel.getUserIDValue() + "&localeid=en-us&MailSubject=&userQuestion=" + questionModelDg.userQuestion + "&intSiteID=" + appUserModel.getSiteIDValue() + "&Questionskills=" + questionModelDg.questionCategories;
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/SendExpertMails?intQuestionID=" + questionModelDg.questionID + "&UserId=" + appUserModel.getUserIDValue() + "&localeid="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&MailSubject=&userQuestion=" + questionModelDg.userQuestion + "&intSiteID=" + appUserModel.getSiteIDValue() + "&Questionskills=" + questionModelDg.questionCategories;
 
             parmStringUrl = parmStringUrl.replaceAll(" ", "%20");
 
             vollyService.getJsonObjResponseVolley("SendExpertMails", parmStringUrl, appUserModel.getAuthHeaders());
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }

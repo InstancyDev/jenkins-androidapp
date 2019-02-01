@@ -45,6 +45,7 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileConfigsModel;
@@ -55,6 +56,7 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserEducationModel;
 import com.instancy.instancylearning.models.UserExperienceModel;
 import com.instancy.instancylearning.mylearning.MyLearningFragment;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -142,7 +144,9 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -346,7 +350,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             boolean checkPforile = getALlProfilesDetailsFromDB();
             if (!checkPforile) {
-                Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -482,7 +486,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(context, "Failed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
             }
 
@@ -530,7 +534,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         profileWebCall(appUserModel.getUserIDValue(), true);
                     } else {
 
-                        Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -557,7 +561,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 
         if (imageFileStrr.length() < 10) {
-            Toast.makeText(context, "Invalid attached file", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_invalid_attachment), Toast.LENGTH_SHORT).show();
         } else {
 
             Log.d(TAG, "validateNewForumCreation: " + imageFileStrr);
@@ -569,7 +573,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 sendImageTOServer(addQuotes, fileName);
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -587,7 +591,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         } else {
 
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -688,10 +692,10 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(context);
-        pictureDialog.setTitle("Select Action");
+        pictureDialog.setTitle(getLocalizationValue(JsonLocalekeys.commoncomponent_label_select_action));
         String[] pictureDialogItems = {
-                "Select photo from gallery",
-                "Capture photo from camera"};
+               getLocalizationValue(JsonLocalekeys.commoncomponent_label_selectfromgallery),
+                getLocalizationValue(JsonLocalekeys.commoncomponent_label_capturefromcamera)};
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -735,18 +739,18 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("true")) {
-                    Toast.makeText(context, "    Profile Picture Successfully Updated   ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_profilepicturesuccessfullyupdatedtoserver), Toast.LENGTH_SHORT).show();
 //                    profileWebCall(appUserModel.getUserIDValue(), true);
 
                     ISPROFILENAMEORIMAGEUPDATED = 1;
                 } else {
-                    Toast.makeText(context, "   Profile Picture failed to Update    ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context,getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })

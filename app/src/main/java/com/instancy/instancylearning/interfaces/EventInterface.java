@@ -10,4 +10,6 @@ public interface EventInterface {
 
 
     void cancelEnrollment(MyLearningModel learningModel, boolean isCancelEnrollment);
+
+    void archiveAndUnarchive(boolean isArchived);
 }

@@ -62,11 +62,13 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.interfaces.Service;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.myskills.AddSkillModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -228,7 +230,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
     CustomFlowLayout tagsCategories;
 
-    LinearLayout lltagslayout;
+    RelativeLayout lltagslayout;
 
     @BindView(R.id.txtCategoriesName)
     TextView txtCategoriesName;
@@ -239,10 +241,21 @@ public class CreateNewForumActivity extends AppCompatActivity {
     @BindView(R.id.tagsRelative)
     RelativeLayout tagsRelative;
 
+    @BindView(R.id.txtCategoriesIcon)
+    TextView txtCategoriesIcon;
+
+    @BindView(R.id.lytCategories)
+    RelativeLayout lytCategories;
+
     List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
 
 
     boolean allowNotification = true, allowNewTopic = true, allowAttachFile = true, isUpdateForum = false, allowShare = true, allowLikeTopic = true, allowPin = true, allowPrivate = true;
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, CreateNewForumActivity.this);
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -252,7 +265,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
         uiSettingsModel = UiSettingsModel.getInstance();
-        lltagslayout = (LinearLayout) findViewById(R.id.lltagslayout);
+        lltagslayout = (RelativeLayout) findViewById(R.id.lltagslayout);
 
         ButterKnife.bind(this);
 
@@ -276,7 +289,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             isUpdateForum = true;
             editTitle.setText(discussionForumModel.name);
             editDescription.setText(discussionForumModel.description);
-            txtSave.setText("Update");
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
             updateUiForEditQuestion();
             if (discussionForumModel.categoriesIDArray != null && discussionForumModel.categoriesIDArray.size() > 0) {
                 breadcrumbItemsList = generateSelectedContentValues(discussionForumModel.categoriesIDArray);
@@ -295,7 +308,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Add Forum" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_header_addforumtitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -440,14 +453,14 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText("Remove");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
             attachedImg.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
 
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText("Upload");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
             attachedImg.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -472,13 +485,22 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
     public void initilizeHeaderView() {
 
-
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtSettings.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCategoriesCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtCategoriesClear.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        txtCategoriesIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        txtCategoriesIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtCategoriesName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        FontManager.markAsIconContainer(txtCategoriesIcon, iconFont);
+
+        txtCategoriesIcon.setText(context.getResources().getString(R.string.fa_icon_sort_down));
+
         SpannableString styledTitle
-                = new SpannableString("*Title:");
+                = new SpannableString("*" + getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel) + ":");
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -676,7 +698,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
             parameters.put("CreatedUserID", toRequestBody(appUserModel.getUserIDValue()));
             parameters.put("SiteID", toRequestBody(appUserModel.getSiteIDValue()));
-            parameters.put("locale", toRequestBody("en-us"));
+            parameters.put("locale", toRequestBody(preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))));
             parameters.put("ForumID", toRequestBody("" + forumID));
             parameters.put("Name", toRequestBody(titleStr));
             parameters.put("CategoryIDs", toRequestBody(categoryIds));
@@ -705,7 +727,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
             } else {
 
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
             }
         }
@@ -742,7 +764,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
-                Toast.makeText(context, "Success! \nYour  Forum has been successfully posted.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newforumhasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 closeForum(true);
             }
@@ -750,7 +772,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(context, "Forum cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newforumauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });
@@ -814,7 +836,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(CreateNewForumActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewForumActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -837,6 +859,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
                             generateBreadcrumb(selectedCategories);
                             breadcrumbItemsList = selectedCategories;
                             txtCategoriesName.setVisibility(View.GONE);
+                            lytCategories.setVisibility(View.GONE);
                             txtCategoriesClear.setVisibility(View.VISIBLE);
                             tagsCategories.setVisibility(View.VISIBLE);
                         }
@@ -853,7 +876,8 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
     public void updateBreadCrumbForEdit() {
         if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
-            txtCategoriesName.setVisibility(View.GONE);
+            txtCategoriesName.setVisibility(View.INVISIBLE);
+            lytCategories.setVisibility(View.INVISIBLE);
             tagsRelative.setVisibility(View.VISIBLE);
             lltagslayout.setVisibility(View.VISIBLE);
             txtCategoriesClear.setVisibility(View.VISIBLE);
@@ -870,10 +894,10 @@ public class CreateNewForumActivity extends AppCompatActivity {
         breadcrumbItemsList = new ArrayList<>();
         generateBreadcrumb(breadcrumbItemsList);
         txtCategoriesName.setVisibility(View.VISIBLE);
-        txtCategoriesClear.setVisibility(View.GONE);
-        tagsCategories.setVisibility(View.GONE);
+        lytCategories.setVisibility(View.VISIBLE);
+        txtCategoriesClear.setVisibility(View.INVISIBLE);
+        tagsCategories.setVisibility(View.INVISIBLE);
     }
-
 
     public List<ContentValues> generateTagsList(List<AddSkillModel> skillModelList) {
         List<ContentValues> tagsList = new ArrayList<>();
@@ -986,7 +1010,6 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
                 String categoryName = tv.getText().toString();
 
-//                removeItemFromBreadcrumbList(categoryName.trim());
                 removeItemFromBreadcrumbListByLevel(categoryLevel);
                 generateBreadcrumb(breadcrumbItemsList);
 
@@ -1054,6 +1077,13 @@ public class CreateNewForumActivity extends AppCompatActivity {
         if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
 
             breadcrumbItemsList.remove(level);
+        }
+
+        if (breadcrumbItemsList != null && breadcrumbItemsList.size() == 0) {
+
+            clearCategory();
+
+
         }
 
     }

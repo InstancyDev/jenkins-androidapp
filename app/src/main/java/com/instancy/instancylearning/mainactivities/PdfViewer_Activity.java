@@ -42,6 +42,7 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
     Integer pageNumber = 0;
     Uri uri;
     MyLearningModel myLearningModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +55,6 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
         svProgressHUD = new SVProgressHUD(this);
         Bundle bundle = getIntent().getExtras();
         String courseName = "";
-
 
         if (bundle != null) {
             coursePdf = bundle.getString("PDF_URL");

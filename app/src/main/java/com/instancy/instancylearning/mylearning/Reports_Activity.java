@@ -29,11 +29,13 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.IResult;
 
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ReportDetail;
 import com.instancy.instancylearning.models.ReportDetailsForQuestions;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -122,7 +124,9 @@ public class Reports_Activity extends AppCompatActivity {
     boolean isFromProgressReport = false;
 
     View header;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,Reports_Activity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,7 +160,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Progress Report" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.mylearning_header_reporttitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -181,7 +185,7 @@ public class Reports_Activity extends AppCompatActivity {
 
     public void getDownloadedMobileContentMetaData() {
 
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         nodataLabel.setText("");
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?SiteURL=" + appUserModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid=" + learningModel.getUserID() + "&DelivoryMode=1&IsDownload=0&IsDownload=0";
 
@@ -191,7 +195,7 @@ public class Reports_Activity extends AppCompatActivity {
 
     public void getDownloadedMobileTrackingData() {
 
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + appUserModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
 
         vollyService.getJsonObjResponseVolley("DMTD", urlString, appUserModel.getAuthHeaders());
@@ -378,7 +382,7 @@ public class Reports_Activity extends AppCompatActivity {
         txtName.setText(learningModel.getCourseName());
 
         if (isValidString(reportDetail.dateCompleted)) {
-            txtDateCompleted.setText("Date Completed: " + reportDetail.dateCompleted);
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" " + reportDetail.dateCompleted);
         }
 
         if (isValidString(reportDetail.dateStarted)) {
@@ -386,9 +390,9 @@ public class Reports_Activity extends AppCompatActivity {
         }
 
         if (isValidString(reportDetail.timeSpent)) {
-            txtTimeSpent.setText("Time Spent: " + reportDetail.timeSpent);
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel)+" " + reportDetail.timeSpent);
         } else {
-            txtTimeSpent.setText("Time Spent: 0:00:00");
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel)+ " 0:00:00");
         }
 
         nodataLabel.setText("");
@@ -405,11 +409,11 @@ public class Reports_Activity extends AppCompatActivity {
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
             if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")) {
-                displayStatus = "Completed (failed)";
+                displayStatus = getLocalizationValue(JsonLocalekeys.status_completed_failed);
             }
 
             if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")) {
-                displayStatus = "Completed (passed)";
+                displayStatus = getLocalizationValue(JsonLocalekeys.status_completed_passed);
             }
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
@@ -422,15 +426,15 @@ public class Reports_Activity extends AppCompatActivity {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
             displayScore = "50";
-            displayStatus = "In Progress";
+            displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            displayStatus = "Pending Review";
+            displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
             displayScore = "100";
         } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
 
-            displayStatus = "Registered";
+            displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_registerlabel);
             txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
 
 
@@ -442,7 +446,7 @@ public class Reports_Activity extends AppCompatActivity {
         } else if (statusFromModel.toLowerCase().contains("Expired")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            displayStatus = "Expired";
+            displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_expiredlabel);
         } else {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
@@ -458,7 +462,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         }
 
-        txtScore.setText("Score: " + displayScore);
+        txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + displayScore);
         txtStatus.setText(upperCaseWords(displayStatus));
     }
 

@@ -43,12 +43,14 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -147,7 +149,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
 
     String topicID = "";
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,DiscussionTopicActivity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,7 +191,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Topics" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel)+ "</font>"));
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         fourmAdapter = new DiscussionTopicAdapter(this, BIND_ABOVE_CLIENT, discussionTopicModels);
         discussionFourmlistView.setAdapter(fourmAdapter);
@@ -241,11 +246,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         txtName.setText(discussionForumModel.name);
         txtShortDisc.setText(discussionForumModel.descriptionValue);
-        txtAuthor.setText("Moderator:" + discussionForumModel.author + " ");
-        txtLastUpdate.setText("Last update: " + discussionForumModel.createddate + " ");
+        txtAuthor.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+" " + discussionForumModel.author + " ");
+        txtLastUpdate.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel)+" " + discussionForumModel.createddate + " ");
 
-        txtTopicsCount.setText(discussionForumModel.nooftopics + " Topic(s)");
-        txtCommentsCount.setText(discussionForumModel.totalposts + " Comment(s)");
+        txtTopicsCount.setText(discussionForumModel.nooftopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        txtCommentsCount.setText(discussionForumModel.totalposts + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
         txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -263,7 +268,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     public void refreshMyLearning(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
         vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumid, appUserModel.getAuthHeaders());
@@ -289,7 +294,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                         }
                     } else {
 
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
                 }
                 svProgressHUD.dismiss();
@@ -301,7 +306,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -324,7 +329,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         } else {
             discussionTopicModels = new ArrayList<DiscussionTopicModel>();
             fourmAdapter.refreshList(discussionTopicModels);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
         updateCommentsCount();
@@ -347,8 +352,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             totalCount = totalCount + noofreplies;
 
         }
-        txtCommentsCount.setText(totalCount + " Comment(s)");
-        txtTopicsCount.setText(discussionTopicModels.size() + " Topic(s)");
+        txtCommentsCount.setText(totalCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
+        txtTopicsCount.setText(discussionTopicModels.size() + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
     }
 
     @Override
@@ -407,7 +412,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -424,11 +429,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                     attachFragment(discussionTopicModels.get(selectedPostion));
                     isFromNotification = false;
                 } catch (IndexOutOfBoundsException ex) {
-//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
                 }
 
             } else {
-                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -517,11 +522,12 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         Menu menu = popup.getMenu();
 
         menu.getItem(0).setVisible(true);//view
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editforumoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deleteforumoption));;
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("Edit")) {
+                if (item.getItemId()==R.id.ctx_edit) {
                     Intent intentDetail = new Intent(context, CreateNewTopicActivity.class);
                     intentDetail.putExtra("isfromedit", true);
                     intentDetail.putExtra("topicModel", discussionTopicModel);

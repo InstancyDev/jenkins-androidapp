@@ -52,12 +52,14 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -136,7 +138,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
 
     String topicID = "";
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,DiscussionTopicActivity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,7 +191,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Topics" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel) + "</font>"));
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         discussionTopicModels = new ArrayList<DiscussionTopicModelDg>();
         fourmAdapter = new DiscussionTopicAdapter(this, BIND_ABOVE_CLIENT, discussionTopicModels);
@@ -272,10 +277,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtShortDesc.setText(discussionForumModel.description);
 //        holder.txtAuthor.setText("Moderator: " + discussionForumModel.moderatorName + " | Created by: " + discussionForumModel.author + " on " + discussionForumModel.createdDate + " | Last Updated by : " + discussionForumModel.updatedAuthor + " on " + discussionForumModel.updatedDate);
 
-        txtTopics.setText(discussionForumModel.noOfTopics + " Topic(s)");
-        txtLikes.setText(discussionForumModel.totalLikes + " Like(s)");
+        txtTopics.setText(discussionForumModel.noOfTopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        txtLikes.setText(discussionForumModel.totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
 
-        String totalActivityStr = "Moderator: ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+": ";
 
         if (isValidString(discussionForumModel.moderatorName)) {
 
@@ -284,12 +289,12 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         if (isValidString(discussionForumModel.author)) {
 
-            totalActivityStr = totalActivityStr + " | Created by: " + discussionForumModel.author + " on " + discussionForumModel.createdDate;
+            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + discussionForumModel.author + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " + discussionForumModel.createdDate;
         }
 
         if (isValidString(discussionForumModel.updatedAuthor)) {
 
-            totalActivityStr = totalActivityStr + " | Last Updated by : " + discussionForumModel.updatedAuthor + " on " + discussionForumModel.updatedDate;
+            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel)+" : " + discussionForumModel.updatedAuthor + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " + discussionForumModel.updatedDate;
         }
 
         txtAuthor.setText(totalActivityStr);
@@ -342,7 +347,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     public void refreshMyLearning(Boolean isRefreshed) {
 
-        vollyService.getJsonObjResponseVolley("GetForumTopics", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&strLocale=en-us", appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("GetForumTopics", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&strLocale=preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))", appUserModel.getAuthHeaders());
         swipeRefreshLayout.setRefreshing(false);
 
     }
@@ -364,7 +369,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                         }
                     } else {
 
-//                        nodata_Label.setText(getResources().getString(R.string.no_data));
+//                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
                 }
                 svProgressHUD.dismiss();
@@ -376,7 +381,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-//                nodata_Label.setText(getResources().getString(R.string.no_data));
+//                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -415,7 +420,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         } else {
             discussionTopicModels = new ArrayList<DiscussionTopicModelDg>();
             fourmAdapter.refreshList(discussionTopicModels);
-//            nodata_Label.setText(getResources().getString(R.string.no_data));
+//            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             footor.setVisibility(View.VISIBLE);
         }
 
@@ -499,7 +504,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -516,11 +521,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                     attachFragment(discussionTopicModels.get(selectedPostion));
                     isFromNotification = false;
                 } catch (IndexOutOfBoundsException ex) {
-//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
                 }
 
             } else {
-                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -620,12 +625,12 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     public void getForumLevelLikeList(final DiscussionTopicModelDg forumModel) {
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetTopicCommentLevelLikeList?strObjectID=" + forumModel.contentID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale=en-us&intTypeID=1";
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetTopicCommentLevelLikeList?strObjectID=" + forumModel.contentID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale=preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))&intTypeID=1";
 
             vollyService.getStringResponseVolley("GetTopicCommentLevelLikeList", parmStringUrl, appUserModel.getAuthHeaders());
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -645,7 +650,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_edittopicoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deletetopicoption));
         if (isAbleToEditTopic) {
             menu.getItem(0).setVisible(true);//view
         } else {
@@ -727,7 +733,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             bottomSheetDialog.setContentView(view);
             bottomSheetDialog.show();
         } else {
-            Toast.makeText(context, "No Likes", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_nolikeslabel), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -743,7 +749,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             discussionForumModel.totalLikes = discussionForumModel.totalLikes + 1;
         }
 
-        txtLikes.setText(discussionForumModel.totalLikes + " Like(s)");
+        txtLikes.setText(discussionForumModel.totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
 
         JSONObject parameters = new JSONObject();
 
@@ -752,7 +758,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         parameters.put("intTypeID", 1);
         parameters.put("blnIsLiked", isLiked);
         parameters.put("intSiteID", appUserModel.getSiteIDValue());
-        parameters.put("strLocale", "en-us");
+        parameters.put("strLocale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
         Log.d(TAG, "validateNewForumCreation: " + parameterString);
@@ -762,7 +768,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             sendNewLikeDataToServer(parameterString);
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -784,7 +790,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(DiscussionTopicActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(DiscussionTopicActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -807,8 +813,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+/*                headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");*/
 
 
                 return headers;
@@ -837,7 +843,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         parameters.put("ForumID", discussionForumModel.forumID);
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("ForumName", discussionForumModel.name);
-        parameters.put("LocaleID", "en-us");
+        parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
         Log.d(TAG, "validateNewForumCreation: " + parameterString);
@@ -845,7 +851,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         if (isNetworkConnectionAvailable(this, -1)) {
             deleteTopicFromServer(parameterString);
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -864,20 +870,20 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour topic has been successfully deleted.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Success! \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_topichasbeensuccessfullydeleted), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
 //                    deleteCommentFromLocalDB();
                 } else {
 
-                    Toast.makeText(context, "Topic cannot be deleted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_topiccannotdeletedcontactadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -900,8 +906,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }

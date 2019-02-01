@@ -20,9 +20,11 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -115,10 +117,10 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         holder.txtShortDisc.setText(discussionForumModelList.get(position).description);
 //        holder.txtAuthor.setText("Moderator: " + discussionForumModelList.get(position).moderatorName + " | Created by: " + discussionForumModelList.get(position).author + " on " + discussionForumModelList.get(position).createdDate + " | Last Updated by : " + discussionForumModelList.get(position).updatedAuthor + " on " + discussionForumModelList.get(position).updatedDate);
 
-        holder.txtTopics.setText(discussionForumModelList.get(position).noOfTopics + " Topic(s)");
-        holder.txtLikes.setText(discussionForumModelList.get(position).totalLikes + " Like(s)");
+        holder.txtTopics.setText(discussionForumModelList.get(position).noOfTopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        holder.txtLikes.setText(discussionForumModelList.get(position).totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
 
-        String totalActivityStr = "Moderator: ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+" ";
 
         if (isValidString(discussionForumModelList.get(position).moderatorName)) {
 
@@ -126,13 +128,11 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         }
 
         if (isValidString(discussionForumModelList.get(position).author)) {
-
-            totalActivityStr = totalActivityStr + " | Created by: " + discussionForumModelList.get(position).author + " on " + discussionForumModelList.get(position).createdDate;
+            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": " + discussionForumModelList.get(position).author + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " + discussionForumModelList.get(position).createdDate;
         }
 
         if (isValidString(discussionForumModelList.get(position).updatedAuthor)) {
-
-            totalActivityStr = totalActivityStr + " | Last Updated by: " + discussionForumModelList.get(position).updatedAuthor + " on " + discussionForumModelList.get(position).updatedDate;
+            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedlabel)+": " + discussionForumModelList.get(position).updatedAuthor + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " +discussionForumModelList.get(position).updatedDate;
         }
 
         holder.txtAuthor.setText(totalActivityStr);
@@ -267,7 +267,10 @@ public class DiscussionFourmAdapter extends BaseAdapter {
 
         this.notifyDataSetChanged();
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
 
+    }
 }
 
 

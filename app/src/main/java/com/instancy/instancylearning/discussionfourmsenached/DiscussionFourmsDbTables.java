@@ -51,6 +51,9 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("forumList");
 
+        if (jsonTableAry==null)
+            return;
+
         // for deleting records in table for respective table
         ejectRecordsinTable(TBL_FORUMS_DIGI);
 

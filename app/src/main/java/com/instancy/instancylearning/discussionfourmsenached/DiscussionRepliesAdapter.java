@@ -25,8 +25,10 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -113,7 +115,7 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtName.setText(discussionReplyModelList.get(position).replyBy);
-        holder.txtAskedWhen.setText("Replied on: " + discussionReplyModelList.get(position).dtPostedOnDate);
+        holder.txtAskedWhen.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_repliedon)+": " + discussionReplyModelList.get(position).dtPostedOnDate);
         holder.txtmessage.setText(discussionReplyModelList.get(position).message);
         holder.txtmessage.setMaxLines(200);
 
@@ -253,7 +255,10 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
 
         return d;
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
 
+    }
 }
 
 

@@ -101,7 +101,7 @@
 
         <!-- MylearningDetail screen -->
         <activity
-            android:name=".mylearning.MyLearningDetail_Activity"
+            android:name=".mylearning.MyLearningDetailActivity"
             android:screenOrientation="portrait"></activity>
 
         <!--ADVANCED WEBVIEW -->
@@ -245,7 +245,12 @@
         <activity
             android:name=".mylearning.EventTrackList_Activity"
             android:screenOrientation="portrait"></activity>
-
+        <activity
+            android:name=".mylearning.MyLearningSchedulelActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".mylearning.MyLearningDetailActivity1"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".mylearning.WriteReviewAcitiviy"
             android:screenOrientation="portrait"></activity>

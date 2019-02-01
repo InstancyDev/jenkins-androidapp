@@ -68,12 +68,14 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -146,6 +148,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     @BindView(R.id.lltagslayout)
     LinearLayout lltagslayout;
 
+    @BindView(R.id.txtCategoriesIcon)
+    TextView txtCategoriesIcon;
+
+    @BindView(R.id.lytCategories)
+    RelativeLayout lytCategories;
+
     @BindView(R.id.tagsRelative)
     RelativeLayout tagsRelative;
 
@@ -172,6 +180,11 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
     public DiscussionFourm_fragment() {
 
+
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
 
     }
 
@@ -218,12 +231,11 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         isPrivateForum = db.isPrivilegeExistsFor(StaticValues.PRIVATEPREVILAGEISALLOWED);
 
-
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
 
@@ -234,7 +246,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         try {
             parameters.put("intUserID", appUserModel.getUserIDValue());
             parameters.put("intSiteID", appUserModel.getSiteIDValue());
-            parameters.put("strLocale", "en-us");
+            parameters.put("strLocale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("strSearchText", queryString);
             parameters.put("intCompID", sideMenusModel.getComponentId());
             parameters.put("intCompInsID", sideMenusModel.getRepositoryId());
@@ -360,7 +372,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         try {
             parameters.put("intUserID", appUserModel.getUserIDValue());
             parameters.put("intSiteID", appUserModel.getSiteIDValue());
-            parameters.put("strLocale", "en-us");
+            parameters.put("strLocale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("intCompID", sideMenusModel.getComponentId());
             parameters.put("intCompInsID", sideMenusModel.getRepositoryId());
 
@@ -430,6 +442,8 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         });
 
         txtCategoriesName.setVisibility(View.VISIBLE);
+        lytCategories.setVisibility(View.VISIBLE);
+        txtCategoriesIcon.setOnClickListener(this);
         txtCategoriesName.setOnClickListener(this);
 
         tagsRelative.setVisibility(View.VISIBLE);
@@ -443,6 +457,13 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         tagsCategories.setVisibility(View.GONE);
 
+        txtCategoriesClear.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        txtCategoriesIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtCategoriesName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        FontManager.markAsIconContainer(txtCategoriesIcon, iconFont);
+
+        txtCategoriesIcon.setText( context.getResources().getString(R.string.fa_icon_sort_down));
 
         return rootView;
     }
@@ -511,10 +532,21 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         } else {
             discussionForumModelList = new ArrayList<DiscussionForumModelDg>();
             discussionFourmAdapter.refreshList(discussionForumModelList);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             originalForumList = discussionForumModelList;
         }
 
+
+        if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
+            generateBreadcrumb(breadcrumbItemsList);
+            txtCategoriesName.setVisibility(View.GONE);
+            lytCategories.setVisibility(View.GONE);
+            txtCategoriesClear.setVisibility(View.VISIBLE);
+            tagsCategories.setVisibility(View.VISIBLE);
+
+            discussionForumModelList = getDiscussionForumListCategories(breadcrumbItemsList);
+            discussionFourmAdapter.refreshList(discussionForumModelList);
+        }
 
 //        if (discussionForumModelList.size() > 5 && !isFromGlobalSearch) {
 //            if (item_search != null)
@@ -538,11 +570,11 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                     attachFragment(discussionForumModelList.get(selectedPostion), isFromNotification);
                     isFromNotification = false;
                 } catch (IndexOutOfBoundsException ex) {
-//                        Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
                 }
 
             } else {
-                Toast.makeText(context, "No Content Avaliable", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -601,11 +633,11 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
@@ -710,7 +742,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -784,7 +816,8 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editforumoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deleteforumoption));
         if (isAbleToEdit) {
             menu.getItem(0).setVisible(true);//view
         } else {
@@ -854,18 +887,18 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                     List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
                     selectedCategories = (List<ContentValues>) data.getExtras().getSerializable("selectedCategories");
                     Log.d(TAG, "selectedCategories: " + selectedCategories.size());
-                    discussionForumModelList = getDiscussionForumListCategories(selectedCategories);
-                    discussionFourmAdapter.refreshList(discussionForumModelList);
 
-                    if (selectedCategories != null && selectedCategories.size() > 0) {
+                    if (selectedCategories.size() > 0) {
                         generateBreadcrumb(selectedCategories);
                         breadcrumbItemsList = selectedCategories;
                         txtCategoriesName.setVisibility(View.GONE);
+                        lytCategories.setVisibility(View.GONE);
                         txtCategoriesClear.setVisibility(View.VISIBLE);
                         tagsCategories.setVisibility(View.VISIBLE);
                     }
 
-
+                    discussionForumModelList = getDiscussionForumListCategories(selectedCategories);
+                    discussionFourmAdapter.refreshList(discussionForumModelList);
                 }
 
             }
@@ -906,7 +939,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         discussionForumModelDgs.addAll(hs);
 
         if (discussionForumModelDgs.size() == 0) {
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
         return discussionForumModelDgs;
@@ -917,7 +950,6 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         intentDetail.putExtra("forumModel", forumModel);
         intentDetail.putExtra("NOTIFICATION", isFromNotification);
         intentDetail.putExtra("TOPICID", topicID);
-
         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
     }
 
@@ -930,12 +962,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     public void getForumLevelLikeList(final DiscussionForumModelDg forumModel) {
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetForumLevelLikeList?strObjectID=" + forumModel.forumID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale=en-us";
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetForumLevelLikeList?strObjectID=" + forumModel.forumID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale=preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))";
 
             vollyService.getStringResponseVolley("GetForumLevelLikeList", parmStringUrl, appUserModel.getAuthHeaders());
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -944,12 +976,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     public void deleteForumFromServer(final DiscussionForumModelDg forumModel) {
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/DeleteForum?ForumID=" + forumModel.forumID + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getUserIDValue() + "&LocaleID=en-us";
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/DeleteForum?ForumID=" + forumModel.forumID + "&UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getUserIDValue() + "&LocaleID=preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))";
 
             vollyService.getStringResponseVolley("DeleteForum", parmStringUrl, appUserModel.getAuthHeaders());
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -989,12 +1021,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             LikesAdapter upvotersAdapter = new LikesAdapter(getActivity(), likesModelList);
             lv_languages.setAdapter(upvotersAdapter);
             TextView txtCountVoted = view.findViewById(R.id.txtCountVoted);
-            txtCountVoted.setText(likesModelList.size() + " Likes");
+            txtCountVoted.setText(likesModelList.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
             bottomSheetDialog = new BottomSheetDialog(context);
             bottomSheetDialog.setContentView(view);
             bottomSheetDialog.show();
         } else {
-            Toast.makeText(context, "No Likes", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_nolikeslabel), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -1004,6 +1036,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     public void onClick(View view) {
 
         switch (view.getId()) {
+            case R.id.txtCategoriesIcon:
             case R.id.txtCategoriesName:
             case R.id.lltagslayout:
                 chooseCategory();
@@ -1017,13 +1050,15 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
     public void clearCategory() {
 
-        injectFromDbtoModel();
+
         txtCategoriesCount.setText("");
         breadcrumbItemsList = new ArrayList<>();
         generateBreadcrumb(breadcrumbItemsList);
         txtCategoriesName.setVisibility(View.VISIBLE);
+        lytCategories.setVisibility(View.VISIBLE);
         txtCategoriesClear.setVisibility(View.GONE);
         tagsCategories.setVisibility(View.GONE);
+        injectFromDbtoModel();
     }
 
     public void chooseCategory() {

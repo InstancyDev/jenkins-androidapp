@@ -42,18 +42,19 @@ public class FilterByAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<FilterByModel> filterByModelList = null;
-
+    ContentFilterByModel contentFilterByModel;
     AppUserModel appUserModel;
     PreferencesManager preferencesManager;
     UiSettingsModel uiSettingsModel;
     boolean goInside;
 
-    public FilterByAdapter(Activity activity, List<FilterByModel> filterByModelList, boolean goInside) {
+    public FilterByAdapter(Activity activity, List<FilterByModel> filterByModelList, ContentFilterByModel contentFilterByModel) {
         this.activity = activity;
         this.filterByModelList = filterByModelList;
 
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
+        this.contentFilterByModel = contentFilterByModel;
         this.goInside = goInside;
         notifyDataSetChanged();
         preferencesManager = PreferencesManager.getInstance();
@@ -101,7 +102,13 @@ public class FilterByAdapter extends BaseAdapter {
         holder.txtCategoryDisplayName = (TextView) convertView.findViewById(R.id.txtCategoryDisplayName);
         holder.txtArrow = (TextView) convertView.findViewById(R.id.txtArrow);
         holder.txtCategoryDisplayName.setText(filterByModel.categoryName);
-        if (!goInside) {
+        if (filterByModel.isContainsChild) {
+            holder.txtArrow.setVisibility(View.VISIBLE);
+        } else {
+            holder.txtArrow.setVisibility(View.GONE);
+        }
+
+        if (contentFilterByModel.categoryID.equalsIgnoreCase("bytype")) {
             holder.txtArrow.setVisibility(View.GONE);
         }
 

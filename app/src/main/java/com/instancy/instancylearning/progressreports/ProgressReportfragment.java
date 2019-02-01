@@ -74,12 +74,14 @@ import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ReportSummeryResponseListner;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProgressChartsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -161,6 +163,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -192,10 +198,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
     public void refreshCatalog(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
-        String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=en-us&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
+        String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetConsolidateRPT?aintSiteID=" + appUserModel.getSiteIDValue() + "&aintUserID=" + appUserModel.getUserIDValue() + "&astrLocale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&aintComponentID=" + sideMenusModel.getComponentId() + "&aintCompInsID=" + sideMenusModel.getRepositoryId() + "&aintSelectedGroupValue=0";
 
         vollyService.getStringResponseVolley("PRGLIST", parmStringUrl, appUserModel.getAuthHeaders());
 
@@ -498,11 +504,11 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
@@ -577,7 +583,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -839,6 +845,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
                 progressReportModel.overScore = jsonMyLearningColumnObj.getString("overallscore");
 
+                if (!isValidString(progressReportModel.overScore)) {
+                    progressReportModel.overScore = "";
+                }
+
             }
             // ObjectID
             if (jsonMyLearningColumnObj.has("skillname")) {
@@ -988,6 +998,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             if (jsonMyLearningColumnObj.has("overallscore")) {
 
                 progressReportModel.overScore = jsonMyLearningColumnObj.getString("overallscore");
+
+                if (!isValidString(progressReportModel.overScore)) {
+                    progressReportModel.overScore = "";
+                }
 
             }
             // ObjectID

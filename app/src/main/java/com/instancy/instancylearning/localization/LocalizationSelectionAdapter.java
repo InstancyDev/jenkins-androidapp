@@ -99,7 +99,7 @@ public class LocalizationSelectionAdapter extends BaseAdapter {
         holder.txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
 
-        String thumbUrl = appUserModel.getSiteURL() + "Content/SiteFiles/FlagIcons/United_States_of_America.png";
+        String thumbUrl = appUserModel.getSiteURL() + "Content/SiteFiles/FlagIcons/"+localizationSelectionModelList.get(position).getCountryFlag();
         //+ localizationSelectionModelList.get(position).countryFlag;
 
         Picasso.with(activity).

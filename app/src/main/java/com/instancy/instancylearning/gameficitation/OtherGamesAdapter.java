@@ -23,9 +23,11 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 
 import com.instancy.instancylearning.globalpackage.AppController;
 
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.OtherGameModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -111,7 +113,6 @@ public class OtherGamesAdapter extends BaseAdapter {
         holder.txtName.setText(" " + otherGameModelList.get(position).name);
         holder.txtCredits.setText(" " + otherGameModelList.get(position).decimal2);
 
-
         holder.lbName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.lbCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -123,7 +124,7 @@ public class OtherGamesAdapter extends BaseAdapter {
 
         if (isValidString(otherGameModelList.get(position).certifyviewlink)) {
             holder.txtCertificate.setText(otherGameModelList.get(position).certificatePage);
-            holder.txtCertificate.setText("View Certificate");
+            holder.txtCertificate.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.view_certificate,context));
         } else {
             holder.txtCertificate.setText("NA");
         }

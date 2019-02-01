@@ -20,10 +20,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CommunitiesModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -118,7 +120,7 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         holder.txtIsMember.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
         if (communitiesModelList.get(position).labelalreadyamember.equalsIgnoreCase("null") || communitiesModelList.get(position).labelalreadyamember.equalsIgnoreCase("")) {
-            holder.txtIsMember.setText("Pending Request");
+            holder.txtIsMember.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.learningcommunity_label_pendingrequestlabel,activity));
             holder.txtIsMember.setVisibility(View.GONE);
         } else {
 

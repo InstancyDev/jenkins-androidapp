@@ -11,7 +11,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.WiFiTransferModal;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -51,7 +53,9 @@ public class FileTransferService extends IntentService {
     public FileTransferService() {
         super("FileTransferService");
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,this);
+    }
     @Override
     public void onCreate() {
         // TODO Auto-generated method stub
@@ -113,7 +117,7 @@ public class FileTransferService extends IntentService {
 
                     public void run() {
                         // TODO Auto-generated method stub
-                        Toast.makeText(FileTransferService.this, "Paired Device is not Ready to receive the file", Toast.LENGTH_LONG).show();
+                        Toast.makeText(FileTransferService.this, getLocalizationValue(JsonLocalekeys.paireddevicedidnotready), Toast.LENGTH_LONG).show();
                     }
                 });
                 DeviceDetailFragment.DismissProgressDialog();

@@ -52,10 +52,12 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.mcoy_jiang.videomanager.ui.McoyVideoView;
 import com.squareup.picasso.Picasso;
@@ -126,7 +128,10 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
     View footor;
 
     TextView txtRepliesCount;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,DiscussionRepliesActivity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,7 +170,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Replies" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_replys) + "</font>"));
         discussionReplyModelList = new ArrayList<DiscussionReplyModelDg>();
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         repliesAdapter = new DiscussionRepliesAdapter(this, BIND_ABOVE_CLIENT, discussionReplyModelList);
@@ -247,12 +252,12 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
 
         txtName.setText(discussionCommentsModel.commentedBy);
-        txtDaysAgo.setText("Commented on: " + discussionCommentsModel.commentedFromDays);
+        txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel)+" " + discussionCommentsModel.commentedFromDays);
         txtMessage.setText(discussionCommentsModel.message);
         txtMessage.setMaxLines(200);
 
-        txtLikesCount.setText(discussionCommentsModel.commentLikes + " Like(s)");
-        txtRepliesCount.setText(discussionCommentsModel.commentRepliesCount + " Replies");
+        txtLikesCount.setText(discussionCommentsModel.commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        txtRepliesCount.setText(discussionCommentsModel.commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_replys));
 
 
 //        assert txtLike != null;
@@ -327,7 +332,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         try {
             parameters.put("TopicID", discussionCommentsModel.topicID);
             parameters.put("TopicName", "");
-            parameters.put("LocaleID", "en-us");
+            parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("ForumID", discussionCommentsModel.forumID);
             parameters.put("Message", discussionCommentsModel.message);
             parameters.put("UserID", appUserModel.getUserIDValue());
@@ -363,7 +368,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -402,7 +407,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
             repliesAdapter.refreshList(discussionReplyModelList);
             footor.setVisibility(View.VISIBLE);
         }
-        txtRepliesCount.setText(discussionReplyModelList.size() + " Replies");
+        txtRepliesCount.setText(discussionReplyModelList.size() + getLocalizationValue(JsonLocalekeys.discussionforum_label_reply));
     }
 
     @Override
@@ -456,7 +461,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
             swipeRefreshLayout.setRefreshing(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -514,7 +519,8 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deleterepliesoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editrepliesoption));
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);//edit
 
@@ -555,7 +561,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("TopicName", appUserModel.getSiteIDValue());
         parameters.put("NoofReplies", "0");
-        parameters.put("LocaleID", "en-us");
+        parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
         parameters.put("LastPostedDate", commentsModel.postedDate);
         parameters.put("CreatedUserID", commentsModel.postedBy);
         parameters.put("AttachementPath", commentsModel.picture);
@@ -566,7 +572,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         if (isNetworkConnectionAvailable(this, -1)) {
             deleteCommentFromServer(parameterString, commentsModel);
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -585,19 +591,19 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour new reply has been successfully posted to server.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_replyhasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
                 } else {
 
-                    Toast.makeText(context, "New reply cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_replyauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -620,8 +626,8 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -652,7 +658,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         parameters.put("intTypeID", 5);
         parameters.put("blnIsLiked", isLiked);
         parameters.put("intSiteID", appUserModel.getSiteIDValue());
-        parameters.put("strLocale", "en-us");
+        parameters.put("strLocale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
         Log.d(TAG, "validateNewForumCreation: " + parameterString);
@@ -661,7 +667,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
             sendNewLikeDataToServer(parameterString);
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -683,7 +689,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(DiscussionRepliesActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(DiscussionRepliesActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -706,8 +712,8 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;

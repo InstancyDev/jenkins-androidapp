@@ -53,9 +53,11 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -151,7 +153,10 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     ImageView attachmentThumb;
 
     boolean isUpdateForum = false;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,CreateNewTopicActivity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -181,7 +186,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
             editTitle.setText(discussionTopicModel.name);
             editDescription.setText(discussionTopicModel.longDescription);
             editAttachment.setText(discussionTopicModel.uploadFileName);
-            txtSave.setText("Update");
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
             updateUiForEditQuestion();
         } else {
             attachmentThumb.setVisibility(View.GONE);
@@ -190,7 +195,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "       Add Topic" + "</font>"));
+                "       "+getLocalizationValue(JsonLocalekeys.discussionforum_header_addtopictitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -211,7 +216,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledTitle
-                = new SpannableString("*Title:");
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel)+":");
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -260,14 +265,14 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText("Remove");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText("Upload");
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
             attachmentThumb.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -392,7 +397,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(CreateNewTopicActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewTopicActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -419,7 +424,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         }
 
         if (endocedImageStr.length() < 10) {
-            Toast.makeText(CreateNewTopicActivity.this, "Invalid attached file", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CreateNewTopicActivity.this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_invalid_attachment), Toast.LENGTH_SHORT).show();
         } else {
 
             Log.d(TAG, "validateNewForumCreation: " + endocedImageStr);
@@ -433,7 +438,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 finalfileName = fileName;
 
             } else {
-                Toast.makeText(CreateNewTopicActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateNewTopicActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -452,14 +457,14 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                 } else {
 
-                    Toast.makeText(CreateNewTopicActivity.this, "Attachment cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewTopicActivity.this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_invalid_attachment_contactadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(CreateNewTopicActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(CreateNewTopicActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -545,7 +550,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         String descriptionStr = editDescription.getText().toString().trim();
 
         if (titleStr.length() < 1) {
-            Toast.makeText(this, "Enter title", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_textfield_newforumtitletextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -557,7 +562,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 parameters.put("UserID", appUserModel.getUserIDValue());
                 parameters.put("SiteID", appUserModel.getSiteIDValue());
                 parameters.put("OrgID", appUserModel.getSiteIDValue());
-                parameters.put("LocaleID", "en-us");
+                parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
                 parameters.put("InvolvedUsers", "");
                 parameters.put("ForumID", discussionForumModel.forumID);
                 parameters.put("ForumName", discussionForumModel.name);
@@ -573,7 +578,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
                 parameters.put("OrgID", appUserModel.getSiteIDValue());
                 parameters.put("InvolvedUsers", "");
                 parameters.put("SiteID", appUserModel.getSiteIDValue());
-                parameters.put("LocaleID", "en-us");
+                parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
                 parameters.put("ForumName", discussionForumModel.name);
                 parameters.put("strAttachFile", finalfileName);
                 parameters.put("strContentID", "");
@@ -588,7 +593,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                 sendNewForumDataToServer(parameterString, isUpdateForum);
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -632,19 +637,19 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                     } else {
                         closeForum(true);
-                        Toast.makeText(context, "Success! \nYour  topic has been successfully posted.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newtopichasbeensuccessfullyadded), Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
 
-                    Toast.makeText(context, "Topic cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_topiccannotpostedcontactadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })

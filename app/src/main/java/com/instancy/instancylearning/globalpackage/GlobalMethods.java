@@ -30,6 +30,7 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.AdvancedWebCourseLaunch;
 import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -40,8 +41,9 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.EventTrackList_Activity;
-import com.instancy.instancylearning.mylearning.MyLearningDetail_Activity;
+import com.instancy.instancylearning.mylearning.MyLearningDetailActivity1;
 import com.instancy.instancylearning.mylearning.Reports_Activity;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -98,9 +100,9 @@ public class GlobalMethods {
             if (isCompleted) {
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage(context.getString(R.string.mycatalog_enddurationdate))
+                builder.setMessage(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.mylearning_alertsubtitle_selectedcontenthasbeenexpired, context))
                         .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.commoncomponent_alertbutton_okbutton, context), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 //do things
                                 dialog.dismiss();
@@ -580,7 +582,9 @@ public class GlobalMethods {
 
                         if (isAngularLaunch) {
 
-                            urlForView = myLearningModel.getSiteURL() + "/ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//" + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappurl=true";
+                            String startPage = myLearningModel.getStartPage().replace("/", "~");
+
+                            urlForView = myLearningModel.getSiteURL() + "ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + startPage + "?nativeappurl=true";
 
                         } else {// normal launch
                             urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
@@ -645,7 +649,6 @@ public class GlobalMethods {
                             || encodedStr.toLowerCase().contains(".pptx")) {
 
                         encodedStr = encodedStr.replace("file://", "");
-
 
                         String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                         Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
@@ -822,6 +825,26 @@ public class GlobalMethods {
         menu.getItem(11).setVisible(false);
         menu.getItem(12).setVisible(false);
 
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_playoption, v.getContext()));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewoption, v.getContext()));
+        menu.getItem(2).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_detailsoption, v.getContext()));
+
+        menu.getItem(3).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_joinoption, v.getContext()));
+        menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_downloadoption, v.getContext()));
+        menu.getItem(5).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_reportoption, v.getContext()));
+
+        menu.getItem(6).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_addtocalendaroption, v.getContext()));
+        ;
+        menu.getItem(7).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_setcompleteoption, v.getContext()));
+        ;
+        menu.getItem(8).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_relatedcontentoption, v.getContext()));
+        ; // related content
+        menu.getItem(9).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_cancelenrollmentoption, v.getContext()));// cancel
+        menu.getItem(10).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_deleteoption, v.getContext()));
+        menu.getItem(11).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_label_archivetitlelabel, v.getContext()));
+        menu.getItem(12).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_removefromarchive, v.getContext()));
+
+
         if (myLearningDetalData.isArchived()) {
             menu.getItem(11).setVisible(false);
             menu.getItem(12).setVisible(true);
@@ -922,6 +945,8 @@ public class GlobalMethods {
 
         if (typeFrom.equalsIgnoreCase("event") || typeFrom.equalsIgnoreCase("track")) {
             menu.getItem(2).setVisible(false);
+            menu.getItem(11).setVisible(false);
+            menu.getItem(12).setVisible(false);
         }
 
         if (!isReportEnabled) {
@@ -934,7 +959,7 @@ public class GlobalMethods {
 
                 switch (item.getItemId()) {
                     case R.id.ctx_detail:
-                        Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+                        Intent intentDetail = new Intent(v.getContext(), MyLearningDetailActivity1.class);
                         intentDetail.putExtra("IFROMCATALOG", false);
                         intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
                         intentDetail.putExtra("typeFrom", typeFrom);
@@ -953,7 +978,7 @@ public class GlobalMethods {
                         if (isNetworkConnectionAvailable(v.getContext(), -1)) {
                             downloadStart.downloadTheContent();
                         } else {
-                            showToast(v.getContext(), "No Internet");
+                            showToast(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()));
                         }
                         break;
                     case R.id.ctx_relatedcontent:
@@ -965,7 +990,7 @@ public class GlobalMethods {
                             deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
                         } else {
 
-                            Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case R.id.ctx_complete:
@@ -976,7 +1001,7 @@ public class GlobalMethods {
                             new SetCourseCompleteSynchTask(v.getContext(), databaseH, myLearningDetalData, setcompleteLitner).execute();
                         } else {
 
-                            Toast.makeText(v.getContext(), v.getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case R.id.ctx_play:
@@ -997,7 +1022,7 @@ public class GlobalMethods {
                         break;
                     case R.id.ctx_cancelenrollment:
                         final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                        builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(v.getResources().getString(R.string.eventalert))
+                        builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure, v.getContext()))
                                 .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
@@ -1023,7 +1048,7 @@ public class GlobalMethods {
                 }
 
 //                if (item.getTitle().toString().equalsIgnoreCase("details")) {
-//                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetail_Activity.class);
+//                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetailActivity1.class);
 //                    intentDetail.putExtra("IFROMCATALOG", false);
 //                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
 //                    intentDetail.putExtra("typeFrom", typeFrom);
@@ -1036,7 +1061,7 @@ public class GlobalMethods {
 //                if (item.getItemId() == R.id.ctx_view) {
 //                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
 //                }
-//                if (item.getTitle().toString().equalsIgnoreCase("Report")) {
+//                if (item.getTitle().toString().equalsIgnoreCase(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport)+"")) {
 //
 //                    Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
 //                    intentReports.putExtra("myLearningDetalData", myLearningDetalData);
@@ -1076,7 +1101,7 @@ public class GlobalMethods {
 //
 //                }
 //
-//                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_add_to_calendar))) {
+//                if (item.getTitle().toString().equalsIgnoreCase(v.getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_addtocalendaroption))) {
 //
 //                    downloadInterface.cancelEnrollment(false);
 //                }
@@ -1208,6 +1233,9 @@ public class GlobalMethods {
     }
 
     public static void addEventToDeviceCalendar(MyLearningModel myLearningModel, Context context) {
+
+        if (myLearningModel.getEventScheduleType() == 1)
+            return;
 
         long startMillis = convertStringToLong(myLearningModel.getEventstartTime());
         long endMillis = convertStringToLong(myLearningModel.getEventendTime());
@@ -1810,5 +1838,9 @@ public class GlobalMethods {
         sideMenusModel.setParameterStrings("");
         sideMenusModel.setSiteID(globalSearchResultModelNew.siteid);
         return sideMenusModel;
+    }
+
+    private static String getLocalizationValue(String key, Context context) {
+        return JsonLocalization.getInstance().getStringForKey(key, context);
     }
 }

@@ -1,5 +1,10 @@
 package com.instancy.instancylearning.models;
 
+import android.content.Context;
+
+import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,34 +20,71 @@ import java.util.List;
 
 public class NativeSetttingsModel {
 
-    public static HashMap<String, List<String>> getData(Boolean isLogin) {
+//    public static HashMap<String, List<String>> getData(Boolean isLogin) {
+//        HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
+//
+//        if (!isLogin) {
+//            List<String> cricket = new ArrayList<String>();
+//            cricket.add("Reset site URL");
+//            cricket.add("Change site URL");
+//            expandableListDetail.put("Preferences", cricket);
+//        } else {
+//            List<String> football = new ArrayList<String>();
+//
+//            football.add("Assigned Content Target Reminder");
+//            football.add("Content Assignment");
+//            football.add("New Content items Available in the Catalog fragment");
+//            football.add("Content items Unassigned");
+//
+//            List<String> basketball = new ArrayList<String>();
+//            // insidesettings_tablerow_autodownloadstatuslabel
+//            //   JsonLocalization.getStringForKey("insidesettings_tablerow_applanguagenamelabel",context);
+//            basketball.add("Enable Auto Download of Content");
+//
+//            List<String> localization = new ArrayList<String>();
+//            localization.add("App Language");
+//
+//            expandableListDetail.put("NOTIFICATION", football);
+//            expandableListDetail.put("LANGUAGE", localization);
+//            expandableListDetail.put("DOWNLOAD", basketball);
+//
+//        }
+//
+//
+//        return expandableListDetail;
+//    }
+
+    public static HashMap<String, List<String>> getData(Boolean isLogin, Context context) {
         HashMap<String, List<String>> expandableListDetail = new HashMap<String, List<String>>();
+        JsonLocalization jsonLocalization = JsonLocalization.getInstance();
 
         if (!isLogin) {
             List<String> cricket = new ArrayList<String>();
-            cricket.add("Reset site URL");
-            cricket.add("Change site URL");
+            cricket.add(jsonLocalization.getStringForKey(JsonLocalekeys.siteurlsetting_tablerow_resetsiteurl, context));
+            cricket.add(jsonLocalization.getStringForKey(JsonLocalekeys.siteurlsetting_tablerow_changesiteurl, context));
             expandableListDetail.put("Preferences", cricket);
         } else {
             List<String> football = new ArrayList<String>();
 
-            football.add("Assigned Content Target Reminder");
-            football.add("Content Assignment");
-            football.add("New Content items Available in the Catalog fragment");
-            football.add("Content items Unassigned");
+            football.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contenttargetreminderlabel, context));
+            football.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentassignmentlabel, context));
+            football.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentsavailableincataloglabel, context));
+            football.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentitemsunassignedlabel, context));
 
             List<String> basketball = new ArrayList<String>();
-            basketball.add("Enable Auto Download of Content");
+          
+
+            basketball.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_autodownloadstatuslabel, context));
 
             List<String> localization = new ArrayList<String>();
-            localization.add("App Language");
 
-            expandableListDetail.put("NOTIFICATION", football);
-            expandableListDetail.put("LANGUAGE", localization);
-            expandableListDetail.put("DOWNLOAD", basketball);
+            localization.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_applanguagenamelabel, context));
+
+            expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headingnotification, context), football);
+            expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headinglanguage, context), localization);
+            expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headingdownload, context), basketball);
 
         }
-
 
         return expandableListDetail;
     }

@@ -9,10 +9,11 @@ import java.util.List;
 
 public class FilterByModel implements Serializable {
 
-    public int parentID = 0;
+    public String parentID = "0";
     public String categoryName = "";
     public String categoryIcon = "";
-    public int categoryID = 0;
+    public String categoryID = "0";
     public boolean isSelected = false;
+    public boolean isContainsChild = false;
 
 }

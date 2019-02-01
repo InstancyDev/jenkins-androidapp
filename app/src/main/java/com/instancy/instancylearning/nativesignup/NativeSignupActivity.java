@@ -38,6 +38,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -45,6 +46,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 
 import com.instancy.instancylearning.models.SignUpConfigsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -119,7 +121,9 @@ public class NativeSignupActivity extends AppCompatActivity {
     TextView termsTxt;
 
     String termsString = "";
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,NativeSignupActivity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,7 +148,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getResources().getString(R.string.login_button_signupbutton) + "</font>"));
+                getLocalizationValue(JsonLocalekeys.login_button_signupbutton) + "</font>"));
 
 
         try {
@@ -388,13 +392,13 @@ public class NativeSignupActivity extends AppCompatActivity {
                 return true;
             case R.id.deleteItem:
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getResources().getString(R.string.removeeducationmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
-                        .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setMessage(getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_deleteeducation)).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation))
+                        .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.profile_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
                     }
-                }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                }).setPositiveButton(getLocalizationValue(JsonLocalekeys.profile_alertbutton_deletebutton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //do things
                         dialog.dismiss();
@@ -466,7 +470,7 @@ public class NativeSignupActivity extends AppCompatActivity {
                     isValidationCompleted = true;
                 } else {
                     isValidationCompleted = false;
-                    Toast.makeText(context, getResources().getString(R.string.email_validation), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.signup_alertsubtitle_invalidemail), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -528,10 +532,10 @@ public class NativeSignupActivity extends AppCompatActivity {
                 if (isNetworkConnectionAvailable(this, -1)) {
                     sendNewSignUpDetailsDataToServer(addQuotes);
                 } else {
-                    Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.accept_terms), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.signup_alertsubtitle_pleaseaccepttermsandconditions), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -546,7 +550,7 @@ public class NativeSignupActivity extends AppCompatActivity {
         }
 
         String apiURL = "";
-        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCreateSignUp?Locale=en-us&SiteURL=" + appUserModel.getSiteURL();
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCreateSignUp?Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&SiteURL=" + appUserModel.getSiteURL();
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         final byte[] finalEncrpt = encrpt;
@@ -567,7 +571,7 @@ public class NativeSignupActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -663,7 +667,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         } else {
 
-            urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=en-us&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
+            urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
 
         }// esperanza call
 

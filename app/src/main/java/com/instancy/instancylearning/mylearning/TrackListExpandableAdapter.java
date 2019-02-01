@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,12 +45,15 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
+
 import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -208,7 +213,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
         holder.txtTitle.setText(trackChildList.getCourseName());
         holder.txtCourseName.setText(trackChildList.getMediaName());
-        holder.txtAuthor.setText("By " + trackChildList.getAuthor());
+        holder.txtAuthor.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_by) + " " + trackChildList.getAuthor());
         holder.txtShortDisc.setText(trackChildList.getShortDes());
 
         if (trackChildList.getShortDes().isEmpty()) {
@@ -266,18 +271,18 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 if (trackChildList.getStatusActual().equalsIgnoreCase("Completed")) {
 
 //                    statusValue = "Completed";
-                    statusValue =childView.getContext().getString(R.string.status_completed);
+                    statusValue = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
 
 
                 } else if (trackChildList.getStatusActual().equalsIgnoreCase("failed")) {
 
 //                    statusValue = "Completed(failed)";
-                    statusValue =childView.getContext().getString(R.string.status_completed_failed);
+                    statusValue = getLocalizationValue(JsonLocalekeys.status_completed_failed);
 
                 } else if (trackChildList.getStatusActual().equalsIgnoreCase("passed")) {
 
 //                    statusValue = "Completed(passed)";
-                    statusValue =childView.getContext().getString(R.string.status_completed_passed);
+                    statusValue = getLocalizationValue(JsonLocalekeys.status_completed_passed);
 
                 }
 
@@ -289,7 +294,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             } else if (trackChildList.getStatusActual().equalsIgnoreCase("Not Started")) {
 
 //                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                String statusValue =childView.getContext().getString(R.string.status_notstarted);
+                String statusValue = getLocalizationValue(JsonLocalekeys.mylearning_label_notstartedlabel);
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusNotStarted)));
                 holder.progressBar.setProgress(0);
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
@@ -303,10 +308,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 if (trackChildList.getStatusActual().equalsIgnoreCase("incomplete")) {
 
 //                    status = "In Progress";
-                    status =childView.getContext().getString(R.string.status_inprogress);
+                    status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
                 } else if (trackChildList.getStatusActual().length() == 0) {
 //                    status = "In Progress";
-                    status =childView.getContext().getString(R.string.status_inprogress);
+                    status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
                 } else {
                     status = trackChildList.getStatusActual();
                 }
@@ -317,8 +322,8 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             } else if (trackChildList.getStatusActual().equalsIgnoreCase("pending review") || (trackChildList.getStatusActual().toLowerCase().contains("pendingreview")) || (trackChildList.getStatusActual().toLowerCase().contains("grade"))) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
-                String status = "Pending Review";
-                status =childView.getContext().getString(R.string.status_pending_review);
+                String status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
+                status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
                 holder.progressBar.setProgress(100);
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
                 courseStatus = status + "(" + 100;
@@ -357,7 +362,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     .autoHide(true, 5000)
                     .corner(30)
                     .position(ViewTooltip.Position.LEFT).clickToHide(true)
-                    .text("Click to download the content").onHide(new ViewTooltip.ListenerHide() {
+                    .text(getLocalizationValue(JsonLocalekeys.mylearning_label_clicktodownloadlabel)).onHide(new ViewTooltip.ListenerHide() {
                 @Override
                 public void onHide(View view) {
                     appController.setAlreadyViewdTrack(true);
@@ -371,7 +376,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     .autoHide(true, 5000)
                     .corner(30)
                     .position(ViewTooltip.Position.LEFT)
-                    .text("Click for more options").clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
+                    .text(" " + getLocalizationValue(JsonLocalekeys.mylearning_label_clickformoreopetionlabel)).clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
                 @Override
                 public void onHide(View view) {
                     appController.setAlreadyViewdTrack(true);
@@ -386,7 +391,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     .autoHide(true, 5000)
                     .corner(30)
                     .position(ViewTooltip.Position.BOTTOM)
-                    .text("Click on image to view").clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
+                    .text(" " + getLocalizationValue(JsonLocalekeys.mylearning_label_clickonimagelabel)).clickToHide(true).onHide(new ViewTooltip.ListenerHide() {
                 @Override
                 public void onHide(View view) {
                     appController.setAlreadyViewdTrack(true);
@@ -429,7 +434,17 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         String imgUrl = trackChildList.getImageData();
 
         Picasso.with(childView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+
+        String thumbUrl = trackChildList.getSiteURL() + "/Content/SiteFiles/ContentTypeIcons/" + trackChildList.getContentTypeImagePath();
+
+        Picasso.with(childView.getContext()).
+                load(thumbUrl).
+                into(holder.contentIcon);
+
+        holder.contentIcon.setBackgroundTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorWhite)));
+
         childView.setTag("view");
+
         return childView;
     }
 
@@ -495,6 +510,16 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         @BindView(R.id.btntxt_download)
         TextView btnDownload;
 
+//        @Nullable
+//        @BindView(R.id.fabbtnthumb)
+//        FloatingActionButton fabbtnthumb;
+
+
+        @Nullable
+        @BindView(R.id.fabbtnthumb)
+        FloatingActionButton contentIcon;
+
+
         @Nullable
         @BindView(R.id.circle_progress_track)
         CircleProgressBar circleProgressBar;
@@ -551,7 +576,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, isReportEnabled, downloadStart,uiSettingsModel);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, isReportEnabled, downloadStart, uiSettingsModel);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());
@@ -567,7 +592,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //                        showToast(_context, "Download in progress");
                     }
                 } else {
-                    showToast(_context, "No Internet");
+                    showToast(_context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                 }
             }
         }
@@ -741,7 +766,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                     @Override
                     public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
                         Log.d("TAG", "onDownloadFailed: " + +errorCode);
-                        Toast.makeText(_context, "Download failed " + errorMessage, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(_context, getLocalizationValue(JsonLocalekeys.commoncomponent_downloadfailed) + " " + errorMessage, Toast.LENGTH_SHORT).show();
                         isDownloading = false;
                     }
 
@@ -852,4 +877,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         return listView.getChildAt(flatPosition - first);
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
+    }
 }

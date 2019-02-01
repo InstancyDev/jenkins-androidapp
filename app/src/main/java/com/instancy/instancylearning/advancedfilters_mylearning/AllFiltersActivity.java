@@ -22,9 +22,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import java.io.Serializable;
@@ -116,6 +118,12 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
 
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -239,11 +247,8 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                     } else {
                         nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
                     }
-
                 }
-
             }
-
 
             if (allFilterModelList != null && allFilterModelList.size() > 0) {
                 allFilterModelList.get(0).categorySelectedData = nameSelectedCats;
@@ -296,7 +301,8 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                     applyFilterModel.categories = generateSelectedCategories(contentFilterByModelList.get(i));
                     break;
                 case "skills":
-                    applyFilterModel.skills = generateSelectedCategories(contentFilterByModelList.get(i));
+                    applyFilterModel.skillCats = generateSelectedCategoriesCatsAndSkills(contentFilterByModelList.get(i), 1);
+                    applyFilterModel.skills = generateSelectedCategoriesCatsAndSkills(contentFilterByModelList.get(i), 2);
                     break;
                 case "bytype":
                     applyFilterModel.objectTypes = generateSelectedCategories(contentFilterByModelList.get(i));
@@ -313,6 +319,27 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                 case "rate":
                     applyFilterModel.ratings = generateSelectedCategories(contentFilterByModelList.get(i));
                     break;
+                case "eventdates": //IDS
+                    applyFilterModel.firstName = contentFilterByModelList.get(i).categorySelectedStartDate.length() > 0 ? contentFilterByModelList.get(i).categorySelectedStartDate : contentFilterByModelList.get(i).selectedSkillsCatIdString;
+                    applyFilterModel.lastName = contentFilterByModelList.get(i).categorySelectedEndDate;
+                    break;
+            }
+
+            if (allFilterModelList.size() > 0) {
+
+                for (int k = 0; k < allFilterModelList.size(); k++) {
+
+                    if (allFilterModelList.get(k).categoryID == 3) {
+                        applyFilterModel.sortBy = allFilterModelList.get(k).categorySelectedData;
+
+                    }
+
+                    if (allFilterModelList.get(k).categoryID == 2) {
+                        applyFilterModel.groupBy = allFilterModelList.get(k).categorySelectedData;
+
+                    }
+                    applyFilterModel.selectedId = allFilterModelList.get(k).categorySelectedID;
+                }
 
             }
 
@@ -320,6 +347,39 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
 
         return applyFilterModel;
     }
+
+    public String generateSelectedCategoriesCatsAndSkills(ContentFilterByModel contentFilterByModel, int typeFilter) {
+        String generatedStr = "";
+
+
+        if (contentFilterByModel.selectedSkillIdsArry == null || contentFilterByModel.selectedSkillIdsArry.size() == 0)
+            return generatedStr;
+
+        if (typeFilter == 1) {
+            for (int i = 0; i < contentFilterByModel.selectedSkillIdsArry.size(); i++) {
+                if (generatedStr.length() > 0) {
+                    generatedStr = generatedStr.concat("," + contentFilterByModel.selectedSkillIdsArry.get(i));
+                } else {
+                    generatedStr = "" + contentFilterByModel.selectedSkillIdsArry.get(i);
+                }
+            }
+        }
+        if (contentFilterByModel.selectedChildSkillIdsArry == null || contentFilterByModel.selectedChildSkillIdsArry.size() == 0)
+            return generatedStr;
+        if (typeFilter == 2) {
+            generatedStr = "";
+            for (int i = 0; i < contentFilterByModel.selectedChildSkillIdsArry.size(); i++) {
+                if (generatedStr.length() > 0) {
+                    generatedStr = generatedStr.concat("," + contentFilterByModel.selectedChildSkillIdsArry.get(i));
+                } else {
+                    generatedStr = "" + contentFilterByModel.selectedChildSkillIdsArry.get(i);
+                }
+
+            }
+        }
+        return generatedStr;
+    }
+
 
     public String generateSelectedCategories(ContentFilterByModel contentFilterByModel) {
         String generatedStr = "";

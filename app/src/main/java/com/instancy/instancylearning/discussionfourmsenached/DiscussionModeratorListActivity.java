@@ -51,9 +51,11 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -116,8 +118,10 @@ public class DiscussionModeratorListActivity extends AppCompatActivity implement
     SwipeRefreshLayout swipeRefreshLayout;
 
     List<DiscussionModeratorModel> discussionModeratorModelList = null;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,DiscussionModeratorListActivity.this);
 
-    @Override
+    }    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.discussiontopics_fragment);
@@ -145,7 +149,7 @@ public class DiscussionModeratorListActivity extends AppCompatActivity implement
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Moderator" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel).replace(":","") + "</font>"));
         discussionModeratorModelList = new ArrayList<DiscussionModeratorModel>();
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         moderatorAdapter = new DiscussionModeratorAdapter(this, BIND_ABOVE_CLIENT, discussionModeratorModelList);
@@ -180,7 +184,7 @@ public class DiscussionModeratorListActivity extends AppCompatActivity implement
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserListBasedOnRoles?intSiteID=" + appUserModel.getSiteIDValue() + "&intUserID=" + appUserModel.getUserIDValue() + "&strLocale=en-us";
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserListBasedOnRoles?intSiteID=" + appUserModel.getSiteIDValue() + "&intUserID=" + appUserModel.getUserIDValue() + "&strLocale=preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))";
 
 
         vollyService.getStringResponseVolley("GetUserListBasedOnRoles", urlStr, appUserModel.getAuthHeaders());
@@ -202,7 +206,7 @@ public class DiscussionModeratorListActivity extends AppCompatActivity implement
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -258,10 +262,10 @@ public class DiscussionModeratorListActivity extends AppCompatActivity implement
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 //            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));

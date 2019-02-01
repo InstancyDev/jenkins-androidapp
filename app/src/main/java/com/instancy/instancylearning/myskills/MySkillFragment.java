@@ -47,11 +47,13 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -126,7 +128,9 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -149,7 +153,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
     public void refreshMySkills(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
         String urlStr = appUserModel.getWebAPIUrl() + "/MySkills/GetSkilsData?SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId();
@@ -212,7 +216,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -230,7 +234,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         }
 
                     } else {
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
                 }
                 if (requestType.equalsIgnoreCase("GetSkiloption")) {
@@ -410,7 +414,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         } else {
             mySkillModelList = new ArrayList<MySkillModel>();
             mySkillAdapter.refreshList(mySkillModelList, responseAry);
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
     }
 
@@ -420,7 +424,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "MySkill" + "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +sideMenusModel.getDisplayName()+ "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -649,7 +653,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         addSkillMenu.setVisible(true);
         FrameLayout rootView = (FrameLayout) addSkillMenu.getActionView();
         addSkillText = (TextView) rootView.findViewById(R.id.txtaddskill);
-        addSkillMenu.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Add Skill" + "</font>"));
+        addSkillMenu.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.mycompetency_label_addskilslabel) + "</font>"));
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -706,7 +710,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
             refreshMySkills(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -757,6 +761,9 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         menu.getItem(0).setVisible(true);
         menu.getItem(1).setVisible(true);
 
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.myskills_actionsheet_viewcontentoption));//view  ctx_view
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.myskills_actionsheet_deleteoption));//add   ctx_add
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
@@ -775,7 +782,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                             deleteMySkill(skillCountModel.prefCatID);
                         } else {
 
-                            Toast.makeText(context, context.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                         }
 
                         break;

@@ -33,9 +33,11 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -101,6 +103,11 @@ public class CatalogAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
+
+    }
+
     @Override
     public int getCount() {
         return myLearningModel != null ? myLearningModel.size() : 0;
@@ -159,22 +166,21 @@ public class CatalogAdapter extends BaseAdapter {
                     avaliableSeats = 0;
                     nf.printStackTrace();
                 }
-
                 if (avaliableSeats > 0) {
-                    holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Available seats : " + myLearningModel.get(position).getAviliableSeats());
+                    holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | " + getLocalizationValue(JsonLocalekeys.commoncomponent_label_availableseats) + myLearningModel.get(position).getAviliableSeats());
 
                 } else if (avaliableSeats <= 0) {
 
                     if (myLearningModel.get(position).getEnrollmentlimit() == myLearningModel.get(position).getNoofusersenrolled() && myLearningModel.get(position).getWaitlistlimit() == 0 || (myLearningModel.get(position).getWaitlistlimit() != -1 && myLearningModel.get(position).getWaitlistlimit() == myLearningModel.get(position).getWaitlistenrolls())) {
 
-                        holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | (Enrollment Closed)");
+                        holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | (" + getLocalizationValue(JsonLocalekeys.commoncomponent_label_enrollmentclosed) + ")");
 
                     } else if (myLearningModel.get(position).getWaitlistlimit() != -1 && myLearningModel.get(position).getWaitlistlimit() != myLearningModel.get(position).getWaitlistenrolls()) {
 
                         int waitlistSeatsLeftout = myLearningModel.get(position).getWaitlistlimit() - myLearningModel.get(position).getWaitlistenrolls();
 
                         if (waitlistSeatsLeftout > 0) {
-                            holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " | Full | Waitlist seats: " + waitlistSeatsLeftout);
+                            holder.txtCourseName.setText(myLearningModel.get(position).getMediaName() + " |  " + getLocalizationValue(JsonLocalekeys.commoncomponent_label_full) + "  |  " + getLocalizationValue(JsonLocalekeys.commoncomponent_label_wairlistseats) + waitlistSeatsLeftout);
                         }
                     }
                 }
@@ -205,20 +211,11 @@ public class CatalogAdapter extends BaseAdapter {
             holder.consolidateLine.setVisibility(View.VISIBLE);
         }
 
-        if (myLearningModel.get(position).
-
-                getViewType().
-
-                equalsIgnoreCase("3"))
-
-        {
+        if (myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
             holder.txtPrice.setText("$" + myLearningModel.get(position).getPrice());
-//            holder.txtPrice.setText(myLearningModel.get(position).getPrice() + " "+myLearningModel.get(position).getCurrency());
             holder.txtPrice.setVisibility(View.VISIBLE);
-//            holder.txtPriceLabel.setVisibility(View.VISIBLE);
-        } else
-
-        {
+            holder.btnDownload.setVisibility(View.GONE);
+        } else {
             holder.txtPrice.setVisibility(View.GONE);
 //            holder.txtPriceLabel.setVisibility(View.GONE);
             holder.txtPrice.setText("");
@@ -233,9 +230,7 @@ public class CatalogAdapter extends BaseAdapter {
 
         }
 
-        holder.txtSiteName.setText(" " + myLearningModel.get(position).
-
-                getSiteName());
+        holder.txtSiteName.setText(" " + myLearningModel.get(position).getSiteName());
         float ratingValue = 0;
         try
 
@@ -753,7 +748,7 @@ public class CatalogAdapter extends BaseAdapter {
             };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.card_view})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.card_view, R.id.fabbtnthumb})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

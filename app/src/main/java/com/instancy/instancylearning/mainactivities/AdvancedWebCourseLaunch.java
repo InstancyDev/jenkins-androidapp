@@ -26,8 +26,10 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.interfaces.LRSJavaScriptInterface;
 import com.instancy.instancylearning.interfaces.hideProgressListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 
 /**
@@ -47,7 +49,9 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     hideProgressListner hideProgressListner = null;
 
     boolean isCloseEnable = false;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,AdvancedWebCourseLaunch.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +71,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             isCloseEnable = bundle.getBoolean("ISCLOSE", false);
 
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
             Log.d(TAG, "onCreate:AdvancedWebCourseLaunch " + courseUrl);
             clearWebViewAbsolutely(adWebView);

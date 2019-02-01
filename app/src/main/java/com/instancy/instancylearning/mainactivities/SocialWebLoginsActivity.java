@@ -24,8 +24,10 @@ import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -42,6 +44,10 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
     PreferencesManager preferencesManager;
     SVProgressHUD svProgressHUD;
     AppUserModel appUserModel;
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, SocialWebLoginsActivity.this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +67,12 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
             isFromAttachment = bundle.getBoolean("ATTACHMENT", false);
             if (isFromAttachment) {
                 url = bundle.getString(StaticValues.KEY_SOCIALLOGIN);
+                url = url.replace(" ", "%20");
+                Log.d("Video", "thumbnailvideo: " + url);
             } else {
                 url = appUserModel.getSiteURL().concat(bundle.getString(StaticValues.KEY_SOCIALLOGIN));
             }
-
             actionBaritle = bundle.getString(StaticValues.KEY_ACTIONBARTITLE);
-
         }
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + actionBaritle + "</font>"));
@@ -97,7 +103,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
 
         WebSettings webSettings = this.webView.getSettings();
 
-        if (actionBaritle.contains("Terms of use")){
+        if (actionBaritle.contains("Terms of use")) {
             webSettings.setBuiltInZoomControls(true);
         }
 
@@ -171,7 +177,7 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
                 if (url.toLowerCase().contains("autosocialloginnativeapp.aspx")) {
                     if (url.contains("?")) {
 
-                        Toast.makeText(SocialWebLoginsActivity.this, "Login success..!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SocialWebLoginsActivity.this, getLocalizationValue(JsonLocalekeys.login_success), Toast.LENGTH_SHORT).show();
 
                         String query = url.toLowerCase().substring(
                                 url.lastIndexOf("?") + 1);

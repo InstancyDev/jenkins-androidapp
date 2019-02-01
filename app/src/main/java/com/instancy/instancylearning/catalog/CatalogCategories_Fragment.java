@@ -44,6 +44,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.RecyclerViewClickListener;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
 import com.instancy.instancylearning.models.MyLearningModel;
@@ -51,6 +52,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 
 import com.instancy.instancylearning.utils.CustomFlowLayout;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -111,7 +113,10 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     List<CatalogCategoryButtonModel> categoryButtonModelList1;
 
     ButtonAdapter mAdapter;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
 
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -305,7 +310,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         llCatalogGridCatageory.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppBGColor())));
         category_breadcrumb = (CustomFlowLayout) rootView.findViewById(R.id.cflBreadcrumb);
         breadcrumbItemsList = new ArrayList<ContentValues>();
-        addItemToBreadcrumbList("0", "All");
+        addItemToBreadcrumbList("0", getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton));
 
         llCatalogGridCatageory.setVisibility(View.VISIBLE);
 
@@ -320,7 +325,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
 
         if (categoryButtonModelList1.size() == 0) {
-            nodata_Label.setText(getResources().getString(R.string.no_data));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             nodata_Label.setVisibility(View.VISIBLE);
         } else {
             nodata_Label.setVisibility(View.GONE);
@@ -389,7 +394,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
                     } else {
 
-                        Toast.makeText(context, "  No Content found  ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context,getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -408,7 +413,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
 
             if (categoryButtonModelList1.size() == 0) {
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                 nodata_Label.setVisibility(View.VISIBLE);
             } else {
                 nodata_Label.setVisibility(View.GONE);
@@ -627,7 +632,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         if (!isRefreshed) {
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
         String paramsString = "siteURL=" + appUserModel.getSiteURL() + "&componentId="
@@ -643,7 +648,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             refreshCatalog(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -34,13 +33,14 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.GLobalSearchSelectedModel;
 import com.instancy.instancylearning.models.GlobalSearchCategoryModel;
-import com.instancy.instancylearning.models.GlobalSearchResultModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -56,7 +56,6 @@ import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.fet
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.getSelectedModelList;
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.isAllCheckedBoolMethod;
 import static com.instancy.instancylearning.models.GlobalSearchCategoryModel.isParentComponentExists;
-import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
@@ -96,7 +95,9 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
     SideMenusModel sideMenusModel = null;
 
     Toolbar toolbar;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,GlobalSearchActivity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,7 +176,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         if (isNetworkConnectionAvailable(this, -1)) {
             refreshCatagories(false);
         } else {
-            Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -270,11 +271,11 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
     public void refreshCatagories(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
         String urlStr = appUserModel.getWebAPIUrl() + "search/GetSearchComponentList?";
 
-        String paramsString = urlStr + "strLocale=en-us" +
+        String paramsString = urlStr + "strLocale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"" +
                 "&intSiteID=" + appUserModel.getSiteIDValue() +
                 "&intUserID=" + appUserModel.getUserIDValue();
 
@@ -363,10 +364,10 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
 //          tintMenuIcon(getActivity(), item_search, R.color.colorWhite);.
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
 //            txtSearch.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorWhite)));
@@ -417,7 +418,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                         checkEverything(query);
 
                     } else {
-                        Toast.makeText(GlobalSearchActivity.this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GlobalSearchActivity.this, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -479,7 +480,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
         } else {
 
-            Toast.makeText(this, getString(R.string.alert_nocat_selected), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.alert_nocat_selected), Toast.LENGTH_SHORT).show();
         }
 
 //            if (checkSelectedBool || gLobalSearchSelectedModelList.size() > 0) {

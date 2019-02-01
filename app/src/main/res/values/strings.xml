@@ -13,7 +13,7 @@
 
     <!--<string name="app_name"> AEI para Ti </string>-->
 
-    <!--<string name="app_name"> YouNextU </string>-->
+    <!--<string name="app_name"> YourNextU </string>-->
 
     <string name="app_name"> Development </string>
 
@@ -48,8 +48,8 @@
 
     <string name="no_games_avaliable">There are no games available at this time.</string>
 
+    <string name="no_users_to_display">No users</string>
 
-    <string name="alert_nocat_selected"> Please select at least one component </string>
 
     <string name="loadingtxt">Loading...</string>
 
@@ -170,8 +170,6 @@
     <string name="mycat_need_internet_to_download">You need internet connection to download course(s)</string>
     <string name="menu_need_internet_to_view">You need internet connection to navigate to this menu.</string>
     <string name="web_screen_internet_lost">There is no network connection available.\nGo back to browse courses</string>
-    <string name="rating_update_fail">Content rating update failed</string>
-    <string name="rating_update_success">Content rating successfully updated</string>
     <string name="status_update_fail">Content statusActual update failed</string>
     <string name="status_update_success">Content statusActual successfully updated</string>
     <string name="alert">Alert</string>
@@ -240,76 +238,17 @@
 
 
     <!-- non esperanza keys for direct localization-->
-
-    <string name="mylearning_actionsheet_canceloption">Cancel</string>
-    <string name="mylearning_actionsheet_viewoption">View</string>
-    <string name="mylearning_actionsheet_playoption">Play</string>
-    <string name="mylearning_actionsheet_practiceassessmentoption">Practice Assessment</string>
-    <string name="mylearning_actionsheet_detailsoption">Details</string>
-    <string name="mylearning_actionsheet_joinoption">Join</string>
-    <string name="mylearning_actionsheet_reportoption">Report</string>
-    <string name="mylearning_actionsheet_relatedcontentoption">Related Content</string>
-    <string name="mylearning_actionsheet_addtocalendaroption">Add to Calendar</string>
-    <string name="mylearning_actionsheet_setcompleteoption">Set Complete</string>
-    <string name="mylearning_actionsheet_shareoption">Share</string>
-    <string name="mylearning_actionsheet_deleteoption">Delete</string>
-    <string name="mylearning_actionsheet_cancelenrollmentoption">Cancel Enrollment</string>
     <string name="mylearning_actionsheet_addtoarchive">Archive</string>
-    <string name="mylearning_actionsheet_removefromarchive">Unarchive</string>
-
-
-    <string name="catalog_actionsheet_addtowishlist">Add to WishList</string>
-    <string name="catalog_actionsheet_removefromwishlist">Remove from WishList</string>
 
 
     <string name="mylearning_search_hint">Search..</string>
 
-    <string name="details_button_edityourreviewbutton">Edit your Review</string>
-    <string name="details_button_writeareviewbutton">Write a Review</string>
-    <string name="details_button_addtomylearningbutton">Add</string>
-    <string name="details_button_viewbutton">View</string>
-    <string name="details_button_playbutton">Play</string>
-    <string name="details_button_buybutton">Buy</string>
-    <string name="details_button_enrollbutton">Enroll</string>
-    <string name="details_button_relatedcontentbutton">Related Content</string>
-    <string name="details_button_addtocalendarbutton">Add to Calendar</string>
-    <string name="details_button_setcompletebutton">Set Complete</string>
-    <string name="details_button_reportbutton">Report</string>
-    <string name="details_button_deletebutton">Delete</string>
-    <string name="details_button_updatebutton">Update</string>
-    <string name="details_button_cancelbutton">Cancel</string>
-    <string name="details_button_submitbutton">Submit</string>
-
-    <string name="details_label_descriptionlabel">Description</string>
-    <string name="details_label_ratingsandreviewslabel">Ratings and Reviews</string>
-    <string name="details_label_averageratinglabel">Average Rating</string>
-
-    <string name="details_label_rated">Rated %.1f out of 5 of %d ratings</string>
-
-    <string name="sidemenu_button_notificationbutton">Notifications</string>
-    <string name="sidemenu_button_settingsbutton">Settings</string>
-    <string name="insidesettings_tablesection_headingnotification">Notification</string>
-
-
-    <string name="profile_button_educationcancelbutton">Cancel</string>
-    <string name="profile_button_educationsavebutton">Save</string>
-
-    <string name="login_header_logintitlelabel">Login</string>
-    <string name="login_alerttitle_signinfailed">Sign In Failed</string>
-    <string name="login_alertsubtitle_usernameorpasswordcannotbeempty">Username or Password cannot be empty.</string>
-    <string name="login_alertsubtitle_invalidusernameorpassword">Invalid user name or password</string>
-    <string name="login_alertsubtitle_pendingregistration">Your registration is not yet approved!</string>
-    <string name="login_actionsheet_canceloption">Cancel</string>
-    <string name="login_actionsheet_settingsoption">Settings</string>
-    <string name="login_button_signinbutton">Sign In</string>
-    <string name="login_button_signupbutton">Sign Up</string>
-    <string name="login_button_forgotpasswordbutton">Forgot Password</string>
-    <string name="login_textfield_usernametextfieldplaceholder">User name</string>
-    <string name="login_textfield_passwordtextfieldplaceholder">Password</string>
 
     <string name="forgot_textfield_resettextfieldplaceholder">Enter the email associated with your account and will send you a link to reset your password </string>
 
     <string name="forgot_title">Reset Password</string>
+
+    <string name="login_button_signinbutton">Sign In</string>
 
     <string name="ratinscreen_submit">Submit</string>
     <string name="ratinscreen_cancel">Cancel</string>
@@ -322,25 +261,17 @@
     <string name="ratinscreen_alert_subtitle">Are you sure you want to delete your review? </string>
     <string name="ratinscreen_alert_positive">Delete </string>
     <string name="ratinscreen_alert_negative">Cancel </string>
-    <string name="mylearning_actionsheet_downloadoption">Download</string>
+    <!--<string name="mylearning_actionsheet_downloadoption">Download</string>-->
 
-    <string name="side_menu_signout">SIgn out </string>
+    <string name="side_menu_signout">Sign out </string>
 
-    <string name="exitapplication">Do you want to exit the application</string>
-    <string name="exitapplication_positive">Ok</string>
-    <string name="exitapplication_negative">Cancel</string>
 
     <string name="alert_headtext_no_internet">      No Internet      </string>
 
     <string name="status_notstarted">Not Started</string>
-    <string name="status_completed_failed">Completed(failed)</string>
-    <string name="status_completed_passed">Completed(passed)</string>
     <string name="status_completed">Completed</string>
     <string name="status_inprogress">In Progress</string>
     <string name="status_pending_review">Pending Review</string>
-    <string name="status_attended">Attended</string>
-    <string name="status_registered">Registered</string>
-    <string name="status_expired">Expired</string>
     <string name="accept_terms">Accept terms of use</string>
     <string name="terms_of_use">Terms of Use</string>
     <string name="i_agree_to">I agree to</string>
@@ -348,6 +279,16 @@
     <string name="enter_validation">Enter</string>
     <string name="passwd_validation">Password doesn\'t match</string>
     <string name="email_validation">Email is not valid</string>
+
+
+    <string name="locale_changed">isLocaleChanged</string>
+    <string name="locale_name">locale_name</string>
+    <string name="locale_display_name">locale_display_name</string>
+    <string name="localization">localization</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
     <!--esperanza-->
     <!--<string name="mylearning_actionsheet_canceloption">Cancelar</string>-->

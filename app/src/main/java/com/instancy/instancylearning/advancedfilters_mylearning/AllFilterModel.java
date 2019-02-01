@@ -13,6 +13,7 @@ public class AllFilterModel implements Serializable {
     public String categoryName = "";
     public String categoryIcon = "";
     public int categoryID = 0;
+    public String categorySelectedDataDisplay = "";
     public String categorySelectedData = "";
     public int categorySelectedID = -1;
     public List<String> groupArrayList = new ArrayList<>();

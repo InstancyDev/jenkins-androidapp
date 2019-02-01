@@ -20,7 +20,9 @@ import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -39,7 +41,9 @@ public class SignUp_Activity extends AppCompatActivity {
     private AdvancedWebView webView;
     private SVProgressHUD svProgressHUD;
     Context context;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,SignUp_Activity.this);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +67,7 @@ public class SignUp_Activity extends AppCompatActivity {
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         final UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
 
 
         try {
@@ -84,7 +88,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
         if (uiSettingsModel.isEnableAzureSSOForLearner()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> Login </font>"));
+            getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> "+getLocalizationValue(JsonLocalekeys.login_header_logintitlelabel)+"< /font>"));
             url = appDefaultUrl + "fromnative/true";
         } else {
 //            url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true"; old login data
@@ -118,7 +122,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
                 } else if (url.toLowerCase().contains("success/false")) {
 
-                    Toast.makeText(SignUp_Activity.this, "Sign up failed..!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUp_Activity.this, getLocalizationValue(JsonLocalekeys.signup_alerttitle_signupfailed), Toast.LENGTH_SHORT).show();
                 } else if (url.toLowerCase().contains("Sign In")) {
 
                     finish();
@@ -167,7 +171,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
         } else {
 
-            Toast.makeText(this, "No internet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
         }
 

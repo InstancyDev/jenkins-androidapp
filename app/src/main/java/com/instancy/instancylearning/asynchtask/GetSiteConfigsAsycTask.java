@@ -37,7 +37,7 @@ public class GetSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> {
         int i = 10;
         publishProgress(i);
 //        String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0],true);
-        String tempWebApiUrl = webAPIClient.getSiteAPIDetailsForDigi(params[0], true);
+        String tempWebApiUrl = webAPIClient.getSiteAPIDetailsForDigi(params[0], true,context);
 
         if (tempWebApiUrl.length() != 0) {
             i = i + 10;
@@ -62,10 +62,12 @@ public class GetSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> {
             uiSettingsModel = db.getAppSettingsFromLocal(params[0], "374");
             i = i + 10;
             publishProgress(i);
-        } else {
-
-
         }
+
+//        else {
+//
+//
+//        }
         return null;
     }
 

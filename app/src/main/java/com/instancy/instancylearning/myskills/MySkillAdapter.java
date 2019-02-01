@@ -38,10 +38,12 @@ import com.instancy.instancylearning.catalogfragment.CatalogFragmentActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.CompetencyCategoryModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 
 import org.json.JSONArray;
@@ -336,7 +338,7 @@ public class MySkillAdapter extends BaseExpandableListAdapter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(ctx, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
 
             }
         })
@@ -359,8 +361,8 @@ public class MySkillAdapter extends BaseExpandableListAdapter {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -506,5 +508,7 @@ public class MySkillAdapter extends BaseExpandableListAdapter {
         }
 
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,ctx);
+    }
 }

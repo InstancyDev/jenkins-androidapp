@@ -25,9 +25,11 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -117,11 +119,11 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         holder.txtName.setText(askExpertAnswerModelList.get(position).respondedUserName);
-        holder.txtDaysAgo.setText(" Answered on: " + askExpertAnswerModelList.get(position).daysAgo);
+        holder.txtDaysAgo.setText(" "+ JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answeredonlabel, activity)+" " + askExpertAnswerModelList.get(position).daysAgo);
         holder.txtMessage.setText(askExpertAnswerModelList.get(position).response + " ");
-        holder.txtTotalViews.setText(askExpertAnswerModelList.get(position).viewsCount + " Views");
-        holder.txtComments.setText("Comments " + askExpertAnswerModelList.get(position).commentCount);
-        holder.txtUpvote.setText("Upvote " + askExpertAnswerModelList.get(position).upvotesCount);
+        holder.txtTotalViews.setText(askExpertAnswerModelList.get(position).viewsCount + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, activity));
+        holder.txtComments.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_commentstitlelabel, activity)+" " + askExpertAnswerModelList.get(position).commentCount);
+        holder.txtUpvote.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_upvotetitlelabel, activity)+" " + askExpertAnswerModelList.get(position).upvotesCount);
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtDaysAgo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

@@ -72,6 +72,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.interfaces.SiteConfigInterface;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CommunitiesModel;
@@ -80,6 +81,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.SweetAlert;
@@ -146,7 +148,9 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
 
     }
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -181,7 +185,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             sideMenusModel.setComponentId("189");
         }
 
-        String apiURL = appUserModel.getWebAPIUrl() + "/Mobilelms/GetPortalListing?siteid=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Locale=en-us&compid=" + sideMenusModel.getComponentId() + "&CompInsID=" + sideMenusModel.getRepositoryId();
+        String apiURL = appUserModel.getWebAPIUrl() + "/Mobilelms/GetPortalListing?siteid=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&compid=" + sideMenusModel.getComponentId() + "&CompInsID=" + sideMenusModel.getRepositoryId();
 
         vollyService.getJsonObjResponseVolley("COMMSLIST", apiURL, appUserModel.getAuthHeaders());
 
@@ -204,7 +208,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                         }
                     } else {
                         swipeRefreshLayout.setRefreshing(false);
-                        nodataLable.setText(getResources().getString(R.string.no_data));
+                        nodataLable.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
                 }
 
@@ -217,7 +221,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
-                nodataLable.setText(getResources().getString(R.string.no_data));
+                nodataLable.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                 svProgressHUD.dismiss();
             }
 
@@ -325,11 +329,11 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
@@ -397,7 +401,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             MenuItemCompat.collapseActionView(item_search);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -473,7 +477,8 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.learningcommunity_actionsheet_gotocommunityoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.learningcommunity_actionsheet_joincommunityoption));
         if (communitiesModel.actiongoto == 1) {
             menu.getItem(0).setVisible(true);
             menu.getItem(1).setVisible(false);
@@ -487,12 +492,12 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("Go to Community")) {
+                if (item.getItemId()==R.id.ctx_gotocommunity) {
 
 //                    Toast.makeText(context, "this is got to " + communitiesModelList.get(position).siteurl, Toast.LENGTH_SHORT).show();
                     loginVollyWebCall(communitiesModelList.get(position));
                 }
-                if (item.getTitle().toString().equalsIgnoreCase("Join Community")) {
+                if (item.getItemId()==R.id.ctx_joincommunity) {
 
 //                    Toast.makeText(context, "this is join Community", Toast.LENGTH_SHORT).show();
                     loginVollyWebCall(communitiesModelList.get(position));
@@ -509,7 +514,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         if (isNetworkConnectionAvailable(context, -1)) {
 
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
             final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
             final String passWord = preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD);
 
@@ -550,14 +555,14 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
                                     if (resultForLogin.contains("Login Failed")) {
 
                                         Toast.makeText(context,
-                                                "Authentication Failed. Contact site admin",
+                                                getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_authenticationfailedcontactsiteadmin),
                                                 Toast.LENGTH_LONG).show();
 
                                     }
 
                                     if (resultForLogin.contains("Pending Registration")) {
 
-                                        Toast.makeText(context, "Please be patient while awaiting approval. You will receive an email once your profile is approved.",
+                                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_pleasebepatientawaitingapproval),
                                                 Toast.LENGTH_LONG).show();
 
                                         refreshCatalog(false);
@@ -636,7 +641,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
 
         } else {
-            Toast.makeText(getContext(), "  " + getString(R.string.alert_headtext_no_internet) + "  ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "  " + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet) + "  ", Toast.LENGTH_SHORT).show();
         }
     }
 

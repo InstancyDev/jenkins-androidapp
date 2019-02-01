@@ -27,8 +27,10 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.NativeSettingsAdapter;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.interfaces.StringResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.Utilities;
@@ -36,6 +38,7 @@ import com.instancy.instancylearning.utils.Utilities;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.annotation.Native;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +63,10 @@ public class NativeSettings extends AppCompatActivity {
     final Context context = this;
     String TAG = NativeSettings.class.getSimpleName();
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, NativeSettings.this);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +84,7 @@ public class NativeSettings extends AppCompatActivity {
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Settings</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.sidemenu_button_settingsbutton) + "</font>"));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -93,7 +100,7 @@ public class NativeSettings extends AppCompatActivity {
         someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         // Add a few teams to display.
-        expandableListDetail = NativeSetttingsModel.getData(isLogin);
+        expandableListDetail = NativeSetttingsModel.getData(isLogin, NativeSettings.this);
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
         expandableListView = (ExpandableListView) findViewById(R.id.settings_list);
         // Construct our adapter, using our own layout and myTeams
@@ -113,9 +120,9 @@ public class NativeSettings extends AppCompatActivity {
                 if (childPosition == 0 && !isLogin) {
 
 //                    new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE)
-//                            .setTitleText("Are you sure?")
-//                            .setContentText("Do you want to reset the site URL!")
-//                            .setConfirmText("Yes,reset it!")
+//                            .setTitleText(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringareyousure))
+//                            .setContentText(getLocalizationValue(JsonLocalekeys.sidemenu_button_settingsbutton))
+//                            .setConfirmText(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_resetbutton))
 //                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
 //                                @Override
 //                                public void onClick(SweetAlertDialog sDialog) {
@@ -124,9 +131,9 @@ public class NativeSettings extends AppCompatActivity {
 //                                        Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
 //                                        intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                                        startActivity(intentBranding);
-//                                        Toast.makeText(context, "Default url set " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
+//                                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.default_url_set) + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
 //                                    } else {
-//                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 //                                    }
 //
 //
@@ -144,9 +151,9 @@ public class NativeSettings extends AppCompatActivity {
 //                            .show();
 
                     final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(NativeSettings.this);
-                    builder.setMessage("Do you want to reset the site URL!").setTitle("Are you sure?")
+                    builder.setMessage(getLocalizationValue(JsonLocalekeys.sidemenu_button_settingsbutton)).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringareyousure))
                             .setCancelable(false)
-                            .setPositiveButton("Yes, reset it!", new DialogInterface.OnClickListener() {
+                            .setPositiveButton(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_resetbutton), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     //do things
 
@@ -155,14 +162,14 @@ public class NativeSettings extends AppCompatActivity {
                                         Intent intentBranding = new Intent(NativeSettings.this, Splash_activity.class);
                                         intentBranding.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         startActivity(intentBranding);
-                                        Toast.makeText(context, "Default url set " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.default_url_set) + "  " + preferencesManager.getStringValue(StaticValues.KEY_SITEURL), Toast.LENGTH_LONG).show();
                                     } else {
-                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                                     }
 
                                     dialog.dismiss();
                                 }
-                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            }).setNegativeButton(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -207,8 +214,8 @@ public class NativeSettings extends AppCompatActivity {
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)
-                .setTitle("SITE URL")
-                .setPositiveButton("SAVE",
+                .setTitle(getLocalizationValue(JsonLocalekeys.siteurlsetting_label_siteurlheadinglabel))
+                .setPositiveButton(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_submitbutton),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // get user input and set it to result
@@ -221,11 +228,11 @@ public class NativeSettings extends AppCompatActivity {
 //                                        resetUrlWebCall(newUrl);
                                         resetUrlWebCallForDigi(newUrl);
                                     } else {
-                                        Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                                     }
 
                                 } else {
-                                    Toast.makeText(context, "Invalid Url " + newUrl, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.siteurlsetting_alertsubtitle_siteurlnotvalidorcheckinternetconnection), Toast.LENGTH_SHORT).show();
 
                                 }
 
@@ -233,7 +240,7 @@ public class NativeSettings extends AppCompatActivity {
 
 
                         })
-                .setNegativeButton("CANCEL",
+                .setNegativeButton(getLocalizationValue(JsonLocalekeys.siteurlsetting_alertbutton_cancelbutton),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
@@ -270,11 +277,11 @@ public class NativeSettings extends AppCompatActivity {
                             startActivity(intentBranding);
 
                         } else {
-                            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
-                        Toast.makeText(context, "Invalid Url " + webApiUrl, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.siteurlsetting_alertsubtitle_siteurlnotvalidorcheckinternetconnection) + webApiUrl, Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -285,7 +292,7 @@ public class NativeSettings extends AppCompatActivity {
             @Override
             public void getError(String error) {
                 LogUtils.e(TAG, "Result error " + error);
-                Toast.makeText(context, "Invalid Request ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });
@@ -296,7 +303,10 @@ public class NativeSettings extends AppCompatActivity {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
-        String requestURL = "http://angularbasicapi.instancysoft.com/api/Authentication/GetAPIAuth?AppURL=" + newUrl;
+        //     String requestURL = getResources().getString(R.string.app_default_auth_url)+"Authentication/GetAPIAuth?AppURL=" + newUrl;
+
+        String requestURL = getResources().getString(R.string.app_default_auth_url) + "Authentication/GetAPIAuth?AppURL=" + newUrl;
+
 
         VolleySingleton.stringRequests(requestURL, new StringResultListner<String>() {
             @Override
@@ -325,11 +335,11 @@ public class NativeSettings extends AppCompatActivity {
                             startActivity(intentBranding);
 
                         } else {
-                            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
-                        Toast.makeText(context, "Invalid Url " + webApiUrl, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.siteurlsetting_alertsubtitle_siteurlnotvalidorcheckinternetconnection) + webApiUrl, Toast.LENGTH_SHORT).show();
 
                     }
 
@@ -340,7 +350,7 @@ public class NativeSettings extends AppCompatActivity {
             @Override
             public void getError(String error) {
                 LogUtils.e(TAG, "Result error " + error);
-                Toast.makeText(context, "Invalid Request ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });

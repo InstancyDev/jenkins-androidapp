@@ -29,6 +29,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -49,9 +50,11 @@ import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -75,6 +78,7 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
+import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -420,7 +424,6 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
 
         if (myLearningModel.get(position).getGroupName().length() > 0) {
-
             holder.txtgroupName.setVisibility(View.VISIBLE);
             holder.txtgroupName.setText(myLearningModel.get(position).getGroupName());
         } else {
@@ -442,14 +445,6 @@ public class MyLearningAdapter extends BaseAdapter {
         } else {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
-
-
-//        holder.btnContextMenu.getDrawable().setTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppTextColor())));
-
-//        Drawable myIcon = convertView.getContext().getDrawable(R.drawable.ic_more_vert_black_24dp);
-//        holder.btnContextMenu.setImageDrawable(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getAppHeaderTextColor())));
-//        holder.btnContextMenu.setColorFilter(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
-
         holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
         if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
@@ -469,7 +464,21 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.ratingBar.setRating(ratingValue);
 
         if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
-            holder.ratingBar.setVisibility(View.INVISIBLE);
+            holder.ratingBar.setVisibility(View.GONE);
+        }
+        int ratingRequired = 0;
+        try {
+            ratingRequired = Integer.parseInt(uiSettingsModel.getMinimimRatingRequiredToShowRating());
+        } catch (NumberFormatException exce) {
+            ratingRequired = 0;
+        }
+
+        if (myLearningModel.get(position).getTotalratings() >= uiSettingsModel.getNumberOfRatingsRequiredToShowRating() && ratingValue >= ratingRequired) {
+            holder.txtWriteReview.setVisibility(View.GONE);
+            holder.ratingBar.setVisibility(View.VISIBLE);
+        } else {
+            holder.ratingBar.setVisibility(View.GONE);
+            holder.txtWriteReview.setVisibility(View.VISIBLE);
         }
 
         // apply colors
@@ -479,6 +488,10 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtWriteReview.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        holder.txtWriteReview.setText(getLocalizationValue(JsonLocalekeys.details_button_writeareviewbutton));
+        holder.txtEnrollShedule.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_enrollnow));
+        holder.txtEnrollShedule.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         holder.txtEventFromTo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtEventLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -551,6 +564,18 @@ public class MyLearningAdapter extends BaseAdapter {
 //              File extStore = Environment.getExternalStorageDirectory();
         }
 
+
+        if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+            holder.txtEnrollShedule.setVisibility(View.VISIBLE);
+            holder.authorLayout.setVisibility(View.GONE);
+            holder.eventLayout.setVisibility(View.GONE);
+            holder.locationlayout.setVisibility(View.GONE);
+
+        } else {
+
+            holder.txtEnrollShedule.setVisibility(View.GONE);
+        }
+
         holder.txtCourseStatus.setVisibility(View.VISIBLE);
         String courseStatus = "";
 //            int progressPercentage = 1;
@@ -563,16 +588,15 @@ public class MyLearningAdapter extends BaseAdapter {
 //            }
 
         String statusFromModel = myLearningModel.get(position).getStatusActual();
-        String statusDisplayFromModel = myLearningModel.get(position).getStatusDisplay();
 
-        Log.d(TAG, "getView: statusFromModel " + statusFromModel);
+        Log.d(TAG, "getView: statusFromModel" + statusFromModel);
 
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
             if (statusFromModel.equalsIgnoreCase("Completed")) {
 
 //                statusFromModel = "Completed";
-                statusFromModel = vi.getContext().getString(R.string.status_completed);
+                statusFromModel = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
 
 
             } else if (statusFromModel.equalsIgnoreCase("failed")) {
@@ -582,7 +606,7 @@ public class MyLearningAdapter extends BaseAdapter {
             } else if (statusFromModel.equalsIgnoreCase("passed")) {
 
 //                statusFromModel = "Completed(passed)";
-                statusFromModel = vi.getContext().getString(R.string.status_completed_passed);
+                statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_passed);
             }
 
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
@@ -603,10 +627,10 @@ public class MyLearningAdapter extends BaseAdapter {
 
             if (statusFromModel.equalsIgnoreCase("incomplete")) {
 //                status = "In Progress ";
-                status = vi.getContext().getString(R.string.status_inprogress);
+                status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
             } else if (statusFromModel.length() == 0) {
 //                status = "In Progress ";
-                status = vi.getContext().getString(R.string.status_inprogress);
+                status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
             } else {
                 status = statusFromModel;
 
@@ -619,7 +643,7 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "Pending Review";
 
-            status = vi.getContext().getString(R.string.status_pending_review);
+            status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
 
             holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
@@ -629,17 +653,23 @@ public class MyLearningAdapter extends BaseAdapter {
             String status = "";
 
 //            status = statusFromModel;
-            status = vi.getContext().getString(R.string.status_registered);
+            status = getLocalizationValue(JsonLocalekeys.mylearning_label_registerlabel);
             holder.progressBar.setProgress(100);
-            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorGray));
+            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
             courseStatus = status;
-        } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
+
+            if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_tobesechdule);
+                holder.txtCourseStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+            }
+
+        } else if (statusFromModel.toLowerCase().contains("attended")) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
             String status = "";
 
 //            status = statusFromModel;
 
-            status = vi.getContext().getString(R.string.status_attended);
+            status = getLocalizationValue(JsonLocalekeys.mylearning_label_attendedlabel);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
             courseStatus = status;
         } else if (statusFromModel.toLowerCase().contains("Expired")) {
@@ -647,7 +677,7 @@ public class MyLearningAdapter extends BaseAdapter {
             String status = "";
 
 //            status = statusFromModel;
-            status = vi.getContext().getString(R.string.status_expired);
+            status = getLocalizationValue(JsonLocalekeys.mylearning_label_expiredlabel);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
             courseStatus = status;
         } else {
@@ -676,8 +706,6 @@ public class MyLearningAdapter extends BaseAdapter {
 
         holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorWhite)));
 
-//        holder.fabbtnthumb.setVisibility(View.VISIBLE);
-
 //        holder.btnContextMenu.setImageTintList(ColorStateList.valueOf(Color.parseColor("#ff0000")));
 
         if (myLearningModel.get(position).getIsRequired() == 1) {
@@ -685,7 +713,6 @@ public class MyLearningAdapter extends BaseAdapter {
         } else {
             holder.lbRequired.setVisibility(View.INVISIBLE);
         }
-
 
         final float oldRating = ratingValue;
 
@@ -698,7 +725,6 @@ public class MyLearningAdapter extends BaseAdapter {
                 if (fromUser) {
                     try {
                         getUserRatingsOfTheContent(position, rating);
-
 
                         new CountDownTimer(500, 1000) {
                             public void onTick(long millisUntilFinished) {
@@ -738,7 +764,7 @@ public class MyLearningAdapter extends BaseAdapter {
                         preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
                     }
                 })
-                        .text("Click to download the content").clickToHide(true)
+                        .text(getLocalizationValue(JsonLocalekeys.mylearning_label_clicktodownloadlabel)).clickToHide(true)
                         .show();
 
                 ViewTooltip
@@ -746,7 +772,7 @@ public class MyLearningAdapter extends BaseAdapter {
                         .autoHide(true, 5000)
                         .corner(30)
                         .position(ViewTooltip.Position.BOTTOM).clickToHide(true)
-                        .text("Click for more options").onHide(new ViewTooltip.ListenerHide() {
+                        .text(" " + getLocalizationValue(JsonLocalekeys.mylearning_label_clickformoreopetionlabel)).onHide(new ViewTooltip.ListenerHide() {
                     @Override
                     public void onHide(View view) {
                         appcontroller.setAlreadyViewd(true);
@@ -762,7 +788,7 @@ public class MyLearningAdapter extends BaseAdapter {
                         .position(ViewTooltip.Position.BOTTOM)
                         .clickToHide(true)
                         .animation(new ViewTooltip.FadeTooltipAnimation(500))
-                        .text("Click on image to view").onHide(new ViewTooltip.ListenerHide() {
+                        .text(" " + getLocalizationValue(JsonLocalekeys.mylearning_label_clickonimagelabel)).onHide(new ViewTooltip.ListenerHide() {
                     @Override
                     public void onHide(View view) {
                         appcontroller.setAlreadyViewd(true);
@@ -885,12 +911,24 @@ public class MyLearningAdapter extends BaseAdapter {
         TextView txtEventLocation;
 
         @Nullable
+        @BindView(R.id.txtWriteReview)
+        TextView txtWriteReview;
+
+        @Nullable
+        @BindView(R.id.txtEnrollShedule)
+        TextView txtEnrollShedule;
+
+        @Nullable
         @BindView(R.id.eventlayout)
         LinearLayout eventLayout;
 
         @Nullable
         @BindView(R.id.locationlayout)
         LinearLayout locationlayout;
+
+        @Nullable
+        @BindView(R.id.author_site_layout)
+        LinearLayout authorLayout;
 
         @Nullable
         @BindView(R.id.fabbtnthumb)
@@ -950,35 +988,52 @@ public class MyLearningAdapter extends BaseAdapter {
             downloadStart = new DownloadStart() {
                 @Override
                 public void downloadTheContent() {
-
-//                    ((ListView) parent).performItemClick(view, getPosition,  R.id.btntxt_download);
-//                    TextView btnCtxDownload = (TextView) view.findViewById(R.id.btntxt_download);
-//                    actionsForMenu(btnCtxDownload);
                     btnDownload.performClick();
                 }
             };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name, R.id.fabbtnthumb, R.id.txtEnrollShedule, R.id.txtWriteReview})
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
-
                 GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel);
+            } else if (view.getId() == R.id.txtWriteReview) {
+                try {
+
+                    if (isNetworkConnectionAvailable(activity, -1)) {
+
+                        float ratingValue = 0;
+                        try {
+                            ratingValue = Float.parseFloat(myLearningModel.get(getPosition).getRatingId());
+                        } catch (NumberFormatException ex) {
+                            ex.printStackTrace();
+                            ratingValue = 0;
+                        }
+                        getUserRatingsOfTheContent(getPosition, ratingValue);
+                    } else {
+
+                        Toast.makeText(activity, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             } else {
-                if (!myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
+                if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && uiSettingsModel.isEnableMultipleInstancesforEvent() && myLearningDetalData.getEventScheduleType() == 1) {
+                    ((ListView) parent).performItemClick(view, getPosition, 0);
+                } else {
                     ((ListView) parent).performItemClick(view, getPosition, 0);
                 }
             }
         }
     }
 
-    public void getUserRatingsOfTheContent(final int position, final float rating) throws
-            JSONException {
+    public void getUserRatingsOfTheContent(final int position, final float rating) throws JSONException {
 
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.get(position).getContentID());
-        parameters.put("Locale", "en-us");
+        parameters.put("Locale", preferencesManager.getLocalizationStringValue(activity.getResources().getString(R.string.locale_name)));
         parameters.put("metadata", "0");
         parameters.put("intUserID", appUserModel.getUserIDValue());
         parameters.put("CartID", "");
@@ -1035,8 +1090,8 @@ public class MyLearningAdapter extends BaseAdapter {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -1075,40 +1130,44 @@ public class MyLearningAdapter extends BaseAdapter {
             intentReview.putExtra("isEditReview", isEditReview);
             if (isEditReview) {
                 intentReview.putExtra("editObj", (Serializable) editObj.toString());
-
             }
+
             intentReview.putExtra("ratednow", rating);
             intentReview.putExtra("from", true);
             activity.startActivityForResult(intentReview, REVIEW_REFRESH);
-
         }
-
     }
-
 
     public void addToArchiveApiCall(int position, boolean isArchived) throws
             JSONException {
-        int arch = 0;
+        int archV = 0;
         if (isArchived) {
-            arch = 1;
+            archV = 1;
         } else {
-            arch = 0;
+            archV = 0;
         }
 
         JSONObject parameters = new JSONObject();
         parameters.put("ContentID", myLearningModel.get(position).getContentID());
-        parameters.put("IsArchived", arch);
+        parameters.put("IsArchived", archV);
         parameters.put("UserID", appUserModel.getUserIDValue());
 
         final String parameterString = parameters.toString();
 
         String urlString = appUserModel.getWebAPIUrl() + "/catalog/UpdateMyLearningArchive";
 
+        final int finalArchV = archV;
         final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
+                if (finalArchV == 1) {
+                    Toast.makeText(activity, " Archived Successfully ", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(activity, " Unarchived Successfully ", Toast.LENGTH_SHORT).show();
+                }
+                eventInterface.archiveAndUnarchive(true);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -1119,7 +1178,6 @@ public class MyLearningAdapter extends BaseAdapter {
         })
 
         {
-
             @Override
             public String getBodyContentType() {
                 return "application/json";
@@ -1127,7 +1185,7 @@ public class MyLearningAdapter extends BaseAdapter {
             }
 
             @Override
-            public byte[] getBody() throws com.android.volley.AuthFailureError {
+            public byte[] getBody() {
                 return parameterString.getBytes();
             }
 
@@ -1136,8 +1194,8 @@ public class MyLearningAdapter extends BaseAdapter {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -1153,6 +1211,9 @@ public class MyLearningAdapter extends BaseAdapter {
 
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
+    }
 }
 
 

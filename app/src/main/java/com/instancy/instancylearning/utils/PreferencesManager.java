@@ -45,6 +45,20 @@ public class PreferencesManager {
     public String getStringValue(String KEY_VALUE) {
         return mPref.getString(KEY_VALUE, "");
     }
+    public String getLocalizationStringValue(String KEY_VALUE) {
+        return mPref.getString(KEY_VALUE, "en-us");
+    }
+    public String getLocalizationDisplayStringValue(String KEY_VALUE) {
+        return mPref.getString(KEY_VALUE, "English");
+    }
+    public void setBooleanValue(boolean value, String KEY_VALUE) {
+        mPref.edit()
+                .putBoolean(KEY_VALUE, value)
+                .commit();
+    }
+    public boolean getBooleanValue(String KEY_VALUE) {
+        return mPref.getBoolean(KEY_VALUE, false);
+    }
 
     public void remove(String key) {
         mPref.edit()

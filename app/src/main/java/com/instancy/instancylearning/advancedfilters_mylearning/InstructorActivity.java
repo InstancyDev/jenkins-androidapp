@@ -218,7 +218,8 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
     public void getSelectedCategoriesValues() {
 
         if (instructorModelList != null && instructorModelList.size() > 0) {
-
+            contentFilterByModel.selectedSkillIdsArry = new ArrayList<>();
+            contentFilterByModel.selectedSkillNamesArry = new ArrayList<>();
             for (int i = 0; i < instructorModelList.size(); i++) {
 
                 if (instructorModelList.get(i).isSelected) {

@@ -43,11 +43,13 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DegreeTypeModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.models.UserEducationModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -154,7 +156,9 @@ public class Education_activity extends AppCompatActivity {
     boolean toCheck = false;
 
     UserEducationModel userEducationModel;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,Education_activity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -203,7 +207,7 @@ public class Education_activity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "     Education" + "</font>"));//
+                getLocalizationValue(JsonLocalekeys.profile_header_educationtitlelabel) + "</font>"));//
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -222,8 +226,8 @@ public class Education_activity extends AppCompatActivity {
 
         }
 
-        txtSave.setText(getResources().getString(R.string.profile_button_educationsavebutton));
-        txtCancel.setText(getResources().getString(R.string.profile_button_educationcancelbutton));
+        txtSave.setText(getLocalizationValue(JsonLocalekeys.profile_button_educationsavebutton));
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.profile_button_educationcancelbutton));
     }
 
     public void initilizeSpinnersView() {
@@ -405,13 +409,13 @@ public class Education_activity extends AppCompatActivity {
                 return true;
             case R.id.deleteItem:
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(getResources().getString(R.string.removeeducationmessage)).setTitle(getResources().getString(R.string.removeconnectionalert))
-                        .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setMessage(getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_deleteeducation)).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation))
+                        .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.profile_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
                     }
-                }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                }).setPositiveButton(getLocalizationValue(JsonLocalekeys.profile_alertbutton_deletebutton), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //do things
                         dialog.dismiss();
@@ -439,7 +443,7 @@ public class Education_activity extends AppCompatActivity {
 
         Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_trash, context, uiSettingsModel.getAppHeaderTextColor());
         itemDelete.setIcon(filterDrawable);
-        itemDelete.setTitle("Delete");
+        itemDelete.setTitle(getLocalizationValue(JsonLocalekeys.profile_button_educationdeletebutton));
 
         if (isNewRecord) {
             itemDelete.setVisible(false);
@@ -497,17 +501,17 @@ public class Education_activity extends AppCompatActivity {
         }
 
         if (schoolStr.length() < 1) {
-            Toast.makeText(this, "Enter school", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_educationschooluniversitytextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (countryStr.length() < 1) {
-            Toast.makeText(this, "Enter country", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_educationcountrynametextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (degreeStr.length() < 1) {
-            Toast.makeText(this, "Enter degree", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_educationdegreetextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (fromYInt == 0) {
-            Toast.makeText(this, "Please select from year", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_educationfromyeartextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (toYearInt == 0) {
-            Toast.makeText(this, "Please select to year", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_textfield_educationtoyeartextfieldplaceholder), Toast.LENGTH_SHORT).show();
         } else if (isLEssthan) {
-            Toast.makeText(this, "Your To year can't be earlier or same than your From year ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_selectpropertoyearvalue), Toast.LENGTH_SHORT).show();
         } else {
 
             String totalYs = totalYearStr(fromYInt, toYearInt);
@@ -537,7 +541,7 @@ public class Education_activity extends AppCompatActivity {
             if (isNetworkConnectionAvailable(this, -1)) {
                 sendNewOrUpdatedEducationDetailsDataToServer(parameterString);
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -562,21 +566,21 @@ public class Education_activity extends AppCompatActivity {
                 if (s.contains("true")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, "Success! \nYou have successfully added the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\nYou have successfully added the education", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, "Success! \nYou have successfully updated the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\nYou have successfully updated the education", Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alert_cannotpostedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -624,7 +628,7 @@ public class Education_activity extends AppCompatActivity {
     }
 
     public void getDegreeTitles() {
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
 
         String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GeteducationTitleList";
 
@@ -752,18 +756,18 @@ public class Education_activity extends AppCompatActivity {
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, "Success! \nYou have successfully deleted the education", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\n"+getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_educationdeleteSuccessfully), Toast.LENGTH_SHORT).show();
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "Education cannot be posted to server. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alert_cannotpostedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })

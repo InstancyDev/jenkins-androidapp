@@ -6,6 +6,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.google.gson.JsonParser;
+import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.utils.Utilities;
@@ -188,9 +189,9 @@ public class WebAPIClient {
         }
     }
 
-    public String getSiteAPIDetailsForDigi(String siteUrl, boolean isMainSite) {
-//        String requestURL = "https://masterapi.instancy.com//api//Authentication/GetAPIAuth?AppURL=" + siteUrl;
-        String requestURL = "http://angularbasicapi.instancysoft.com/api/Authentication/GetAPIAuth?AppURL=" + siteUrl;
+    public String getSiteAPIDetailsForDigi(String siteUrl, boolean isMainSite,Context context) {
+        String requestURL =context.getResources().getString(R.string.app_default_auth_url)+ "Authentication/GetAPIAuth?AppURL=" + siteUrl;
+//        String requestURL = "http://angularbasicapi.instancysoft.com/api/Authentication/GetAPIAuth?AppURL=" + siteUrl;
 
         String webApiUrl = "";
         Log.d("AUTH", "getAPIAuthDetails: " + requestURL);

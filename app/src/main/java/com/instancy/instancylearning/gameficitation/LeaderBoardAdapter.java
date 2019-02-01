@@ -16,11 +16,13 @@ import android.widget.TextView;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.LeaderboardList;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.CompetencyJobRoles;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -94,8 +96,8 @@ public class LeaderBoardAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.txtDisplayName.setText(leaderboardListList.get(position).userDisplayName);
 
-        String description=  "Points: " + leaderboardListList.get(position).points  + "   Level: " + leaderboardListList.get(position).levelName +
-        "   Badges: " + leaderboardListList.get(position).badges;
+        String description=  getLocalizationValue(JsonLocalekeys.filter_label_points)+": " + leaderboardListList.get(position).points  +getLocalizationValue(JsonLocalekeys.filter_label_level)+ "   : " + leaderboardListList.get(position).levelName +
+                getLocalizationValue(JsonLocalekeys.filter_label_badges)+"   : " + leaderboardListList.get(position).badges;
 
         holder.txtDescription.setText(description);
         holder.txtRank.setText(""+leaderboardListList.get(position).rank);
@@ -141,6 +143,9 @@ public class LeaderBoardAdapter extends BaseAdapter {
 //            ((ListView) parent).performItemClick(view, getPosition, 0);
 
         }
+    }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
     }
 }
 

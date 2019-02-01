@@ -29,10 +29,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -42,6 +44,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
@@ -107,7 +110,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contentFilterByModel.categoryName + "</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + contentFilterByModel.categoryDisplayName + "</font>"));
 
         applyUiColor();
         try {
@@ -123,7 +126,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
         noDataLabel = (TextView) findViewById(R.id.nodata_label);
         filterByModelList = new ArrayList<>();
         listView = (ListView) findViewById(R.id.lstContentFilterBy);
-        filterByAdapter = new FilterByAdapter(this, filterByModelList, contentFilterByModel.goInside);
+        filterByAdapter = new FilterByAdapter(this, filterByModelList, contentFilterByModel);
         listView.setAdapter(filterByAdapter);
         listView.setDivider(null);
         listView.setOnItemClickListener(this);
@@ -134,7 +137,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
-            String urlStr = "SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&Type=" + contentFilterByModel.categoryID + "&ShowAllItems=&FilterContentType=&FilterMediaType=&EventType=&SprateEvents=false&IsCompetencypath=false";
+            String urlStr = "SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&Type=" + contentFilterByModel.categoryID + "&ShowAllItems=&FilterContentType=&FilterMediaType=&EventType=&SprateEvents=false&IsCompetencypath=false&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
             vollyService.getStringResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/catalog/GetCategoriesTree?" + urlStr, appUserModel.getAuthHeaders());
 
@@ -193,6 +196,13 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -255,7 +265,8 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
 
         if (filtersParents != null && filtersParents.size() > 0) {
-
+            contentFilterByModel.selectedSkillIdsArry = new ArrayList<>();
+            contentFilterByModel.selectedSkillNamesArry = new ArrayList<>();
             for (int i = 0; i < filtersParents.size(); i++) {
 
                 if (filtersParents.get(i).isSelected) {
@@ -266,8 +277,28 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
                 }
             }
 
+            contentFilterByModel.selectedSkillIdsArry = removeAllDuplicates(contentFilterByModel.selectedSkillIdsArry);
+
+            contentFilterByModel.selectedSkillNamesArry = removeAllDuplicates(contentFilterByModel.selectedSkillNamesArry);
+
         }
     }
+
+    public List<String> removeAllDuplicates(List<String> values) {
+
+        List<String> noDuplicates = new ArrayList<String>();
+
+        if (values == null || values.size() == 0)
+            return noDuplicates;
+
+        HashSet<String> hashSet = new HashSet<String>();
+        hashSet.addAll(values);
+        values.clear();
+        values.addAll(hashSet);
+
+        return values;
+    }
+
 
     public void resetArrayList() {
 
@@ -320,7 +351,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
     public void getSelectedCategories() {
         String selectedSkillsIds = "";
         String selectedSkillsNames = "";
-        List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
+
 
         if (filtersParents != null && filtersParents.size() > 0) {
 
@@ -433,14 +464,22 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
             JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
 
             filterByModel.categoryName = jsonColumnObj.optString("CategoryName");
-            filterByModel.categoryID = jsonColumnObj.optInt("CategoryID");
-            filterByModel.parentID = jsonColumnObj.optInt("ParentID");
+            filterByModel.categoryID = jsonColumnObj.optString("CategoryID");
+            filterByModel.parentID = jsonColumnObj.optString("ParentID","0");
             filterByModel.categoryIcon = jsonColumnObj.optString("CategoryIcon");
-            if (filterByModel.parentID == 0) {
+
+            if (filterByModel.parentID.equalsIgnoreCase("0")) {
                 filterByList.add(filterByModel);
             }
-
             filterByModelList.add(filterByModel);
+        }
+
+        if (filterByList.size() > 0) {
+            for (int i = 0; i < filterByList.size(); i++) {
+
+                filterByList.get(i).isContainsChild = checkItContainsChilds(filterByList.get(i));
+
+            }
         }
 
         return filterByList;
@@ -448,17 +487,19 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+        FilterByModel filterByModel = (FilterByModel) adapterView.getItemAtPosition(i);
+        String titleHeader = filterByModel.categoryName;
         switch (view.getId()) {
             case R.id.chxCategoryDisplayName:
                 refreshCheckedItem(view, i);
                 break;
             case R.id.txtCategoryDisplayName:
                 if (contentFilterByModel.goInside) {
-                    filtersChilds = generateInnerChildCategories(filterByModelList.get(i));
+                    filtersChilds = generateInnerChildCategories(filterByModel);
                     if (filtersChilds != null && filtersChilds.size() > 0) {
                         Intent intent = new Intent(this, SelectedActivity.class);
                         intent.putExtra("isFrom", 0);
+                        intent.putExtra("TITLEHEADER", titleHeader);
                         intent.putExtra("filterByModelList", (Serializable) filtersChilds);
                         intent.putExtra("contentFilterByModel", (Serializable) contentFilterByModel);
                         startActivityForResult(intent, FILTER_CLOSE_CODE);
@@ -485,7 +526,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
         for (int i = 0; i < filterByModelList.size(); i++) {
 
-            if (filterByModel.parentID == 0 && filterByModelList.get(i).parentID == filterByModel.categoryID) {
+            if (filterByModel.parentID.equalsIgnoreCase("0") && filterByModelList.get(i).parentID.equalsIgnoreCase(filterByModel.categoryID)) {
                 filterByList.add(filterByModelList.get(i));
             }
 
@@ -498,7 +539,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
                 for (int k = 0; k < filterByModelList.size(); k++) {
 
-                    if (filterByModelList.get(k).parentID == filterByList.get(i).categoryID) {
+                    if (filterByModelList.get(k).parentID.equalsIgnoreCase(filterByList.get(i).categoryID)) {
                         filterInnerByList.add(filterByModelList.get(k));
                     }
 
@@ -514,6 +555,45 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
         }
 
         return filterByList;
+    }
+
+    public boolean checkItContainsChilds(FilterByModel filterByModel) {
+        List<FilterByModel> filterByList = new ArrayList<>();
+
+        boolean isHaveChilds = false;
+
+        for (int i = 0; i < filterByModelList.size(); i++) {
+
+            if (filterByModel.parentID.equalsIgnoreCase("0") && filterByModelList.get(i).parentID.equalsIgnoreCase(filterByModel.categoryID)) {
+//                filterByList.add(filterByModelList.get(i));
+                isHaveChilds = true;
+            }
+
+        }
+
+        if (filterByList.size() > 0) {
+
+            for (int i = 0; i < filterByList.size(); i++) {
+                List<FilterByModel> filterInnerByList = new ArrayList<>();
+
+                for (int k = 0; k < filterByModelList.size(); k++) {
+
+                    if (filterByModelList.get(k).parentID.equalsIgnoreCase(filterByList.get(i).categoryID)) {
+                        // filterInnerByList.add(filterByModelList.get(k));
+                        isHaveChilds = true;
+                    }
+
+                }
+
+                if (filterInnerByList.size() > 0) {
+                    filterByList.addAll(filterInnerByList);
+                }
+
+            }
+
+        }
+
+        return isHaveChilds;
     }
 
 

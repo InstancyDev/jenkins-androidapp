@@ -47,6 +47,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.localization.LocalizationSelectionActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 
@@ -54,6 +55,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.NativeSetttingsModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 
@@ -99,6 +101,9 @@ public class SettingsInnerFragment extends Fragment {
 
 
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -135,7 +140,7 @@ public class SettingsInnerFragment extends Fragment {
         ButterKnife.bind(this, rootView);
 
 
-        expandableListDetail = NativeSetttingsModel.getData(true);
+        expandableListDetail = NativeSetttingsModel.getData(true,getActivity());
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
         settingsInnerAdapter = new SettingsInnerAdapter(context, expandableListTitle, expandableListDetail, settingsExpandList);
         settingsExpandList.setAdapter(settingsInnerAdapter);
@@ -170,7 +175,7 @@ public class SettingsInnerFragment extends Fragment {
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getResources().getString(R.string.label_settings) + "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.sidemenu_button_settingsbutton) + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
 

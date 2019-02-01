@@ -55,12 +55,14 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.AskExpertSkillsModel;
 import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -191,8 +193,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Ask a Question" + "</font>"));
-
+                getLocalizationValue(JsonLocalekeys.asktheexpert_header_askaquestiontitlelabel) + "</font>"));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -211,7 +212,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
     }
 
     public void getSkillsCalatalogFrom() {
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         String parmStringUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/GetUserQuestionSkills?SiteID=" + appUserModel.getSiteIDValue() + "&Type=selected&ExpertID=" + expertID;
         vollyService.getJsonObjResponseVolley("ASKQSCAT", parmStringUrl, appUserModel.getAuthHeaders());
 
@@ -223,7 +224,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledTitle
-                = new SpannableString("*Question");
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.asktheexpert_label_questionlabel));
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -231,7 +232,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         labelTitle.setText(styledTitle);
 
         SpannableString styledDescription
-                = new SpannableString("*Select the relevant skills :");
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.asktheexpert_label_skillslabel));
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -311,9 +312,9 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         String descriptionStr = editDescription.getText().toString().trim();
 
         if (descriptionStr.length() < 1) {
-            Toast.makeText(this, "Please enter question", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.asktheexpert_label_questionentertitle), Toast.LENGTH_SHORT).show();
         } else if (category.length() == 0) {
-            Toast.makeText(this, "Please select skill", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.asktheexpert_label_questionskillstitle), Toast.LENGTH_SHORT).show();
         } else {
 //            Map<String, String> parameters = new HashMap<String, String>();
             JSONObject parameters = new JSONObject();
@@ -336,7 +337,7 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
                 sendNewForumDataToServer(addQuotes, descriptionStr, category);
 
             } else {
-                Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -359,7 +360,9 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour new Question has been successfully posted.", Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)
+                            +" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_questionpostedsuccessfully), Toast.LENGTH_SHORT).show();
                     AskExpertQuestionModel askExpertQuestionModel = new AskExpertQuestionModel();
                     String replaceString = s.replace("##", "=");
                     String[] strSplitvalues = replaceString.split("=");
@@ -384,14 +387,14 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, "New Question cannot be posted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_unabletopostquetion), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
                 closeForum(false);
             }
@@ -415,8 +418,8 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;
@@ -601,6 +604,11 @@ public class AskQuestionActivity extends AppCompatActivity implements AdapterVie
         }
 
         return askExpertSkillsModelList1;
+    }
+
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key, this);
+
     }
 
 }

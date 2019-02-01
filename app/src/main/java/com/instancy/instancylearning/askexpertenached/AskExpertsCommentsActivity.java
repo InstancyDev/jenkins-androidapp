@@ -58,12 +58,14 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.AskExpertQuestionModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -202,7 +204,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Comments" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentstitlelabel) + "</font>"));
 
         askExpertCommentAdapter = new AskExpertCommentAdapter(this, BIND_ABOVE_CLIENT, askExpertCommentModelList);
         askExpertsListView.setAdapter(askExpertCommentAdapter);
@@ -329,7 +331,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
         final EditText userInputDialogEditText = (EditText) mView.findViewById(R.id.userInputDialog);
         alertDialogBuilderUserInput
                 .setCancelable(false)
-                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_submitbutton), new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialogBox, int id) {
                         // ToDo get user input here
 
@@ -341,7 +343,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                             e.printStackTrace();
                         }
                     }
-                }).setNegativeButton("Cancel",
+                }).setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_cancelbutton),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
                         dialogBox.cancel();
@@ -365,10 +367,10 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
 
         txtName.setText(askExpertAnswerModel.respondedUserName);
-        txtDaysAgo.setText(" Answered on: " + askExpertAnswerModel.daysAgo);
+        txtDaysAgo.setText(" "+getLocalizationValue(JsonLocalekeys.asktheexpert_label_answeredonlabel)+" " + askExpertAnswerModel.daysAgo);
         txtMessage.setText(askExpertAnswerModel.response + " ");
-        txtTotalViews.setText(askExpertAnswerModel.upvotesCount + " Views");
-        txtComments.setText("Comments " + askExpertAnswerModel.commentCount);
+        txtTotalViews.setText(askExpertAnswerModel.upvotesCount + getLocalizationValue(JsonLocalekeys.asktheexpert_label_viewslabel));
+        txtComments.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentstitlelabel)+" " + askExpertAnswerModel.commentCount);
 
         txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtDaysAgo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -437,7 +439,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
             askExpertCommentAdapter.refreshList(askExpertCommentModelList);
         }
 
-        txtComments.setText(" Comments " + askExpertCommentModelList.size());
+        txtComments.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentstitlelabel) + askExpertCommentModelList.size());
     }
 
     @Override
@@ -485,7 +487,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
             swipeRefreshLayout.setRefreshing(false);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -548,20 +550,21 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);//edit
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));;
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.ctx_delete:
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-                        alertDialog.setCancelable(false).setTitle("Confirmation").setMessage("Are you sure you want to permanently delete the comment :")
-                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage(getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_areyousuretodeletecomment))
+                                .setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption), new DialogInterface.OnClickListener() {
                                     public void onClick(final DialogInterface dialogBox, int id) {
                                         // ToDo get user input here
                                         deleteCommentFromServer(askExpertCommentModel);
                                     }
-                                }).setNegativeButton("Cancel",
+                                }).setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_canceloption),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialogBox, int id) {
                                         dialogBox.cancel();
@@ -593,21 +596,21 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("1")) {
-
-                    Toast.makeText(context, " Success! \nComment has been successfully deleted ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alerttsubtitle_commentdeletesuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAnswers = true;
                     db.deleteCommentFromLocalDB(askExpertCommentModel);
                     injectFromDbtoModel();
                 } else {
 
-                    Toast.makeText(context, "Comment cannot be deleted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_commentauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
                 svProgressHUD.dismiss();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -635,7 +638,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
     public void refreshForComments(Boolean isRefreshed) {
         if (!isRefreshed) {
-            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 
         String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetUserResponseComments?UserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&intQuestionID=" + askExpertQuestionModel.questionID;
@@ -651,7 +654,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
         String dateStringSec = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (messageStr.length() < 5) {
-            Toast.makeText(AskExpertsCommentsActivity.this, "Answer cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answercannotbeempty), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -660,7 +663,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
             parameters.put("ResponseText", messageStr);
             parameters.put("UserID", appUserModel.getUserIDValue());
             parameters.put("SiteID", appUserModel.getSiteIDValue());
-            parameters.put("Locale", "en-us");
+            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             String parameterString = parameters.toString();
             Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
@@ -679,7 +682,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 askExpertAnswerModel.respondedusername = appUserModel.getUserName();
                 sendNewForumDataToServer(addQuotes, askExpertAnswerModel);
             } else {
-                Toast.makeText(AskExpertsCommentsActivity.this, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsCommentsActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -709,12 +712,12 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                         insertSingleAsktheExpertAnswerDataIntoSqLite(askExpertAnswerModel, 1);
                     }
 
-                    Toast.makeText(AskExpertsCommentsActivity.this, "Success! \nYour Answer has been successfully posted ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+ "\n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answersuccessfullyposted), Toast.LENGTH_SHORT).show();
 
 
                 } else {
 
-                    Toast.makeText(AskExpertsCommentsActivity.this, "New Answer cannot be posted . Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_newanswer_authenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -723,7 +726,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(AskExpertsCommentsActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -746,8 +749,8 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;
@@ -836,7 +839,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
             sendNewLikeDataToServer(parameterString);
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -859,7 +862,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(AskExpertsCommentsActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -882,8 +885,8 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+      /*          headers.put("Content-Type", "application/json");
+                headers.put("Accept", "application/json");*/
 
 
                 return headers;
@@ -901,7 +904,10 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key, AskExpertsCommentsActivity.this);
 
+    }
 }
 
 

@@ -39,8 +39,8 @@
         android:layout_above="@+id/filter_btn_layout"
         android:layout_below="@+id/relativeSeekbar"
         android:padding="10dp"
-        android:paddingEnd="35dp"
-        android:paddingStart="35dp">
+        android:paddingEnd="5dp"
+        android:paddingStart="5dp">
 
         <RadioGroup
             android:id="@+id/radioGrp"

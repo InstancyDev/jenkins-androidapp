@@ -50,10 +50,17 @@ public class DiscussionForumCategoriesAdapter extends BaseAdapter {
 
     }
 
-    public void refreshList(List<DiscussionCategoriesModel> discussionCategoriesModelList) {
+    public void refreshList(List<DiscussionCategoriesModel> discussionCategoriesModelList, boolean isFirstTime) {
         this.discussionCategoriesModelList = discussionCategoriesModelList;
-        this.searchList = new ArrayList<DiscussionCategoriesModel>();
-        this.searchList.addAll(discussionCategoriesModelList);
+        if (isFirstTime) {
+            this.searchList = new ArrayList<DiscussionCategoriesModel>();
+            this.searchList.addAll(discussionCategoriesModelList);
+        }
+        this.notifyDataSetChanged();
+
+    }
+
+    public void notifyiedDataSet() {
         this.notifyDataSetChanged();
     }
 

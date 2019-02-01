@@ -24,9 +24,11 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -77,7 +79,9 @@ public class ProgressReportsActivity extends AppCompatActivity {
 
 
     View header;
-
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,ProgressReportsActivity.this);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +112,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Progress Report" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.mylearning_header_reporttitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -121,21 +125,21 @@ public class ProgressReportsActivity extends AppCompatActivity {
         }
 
         if (isNetworkConnectionAvailable(this, -1)) {
-            getProgressdataDetails(progressReportModel);
+        //    getProgressdataDetails(progressReportModel);
             getSummaryData(progressReportModel);
         } else {
 
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
 
     public void getProgressdataDetails(ProgressReportModel reportModel) {
 
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getprogressdatadetails?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + reportModel.datestarted + "&EndDate=" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") +
-                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&siteid=" + reportModel.siteID + "&locale=en-us&EventID=" + reportModel.SCOID;
+                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&siteid=" + reportModel.siteID + "&locale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&EventID=" + reportModel.SCOID;
 
         urlString = urlString.replaceAll(" ", "%20");
 
@@ -146,7 +150,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
     public void getSummaryData(ProgressReportModel reportModel) {
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getsummarydata?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + reportModel.datestarted + "&EndDate=" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") +
-                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&locale=en-us&EventID=" + reportModel.SCOID;
+                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&locale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&EventID=" + reportModel.SCOID;
 
         urlString = urlString.replaceAll(" ", "%20");
 
@@ -162,7 +166,6 @@ public class ProgressReportsActivity extends AppCompatActivity {
                 if (requestType.equalsIgnoreCase("getprogressdatadetails")) {
                     if (response != null) {
 
-
                         try {
                             reportDetailsForQuestionsArrayList = generateReportsQuestionDetailList(response);
 
@@ -171,7 +174,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
                                 reportAdapter.refreshList(reportDetailsForQuestionsArrayList);
                                 nodataLabel.setText("");
                             } else {
-                                nodataLabel.setText(getResources().getString(R.string.no_data));
+                                nodataLabel.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                             }
 
                         } catch (JSONException e) {
@@ -257,9 +260,9 @@ public class ProgressReportsActivity extends AppCompatActivity {
 //        cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
         if (isValidString(summaryModel.courseName)) {
-            reportTitle.setText("Report:" + summaryModel.courseName);
+            reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport)+":" + summaryModel.courseName);
         } else {
-            reportTitle.setText("Report:");
+            reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport)+":");
         }
 
         if (isValidString(summaryModel.courseName)) {
@@ -275,52 +278,58 @@ public class ProgressReportsActivity extends AppCompatActivity {
         }
 
         if (isValidString(summaryModel.assignedDate)) {
-            txtAssignedDate.setText("Assigned Date: " + summaryModel.assignedDate);
+            txtAssignedDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_assigneddate)+": " + summaryModel.assignedDate);
         } else {
-            txtAssignedDate.setText("Assigned Date:");
+            txtAssignedDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_assigneddate)+":");
         }
 
         if (isValidString(summaryModel.targetDate)) {
-            txtTargetDate.setText("Target Date: " + summaryModel.targetDate);
+            txtTargetDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_targetdate)+": " + summaryModel.targetDate);
         } else {
-            txtTargetDate.setText("Target Date: ");
+            txtTargetDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_targetdate)+": ");
         }
 
         if (isValidString(summaryModel.dateStarted)) {
-            txtDateStarted.setText("Date Started: " + summaryModel.dateStarted);
+            txtDateStarted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" "+ summaryModel.dateStarted);
         } else {
-            txtDateStarted.setText("Date Started: ");
+            txtDateStarted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" ");
         }
 
         if (isValidString(summaryModel.dateCompleted)) {
-            txtDateCompleted.setText("Date Completed: " + summaryModel.dateCompleted);
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" " + summaryModel.dateCompleted);
         } else {
-            txtDateCompleted.setText("Date Completed: ");
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" ");
         }
 
         if (isValidString(summaryModel.timeSpent)) {
-            txtTimeSpent.setText("Time Spent: " + summaryModel.timeSpent);
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + summaryModel.timeSpent);
         } else {
-            txtTimeSpent.setText("Time Spent: ");
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel));
         }
 
         if (isValidString(summaryModel.numberOfTimeAccessedInThisPeriod)) {
-            txtTimeAccessedInThisPeriod.setText("# Times Accessed in This Period: " + summaryModel.numberOfTimeAccessedInThisPeriod);
+            txtTimeAccessedInThisPeriod.setText("# "+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": " + summaryModel.numberOfTimeAccessedInThisPeriod);
         } else {
-            txtTimeAccessedInThisPeriod.setText("# Times Accessed in This Period: ");
+            txtTimeAccessedInThisPeriod.setText("# "+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": ");
         }
 
         if (isValidString(summaryModel.numberOfAttemptsInThisPeriod)) {
-            txtTimeAttemptInThisPeriod.setText("#Times Attempts in This Period: " + summaryModel.numberOfAttemptsInThisPeriod);
+            txtTimeAttemptInThisPeriod.setText("#"+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": " + summaryModel.numberOfAttemptsInThisPeriod);
         } else {
-            txtTimeAttemptInThisPeriod.setText("#Times Attempts in This Period: ");
+            txtTimeAttemptInThisPeriod.setText("#"+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": ");
         }
 
         if (isValidString(summaryModel.score)) {
-            txtScore.setText("Score: " + summaryModel.score);
+            txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + summaryModel.score);
         } else {
-            txtScore.setText("Score: ");
+            txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel));
         }
+
+//        if (isValidString(summaryModel.percentageCompleted)) {
+//            txtPercentCompleted.setText("%"+getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel)+": " + summaryModel.percentageCompleted);
+//        } else {
+//            txtPercentCompleted.setText("%"+getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel)+": ");
+//        }
 
         if (isValidString(summaryModel.percentageCompleted)) {
             txtPercentCompleted.setText("%Completed: " + summaryModel.percentageCompleted);
@@ -328,9 +337,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
             txtPercentCompleted.setText("%Completed: ");
         }
 
-
         if (summaryModel.status.equalsIgnoreCase("Completed") || (summaryModel.status.toLowerCase().contains("passed") || summaryModel.status.toLowerCase().contains("failed")) || summaryModel.status.equalsIgnoreCase("completed")) {
-
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
 

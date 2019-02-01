@@ -46,9 +46,12 @@ import com.instancy.instancylearning.catalogfragment.CatalogFragmentActivity;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
+import com.instancy.instancylearning.utils.PreferencesManager;
 
 
 import org.json.JSONArray;
@@ -342,7 +345,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         // the chart.
 
         String[] mParties = new String[]{
-                skillModel.gapScore + " Gap", skillModel.weightedAverage + " Average", skillModel.requiredProficiency + " Required"
+                skillModel.gapScore + " "+getLocalizationValue(JsonLocalekeys.mycompetency_label_gapheaderlabel), skillModel.weightedAverage + " "+getLocalizationValue(JsonLocalekeys.mycompetency_label_averageheaderlabel), skillModel.requiredProficiency + " "+getLocalizationValue(JsonLocalekeys.mycompetency_label_requiredheaderlabel)
         };
 
 //        for (int i = 0; i < count; i++) {
@@ -361,7 +364,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
             }
         }
 
-        PieDataSet dataSet = new PieDataSet(entries, skillModel.requiredProficiency + " Required");
+        PieDataSet dataSet = new PieDataSet(entries, skillModel.requiredProficiency + " "+getLocalizationValue(JsonLocalekeys.mycompetency_label_requiredheaderlabel));
         // add a lot of colors
 
         ArrayList<Integer> colors = new ArrayList<Integer>();
@@ -515,6 +518,9 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
 
         Menu menu = popup.getMenu();
 
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.mycompetency_actionsheet_viewcontentoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.mycompetency_actionsheet_saveoption));;
+
         if (skillModelList.get(position).viewContent.equalsIgnoreCase("false")) {
             menu.getItem(0).setVisible(false);//viewcontent
 
@@ -536,7 +542,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getTitle().toString().equalsIgnoreCase("View Content")) {
+                if (item.getItemId()==R.id.ctx_viewcontent) {
 
                     Intent intentDetail = new Intent(ctx, CatalogFragmentActivity.class);
                     intentDetail.putExtra("SIDEMENUMODEL", sideMenusModel);
@@ -546,7 +552,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
                     ctx.startActivity(intentDetail);
                 }
 
-                if (item.getTitle().toString().equalsIgnoreCase("Save")) {
+                if (item.getItemId()==R.id.ctx_save) {
 
 
                     String skillValueString = prepareTheSkillSetValueString();
@@ -557,7 +563,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
                             submitSkillData(skillValueString, categoryModel);
                         } else {
 
-                            Toast.makeText(ctx, ctx.getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ctx, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -603,7 +609,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         parameters.put("PrefCategoryID", categoryModel.prefCategoryID);
         parameters.put("JobRoleID", categoryModel.jobRoleID);
         parameters.put("SkillSetValue", skillString);
-        parameters.put("Locale", "en-us");
+        parameters.put("Locale", PreferencesManager.getInstance().getLocalizationStringValue(ctx.getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
 
@@ -642,7 +648,7 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(ctx, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
 
             }
         })
@@ -665,8 +671,8 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -694,5 +700,8 @@ public class CompetencyCatSkillAdapter extends BaseExpandableListAdapter {
             skillModelList.get(i).weightedAverage = Double.parseDouble(df2.format(averageValue));
         }
         notifyDataSetChanged();
+    }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,ctx);
     }
 }

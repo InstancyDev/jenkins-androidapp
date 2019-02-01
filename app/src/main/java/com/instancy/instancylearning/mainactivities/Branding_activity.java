@@ -15,7 +15,9 @@ import android.widget.Toast;
 
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.SlideAdapters;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import java.util.ArrayList;
 
@@ -47,6 +49,9 @@ public class Branding_activity extends Activity {
 
     @BindView(R.id.signup_brand)
     Button btnSignup;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,Branding_activity.this);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,7 +71,7 @@ public class Branding_activity extends Activity {
         if (imagesArray.size() > 0) {
             initView();
         } else {
-            Toast.makeText(this, getString(R.string.alert_headtext_no_sliding_images), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
         }
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase("CLE Academy")) {

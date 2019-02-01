@@ -55,11 +55,13 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -136,6 +138,11 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     View footor;
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, DiscussionCommentsActivity.this);
+
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -174,7 +181,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "Comments" + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel) + "</font>"));
         discussionCommentsModelList = new ArrayList<DiscussionCommentsModelDg>();
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         commentsAdapter = new DiscussionCommentsAdapter(this, BIND_ABOVE_CLIENT, discussionCommentsModelList);
@@ -252,10 +259,10 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         txtName.setText(discussionTopicModel.name);
         txtShortDesc.setText(discussionTopicModel.longDescription);
 
-        txtLikesCount.setText(discussionTopicModel.likes + " Like(s)");
-        txtCommentCount.setText(discussionTopicModel.noOfReplies + " Comment(s)");
+        txtLikesCount.setText(discussionTopicModel.likes + "" + getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        txtCommentCount.setText(discussionTopicModel.noOfReplies + " " + getLocalizationValue(JsonLocalekeys.discussionforum_header_discussiontopiccommentstitlelabel));
 
-        String totalActivityStr = "Created by: ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedlabel) + ": ";
 
         if (isValidString(discussionTopicModel.author)) {
 
@@ -264,7 +271,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         if (isValidString(discussionTopicModel.modifiedUserName)) {
 
-            totalActivityStr = totalActivityStr + " |  Last Updated by:" + discussionTopicModel.author + " " + discussionTopicModel.updatedTime;
+            totalActivityStr = totalActivityStr + " |  " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedlabel) + ":" + discussionTopicModel.author + " " + discussionTopicModel.updatedTime;
         }
 
         txtAuthor.setText(totalActivityStr);
@@ -326,12 +333,12 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         if (!isRefreshed) {
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
-        vollyService.getStringResponseVolley("GetCommentList", appUserModel.getWebAPIUrl() + "/MobileLMS/GetCommentList?intSiteID=" + appUserModel.getSiteIDValue() + "&ForumID=" + discussionTopicModel.forumId + "&TopicID=" + discussionTopicModel.contentID + "&intUserID=" + appUserModel.getUserIDValue() + "&strLocale=en-us", appUserModel.getAuthHeaders());
+        vollyService.getStringResponseVolley("GetCommentList", appUserModel.getWebAPIUrl() + "/MobileLMS/GetCommentList?intSiteID=" + appUserModel.getSiteIDValue() + "&ForumID=" + discussionTopicModel.forumId + "&TopicID=" + discussionTopicModel.contentID + "&intUserID=" + appUserModel.getUserIDValue() + "&strLocale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"", appUserModel.getAuthHeaders());
 
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    public void  gotoReplyActivity(DiscussionCommentsModelDg discussionCommentsModel){
+    public void gotoReplyActivity(DiscussionCommentsModelDg discussionCommentsModel) {
 
         Intent intentDetail = new Intent(context, AddReplyActivity.class);
         intentDetail.putExtra("commentModel", discussionCommentsModel);
@@ -356,7 +363,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_data));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
             @Override
@@ -371,7 +378,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                             e.printStackTrace();
                         }
                     } else {
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
                 }
 
@@ -472,7 +479,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             swipeRefreshLayout.setRefreshing(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(context, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -541,7 +548,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);//edit
-
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deletecommentoption));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editcommentoption));
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
@@ -623,7 +631,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         parameters.put("UserID", appUserModel.getUserIDValue());
         parameters.put("TopicName", discussionTopicModel.name);
         parameters.put("NoofReplies", commentsModel.commentRepliesCount);
-        parameters.put("LocaleID", "en-us");
+        parameters.put("LocaleID", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
         parameters.put("LastPostedDate", commentsModel.postedDate);
         parameters.put("CreatedUserID", commentsModel.postedBy);
         parameters.put("AttachementPath", commentsModel.commentFileUploadPath);
@@ -634,7 +642,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         if (isNetworkConnectionAvailable(this, -1)) {
             deleteCommentFromServer(parameterString);
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -652,20 +660,20 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \nYour comment has been successfully deleted.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alerttsubtitle_commentdeletesuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
 //                    deleteCommentFromLocalDB(discussionTopicModel);
                 } else {
 
-                    Toast.makeText(context, "Comment cannot be deleted. Contact site admin.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commentauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(context, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -688,8 +696,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -708,12 +716,12 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     public void getForumLevelLikeList(DiscussionCommentsModelDg commentsModel) {
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetTopicCommentLevelLikeList?strObjectID=" + commentsModel.commentID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale=en-us&intTypeID=2";
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetTopicCommentLevelLikeList?strObjectID=" + commentsModel.commentID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&intTypeID=2";
 
             vollyService.getStringResponseVolley("GetTopicCommentLevelLikeList", parmStringUrl, appUserModel.getAuthHeaders());
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -779,7 +787,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         parameters.put("intTypeID", 2);
         parameters.put("blnIsLiked", isLiked);
         parameters.put("intSiteID", appUserModel.getSiteIDValue());
-        parameters.put("strLocale", "en-us");
+        parameters.put("strLocale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
         String parameterString = parameters.toString();
         Log.d(TAG, "validateNewForumCreation: " + parameterString);
@@ -789,7 +797,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             sendNewLikeDataToServer(parameterString);
 
         } else {
-            Toast.makeText(context, "" + getResources().getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -811,7 +819,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(DiscussionCommentsActivity.this, "Some error occurred -> " + volleyError, Toast.LENGTH_LONG).show();
+                Toast.makeText(DiscussionCommentsActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
                 svProgressHUD.dismiss();
             }
         })
@@ -834,8 +842,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;

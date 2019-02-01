@@ -16,13 +16,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 
@@ -33,11 +36,17 @@ import com.instancy.instancylearning.asynchtask.GetSiteConfigsAsycTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 
 import com.instancy.instancylearning.globalpackage.AppController;
+import com.instancy.instancylearning.helper.IResult;
+import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.SiteConfigInterface;
+import com.instancy.instancylearning.localization.JsonLocalization;
+
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -47,6 +56,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,6 +91,15 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     AppController appController;
     boolean isFromPush = false;
     JSONObject parameters = null;
+    VollyService vollyService;
+    IResult resultCallback = null;
+    int navigationType = 1;
+    ArrayList<String> imagesArray;
+    int i = 0;
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, Splash_activity.this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +108,8 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         ButterKnife.bind(this);
         context = this;
         imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
-
+        initVolleyCallback();
+        vollyService = new VollyService(resultCallback, this);
         db = new DatabaseHandler(context);
         Fabric.with(this, new Crashlytics());
 
@@ -103,10 +123,8 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         preferencesManager.setStringValue("false", StaticValues.SUB_SITE_ENTERED);
         if (siteUrl.length() == 0) {
             preferencesManager.setStringValue(getResources().getString(R.string.app_default_url), StaticValues.KEY_SITEURL);
-
         }
         if (siteID.length() == 0) {
-
             preferencesManager.setStringValue("374", StaticValues.KEY_SITEID);
         }
 
@@ -238,7 +256,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
-
         if (isNetworkConnectionAvailable(context, -1)) {
 
             if (getSiteConfigsAsycTask.getStatus() == AsyncTask.Status.PENDING) {
@@ -255,12 +272,13 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
             if (uiSettingsModel.getNativeAppType().equalsIgnoreCase("course app")) {
 
                 new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                        .setTitleText(getResources().getString(R.string.alert_headtext_no_internet))
-                        .setContentText(getResources().getString(R.string.alert_text_check_connection))
+                        .setTitleText(getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet))
+                        .setContentText(getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection))
                         .show();
 
             } else {
 
+            //    getLocaleFileForLocalazation();
 
                 String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
@@ -282,8 +300,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     }
 
                 }
-
-            }
+                }
         }
     }
 
@@ -341,6 +358,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     boolean readCalendarAccepted = grantResults[3] == PackageManager.PERMISSION_GRANTED;
                     if (storageAccepted && cameraAccepted && writeCalenderAccepted && readCalendarAccepted) {
 //                        Toast.makeText(Splash_activity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+
                         callWebMethods();
 
 
@@ -394,7 +412,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         final ArrayList<String> imagesArray = new ArrayList<String>();
         String splashImagesPath = getExternalFilesDir(null) + "/Mydownloads/"
                 + "SplashImages" + "";
-        int i = 0;
+        i = 0;
         try {
             File[] files = null;
             files = new File(splashImagesPath).listFiles();
@@ -414,9 +432,128 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        navigationType = 2;
+     //   getLocaleFileForLocalazation();
 
         String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
+        if (userID != null && !userID.equalsIgnoreCase("")) {
+
+            Intent intent = new Intent(this, SideMenu.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+// push values
+            intent.putExtra("PUSH", isFromPush);
+            intent.putExtra(StaticValues.FCM_OBJECT, (Serializable) parameters.toString());
+            startActivity(intent);
+
+        } else {
+
+            if (i > 0) {
+                Intent intent = new Intent(this, Branding_activity.class);
+                intent.putStringArrayListExtra("slideimages", imagesArray);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } else {
+
+
+                if (uiSettingsModel.isEnableAzureSSOForLearner()) {
+                    Intent intentSignup = new Intent(this, SignUp_Activity.class);
+                    startActivity(intentSignup);
+
+                } else {
+                    Intent intent = new Intent(this, Login_activity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+
+            }
+
+        }
+    }
+
+    public void getLocaleFileForLocalazation() {
+        if (isNetworkConnectionAvailable(this, -1)) {
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetLocalizationFile?LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&siteID=" + appUserModel.getSiteIDValue();
+            vollyService.getStringResponseVolley("GetLocalizationFile", parmStringUrl, appUserModel.getAuthHeaders());
+        } else {
+            Toast.makeText(this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void initVolleyCallback() {
+        resultCallback = new IResult() {
+            @Override
+            public void notifySuccess(String requestType, JSONObject response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + "That didn't work!");
+            }
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley String post" + response);
+                if (!TextUtils.isEmpty(response)) {
+                    JsonLocalization.saveLocaleFileToInternalStorage(response, preferencesManager.getStringValue(getResources().getString(R.string.locale_name)), Splash_activity.this);
+                    JSONObject localData = null;
+                    try {
+                        localData = new JSONObject(response);
+                        // key is the default value returned if key is not found in json
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        preferencesManager.setBooleanValue(true, getResources().getString(R.string.locale_changed));
+                        if (navigationType == 1)
+                            navigateToNextScreen();
+                        else
+                            navigateToNextScreen2();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+            @Override
+            public void notifySuccessLearningModel(String requestType, JSONObject response, MyLearningModel myLearningModel) {
+
+            }
+        };
+    }
+
+
+    private void navigateToNextScreen() {
+        String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
+
+        if (userID != null && !userID.equalsIgnoreCase("")) {
+            appController.setAlreadyViewd(true);
+            preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
+            Intent intent = new Intent(Splash_activity.this, SideMenu.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+
+        } else {
+            if (uiSettingsModel.isEnableAzureSSOForLearner()) {
+                Intent intentSignup = new Intent(Splash_activity.this, SignUp_Activity.class);
+                startActivity(intentSignup);
+            } else {
+                Intent intent = new Intent(Splash_activity.this, Login_activity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            }
+
+        }
+    }
+
+    private void navigateToNextScreen2() {
+        String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
         if (userID != null && !userID.equalsIgnoreCase("")) {
 
             Intent intent = new Intent(this, SideMenu.class);

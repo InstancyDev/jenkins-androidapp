@@ -46,6 +46,8 @@ import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.Ach_UserBadges;
 import com.instancy.instancylearning.models.Ach_UserLevel;
@@ -58,6 +60,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mycompetency.OtherGameModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
@@ -164,6 +167,10 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
     @BindView(R.id.txtBadges)
     TextView txtBadges;
 
+    @Nullable
+    @BindView(R.id.groupname)
+    TextView groupName;
+
     String gameId = "1";
 
     @Nullable
@@ -192,6 +199,10 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     }
 
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -214,7 +225,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     public void refreshGameList(Boolean isRefreshed) {
         if (!isRefreshed) {
-//            svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+//            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
 //        String urlStr = appUserModel.getWebAPIUrl() + "/Mobilelms/GetGameList";
         String urlStr = appUserModel.getWebAPIUrl() + "/LeaderBoard/GetGameList";
@@ -225,7 +236,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         try {
 
-            parameters.put("Locale", "en-us");
+            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("SiteID", appUserModel.getSiteIDValue());
             parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
             parameters.put("ComponentID", sideMenusModel.getComponentId());
@@ -260,17 +271,15 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         JSONObject parameters = new JSONObject();
 
-//,,,jsonobject = Optional(["GameID": 1, "UserID": "1", "ComponentID": 293, "SiteID": "374", "Locale": "en-us", "ComponentInsID": 4202])
+//,,,jsonobject = Optional(["GameID": 1, "UserID": "1", "ComponentID": 293, "SiteID": "374", "Locale": preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)), "ComponentInsID": 4202])
 
         try {
-            parameters.put("Locale", "en-us");
+            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("SiteID", appUserModel.getSiteIDValue());
-//            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
-//            parameters.put("ComponentID", sideMenusModel.getComponentId());
+            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
+            parameters.put("ComponentID", sideMenusModel.getComponentId());
             parameters.put("GameID", gameID);
             parameters.put("UserID", appUserModel.getUserIDValue());
-            parameters.put("ComponentInsID", 4202);
-            parameters.put("ComponentID", 293);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -317,7 +326,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
             }
 
             @Override
@@ -345,7 +354,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                             } else {
                                 svProgressHUD.dismiss();
 
-                                nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
                             }
 
                         } catch (JSONException e) {
@@ -392,7 +401,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         otherGameModelList = new ArrayList<>();
 
         JSONArray jsonArray = response.getJSONArray("Table");
-
+        int certificateCount = 0;
         if (jsonArray != null && jsonArray.length() > 0) {
             for (int j = 0; j < jsonArray.length(); j++) {
                 JSONObject columnObj = jsonArray.getJSONObject(j);
@@ -400,7 +409,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 OtherGameModel otherGameModel = new OtherGameModel();
                 otherGameModel.contentID = columnObj.optString("ContentID");
                 otherGameModel.name = columnObj.optString("Name");
-                otherGameModel.decimal2 = columnObj.optDouble("Decimal2");
+                otherGameModel.decimal2 = columnObj.optDouble("Decimal2",0);
                 otherGameModel.certificateID = columnObj.optString("CertificateID");
                 otherGameModel.coreLessonStatus = columnObj.optString("CoreLessonStatus");
                 otherGameModel.scoreRaw = columnObj.optString("ScoreRaw");
@@ -410,6 +419,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 otherGameModel.certifycountwebapilevel = columnObj.optInt("certifycountwebapilevel");
                 otherGameModellocList.add(otherGameModel);
                 otherGameModelList.add(otherGameModel);
+                certificateCount = certificateCount + otherGameModel.certifycountwebapilevel;
             }
 
         }
@@ -419,7 +429,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         JSONArray jsonArray2 = response.getJSONArray("Table2");
 
         String creditScore = "0", certificates = "0";
-
+//[{"creditcount":58,"certificatecount":3}]
         if (jsonArray1 != null && jsonArray1.length() > 0) {
             JSONObject jsonObject = jsonArray1.getJSONObject(0);
 
@@ -432,8 +442,8 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
         }
 
-
-        updateOtherGameBoard(creditScore, certificates);
+//        updateOtherGameBoard(creditScore, certificates); commented for not matching web level certificate count
+        updateOtherGameBoard(creditScore, "" + certificateCount);
 
         return otherGameModellocList;
     }
@@ -466,7 +476,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                         getAchivmentsByGameID(gameId);
                 } else {
                     injectFromDbtoModel();
-//                    Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -519,7 +529,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             refreshGameList(false);
         } else {
 //            injectFromDbtoModel();
-            nodata_Label.setText(getResources().getString(R.string.no_games_avaliable));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
         }
 
         initilizeView();
@@ -606,23 +616,32 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
     }
 
     public void updateOtherGameBoard(String credits, String certificates) {
-
         txtCredits.setText(credits);
         txtCertificate.setText(certificates);
-
     }
-
 
     public void updateLeaderBoard(Ach_UserOverAllData achUserOverAllData1) {
 
         txtName.setText(achUserOverAllData1.userDisplayName);
-        txtPointsawarded.setText(achUserOverAllData1.neededPoints + " Points to " + achUserOverAllData1.neededLevel + " level");
         txtBadges.setText("" + achUserOverAllData1.badges);
         txtPoints.setText("" + achUserOverAllData1.overAllPoints);
         txtLevel.setText(achUserOverAllData1.userLevel);
         String imgUrl = appUserModel.getSiteURL() + achUserOverAllData1.userProfilePath;
         Picasso.with(context).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imageAchived);
 
+        if (achUserOverAllData1.neededPoints > 0 && isValidString(achUserOverAllData1.neededLevel)) {
+            txtPointsawarded.setText(achUserOverAllData1.neededPoints + " " + getLocalizationValue(JsonLocalekeys.filter_label_points) + " " + achUserOverAllData1.neededLevel + " " + getLocalizationValue(JsonLocalekeys.filter_label_level));
+
+        } else {
+            txtPointsawarded.setText("");
+        }
+
+        //   Math.round(((this.UserAchieveDashBoardData.OverAllPoints) / (this.UserAchieveDashBoardData.OverAllPoints + this.UserAchieveDashBoardData.NeededPoints)) * 100)
+
+
+        int progressValue = (achUserOverAllData1.overAllPoints / (achUserOverAllData1.overAllPoints + achUserOverAllData1.neededPoints)) * 100;
+
+        progressBar.setProgress(progressValue);
 
         //color update
         txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -644,6 +663,8 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         lbCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCertificate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        groupName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        groupName.setText(getLocalizationValue(JsonLocalekeys.gamemifaction_othergames_header));
     }
 
     public void initilizeView() {
@@ -706,7 +727,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             refreshGameList(true);
         } else {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(getContext(), getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -728,14 +749,22 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         Intent intentSocial = new Intent(context, SocialWebLoginsActivity.class);
         switch (view.getId()) {
             case R.id.txtCertificate:
-                Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
-                String urlForCertificate = appUserModel.getSiteURL() + "content/sitefiles/" + appUserModel.getSiteIDValue() + "/UserCertificates/" + otherGameModelList.get(i).certificateID + ".pdf";
+                OtherGameModel otherGameModel = otherGameModelList.get(i);
+                Log.d(TAG, "onItemClick: " + otherGameModel);
+                String urlForCertificate = appUserModel.getSiteURL() + "content/sitefiles/" + appUserModel.getSiteIDValue() + "/UserCertificates/" + appUserModel.getUserIDValue() + "/" + otherGameModelList.get(i).certificateID + "/Certificate.pdf";
 
                 if (isValidString(otherGameModelList.get(i).certificateID)) {
-                    intentSocial.putExtra("ATTACHMENT", true);
-                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, urlForCertificate);
-                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, otherGameModelList.get(i).certificatePage);
-                    startActivity(intentSocial);
+//                    intentSocial.putExtra("ATTACHMENT", true);
+//                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, urlForCertificate);
+//                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, otherGameModelList.get(i).certificatePage);
+//                    startActivity(intentSocial);
+                    MyLearningModel myLearningModel = new MyLearningModel();
+                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+                    pdfIntent.putExtra("PDF_URL", urlForCertificate);
+                    pdfIntent.putExtra("ISONLINE", "YES");
+                    pdfIntent.putExtra("myLearningDetalData", myLearningModel);
+                    pdfIntent.putExtra("PDF_FILENAME", otherGameModelList.get(i).certificatePage);
+                    startActivity(pdfIntent);
                 }
 
                 Log.d(TAG, "onItemClick: " + urlForCertificate);

@@ -27,10 +27,12 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONArray;
@@ -39,6 +41,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import butterknife.BindView;
@@ -144,6 +147,12 @@ public class CtryCmpnyActivity extends AppCompatActivity implements View.OnClick
         btnReset.setBackground(getButtonDrawable());
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+    }
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, this);
     }
 
     public ShapeDrawable getButtonDrawable() {
@@ -332,6 +341,9 @@ public class CtryCmpnyActivity extends AppCompatActivity implements View.OnClick
 
         if (ctryCmpnyModelList != null && ctryCmpnyModelList.size() > 0) {
 
+            contentFilterByModel.selectedSkillIdsArry = new ArrayList<>();
+            contentFilterByModel.selectedSkillNamesArry = new ArrayList<>();
+
             for (int i = 0; i < ctryCmpnyModelList.size(); i++) {
 
                 if (ctryCmpnyModelList.get(i).isSelected) {
@@ -341,8 +353,30 @@ public class CtryCmpnyActivity extends AppCompatActivity implements View.OnClick
 
                 }
             }
+
+            contentFilterByModel.selectedSkillIdsArry = removeAllDuplicates(contentFilterByModel.selectedSkillIdsArry);
+
+            contentFilterByModel.selectedSkillNamesArry = removeAllDuplicates(contentFilterByModel.selectedSkillNamesArry);
+
         }
     }
+
+    public List<String> removeAllDuplicates(List<String> values) {
+
+        List<String> noDuplicates = new ArrayList<String>();
+
+        if (values == null || values.size() == 0)
+            return noDuplicates;
+
+        HashSet<String> hashSet = new HashSet<String>();
+        hashSet.addAll(values);
+        values.clear();
+        values.addAll(hashSet);
+
+        return values;
+    }
+
+
 
     public void updateSelectedArrayList(List<String> selectedValues) {
 

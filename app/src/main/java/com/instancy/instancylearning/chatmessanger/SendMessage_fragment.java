@@ -49,11 +49,13 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.Communicator;
 import com.instancy.instancylearning.interfaces.ResultListner;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
@@ -125,6 +127,11 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
     public SendMessage_fragment() {
 
+
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
 
     }
 
@@ -301,7 +308,9 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         usersChatListView.setOnItemClickListener(this);
         usersChatListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
         initilizeView();
-        getChatConnectionUserList();
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            getChatConnectionUserList();
+        }
         updateGameSpinner();
 
 
@@ -314,7 +323,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + "Messaging" + "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.sidemenu_button_messagingbutton) + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -338,11 +347,11 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
             item_search.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 //            tintMenuIcon(getActivity(), item_search, R.color.colorWhite);
-            item_search.setTitle("Search");
+            item_search.setTitle(getLocalizationValue(JsonLocalekeys.search_label));
             final SearchView searchView = (SearchView) item_search.getActionView();
 //            searchView.setBackgroundColor(Color.WHITE);
             EditText txtSearch = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
-            txtSearch.setHint("Search..");
+            txtSearch.setHint(getLocalizationValue(JsonLocalekeys.commoncomponent_label_searchlabel));
             txtSearch.setHintTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
             txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getMenuHeaderTextColor()));
 
@@ -414,7 +423,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             case R.id.btntxt_download:
                 if (isNetworkConnectionAvailable(context, -1)) {
                 } else {
-                    showToast(context, "No Internet");
+                    showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                 }
                 break;
             case R.id.card_view:
@@ -494,10 +503,15 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onDestroy() {
         super.onDestroy();
-        signalAService.stopSignalA();
+        if (signalAService != null) {
+            signalAService.stopSignalA();
+        }
     }
 
     public void getChatConnectionUserList() {
+
+        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
+
         JSONObject parameters = new JSONObject();
         try {
             parameters.put("FromUserID", appUserModel.getUserIDValue());

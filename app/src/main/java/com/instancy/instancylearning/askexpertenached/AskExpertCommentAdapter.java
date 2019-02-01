@@ -25,8 +25,10 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -117,7 +119,7 @@ public class AskExpertCommentAdapter extends BaseAdapter {
 
         holder.txtName.setText(askExpertCommentModelList.get(position).commentedUserName);
         holder.txtMessage.setText(askExpertCommentModelList.get(position).commentDescription + " ");
-        holder.txtAskedWhen.setText("Commented on: " + askExpertCommentModelList.get(position).commentedDate);
+        holder.txtAskedWhen.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_commentedontitlelabel, activity)+" " + askExpertCommentModelList.get(position).commentedDate);
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAnsweredOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

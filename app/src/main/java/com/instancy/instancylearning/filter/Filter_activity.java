@@ -18,12 +18,14 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 
 import com.instancy.instancylearning.R;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.normalfilters.FiltersSerilization;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.FiltersApplyModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
 import org.json.JSONException;
@@ -66,7 +68,10 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
     String contentKey = "", groupKey = "";
 
     JSONObject jsonInnerValues;
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,Filter_activity.this);
 
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +85,7 @@ public class Filter_activity extends AppCompatActivity implements View.OnClickLi
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Filters</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>"+getLocalizationValue(JsonLocalekeys.advancefilter_header_filtertitlelabel)+"</font>"));
 
         isFromMylearning = getIntent().getIntExtra("isFrom", 1);
 

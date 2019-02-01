@@ -25,9 +25,11 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
+import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionTopicModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
+import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.squareup.picasso.Picasso;
 
@@ -123,7 +125,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.txtShortDisc.setText(discussionTopicModelList.get(position).longDescription);
 
 
-        String totalActivityStr = "Created by: ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": ";
 
         if (isValidString(discussionTopicModelList.get(position).author)) {
 
@@ -132,13 +134,13 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
         if (isValidString(discussionTopicModelList.get(position).modifiedUserName)) {
 
-            totalActivityStr = totalActivityStr + " |  Last Updated by: " + discussionTopicModelList.get(position).author + " " + discussionTopicModelList.get(position).updatedTime;
+            totalActivityStr = totalActivityStr + " |  "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": " + discussionTopicModelList.get(position).author + " " + discussionTopicModelList.get(position).updatedTime;
         }
 
         holder.txtAuthor.setText(totalActivityStr);
 
-        holder.txtLikesCount.setText(discussionTopicModelList.get(position).likes + " Like(s)");
-        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noOfReplies + " Comment(s)");
+        holder.txtLikesCount.setText(discussionTopicModelList.get(position).likes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noOfReplies + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -315,7 +317,10 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
         this.notifyDataSetChanged();
     }
+    private String getLocalizationValue(String key){
+        return  JsonLocalization.getInstance().getStringForKey(key,activity);
 
+    }
 }
 
 
