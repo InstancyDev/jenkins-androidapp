@@ -167,8 +167,8 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
         btnStartDate.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnEndDate.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
-        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
 
 
         if (isValidString(contentFilterByModel.categorySelectedStartDate)) {
@@ -265,7 +265,7 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
 
         Calendar newCalendar = Calendar.getInstance();
         datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+            DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar newDate = Calendar.getInstance();
@@ -299,8 +299,9 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
                 contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionIdValue;
                 contentFilterByModel.categorySelectedID = sortModelList.get(i).categoryID;
                 contentFilterByModel.categorySelectedStartDate = sortModelList.get(i).optionIdValue;
+                contentFilterByModel.categorySelectedEndDate = "";
                 if (sortModelList.get(i).categoryID == 7) {
-                    DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                    DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                     contentFilterByModel.categorySelectedStartDate = dateFormatter.format(startDate);
                     if (EndDateStr.length() > 0) {
                         contentFilterByModel.categorySelectedEndDate = dateFormatter.format(endDate);
@@ -349,66 +350,54 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
 
     }
 
-
     public List<SortModel> generateFilterByModelList() {
         List<SortModel> sortModelList = new ArrayList<>();
 
-//        let mainFilterType = [
-//        "Today", "Tomorrow", "This Week", "Next Week", "This Month", "Choose Date"]
-//
-//
-//        {"id":'today',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateToday')},
-//        {"id":'tomorrow',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateTomorrow')},
-//        {"id":'thisweek',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateThisWeek')},
-//        {"id":'nextweek',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateNextWeek')},
-//        {"id":'thismonth',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateThisMonth')},
-//        {"id":'nextmonth',"itemName":this.Commonutilites.GetLocalizationString('Filter_EventDateNextMonth')},
 
         SortModel sortModelToday = new SortModel();
-        sortModelToday.optionDisplayText = "Today";
+        sortModelToday.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatetoday);
         sortModelToday.optionIdValue = "today";
         sortModelToday.categoryID = 1;
         sortModelList.add(sortModelToday);
 
         SortModel sortModelTomorrow = new SortModel();
-        sortModelTomorrow.optionDisplayText = "Tomorrow";
+        sortModelTomorrow.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatetomorrow);
         sortModelTomorrow.optionIdValue = "tomorrow";
         sortModelTomorrow.categoryID = 2;
         sortModelList.add(sortModelTomorrow);
 
         SortModel sortModelThisWeek = new SortModel();
-        sortModelThisWeek.optionDisplayText = "This Week";
+        sortModelThisWeek.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatethisweek);
         sortModelThisWeek.optionIdValue = "thisweek";
         sortModelThisWeek.categoryID = 3;
         sortModelList.add(sortModelThisWeek);
 
 
         SortModel sortModelNextweek = new SortModel();
-        sortModelNextweek.optionDisplayText = "Next Week";
+        sortModelNextweek.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatenextweek);
         sortModelNextweek.optionIdValue = "nextweek";
         sortModelNextweek.categoryID = 4;
         sortModelList.add(sortModelNextweek);
 
 
         SortModel sortModelThismonth = new SortModel();
-        sortModelThismonth.optionDisplayText = "This Month";
+        sortModelThismonth.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatethismonth);
         sortModelThismonth.optionIdValue = "thismonth";
         sortModelThismonth.categoryID = 5;
         sortModelList.add(sortModelThismonth);
 
         SortModel sortModelNextmonth = new SortModel();
-        sortModelNextmonth.optionDisplayText = "Next Month";
+        sortModelNextmonth.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatenextmonth);
         sortModelNextmonth.optionIdValue = "nextmonth";
         sortModelNextmonth.categoryID = 6;
         sortModelList.add(sortModelNextmonth);
 
 
         SortModel sortModelChooseDate = new SortModel();
-        sortModelChooseDate.optionDisplayText = "Choose Date";
+        sortModelChooseDate.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_eentdatechoosedate);
         sortModelChooseDate.optionIdValue = "choosedate";
         sortModelChooseDate.categoryID = 7;
         sortModelList.add(sortModelChooseDate);
-
 
         return sortModelList;
     }

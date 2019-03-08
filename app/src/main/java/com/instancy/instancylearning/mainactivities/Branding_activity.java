@@ -85,7 +85,7 @@ public class Branding_activity extends Activity {
 
         btnLogin.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnLogin.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-
+        btnLogin.setText(getLocalizationValue(JsonLocalekeys.login_button_signinbutton));
 //        View someView = findViewById(R.id.brandinglayout);
 //        someView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLoginBGColor()));
 

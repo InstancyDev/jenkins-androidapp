@@ -212,6 +212,7 @@
                     android:padding="1dp">
 
                     <LinearLayout
+                        android:id="@+id/dateLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -320,13 +321,28 @@
                     android:textSize="14sp"
                     android:visibility="gone" />
 
+                <TextView
+                    android:id="@+id/txtReadMoreWhatYouLearn"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/txtWhatYouLearnText"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="right"
+                    android:padding="2dp"
+                    android:text="Read More"
+                    android:textColor="@color/colorRed"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
 
                 <TextView
                     android:id="@+id/txtDescription"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/rating_layout"
-                    android:layout_below="@+id/txtWhatYouLearnText"
+                    android:layout_below="@+id/txtReadMoreWhatYouLearn"
                     android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:gravity="left"
@@ -351,13 +367,27 @@
                     android:textColor="@color/colorGray"
                     android:textSize="14sp" />
 
+                <TextView
+                    android:id="@+id/txtReadMoreDesc"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/txtLongDesc"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="right"
+                    android:padding="2dp"
+                    android:text="Read More"
+                    android:textColor="@color/colorRed"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/txtTableofContentTitle"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/rating_layout"
-                    android:layout_below="@+id/txtLongDesc"
+                    android:layout_below="@+id/txtReadMoreDesc"
                     android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:gravity="left"
@@ -381,6 +411,21 @@
                     android:text=""
                     android:textColor="@color/colorGray"
                     android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/txtReadMoreTableofConten"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/txtTableofContentText"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:gravity="right"
+                    android:padding="2dp"
+                    android:text="Read More"
+                    android:textColor="@color/colorRed"
+                    android:textSize="16sp"
                     android:visibility="gone" />
 
 
@@ -466,7 +511,6 @@
             android:id="@+id/contentratinglayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/txtRating"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -560,6 +604,7 @@
         android:padding="4dp"
         android:text="@string/details_button_writeareviewbutton"
         android:textAlignment="viewEnd"
-        android:textAllCaps="false" />
+        android:textAllCaps="false"
+        android:visibility="gone" />
 
 </RelativeLayout>

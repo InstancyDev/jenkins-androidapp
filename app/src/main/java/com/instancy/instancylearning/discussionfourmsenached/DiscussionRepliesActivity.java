@@ -168,9 +168,12 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         header = (View) getLayoutInflater().inflate(R.layout.discussioncommentcell_en, null);
         footor = (View) getLayoutInflater().inflate(R.layout.no_data_layout, null);
 
+        TextView nodataFottor = footor.findViewById(R.id.nodata_label);
+        nodataFottor.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
+
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getLocalizationValue(JsonLocalekeys.discussionforum_label_replys) + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton) + "</font>"));
         discussionReplyModelList = new ArrayList<DiscussionReplyModelDg>();
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         repliesAdapter = new DiscussionRepliesAdapter(this, BIND_ABOVE_CLIENT, discussionReplyModelList);
@@ -250,14 +253,16 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         txtRepliesCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtDaysAgo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        txtReply.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel));
+        txtLike.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_likelabel));
 
         txtName.setText(discussionCommentsModel.commentedBy);
         txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel)+" " + discussionCommentsModel.commentedFromDays);
         txtMessage.setText(discussionCommentsModel.message);
         txtMessage.setMaxLines(200);
 
-        txtLikesCount.setText(discussionCommentsModel.commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
-        txtRepliesCount.setText(discussionCommentsModel.commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_replys));
+        txtLikesCount.setText(discussionCommentsModel.commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        txtRepliesCount.setText(discussionCommentsModel.commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
 
 
 //        assert txtLike != null;
@@ -407,7 +412,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
             repliesAdapter.refreshList(discussionReplyModelList);
             footor.setVisibility(View.VISIBLE);
         }
-        txtRepliesCount.setText(discussionReplyModelList.size() + getLocalizationValue(JsonLocalekeys.discussionforum_label_reply));
+        txtRepliesCount.setText(discussionReplyModelList.size() + getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
     }
 
     @Override
@@ -519,8 +524,8 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deleterepliesoption));
-        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editrepliesoption));
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_areyousuretodeletereply));
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editcommentoption));
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);//edit
 
@@ -591,12 +596,12 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_replyhasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_replyauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

@@ -254,7 +254,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
     public void callWebMethods() {
 
-        uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
         if (isNetworkConnectionAvailable(context, -1)) {
 
@@ -267,7 +266,10 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
                 LogUtils.d("already running ");
             }
+            uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
+
         } else {
+            uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
 
             if (uiSettingsModel.getNativeAppType().equalsIgnoreCase("course app")) {
 
@@ -278,7 +280,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             } else {
 
-            //    getLocaleFileForLocalazation();
+                //    getLocaleFileForLocalazation();
 
                 String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
@@ -300,7 +302,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     }
 
                 }
-                }
+            }
         }
     }
 
@@ -433,7 +435,7 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
             e.printStackTrace();
         }
         navigationType = 2;
-     //   getLocaleFileForLocalazation();
+        //   getLocaleFileForLocalazation();
 
         String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
@@ -454,7 +456,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             } else {
-
 
                 if (uiSettingsModel.isEnableAzureSSOForLearner()) {
                     Intent intentSignup = new Intent(this, SignUp_Activity.class);

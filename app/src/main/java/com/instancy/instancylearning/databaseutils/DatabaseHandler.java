@@ -407,7 +407,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT,appLoginLogoBackgroundcolorColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER, CCEventStartdate TEXT,isGlobalSearch INTEGER,enableMemberShipConfig  INTEGER,enableIndidvidualPurchaseConfig  INTEGER,enableSkillstobeMappedwithJobRoles  INTEGER,EnableMultipleInstancesforEvent BOOLEAN,NumberOfRatingsRequiredToShowRating INTEGER,MinimimRatingRequiredToShowRating String,NoOfDaysForCourseTargetDate INTEGER,showEventAvailableFewSeatsLeft INTEGER)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT,appLoginLogoBackgroundcolorColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER, CCEventStartdate TEXT,isGlobalSearch INTEGER,enableMemberShipConfig  INTEGER,enableIndidvidualPurchaseConfig  INTEGER,enableSkillstobeMappedwithJobRoles  INTEGER,EnableMultipleInstancesforEvent BOOLEAN,NumberOfRatingsRequiredToShowRating INTEGER,MinimimRatingRequiredToShowRating String,NoOfDaysForCourseTargetDate INTEGER,showEventAvailableFewSeatsLeft INTEGER,EnableEcommerce INTEGER)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -420,7 +420,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,isarchived BOOLEAN,isRequired BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,ThumbnailVideoPath TEXT,totalratings INTEGER)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,isarchived BOOLEAN,isRequired BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,ThumbnailVideoPath TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
@@ -432,7 +432,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERSESSION
@@ -460,16 +460,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKLISTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,displaystatus TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,contentTypeImagePath TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid INTEGER,siteid INTEGER,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate DATE,startpage TEXT,eventstarttime DATE,eventendtime DATE,objecttypeid INTEGER,locationname TEXT,timezone TEXT,scoid INTEGER,participanturl TEXT,courselaunchpath TEXT,status TEXT,displaystatus TEXT,password TEXT,eventid TEXT,displayname TEXT,trackscoid TEXT,parentid TEXT,blockname TEXT,showstatus TEXT,timedelay TEXT,isdiscussion TEXT,eventcontentid TEXT, sequencenumber TEXT,courseattempts TEXT,mediatypeid TEXT, relatedcontentcount INTEGER, downloadurl TEXT,eventaddedtocalender TEXT, joinurl TEXT,offlinepath TEXT, typeofevent INTEGER,presenter TEXT,isdownloaded TEXT, progress TEXT, stepid  TEXT, ruleid  TEXT,wmessage TEXT,trackContentId TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,contentTypeImagePath TEXT,activityid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_RELATEDCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,contentTypeImagePath TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdiscussion TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,wresult TEXT, wmessage TEXT, durationenddate TEXT, isExpiry TEXT, ratingid TEXT, publisheddate TEXT,mediatypeid TEXT,dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, joinurl TEXT,blockname TEXT,trackscoid TEXT, progress TEXT, showstatus TEXT,trackContentId TEXT, stepid  TEXT, ruleid  TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,contentTypeImagePath TEXT,activityid TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
                 + "(lrsid INTEGER PRIMARY KEY AUTOINCREMENT,LRS TEXT,url TEXT,method TEXT,data TEXT,auth TEXT,callback TEXT,lrsactor TEXT,extraHeaders TEXT,siteid INTEGER,scoid INTEGER,userid INTEGER,isupdate TEXT)");
@@ -1273,8 +1273,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                                     } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("showEventAvailableFewSeatsLeft"))) {
 
                                         uiSettingsModel.setShowEventAvailableFewSeatsLeft(nativeSettingsObj.get("keyvalue").getAsInt());
-                                    }
+                                    } else if ((nativeSettingsObj.get("name").getAsString().equalsIgnoreCase("EnableEcommerce"))) {
 
+                                        uiSettingsModel.setEnableEcommerce(nativeSettingsObj.get("keyvalue").getAsBoolean());
+                                    }
                                 }
                             }
                         }
@@ -1455,6 +1457,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("MinimimRatingRequiredToShowRating", uiSettingsModel.getMinimimRatingRequiredToShowRating());
             contentValues.put("NoOfDaysForCourseTargetDate", uiSettingsModel.getNoOfDaysForCourseTargetDate());
             contentValues.put("showEventAvailableFewSeatsLeft", uiSettingsModel.getShowEventAvailableFewSeatsLeft());
+
+            contentValues.put("EnableEcommerce", uiSettingsModel.isEnableEcommerce());
+
 
             //  NumberOfRatingsRequiredToShowRating INTEGER,MinimimRatingRequiredToShowRating INTEGER,NoOfDaysForCourseTargetDate INTEGER
 
@@ -1734,6 +1739,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             uiSettingsModel.setShowEventAvailableFewSeatsLeft(cursor.getInt(cursor
                     .getColumnIndex("showEventAvailableFewSeatsLeft")));
 
+            uiSettingsModel.setEnableEcommerce(cursor.getInt(cursor
+                    .getColumnIndex("EnableEcommerce")) > 0);
 
         }
         cursor.close();
@@ -2330,8 +2337,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             sqlEx.printStackTrace();
         }
 
+    }
+
+    public void ejectRecordsInEventByTabValue(String TabValue, String ComponentId) {
+        //  SELECT DISTINCT * FROM EVENTCONTENTDATA WHERE categorycompid = 153 AND eventTabValue ='upcoming'
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            String strDelete = "DELETE FROM " + TBL_EVENTCONTENTDATA + " WHERE  categorycompid = '"
+                    + ComponentId + "' AND eventTabValue = '" + TabValue + "'";
+            db.execSQL(strDelete);
+
+        } catch (SQLiteException sqlEx) {
+
+            sqlEx.printStackTrace();
+        }
+
 
     }
+
 
     public void ejectRecordsInEventByTab(String TabValue, String ComponentId) {
 
@@ -2690,11 +2714,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
 
-
                 if (isValidString(imageurl)) {
 
                     myLearningModel.setThumbnailImagePath(imageurl);
-                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+//                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    String imagePathSet = myLearningModel.getSiteURL() + imageurl;
                     myLearningModel.setImageData(imagePathSet);
 
 
@@ -2709,85 +2733,89 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     }
 
                 }
+            }
+            // relatedcontentcount
+            if (jsonMyLearningColumnObj.has("relatedconentcount")) {
 
-                // relatedcontentcount
-                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
+                myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
 
-                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
+            }
+            // isDownloaded
+            if (jsonMyLearningColumnObj.has("isdownloaded")) {
 
-                }
-                // isDownloaded
-                if (jsonMyLearningColumnObj.has("isdownloaded")) {
+                myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
 
-                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
+            }
+            // courseattempts
+            if (jsonMyLearningColumnObj.has("courseattempts")) {
 
-                }
-                // courseattempts
-                if (jsonMyLearningColumnObj.has("courseattempts")) {
+                myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
 
-                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
+            }
+            // objecttypeid
+            if (jsonMyLearningColumnObj.has("objecttypeid")) {
 
-                }
-                // objecttypeid
-                if (jsonMyLearningColumnObj.has("objecttypeid")) {
+                myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
 
-                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
+            }
+            // scoid
+            if (jsonMyLearningColumnObj.has("scoid")) {
 
-                }
-                // scoid
-                if (jsonMyLearningColumnObj.has("scoid")) {
+                myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
 
-                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
+            }
+            // startpage
+            if (jsonMyLearningColumnObj.has("startpage")) {
 
-                }
-                // startpage
-                if (jsonMyLearningColumnObj.has("startpage")) {
+                myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
 
-                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
+            }
+            // status
+            if (jsonMyLearningColumnObj.has("actualstatus")) {
 
-                }
-                // status
-                if (jsonMyLearningColumnObj.has("actualstatus")) {
-
-                    String status = jsonMyLearningColumnObj.get("actualstatus").toString();
-                    if (isValidString(status)) {
-                        myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
-                        if (status.contains("not attempted")) {
-                            myLearningModel.setStatusActual("Not Started");
-                        }
-                    } else {
+                String status = jsonMyLearningColumnObj.get("actualstatus").toString();
+                if (isValidString(status)) {
+                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("actualstatus").toString());
+                    if (status.contains("not attempted")) {
                         myLearningModel.setStatusActual("Not Started");
                     }
-
+                } else {
+                    myLearningModel.setStatusActual("Not Started");
                 }
 
-                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
+            }
 
-                    myLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
+            if (jsonMyLearningColumnObj.has("corelessonstatus")) {
 
-                }
+                myLearningModel.setStatusDisplay(jsonMyLearningColumnObj.get("corelessonstatus").toString());
 
-                // userName
-                myLearningModel.setUserName(appUserModel.getUserName());
-                // longdes
-                if (jsonMyLearningColumnObj.has("longdescription")) {
+            }
 
-                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
+            // userName
+            myLearningModel.setUserName(appUserModel.getUserName());
+            // longdes
+            if (jsonMyLearningColumnObj.has("longdescription")) {
+
+                Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
 
 //                    myLearningModel.setShortDes(result.toString());
-                    myLearningModel.setLongDes(result.toString());
+                myLearningModel.setLongDes(result.toString());
 
+            }
+            // typeofevent
+            if (jsonMyLearningColumnObj.has("typeofevent")) {
+
+                String typeOfEventS = jsonMyLearningColumnObj.get("typeofevent").toString();
+                int typeoFEvent = 0;
+                if (isValidString(typeOfEventS)) {
+                    typeoFEvent = Integer.parseInt(typeOfEventS);
                 }
-                // typeofevent
-                if (jsonMyLearningColumnObj.has("typeofevent")) {
 
-                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
+                myLearningModel.setTypeofevent(typeoFEvent);
 
-                    myLearningModel.setTypeofevent(typeoFEvent);
+            }
 
-                }
-
-                // medianame
+            // medianame
 //                if (jsonMyLearningColumnObj.has("medianame")) {
 //                    String medianame = "";
 //
@@ -2813,88 +2841,88 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                }       // ratingid
 
 
-                if (jsonMyLearningColumnObj.has("contenttype")) {
-                    myLearningModel.setMediaName(jsonMyLearningColumnObj.get("contenttype").toString());
-                }
+            if (jsonMyLearningColumnObj.has("contenttype")) {
+                myLearningModel.setMediaName(jsonMyLearningColumnObj.get("contenttype").toString());
+            }
 
-                if (jsonMyLearningColumnObj.has("ratingid")) {
+            if (jsonMyLearningColumnObj.has("ratingid")) {
 
-                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
+                myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
 
-                }
-                // publishedDate
-                if (jsonMyLearningColumnObj.has("publisheddate")) {
+            }
+            // publishedDate
+            if (jsonMyLearningColumnObj.has("publisheddate")) {
 
-                    myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
+                myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
 
-                }
-                // eventstartdatedisplay
-                if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
+            }
+            // eventstartdatedisplay
+            if (jsonMyLearningColumnObj.has("eventstartdatedisplay")) {
 
 //                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setEventstartTime(formattedDate);
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                myLearningModel.setEventstartTime(formattedDate);
 
 
-                }
+            }
 
 
-                //  eventenddatedisplay
-                if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
+            //  eventenddatedisplay
+            if (jsonMyLearningColumnObj.has("eventenddatedisplay")) {
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setEventendTime(formattedDate);
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatedisplay").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                myLearningModel.setEventendTime(formattedDate);
 
-                }
+            }
 
-                // eventstartdatetime UTC
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
+            // eventstartdatetime UTC
+            if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
 
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setEventstartUtcTime(formattedDate);
-
-
-                }
-
-                //  eventenddatetime UTC
-                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
-
-                    String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-                    Log.d(TAG, "injectEventCatalog: " + formattedDate);
-                    myLearningModel.setEventendUtcTime(formattedDate);
-
-                }
-                // mediatypeid
-                if (jsonMyLearningColumnObj.has("mediatypeid")) {
-
-                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
-
-                }
-                // dateassigned
-                if (jsonMyLearningColumnObj.has("dateassigned")) {
-
-                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventstartdatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                myLearningModel.setEventstartUtcTime(formattedDate);
 
 
-                }
-                // keywords
-                if (jsonMyLearningColumnObj.has("seokeywords")) {
+            }
 
-                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
+            //  eventenddatetime UTC
+            if (jsonMyLearningColumnObj.has("eventenddatetime")) {
 
-                }
-                // eventcontentid
-                if (jsonMyLearningColumnObj.has("eventcontentid")) {
+                String formattedDate = formatDate(jsonMyLearningColumnObj.get("eventenddatetime").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+                Log.d(TAG, "injectEventCatalog: " + formattedDate);
+                myLearningModel.setEventendUtcTime(formattedDate);
 
-                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+            }
+            // mediatypeid
+            if (jsonMyLearningColumnObj.has("mediatypeid")) {
 
-                }
-                // eventAddedToCalender
-                myLearningModel.setEventAddedToCalender(false);
+                myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
+
+            }
+            // dateassigned
+            if (jsonMyLearningColumnObj.has("dateassigned")) {
+
+                myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
+
+
+            }
+            // keywords
+            if (jsonMyLearningColumnObj.has("seokeywords")) {
+
+                myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
+
+            }
+            // eventcontentid
+            if (jsonMyLearningColumnObj.has("eventcontentid")) {
+
+                myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
+
+            }
+            // eventAddedToCalender
+            myLearningModel.setEventAddedToCalender(false);
 
 //            if (jsonMyLearningColumnObj.has("startdate")) {
 //
@@ -2905,176 +2933,180 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //                    myLearningModel.setEventAddedToCalender(true);
 //                }
 //            }
-                // isExpiry
+            // isExpiry
 
 //            if (jsonMyLearningColumnObj.has("startdate")) {
 //
 //                myLearningModel.setIsExpiry(jsonMyLearningColumnObj.get("startdate").toString());
 //
 //            }
-                // locationname
-                if (jsonMyLearningColumnObj.has("eventfulllocation")) {
+            // locationname
+            if (jsonMyLearningColumnObj.has("eventfulllocation")) {
 
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
+                myLearningModel.setLocationName(jsonMyLearningColumnObj.get("eventfulllocation").toString());
 
-                }
-                // timezone
-                if (jsonMyLearningColumnObj.has("timezone")) {
+            }
+            // timezone
+            if (jsonMyLearningColumnObj.has("timezone")) {
 
-                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
+                myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
 
-                }
-                // participanturl
-                if (jsonMyLearningColumnObj.has("participanturl")) {
+            }
+            // participanturl
+            if (jsonMyLearningColumnObj.has("participanturl")) {
 
-                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
+                myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
 
-                }
-                // password
+            }
+            // password
 
-                myLearningModel.setPassword(appUserModel.getPassword());
+            myLearningModel.setPassword(appUserModel.getPassword());
 
-                // isListView
-                if (jsonMyLearningColumnObj.has("bit5")) {
+            // isListView
+            if (jsonMyLearningColumnObj.has("bit5")) {
 
-                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
+                myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
 
-                }
-
-                // joinurl
-                if (jsonMyLearningColumnObj.has("joinurl")) {
-
-                    if (myLearningModel.getTypeofevent() == 2) {
-
-
-                        String joinUrl = jsonMyLearningColumnObj.get("joinurl").toString();
-
-                        if (isValidString(joinUrl)) {
-                            myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
-                        }
-
-                    } else if (myLearningModel.getTypeofevent() == 1) {
-                        myLearningModel.setJoinurl("");
-                    }
-                }
-
-                // offlinepath
-                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
-                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
-                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
-                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
-                    String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
-
-                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
-
-                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
-                }
-//
-
-                // wresult
-                if (jsonMyLearningColumnObj.has("wresult")) {
-
-                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
-
-                }
-                // wmessage
-                if (jsonMyLearningColumnObj.has("wmessage")) {
-
-                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
-
-                }
-
-                // presenter
-                if (jsonMyLearningColumnObj.has("presenter")) {
-
-                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
-
-                }
-
-                //sitename
-                if (jsonMyLearningColumnObj.has("progress")) {
-
-                    myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
-                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
-                        ejectRecordsinCmi(myLearningModel);
-
-                    }
-                }
-
-                //membershipname
-                if (jsonMyLearningColumnObj.has("membershipname")) {
-
-                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
-
-                }
-                //membershiplevel
-                if (jsonMyLearningColumnObj.has("membershiplevel")) {
-
-                    myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
-
-                }
-
-                //membershiplevel
-                if (jsonMyLearningColumnObj.has("folderpath")) {
-
-                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.getString("folderpath"));
-
-                }
-
-                if (jsonMyLearningColumnObj.has("isarchived")) {
-
-                    myLearningModel.setArchived(jsonMyLearningColumnObj.getBoolean("isarchived"));
-
-                }
-
-
-                //jwvideokey
-                if (jsonMyLearningColumnObj.has("jwvideokey")) {
-
-                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
-
-                    if (isValidString(jwKey)) {
-                        myLearningModel.setJwvideokey(jwKey);
-                    } else {
-                        myLearningModel.setJwvideokey("");
-                    }
-
-                }
-
-                //cloudmediaplayerkey
-                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
-
-                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
-
-                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
-
-                    if (isValidString(jwKey)) {
-                        myLearningModel.setCloudmediaplayerkey(jwKey);
-                    } else {
-                        myLearningModel.setCloudmediaplayerkey("");
-                    }
-                }
-
-                myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
-
-                myLearningModel.setIsRequired(jsonMyLearningColumnObj.optInt("required", 0));
-
-                myLearningModel.setTotalratings(jsonMyLearningColumnObj.optInt("totalratings", 0));
-
-                myLearningModel.setEventScheduleType(jsonMyLearningColumnObj.optInt("eventscheduletype", 0));
-
-                if (isCotentExists(myLearningModel, TBL_DOWNLOADDATA)) {
-                    continue;
-                }
-
-                injectMyLearningIntoTable(myLearningModel, false, false);
             }
 
-            db.close();
+            // joinurl
+            if (jsonMyLearningColumnObj.has("joinurl")) {
+
+                if (myLearningModel.getTypeofevent() == 2) {
+
+
+                    String joinUrl = jsonMyLearningColumnObj.get("joinurl").toString();
+
+                    if (isValidString(joinUrl)) {
+                        myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
+                    }
+
+                } else if (myLearningModel.getTypeofevent() == 1) {
+                    myLearningModel.setJoinurl("");
+                }
+            }
+
+            // offlinepath
+            if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
+                String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
+                String startPage = jsonMyLearningColumnObj.get("startpage").toString();
+                String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
+                        + "/.Mydownloads/Contentdownloads" + "/" + contentid;
+
+                String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
+
+                myLearningModel.setOfflinepath(finalDownloadedFilePath);
+            }
+//
+
+            // wresult
+            if (jsonMyLearningColumnObj.has("wresult")) {
+
+                myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
+
+            }
+            // wmessage
+            if (jsonMyLearningColumnObj.has("wmessage")) {
+
+                myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
+
+            }
+
+            // presenter
+            if (jsonMyLearningColumnObj.has("presenter")) {
+
+                myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
+
+            }
+
+            //sitename
+            if (jsonMyLearningColumnObj.has("progress")) {
+
+                myLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
+                if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
+                    ejectRecordsinCmi(myLearningModel);
+
+                }
+            }
+
+            //membershipname
+            if (jsonMyLearningColumnObj.has("membershipname")) {
+
+                myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
+
+            }
+            //membershiplevel
+            if (jsonMyLearningColumnObj.has("membershiplevel")) {
+
+                myLearningModel.setMemberShipLevel(jsonMyLearningColumnObj.getInt("membershiplevel"));
+
+            }
+
+            //membershiplevel
+            if (jsonMyLearningColumnObj.has("folderpath")) {
+
+                myLearningModel.setFolderPath(jsonMyLearningColumnObj.getString("folderpath"));
+
+            }
+
+            if (jsonMyLearningColumnObj.has("isarchived")) {
+
+                myLearningModel.setArchived(jsonMyLearningColumnObj.getBoolean("isarchived"));
+
+            }
+
+
+            //jwvideokey
+            if (jsonMyLearningColumnObj.has("jwvideokey")) {
+
+                String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
+
+                if (isValidString(jwKey)) {
+                    myLearningModel.setJwvideokey(jwKey);
+                } else {
+                    myLearningModel.setJwvideokey("");
+                }
+
+            }
+
+            //cloudmediaplayerkey
+            if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
+
+                myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
+
+                String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
+
+                if (isValidString(jwKey)) {
+                    myLearningModel.setCloudmediaplayerkey(jwKey);
+                } else {
+                    myLearningModel.setCloudmediaplayerkey("");
+                }
+            }
+
+            myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
+
+            myLearningModel.setIsRequired(jsonMyLearningColumnObj.optInt("required", 0));
+
+            myLearningModel.setTotalratings(jsonMyLearningColumnObj.optInt("totalratings", 0));
+
+            myLearningModel.setEventScheduleType(jsonMyLearningColumnObj.optInt("eventscheduletype", 0));
+
+            myLearningModel.setGroupName(jsonMyLearningColumnObj.optString("headerlocationname", ""));
+
+            myLearningModel.setActivityId(jsonMyLearningColumnObj.optString("activityid", ""));
+
+
+            if (isCotentExists(myLearningModel, TBL_DOWNLOADDATA)) {
+                continue;
+            }
+
+            injectMyLearningIntoTable(myLearningModel, false, false);
         }
 
+        db.close();
     }
+
 
     public void injectMyLearningIntoTable(MyLearningModel myLearningModel, boolean subscibed, boolean isFromprogressReport) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -3147,7 +3179,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             contentValues.put("contentTypeImagePath", myLearningModel.getContentTypeImagePath());
             contentValues.put("EventScheduleType", myLearningModel.getEventScheduleType());
-
+            contentValues.put("groupName", myLearningModel.getGroupName());
+            contentValues.put("activityid", myLearningModel.getActivityId());
 
             if (!isFromprogressReport) {
                 if (subscibed) {
@@ -3188,6 +3221,60 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    public void updateMylearningDetailPageDataWithContentValues(MyLearningModel myLearningModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put("LongDescription", myLearningModel.getLongDes()); //These Fields should be your String values of actual column names
+            cv.put("ThumbnailVideoPath", myLearningModel.getThumbnailVideoPath());
+            cv.put("totalratings", myLearningModel.getTotalratings());
+            cv.put("LearningObjectives", myLearningModel.getLearningObjectives());
+            cv.put("TableofContent", myLearningModel.getLearningObjectives());
+
+            db.update(TBL_DOWNLOADDATA, cv, "siteid=" + myLearningModel.getSiteID() + " AND scoid=" + myLearningModel.getScoId(), null);
+
+        } catch (Exception e) {
+
+            Log.e("updateMylearningDetailPageDataWithContentValues", e.toString());
+        }
+
+    }
+
+
+    public MyLearningModel fetchLearningModel(MyLearningModel learningModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_DOWNLOADDATA + " WHERE userid =" + learningModel.getUserID() + " AND siteid = " + learningModel.getSiteID() + " AND scoid = " + learningModel.getScoId() + " AND contentid = '" + learningModel.getContentID() + "'";
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    learningModel.setEventScheduleType(cursor.getInt(cursor.getColumnIndex("EventScheduleType")));
+                    learningModel.setTableofContent(cursor.getString(cursor.getColumnIndex("TableofContent")));
+                    learningModel.setLearningObjectives(cursor.getString(cursor.getColumnIndex("LearningObjectives")));
+                    learningModel.setThumbnailVideoPath(cursor.getString(cursor.getColumnIndex("ThumbnailVideoPath")));
+                    learningModel.setStatusActual((cursor.getString(cursor.getColumnIndex("ContentStatus"))));
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return learningModel;
+    }
+
+
     public List<MyLearningModel> fetchMylearningModel() {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
@@ -3195,7 +3282,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        String strSelQuery = "SELECT * FROM " + TBL_DOWNLOADDATA;
 ////                + " ORDER BY ";
 
-        String strSelQuery = "SELECT DISTINCT D.*, CASE WHEN C.status is NOT NULL OR NOT C.status = '' then C.status ELSE D.status END as objStatus FROM " + TBL_DOWNLOADDATA + " D LEFT OUTER JOIN " + TBL_CMI + " C ON D.userid = C.userid AND D.scoid = C.scoid AND D.siteid = C.siteid ORDER BY D.dateassigned DESC";
+//        String strSelQuery = "SELECT DISTINCT D.*, CASE WHEN C.status is NOT NULL OR NOT C.status = '' then C.status ELSE D.status END as objStatus FROM " + TBL_DOWNLOADDATA + " D LEFT OUTER JOIN " + TBL_CMI + " C ON D.userid = C.userid AND D.scoid = C.scoid AND D.siteid = C.siteid ORDER BY D.dateassigned DESC";
+
+
+        String strSelQuery = "SELECT DISTINCT D.*, CASE WHEN C.status is NOT NULL OR NOT C.status = '' then C.status ELSE D.status END as objStatus FROM " + TBL_DOWNLOADDATA + " D LEFT OUTER JOIN " + TBL_CMI + " C ON D.userid = C.userid AND D.scoid = C.scoid AND D.siteid = C.siteid ";
 
         Log.d(TAG, "fetchMylearningModel: " + strSelQuery);
         try {
@@ -3336,6 +3426,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventScheduleType(cursor.getInt(cursor
                             .getColumnIndex("EventScheduleType")));
 
+                    myLearningModel.setGroupName(cursor.getString(cursor
+                            .getColumnIndex("groupName")));
+
+                    myLearningModel.setActivityId(cursor.getString(cursor
+                            .getColumnIndex("activityid")));
+
 
                     myLearningModel.setAddedToMylearning(1);
 
@@ -3458,7 +3554,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (isValidString(imageurl)) {
 
                     myLearningModel.setThumbnailImagePath(imageurl);
-                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+//                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+
+
+                    String imagePathSet = myLearningModel.getSiteURL() + imageurl;
+
                     myLearningModel.setImageData(imagePathSet);
 
 
@@ -3874,10 +3974,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setEventScheduleType(jsonMyLearningColumnObj.optInt("eventscheduletype", 0));
 
+                myLearningModel.setGroupName(jsonMyLearningColumnObj.optString("headerlocationname", ""));
+
+                myLearningModel.setActivityId(jsonMyLearningColumnObj.optString("activityid", ""));
+
 
                 if (isCotentExists(myLearningModel, TBL_CATALOGDATA)) {
                     continue;
                 }
+
 
                 injectCatalogDataIntoTable(myLearningModel, isFromCatageories);
 
@@ -3973,6 +4078,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("contentTypeImagePath", myLearningModel.getContentTypeImagePath());
             contentValues.put("totalratings", myLearningModel.getTotalratings());
             contentValues.put("EventScheduleType", myLearningModel.getEventScheduleType());
+            contentValues.put("groupName", myLearningModel.getGroupName());
+            contentValues.put("activityid", myLearningModel.getActivityId());
+
+
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -4012,7 +4121,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public List<MyLearningModel> fetchCatalogModel(String componentID, String ddlSortList, String ddlSortType) {
+    public List<MyLearningModel> fetchCatalogModel(String componentID, String ddlSortList, String ddlSortType, boolean filterApplied) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
@@ -4021,16 +4130,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String orderType = getTheDatabaseColumnName(ddlSortList);
 
-        if (!orderType.equalsIgnoreCase("publisheddate")) {
+        if (!filterApplied) {
+            if (!orderType.equalsIgnoreCase("publisheddate")) {
 
-            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY " + orderType + " " + ddlSortType;
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY " + orderType + " " + ddlSortType;
 
-        } else if (ddlSortList.equalsIgnoreCase("publisheddate")) {
-            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY " + orderType + " " + ddlSortType;
+            } else if (ddlSortList.equalsIgnoreCase("publisheddate")) {
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY " + orderType + " " + ddlSortType;
 
+            } else {
+                strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate DESC";
+            }
         } else {
-            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID + "  ORDER BY publisheddate DESC";
+            strSelQuery = "SELECT DISTINCT * FROM " + TBL_CATALOGDATA + " WHERE categorycompid = " + componentID;
         }
+
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -4186,6 +4300,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventScheduleType(cursor.getInt(cursor
                             .getColumnIndex("EventScheduleType")));
 
+                    myLearningModel.setGroupName(cursor.getString(cursor
+                            .getColumnIndex("groupName")));
+
+                    myLearningModel.setGroupName(cursor.getString(cursor
+                            .getColumnIndex("activityid")));
+
 
                     myLearningModel.setEventAddedToCalender(false);
 
@@ -4210,16 +4330,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 // inject eventcatalog data to table
 
-    public void injectEventCatalog(JSONObject jsonObject, String tabValue, int pageIndex, String ComponentId) throws JSONException {
+    public void injectEventCatalog(JSONObject jsonObject, String tabValue, int pageIndex, String ComponentId, int recondCount, boolean filterApplied) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
+
 //        ejectRecordsinTable(TBL_EVENTCONTENTDATA);
 
-        if (pageIndex == 1) {
+        if (pageIndex == 1 || recondCount == 0) {
 
             ejectRecordsInEventByTab(tabValue, ComponentId);
 
+        }
+
+        if (filterApplied) {
+            ejectRecordsInEventByTabValue(tabValue, ComponentId);
         }
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
@@ -4330,9 +4455,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (isValidString(imageurl)) {
 
                     myLearningModel.setThumbnailImagePath(imageurl);
-                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+//                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    String imagePathSet = myLearningModel.getSiteURL() + imageurl;
                     myLearningModel.setImageData(imagePathSet);
-
 
                 } else {
                     if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
@@ -4729,6 +4854,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setEventScheduleType(jsonMyLearningColumnObj.optInt("eventscheduletype", 0));
 
+                myLearningModel.setGroupName(jsonMyLearningColumnObj.optString("headerlocationname", ""));
+
 
                 if (isCotentExists(myLearningModel, TBL_EVENTCONTENTDATA)) {
                     continue;
@@ -4813,6 +4940,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             contentValues.put("contentTypeImagePath", myLearningModel.getContentTypeImagePath());
             contentValues.put("EventScheduleType", myLearningModel.getEventScheduleType());
+            contentValues.put("groupName", myLearningModel.getGroupName());
+
 
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -4822,7 +4951,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-    public List<MyLearningModel> fetchEventCatalogModel(String componentID, String typeTab, String ddlSortList, String ddlSortType) {
+    public List<MyLearningModel> fetchEventCatalogModel(String componentID, String typeTab, String ddlSortList, String ddlSortType, boolean isfilterApplied) {
         List<MyLearningModel> myLearningModelList = null;
         MyLearningModel myLearningModel = new MyLearningModel();
         SQLiteDatabase db = this.getWritableDatabase();
@@ -4830,44 +4959,59 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // original
 //        String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventTabValue = '" + typeTab + "'  ORDER BY eventstarttime ASC";
 
+
         String strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
 
 
         String orderType = getTheDatabaseColumnName(ddlSortList);
 
+        if (!isfilterApplied) {
 
-        if (!orderType.equalsIgnoreCase("publisheddate")) {
+            if (!orderType.equalsIgnoreCase("publisheddate")) {
 
-            switch (typeTab) {
-                case "upcoming": //eventTabValue typeTab
-                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "'";
-                    break;
-                case "past":
-                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "'";
+                switch (typeTab) {
+                    case "upcoming": //eventTabValue typeTab
+                        strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "'";
+                        break;
+                    case "past":
+                        strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "'";
+                        break;
+                    case "calendar":
+                        strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !=''";
+                        break;
+                }
 
-                    break;
-                case "calendar":
-                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !=''";
-                    break;
+            } else {
+
+                switch (typeTab) {
+                    case "upcoming": //eventTabValue typeTab
+                        strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+                        break;
+                    case "past":
+                        strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+
+                        break;
+                    case "calendar":
+                        strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' ORDER BY eventstarttime ASC";
+                        break;
+                }
             }
-
         } else {
-
             switch (typeTab) {
                 case "upcoming": //eventTabValue typeTab
-                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime >= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' AND eventTabValue= '" + typeTab + "' ORDER BY eventstarttime ASC";
                     break;
                 case "past":
-                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' ORDER BY eventstarttime ASC";
-                    ;
+                    strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' AND eventendUtctime <= '" + getCurrentDateTimeInUTC("yyyy-MM-dd HH:mm:ss") + "' AND eventTabValue= '" + typeTab + "' ORDER BY eventstarttime ASC";
+
                     break;
                 case "calendar":
                     strSelQuery = "SELECT DISTINCT * FROM " + TBL_EVENTCONTENTDATA + " WHERE categorycompid = " + componentID + " AND eventendUtctime !='' ORDER BY eventstarttime ASC";
                     break;
             }
 
-
         }
+
 
         Log.d(TAG, "fetchCatalogModel: " + strSelQuery);
         try {
@@ -5032,6 +5176,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventScheduleType(cursor.getInt(cursor
                             .getColumnIndex("EventScheduleType")));
 
+
+                    myLearningModel.setGroupName(cursor.getString(cursor
+                            .getColumnIndex("groupName")));
+
                     myLearningModel.setEventAddedToCalender(false);
 
                     Log.d(TAG, "fetchEventCatalogModel: is event added " + myLearningModel.getAddedToMylearning() + "  with getCourseName  " + myLearningModel.getCourseName());
@@ -5137,6 +5285,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if (jsonMyLearningColumnObj.has("parentid")) {
 
                 trackLearningModel.setParentID(jsonMyLearningColumnObj.get("parentid").toString());
+
+            }
+
+            // parentid
+            if (jsonMyLearningColumnObj.has("activityid")) {
+
+                trackLearningModel.setActivityId(jsonMyLearningColumnObj.get("activityid").toString());
 
             }
 
@@ -6090,6 +6245,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("eventstartUtctime", trackListModel.getEventstartUtcTime());
             contentValues.put("eventendUtctime", trackListModel.getEventendUtcTime());
             contentValues.put("contentTypeImagePath", trackListModel.getContentTypeImagePath());
+
+            contentValues.put("activityid", trackListModel.getActivityId());
+
+
             db.insert(TBL_TRACKLISTDATA, null, contentValues);
 
         } catch (SQLiteException exception) {
@@ -6254,6 +6413,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     trackListModel.setContentTypeImagePath(cursor.getString(cursor
                             .getColumnIndex("contentTypeImagePath")));
+
+                    trackListModel.setActivityId(cursor.getString(cursor
+                            .getColumnIndex("activityid")));
 
 
                     if (isTrackListView) {
@@ -6431,7 +6593,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("wmessage", "");
             contentValues.put("eventstartUtctime", trackListModel.getEventstartUtcTime());
             contentValues.put("eventendUtctime", trackListModel.getEventendUtcTime());
-
+            contentValues.put("activityid", trackListModel.getActivityId());
 
             db.insert(TBL_RELATEDCONTENTDATA, null, contentValues);
 
@@ -8393,8 +8555,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             }
             insertStudentResponses(studentresponse);
-
-
         }
         return "true";
     }
@@ -10746,7 +10906,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 if (isValidString(imageurl)) {
 
                     myLearningModel.setThumbnailImagePath(imageurl);
-                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
+                    String imagePathSet = myLearningModel.getSiteURL() + imageurl;
                     myLearningModel.setImageData(imagePathSet);
 
 
@@ -11060,7 +11220,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setStatusActual("Not Started");
                 }
 
-                myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
+                myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("contenttypethumbnail", ""));
 
                 myLearningModel.setIsRequired(jsonMyLearningColumnObj.optInt("required", 0));
 
@@ -13493,6 +13653,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     catalogCategoryButtonModel.setContentCount(cursor.getString(cursor.getColumnIndex("contentcount")));
                     catalogCategoryButtonModel.setColumn1(cursor.getString(cursor.getColumnIndex("column1")));
                     catalogCategoryButtonModel.setComponentId(cursor.getString(cursor.getColumnIndex("componentid")));
+                    catalogCategoryButtonModel.setCategoryIcon(cursor.getString(cursor.getColumnIndex("categoryicon")));
                     catalogCategoryButtonModelList.add(catalogCategoryButtonModel);
                 }
             }
@@ -13673,6 +13834,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setAddedToMylearning(cursor.getInt(cursor
                             .getColumnIndex("isaddedtomylearning")));
+
+                    myLearningModel.setContentTypeImagePath(cursor.getString(cursor
+                            .getColumnIndex("contentTypeImagePath")));
+
+                    myLearningModel.setFolderPath(cursor.getString(cursor
+                            .getColumnIndex("folderpath")));
 
                     myLearningModel.setEventAddedToCalender(false);
 

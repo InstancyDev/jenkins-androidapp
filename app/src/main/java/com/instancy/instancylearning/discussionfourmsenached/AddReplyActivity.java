@@ -105,8 +105,8 @@ public class AddReplyActivity extends AppCompatActivity {
     TextView txtSave;
 
     @Nullable
-    @BindView(R.id.txtDescription)
-    TextView txtDescription;
+    @BindView(R.id.lbReplay)
+    TextView lbReplay;
 
     @Nullable
     @BindView(R.id.edit_description)
@@ -117,10 +117,12 @@ public class AddReplyActivity extends AppCompatActivity {
     LinearLayout bottomLayout;
 
     boolean isUpdateForum = false;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,AddReplyActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, AddReplyActivity.this);
 
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,11 +140,15 @@ public class AddReplyActivity extends AppCompatActivity {
         svProgressHUD = new SVProgressHUD(context);
 
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+        lbReplay.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
+        txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumsavebutton));
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newfourmcancelbutton));
+        lbReplay.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel));
 
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
-
 
         discussionCommentsModel = (DiscussionCommentsModelDg) getIntent().getSerializableExtra("commentModel");
 
@@ -151,7 +157,7 @@ public class AddReplyActivity extends AppCompatActivity {
             discussionReplyModel = (DiscussionReplyModelDg) getIntent().getSerializableExtra("replymodel");
             isUpdateForum = true;
             editDescription.setText(discussionReplyModel.message);
-            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_updatebutton));
         } else {
 
             isUpdateForum = false;
@@ -159,7 +165,7 @@ public class AddReplyActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getLocalizationValue(JsonLocalekeys.discussionforum_label_replyto) + discussionCommentsModel.message + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel) + "  " + discussionCommentsModel.message + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -176,17 +182,17 @@ public class AddReplyActivity extends AppCompatActivity {
     }
 
     public void initilizeHeaderView() {
-
-        SpannableString styledDescription
-                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_reply));
-        styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
-        styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
-        styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        styledDescription.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//
+//        SpannableString styledDescription
+//                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel));
+//        styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
+//        styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
+//        styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        styledDescription.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_label_enterreplylabel));
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopicdescriptionlabel));
     }
 
     void initVolleyCallback() {
@@ -297,7 +303,7 @@ public class AddReplyActivity extends AppCompatActivity {
         }
 
         if (descriptionStr.length() < 1) {
-            Toast.makeText(AddReplyActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_label_enterreplylabel), Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddReplyActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopicdescriptionlabel), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -358,12 +364,12 @@ public class AddReplyActivity extends AppCompatActivity {
                     if (jsonTableAry != null && jsonTableAry.length() > 0) {
 
                         closeForum(true);
-                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_replyhasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
 
-                    Toast.makeText(AddReplyActivity.this,getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_replyauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddReplyActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

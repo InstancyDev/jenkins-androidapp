@@ -127,7 +127,7 @@
     <string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>
     <string name="app_default_auth_url">http://angularbasicapi.instancysoft.com/api/</string>
 
-    <!--<string name="app_default_url">http://digimedica.instancysoft.com/</string>-->
+    <!--<string name="app_default_url">http://stagingyournextu.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
     <!--<string name="app_default_auth_url">http://angularbasicapi.instancysoft.com/api/</string>-->
 

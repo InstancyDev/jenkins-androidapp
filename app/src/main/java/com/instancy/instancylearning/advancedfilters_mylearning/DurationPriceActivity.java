@@ -140,8 +140,8 @@ public class DurationPriceActivity extends AppCompatActivity implements View.OnC
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
-        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
 
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeSeekbar);
 

@@ -52,6 +52,7 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         appUserModel = AppUserModel.getInstance();
     }
 
+
     public void refreshList(List<ProgressReportModel> progressReportModellist) {
         this.progressReportModellist = progressReportModellist;
         this.notifyDataSetChanged();
@@ -154,6 +155,38 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
                 .findViewById(R.id.txt_status);
 
 
+        // Title Labels Localazation Start
+        TextView txtTitle = (TextView) convertView
+                .findViewById(R.id.txtTitle);
+
+        TextView titleSiteName = (TextView) convertView
+                .findViewById(R.id.titleSiteName);
+
+        TextView titleContentType = (TextView) convertView
+                .findViewById(R.id.titleContentType);
+
+        TextView titleDateStarted = (TextView) convertView
+                .findViewById(R.id.titleDateStarted);
+
+        TextView titleDateCompleted = (TextView) convertView
+                .findViewById(R.id.titleDateCompleted);
+
+        TextView titleStatus = (TextView) convertView
+                .findViewById(R.id.titleStatus);
+
+        TextView titleScore = (TextView) convertView
+                .findViewById(R.id.titleScore);
+
+        txtTitle.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contenttitlelabel) + " :");
+        titleSiteName.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_sitenamelabel) + " :");
+        titleContentType.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentstypeslabel) + " :");
+        titleDateStarted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datestartedlabel) + " :");
+        titleDateCompleted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datecompletedlabel) + " :");
+        titleStatus.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_statuslabel) + " :");
+        titleScore.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_scorelabel) + " :");
+
+        // Title Labels Localazation End
+
         TextView txtScore = (TextView) convertView
                 .findViewById(R.id.txt_score);
         txtContentTitle.setTypeface(null, Typeface.BOLD);
@@ -227,6 +260,39 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
         TextView txtScore = (TextView) convertView
                 .findViewById(R.id.txt_score);
+
+
+        // Title Labels Localazation Start
+        TextView txtTitle = (TextView) convertView
+                .findViewById(R.id.txtTitle);
+
+        TextView titleSiteName = (TextView) convertView
+                .findViewById(R.id.titleSiteName);
+
+        TextView titleContentType = (TextView) convertView
+                .findViewById(R.id.titleContentType);
+
+        TextView titleDateStarted = (TextView) convertView
+                .findViewById(R.id.titleDateStarted);
+
+        TextView titleDateCompleted = (TextView) convertView
+                .findViewById(R.id.titleDateCompleted);
+
+        TextView titleStatus = (TextView) convertView
+                .findViewById(R.id.titleStatus);
+
+        TextView titleScore = (TextView) convertView
+                .findViewById(R.id.titleScore);
+
+        txtTitle.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contenttitlelabel) + " :");
+        titleSiteName.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_sitenamelabel) + " :");
+        titleContentType.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentstypeslabel) + " :");
+        titleDateStarted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datestartedlabel) + " :");
+        titleDateCompleted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datecompletedlabel) + " :");
+        titleStatus.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_statuslabel) + " :");
+        titleScore.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_scorelabel) + " :");
+
+        // Title Labels Localazation End
 
         final TextView txtContextmenu = (TextView) convertView
                 .findViewById(R.id.txt_contextmenu);

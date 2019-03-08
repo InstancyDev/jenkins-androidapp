@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -81,8 +82,8 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
         }
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-//        getSupportActionBar().setSubtitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + courseName + "</font>"));
-//        getSupportActionBar().setSubtitle("sdfsdfsdf");
+//        getSupportActionBar().setSubtitle(Html.fromHtml("<font color='" + uiSettingsModel.getAppTextColor() + "'>" + courseName + "</font>"));
+//        getSupportActionBar().setSubtitle(courseName);
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);

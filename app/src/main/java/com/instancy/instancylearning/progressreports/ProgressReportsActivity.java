@@ -79,9 +79,11 @@ public class ProgressReportsActivity extends AppCompatActivity {
 
 
     View header;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,ProgressReportsActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, ProgressReportsActivity.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +127,11 @@ public class ProgressReportsActivity extends AppCompatActivity {
         }
 
         if (isNetworkConnectionAvailable(this, -1)) {
-        //    getProgressdataDetails(progressReportModel);
+
+            if (progressReportModel.objectTypeID.equalsIgnoreCase("8") || progressReportModel.objectTypeID.equalsIgnoreCase("9")) {
+                getProgressdataDetails(progressReportModel);
+            }
+
             getSummaryData(progressReportModel);
         } else {
 
@@ -139,7 +145,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
         svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getprogressdatadetails?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + reportModel.datestarted + "&EndDate=" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") +
-                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&siteid=" + reportModel.siteID + "&locale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&EventID=" + reportModel.SCOID;
+                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&siteid=" + reportModel.siteID + "&locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&EventID=" + reportModel.SCOID;
 
         urlString = urlString.replaceAll(" ", "%20");
 
@@ -150,7 +156,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
     public void getSummaryData(ProgressReportModel reportModel) {
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getsummarydata?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + reportModel.datestarted + "&EndDate=" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") +
-                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&locale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&EventID=" + reportModel.SCOID;
+                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&EventID=" + reportModel.SCOID;
 
         urlString = urlString.replaceAll(" ", "%20");
 
@@ -256,13 +262,21 @@ public class ProgressReportsActivity extends AppCompatActivity {
         txtTimeAttemptInThisPeriod.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtDetails.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+
         txtPercentCompleted.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 //        cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        if (isValidString(summaryModel.courseName)) {
-            reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport)+":" + summaryModel.courseName);
+        if (progressReportModel.objectTypeID.equalsIgnoreCase("8") || progressReportModel.objectTypeID.equalsIgnoreCase("9")) {
+            txtDetails.setVisibility(View.VISIBLE);
         } else {
-            reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport)+":");
+            txtDetails.setVisibility(View.GONE);
+        }
+        txtDetails.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_details));
+        if (isValidString(summaryModel.courseName)) {
+            reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport) + ": " + summaryModel.courseName);
+        } else {
+            reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport) + ": ");
         }
 
         if (isValidString(summaryModel.courseName)) {
@@ -271,52 +285,48 @@ public class ProgressReportsActivity extends AppCompatActivity {
             reportSubTitle.setText("");
         }
 
-        if (isValidString(summaryModel.status)) {
-            txtStatus.setText(summaryModel.status);
-        } else {
-            txtStatus.setText("");
-        }
+        lbStatus.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_statuslabel) + " : ");
 
         if (isValidString(summaryModel.assignedDate)) {
-            txtAssignedDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_assigneddate)+": " + summaryModel.assignedDate);
+            txtAssignedDate.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_dateassignedlabel) + " " + summaryModel.assignedDate);
         } else {
-            txtAssignedDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_assigneddate)+":");
+            txtAssignedDate.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_dateassignedlabel) + " ");
         }
 
         if (isValidString(summaryModel.targetDate)) {
-            txtTargetDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_targetdate)+": " + summaryModel.targetDate);
+            txtTargetDate.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_targetdatelabel) + " " + summaryModel.targetDate);
         } else {
-            txtTargetDate.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_targetdate)+": ");
+            txtTargetDate.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_targetdatelabel) + " ");
         }
 
         if (isValidString(summaryModel.dateStarted)) {
-            txtDateStarted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" "+ summaryModel.dateStarted);
+            txtDateStarted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datestartedlabel) + ": " + summaryModel.dateStarted);
         } else {
-            txtDateStarted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" ");
+            txtDateStarted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datestartedlabel) + ": ");
         }
 
         if (isValidString(summaryModel.dateCompleted)) {
-            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" " + summaryModel.dateCompleted);
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datecompletedlabel) + ": " + summaryModel.dateCompleted);
         } else {
-            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" ");
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_datecompletedlabel) + ": ");
         }
 
         if (isValidString(summaryModel.timeSpent)) {
-            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + summaryModel.timeSpent);
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + " " + summaryModel.timeSpent);
         } else {
             txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel));
         }
 
         if (isValidString(summaryModel.numberOfTimeAccessedInThisPeriod)) {
-            txtTimeAccessedInThisPeriod.setText("# "+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": " + summaryModel.numberOfTimeAccessedInThisPeriod);
+            txtTimeAccessedInThisPeriod.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_timesaccessedinthisperiodlabel) + " " + summaryModel.numberOfTimeAccessedInThisPeriod);
         } else {
-            txtTimeAccessedInThisPeriod.setText("# "+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": ");
+            txtTimeAccessedInThisPeriod.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_timesaccessedinthisperiodlabel));
         }
 
         if (isValidString(summaryModel.numberOfAttemptsInThisPeriod)) {
-            txtTimeAttemptInThisPeriod.setText("#"+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": " + summaryModel.numberOfAttemptsInThisPeriod);
+            txtTimeAttemptInThisPeriod.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_timesattemptsinthisperiodlabel) + " " + summaryModel.numberOfAttemptsInThisPeriod);
         } else {
-            txtTimeAttemptInThisPeriod.setText("#"+getLocalizationValue(JsonLocalekeys.progressreports_label_timesaccessedinthisperiod)+": ");
+            txtTimeAttemptInThisPeriod.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_timesattemptsinthisperiodlabel));
         }
 
         if (isValidString(summaryModel.score)) {
@@ -332,44 +342,41 @@ public class ProgressReportsActivity extends AppCompatActivity {
 //        }
 
         if (isValidString(summaryModel.percentageCompleted)) {
-            txtPercentCompleted.setText("%Completed: " + summaryModel.percentageCompleted);
+            txtPercentCompleted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_percentagecompletedlabel) + summaryModel.percentageCompleted);
         } else {
-            txtPercentCompleted.setText("%Completed: ");
+            txtPercentCompleted.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_percentagecompletedlabel));
         }
-
-        if (summaryModel.status.equalsIgnoreCase("Completed") || (summaryModel.status.toLowerCase().contains("passed") || summaryModel.status.toLowerCase().contains("failed")) || summaryModel.status.equalsIgnoreCase("completed")) {
+        if (summaryModel.result.equalsIgnoreCase("Completed") || (summaryModel.result.toLowerCase().contains("passed") || summaryModel.result.toLowerCase().contains("failed")) || summaryModel.result.equalsIgnoreCase("completed")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
 
-        } else if (summaryModel.status.equalsIgnoreCase("Not Started")) {
-
+        } else if (summaryModel.result.equalsIgnoreCase("Not Started")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
 
-
-        } else if (summaryModel.status.equalsIgnoreCase("incomplete") || (summaryModel.status.toLowerCase().contains("inprogress")) || (summaryModel.status.toLowerCase().contains("in progress"))) {
+        } else if (summaryModel.result.equalsIgnoreCase("incomplete") || (summaryModel.result.toLowerCase().contains("inprogress")) || (summaryModel.result.toLowerCase().contains("in progress"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
 
-        } else if (summaryModel.status.equalsIgnoreCase("pending review") || (summaryModel.status.toLowerCase().contains("pendingreview")) || (summaryModel.status.toLowerCase().contains("grade"))) {
+        } else if (summaryModel.result.equalsIgnoreCase("pending review") || (summaryModel.result.toLowerCase().contains("pendingreview")) || (summaryModel.result.toLowerCase().contains("grade"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
 
-        } else if (summaryModel.status.equalsIgnoreCase("Registered") || (summaryModel.status.toLowerCase().contains("registered"))) {
+        } else if (summaryModel.result.equalsIgnoreCase("Registered") || (summaryModel.result.toLowerCase().contains("registered"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
 
-        } else if (summaryModel.status.toLowerCase().contains("attended") || (summaryModel.status.toLowerCase().contains("registered"))) {
+        } else if (summaryModel.result.toLowerCase().contains("attended") || (summaryModel.result.toLowerCase().contains("registered"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
 
-        } else if (summaryModel.status.toLowerCase().contains("Expired")) {
+        } else if (summaryModel.result.toLowerCase().contains("Expired")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
 
         }
 
-        txtStatus.setText(upperCaseWords(summaryModel.status));
+        txtStatus.setText(upperCaseWords(summaryModel.result));
 
 
     }

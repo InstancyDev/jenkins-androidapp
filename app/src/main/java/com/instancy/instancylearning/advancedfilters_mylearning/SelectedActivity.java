@@ -147,8 +147,8 @@ public class SelectedActivity extends AppCompatActivity implements View.OnClickL
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
-        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
     }
 
     private String getLocalizationValue(String key) {

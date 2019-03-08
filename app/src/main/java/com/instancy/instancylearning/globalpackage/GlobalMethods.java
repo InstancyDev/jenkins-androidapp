@@ -131,7 +131,9 @@ public class GlobalMethods {
                 e.printStackTrace();
             }
             String lrsEndPoint = "";
-            String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+//            String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+            String lrsActor = "{\"name\":[\"" + userName + "\"],\"account\":[{\"accountServiceHomePage\":\"" + myLearningModel.getSiteURL() + "\",\"accountName\":\"" + myLearningModel.getPassword() + "|" + userLoginId + "\"}],\"objectType\":\"Agent\"}&activity_id=" + myLearningModel.getActivityId() +
+                    "&grouping=" + myLearningModel.getActivityId();
             String lrsAuthorizationKey = "";
             String enabletincanSupportforco = "";
             String enabletincanSupportforao = "";
@@ -162,40 +164,40 @@ public class GlobalMethods {
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
                 offlinePath = "file://" + myLearningModel.getOfflinepath();
                 // LRS is implemented completed disabled for some resons
-                if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
-
-                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
-
-                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
-                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
-
-                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
-                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
-                    } else {
-                        databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
+//                if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
+//                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
 //
-                        offlinePath = databaseH.generateOfflinePathForCourseView(myLearningModel, context);
-                    }
-                } else {
-
-                    databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
+//                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
 //
-                    offlinePath = databaseH.generateOfflinePathForCourseView(myLearningModel, context);
+//                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
+//                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
+//
+//                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
+//                        offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor + "&cid=0&nativeappURL=true&IsInstancyContent=true";
+//                    } else {
+//                        databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
+////
+//                        offlinePath = databaseH.generateOfflinePathForCourseView(myLearningModel, context);
+//                    }
+//                } else {
 
-                }
+                databaseH.preFunctionalityBeforeNonLRSOfflineContentPathCreation(myLearningModel, context);
+//
+                offlinePath = databaseH.generateOfflinePathForCourseView(myLearningModel, context);
+
+//                }
 
             } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
 
-                String encodedString = "";
+                String encodedString = lrsActor;
 
-                try {
-                    encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
-//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
-
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+//
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
                 offlinePath = "file://" + myLearningModel.getOfflinepath();
                 offlinePath = offlinePath + "?&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&cid=0&nativeappURL=true&IsInstancyContent=true";
 
@@ -440,7 +442,7 @@ public class GlobalMethods {
 
             }
 
-            /// ONLINEVIEW
+            /// ONLINEVIEW UPENDRA
         } else {
 
             boolean isAngularLaunch = true;
@@ -484,11 +486,8 @@ public class GlobalMethods {
                             learnerSessionModel.setScoID(myLearningModel.getScoId());
                             learnerSessionModel.setAttemptNumber("" + (attempts + 1));
                             learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
-
                             databaseH.insertUserSession(learnerSessionModel);
-
                         }
-
                     }
                     databaseH = new DatabaseHandler(context);
                     JSONObject jsonObject = new JSONObject();
@@ -499,10 +498,10 @@ public class GlobalMethods {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
-
                     String lrsEndPoint = "";
-                    String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+//                    String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+                    String lrsActor = "{\"name\":[\"" + userName + "\"],\"account\":[{\"accountServiceHomePage\":\"" + myLearningModel.getSiteURL() + "\",\"accountName\":\"" + myLearningModel.getPassword() + "|" + userLoginId + "\"}],\"objectType\":\"Agent\"}&activity_id=" + myLearningModel.getActivityId() +
+                            "&grouping=" + myLearningModel.getActivityId();
                     String lrsAuthorizationKey = "";
                     String enabletincanSupportforco = "";
                     String enabletincanSupportforao = "";
@@ -512,10 +511,12 @@ public class GlobalMethods {
                     try {
 
                         if (jsonObject.length() != 0) {
-//
                             if (isAngularLaunch) {
                                 String lrsString = jsonObject.getString("lrsendpoint");
-                                lrsEndPoint = lrsString.replace("/", "~");
+                                if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("102"))
+                                    lrsEndPoint = lrsString.replace("/", "~");
+                                else
+                                    lrsEndPoint = lrsString;
                             } else {
                                 lrsEndPoint = jsonObject.getString("lrsendpoint");
                             }
@@ -543,8 +544,11 @@ public class GlobalMethods {
 
 
                         if (isAngularLaunch) {
+
                             urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappURL=true";
+
                         } else { // normal Launch
+
                             urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
                         }
 
@@ -601,15 +605,16 @@ public class GlobalMethods {
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                         String encodedString = "";
-
-                        try {
-                            encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
-//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
-
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                        urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
+//                        try {
+////                            encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+//                            encodedString = lrsActor.replace(" ", "%20");
+////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+//
+//                        } catch (UnsupportedEncodingException e) {
+//                            e.printStackTrace();
+//                        }
+                        encodedString = lrsActor.replace(" ", "%20");
+                        urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + /*&registration=*/ "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
                         String cerName = myLearningModel.getContentID() + "_Certificate";
@@ -633,7 +638,6 @@ public class GlobalMethods {
 //                        encodedStr = replace(urlForView.toLowerCase());// commented for digimedica
                         encodedStr = replace(urlForView);
                     }
-
 
                     Log.d("DBG", "launchCourseView: " + encodedStr);
                     if (encodedStr.endsWith(".pdf")) {
@@ -803,7 +807,7 @@ public class GlobalMethods {
         }
     }
 
-    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel) {
+    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel, final SideMenusModel sideMenusModel) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -841,8 +845,8 @@ public class GlobalMethods {
         ; // related content
         menu.getItem(9).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_cancelenrollmentoption, v.getContext()));// cancel
         menu.getItem(10).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_deleteoption, v.getContext()));
-        menu.getItem(11).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_label_archivetitlelabel, v.getContext()));
-        menu.getItem(12).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_removefromarchive, v.getContext()));
+        menu.getItem(11).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_archiveoption, v.getContext()));
+        menu.getItem(12).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_unarchiveoption, v.getContext()));
 
 
         if (myLearningDetalData.isArchived()) {
@@ -912,9 +916,10 @@ public class GlobalMethods {
             // returnEventCompleted
 
             if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
-                menu.getItem(9).setVisible(true);
+                if (myLearningDetalData.getEventScheduleType()<1){
+                    menu.getItem(9).setVisible(true);
+                }
                 menu.getItem(6).setVisible(true);
-
             }
 
             if (!returnEventCompleted(myLearningDetalData.getEventendTime())) {
@@ -963,6 +968,7 @@ public class GlobalMethods {
                         intentDetail.putExtra("IFROMCATALOG", false);
                         intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
                         intentDetail.putExtra("typeFrom", typeFrom);
+                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
                         ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
                         break;
                     case R.id.ctx_view:
@@ -1124,7 +1130,7 @@ public class GlobalMethods {
             deleteDirectory(parentFile);
             if (downloadInterface != null) {
                 downloadInterface.deletedTheContent(1);
-                Toast.makeText(v.getContext(), "     Successfully deleted.    ", Toast.LENGTH_LONG).show();
+                Toast.makeText(v.getContext(), getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_youhavesuccessfullydeleteddownloadedcontent, v.getContext()), Toast.LENGTH_LONG).show();
                 databaseH = new DatabaseHandler(v.getContext());
                 databaseH.ejectRecordsinCmi(myLearningModel);
                 databaseH.ejectRecordsinStudentResponse(myLearningModel);
@@ -1274,11 +1280,24 @@ public class GlobalMethods {
 
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-                    urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO";
+                   // urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO";
 
+                    urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/false/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappURL=true";
+//
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11")) {
 
-                    urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&ContentID=" + myLearningModel.getContentID();
+                 //   urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&ContentID=" + myLearningModel.getContentID();
+
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && isValidString(myLearningModel.getJwvideokey())) {
+
+//                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+
+                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html";
+
+                    } else {
+                        urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+                    }
+
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
                 {
@@ -1289,16 +1308,22 @@ public class GlobalMethods {
                     urlForView = myLearningModel.getStartPage();
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
 
-                    urlForView = myLearningModel.getSiteURL() + "//PublicModules/AJAXPreview.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=";
+//                    urlForView = myLearningModel.getSiteURL() + "//PublicModules/AJAXPreview.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=";
 
+                    String startPage = myLearningModel.getStartPage().replace("/", "~");
+
+                    urlForView = myLearningModel.getSiteURL() + "ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/false/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + startPage + "?nativeappurl=true";
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
-                    urlForView = myLearningModel.getSiteURL() + "//PublicModules/AJAXPreview.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=NO" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=";
+//                    urlForView = myLearningModel.getSiteURL() + "//PublicModules/AJAXPreview.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=NO" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=";
+
+                    urlForView = myLearningModel.getSiteURL() + "/ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/false/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//ismobilecontentview/true/ContentPath/~" + myLearningModel.getStartPage() + "?nativeappurl=true";
+
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                     String encodedString = "";
 
-                    urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + "" + "&auth=" + "" + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO" + "&nativeappURL=true";
+                    urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + "" + "&auth=" + "" + "&actor=" + encodedString + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO" + "&nativeappURL=true";
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
                     String cerName = myLearningModel.getContentID() + "_Certificate";
@@ -1319,7 +1344,7 @@ public class GlobalMethods {
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
                     encodedStr = replace(urlForView);
                 } else {
-                    encodedStr = replace(urlForView.toLowerCase());
+                    encodedStr = replace(urlForView);
                 }
 
 
@@ -1476,7 +1501,9 @@ public class GlobalMethods {
                 }
 
                 String lrsEndPoint = "";
-                String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+//                String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+                String lrsActor = "{\"name\":[\"" + userName + "\"],\"account\":[{\"accountServiceHomePage\":\"" + myLearningModel.getSiteURL() + "\",\"accountName\":\"" + myLearningModel.getPassword() + "|" + userLoginId + "\"}],\"objectType\":\"Agent\"}&activity_id=" + myLearningModel.getActivityId() +
+                        "&grouping=" + myLearningModel.getActivityId();
                 String lrsAuthorizationKey = "";
                 String enabletincanSupportforco = "";
                 String enabletincanSupportforao = "";
@@ -1550,15 +1577,15 @@ public class GlobalMethods {
                     urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
-                    String encodedString = "";
+                    String encodedString = lrsActor;
 
-                    try {
-                        encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
-//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
-
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+//
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
                     urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {

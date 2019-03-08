@@ -151,63 +151,63 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
 
         // We need to create a new "cell container"
 //        if (convertView == null) {
-            switch (expandableListTitle.get(groupPosition).groupId) {
-                case "1":
-                    convertView = inflater.inflate(R.layout.achivmentspointscell, null);
-                    TextView textCount = convertView.findViewById(R.id.txt_count);
-                    TextView textAwardedOn = convertView.findViewById(R.id.txt_awardedon);
-                    TextView textTitle = convertView.findViewById(R.id.txt_title);
-                    textCount.setText("" + achUserPointsList.get(childPosition).points);
-                    textAwardedOn.setText(getLocalizationValue(JsonLocalekeys.filter_label_awardedon) + " " + achUserPointsList.get(childPosition).userReceivedDate);
-                    textTitle.setText("" + achUserPointsList.get(childPosition).pointsDescription);
-                    textCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    textAwardedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    textTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    convertView.setTag(childType);
-                    break;
-                case "2":
-                    convertView = inflater.inflate(R.layout.achivmentslevelcell, null);
-                    TextView textPoints = convertView.findViewById(R.id.txtPoints);
-                    TextView textAwarded = convertView.findViewById(R.id.txtAwardedon);
-                    TextView txtLevel = convertView.findViewById(R.id.txtLevel);
-                    txtLevel.setText("" + achUserLevelList.get(childPosition).levelName);
-                    if (achUserLevelList.get(childPosition).levelReceivedDate.length() > 0) {
+        switch (expandableListTitle.get(groupPosition).groupId) {
+            case "1":
+                convertView = inflater.inflate(R.layout.achivmentspointscell, null);
+                TextView textCount = convertView.findViewById(R.id.txt_count);
+                TextView textAwardedOn = convertView.findViewById(R.id.txt_awardedon);
+                TextView textTitle = convertView.findViewById(R.id.txt_title);
+                textCount.setText("" + achUserPointsList.get(childPosition).points);
+                textAwardedOn.setText(getLocalizationValue(JsonLocalekeys.achievements_label_awardedonlabel) + " " + achUserPointsList.get(childPosition).userReceivedDate);
+                textTitle.setText("" + achUserPointsList.get(childPosition).pointsDescription);
+                textCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                textAwardedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                textTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                convertView.setTag(childType);
+                break;
+            case "2":
+                convertView = inflater.inflate(R.layout.achivmentslevelcell, null);
+                TextView textPoints = convertView.findViewById(R.id.txtPoints);
+                TextView textAwarded = convertView.findViewById(R.id.txtAwardedon);
+                TextView txtLevel = convertView.findViewById(R.id.txtLevel);
+                txtLevel.setText("" + achUserLevelList.get(childPosition).levelName);
+                if (achUserLevelList.get(childPosition).levelReceivedDate.length() > 0) {
 
-                        textAwarded.setText(getLocalizationValue(JsonLocalekeys.filter_label_awardedon) + " " + achUserLevelList.get(childPosition).levelReceivedDate);
+                    textAwarded.setText(getLocalizationValue(JsonLocalekeys.achievements_label_awardedonlabel) + " " + achUserLevelList.get(childPosition).levelReceivedDate);
 
-                    } else {
-                        textAwarded.setText("");
-                    }
-                    textPoints.setText("" + achUserLevelList.get(childPosition).levelPoints);
-                    textPoints.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    textAwarded.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    txtLevel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    convertView.setTag(childType);
-                    break;
-                case "3":
-                    convertView = inflater.inflate(R.layout.achivmentsbadgescell, null);
-                    TextView txtTitle = convertView.findViewById(R.id.txt_title);
-                    TextView textDesc = convertView.findViewById(R.id.txt_description);
-                    TextView textAwardedBadge = convertView.findViewById(R.id.txt_awardedon);
-                    ImageView badgeImage = (ImageView) convertView.findViewById(R.id.imageBadge);
-                    txtTitle.setText("" + achUserBadgesList.get(childPosition).badgeName);
-                    textAwardedBadge.setText(getLocalizationValue(JsonLocalekeys.filter_label_awardedon) + " " + achUserBadgesList.get(childPosition).badgeReceivedDate);
-                    textDesc.setText("" + achUserBadgesList.get(childPosition).badgeDescription);
-                    String imgUrl = achUserBadgesList.get(childPosition).badgeImage;
-                    Picasso.with(context).load(imgUrl).placeholder(R.drawable.badge).into(badgeImage);
-                    txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    textDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    textAwardedBadge.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-                    convertView.setTag(childType);
-                    break;
-                case "23":
-                    convertView = inflater.inflate(R.layout.achivmentsgroupcell, null);
-                    convertView.setTag(childType);
-                    break;
-                default:
-                    // Maybe we should implement a default behaviour but it should be ok we know there are 4 child types right?
-                    break;
-            }
+                } else {
+                    textAwarded.setText("");
+                }
+                textPoints.setText("" + achUserLevelList.get(childPosition).levelPoints);
+                textPoints.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                textAwarded.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                txtLevel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                convertView.setTag(childType);
+                break;
+            case "3":
+                convertView = inflater.inflate(R.layout.achivmentsbadgescell, null);
+                TextView txtTitle = convertView.findViewById(R.id.txt_title);
+                TextView textDesc = convertView.findViewById(R.id.txt_description);
+                TextView textAwardedBadge = convertView.findViewById(R.id.txt_awardedon);
+                ImageView badgeImage = (ImageView) convertView.findViewById(R.id.imageBadge);
+                txtTitle.setText("" + achUserBadgesList.get(childPosition).badgeName);
+                textAwardedBadge.setText(getLocalizationValue(JsonLocalekeys.achievements_label_awardedonlabel) + " " + achUserBadgesList.get(childPosition).badgeReceivedDate);
+                textDesc.setText("" + achUserBadgesList.get(childPosition).badgeDescription);
+                String imgUrl = achUserBadgesList.get(childPosition).badgeImage;
+                Picasso.with(context).load(imgUrl).placeholder(R.drawable.badge).into(badgeImage);
+                txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                textDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                textAwardedBadge.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+                convertView.setTag(childType);
+                break;
+            case "23":
+                convertView = inflater.inflate(R.layout.achivmentsgroupcell, null);
+                convertView.setTag(childType);
+                break;
+            default:
+                // Maybe we should implement a default behaviour but it should be ok we know there are 4 child types right?
+                break;
+        }
 //        } else {
 //            // There is nothing to do here really we just need to set the content of view which we do in both cases
 //        }

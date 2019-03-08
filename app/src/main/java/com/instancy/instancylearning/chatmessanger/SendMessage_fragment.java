@@ -25,6 +25,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,9 +39,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.android.volley.VolleyError;
+import com.baoyz.swipemenulistview.SwipeMenu;
+import com.baoyz.swipemenulistview.SwipeMenuCreator;
+import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -74,10 +80,14 @@ import butterknife.ButterKnife;
 
 import static android.content.Context.BIND_ABOVE_CLIENT;
 
+
+import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
+//https://www.spaceotechnologies.com/swipe-delete-listview-android-example/
 
 /**
  * Created by Upendranath on 5/19/2017.
@@ -97,7 +107,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     DatabaseHandler db;
 
     @BindView(R.id.userschatlist)
-    ListView usersChatListView;
+    SwipeMenuListView usersChatListView;
 
     SendMessageAdapter chatMessageAdapter;
     List<PeopleListingModel> peopleListingModelList = null;
@@ -303,10 +313,12 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             e.printStackTrace();
         }
         chatListModelList = new ArrayList<ChatListModel>();
+        initilizeSwipe();
         chatMessageAdapter = new SendMessageAdapter(getActivity(), BIND_ABOVE_CLIENT, chatListModelList);
         usersChatListView.setAdapter(chatMessageAdapter);
         usersChatListView.setOnItemClickListener(this);
         usersChatListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+
         initilizeView();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             getChatConnectionUserList();
@@ -315,6 +327,78 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
 
         return rootView;
+    }
+
+    public void initilizeSwipe() {
+
+        SwipeMenuCreator creator = new SwipeMenuCreator() {
+
+            @Override
+            public void create(SwipeMenu menu) {
+                // Create different menus depending on the view type
+                switch (menu.getViewType()) {
+                    case 0:
+                        createMenu1(menu);
+                        break;
+                }
+            }
+        };
+
+        // set creator
+        usersChatListView.setMenuCreator(creator);
+
+        // step 2. listener item click event
+        usersChatListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                ChatListModel item = chatListModelList.get(position);
+                switch (index) {
+                    case 0:
+                        // open
+                        Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
+                        // delete
+//					delete(item);
+                        chatListModelList.remove(position);
+                        chatMessageAdapter.notifyDataSetChanged();
+                        Toast.makeText(context, "Archived", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+
+                        break;
+                }
+                return false;
+            }
+
+        });
+
+    }
+
+    private void createMenu1(SwipeMenu menu) {
+
+        Drawable iconArchive = getButtonDrawable(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
+
+        Drawable iconDelete = getButtonDrawable(R.string.fa_icon_trash, context, uiSettingsModel.getAppHeaderTextColor());
+
+
+        SwipeMenuItem item1 = new SwipeMenuItem(
+                context);
+        item1.setBackground(new ColorDrawable(Color.rgb(0xE5, 0x18,
+                0x5E)));
+        item1.setWidth(dp2px(75));
+        item1.setIcon(iconArchive);
+        item1.setTitle("Archive");
+        menu.addMenuItem(item1);
+        SwipeMenuItem item2 = new SwipeMenuItem(
+                context);
+        item2.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
+                0xCE)));
+        item2.setWidth(dp2px(75));
+        item2.setIcon(iconDelete);
+        item2.setTitle("Delete");
+        item2.setTitleColor(getResources().getColor(R.color.colorRed));
+        menu.addMenuItem(item2);
     }
 
     public void initilizeView() {
@@ -420,13 +504,7 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
         ChatListModel chatListModel = (ChatListModel) parent.getItemAtPosition(position);
         PeopleListingModel peopleListingModel = convertTopeopleModel(chatListModel);
         switch (view.getId()) {
-            case R.id.btntxt_download:
-                if (isNetworkConnectionAvailable(context, -1)) {
-                } else {
-                    showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
-                }
-                break;
-            case R.id.card_view:
+            case R.id.txtPeople:
                 Intent intentDetail = new Intent(context, ChatActivity.class);
                 intentDetail.putExtra("peopleListingModel", peopleListingModel);
                 startActivity(intentDetail);
@@ -436,7 +514,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             default:
         }
     }
-
 
     public PeopleListingModel convertTopeopleModel(ChatListModel chatListModel) {
         PeopleListingModel peopleListingModel = new PeopleListingModel();
@@ -773,4 +850,10 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
         return userRoles;
     }
+
+    private int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
+    }
+
 }

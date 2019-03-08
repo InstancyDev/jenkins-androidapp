@@ -297,7 +297,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectEventCatalog(response, TABBALUE, 1, "");
+                            db.injectEventCatalog(response, TABBALUE, 1, "",1,false);
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -413,7 +413,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), "", "", "");
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), "", "", "",false);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -1849,7 +1849,6 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                                             addEventToAndroidDevice(catalogModel);
                                             db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
                                             injectFromDbtoModel(false);
-
                                         }
                                     });
                             AlertDialog alert = builder.create();

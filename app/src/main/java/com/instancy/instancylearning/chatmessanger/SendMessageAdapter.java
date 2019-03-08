@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -43,10 +45,10 @@ public class SendMessageAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ChatListModel> chatListModelList = null;
-    private int resource;
+
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
-    SVProgressHUD svProgressHUD;
+
     private String TAG = SendMessageAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<ChatListModel> searchList;
@@ -56,12 +58,11 @@ public class SendMessageAdapter extends BaseAdapter {
         this.activity = activity;
         this.chatListModelList = chatListModelList;
         this.searchList = new ArrayList<ChatListModel>();
-        this.resource = resource;
+
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
-        svProgressHUD = new SVProgressHUD(activity);
-        appUserModel = AppUserModel.getInstance();
+
 
     }
 
@@ -86,6 +87,7 @@ public class SendMessageAdapter extends BaseAdapter {
     public long getItemId(int position) {
         return position;
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -149,6 +151,15 @@ public class SendMessageAdapter extends BaseAdapter {
             holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle_o, "#008000"));
         }
 
+
+        holder.txtName.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ((SwipeMenuListView) parent).performItemClick(v, position, 0); // Let the event be handled in onItemClick()
+            }
+        });
+
         return convertView;
     }
 
@@ -205,14 +216,13 @@ public class SendMessageAdapter extends BaseAdapter {
         @BindView(R.id.txtPlace)
         TextView txtPlace;
 
-        @OnClick({R.id.card_view})
-        public void actionsForMenu(View view) {
-
-            ((ListView) parent).performItemClick(view, getPosition, 0);
-
-        }
+//        @OnClick({R.id.card_view, R.id.txtPeople})
+//        public void actionsForMenu(View view) {
+//            ((SwipeMenuListView) parent).performItemClick(view, getPosition, 0);
+//        }
 
     }
+
 }
 
 

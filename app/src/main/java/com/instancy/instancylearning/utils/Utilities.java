@@ -111,6 +111,17 @@ public class Utilities {
         return result;
     }
 
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtmlForYourNExt(String html) {
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(html, Html.FROM_HTML_MODE_COMPACT);
+        } else {
+            result = Html.fromHtml(html);
+        }
+        return result;
+    }
+
 
     public static String fromHtmlToString(String html) {
         Spanned result;
@@ -1291,7 +1302,7 @@ public class Utilities {
             e.printStackTrace();
             isCompleted = false;
         }
-        if (strDate==null)
+        if (strDate == null)
             return false;
 
         if (new Date().after(strDate)) {

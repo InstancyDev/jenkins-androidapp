@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:padding="4dp">
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
@@ -14,12 +14,9 @@
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginTop="3dp"
-        android:padding="6dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        app:contentPadding="4dp">
+        app:cardElevation="4dp"
+        app:contentPadding="7dp">
 
         <LinearLayout
             android:id="@+id/linearlayout"
@@ -27,19 +24,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:weightSum="4">
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
                 <TextView
-                    android:id="@+id/txt_title"
-
+                    android:id="@+id/txtTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:layout_toRightOf="@+id/expIcon"
                     android:ellipsize="end"
                     android:gravity="left"
                     android:maxLines="1"
@@ -53,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:layout_toRightOf="@+id/txt_title"
+                    android:layout_toRightOf="@+id/txtTitle"
                     android:ellipsize="end"
                     android:gravity="left"
                     android:maxLines="1"
@@ -66,8 +59,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:textAlignment="center"
                     android:text="@string/fa_icon_ellipsis_v"
+                    android:textAlignment="center"
                     android:textSize="20dp"
                     android:textStyle="bold"
                     android:visibility="visible" />
@@ -80,6 +73,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/titleSiteName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -100,7 +94,6 @@
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
-                    android:text="one"
                     android:textSize="12sp" />
 
             </LinearLayout>
@@ -111,6 +104,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/titleContentType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -131,7 +125,6 @@
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
-                    android:text="one"
                     android:textSize="12sp" />
 
 
@@ -143,6 +136,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/titleDateStarted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -163,7 +157,6 @@
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
-                    android:text="one"
                     android:textSize="12sp" />
 
 
@@ -175,6 +168,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/titleDateCompleted"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -195,7 +189,6 @@
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
-                    android:text="one"
                     android:textSize="12sp" />
 
 
@@ -207,6 +200,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/titleStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -227,7 +221,6 @@
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
-                    android:text="one"
                     android:textSize="12sp" />
 
 
@@ -239,6 +232,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/titleScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
@@ -259,13 +253,11 @@
                     android:gravity="left"
                     android:maxLines="1"
                     android:padding="2dp"
-                    android:text="one"
                     android:textSize="12sp" />
-
 
             </LinearLayout>
 
         </LinearLayout>
-    </android.support.v7.widget.CardView>
 
+    </android.support.v7.widget.CardView>
 </RelativeLayout>

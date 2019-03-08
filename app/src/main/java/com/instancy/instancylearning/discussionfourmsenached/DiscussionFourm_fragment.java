@@ -30,8 +30,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.Spanned;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -50,18 +48,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
-import com.instancy.instancylearning.askexpertenached.AskExpertsAnswersActivity;
-import com.instancy.instancylearning.discussionfourmsenached.CreateNewForumActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalsearch.GlobalSearchActivity;
 import com.instancy.instancylearning.helper.FontManager;
@@ -70,7 +59,6 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
-import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -445,6 +433,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         lytCategories.setVisibility(View.VISIBLE);
         txtCategoriesIcon.setOnClickListener(this);
         txtCategoriesName.setOnClickListener(this);
+        txtCategoriesName.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_categorytitle));
 
         tagsRelative.setVisibility(View.VISIBLE);
         tagsRelative.setOnClickListener(this);
@@ -463,7 +452,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
         FontManager.markAsIconContainer(txtCategoriesIcon, iconFont);
 
-        txtCategoriesIcon.setText( context.getResources().getString(R.string.fa_icon_sort_down));
+        txtCategoriesIcon.setText(context.getResources().getString(R.string.fa_icon_sort_down));
 
         return rootView;
     }
@@ -1021,12 +1010,12 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             LikesAdapter upvotersAdapter = new LikesAdapter(getActivity(), likesModelList);
             lv_languages.setAdapter(upvotersAdapter);
             TextView txtCountVoted = view.findViewById(R.id.txtCountVoted);
-            txtCountVoted.setText(likesModelList.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+            txtCountVoted.setText(likesModelList.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
             bottomSheetDialog = new BottomSheetDialog(context);
             bottomSheetDialog.setContentView(view);
             bottomSheetDialog.show();
         } else {
-            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_nolikeslabel), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_nolikesfound), Toast.LENGTH_SHORT).show();
         }
 
     }

@@ -81,7 +81,13 @@ public class AllFilterAdapter extends BaseAdapter {
         TextView txtCategorySelectedSkills = (TextView) vi.findViewById(R.id.txtCategorySelectedSkills);
         TextView txtArrow = (TextView) vi.findViewById(R.id.txtArrow);
         txtCategoryDisplayName.setText(contentFilterByModel.categoryName);
-        txtCategorySelectedSkills.setText(contentFilterByModel.categorySelectedData);
+        if (contentFilterByModel.categoryID==3){
+            txtCategorySelectedSkills.setText(contentFilterByModel.categorySelectedDataDisplay);
+        }
+        else {
+            txtCategorySelectedSkills.setText(contentFilterByModel.categorySelectedData);
+        }
+
         return vi;
     }
 

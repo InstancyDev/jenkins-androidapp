@@ -55,6 +55,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -141,14 +142,14 @@ public class CatalogAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-
+        holder.ratingBar.setVisibility(View.GONE);
         if (isEvent) {
 
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
 
 //            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
 
-            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter());
+            holder.txtAuthor.setText(myLearningModel.get(position).getAuthor());
             holder.txtEventFromTo.setText(fromDate);
             holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
             holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
@@ -156,7 +157,7 @@ public class CatalogAdapter extends BaseAdapter {
             if (myLearningModel.get(position).getTypeofevent() == 2) {
                 holder.locationlayout.setVisibility(View.GONE);
             }
-            holder.ratingBar.setVisibility(View.GONE);
+
             if (!myLearningModel.get(position).isCompletedEvent()) {
                 // write new logic
                 int avaliableSeats = 0;
@@ -301,43 +302,50 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-        if (myLearningModel.get(position).
-
-                getObjecttypeId().
-
-                equalsIgnoreCase("70"))
-
-        {
+        if (myLearningModel.get(position).getObjecttypeId(). equalsIgnoreCase("70")) {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.txtPrice.setVisibility(View.GONE);
             holder.eventLayout.setVisibility(View.VISIBLE);
             holder.txtAthrIcon.setVisibility(View.VISIBLE);
 
-            holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
+            holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
 //            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
             holder.txtEventFromTo.setText(fromDate);
             holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
             if (myLearningModel.get(position).getTypeofevent() == 2) {
                 holder.locationlayout.setVisibility(View.GONE);
+
             }
 
-            if (myLearningModel.get(position).getLocationName().length() == 0) {
+            if (isValidString(myLearningModel.get(position).getLocationName())) {
+                holder.locationlayout.setVisibility(View.VISIBLE);
+                holder.txtLocationIcon.setVisibility(View.VISIBLE);
+            }else {
                 holder.locationlayout.setVisibility(View.GONE);
+                holder.txtLocationIcon.setVisibility(View.GONE);
             }
+
+            if (isValidString(myLearningModel.get(position).getAuthor())) {
+                holder.txtAuthor.setVisibility(View.VISIBLE);
+                holder.txtAthrIcon.setVisibility(View.VISIBLE);
+            }else {
+                holder.txtAuthor.setVisibility(View.GONE);
+                holder.txtAthrIcon.setVisibility(View.GONE);
+            }
+
 //            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
             holder.txtTimeZone.setVisibility(View.GONE);
 
         } else
 
         {
-
-
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
             holder.eventLayout.setVisibility(View.GONE);
+            holder.txtLocationIcon.setVisibility(View.GONE);
             holder.txtAthrIcon.setVisibility(View.GONE);
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                 holder.btnDownload.setVisibility(View.GONE);
                 holder.circleProgressBar.setVisibility(View.GONE);
 
@@ -348,12 +356,10 @@ public class CatalogAdapter extends BaseAdapter {
                 if (myFile.exists()) {
                     holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
                     holder.btnDownload.setEnabled(false);
-
                 } else {
                     holder.btnDownload.setTextColor(vi.getResources().getColor(R.color.colorBlack));
                     holder.btnDownload.setEnabled(true);
                     holder.btnDownload.setVisibility(View.GONE);
-
                 }
 
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
@@ -361,19 +367,11 @@ public class CatalogAdapter extends BaseAdapter {
                 }
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
                     holder.btnDownload.setVisibility(View.VISIBLE);
-//                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
-//                        holder.btnDownload.setVisibility(View.GONE);
-//                    }
                 }
 
                 holder.circleProgressBar.setVisibility(View.GONE);
 
-//              File extStore = Environment.getExternalStorageDirectory();
-
             }
-
-            // do something for phones running an SDK before lollipop
-
 
         }
         if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
@@ -712,7 +710,6 @@ public class CatalogAdapter extends BaseAdapter {
         @Nullable
         @BindView(R.id.locationlayout)
         LinearLayout locationlayout;
-
 
         @Nullable
         @BindView(R.id.fabbtnthumb)

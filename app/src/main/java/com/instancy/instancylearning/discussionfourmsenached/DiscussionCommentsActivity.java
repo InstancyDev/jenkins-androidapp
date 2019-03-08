@@ -179,6 +179,9 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         header = (View) getLayoutInflater().inflate(R.layout.discussiontopiccell_en, null);
         footor = (View) getLayoutInflater().inflate(R.layout.no_data_layout, null);
 
+        TextView nodataFottor = footor.findViewById(R.id.nodata_label);
+        nodataFottor.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
+
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel) + "</font>"));
@@ -255,14 +258,16 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         txtLikesCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        txtComment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
+        txtLikes.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
 
         txtName.setText(discussionTopicModel.name);
         txtShortDesc.setText(discussionTopicModel.longDescription);
 
-        txtLikesCount.setText(discussionTopicModel.likes + "" + getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
-        txtCommentCount.setText(discussionTopicModel.noOfReplies + " " + getLocalizationValue(JsonLocalekeys.discussionforum_header_discussiontopiccommentstitlelabel));
+        txtLikesCount.setText(discussionTopicModel.likes + "" + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        txtCommentCount.setText(discussionTopicModel.noOfReplies + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
-        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedlabel) + ": ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel) + ": ";
 
         if (isValidString(discussionTopicModel.author)) {
 
@@ -271,7 +276,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         if (isValidString(discussionTopicModel.modifiedUserName)) {
 
-            totalActivityStr = totalActivityStr + " |  " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedlabel) + ":" + discussionTopicModel.author + " " + discussionTopicModel.updatedTime;
+            totalActivityStr = totalActivityStr + " |  " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel) + ":" + discussionTopicModel.author + " " + discussionTopicModel.updatedTime;
         }
 
         txtAuthor.setText(totalActivityStr);
@@ -312,6 +317,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         assert txtComment != null;
         txtComment.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_comment), null, null, null);
+
+
 
     }
 
@@ -419,7 +426,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             commentsAdapter.refreshList(discussionCommentsModelList);
             footor.setVisibility(View.VISIBLE);
         }
-        txtCommentCount.setText(discussionCommentsModelList.size() + " Comment(s)");
+        txtCommentCount.setText(discussionCommentsModelList.size() + " "+ getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
     }
 
     @Override
@@ -659,14 +666,13 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("success")) {
-
                     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alerttsubtitle_commentdeletesuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
 //                    deleteCommentFromLocalDB(discussionTopicModel);
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commentauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

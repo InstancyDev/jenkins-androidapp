@@ -171,6 +171,19 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
     @BindView(R.id.groupname)
     TextView groupName;
 
+    @Nullable
+    @BindView(R.id.txtpointlabel)
+    TextView txtpointlabel;
+
+    @Nullable
+    @BindView(R.id.txtlevellabel)
+    TextView txtlevellabel;
+
+    @Nullable
+    @BindView(R.id.txtAwardedon)
+    TextView txtAwardedon;
+
+
     String gameId = "1";
 
     @Nullable
@@ -255,10 +268,9 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     }
 
-    public void getAchivmentsByGameIDForOther(String gameID) {
+    public void getAchivmentsByGameIDForOther() {
 
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MyAchievementr/MyCreditCertificate?UserID=" + appUserModel.getUserIDValue();
+        String urlStr = appUserModel.getWebAPIUrl() + "MyAchievementr/MyCreditCertificate?UserID=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         vollyService.getJsonObjResponseVolley("ACHIVBOARDOTHER", urlStr, appUserModel.getAuthHeaders());
 
@@ -326,7 +338,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
             }
 
             @Override
@@ -346,7 +358,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                                 gameId = object.getString("GameID");
 //                                getAchivmentsByGameID(gameId);
                                 if (gameId.equalsIgnoreCase("-1"))
-                                    getAchivmentsByGameIDForOther(gameId);
+                                    getAchivmentsByGameIDForOther();
                                 else
                                     getAchivmentsByGameID(gameId);
 
@@ -354,7 +366,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                             } else {
                                 svProgressHUD.dismiss();
 
-                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
                             }
 
                         } catch (JSONException e) {
@@ -380,7 +392,6 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
                     }
                     Log.d(TAG, requestType + " : " + response);
-
 
                 }
 
@@ -409,7 +420,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 OtherGameModel otherGameModel = new OtherGameModel();
                 otherGameModel.contentID = columnObj.optString("ContentID");
                 otherGameModel.name = columnObj.optString("Name");
-                otherGameModel.decimal2 = columnObj.optDouble("Decimal2",0);
+                otherGameModel.decimal2 = columnObj.optDouble("Decimal2", 0);
                 otherGameModel.certificateID = columnObj.optString("CertificateID");
                 otherGameModel.coreLessonStatus = columnObj.optString("CoreLessonStatus");
                 otherGameModel.scoreRaw = columnObj.optString("ScoreRaw");
@@ -417,6 +428,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
                 otherGameModel.certificatePage = columnObj.optString("CertificatePage");
                 otherGameModel.certifyviewlink = columnObj.optString("certifyviewlink");
                 otherGameModel.certifycountwebapilevel = columnObj.optInt("certifycountwebapilevel");
+                otherGameModel.certificatepreviewpath = columnObj.optString("CertificatePreviewPath");
                 otherGameModellocList.add(otherGameModel);
                 otherGameModelList.add(otherGameModel);
                 certificateCount = certificateCount + otherGameModel.certifycountwebapilevel;
@@ -471,7 +483,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
                     if (gameId.equalsIgnoreCase("-1"))
-                        getAchivmentsByGameIDForOther(gameId);
+                        getAchivmentsByGameIDForOther();
                     else
                         getAchivmentsByGameID(gameId);
                 } else {
@@ -529,7 +541,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
             refreshGameList(false);
         } else {
 //            injectFromDbtoModel();
-            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
         }
 
         initilizeView();
@@ -576,14 +588,14 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         if (achUserPointsList.size() > 0) {
             GamificationModel gamificationModel = new GamificationModel();
             gamificationModel.groupId = "1";
-            gamificationModel.groupname = "Points";
+            gamificationModel.groupname = getLocalizationValue(JsonLocalekeys.achievements_tablesection_headingpoints);
             gamificationModelList.add(gamificationModel);
         }
 
         if (achUserLevelList.size() > 0) {
             GamificationModel gamificationModel = new GamificationModel();
             gamificationModel.groupId = "2";
-            gamificationModel.groupname = "Level";
+            gamificationModel.groupname = getLocalizationValue(JsonLocalekeys.achievements_tablesection_headinglevel);
             gamificationModelList.add(gamificationModel);
         }
 
@@ -591,7 +603,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
             GamificationModel gamificationModel = new GamificationModel();
             gamificationModel.groupId = "3";
-            gamificationModel.groupname = "Badges";
+            gamificationModel.groupname = getLocalizationValue(JsonLocalekeys.achievements_tablesection_headingbadges);
             gamificationModelList.add(gamificationModel);
         }
 
@@ -650,6 +662,13 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         txtLevel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtPoints.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
+        txtpointlabel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtlevellabel.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtAwardedon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        txtAwardedon.setText(getLocalizationValue(JsonLocalekeys.achievements_tablesection_headingbadges));
+        txtlevellabel.setText(getLocalizationValue(JsonLocalekeys.achievements_tablesection_headinglevel));
+        txtpointlabel.setText(getLocalizationValue(JsonLocalekeys.achievements_tablesection_headingpoints));
     }
 
     public void initilizeOtherGameView() {
@@ -665,6 +684,7 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         txtCertificate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         groupName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         groupName.setText(getLocalizationValue(JsonLocalekeys.gamemifaction_othergames_header));
+
     }
 
     public void initilizeView() {
@@ -746,24 +766,22 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intentSocial = new Intent(context, SocialWebLoginsActivity.class);
         switch (view.getId()) {
             case R.id.txtCertificate:
                 OtherGameModel otherGameModel = otherGameModelList.get(i);
                 Log.d(TAG, "onItemClick: " + otherGameModel);
-                String urlForCertificate = appUserModel.getSiteURL() + "content/sitefiles/" + appUserModel.getSiteIDValue() + "/UserCertificates/" + appUserModel.getUserIDValue() + "/" + otherGameModelList.get(i).certificateID + "/Certificate.pdf";
+//                String urlForCertificate = appUserModel.getSiteURL() + "content/sitefiles/" + appUserModel.getSiteIDValue() + "/UserCertificates/" + appUserModel.getUserIDValue() + "/" + otherGameModelList.get(i).certificateID + "/Certificate.pdf";
 
-                if (isValidString(otherGameModelList.get(i).certificateID)) {
-//                    intentSocial.putExtra("ATTACHMENT", true);
-//                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, urlForCertificate);
-//                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, otherGameModelList.get(i).certificatePage);
-//                    startActivity(intentSocial);
+                String urlForCertificate = appUserModel.getSiteURL() + otherGameModelList.get(i).certificatepreviewpath;
+
+                if (isValidString(otherGameModelList.get(i).certificatepreviewpath)) {
+
                     MyLearningModel myLearningModel = new MyLearningModel();
                     Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
                     pdfIntent.putExtra("PDF_URL", urlForCertificate);
                     pdfIntent.putExtra("ISONLINE", "YES");
                     pdfIntent.putExtra("myLearningDetalData", myLearningModel);
-                    pdfIntent.putExtra("PDF_FILENAME", otherGameModelList.get(i).certificatePage);
+                    pdfIntent.putExtra("PDF_FILENAME", otherGameModelList.get(i).name);
                     startActivity(pdfIntent);
                 }
 

@@ -366,7 +366,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue()+"&strlocaleId="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         urlStr = urlStr.replaceAll(" ", "%20");
 

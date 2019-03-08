@@ -125,7 +125,7 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         holder.txtShortDisc.setText(discussionTopicModelList.get(position).longDescription);
 
 
-        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + ": ";
 
         if (isValidString(discussionTopicModelList.get(position).author)) {
 
@@ -134,24 +134,23 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
         if (isValidString(discussionTopicModelList.get(position).modifiedUserName)) {
 
-            totalActivityStr = totalActivityStr + " |  "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": " + discussionTopicModelList.get(position).author + " " + discussionTopicModelList.get(position).updatedTime;
+            totalActivityStr = totalActivityStr + " |  " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + ": " + discussionTopicModelList.get(position).author + " " + discussionTopicModelList.get(position).updatedTime;
         }
 
         holder.txtAuthor.setText(totalActivityStr);
 
-        holder.txtLikesCount.setText(discussionTopicModelList.get(position).likes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
-        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noOfReplies + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
+        holder.txtLikesCount.setText(discussionTopicModelList.get(position).likes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_likelabel));
+        holder.txtCommentsCount.setText(discussionTopicModelList.get(position).noOfReplies + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDisc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtLikesCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
+        holder.txtComment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
 //        assert holder.txtLikes != null;
 //        holder.txtLikes.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_thumbs_o_up), null, null, null);
-
 
         if (discussionTopicModelList.get(position).likeState) {
             holder.txtLikes.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -163,8 +162,10 @@ public class DiscussionTopicAdapter extends BaseAdapter {
         }
 
         assert holder.txtComment != null;
-        holder.txtComment.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_comment), null, null, null);
+        holder.txtComment.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(convertView.getContext(), R.string.fa_icon_comment, uiSettingsModel.getAppTextColor()), null, null, null);
 
+        holder.txtLikes.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        holder.txtComment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
         if (discussionTopicModelList.get(position).longDescription.isEmpty() || discussionTopicModelList.get(position).longDescription.contains("null")) {
             holder.txtShortDisc.setVisibility(View.GONE);
@@ -317,8 +318,9 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
         this.notifyDataSetChanged();
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,activity);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
 
     }
 }

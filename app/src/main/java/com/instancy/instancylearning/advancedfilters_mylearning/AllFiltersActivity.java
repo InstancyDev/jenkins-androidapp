@@ -31,6 +31,7 @@ import com.instancy.instancylearning.utils.PreferencesManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
@@ -53,6 +54,9 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
     AllFilterAdapter allFilterAdapter;
     Button btnApply, btnReset;
     SideMenusModel sideMenusModel;
+    String contentFilterType = "";
+
+    HashMap<String, String> responMap = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +71,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>Filters</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>"+ getLocalizationValue(JsonLocalekeys.filter_lbl_filtertitlelabel)+"</font>"));
 
         isFromMylearning = getIntent().getIntExtra("isFrom", 0);
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
@@ -75,15 +79,18 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
 
         allFilterModelList = (List<AllFilterModel>) getIntent().getExtras().getSerializable("allFilterModelList");
 
+        responMap = (HashMap<String, String>) getIntent().getExtras().getSerializable("responMap");
+
+        contentFilterType = getIntent().getStringExtra("contentFilterType");
+
         applyUiColor();
+
         try {
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
-
         } catch (RuntimeException ex) {
-
             ex.printStackTrace();
         }
 
@@ -118,8 +125,8 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
 
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
-        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
     }
 
     private String getLocalizationValue(String key) {
@@ -212,7 +219,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
 
                                 allFilterModelList.get(i).categorySelectedData = allFilterModel.categorySelectedData;
                                 allFilterModelList.get(i).categorySelectedID = allFilterModel.categorySelectedID;
-
+                                allFilterModelList.get(i).categorySelectedDataDisplay = allFilterModel.categorySelectedDataDisplay;
                                 allFilterAdapter.refreshList(allFilterModelList);
                             }
                         }
@@ -278,12 +285,16 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                 intents.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                 intents.putExtra("allFilterModel", (Serializable) allFilterModelList.get(i));
                 intents.putExtra("isFrom", 3);
+                intents.putExtra("contentFilterType", contentFilterType);
+                intents.putExtra("responMap", (Serializable) responMap);
                 startActivityForResult(intents, FILTER_CLOSE_CODE);
                 break;
             case 2:
                 Intent intentG = new Intent(this, SortActivity.class);
                 intentG.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                 intentG.putExtra("allFilterModel", (Serializable) allFilterModelList.get(i));
+                intentG.putExtra("responMap", (Serializable) responMap);
+                intentG.putExtra("contentFilterType", contentFilterType);
                 intentG.putExtra("isFrom", 3);
                 startActivityForResult(intentG, FILTER_CLOSE_CODE);
                 break;
@@ -295,7 +306,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
         ApplyFilterModel applyFilterModel = new ApplyFilterModel();
 
         for (int i = 0; i < contentFilterByModelList.size(); i++) {
-
+            applyFilterModel.filterApplied = true;
             switch (contentFilterByModelList.get(i).categoryID) {
                 case "cat":
                     applyFilterModel.categories = generateSelectedCategories(contentFilterByModelList.get(i));
@@ -331,6 +342,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
 
                     if (allFilterModelList.get(k).categoryID == 3) {
                         applyFilterModel.sortBy = allFilterModelList.get(k).categorySelectedData;
+                        applyFilterModel.sortByDisplay = allFilterModelList.get(k).categorySelectedDataDisplay;
 
                     }
 
@@ -340,7 +352,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                     }
                     applyFilterModel.selectedId = allFilterModelList.get(k).categorySelectedID;
                 }
-
+                applyFilterModel.filterApplied = true;
             }
 
         }
@@ -352,10 +364,11 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
         String generatedStr = "";
 
 
-        if (contentFilterByModel.selectedSkillIdsArry == null || contentFilterByModel.selectedSkillIdsArry.size() == 0)
-            return generatedStr;
-
         if (typeFilter == 1) {
+
+            if (contentFilterByModel.selectedSkillIdsArry == null || contentFilterByModel.selectedSkillIdsArry.size() == 0)
+                return generatedStr;
+
             for (int i = 0; i < contentFilterByModel.selectedSkillIdsArry.size(); i++) {
                 if (generatedStr.length() > 0) {
                     generatedStr = generatedStr.concat("," + contentFilterByModel.selectedSkillIdsArry.get(i));
@@ -364,9 +377,13 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                 }
             }
         }
-        if (contentFilterByModel.selectedChildSkillIdsArry == null || contentFilterByModel.selectedChildSkillIdsArry.size() == 0)
-            return generatedStr;
+
+
         if (typeFilter == 2) {
+
+            if (contentFilterByModel.selectedChildSkillIdsArry == null || contentFilterByModel.selectedChildSkillIdsArry.size() == 0)
+                return generatedStr;
+
             generatedStr = "";
             for (int i = 0; i < contentFilterByModel.selectedChildSkillIdsArry.size(); i++) {
                 if (generatedStr.length() > 0) {

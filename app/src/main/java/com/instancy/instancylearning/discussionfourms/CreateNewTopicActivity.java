@@ -186,7 +186,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
             editTitle.setText(discussionTopicModel.name);
             editDescription.setText(discussionTopicModel.longdescription);
             editAttachment.setText(discussionTopicModel.attachment);
-            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_updatebutton));
         } else {
 
             isUpdateForum = false;
@@ -574,7 +574,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_topiccannotpostedcontactadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

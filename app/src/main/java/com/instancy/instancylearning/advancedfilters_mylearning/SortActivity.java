@@ -43,6 +43,8 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -82,6 +84,10 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
 
     RelativeLayout relativeLayout;
 
+    HashMap<String, String> responMap = null;
+
+    String contentFilterType = "";
+
     //    https://github.com/shineM/TreeView
 
     @Override
@@ -100,6 +106,10 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
         isFromMylearning = getIntent().getIntExtra("isFrom", 0);
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
         allFilterModel = (AllFilterModel) getIntent().getExtras().getSerializable("allFilterModel");
+        responMap = (HashMap<String, String>) getIntent().getExtras().getSerializable("responMap");
+
+        contentFilterType = getIntent().getStringExtra("contentFilterType");
+
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -176,8 +186,8 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
-        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
     }
 
     private String getLocalizationValue(String key) {
@@ -373,7 +383,7 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
 
         JSONObject jsonObject = new JSONObject(responseStr);
         JSONArray jsonTableAry = jsonObject.getJSONArray("Table");
-
+        List<String> filterCategoriesArray = getArrayListFromString(contentFilterType);
         for (int i = 0; i < jsonTableAry.length(); i++) {
             SortModel sortModel = new SortModel();
             JSONObject jsonColumnObj = jsonTableAry.getJSONObject(i);
@@ -384,7 +394,52 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
             sortModel.localID = jsonColumnObj.optString("LocalID");
             sortModel.categoryID = jsonColumnObj.optInt("ID");
             //   DateAssigned desc
-            sortModelList.add(sortModel);
+
+            if (jsonColumnObj.optString("EnableColumn").equalsIgnoreCase("ecommerce")) {
+                if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
+                    for (int k = 0; k < filterCategoriesArray.size(); k++) {
+                        switch (filterCategoriesArray.get(k)) {
+                            case "ecommerceprice":
+                                sortModelList.add(sortModel);
+                                break;
+//                            case "rating":
+//                                sortModelList.add(sortModel);
+//                                break;
+
+                        }
+                    }
+                }
+//                if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+//                    String showrRatings = responMap.get("EnableEcommerce");
+//                    if (showrRatings.contains("true")) {
+//                        if (uiSettingsModel.isEnableEcommerce()) {
+//                            sortModelList.add(sortModel);
+//                        }
+//                    }
+//                }
+
+            } else if (jsonColumnObj.optString("EnableColumn").equalsIgnoreCase("rating")) {
+
+                if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
+                    for (int k = 0; k < filterCategoriesArray.size(); k++) {
+                        switch (filterCategoriesArray.get(k)) {
+                            case "rating":
+                                sortModelList.add(sortModel);
+                                break;
+                        }
+                    }
+                }
+//                if (responMap != null && responMap.containsKey("ShowrRatings")) {
+//                    String showrRatings = responMap.get("ShowrRatings");
+//                    if (showrRatings.contains("true")) {
+//                        sortModelList.add(sortModel);
+//                    }
+//                }
+            } else {
+
+                sortModelList.add(sortModel);
+            }
+
         }
         return sortModelList;
     }
@@ -422,5 +477,17 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
         return sortModelList;
     }
 
+    public List<String> getArrayListFromString(String questionCategoriesString) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (questionCategoriesString.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
+
+        return questionCategoriesArray;
+
+    }
 
 }

@@ -115,9 +115,10 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtName.setText(discussionReplyModelList.get(position).replyBy);
-        holder.txtAskedWhen.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_repliedon)+": " + discussionReplyModelList.get(position).dtPostedOnDate);
+        holder.txtAskedWhen.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel)+": " + discussionReplyModelList.get(position).dtPostedOnDate);
         holder.txtmessage.setText(discussionReplyModelList.get(position).message);
         holder.txtmessage.setMaxLines(200);
+        holder.txtLike.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel));
 
 
         assert holder.txtLike != null;

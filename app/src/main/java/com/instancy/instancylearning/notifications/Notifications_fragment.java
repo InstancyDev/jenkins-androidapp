@@ -146,9 +146,11 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -174,7 +176,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         if (!isRefreshed) {
             svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         }
-        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"", appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("NOTIFICATIODATA", appUserModel.getWebAPIUrl() + "/MobileLMS/GetMobileNotifications?userid=" + appUserModel.getUserIDValue() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "", appUserModel.getAuthHeaders());
 
     }
 
@@ -286,11 +288,11 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
 
-        if (item_search != null && notificationModelList.size() > 5) {
-            item_search.setVisible(true);
-        } else {
-            item_search.setVisible(false);
-        }
+//        if (item_search != null && notificationModelList.size() > 5) {
+//            item_search.setVisible(true);
+//        } else {
+//            item_search.setVisible(false);
+//        }
 
     }
 
@@ -339,6 +341,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                 public boolean onQueryTextChange(String newText) {
 
                     notificationAdapter.filter(newText.toLowerCase(Locale.getDefault()));
+
+                    if (notificationAdapter.getCount() < 1) {
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+
+                    } else {
+                        nodata_Label.setText("");
+                    }
 
                     return true;
                 }
@@ -485,6 +494,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
             ((SideMenu) getActivity()).homeControllClicked(true, 10, "", false, "");
 
+        } else {
+
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notification_alert_subtitlerespectivecontentnotavailablealert), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -579,7 +591,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert)+" \n"+getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert) + " \n" + getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert), Toast.LENGTH_SHORT).show();
                     NOTIFICATIONVIWED = 1;
                     deleteAnswerFromLocalDB(notificationModel);
 
@@ -648,7 +660,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert)+" \n"+getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert) , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert) + " \n" + getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert), Toast.LENGTH_SHORT).show();
 
                     notificationModelList.get(position).markasread = "true";
                     notificationAdapter.notifyDataSetChanged();

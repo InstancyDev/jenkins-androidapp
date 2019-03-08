@@ -658,11 +658,11 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 //            }
 //        }
 
-        if (uiSettingsModel.isGlobasearch() && queryString.length() > 0) {
-
-            peopleListingAdapter.filter(queryString);
-
-        }
+//        if (uiSettingsModel.isGlobasearch() && queryString.length() > 0) {
+//
+//            peopleListingAdapter.filter(queryString);
+//
+//        }
 
     }
 
@@ -867,35 +867,35 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "locations";
-                            contentFilterByModel.categoryDisplayName = "Locations";
+                            contentFilterByModel.categoryDisplayName =  getLocalizationValue(JsonLocalekeys.filter_lbl_location);
                             contentFilterByModel.goInside = true;
                             break;
                         case "skills":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "skills";
-                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.categoryDisplayName =  getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
                             contentFilterByModel.goInside = true;
                             break;
                         case "jobroles":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "jobroles";
-                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.categoryDisplayName =  getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
                             contentFilterByModel.goInside = false;
                             break;
                         case "company":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "company";
-                            contentFilterByModel.categoryDisplayName = "Company";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_company);
                             contentFilterByModel.goInside = false;
                             break;
                         case "userinfo":
                             contentFilterByModel.categoryName = "Userinfo";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "userinfo";
-                            contentFilterByModel.categoryDisplayName = "User Info";
+                            contentFilterByModel.categoryDisplayName =getLocalizationValue(JsonLocalekeys.filter_lbl_userinfotitlelabel);
                             contentFilterByModel.goInside = false;
                             break;
                     }
@@ -914,7 +914,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         List<AllFilterModel> allFilterModelList = new ArrayList<>();
 
         AllFilterModel advFilterModel = new AllFilterModel();
-        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_filterbytitlelabel);
         advFilterModel.categoryID = 1;
         allFilterModelList.add(advFilterModel);
 
@@ -922,7 +922,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             String enableGroupby = responMap.get("EnableGroupby");
             if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
                 AllFilterModel groupFilterModel = new AllFilterModel();
-                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryName =getLocalizationValue(JsonLocalekeys.filter_lbl_groupbytitlelabel);
                 groupFilterModel.categoryID = 2;
                 if (responMap != null && responMap.containsKey("ddlGroupby")) {
 
@@ -938,7 +938,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 
         AllFilterModel sortFilterModel = new AllFilterModel();
-        sortFilterModel.categoryName = "Sort By";
+        sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
         sortFilterModel.categoryID = 3;
         allFilterModelList.add(sortFilterModel);
 
@@ -1088,7 +1088,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
         }
 
         if (peopleListingModel.viewContentAction) {
-            menu.getItem(1).setVisible(true);
+//            menu.getItem(1).setVisible(true); content
         }
 
         // comment for cvcta

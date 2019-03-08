@@ -234,6 +234,16 @@ public class MyLearningModel implements Serializable {
 
     String groupName = "";
 
+    String activityId = "";
+
+    public String getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
+    }
+
     // Exclusive For Track List Model start
     String score = "";
     String timeDelay = "";

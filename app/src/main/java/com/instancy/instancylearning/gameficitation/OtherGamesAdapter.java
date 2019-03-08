@@ -122,7 +122,7 @@ public class OtherGamesAdapter extends BaseAdapter {
 
         holder.txtCertificate.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        if (isValidString(otherGameModelList.get(position).certifyviewlink)) {
+        if (isValidString(otherGameModelList.get(position).certificatepreviewpath)) {
             holder.txtCertificate.setText(otherGameModelList.get(position).certificatePage);
             holder.txtCertificate.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.view_certificate,context));
         } else {

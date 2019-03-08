@@ -235,6 +235,9 @@ public class CreateNewForumActivity extends AppCompatActivity {
     @BindView(R.id.txtCategoriesName)
     TextView txtCategoriesName;
 
+    @BindView(R.id.txtCategories)
+    TextView txtCategories;
+
     @BindView(R.id.txtCategoriesClear)
     TextView txtCategoriesClear;
 
@@ -277,6 +280,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
+
         tagsCategories = (CustomFlowLayout) findViewById(R.id.cflBreadcrumb);
 
         initVolleyCallback();
@@ -289,7 +293,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             isUpdateForum = true;
             editTitle.setText(discussionForumModel.name);
             editDescription.setText(discussionForumModel.description);
-            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_updatebutton));
             updateUiForEditQuestion();
             if (discussionForumModel.categoriesIDArray != null && discussionForumModel.categoriesIDArray.size() > 0) {
                 breadcrumbItemsList = generateSelectedContentValues(discussionForumModel.categoriesIDArray);
@@ -304,7 +308,12 @@ public class CreateNewForumActivity extends AppCompatActivity {
             btnUpload.setTag(0);
             isUpdateForum = false;
             clearCategory();
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumsavebutton));
+
         }
+        editTitle.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textfield_newtopictitletextfieldplaceholder));
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textview_newtopicdescriptionplaceholder));
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newfourmcancelbutton));
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -330,6 +339,8 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         btnSelect.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnSelect.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        btnSelect.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_selectbutton));
+
 
         // Multipart
 
@@ -453,14 +464,14 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumremoveimagebutton));
             attachedImg.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
 
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newtopicselectfileuploadbutton));
             attachedImg.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -487,6 +498,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         labelTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         labelDescritpion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtModerator.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtSettings.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCategoriesCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCategoriesClear.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -494,18 +506,35 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         txtCategoriesIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCategoriesName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtCategories.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtPrivacy.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
         Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
         FontManager.markAsIconContainer(txtCategoriesIcon, iconFont);
 
+        labelDescritpion.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_newforumDescriptionlabel));
+        txtModerator.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel));
+        txtSettings.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_newforumSettingslabel));
+        txtCategoriesName.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_categorytitle));
+        txtCategories.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_categorytitle));
+        txtPrivacy.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_privacyoptionlabel));
         txtCategoriesIcon.setText(context.getResources().getString(R.string.fa_icon_sort_down));
 
-        SpannableString styledTitle
-                = new SpannableString("*" + getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel) + ":");
+        SpannableString styledTitle = new SpannableString("*" + getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel) + ":");
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         styledTitle.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelTitle.setText(styledTitle);
+
+
+        switchAttachFiles.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_newforumattachfile));
+        switchEmail.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_newforumsendemail));
+        switchNewTopics.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_newforumcreatenewtopic));
+        switchLikeorComment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_newforumliketopicorcomment));
+        switchPintopic.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_newforumpinthetopic));
+        switchShare.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_newforumsharewithconnectionsorpeople));
+        switchPrivacy.setText(getLocalizationValue(JsonLocalekeys.discussionforum_tablesection_privateforum));
 
         switchAttachFiles.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -688,11 +717,11 @@ public class CreateNewForumActivity extends AppCompatActivity {
         }
 
         if (titleStr.length() < 1) {
-            Toast.makeText(this, "Please enter forum", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_enterforum), Toast.LENGTH_SHORT).show();
         } else if (!allowAttachFile && !allowShare && !allowLikeTopic && !allowNewTopic && !allowNotification && !allowPin && !allowPrivate) {
-            Toast.makeText(this, "Please select one setting", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_selectonesetting), Toast.LENGTH_SHORT).show();
         } else if (moderatorId == 0) {
-            Toast.makeText(this, "Please select moderator", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_select_moderator), Toast.LENGTH_SHORT).show();
         } else {
 
             Map<String, RequestBody> parameters = new HashMap<String, RequestBody>();
@@ -772,7 +801,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 Log.e("Upload error:", t.getMessage());
-                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newforumauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
             }
         });

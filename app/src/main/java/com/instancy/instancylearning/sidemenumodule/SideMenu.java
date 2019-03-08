@@ -616,8 +616,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         Fragment fragment = null; //
 
-        SideMenusModel catalogSideMenuModel = sideMenusModel;
-
         switch (menuid) {
             case 1:
                 fragment = new MyLearningFragment();

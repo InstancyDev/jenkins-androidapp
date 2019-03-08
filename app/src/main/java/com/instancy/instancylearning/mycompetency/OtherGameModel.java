@@ -17,5 +17,6 @@ public class OtherGameModel implements Serializable {
     public String certificatePercentage = "";
     public String certificatePage = "";
     public String certifyviewlink = "";
+    public String certificatepreviewpath = "";
     public int certifycountwebapilevel = 0;
 }

@@ -210,8 +210,9 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
             }
 
         }
-        String imgUrl = appUserModel.getSiteURL() + "/Content/SiteFiles/Images/" + expandedListText.contenttypethumbnail;
+//        String imgUrl = appUserModel.getSiteURL() + "/Content/SiteFiles/Images/" + expandedListText.contenttypethumbnail;
 
+        String imgUrl = appUserModel.getSiteURL() + expandedListText.thumbnailimagepath;
 
         switch (expandedListText.contextMenuId) {
             case 1:// mylearning
@@ -268,7 +269,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
                 holder.txtStartDate.setVisibility(View.GONE);
                 holder.txtEndDate.setVisibility(View.GONE);
                 holder.txtCreatedOn.setVisibility(View.GONE);
-                holder.txtAskedby.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, context)+" "+ expandedListText.authordisplayname + " ");
+                holder.txtAskedby.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, context) + " " + expandedListText.authordisplayname + " ");
                 holder.txtdateCreated.setText("Date created: " + expandedListText.createddate + " ");
                 break;
             case 10:// people listing

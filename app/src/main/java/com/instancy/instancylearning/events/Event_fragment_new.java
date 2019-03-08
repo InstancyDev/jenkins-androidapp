@@ -505,8 +505,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             StaticValues.PASTCALLED = 1;
                         }
                         try {
-                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId());
                             totalRecordsCount = countOfTotalRecords(response);
+                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount,applyFilterModel.filterApplied);
+
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -566,32 +567,35 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
-                if (response != null && response.length() > 0) {
-                    if (TABBALUE.equalsIgnoreCase("upcoming")) {
-                        StaticValues.UPCOMINGCALLED = 1;
-                    } else if (TABBALUE.equalsIgnoreCase("calendar")) {
-                        pageIndex = 1;
-                        StaticValues.CALENDARCALLED = 1;
-                    } else if (TABBALUE.equalsIgnoreCase("past")) {
-                        StaticValues.PASTCALLED = 1;
-                    }
-                    JSONObject jsonObj = null;
-                    try {
-                        jsonObj = new JSONObject(response);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        if (jsonObj != null) {
-                            db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId());
-                            totalRecordsCount = countOfTotalRecords(jsonObj);
+                if (requestType.equalsIgnoreCase("CATALOGDATA")) {
+                    if (response != null && response.length() > 0) {
+                        if (TABBALUE.equalsIgnoreCase("upcoming")) {
+                            StaticValues.UPCOMINGCALLED = 1;
+                        } else if (TABBALUE.equalsIgnoreCase("calendar")) {
+                            pageIndex = 1;
+                            StaticValues.CALENDARCALLED = 1;
+                        } else if (TABBALUE.equalsIgnoreCase("past")) {
+                            StaticValues.PASTCALLED = 1;
                         }
-                        injectFromDbtoModel(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        JSONObject jsonObj = null;
+                        try {
+                            jsonObj = new JSONObject(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            if (jsonObj != null) {
+                                totalRecordsCount = countOfTotalRecords(jsonObj);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount,applyFilterModel.filterApplied);
+
+                            }
+                            injectFromDbtoModel(true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
-                } else {
-                    nodata_Label.setText(getResources().getString(R.string.no_data));
                 }
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
@@ -726,6 +730,10 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         calenderBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         pastBtn.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        upBtn.setText(getLocalizationValue(JsonLocalekeys.events_tabbutton_upcomingeventsbutton));
+        calenderBtn.setText(getLocalizationValue(JsonLocalekeys.events_tabbutton_calendarbutton));
+        pastBtn.setText(getLocalizationValue(JsonLocalekeys.events_tabbutton_pasteventsbutton));
+
         upBtn.setTypeface(null, Typeface.BOLD);
         segmentedSwitch.setOnCheckedChangeListener(this);
         segmentedSwitch.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
@@ -754,7 +762,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE, ddlSortList, ddlSortType);
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE, ddlSortList, ddlSortType, applyFilterModel.filterApplied);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
             progressBar.setVisibility(View.GONE);
@@ -1066,7 +1074,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         popup.getMenuInflater().inflate(R.menu.event_contextmenu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
         Menu menu = popup.getMenu();
-        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_viewoption));//view
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_relatedcontentoption));//view
         menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_enrolloption));
         ;//enroll
         menu.getItem(2).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_buyoption));
@@ -1074,6 +1082,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         menu.getItem(3).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_detailsoption));
         ;//detail
         menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_cancelenrollmentoption));
+//        menu.getItem(4).setTitle("Cancel");
+
+
         ;//cancel enrollment
 
         menu.getItem(0).setVisible(false);//view
@@ -1094,29 +1105,30 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             menu.getItem(3).setVisible(true);
+            menu.getItem(4).setVisible(true);
 
-            if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
-                menu.getItem(4).setVisible(true);
+//            if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
+//                menu.getItem(4).setVisible(true);
+//
+//                if (myLearningDetalData.getCancelWaitList() == 0) {
+//                    menu.getItem(4).setVisible(false);
+//                }
+//            }
 
-                if (myLearningDetalData.getCancelWaitList() == 0) {
-                    menu.getItem(4).setVisible(false);
-                }
-            }
-
-
-            if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                File myFile = new File(myLearningDetalData.getOfflinepath());
-
-                if (myFile.exists()) {
-
-                    menu.getItem(4).setVisible(true);
-
-                } else {
-
-                    menu.getItem(4).setVisible(false);
-                }
-            }
+// for download content
+//            if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//
+//                File myFile = new File(myLearningDetalData.getOfflinepath());
+//
+//                if (myFile.exists()) {
+//
+//                    menu.getItem(4).setVisible(true);
+//
+//                } else {
+//
+//                    menu.getItem(4).setVisible(false);
+//                }
+//            }
 
         } else {
             if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
@@ -1124,20 +1136,21 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 menu.getItem(1).setVisible(true);
                 menu.getItem(2).setVisible(false);
                 menu.getItem(3).setVisible(true);
+                menu.getItem(4).setVisible(false);//cancel enrollment
 
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                    File myFile = new File(myLearningDetalData.getOfflinepath());
-
-                    if (myFile.exists()) {
-
-                        menu.getItem(4).setVisible(true);
-
-                    } else {
-
-                        menu.getItem(4).setVisible(false);
-                    }
-                }
+//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//
+//                    File myFile = new File(myLearningDetalData.getOfflinepath());
+//
+//                    if (myFile.exists()) {
+//
+//                        menu.getItem(4).setVisible(true);
+//
+//                    } else {
+//
+//                        menu.getItem(4).setVisible(false);
+//                    }
+//                }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
                 menu.getItem(0).setVisible(false);
                 menu.getItem(1).setVisible(true);
@@ -1153,7 +1166,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 //                        menu.getItem(4).setVisible(true);
 //                    }
 //                }
-                if (!uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
+                if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
                     menu.getItem(1).setVisible(false);
                 }
 
@@ -1247,7 +1260,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
         }
 
-
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
@@ -1271,7 +1283,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                     final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent))
                             .setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure))
-                            .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.catalog_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int i) {
                             dialog.dismiss();
@@ -1308,9 +1320,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                 avaliableSeats = 0;
                                 nf.printStackTrace();
                             }
-
                             if (avaliableSeats > 0) {
-
                                 addToMyLearningCheckUser(myLearningDetalData, position, false);
                             } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
 
@@ -3004,6 +3014,8 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 intent.putExtra("isFrom", 0);
                 intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
                 intent.putExtra("allFilterModelList", (Serializable) allFilterModelList);
+                intent.putExtra("contentFilterType", contentFilterType);
+                intent.putExtra("responMap", (Serializable) responMap);
                 startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
             }
         } else {
@@ -3019,7 +3031,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         List<AllFilterModel> allFilterModelList = new ArrayList<>();
 
         AllFilterModel advFilterModel = new AllFilterModel();
-        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_filterbytitlelabel);
         advFilterModel.categoryID = 1;
         allFilterModelList.add(advFilterModel);
 
@@ -3027,10 +3039,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             String enableGroupby = responMap.get("EnableGroupby");
             if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
                 AllFilterModel groupFilterModel = new AllFilterModel();
-                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_groupbytitlelabel);
                 groupFilterModel.categoryID = 2;
                 if (responMap != null && responMap.containsKey("ddlGroupby")) {
-
                     String ddlGroupby = responMap.get("ddlGroupby");
                     Log.d(TAG, "getAllFilterModelList: " + ddlGroupby);
                     groupFilterModel.groupArrayList = getArrayListFromString(ddlGroupby);
@@ -3041,10 +3052,20 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             }
         }
-//        AllFilterModel sortFilterModel = new AllFilterModel();
-//        sortFilterModel.categoryName = "Sort By";
-//        sortFilterModel.categoryID = 3;
-//        allFilterModelList.add(sortFilterModel);
+
+
+        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
+            String enableSortby = responMap.get("EnableFilterSort");
+            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+                AllFilterModel sortFilterModel = new AllFilterModel();
+                sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
+                sortFilterModel.categoryID = 3;
+                sortFilterModel.categorySelectedData = applyFilterModel.sortBy;
+                sortFilterModel.categorySelectedDataDisplay = applyFilterModel.sortByDisplay;
+                allFilterModelList.add(sortFilterModel);
+            }
+        }
+
 
         return allFilterModelList;
     }
@@ -3077,35 +3098,35 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "cat";
-                            contentFilterByModel.categoryDisplayName = "Category";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.catalog_header_categorytitlelabel);
                             contentFilterByModel.goInside = true;
                             break;
                         case "skills":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "skills";
-                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
                             contentFilterByModel.goInside = true;
                             break;
                         case "objecttypeid":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "bytype";
-                            contentFilterByModel.categoryDisplayName = "Content Types";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_contenttype);
                             contentFilterByModel.goInside = false;
                             break;
                         case "jobroles":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "jobroles";
-                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
                             contentFilterByModel.goInside = false;
                             break;
                         case "solutions":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "tag";
-                            contentFilterByModel.categoryDisplayName = "Solutions";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_tag);
                             contentFilterByModel.goInside = false;
                             break;
                         case "rating":
@@ -3115,7 +3136,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                     contentFilterByModel.categoryName = "Show Ratings";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "rate";
-                                    contentFilterByModel.categoryDisplayName = "Rating";
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_rating);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
@@ -3128,19 +3149,19 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                                     contentFilterByModel.categoryName = "SprateEvents";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "duration";
-                                    contentFilterByModel.categoryDisplayName = "Duration";
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_duration);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
                             break;
                         case "ecommerceprice":
-                            if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+                            if (uiSettingsModel.isEnableEcommerce() &&  responMap != null && responMap.containsKey("EnableEcommerce")) {
                                 String showrRatings = responMap.get("EnableEcommerce");
                                 if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
                                     contentFilterByModel.categoryName = "EnableEcommerce";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "priceRange";
-                                    contentFilterByModel.categoryDisplayName = "PriceRange";
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_pricerange);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
@@ -3149,7 +3170,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             contentFilterByModel.categoryName = "Instructor";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "inst";
-                            contentFilterByModel.categoryDisplayName = "Instructor";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_instructor);
                             contentFilterByModel.goInside = false;
                             break;
                         case "certificate":
@@ -3158,7 +3179,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             contentFilterByModel.categoryName = "Event dates";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "eventdates";
-                            contentFilterByModel.categoryDisplayName = "By Dates";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatedate);
                             contentFilterByModel.goInside = false;
                             break;
 

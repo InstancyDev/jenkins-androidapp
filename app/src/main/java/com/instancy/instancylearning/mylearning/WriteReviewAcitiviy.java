@@ -134,9 +134,11 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
     @Nullable
     @BindView(R.id.bottomlayout)
     LinearLayout bottomLayout;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,WriteReviewAcitiviy.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, WriteReviewAcitiviy.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,7 +163,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
         txtSave.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         txtCancel.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
-
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.details_textview_writeyourfeedbackherereviewplaceholder));
         if (bundle != null) {
 
             ratedValue = bundle.getFloat("ratednow", 0);
@@ -174,8 +176,8 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
             txtCancel.setTag(2);
             if (isEditReview) {
                 txtCancel.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_deleteoption));
-                txtCancel.setTag(1);
                 txtSave.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_updateoption));
+                txtCancel.setTag(1);
                 try {
 
                     editObj = new JSONObject(getIntent().getStringExtra("editObj"));
@@ -186,11 +188,14 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
 
             }
 
+            txtCancel.setText(getLocalizationValue(JsonLocalekeys.details_button_cancelbutton));
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_submitbutton));
+
         }
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getLocalizationValue(JsonLocalekeys.details_review) + "</font>"));
+                getLocalizationValue(JsonLocalekeys.details_header_reviewtitlelabel) + "</font>"));
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
             upArrow.setColorFilter(Color.parseColor(uiSettingsModel.getHeaderTextColor()), PorterDuff.Mode.SRC_ATOP);
@@ -240,7 +245,7 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
         }
 
 
-        if (fromAdapter) {
+        if (fromAdapter && !isEditReview) {
             ratingBar.setRating(ratedValue);
             finalRating = ratedValue;
         } else {

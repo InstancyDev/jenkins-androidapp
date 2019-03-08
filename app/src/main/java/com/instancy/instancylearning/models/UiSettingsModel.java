@@ -292,6 +292,16 @@ public class UiSettingsModel {
     private String firstEvent = "";
     private boolean EnableMultipleInstancesforEvent = false;
 
+    public boolean isEnableEcommerce() {
+        return EnableEcommerce;
+    }
+
+    public void setEnableEcommerce(boolean enableEcommerce) {
+        EnableEcommerce = enableEcommerce;
+    }
+
+    private boolean EnableEcommerce = false;
+
 
     private int NumberOfRatingsRequiredToShowRating = 0; //638
 

@@ -132,7 +132,8 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
         btnApply.setOnClickListener(this);
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+
 
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
@@ -309,7 +310,7 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         } else {
 
-            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_label_selectonecategorylabel), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.catalog_header_categorytitlelabel), Toast.LENGTH_SHORT).show();
         }
 
     }

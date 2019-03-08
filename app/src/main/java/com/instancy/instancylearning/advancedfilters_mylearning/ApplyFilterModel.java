@@ -20,6 +20,7 @@ public class ApplyFilterModel implements Serializable {
     public String instructors = "";
     public String groupBy = "";
     public String sortBy = "";
+    public String sortByDisplay = "";
 
     //Xtra for peoplelisting
     public String locations = "";
@@ -29,4 +30,6 @@ public class ApplyFilterModel implements Serializable {
     public String lastName = "";
 
     public int selectedId = -1;
+
+    public boolean filterApplied = false;
 }

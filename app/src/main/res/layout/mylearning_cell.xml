@@ -25,6 +25,8 @@
             android:maxLines="2"
             android:padding="2dp"
             android:text="Peter"
+            android:textStyle="bold"
+            android:background="@color/colorGray"
             android:textColor="@color/colorBlack"
             android:textSize="20sp"
             android:typeface="sans" />
@@ -309,7 +311,7 @@
                         android:gravity="left"
                         android:maxLines="2"
                         android:padding="1dp"
-                        android:text="By Upendra  "
+                        android:text="By   "
                         android:textColor="@color/colorGray"
                         android:textSize="14sp" />
 

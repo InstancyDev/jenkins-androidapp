@@ -194,7 +194,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
-                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
             }
 
             @Override
@@ -220,7 +220,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                                 updateGameSpinner();
                             } else {
                                 svProgressHUD.dismiss();
-                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
                             }
 
                         } catch (JSONException e) {
@@ -228,7 +228,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
                         }
 
                     } else {
-                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
                     }
 
                 }
@@ -349,7 +349,7 @@ public class LeaderboardFragment extends Fragment implements SwipeRefreshLayout.
         } else {
             leaderboardListList = new ArrayList<LeaderboardList>();
             leaderBoardAdapter.refreshList(leaderboardListList);
-            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.there_are_no_games_available_at_this_time));
+            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nogamesavailablelabel));
         }
     }
 

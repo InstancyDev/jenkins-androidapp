@@ -223,6 +223,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         btnForgot.setText(getLocalizationValue(JsonLocalekeys.login_button_forgotpasswordbutton));
 
         btnLogin.setText(getLocalizationValue(JsonLocalekeys.login_button_signinbutton));
+        alertText.setText(getLocalizationValue(JsonLocalekeys.login_alertsubtitle_invalidusernameorpassword));
+
 //        imglogo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLogoBackgroundColor()));
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
@@ -337,6 +339,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 PopupMenu popupMenu = new PopupMenu(this, view);
                 popupMenu.setOnMenuItemClickListener(this);
                 popupMenu.inflate(R.menu.settings_menu);
+                Menu menuOpts = popupMenu.getMenu();
+                menuOpts.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.login_actionsheet_settingsoption));
                 popupMenu.show();
                 break;
             case R.id.btnewuser:
@@ -585,7 +589,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     private void profileWebCall(String userId) {
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue();
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue() + "&strlocaleId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         urlStr = urlStr.replaceAll(" ", "%20");
 
@@ -720,6 +724,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 //        return super.onOptionsItemSelected(item);
+
         switch (item.getItemId()) {
 
             case R.id.id_settings:

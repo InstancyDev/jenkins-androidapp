@@ -133,6 +133,11 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         editResetMail.setHintTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
         editResetMail.setTextColor(Color.parseColor(uiSettingsModel.getAppLoginTextolor()));
 
+        btnSubmit.setText(getLocalizationValue(JsonLocalekeys.forgotpassword_button_resetpasswordbutton));
+        txtTitle.setText(getLocalizationValue(JsonLocalekeys.forgotpassword_label_resetpasswordheadinglabel));
+        txtBody.setText(getLocalizationValue(JsonLocalekeys.forgotpassword_label_guidencetextlabel));
+        editResetMail.setHint(getLocalizationValue(JsonLocalekeys.forgotpassword_textfield_emailtextfieldplaceholder));
+
         Drawable drawablePass = editResetMail.getBackground(); // get current EditText drawable
         drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
 

@@ -48,6 +48,7 @@ import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
@@ -83,6 +84,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SVProgressHUD svProgressHUD;
+    SideMenusModel sideMenusModel = new SideMenusModel();
     DatabaseHandler db;
     private LayoutInflater inflater;
     private List<String> _blockNames; // header titles
@@ -557,7 +559,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //                        ((TrackList_Activity) _context).executeWorkFlowRules("onitemChange");
 //                    }
 
-                    if (_context instanceof EventTrackList_Activity) {
+                    if (_context instanceof EventTrackList_Activity &&  typeFrom.equalsIgnoreCase("track")) {
                         ((EventTrackList_Activity) _context).executeWorkFlowRules("onitemChange");
                     }
                 }
@@ -576,7 +578,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, isReportEnabled, downloadStart, uiSettingsModel);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());

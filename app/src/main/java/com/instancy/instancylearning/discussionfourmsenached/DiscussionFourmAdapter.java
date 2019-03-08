@@ -118,7 +118,7 @@ public class DiscussionFourmAdapter extends BaseAdapter {
 //        holder.txtAuthor.setText("Moderator: " + discussionForumModelList.get(position).moderatorName + " | Created by: " + discussionForumModelList.get(position).author + " on " + discussionForumModelList.get(position).createdDate + " | Last Updated by : " + discussionForumModelList.get(position).updatedAuthor + " on " + discussionForumModelList.get(position).updatedDate);
 
         holder.txtTopics.setText(discussionForumModelList.get(position).noOfTopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
-        holder.txtLikes.setText(discussionForumModelList.get(position).totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        holder.txtLikes.setText(discussionForumModelList.get(position).totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
 
         String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+" ";
 
@@ -128,11 +128,11 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         }
 
         if (isValidString(discussionForumModelList.get(position).author)) {
-            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": " + discussionForumModelList.get(position).author + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " + discussionForumModelList.get(position).createdDate;
+            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": " + discussionForumModelList.get(position).author + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentedonlabel)+" " + discussionForumModelList.get(position).createdDate;
         }
 
         if (isValidString(discussionForumModelList.get(position).updatedAuthor)) {
-            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedlabel)+": " + discussionForumModelList.get(position).updatedAuthor + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " +discussionForumModelList.get(position).updatedDate;
+            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel)+": " + discussionForumModelList.get(position).updatedAuthor + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel)+" " +discussionForumModelList.get(position).updatedDate;
         }
 
         holder.txtAuthor.setText(totalActivityStr);

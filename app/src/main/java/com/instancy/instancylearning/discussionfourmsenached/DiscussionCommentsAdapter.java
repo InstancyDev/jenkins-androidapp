@@ -118,12 +118,12 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtName.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+discussionCommentsModels.get(position).commentedBy);
-        holder.txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentedontitlelabel)+" " + discussionCommentsModels.get(position).commentedFromDays);
+        holder.txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentedonlabel)+" " + discussionCommentsModels.get(position).commentedFromDays);
         holder.txtmessage.setText(discussionCommentsModels.get(position).message);
         holder.txtmessage.setMaxLines(200);
 
-        holder.txtLikesCount.setText(discussionCommentsModels.get(position).commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
-        holder.txtRepliesCount.setText(discussionCommentsModels.get(position).commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_replys));
+        holder.txtLikesCount.setText(discussionCommentsModels.get(position).commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        holder.txtRepliesCount.setText(discussionCommentsModels.get(position).commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
 
 
         assert holder.txtLike != null;
@@ -185,6 +185,8 @@ public class DiscussionCommentsAdapter extends BaseAdapter {
 
         }
 
+        holder.txtLike.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        holder.txtReply.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
 
         if (discussionCommentsModels.get(position).postedBy == Integer.parseInt(appUserModel.getUserIDValue())) {
 

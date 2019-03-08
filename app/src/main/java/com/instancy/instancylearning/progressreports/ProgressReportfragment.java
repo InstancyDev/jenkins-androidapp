@@ -148,6 +148,8 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
     TextView txtContentScore;
 
+    TextView titleStatus, titleContent, titleScore, titleContentTypes;
+
     PieChart mChart, contentChart;
 
     TrackingRingView ringcharts;
@@ -360,6 +362,11 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 xvalues.add(new PieEntry(contentTypesModelList.get(k).contentCount, contentTypesModelList.get(k).contentType));
             }
         }
+
+        if(contentTypesModelList != null  && contentTypesModelList.size()>13){
+            contentChart.setMinimumHeight(1000);
+        }
+
         PieDataSet dataSets = new PieDataSet(xvalues, "");
 
         PieData datas = new PieData(dataSets);
@@ -453,9 +460,25 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         View header = (View) getLayoutInflater(savedInstanceState).inflate(R.layout.progresscharts, null);
         progressExpandList.addHeaderView(header);
         txtContentScore = (TextView) header.findViewById(R.id.contentcount);
+
         mChart = (PieChart) header.findViewById(R.id.statuschart);
         contentChart = (PieChart) header.findViewById(R.id.contenttypechart);
         ringcharts = (TrackingRingView) header.findViewById(R.id.ringcharts);
+
+        /// Localazation
+        titleContentTypes = (TextView) header.findViewById(R.id.titleContentTypes);
+        titleContentTypes.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentstypeslabel));
+
+        titleContent = (TextView) header.findViewById(R.id.titleContent);
+        titleContent.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contenttitlelabel));
+
+        titleScore = (TextView) header.findViewById(R.id.titleScore);
+        titleScore.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_scorelabel));
+
+        titleStatus = (TextView) header.findViewById(R.id.titleStatus);
+        titleStatus.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_statuslabel));
+
+
         progressReportModelList = new ArrayList<ProgressReportModel>();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshCatalog(false);

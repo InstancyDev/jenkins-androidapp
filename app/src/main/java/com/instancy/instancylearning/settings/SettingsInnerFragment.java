@@ -91,18 +91,24 @@ public class SettingsInnerFragment extends Fragment {
     List<String> expandableListTitle;
     HashMap<String, List<String>> expandableListDetail;
 
+
+    HashMap<String, List<InnerSettingsModel>> expandableModelList;
+
     ResultListner resultListner = null;
 
     UiSettingsModel uiSettingsModel;
 
     SettingsInnerAdapter settingsInnerAdapter;
 
+    SettingsInnerModelAdapter settingsInnerModelAdapter;
+
     public SettingsInnerFragment() {
 
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
     }
 
     @Override
@@ -139,11 +145,16 @@ public class SettingsInnerFragment extends Fragment {
 
         ButterKnife.bind(this, rootView);
 
+        expandableListDetail = NativeSetttingsModel.getData(true, getActivity());
 
-        expandableListDetail = NativeSetttingsModel.getData(true,getActivity());
-        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        settingsInnerAdapter = new SettingsInnerAdapter(context, expandableListTitle, expandableListDetail, settingsExpandList);
-        settingsExpandList.setAdapter(settingsInnerAdapter);
+        expandableModelList = NativeSetttingsModel.getDataModelList(true, getActivity());
+
+        expandableListTitle = new ArrayList<String>(expandableModelList.keySet());
+//        settingsInnerAdapter = new SettingsInnerAdapter(context, expandableListTitle, expandableListDetail, settingsExpandList);
+//        settingsExpandList.setAdapter(settingsInnerAdapter);
+
+        settingsInnerModelAdapter = new SettingsInnerModelAdapter(context, expandableListTitle, expandableModelList, settingsExpandList);
+        settingsExpandList.setAdapter(settingsInnerModelAdapter);
 
         settingsExpandList.expandGroup(0);
         settingsExpandList.expandGroup(1);

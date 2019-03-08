@@ -67,6 +67,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -138,10 +139,12 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
 
     String topicID = "";
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,DiscussionTopicActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, DiscussionTopicActivity.this);
 
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,11 +162,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         topicheaderView = (RelativeLayout) findViewById(R.id.topicheader);
         topicheaderView.setVisibility(View.GONE);
 
-        /// uptohear
-
-
         header = (View) getLayoutInflater().inflate(R.layout.discussionfourmcell_en, null);
         footor = (View) getLayoutInflater().inflate(R.layout.no_data_layout, null);
+        TextView nodataFottor = footor.findViewById(R.id.nodata_label);
+        nodataFottor.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
 
         uiSettingsModel = db.getAppSettingsFromLocal(appUserModel.getSiteURL(), appUserModel.getSiteIDValue());
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
@@ -277,10 +279,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtShortDesc.setText(discussionForumModel.description);
 //        holder.txtAuthor.setText("Moderator: " + discussionForumModel.moderatorName + " | Created by: " + discussionForumModel.author + " on " + discussionForumModel.createdDate + " | Last Updated by : " + discussionForumModel.updatedAuthor + " on " + discussionForumModel.updatedDate);
 
-        txtTopics.setText(discussionForumModel.noOfTopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
-        txtLikes.setText(discussionForumModel.totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        txtTopics.setText(discussionForumModel.noOfTopics + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        txtLikes.setText(discussionForumModel.totalLikes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
 
-        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+": ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel) + ": ";
 
         if (isValidString(discussionForumModel.moderatorName)) {
 
@@ -289,12 +291,12 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         if (isValidString(discussionForumModel.author)) {
 
-            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + discussionForumModel.author + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " + discussionForumModel.createdDate;
+            totalActivityStr = totalActivityStr + " | " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + discussionForumModel.author + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel) + " " + discussionForumModel.createdDate;
         }
 
         if (isValidString(discussionForumModel.updatedAuthor)) {
 
-            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel)+" : " + discussionForumModel.updatedAuthor + " "+getLocalizationValue(JsonLocalekeys.commoncomponent_label_on)+" " + discussionForumModel.updatedDate;
+            totalActivityStr = totalActivityStr + " | " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel) + " : " + discussionForumModel.updatedAuthor + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel) + " " + discussionForumModel.updatedDate;
         }
 
         txtAuthor.setText(totalActivityStr);
@@ -324,6 +326,8 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         final TextView txtNew = (TextView) view.findViewById(R.id.txtNew);
         txtOld.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtNew.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        txtNew.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_newestontoplabel));
+        txtOld.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_oldestontoplabel));
 
         txtOld.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -369,7 +373,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                         }
                     } else {
 
-//                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+//                        nodata_Label.setText( );
                     }
                 }
                 svProgressHUD.dismiss();
@@ -381,7 +385,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
                 svProgressHUD.dismiss();
-//                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+                nodata_Label.setText("");
             }
 
             @Override
@@ -420,7 +424,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         } else {
             discussionTopicModels = new ArrayList<DiscussionTopicModelDg>();
             fourmAdapter.refreshList(discussionTopicModels);
-//            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+//            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
             footor.setVisibility(View.VISIBLE);
         }
 
@@ -733,7 +737,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             bottomSheetDialog.setContentView(view);
             bottomSheetDialog.show();
         } else {
-            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_nolikeslabel), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_nolikesfound), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -749,7 +753,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             discussionForumModel.totalLikes = discussionForumModel.totalLikes + 1;
         }
 
-        txtLikes.setText(discussionForumModel.totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_likeslabel));
+        txtLikes.setText(discussionForumModel.totalLikes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
 
         JSONObject parameters = new JSONObject();
 
@@ -870,13 +874,13 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, "Success! \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_topichasbeensuccessfullydeleted), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Success! \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_topichasbeensuccessfullydeleted), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
 //                    deleteCommentFromLocalDB();
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_topiccannotdeletedcontactadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

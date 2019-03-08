@@ -3,6 +3,7 @@ package com.instancy.instancylearning.models;
 import android.content.Context;
 
 import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.settings.InnerSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 
 import org.json.JSONArray;
@@ -62,7 +63,7 @@ public class NativeSetttingsModel {
             List<String> cricket = new ArrayList<String>();
             cricket.add(jsonLocalization.getStringForKey(JsonLocalekeys.siteurlsetting_tablerow_resetsiteurl, context));
             cricket.add(jsonLocalization.getStringForKey(JsonLocalekeys.siteurlsetting_tablerow_changesiteurl, context));
-            expandableListDetail.put("Preferences", cricket);
+            expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.siteurlsetting_tablesection_headingpreferences, context), cricket);
         } else {
             List<String> football = new ArrayList<String>();
 
@@ -72,19 +73,68 @@ public class NativeSetttingsModel {
             football.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentitemsunassignedlabel, context));
 
             List<String> basketball = new ArrayList<String>();
-          
+
 
             basketball.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_autodownloadstatuslabel, context));
 
             List<String> localization = new ArrayList<String>();
 
             localization.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_applanguagenamelabel, context));
+//            localization.add("LANG");
 
             expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headingnotification, context), football);
             expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headinglanguage, context), localization);
             expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headingdownload, context), basketball);
 
         }
+
+        return expandableListDetail;
+    }
+
+
+    public static HashMap<String, List<InnerSettingsModel>> getDataModelList(Boolean isLogin, Context context) {
+        HashMap<String, List<InnerSettingsModel>> expandableListDetail = new HashMap<>();
+        JsonLocalization jsonLocalization = JsonLocalization.getInstance();
+
+
+        List<InnerSettingsModel> football = new ArrayList<>();
+
+        InnerSettingsModel innerSettingsModel = new InnerSettingsModel();
+        innerSettingsModel.settingName = jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contenttargetreminderlabel, context);
+        innerSettingsModel.settingId = 0;
+        football.add(innerSettingsModel);
+
+        innerSettingsModel = new InnerSettingsModel();
+        innerSettingsModel.settingName = jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentassignmentlabel, context);
+        innerSettingsModel.settingId = 0;
+        football.add(innerSettingsModel);
+
+        innerSettingsModel = new InnerSettingsModel();
+        innerSettingsModel.settingName = jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentsavailableincataloglabel, context);
+        innerSettingsModel.settingId = 0;
+        football.add(innerSettingsModel);
+
+        innerSettingsModel = new InnerSettingsModel();
+        innerSettingsModel.settingName = jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_contentitemsunassignedlabel, context);
+        innerSettingsModel.settingId = 0;
+        football.add(innerSettingsModel);
+
+        innerSettingsModel = new InnerSettingsModel();
+        List<InnerSettingsModel> basketball = new ArrayList<>();
+        innerSettingsModel.settingName = jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_autodownloadstatuslabel, context);
+        innerSettingsModel.settingId = 1;
+        basketball.add(innerSettingsModel);
+
+        innerSettingsModel = new InnerSettingsModel();
+        List<InnerSettingsModel> localization = new ArrayList<>();
+        innerSettingsModel.settingName = jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_applanguagenamelabel, context);
+        innerSettingsModel.settingId = 2;
+        localization.add(innerSettingsModel);
+
+
+        expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headingnotification, context), football);
+        expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headinglanguage, context), localization);
+        expandableListDetail.put(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablesection_headingdownload, context), basketball);
 
         return expandableListDetail;
     }
@@ -185,8 +235,6 @@ public class NativeSetttingsModel {
                 j++;
 //                expandableListDetail.put("Filter By", filterModelList);
             }
-
-
         }
         //
         if (jsonObject.has("filterbycontenttype")) {

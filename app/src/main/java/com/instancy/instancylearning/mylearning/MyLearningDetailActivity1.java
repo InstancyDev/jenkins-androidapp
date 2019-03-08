@@ -2,15 +2,19 @@ package com.instancy.instancylearning.mylearning;
 
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
@@ -31,6 +35,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -59,7 +64,6 @@ import com.anjlab.android.iab.v3.SkuDetails;
 import com.anjlab.android.iab.v3.TransactionDetails;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
-import com.google.gson.Gson;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
@@ -81,6 +85,7 @@ import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ReviewRatingModel;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.ApiConstants;
@@ -89,6 +94,7 @@ import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 import com.instancy.instancylearning.wifisharing.WiFiDirectNewActivity;
+import com.smart.moretext.UtilMoreText;
 import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
@@ -119,6 +125,8 @@ import static com.instancy.instancylearning.utils.Utilities.convertDateToDayForm
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
+
+import static com.instancy.instancylearning.utils.Utilities.fromHtmlForYourNExt;
 import static com.instancy.instancylearning.utils.Utilities.getButtonDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
@@ -131,7 +139,7 @@ import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted
  * Created by Upendranath on 6/27/2017 Working on InstancyLearning.
  */
 
-public class MyLearningDetailActivity1 extends AppCompatActivity implements BillingProcessor.IBillingHandler {
+public class MyLearningDetailActivity1 extends AppCompatActivity implements BillingProcessor.IBillingHandler, View.OnClickListener {
 
     BillingProcessor billingProcessor;
     private int MY_SOCKET_TIMEOUT_MS = 5000;
@@ -144,6 +152,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
     TextView txtLongDisx;
 
+    TextView txtReadMoreWhatYouLearn, txtReadMoreTableofConten, txtReadMoreDesc;
+
     ImageView imgThumb;
 
     TextView txtCourseName;
@@ -153,6 +163,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
     TextView txtCourseStatus;
 
     ProgressBar progressBar;
+
+    TextView txtLoadMore;
 
     TextView txtAuthor;
 
@@ -181,7 +193,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
     TextView txtEventLocation;
 
-    LinearLayout eventLayout, locationLayout, authorLayout;
+    LinearLayout eventLayout, locationLayout, authorLayout, dateLayout;
 
     ImageView imgPlayBtn;
 
@@ -226,6 +238,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
     TextView txtOverallRating, ratedOutOfTxt, txtAvg, txtRating;
 
+    int totalRecordsCount = 0;
+
     View header;
 
     String refreshOrNo = "norefresh";
@@ -259,6 +273,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
     boolean isEditReview = false, isReportEnabled = true;
     JSONObject editObj = null;
 
+    SideMenusModel sideMenusModel;
+
     private DatePickerDialog datePickerDialog;
 
     String dueDate = "";
@@ -266,6 +282,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
     boolean isEventSheduled = false;
 
     boolean isEventSheduledDone = false;
+
 
     private String getLocalizationValue(String key) {
         return JsonLocalization.getInstance().getStringForKey(key, MyLearningDetailActivity1.this);
@@ -289,6 +306,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             isFromCatalog = bundle.getBoolean("IFROMCATALOG");
             typeFrom = bundle.getString("typeFrom", "");
             isEventSheduledDone = bundle.getBoolean("SHEDULE", false);
+            sideMenusModel = (SideMenusModel) getIntent().getExtras().getSerializable("sideMenusModel");
         }
         String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
 
@@ -344,11 +362,22 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                         }
                     }
                 }
-                txtAuthor.setText(myLearningModel.getPresenter() + " ");
+                if (isValidString(myLearningModel.getPresenter())) {
+                    txtAuthor.setText(myLearningModel.getPresenter() + " ");
+                }
+
                 String fromDate = convertToEventDisplayDateFormat(myLearningModel.getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
                 String toDate = convertToEventDisplayDateFormat(myLearningModel.getEventendTime(), "yyyy-MM-dd hh:mm:ss");
 
                 txtEventFromTo.setText(fromDate + "  to  " + toDate);
+
+                if (isValidString(fromDate) && isValidString(toDate)) {
+                    dateLayout.setVisibility(View.VISIBLE);
+
+                } else {
+                    dateLayout.setVisibility(View.GONE);
+                }
+
                 txtEventLocation.setText(myLearningModel.getLocationName());
                 txtTimeZone.setText(myLearningModel.getTimeZone());
 
@@ -362,11 +391,14 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             } else {
                 eventLayout.setVisibility(View.GONE);
                 txtAthrIcon.setVisibility(View.GONE);
-                txtAuthor.setText(myLearningModel.getAuthor() + " ");
+
+                if (isValidString(myLearningModel.getAuthor())) {
+                    txtAuthor.setText(myLearningModel.getAuthor() + " ");
+                }
+
             }
 
             if (myLearningModel.getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
-
                 eventLayout.setVisibility(View.GONE);
                 authorLayout.setVisibility(View.GONE);
             }
@@ -438,17 +470,21 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             if (TextUtils.isEmpty(myLearningModel.getLongDes())) {
                 txtLongDisx.setVisibility(View.GONE);
                 txtDescription.setVisibility(View.GONE);
+                txtReadMoreDesc.setVisibility(View.GONE);
             } else {
                 txtLongDisx.setVisibility(View.VISIBLE);
                 txtDescription.setVisibility(View.VISIBLE);
+                txtReadMoreDesc.setVisibility(View.VISIBLE);
             }
 
             if (!TextUtils.isEmpty(myLearningModel.getShortDes())) {
                 txtDescription.setVisibility(View.VISIBLE);
                 txtLongDisx.setVisibility(View.VISIBLE);
                 txtLongDisx.setText(myLearningModel.getShortDes());
+                txtReadMoreDesc.setVisibility(View.VISIBLE);
             } else {
                 txtDescription.setVisibility(View.GONE);
+                txtReadMoreDesc.setVisibility(View.GONE);
             }
 
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
@@ -554,40 +590,40 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         if (reviewRatingModelList == null) {
             reviewRatingModelList = new ArrayList<>();
         }
-
         ratingsAdapter = new RatingsAdapter(this, BIND_ABOVE_CLIENT, reviewRatingModelList);
         ratinsgListview.setAdapter(ratingsAdapter);
         ratinsgListview.addHeaderView(header, null, false);
 
-        int ratingRequired = 0;
+        float ratingRequired = 0;
         try {
-            ratingRequired = Integer.parseInt(uiSettingsModel.getMinimimRatingRequiredToShowRating());
+            ratingRequired = Float.parseFloat(uiSettingsModel.getMinimimRatingRequiredToShowRating());
         } catch (NumberFormatException exce) {
             ratingRequired = 0;
         }
 
+        if (myLearningModel.getStatusActual().equalsIgnoreCase("completed") || myLearningModel.getStatusActual().equalsIgnoreCase("attended") || myLearningModel.getStatusActual().equalsIgnoreCase("passed") || myLearningModel.getStatusActual().equalsIgnoreCase("failed")) {
+            ratingsLayout.setVisibility(View.GONE);
+            btnEditReview.setVisibility(View.VISIBLE);
+        }
 
         if (myLearningModel.getTotalratings() >= uiSettingsModel.getNumberOfRatingsRequiredToShowRating() && ratingValue >= ratingRequired) {
             ratingsLayout.setVisibility(View.VISIBLE);
             try {
                 getUserRatingsOfTheContent(0, false, false);
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             ratinsgListview.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
-
             initilizeRatingsListView();
-
         } else {
-
-            ratingsLayout.setVisibility(View.GONE);
             try {
+
                 getUserRatingsOfTheContent(0, false, true);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
         }
 
         final float oldRating = ratingValue;
@@ -682,6 +718,9 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
         if (isNetworkConnectionAvailable(MyLearningDetailActivity1.this, -1)) {
             GetContentDetails(false, myLearningModel.getContentID());
+        } else {
+            myLearningModel = db.fetchLearningModel(myLearningModel);
+            updateMetaDataFields();
         }
 
     }
@@ -699,6 +738,33 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         txtTableofContentText = (TextView) header.findViewById(R.id.txtTableofContentText);
         txtWhatYouLearnTitle = (TextView) header.findViewById(R.id.txtWhatYouLearnTitle);
         txtWhatYouLearnText = (TextView) header.findViewById(R.id.txtWhatYouLearnText);
+
+        txtTableofContentText.setMaxLines(2);
+        txtLongDisx.setMaxLines(2);
+        txtWhatYouLearnText.setMaxLines(2);
+
+
+        txtWhatYouLearnTitle.setText(getLocalizationValue(JsonLocalekeys.details_label_whattolearnlabel));
+        txtDescription.setText(getLocalizationValue(JsonLocalekeys.details_label_descriptionlabel));
+        txtTableofContentTitle.setText(getLocalizationValue(JsonLocalekeys.details_label_tableofcontentlabel));
+
+        txtReadMoreWhatYouLearn = (TextView) header.findViewById(R.id.txtReadMoreWhatYouLearn);
+        txtReadMoreWhatYouLearn.setTag(0);
+        txtReadMoreWhatYouLearn.setOnClickListener(this);
+        txtReadMoreWhatYouLearn.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readmorebutton));
+        txtReadMoreWhatYouLearn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        txtReadMoreTableofConten = (TextView) header.findViewById(R.id.txtReadMoreTableofConten);
+        txtReadMoreTableofConten.setTag(0);
+        txtReadMoreTableofConten.setOnClickListener(this);
+        txtReadMoreTableofConten.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readmorebutton));
+        txtReadMoreTableofConten.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        txtReadMoreDesc = (TextView) header.findViewById(R.id.txtReadMoreDesc);
+        txtReadMoreDesc.setTag(0);
+        txtReadMoreDesc.setOnClickListener(this);
+        txtReadMoreDesc.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readmorebutton));
+        txtReadMoreDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         fabbtnthumb = (FloatingActionButton) header.findViewById(R.id.fabbtnthumb);
 
@@ -763,6 +829,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
         relativeLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
+        txtRating.setText(getLocalizationValue(JsonLocalekeys.details_label_ratingsandreviewslabel));
 
         // event labels
         txtEvntIcon = (TextView) header.findViewById(R.id.txteventicon);
@@ -778,6 +845,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         txtEventLocation = (TextView) header.findViewById(R.id.txt_eventlocation);
 
         eventLayout = (LinearLayout) header.findViewById(R.id.eventlayout);
+
+        dateLayout = (LinearLayout) header.findViewById(R.id.dateLayout);
 
         locationLayout = (LinearLayout) header.findViewById(R.id.locationlayout);
 
@@ -877,7 +946,6 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                     if (myLearningModel.getViewType().equalsIgnoreCase("1") || myLearningModel.getViewType().equalsIgnoreCase("2")) {
                         if (!returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
                             iconFirst.setBackground(calendarImg);
-
                             int avaliableSeats = 0;
                             try {
                                 avaliableSeats = Integer.parseInt(myLearningModel.getAviliableSeats());
@@ -885,7 +953,6 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                                 avaliableSeats = 0;
                                 nf.printStackTrace();
                             }
-
                             if (avaliableSeats > 0) {
 
                                 buttonFirst.setText(getLocalizationValue(JsonLocalekeys.details_button_enrollbutton));
@@ -900,6 +967,21 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                             }
 
 
+                        } else if (myLearningModel.getEventScheduleType() == 1) {
+                            if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                                Drawable calendar = getButtonDrawable(R.string.fa_icon_calendar, this, uiSettingsModel.getAppButtonTextColor());
+                                buttonFirst.setText(getLocalizationValue(JsonLocalekeys.details_tab_scheduletitlelabel));
+                                buttonFirst.setTag(7);
+                                iconFirst.setBackground(calendar);
+                                if (typeFrom.equalsIgnoreCase("tab") && isLoadingCompleted) {
+//                            buttonFirst.performClick();
+                                    Intent intent = new Intent(MyLearningDetailActivity1.this, MyLearningSchedulelActivity.class);
+                                    intent.putExtra("myLearningDetalData", myLearningModel);
+                                    intent.putExtra("sideMenusModel", sideMenusModel);
+//                                    intent.putExtra("myLearningDetalData", );
+                                    startActivityForResult(intent, DETAIL_CLOSE_CODE);
+                                }
+                            }
                         } else {
 
                             if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
@@ -1029,6 +1111,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 //                            buttonFirst.performClick();
                             Intent intent = new Intent(MyLearningDetailActivity1.this, MyLearningSchedulelActivity.class);
                             intent.putExtra("myLearningDetalData", myLearningModel);
+                            intent.putExtra("sideMenusModel", sideMenusModel);
                             startActivityForResult(intent, DETAIL_CLOSE_CODE);
                         }
                     }
@@ -1216,6 +1299,85 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         myLearningModel.setStatusActual(courseStatus);
     }
 
+    public void updateMetaDataFields() {
+
+        if (!TextUtils.isEmpty(myLearningModel.getThumbnailVideoPath())) {
+            imgPlayBtn.setVisibility(View.VISIBLE);
+        } else {
+            imgPlayBtn.setVisibility(View.GONE);
+        }
+        if (myLearningModel.getStatusActual().equalsIgnoreCase("completed") || myLearningModel.getStatusActual().equalsIgnoreCase("attended") || myLearningModel.getStatusActual().equalsIgnoreCase("passed") || myLearningModel.getStatusActual().equalsIgnoreCase("failed")) {
+            ratingsLayout.setVisibility(View.GONE);
+            btnEditReview.setVisibility(View.VISIBLE);
+        }
+
+        if (isValidString(myLearningModel.getShortDes())) {
+            txtDescription.setVisibility(View.VISIBLE);
+            txtLongDisx.setVisibility(View.VISIBLE);
+            txtLongDisx.setText(myLearningModel.getShortDes());
+            txtReadMoreDesc.setVisibility(View.VISIBLE);
+        } else {
+            txtDescription.setVisibility(View.GONE);
+            txtReadMoreDesc.setVisibility(View.GONE);
+        }
+
+        if (isValidString(myLearningModel.getLongDes())) {
+            txtDescription.setVisibility(View.VISIBLE);
+            txtLongDisx.setVisibility(View.VISIBLE);
+            txtReadMoreDesc.setVisibility(View.VISIBLE);
+            String[] newAry = myLearningModel.getLongDes().split("\\} -->");
+
+            Log.d(TAG, "notifySuccess: " + newAry.length);
+            if (newAry != null && newAry.length > 1) {
+                txtLongDisx.setText(Html.fromHtml(newAry[1]));
+            } else {
+                txtLongDisx.setText(fromHtmlForYourNExt(myLearningModel.getLongDes()));
+            }
+
+//            new UtilMoreText(txtLongDisx, "" + Html.fromHtml(myLearningModel.getLongDes() + "  "), "       Read More", "      Read Less").setSpanTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor())).createString();
+        } else {
+            txtDescription.setVisibility(View.GONE);
+            txtLongDisx.setVisibility(View.GONE);
+            txtReadMoreDesc.setVisibility(View.GONE);
+        }
+
+        if (!TextUtils.isEmpty(myLearningModel.getTableofContent())) {
+            txtTableofContentTitle.setVisibility(View.VISIBLE);
+            txtTableofContentText.setVisibility(View.VISIBLE);
+            txtReadMoreTableofConten.setVisibility(View.VISIBLE);
+            //  txtTableofContentText.setText(Html.fromHtml(myLearningModel.getTableofContent()));
+//            new UtilMoreText(txtTableofContentText, "" + Html.fromHtml(myLearningModel.getTableofContent()), "      Read More", "     Read Less").setSpanTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor())).createString();
+
+
+            String[] newAry = myLearningModel.getTableofContent().split("\\} -->");
+
+            Log.d(TAG, "notifySuccess: " + newAry.length);
+            if (newAry != null && newAry.length > 1) {
+                txtTableofContentText.setText(Html.fromHtml(newAry[1]));
+            } else {
+                txtTableofContentText.setText(fromHtmlForYourNExt(myLearningModel.getTableofContent()));
+            }
+
+
+        }
+        if (!TextUtils.isEmpty(myLearningModel.getLearningObjectives())) {
+            txtWhatYouLearnTitle.setVisibility(View.VISIBLE);
+            txtWhatYouLearnText.setVisibility(View.VISIBLE);
+            txtReadMoreWhatYouLearn.setVisibility(View.VISIBLE);
+//            txtWhatYouLearnText.setText(Html.fromHtml(myLearningModel.getLearningObjectives()));
+
+            String[] newAry = myLearningModel.getLearningObjectives().split("\\} -->");
+
+            Log.d(TAG, "notifySuccess: " + newAry.length);
+            if (newAry != null && newAry.length > 1) {
+                txtWhatYouLearnText.setText(Html.fromHtml(newAry[1]));
+            } else {
+                txtWhatYouLearnText.setText(fromHtmlForYourNExt(myLearningModel.getLearningObjectives()));
+            }
+        }
+
+    }
+
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
@@ -1299,32 +1461,82 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                                 imgPlayBtn.setVisibility(View.GONE);
                             }
 
+                            if (jsonObject.has("ContentStatus")) {
+                                myLearningModel.setStatusActual(jsonObject.getString("ContentStatus"));
+                            }
+
+                            db.updateMylearningDetailPageDataWithContentValues(myLearningModel);
+
+                            if (myLearningModel.getStatusActual().equalsIgnoreCase("completed") || myLearningModel.getStatusActual().equalsIgnoreCase("attended") || myLearningModel.getStatusActual().equalsIgnoreCase("passed") || myLearningModel.getStatusActual().equalsIgnoreCase("failed")) {
+                                ratingsLayout.setVisibility(View.GONE);
+                                btnEditReview.setVisibility(View.VISIBLE);
+                            }
+
                             if (isValidString(myLearningModel.getShortDes())) {
                                 txtDescription.setVisibility(View.VISIBLE);
                                 txtLongDisx.setVisibility(View.VISIBLE);
                                 txtLongDisx.setText(myLearningModel.getShortDes());
+                                txtReadMoreDesc.setVisibility(View.VISIBLE);
                             } else {
                                 txtDescription.setVisibility(View.GONE);
+                                txtReadMoreDesc.setVisibility(View.GONE);
                             }
 
                             if (isValidString(myLearningModel.getLongDes())) {
                                 txtDescription.setVisibility(View.VISIBLE);
                                 txtLongDisx.setVisibility(View.VISIBLE);
-                                txtLongDisx.setText(Html.fromHtml(myLearningModel.getLongDes()));
+                                txtReadMoreDesc.setVisibility(View.VISIBLE);
+                                String[] newAry = myLearningModel.getLongDes().split("\\} -->");
+
+                                Log.d(TAG, "notifySuccess: " + newAry.length);
+                                if (newAry != null && newAry.length > 1) {
+                                    txtLongDisx.setText(Html.fromHtml(newAry[1]));
+                                } else {
+                                    txtLongDisx.setText(fromHtmlForYourNExt(myLearningModel.getLongDes()));
+                                }
+
+//                                new UtilMoreText(txtLongDisx, "" + Html.fromHtml(myLearningModel.getLongDes() + "  "), "        Read More", "        Read Less").setSpanTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor())).createString();
+
                             } else {
                                 txtDescription.setVisibility(View.GONE);
-                                txtLongDisx.setText("");
+                                txtLongDisx.setVisibility(View.GONE);
+                                txtReadMoreDesc.setVisibility(View.GONE);
                             }
 
                             if (!TextUtils.isEmpty(myLearningModel.getTableofContent())) {
                                 txtTableofContentTitle.setVisibility(View.VISIBLE);
                                 txtTableofContentText.setVisibility(View.VISIBLE);
-                                txtTableofContentText.setText(Html.fromHtml(myLearningModel.getTableofContent()));
+                                txtReadMoreTableofConten.setVisibility(View.VISIBLE);
+                                String[] newAry = myLearningModel.getTableofContent().split("\\} -->");
+
+                                Log.d(TAG, "notifySuccess: " + newAry.length);
+                                if (newAry != null && newAry.length > 1) {
+                                    txtTableofContentText.setText(Html.fromHtml(newAry[1]));
+                                } else {
+                                    txtTableofContentText.setText(fromHtmlForYourNExt(myLearningModel.getTableofContent()));
+                                }
+
+//                                   txtTableofContentText.setText(Html.fromHtml(myLearningModel.getTableofContent()));
+
+//                                new UtilMoreText(txtTableofContentText, "" + Html.fromHtml(myLearningModel.getTableofContent() + "  "), "          Read More", "         Read Less").setSpanTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor())).createString();
                             }
                             if (!TextUtils.isEmpty(myLearningModel.getLearningObjectives())) {
                                 txtWhatYouLearnTitle.setVisibility(View.VISIBLE);
                                 txtWhatYouLearnText.setVisibility(View.VISIBLE);
-                                txtWhatYouLearnText.setText(Html.fromHtml(myLearningModel.getLearningObjectives()));
+//                                txtWhatYouLearnText.setText(Html.fromHtml(myLearningModel.getLearningObjectives()));
+                                txtReadMoreWhatYouLearn.setVisibility(View.VISIBLE);
+                                String[] newAry = myLearningModel.getLearningObjectives().split("\\} -->");
+
+                                Log.d(TAG, "notifySuccess: " + newAry.length);
+                                if (newAry != null && newAry.length > 1) {
+                                    txtWhatYouLearnText.setText(Html.fromHtml(newAry[1]));
+                                } else {
+                                    txtWhatYouLearnText.setText(fromHtmlForYourNExt(myLearningModel.getLearningObjectives()));
+                                }
+
+
+//                                new UtilMoreText(txtWhatYouLearnText, "" + Html.fromHtml(myLearningModel.getLearningObjectives() + "  "), "            Read More", "         Read Less").setSpanTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor())).createString();
+
                             }
                             if (myLearningModel.getEventScheduleType() == 1) {
                                 if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
@@ -1501,6 +1713,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                         if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
                             Intent intent = new Intent(MyLearningDetailActivity1.this, MyLearningSchedulelActivity.class);
                             intent.putExtra("myLearningDetalData", myLearningModel);
+                            intent.putExtra("sideMenusModel", sideMenusModel);
                             startActivityForResult(intent, DETAIL_CLOSE_CODE);
                         }
                     }
@@ -1508,13 +1721,14 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                 break;
             case R.id.btntxt_download_detail:
                 downloadTheCourse(myLearningModel, view);
+                refreshOrNo = "refresh";
                 break;
             case R.id.relativesecond:
-                if ((Integer) buttonSecond.getTag() == 7) {
+                if ((Integer) buttonSecond.getTag() == 6) {
                     if (isNetworkConnectionAvailable(MyLearningDetailActivity1.this, -1)) {
                         new SetCourseCompleteSynchTask(this, db, myLearningModel, setCompleteListner).execute();
                     }
-                    refreshOrNo = "refresh";
+
                 }
                 // else if()
                 else {
@@ -1731,13 +1945,17 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
                 if (refresh) {
                     refreshReview = true;
-                    int ratingRequired = 0;
+                    float ratingRequired = 0;
                     try {
-                        ratingRequired = Integer.parseInt(uiSettingsModel.getMinimimRatingRequiredToShowRating());
+                        ratingRequired = Float.parseFloat(uiSettingsModel.getMinimimRatingRequiredToShowRating());
                     } catch (NumberFormatException exce) {
                         ratingRequired = 0;
                     }
 
+                    if (myLearningModel.getStatusActual().equalsIgnoreCase("completed") || myLearningModel.getStatusActual().equalsIgnoreCase("attended") || myLearningModel.getStatusActual().equalsIgnoreCase("passed") || myLearningModel.getStatusActual().equalsIgnoreCase("failed")) {
+                        ratingsLayout.setVisibility(View.GONE);
+                        btnEditReview.setVisibility(View.VISIBLE);
+                    }
 
                     if (myLearningModel.getTotalratings() >= uiSettingsModel.getNumberOfRatingsRequiredToShowRating() && ratingValue >= ratingRequired) {
                         ratingsLayout.setVisibility(View.VISIBLE);
@@ -1753,7 +1971,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
                     } else {
 
-                        ratingsLayout.setVisibility(View.GONE);
+
                     }
 
                 }
@@ -1866,7 +2084,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             parameters.put("DetailsCompID", "107");
             parameters.put("DetailsCompInsID", "3291");
             parameters.put("ComponentDetailsProperties", "");
-            parameters.put("HideAdd: ", "");
+            parameters.put("HideAdd: ", "false");
             parameters.put("objectTypeID", "-1");
             parameters.put("scoID", "");
             parameters.put("SubscribeERC", false);
@@ -2470,7 +2688,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
     }
 
-    public void getUserRatingsOfTheContent(int skippedRows, final boolean isFromActivityResult, final boolean isToCheckUseRating) throws JSONException {
+    public void getUserRatingsOfTheContent(final int skippedRows, final boolean isFromActivityResult, final boolean isToCheckUseRating) throws JSONException {
 
 //        if (skippedRows == 0) {
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
@@ -2503,7 +2721,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 //                initilizeRatingsListView();
                 if (s != null) {
                     try {
-                        mapReviewRating(s, isFromActivityResult, isToCheckUseRating);
+                        mapReviewRating(s, isFromActivityResult, isToCheckUseRating, skippedRows);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -2554,29 +2772,59 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
     public void initilizeRatingsListView() {
 
+        try {
+            getUserRatingsOfTheContent(skippedRows, false, false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final View footerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.loadmoreratings, null, false);
+        ratinsgListview.addFooterView(footerView);
+        txtLoadMore = (TextView) footerView.findViewById(R.id.txtLoadMore);
+        txtLoadMore.setBackground(getShapeDrawable());
+        txtLoadMore.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+        txtLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (skippedRows < ratinsgListview.getAdapter().getCount() - 3 && ratinsgListview.getAdapter().getCount() != 0) {
+
+                    skippedRows = skippedRows + 3;
+                    try {
+                        getUserRatingsOfTheContent(skippedRows, false, false);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    txtLoadMore.setVisibility(View.GONE);
+                }
+
+            }
+        });
 
         ratinsgListview.setOnScrollListener(new EndlessScrollListener() {
 
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
 
-                Log.d(TAG, "onLoadMore: called ");
-                try {
-                    if (skippedRows < totalItemsCount - 3 && totalItemsCount != 0) {
-
-                        skippedRows = skippedRows + 3;
-                        getUserRatingsOfTheContent(skippedRows, false, false);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                Log.d(TAG, "onLoadMore: called ");
+//                try {
+//                    if (skippedRows < totalItemsCount - 3 && totalItemsCount != 0) {
+//
+//                        skippedRows = skippedRows + 3;
+//                        getUserRatingsOfTheContent(skippedRows, false, false);
+//                    }
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
             }
         });
 
+
     }
 
-    public void mapReviewRating(String response, boolean isFromActivityResult, boolean isToCheckUseRating) throws JSONException {
+    public void mapReviewRating(String response, boolean isFromActivityResult, boolean isToCheckUseRating, int skipped) throws JSONException {
 
         if (!isToCheckUseRating)
             ratingsLayout.setVisibility(View.VISIBLE);
@@ -2587,6 +2835,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
         if (jsonObject.has("RecordCount")) {
             recordCount = jsonObject.getInt("RecordCount");
+            totalRecordsCount = recordCount;
         }
 
         if (jsonObject.has("EditRating")) {
@@ -2641,6 +2890,11 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                 reviewRatingModelList = new ArrayList<>();
             }
 
+            if (skipped == 0 && reviewRatingModelList.size() > 0) {
+                reviewRatingModelList = new ArrayList<>();
+            }
+
+
             if (isFromActivityResult) {
                 reviewRatingModelList = new ArrayList<>();
             }
@@ -2687,8 +2941,15 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                     reviewRatingModelList.add(reviewRatingModel);
                 }
                 ratingsAdapter.refreshList(reviewRatingModelList);
+
+                if (recordCount == ratingsAdapter.getCount()) {
+                    txtLoadMore.setVisibility(View.GONE);
+                }
+
             } else {
                 ratingValue = 0;
+                txtLoadMore.setVisibility(View.GONE);
+
             }
             String rating = "" + ratingValue;
             if (reviewRatingModelList.size() > 0) {
@@ -2715,7 +2976,6 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             String replacetheString = getLocalizationValue(JsonLocalekeys.rated_out_of_odf_ratings);
             replacetheString = replacetheString.replace("%.1f", rating);
             replacetheString = replacetheString.replace("%d", "" + recordCount);
-
 
             txtRating.setText(getLocalizationValue(JsonLocalekeys.details_label_ratingsandreviewslabel));
             txtAvg.setText(getLocalizationValue(JsonLocalekeys.details_label_averageratinglabel));
@@ -3480,5 +3740,67 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         startActivity(getIntent());
         overridePendingTransition(0, 0);
 
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.txtReadMoreWhatYouLearn:
+                if ((Integer) txtReadMoreWhatYouLearn.getTag() == 0) {
+                    txtWhatYouLearnText.setMaxLines(Integer.MAX_VALUE);//your TextView
+                    txtReadMoreWhatYouLearn.setTag(1);
+                    txtReadMoreWhatYouLearn.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readlessbutton));
+                } else {
+                    txtWhatYouLearnText.setMaxLines(2);//your TextView
+                    txtReadMoreWhatYouLearn.setTag(0);
+                    txtReadMoreWhatYouLearn.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readmorebutton));
+                }
+                break;
+            case R.id.txtReadMoreDesc:
+                if ((Integer) txtReadMoreDesc.getTag() == 0) {
+                    txtLongDisx.setMaxLines(Integer.MAX_VALUE);//your TextView
+                    txtReadMoreDesc.setTag(1);
+                    txtReadMoreDesc.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readlessbutton));
+                } else {
+                    txtLongDisx.setMaxLines(2);//your TextView
+                    txtReadMoreDesc.setTag(0);
+                    txtReadMoreDesc.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readmorebutton));
+                }
+                break;
+            case R.id.txtReadMoreTableofConten:
+                if ((Integer) txtReadMoreTableofConten.getTag() == 0) {
+                    txtTableofContentText.setMaxLines(Integer.MAX_VALUE);//your TextView
+                    txtReadMoreTableofConten.setTag(1);
+                    txtReadMoreTableofConten.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readlessbutton));
+                } else {
+                    txtTableofContentText.setMaxLines(2);//your TextView
+                    txtReadMoreTableofConten.setTag(0);
+                    txtReadMoreTableofConten.setText(getLocalizationValue(JsonLocalekeys.mylearning_button_readmorebutton));
+                }
+                break;
+        }
+    }
+
+
+    public ShapeDrawable getShapeDrawable() {
+
+        ShapeDrawable sd = new ShapeDrawable();
+
+        // Specify the shape of ShapeDrawable
+        sd.setShape(new RectShape());
+
+        // Specify the border color of shape
+        sd.getPaint().setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        // Set the border width
+        sd.getPaint().setStrokeWidth(10f);
+
+        // Specify the style is a Stroke
+        sd.getPaint().setStyle(Paint.Style.STROKE);
+
+        // Finally, add the drawable background to TextView
+
+        return sd;
     }
 }

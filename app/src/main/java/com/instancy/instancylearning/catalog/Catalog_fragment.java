@@ -142,6 +142,7 @@ import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE_ADV;
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
@@ -214,7 +215,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     CustomFlowLayout category_breadcrumb = null;
 
-    List<ContentValues> breadcrumbItemsList = null;
+    List<ContentValues> breadcrumbItemsList = new ArrayList<ContentValues>();
+
 
     @BindView(R.id.swipemylearning)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -324,15 +326,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 contentIDFromNotification = bundle.getString("CONTENTID");
             }
-
             if (isFromPeopleListing) {
-
                 peopleListingModel = (PeopleListingModel) bundle.getSerializable("peopleListingModel");
-
             }
-
             if (isFromMyCompetency) {
-
                 skillID = bundle.getString("SKILLID");
                 skillName = bundle.getString("TITLENAME");
             }
@@ -348,8 +345,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             if (isFromCatogories) {
 
                 catalogModelsList = (List<MyLearningModel>) bundle.getSerializable("cataloglist");
-                breadcrumbItemsList = new ArrayList<ContentValues>();
+
                 breadcrumbItemsList = (List<ContentValues>) bundle.getSerializable("breadicrumblist");
+                applyFilterModel.categories = bundle.getString("categoryid");
 
             }
         }
@@ -508,7 +506,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         vollyService.getStringResponseFromPostMethod(parameterString, "CATALOGDATA", urlStr);
     }
 
-
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
@@ -618,7 +615,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         } else {
                             refreshCatalog(true);
                         }
-                        Toast.makeText(context, " Item removed from Wishlist Successfully.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_itemremovedtowishlistsuccesfully), Toast.LENGTH_SHORT).show();
                     } else {
 
                     }
@@ -666,7 +663,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
-
 
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
@@ -881,7 +877,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void injectFromDbtoModel() {
-        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId(), ddlSortList, ddlSortType);
+        catalogModelsList = db.fetchCatalogModel(sideMenusModel.getComponentId(), ddlSortList, ddlSortType, applyFilterModel.filterApplied);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -927,6 +923,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             myLearninglistView.setSelection(selectedPostion);
             Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
             intentDetail.putExtra("IFROMCATALOG", true);
+            intentDetail.putExtra("sideMenusModel", sideMenusModel);
             intentDetail.putExtra("myLearningDetalData", catalogModelsList.get(selectedPostion));
             startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
@@ -1291,9 +1288,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         menu.getItem(2).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_buyoption));//buy    ctx_buy
         menu.getItem(3).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_detailsoption));//detail ctx_detail
         menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_deleteoption));//delete  ctx_delete
-        menu.getItem(5).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_downloadoption));//download ctx_download
-        menu.getItem(6).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_addtowishlist));//addwishlist  ctx_addtowishlist
-        menu.getItem(7).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_removefromwishlist));//rmwishlist  ctx_removefromwishlist
+        menu.getItem(5).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_downloadoption));//download ctx_download
+        menu.getItem(6).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_wishlistoption));//addwishlist  ctx_addtowishlist
+        menu.getItem(7).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_removefromwishlistoption));//rmwishlist  ctx_removefromwishlist
+
 
 //        boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
@@ -1420,7 +1418,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 menu.getItem(6).setVisible(true);//isWishListed
             }
         }
-        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")  || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
             menu.getItem(5).setVisible(false);
         }
 
@@ -1433,21 +1431,29 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         if (myLearningDetalData.getAddedToMylearning() == 0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
                             GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
                         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
-
                             GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
-
-
                         } else {
                             GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
                         }
                         break;
                     case R.id.ctx_add:
-                        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime())) {
+                        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime()) && uiSettingsModel.isAllowExpiredEventsSubscription()) {
                             try {
                                 addExpiryEvets(myLearningDetalData, position);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                        } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && uiSettingsModel.isEnableMultipleInstancesforEvent() && myLearningDetalData.getEventScheduleType() == 1) {
+
+                            Log.d(TAG, "sheduled here: sheduled called" + myLearningDetalData.getCourseName());
+
+                            Intent intentDetail = new Intent(context, MyLearningDetailActivity1.class);
+                            intentDetail.putExtra("IFROMCATALOG", false);
+                            intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                            intentDetail.putExtra("typeFrom", "tab");
+                            intentDetail.putExtra("sideMenusModel", sideMenusModel);
+                            startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+
                         } else {
                             if (uiSettingsModel.getNoOfDaysForCourseTargetDate() > 0) {
                                 selectTheDueDate(myLearningDetalData, position, uiSettingsModel.getNoOfDaysForCourseTargetDate());
@@ -1469,6 +1475,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
                         intentDetail.putExtra("IFROMCATALOG", true);
                         intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
                         ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
                         break;
                     case R.id.ctx_delete:
@@ -1506,9 +1513,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         });
         popup.show();//showing popup menu
-
     }
-
 
     public void gotoMemberShipView(MyLearningModel learningModel) {
 
@@ -1520,7 +1525,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //        http://mayur.instancysoft.com/Join/nativeapp/true/membership/true/userid/2/siteid/374
     }
 
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position, boolean isInapp) {
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position,
+                                         boolean isInapp) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
 
@@ -1542,12 +1548,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void selectTheDueDate(final MyLearningModel myLearningDetalData, final int position, int dueDateTarget) {
+    public void selectTheDueDate(final MyLearningModel myLearningDetalData,
+                                 final int position, int dueDateTarget) {
 
         Calendar newCalendar = Calendar.getInstance();
         newCalendar.add(Calendar.DATE, dueDateTarget);
         datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
-            DateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss", Locale.US);
+            DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar newDate = Calendar.getInstance();
@@ -1555,6 +1562,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Log.d(TAG, "onDateSet: " + dateFormatter.format(newDate.getTime()));
                 dueDate = "";
                 dueDate = dateFormatter.format(newDate.getTime());
+                Log.d(TAG, "onDateSet: dueDate " + dueDate);
                 addToMyLearningCheckUser(myLearningDetalData, position, false);
 
             }
@@ -1565,7 +1573,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position, final boolean isAutoAdd, final boolean isJoinedCommunity) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final int position,
+                                final boolean isAutoAdd, final boolean isJoinedCommunity) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
             boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -1654,7 +1663,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-    public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
+    public void checkUserLogin(final MyLearningModel learningModel, final int position,
+                               final boolean isInapp) {
 
 
         final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
@@ -1758,7 +1768,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final int position) {
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel,
+                                                  final int position) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
@@ -1855,7 +1866,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails details) {
+    public void onProductPurchased(@NonNull String productId, @Nullable TransactionDetails
+            details) {
 //        Toast.makeText(context, "You Have Purchased Something ", Toast.LENGTH_SHORT).show();
         Log.v("chip", "Owned Managed Product: " + details.purchaseInfo.purchaseData);
 
@@ -2076,7 +2088,18 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             }
 
+        }
 
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0) {
+//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
+            if (data == null) {
+                pageIndex = 1;
+                if (isDigimedica) {
+                    getMobileCatalogObjectsData(true);
+                } else {
+                    refreshCatalog(true);
+                }
+            }
         }
 
         if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
@@ -2099,12 +2122,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             if (data != null) {
                 boolean isApplied = data.getBooleanExtra("APPLY", false);
                 if (isApplied) {
-
                     contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
-
                     applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
                     Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
                     pageIndex = 1;
+
                     if (isDigimedica) {
                         getMobileCatalogObjectsData(true);
                     } else {
@@ -2203,7 +2225,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         List<AllFilterModel> allFilterModelList = new ArrayList<>();
 
         AllFilterModel advFilterModel = new AllFilterModel();
-        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_filterbytitlelabel);
         advFilterModel.categoryID = 1;
         allFilterModelList.add(advFilterModel);
 
@@ -2211,10 +2233,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             String enableGroupby = responMap.get("EnableGroupby");
             if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
                 AllFilterModel groupFilterModel = new AllFilterModel();
-                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_groupbytitlelabel);
                 groupFilterModel.categoryID = 2;
+                groupFilterModel.isGroup = true;
+                groupFilterModel.categorySelectedData = applyFilterModel.groupBy;
                 if (responMap != null && responMap.containsKey("ddlGroupby")) {
-
                     String ddlGroupby = responMap.get("ddlGroupby");
                     Log.d(TAG, "getAllFilterModelList: " + ddlGroupby);
                     groupFilterModel.groupArrayList = getArrayListFromString(ddlGroupby);
@@ -2222,14 +2245,20 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         allFilterModelList.add(groupFilterModel);
                     }
                 }
-
             }
         }
 
-        AllFilterModel sortFilterModel = new AllFilterModel();
-        sortFilterModel.categoryName = "Sort By";
-        sortFilterModel.categoryID = 3;
-        allFilterModelList.add(sortFilterModel);
+        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
+            String enableSortby = responMap.get("EnableFilterSort");
+            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+                AllFilterModel sortFilterModel = new AllFilterModel();
+                sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
+                sortFilterModel.categoryID = 3;
+                sortFilterModel.categorySelectedData = applyFilterModel.sortBy;
+                sortFilterModel.categorySelectedDataDisplay = applyFilterModel.sortByDisplay;
+                allFilterModelList.add(sortFilterModel);
+            }
+        }
 
         return allFilterModelList;
     }
@@ -2250,35 +2279,36 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "cat";
-                            contentFilterByModel.categoryDisplayName = "Category";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_caegoriestitlelabel);
+                            contentFilterByModel.selectedSkillIdsArry.add(applyFilterModel.categories.length() > 0 ? applyFilterModel.categories : "");
                             contentFilterByModel.goInside = true;
                             break;
                         case "skills":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "skills";
-                            contentFilterByModel.categoryDisplayName = "By Skills";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
                             contentFilterByModel.goInside = true;
                             break;
                         case "objecttypeid":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "bytype";
-                            contentFilterByModel.categoryDisplayName = "Content Types";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_contenttype);
                             contentFilterByModel.goInside = false;
                             break;
                         case "jobroles":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "jobroles";
-                            contentFilterByModel.categoryDisplayName = "Job Roles";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
                             contentFilterByModel.goInside = false;
                             break;
                         case "solutions":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "tag";
-                            contentFilterByModel.categoryDisplayName = "Solutions";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_tag);
                             contentFilterByModel.goInside = false;
                             break;
                         case "rating":
@@ -2288,7 +2318,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                     contentFilterByModel.categoryName = "Show Ratings";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "rate";
-                                    contentFilterByModel.categoryDisplayName = "Rating";
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_rating);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
@@ -2301,19 +2331,19 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                     contentFilterByModel.categoryName = "SprateEvents";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "duration";
-                                    contentFilterByModel.categoryDisplayName = "Duration";
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_duration);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
                             break;
                         case "ecommerceprice":
-                            if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+                            if (uiSettingsModel.isEnableEcommerce() && responMap != null && responMap.containsKey("EnableEcommerce")) {
                                 String showrRatings = responMap.get("EnableEcommerce");
                                 if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
                                     contentFilterByModel.categoryName = "EnableEcommerce";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "priceRange";
-                                    contentFilterByModel.categoryDisplayName = "Price Range";
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_pricerange);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
@@ -2322,7 +2352,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             contentFilterByModel.categoryName = "Instructor";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "inst";
-                            contentFilterByModel.categoryDisplayName = "Instructor";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_instructor);
                             contentFilterByModel.goInside = false;
                             break;
                         case "certificate":
@@ -2331,7 +2361,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             contentFilterByModel.categoryName = "Event dates";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "eventdates";
-                            contentFilterByModel.categoryDisplayName = "By Dates";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatedate);
                             contentFilterByModel.goInside = false;
                             break;
 
@@ -2364,6 +2394,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             if (contentFilterByModelList.size() == 0) {
+//                applyFilterModel.categories = "";
                 contentFilterByModelList = generateContentFilters();
             }
 
@@ -2375,6 +2406,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 intent.putExtra("isFrom", 0);
                 intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
                 intent.putExtra("allFilterModelList", (Serializable) allFilterModelList);
+                intent.putExtra("contentFilterType", contentFilterType);
+                intent.putExtra("responMap", (Serializable) responMap);
                 startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
             }
         } else {
@@ -2449,12 +2482,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 removeItemFromBreadcrumbList(categoryLevel);
                 generateBreadcrumb(breadcrumbItemsList);
                 if (getFragmentManager().getBackStackEntryCount() > 0) {
-//                    try {
-//                        communicator.breadCrumbStatus(breadcrumbItemsList);
-//                    } catch (NullPointerException e) {
-//                        throw new ClassCastException(context.toString()
-//                                + " must implement IFragmentToActivity");
-//                    }
+
                     getFragmentManager().popBackStack();
 
                 }
@@ -2474,7 +2502,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(arrowView, iconFont);
 
-            arrowView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderColor() + "'><medium><b>"
+            arrowView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppButtonBgColor() + "'><medium><b>"
                     + getResources().getString(R.string.fa_icon_angle_right) + "</b></big> </font>"));
 
 //            arrowView.setText(getResources().getString(R.string.fa_icon_forward));
@@ -2488,7 +2516,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             String categoryId = cvBreadcrumbItem.getAsString("categoryid");
             String categoryName = cvBreadcrumbItem.getAsString("categoryname");
 
-            textView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppHeaderColor() + "'><big><b><u>"
+            textView.setText(Html.fromHtml("<font color='" + uiSettingsModel.getAppButtonBgColor() + "'><big><b><u>"
                     + categoryName + "</u></b></big>  </font>"));
 
             textView.setGravity(Gravity.BOTTOM | Gravity.BOTTOM);
@@ -2511,7 +2539,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         breadcrumbItemsList = breadcrumbItemsList.subList(0, categoryLevel + 1);
     }
 
-    public void downloadTheCourse(final MyLearningModel learningModel, final View view, final int position) {
+    public void downloadTheCourse(final MyLearningModel learningModel, final View view,
+                                  final int position) {
 
         if (learningModel.getAddedToMylearning() == 0) {
             addToMyLearning(learningModel, position, true, false);
@@ -2594,7 +2623,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
-    public void downloadThin(String downloadStruri, View view, final MyLearningModel learningModel, final int position) {
+    public void downloadThin(String downloadStruri, View view,
+                             final MyLearningModel learningModel, final int position) {
 
         downloadStruri = downloadStruri.replace(" ", "%20");
         ThinDownloadManager downloadManager = new ThinDownloadManager();
@@ -2867,13 +2897,15 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
             intentDetail.putExtra("IFROMCATALOG", true);
             intentDetail.putExtra("myLearningDetalData", learningModel);
+            intentDetail.putExtra("sideMenusModel", sideMenusModel);
             ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
 
         }
     }
 
 
-    public List<MyLearningModel> generateCatalogForPeopleListing(JSONObject jsonObject) throws JSONException {
+    public List<MyLearningModel> generateCatalogForPeopleListing(JSONObject jsonObject) throws
+            JSONException {
 
 
         List<MyLearningModel> myLearningModelList = new ArrayList<>();
@@ -3357,7 +3389,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
-    public void sendExpiryEventData(final String postData, final int position, final MyLearningModel catalogModel) {
+    public void sendExpiryEventData(final String postData, final int position,
+                                    final MyLearningModel catalogModel) {
         String apiURL = "";
 
         apiURL = appUserModel.getWebAPIUrl() + "/Catalog/AddExpiredContentToMyLearning";
@@ -3477,7 +3510,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         refreshCatalog(true);
                     }
 
-                    Toast.makeText(context, " Item added to Wishlist Successfully. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_itemaddedtowishlistsuccesfully), Toast.LENGTH_SHORT).show();
                 }
 
             }

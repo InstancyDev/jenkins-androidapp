@@ -99,6 +99,7 @@
                             android:backgroundTint="@color/colorStatusInProgress"
                             android:clickable="true"
                             android:isIndicator="false"
+                            android:visibility="invisible"
                             android:rating="3.0"
                             android:stepSize="1.0" />
                     </RelativeLayout>

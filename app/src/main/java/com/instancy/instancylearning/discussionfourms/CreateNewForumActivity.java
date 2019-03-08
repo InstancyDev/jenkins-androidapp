@@ -400,7 +400,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
                     closeForum(true);
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newforumauthenticationfailedcontactsiteadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

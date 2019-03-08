@@ -95,9 +95,11 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
     SideMenusModel sideMenusModel = null;
 
     Toolbar toolbar;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,GlobalSearchActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, GlobalSearchActivity.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -275,7 +277,7 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
         }
         String urlStr = appUserModel.getWebAPIUrl() + "search/GetSearchComponentList?";
 
-        String paramsString = urlStr + "strLocale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"" +
+        String paramsString = urlStr + "strLocale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "" +
                 "&intSiteID=" + appUserModel.getSiteIDValue() +
                 "&intUserID=" + appUserModel.getUserIDValue();
 
@@ -326,9 +328,9 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                         try {
                             expandableListDetail = fetchCategoriesData(response, false, sideMenusModel);
                             boolean parentExistss = isParentComponentExists(response, sideMenusModel);
-                            if (!parentExistss) {
-                                chxSelectedCategory.setVisibility(View.GONE);
-                                checkSelectedBool = false;
+                            if (!parentExistss) { // Commented for the search issue
+//                                chxSelectedCategory.setVisibility(View.GONE);
+//                                checkSelectedBool = false;
                             }
                             expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
                             responseReceived = response;
@@ -336,7 +338,6 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     } else {
 
                     }
@@ -473,8 +474,6 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
             startActivity(intent);
 
         } else if (checkSelectedBool) {
-
-//            Toast.makeText(this, "Single component selected ", Toast.LENGTH_SHORT).show();
 
             gotoParentObj(queryString);
 

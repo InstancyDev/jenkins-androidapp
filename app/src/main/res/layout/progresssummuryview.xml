@@ -219,7 +219,8 @@
             android:padding="6dp"
             android:text="Details"
             android:textColor="@color/colorBlack"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:visibility="visible" />
 
     </LinearLayout>
 

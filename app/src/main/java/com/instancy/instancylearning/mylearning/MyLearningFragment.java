@@ -385,7 +385,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             if (totalRecordsCount == 0) {
                                 myLearningModelsList = new ArrayList<MyLearningModel>();
                                 myLearningAdapter.refreshList(myLearningModelsList);
-                                nodata_Label.setText(getResources().getString(R.string.no_data));
+                                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                             } else {
                                 injectFromDbtoModel();
                             }
@@ -394,7 +394,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             e.printStackTrace();
                         }
                     } else {
-                        nodata_Label.setText(getResources().getString(R.string.no_data));
+                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -436,7 +436,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //            myLearninglistView.setVisibility(View.GONE);
             nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
-
         if (myLearningModelsList.size() == pageSize) {
             pageIndex = 2;
         } else {
@@ -498,6 +497,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         intentDetail.putExtra("IFROMCATALOG", false);
                         intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
                         startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
                         isFromNotification = false;
                     } catch (IndexOutOfBoundsException ex) {
 //                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
@@ -534,7 +534,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearningModelsList = new ArrayList<MyLearningModel>();
         isReportEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         initilizeInterface();
-        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface, isReportEnabled);
+        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface, isReportEnabled, sideMenusModel);
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -759,7 +759,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (itemArchive != null) {
             Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
-            itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_label_archivetitlelabel));
+            itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
         }
 
         if (item_filter != null) {
@@ -867,7 +867,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (isArchived) {
             Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
-            itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_label_archivetitlelabel));
+            itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
             isArchived = false;
             isArchi = 0;
             pageIndex = 1;
@@ -894,7 +894,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (forMylearning) {
             titleName = sideMenusModel.getDisplayName();
         } else {
-            titleName = getLocalizationValue(JsonLocalekeys.mylearning_label_archivetitlelabel);
+            titleName = getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel);
         }
         toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + titleName + "</font>"));
     }
@@ -977,6 +977,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         Intent intentDetail = new Intent(context, MyLearningDetailActivity1.class);
         intentDetail.putExtra("IFROMCATALOG", false);
+        intentDetail.putExtra("sideMenusModel", sideMenusModel);
         intentDetail.putExtra("myLearningDetalData", learningModel);
         intentDetail.putExtra("typeFrom", "tab");
         startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
@@ -1332,12 +1333,26 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                 if (!myFile.exists()) {
 
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
 
                         if (isNetworkConnectionAvailable(getContext(), -1)) {
                             getStatusFromServer(myLearningModel);
-
                         }
+
+                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") && myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+                            int i = -1;
+                            i = db.updateContentStatus(myLearningModel, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50");
+                            if (i == 1) {
+//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+                                injectFromDbtoModel();
+                            } else {
+
+//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+
+
                     } else {
                         if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
@@ -1391,9 +1406,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
         }
-        if (requestCode == DETAIL_CLOSE_CODE && resultCode ==0) {
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0) {
 //            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
             if (data == null) {
+                pageIndex = 1;
                 if (isDigimedica) {
                     getMobileMyCatalogObjectsNew(true);
                 } else {
@@ -1450,13 +1466,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
                 if (refresh) {
-
                     if (isDigimedica) {
                         getMobileMyCatalogObjectsNew(true);
                     } else {
                         refreshMyLearning(true);
                     }
-
                 }
 
             }
@@ -1689,22 +1703,22 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 intent.putExtra("isFrom", 0);
                 intent.putExtra("contentFilterByModelList", (Serializable) contentFilterByModelList);
                 intent.putExtra("allFilterModelList", (Serializable) allFilterModelList);
+                intent.putExtra("contentFilterType", contentFilterType);
+                intent.putExtra("responMap", (Serializable) responMap);
                 startActivityForResult(intent, FILTER_CLOSE_CODE_ADV);
             }
         } else {
             Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
         }
-
     }
-
 
     public List<AllFilterModel> getAllFilterModelList() {
 
         List<AllFilterModel> allFilterModelList = new ArrayList<>();
 
         AllFilterModel advFilterModel = new AllFilterModel();
-        advFilterModel.categoryName = "Filter by";
+        advFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_filterbytitlelabel);
         advFilterModel.categoryID = 1;
         allFilterModelList.add(advFilterModel);
 
@@ -1712,7 +1726,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             String enableGroupby = responMap.get("EnableGroupby");
             if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
                 AllFilterModel groupFilterModel = new AllFilterModel();
-                groupFilterModel.categoryName = "Group By";
+                groupFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_groupbytitlelabel);
                 groupFilterModel.categoryID = 2;
                 groupFilterModel.isGroup = true;
                 groupFilterModel.categorySelectedData = applyFilterModel.groupBy;
@@ -1727,21 +1741,17 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
 
-//        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
-//            String enableSortby = responMap.get("EnableFilterSort");
-//            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
-//                AllFilterModel sortFilterModel = new AllFilterModel();
-//                sortFilterModel.categoryName = "Sort By";
-//                sortFilterModel.categoryID = 3;
-//                allFilterModelList.add(sortFilterModel);
-//            }
-//        }
-
-        AllFilterModel sortFilterModel = new AllFilterModel();
-        sortFilterModel.categoryName = "Sort By";
-        sortFilterModel.categoryID = 3;
-        sortFilterModel.categorySelectedData = applyFilterModel.sortBy;
-        allFilterModelList.add(sortFilterModel);
+        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
+            String enableSortby = responMap.get("EnableFilterSort");
+            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+                AllFilterModel sortFilterModel = new AllFilterModel();
+                sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
+                sortFilterModel.categoryID = 3;
+                sortFilterModel.categorySelectedData = applyFilterModel.sortBy;
+                sortFilterModel.categorySelectedDataDisplay = applyFilterModel.sortByDisplay;
+                allFilterModelList.add(sortFilterModel);
+            }
+        }
 
         return allFilterModelList;
     }
@@ -1755,41 +1765,40 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             if (filterCategoriesArray != null && filterCategoriesArray.size() > 0) {
                 for (int i = 0; i < filterCategoriesArray.size(); i++) {
                     ContentFilterByModel contentFilterByModel = new ContentFilterByModel();
-
                     switch (filterCategoriesArray.get(i)) {
                         case "categories":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "cat";
-                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_acategotytitlelabel);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_caegoriestitlelabel);
                             contentFilterByModel.goInside = true;
                             break;
                         case "skills":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "skills";
-                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_byskillstitlelabel);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
                             contentFilterByModel.goInside = true;
                             break;
                         case "objecttypeid":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "bytype";
-                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_contenttypestitlelabel);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_contenttype);
                             contentFilterByModel.goInside = false;
                             break;
                         case "jobroles":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "jobroles";
-                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_jobrulestitlelabel);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
                             contentFilterByModel.goInside = false;
                             break;
                         case "solutions":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "tag";
-                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_solutionstitlelabel);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_tag);
                             contentFilterByModel.goInside = false;
                             break;
                         case "rating":
@@ -1799,7 +1808,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                                     contentFilterByModel.categoryName = "Show Ratings";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "rate";
-                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_ratingtitlelabel);
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_rating);
 
                                     contentFilterByModel.goInside = false;
                                 }
@@ -1813,20 +1822,20 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                                     contentFilterByModel.categoryName = "SprateEvents";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "duration";
-                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_durationtitlelabel);
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_duration);
 
                                     contentFilterByModel.goInside = false;
                                 }
                             }
                             break;
                         case "ecommerceprice":
-                            if (responMap != null && responMap.containsKey("EnableEcommerce")) {
+                            if (uiSettingsModel.isEnableEcommerce() && responMap != null && responMap.containsKey("EnableEcommerce")) {
                                 String showrRatings = responMap.get("EnableEcommerce");
                                 if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
                                     contentFilterByModel.categoryName = "EnableEcommerce";
                                     contentFilterByModel.categoryIcon = "";
                                     contentFilterByModel.categoryID = "price Range";
-                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.mylearning_label_pricerangetitlelabel);
+                                    contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_pricerange);
                                     contentFilterByModel.goInside = false;
                                 }
                             }
@@ -1835,7 +1844,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             contentFilterByModel.categoryName = "Instructor";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "inst";
-                            contentFilterByModel.categoryDisplayName = "Instructor";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_instructor);
                             contentFilterByModel.goInside = false;
                             break;
                         case "certificate":
@@ -1844,7 +1853,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             contentFilterByModel.categoryName = "Event dates";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "eventdates";
-                            contentFilterByModel.categoryDisplayName = "By Dates";
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_eventdatedate);
                             contentFilterByModel.goInside = false;
                             break;
 

@@ -53,6 +53,7 @@ import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
+import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -79,6 +80,7 @@ import butterknife.OnClick;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -92,6 +94,7 @@ public class MyLearningAdapter extends BaseAdapter {
     private int resource;
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
+    SideMenusModel sideMenusModel;
     SVProgressHUD svProgressHUD;
     PreferencesManager preferencesManager;
     private String TAG = MyLearningAdapter.class.getSimpleName();
@@ -101,7 +104,7 @@ public class MyLearningAdapter extends BaseAdapter {
     EventInterface eventInterface;
     boolean isReportEnabled = true;
 
-    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface, boolean isReportEnabled) {
+    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface, boolean isReportEnabled, SideMenusModel sideMenusModel) {
         this.eventInterface = eventInterface;
         this.activity = activity;
         this.myLearningModel = myLearningModel;
@@ -113,7 +116,7 @@ public class MyLearningAdapter extends BaseAdapter {
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
         svProgressHUD = new SVProgressHUD(activity);
-
+        this.sideMenusModel = sideMenusModel;
         preferencesManager = PreferencesManager.getInstance();
         appUserModel.getWebAPIUrl();
         /* setup enter and exit animation */
@@ -430,7 +433,6 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtgroupName.setVisibility(View.GONE);
         }
 
-
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.txtAuthor.setText(myLearningModel.get(position).getPresenter() + " ");
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
@@ -466,19 +468,22 @@ public class MyLearningAdapter extends BaseAdapter {
         if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.crop_life))) {
             holder.ratingBar.setVisibility(View.GONE);
         }
-        int ratingRequired = 0;
+        float ratingRequired = 0;
         try {
-            ratingRequired = Integer.parseInt(uiSettingsModel.getMinimimRatingRequiredToShowRating());
+            ratingRequired = Float.parseFloat(uiSettingsModel.getMinimimRatingRequiredToShowRating());
         } catch (NumberFormatException exce) {
             ratingRequired = 0;
+        }
+
+        if (myLearningModel.get(position).getStatusActual().toLowerCase().contains("completed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("attended") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("passed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("failed")) {
+            holder.ratingBar.setVisibility(View.GONE);
+            holder.txtWriteReview.setVisibility(View.VISIBLE);
+
         }
 
         if (myLearningModel.get(position).getTotalratings() >= uiSettingsModel.getNumberOfRatingsRequiredToShowRating() && ratingValue >= ratingRequired) {
             holder.txtWriteReview.setVisibility(View.GONE);
             holder.ratingBar.setVisibility(View.VISIBLE);
-        } else {
-            holder.ratingBar.setVisibility(View.GONE);
-            holder.txtWriteReview.setVisibility(View.VISIBLE);
         }
 
         // apply colors
@@ -490,7 +495,7 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.btnDownload.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtWriteReview.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         holder.txtWriteReview.setText(getLocalizationValue(JsonLocalekeys.details_button_writeareviewbutton));
-        holder.txtEnrollShedule.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_enrollnow));
+        holder.txtEnrollShedule.setText(getLocalizationValue(JsonLocalekeys.details_label_enroll));
         holder.txtEnrollShedule.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         holder.txtEventFromTo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -519,13 +524,17 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.progressBar.setVisibility(View.GONE);
-
-            holder.eventLayout.setVisibility(View.VISIBLE);
             holder.txtAthrIcon.setVisibility(View.VISIBLE);
+
+            if (isValidString(myLearningModel.get(position).getLocationName())) {
+                holder.eventLayout.setVisibility(View.VISIBLE);
+            } else {
+                holder.eventLayout.setVisibility(View.GONE);
+            }
 
         } else {
             holder.eventLayout.setVisibility(View.GONE);
-            holder.txtAthrIcon.setVisibility(View.GONE);
+//            holder.txtAthrIcon.setVisibility(View.GONE);
         }
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("688") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("27")) {
             // 102 commented for some XAPI content
@@ -620,6 +629,12 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
             courseStatus = statusFromModel + "  (0";
 
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+                courseStatus = statusFromModel;
+            } else {
+                courseStatus = statusFromModel + "(" + 0;
+            }
+
         } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
 
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
@@ -637,7 +652,14 @@ public class MyLearningAdapter extends BaseAdapter {
             }
             holder.progressBar.setProgress(50);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-            courseStatus = status + " (" + 50;
+
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+                courseStatus = status;
+            } else {
+                courseStatus = status + " (" + 50;
+            }
+
+
 
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
@@ -659,7 +681,7 @@ public class MyLearningAdapter extends BaseAdapter {
             courseStatus = status;
 
             if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
-                courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_tobesechdule);
+                courseStatus = getLocalizationValue(JsonLocalekeys.details_label_tobeshedule);
                 holder.txtCourseStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
             }
 
@@ -686,12 +708,16 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.progressBar.setProgress(0);
             String status = "";
             status = statusFromModel;
-            courseStatus = status + "(" + 0;
+            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+                courseStatus = status;
+            } else {
+                courseStatus = status + "(" + 0;
+            }
+
         }
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.txtCourseStatus.setText(courseStatus);
         } else {
-
             holder.txtCourseStatus.setText(courseStatus + "%)");
         }
         String imgUrl = myLearningModel.get(position).getImageData();
@@ -763,8 +789,7 @@ public class MyLearningAdapter extends BaseAdapter {
                         appcontroller.setAlreadyViewd(true);
                         preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
                     }
-                })
-                        .text(getLocalizationValue(JsonLocalekeys.mylearning_label_clicktodownloadlabel)).clickToHide(true)
+                }).text(getLocalizationValue(JsonLocalekeys.mylearning_label_clicktodownloadlabel)).clickToHide(true)
                         .show();
 
                 ViewTooltip
@@ -997,7 +1022,7 @@ public class MyLearningAdapter extends BaseAdapter {
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel);
             } else if (view.getId() == R.id.txtWriteReview) {
                 try {
 
@@ -1163,9 +1188,11 @@ public class MyLearningAdapter extends BaseAdapter {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
                 if (finalArchV == 1) {
-                    Toast.makeText(activity, " Archived Successfully ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, " " + getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_archivedsuccesfully), Toast.LENGTH_SHORT).show();
+
                 } else {
-                    Toast.makeText(activity, " Unarchived Successfully ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, " " + getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_unarchivedsuccesfully), Toast.LENGTH_SHORT).show();
+
                 }
                 eventInterface.archiveAndUnarchive(true);
             }
@@ -1212,6 +1239,7 @@ public class MyLearningAdapter extends BaseAdapter {
     }
 
     private String getLocalizationValue(String key) {
+        Log.d(TAG, "getLocalizationValue: archived" + JsonLocalization.getInstance().getStringForKey(key, activity));
         return JsonLocalization.getInstance().getStringForKey(key, activity);
     }
 }

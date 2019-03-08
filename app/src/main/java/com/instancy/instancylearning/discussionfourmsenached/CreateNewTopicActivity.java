@@ -153,10 +153,12 @@ public class CreateNewTopicActivity extends AppCompatActivity {
     ImageView attachmentThumb;
 
     boolean isUpdateForum = false;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,CreateNewTopicActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, CreateNewTopicActivity.this);
 
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -186,16 +188,21 @@ public class CreateNewTopicActivity extends AppCompatActivity {
             editTitle.setText(discussionTopicModel.name);
             editDescription.setText(discussionTopicModel.longDescription);
             editAttachment.setText(discussionTopicModel.uploadFileName);
-            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_updatebutton));
             updateUiForEditQuestion();
         } else {
             attachmentThumb.setVisibility(View.GONE);
             isUpdateForum = false;
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumsavebutton));
+
         }
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newfourmcancelbutton));
+        editTitle.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textfield_newtopictitletextfieldplaceholder));
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textview_newtopicdescriptionplaceholder));
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                "       "+getLocalizationValue(JsonLocalekeys.discussionforum_header_addtopictitlelabel) + "</font>"));
+                "       " + getLocalizationValue(JsonLocalekeys.discussionforum_header_addtopictitlelabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -216,12 +223,15 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledTitle
-                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel)+":");
+                = new SpannableString("*" + getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel) + ":");
         styledTitle.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledTitle.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledTitle.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         styledTitle.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelTitle.setText(styledTitle);
+
+        txtAttachment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_newcommentattachmentlabel));
+        labelDescritpion.setText(getLocalizationValue(JsonLocalekeys.details_label_descriptionlabel));
 
 //        SpannableString styledDescription
 //                = new SpannableString("*Description");
@@ -239,7 +249,7 @@ public class CreateNewTopicActivity extends AppCompatActivity {
         btnUpload.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnUpload.setPadding(10, 2, 2, 2);
         btnUpload.setTag(0);
-
+        btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newtopicselectfileuploadbutton));
     }
 
     public void updateUiForEditQuestion() {
@@ -265,14 +275,14 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumremoveimagebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newtopicselectfileuploadbutton));
             attachmentThumb.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -637,12 +647,12 @@ public class CreateNewTopicActivity extends AppCompatActivity {
 
                     } else {
                         closeForum(true);
-                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newtopichasbeensuccessfullyadded), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_newtopichasbeensuccessfullyadded), Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_topiccannotpostedcontactadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

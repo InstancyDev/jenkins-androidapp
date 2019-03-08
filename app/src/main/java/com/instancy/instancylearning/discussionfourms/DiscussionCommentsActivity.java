@@ -588,7 +588,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                     deleteCommentFromLocalDB(commentsModel);
                 } else {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_label_topiccannotpostedcontactadmin), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
 
             }

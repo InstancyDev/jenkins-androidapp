@@ -6,10 +6,9 @@
     <item
         android:id="@+id/add_skill_menu"
         android:orderInCategory="1"
-        android:title="Add Skil"
+        android:title="Add Skills"
         app:actionLayout="@layout/addskilllayout"
         app:showAsAction="always|withText" />
-
 
 </menu>
 

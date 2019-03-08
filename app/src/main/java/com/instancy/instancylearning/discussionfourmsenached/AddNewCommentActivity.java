@@ -207,13 +207,17 @@ public class AddNewCommentActivity extends AppCompatActivity {
             discussionCommentsModel = (DiscussionCommentsModelDg) getIntent().getSerializableExtra("commentModel");
             isUpdateForum = true;
             editDescription.setText(discussionCommentsModel.message);
-            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_update));
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_updatebutton));
             updateUiForEditQuestion();
         } else {
             attachmentThumb.setVisibility(View.GONE);
             isUpdateForum = false;
             changeBtnValue(false);
+            txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumsavebutton));
         }
+
+
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newfourmcancelbutton));
 
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
@@ -272,14 +276,15 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         if (isAttachmentFound) {
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
-            btnUpload.setText(getLocalizationValue(JsonLocalekeys.myconnections_alertbutton_removebutton));
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumremoveimagebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
             btnUpload.setTag(0);
-            btnUpload.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_labelupload));
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newtopicselectfileuploadbutton));
+
             attachmentThumb.setVisibility(View.GONE);
             finalfileName = "";
         }
@@ -315,12 +320,15 @@ public class AddNewCommentActivity extends AppCompatActivity {
         styledDescription.setSpan(new ForegroundColorSpan(Color.parseColor(uiSettingsModel.getAppTextColor())), 1, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         labelDescritpion.setText(styledDescription);
 
+
+        txtAttachment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_newcommentattachmentlabel));
+
         labelTitle.setVisibility(View.GONE);
         editTitle.setVisibility(View.GONE);
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_label_entercommentlabel));
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textview_newcommentdescriptionplaceholder));
     }
 
     void initVolleyCallback() {
@@ -497,7 +505,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         }
 
         if (descriptionStr.length() < 1) {
-            Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_label_entercommentlabel), Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_textview_newcommentdescriptionplaceholder), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -565,7 +573,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
                         uploadFileThroughMultiPart(parameters, contentURIFinal);
                     } else {
-                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commenthasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
 
                         closeForum(true);
                     }
@@ -660,7 +668,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
 
-                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commenthasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 closeForum(true);
             }

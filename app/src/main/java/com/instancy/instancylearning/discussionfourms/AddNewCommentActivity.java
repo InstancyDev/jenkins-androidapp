@@ -200,7 +200,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledDescription
-                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentlabel));
+                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -212,7 +212,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_label_entercommentlabel));
+        editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textview_newcommentdescriptionplaceholder ));
     }
 
     void initVolleyCallback() {
@@ -368,7 +368,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
 
         if (descriptionStr.length() < 1) {
-            Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_label_entercommentlabel), Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_textview_newcommentdescriptionplaceholder ), Toast.LENGTH_SHORT).show();
         } else {
 
             JSONObject parameters = new JSONObject();
@@ -436,7 +436,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
                         sendTopicAttachmentDataToServer(finalEncodedImageStr, replyID, finalfileName);
 
                     } else {
-                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_commenthasbeensuccessfullyposted), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
 
                         closeForum(true);
 

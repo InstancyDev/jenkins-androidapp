@@ -71,10 +71,10 @@ android {
 //        versionName "1.0"
 
         applicationId "com.instancy.development"
-        versionCode 3
-        versionName "1.0.7"
+        versionCode 6
+        versionName "1.1.1"
 
-//        applicationId "com.instancy.younextyou"
+//        applicationId "com.yournextyou"
 //        versionCode 6
 //        versionName "1.0.5"
 
@@ -189,7 +189,7 @@ dependencies {
     compile 'com.github.rajyvan:TrackingRingWidget:1.0'
     compile 'com.github.McoyJiang:ListVideoManager:v1.0'
     compile 'com.appyvet:materialrangebar:1.4.4'
-
-
+    compile 'com.baoyz.swipemenulistview:library:1.3.0'
+    compile 'com.smart.moretext:moretext:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

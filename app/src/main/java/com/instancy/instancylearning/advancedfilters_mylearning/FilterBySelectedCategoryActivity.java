@@ -197,8 +197,8 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-        btnApply.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_applybutton));
-        btnReset.setText(getLocalizationValue(JsonLocalekeys.advancefilter_button_resetbutton));
+        btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
+        btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
     }
 
     private String getLocalizationValue(String key) {
@@ -432,7 +432,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
                             if (filtersParents != null && filtersParents.size() > 0) {
                                 updateSelectedArrayList(contentFilterByModel.selectedSkillIdsArry);
                             } else {
-                                noDataLabel.setText(getResources().getString(R.string.no_data));
+                                noDataLabel.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                             }
 
                         } catch (JSONException e) {
