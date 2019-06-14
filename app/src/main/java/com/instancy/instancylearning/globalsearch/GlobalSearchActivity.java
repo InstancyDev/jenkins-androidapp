@@ -417,7 +417,6 @@ public class GlobalSearchActivity extends AppCompatActivity implements View.OnCl
 
                     if (isNetworkConnectionAvailable(GlobalSearchActivity.this, -1)) {
                         checkEverything(query);
-
                     } else {
                         Toast.makeText(GlobalSearchActivity.this, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 

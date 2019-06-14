@@ -2,6 +2,8 @@ package com.instancy.instancylearning.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,8 +16,10 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
@@ -24,6 +28,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -43,7 +48,6 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
-import com.instancy.instancylearning.models.MyLearningModel;
 
 import org.json.JSONObject;
 
@@ -60,11 +64,13 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.zip.ZipEntry;
@@ -228,6 +234,20 @@ public class Utilities {
         }
         return df.format(c.getTime());
     }
+
+    public static String getOneWeekBeforeData(String format) {
+
+        Calendar newCalendar = Calendar.getInstance();
+        newCalendar.add(Calendar.DATE, -7);
+        SimpleDateFormat df = null;
+        if (isValidString(format)) {
+            df = new SimpleDateFormat(format);
+        } else {
+            df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+        return df.format(newCalendar.getTime());
+    }
+
 
     public static Date getCurrentDateTimeInDate(String dateStr) {
 
@@ -848,6 +868,8 @@ public class Utilities {
     public static Date ConvertToDate(String dateString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date convertedDate = new Date();
+        if (!isValidString(dateString))
+            return convertedDate;
         try {
             convertedDate = dateFormat.parse(dateString);
         } catch (ParseException e) {
@@ -928,6 +950,14 @@ public class Utilities {
         return originalString;
     }
 
+    public static String getFileExtensionWithPlaceHolderImage(String fileName) {
+
+        if (isValidString(fileName) && fileName.contains("."))
+            return fileName.substring(fileName.lastIndexOf("."));
+        else
+            return "";
+    }
+
     public static String getFileNameFromPath(Uri contentURI, Context context) {
 
         String fileName = "";
@@ -956,6 +986,46 @@ public class Utilities {
     }
 
 
+    public static String getFileExtension(Uri selectedUri) {
+
+        String fileExtension = "";
+        if (selectedUri != null) {
+            fileExtension = MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+
+        }
+
+        return fileExtension;
+    }
+
+
+    public static boolean isFilevalidFileFound(String fileTypeStr, String fileFound) {
+        boolean isValidFile = false;
+
+        List<String> fileTypesArray = new ArrayList<>();
+
+        if (!isValidString(fileFound))
+            isValidFile = false;
+
+        if (!isValidString(fileTypeStr))
+            isValidFile = false;
+
+        fileTypesArray = Arrays.asList(fileTypeStr.split(","));
+
+        if (fileTypesArray.size() > 0) {
+
+            for (int k = 0; k < fileTypesArray.size(); k++) {
+
+                if (fileFound.toLowerCase().contains(fileTypesArray.get(k).toLowerCase())) {
+                    isValidFile = true;
+                    break;
+                }
+
+            }
+        }
+
+        return isValidFile;
+    }
+
     public static String getMimeTypeFromUri(Uri selectedUri) {
 
         String mimeType = "";
@@ -977,12 +1047,158 @@ public class Utilities {
             cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
-            return cursor.getString(column_index);
+            String yourRealPath = cursor.getString(column_index);
+            return yourRealPath;
         } finally {
             if (cursor != null) {
                 cursor.close();
             }
         }
+    }
+    //  content://com.android.providers.downloads.documents/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fflutter-logo-round.png.png
+
+    /**
+     * Get a file path from a Uri. This will get the the path for Storage Access
+     * Framework Documents, as well as the _data field for the MediaStore and
+     * other file-based ContentProviders.
+     *
+     * @param context The context.
+     * @param uri     The Uri to query.
+     * @author paulburke
+     */
+    public static String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                if (!TextUtils.isEmpty(id)) {
+                    if (id.startsWith("raw:")) {
+                        return id.replaceFirst("raw:", "");
+                    }
+                    try {
+                        final Uri contentUri = ContentUris.withAppendedId(
+                                Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                        return getDataColumn(context, contentUri, null, null);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                }
+
+//                final String id = DocumentsContract.getDocumentId(uri);
+//                final Uri contentUri = ContentUris.withAppendedId(
+//                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+//                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the value of the data column for this Uri. This is useful for
+     * MediaStore Uris, and other file-based ContentProviders.
+     *
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
+     * @param selectionArgs (Optional) Selection arguments used in the query.
+     * @return The value of the _data column, which is typically a file path.
+     */
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
 
@@ -1375,6 +1591,134 @@ public class Utilities {
         return wrapDrawable;
     }
 
+    public static Drawable getAttachedFileTypeDrawable(String typeFile, Context context, String colorString) {
+
+        Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
+        View customNav = LayoutInflater.from(context).inflate(R.layout.homebutton, null);
+        TextView iconText = (TextView) customNav.findViewById(R.id.homeicon);
+        iconText.setTextColor(Color.parseColor(colorString));
+        iconText.setText(gettheContentType(typeFile));
+        FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
+        Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
+
+        return d;
+    }
+
+    public static int gettheContentType(String typeFile) {
+
+        switch (typeFile.toLowerCase()) {
+            case "xls":
+            case "xlsx":
+
+            case ".xls":
+            case ".xlsx":
+                return R.string.fa_icon_file_excel_o;
+            case "pdf":
+            case ".pdf":
+
+                return R.string.fa_icon_file_pdf_o;
+            case "ppt":
+            case "pptx":
+
+            case ".ppt":
+            case ".pptx":
+                return R.string.fa_icon_file_powerpoint_o;
+            case "doc":
+            case ".docx":
+                return R.string.fa_icon_file_word_o;
+            case "mpp":
+            case ".mpp":
+                return R.string.fa_icon_file;
+            case "mp3":
+            case "wav":
+            case "rmj":
+            case "m3u":
+            case "ogg":
+            case "webm":
+
+            case ".mp3":
+            case ".wav":
+            case ".rmj":
+            case ".m3u":
+            case ".ogg":
+            case ".webm":
+                return R.string.fa_icon_file_audio_o;
+            case "m4a":
+            case "dat":
+            case "wmi":
+            case "avi":
+            case "wm":
+            case "wmv":
+            case "flv":
+            case "rmvb":
+            case "mp4":
+            case "ogv":
+
+            case ".m4a":
+            case ".dat":
+            case ".wmi":
+            case ".avi":
+            case ".wm":
+            case ".wmv":
+            case ".flv":
+            case ".rmvb":
+            case ".mp4":
+            case ".ogv":
+                return R.string.fa_icon_file_video_o;
+            default:
+                return R.string.fa_icon_file;
+
+        }
+    }
+
+    public static int gettheContentTypeNotImg(String typeFile) {
+
+        switch (typeFile.toLowerCase()) {
+            case ".xls":
+            case ".xlsx":
+                return R.string.fa_icon_file_excel_o;
+            case ".pdf":
+                return R.string.fa_icon_file_pdf_o;
+            case ".ppt":
+            case ".pptx":
+                return R.string.fa_icon_file_powerpoint_o;
+            case ".doc":
+            case ".docx":
+                return R.string.fa_icon_file_word_o;
+            case ".mpp":
+                return R.string.fa_icon_file;
+            case ".mp3":
+            case ".wav":
+            case ".rmj":
+            case ".m3u":
+            case ".ogg":
+            case ".webm":
+                return R.string.fa_icon_file_audio_o;
+            case ".m4a":
+            case ".dat":
+            case ".wmi":
+            case ".avi":
+            case ".wm":
+            case ".wmv":
+            case ".flv":
+            case ".rmvb":
+            case ".mp4":
+            case ".ogv":
+                return R.string.fa_icon_file_video_o;
+            case ".jpg":
+            case ".png":
+            case ".jpeg":
+            case ".tiff":
+            case ".gif":
+            case ".webp":
+            case ".svg":
+                return 0;
+            default:
+                return R.string.fa_icon_file;
+
+        }
+    }
+
 
 //    public String getDate(String format)
 //    {
@@ -1546,4 +1890,63 @@ public class Utilities {
     }
 
 
+    public static boolean isBigFileThanExpected(String expectedFileSize, File file) {
+        boolean isCompleted = true;
+
+        if (expectedFileSize == null || !file.exists())
+            return false;
+
+        int requiredSize = 0;
+        try {
+            requiredSize = Integer.parseInt(expectedFileSize) / 1048576;
+        } catch (NumberFormatException nmEx) {
+            nmEx.printStackTrace();
+            requiredSize = 0;
+            return false;
+        }
+
+        double bytes = file.length();
+        double kilobytes = (bytes / 1024);
+        double megabytes = (kilobytes / 1024);
+
+        int foundFileSize = (int) Math.floor(megabytes);
+
+
+        Log.d("isBigFileThanExpected", "isBigFileThanExpected: FileSize " + requiredSize / 1048576);
+
+        Log.d("isBigFileThanExpected", "file: FileSize " + foundFileSize);
+
+        if (foundFileSize < requiredSize)
+            isCompleted = false;
+
+        return isCompleted;
+    }
+
+
+    public static void deleteCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if (dir != null && dir.isFile()) {
+            Log.d("CACHE", "deleteDir: " + dir.getAbsolutePath());
+            return dir.delete();
+        } else {
+            return false;
+        }
+    }
 }

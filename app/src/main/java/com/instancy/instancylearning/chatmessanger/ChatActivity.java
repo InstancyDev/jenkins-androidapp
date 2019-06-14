@@ -121,10 +121,12 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,ChatActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, ChatActivity.this);
 
     }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -257,7 +259,7 @@ public class ChatActivity extends AppCompatActivity {
     public void initilizeView() {
 
         messageEdit = (EditText) findViewById(R.id.edittext_chatbox);
-
+        messageEdit.setHint(getLocalizationValue(JsonLocalekeys.message_typemessage_here));
         messageEdit.addTextChangedListener(new TextWatcher() {
 
             @Override

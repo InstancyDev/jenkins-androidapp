@@ -3,6 +3,7 @@ package com.instancy.instancylearning.myskills;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
@@ -73,6 +75,7 @@ import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBi
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 /**
@@ -109,7 +112,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     JSONArray responseAry = null;
-    View header;
+    //    View header;
     RelativeLayout layoutHeader;
     CustomFlowLayout tagsSkills;
     Spinner spnrCategory;
@@ -128,9 +131,11 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, context);
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -268,6 +273,10 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                 if (requestType.equalsIgnoreCase("AddToMySkills")) {
                     if (response != null && response.length() > 0) {
 
+                        if (!response.equalsIgnoreCase("-1")) {
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.myskill_alertsubtitle_yourskillhasbeensuccessfullyadded), Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "notifySuccess: " + getLocalizationValue(JsonLocalekeys.myskill_alertsubtitle_yourskillhasbeensuccessfullyadded));
+                        }
                         Log.d(TAG, "notifySuccess: " + response);
                         refreshMySkills(true);
                     }
@@ -280,7 +289,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         if (response.equalsIgnoreCase("4")) {
                             refreshMySkills(true);
                         } else {
-                            Toast.makeText(context, "Unable to Delete the selected skill", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.myskill_alertsubtitle_unabletodeletetheselectedskill), Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -364,7 +373,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.myskill_fragment, container, false);
-        header = (View) getLayoutInflater().inflate(R.layout.myskillheaderview, null);
+//        header = (View) getLayoutInflater().inflate(R.layout.myskillheaderview, null);
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         mySkillModelList = new ArrayList<MySkillModel>();
@@ -373,7 +382,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         mySkillExpList.setOnItemClickListener(this);
         mySkillExpList.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
-        mySkillExpList.addHeaderView(header, null, false);
+//        mySkillExpList.addHeaderView(header, null, false);
         mySkillExpList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
@@ -394,7 +403,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         }
 
         initilizeView();
-        initilizeHeaderView();
+        initilizeHeaderView(rootView);
         Typeface iconFont = FontManager.getTypeface(context, FontManager.FONTAWESOME);
         View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
@@ -424,24 +433,28 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +sideMenusModel.getDisplayName()+ "</font>"));
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + sideMenusModel.getDisplayName() + "</font>"));
 
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    public void initilizeHeaderView() {
+    public void initilizeHeaderView(View view) {
 
-        layoutHeader = (RelativeLayout) header.findViewById(R.id.layoutHeader);
-        TextView txtSearch = (TextView) header.findViewById(R.id.txtSearch);
+        layoutHeader = (RelativeLayout) view.findViewById(R.id.layoutHeader);
+        TextView txtSearch = (TextView) view.findViewById(R.id.txtSearch);
         txtSearch.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(context, R.string.fa_icon_search, uiSettingsModel.getAppTextColor()), null, null, null);
         txtSearch.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        tagsSkills = (CustomFlowLayout) header.findViewById(R.id.cflBreadcrumb);
+        tagsSkills = (CustomFlowLayout) view.findViewById(R.id.cflBreadcrumb);
 
         txtSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchAddSkill();
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    searchAddSkill();
+                } else {
 
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -453,7 +466,7 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         categoriesList = new ArrayList<>();
 
 
-        spnrCategory = (Spinner) header.findViewById(R.id.spnrSkillCategory);
+        spnrCategory = (Spinner) view.findViewById(R.id.spnrSkillCategory);
 
 
         spnrCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -476,10 +489,34 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     public void searchAddSkill() {
-        Intent intentDetail = new Intent(context, MySkillsAddListActivity.class);
-        intentDetail.putExtra("addSkillFilteredList", (Serializable) addSkillFilteredList);
-        startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+
+        if (addSkillFilteredList != null && addSkillFilteredList.size() < 4)
+            return;
+
+        if (addSkillFilteredList != null && addSkillFilteredList.size() > 0) {
+            Intent intentDetail = new Intent(context, MySkillsAddListActivity.class);
+            intentDetail.putExtra("addSkillFilteredList", (Serializable) sendRestItemsToSearchAll());
+            startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
+        } else {
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.mycompetency_alertsubtitle_noskillsarefoundrelatedcompetenecy), Toast.LENGTH_SHORT).show();
+        }
     }
+
+    public List<AddSkillModel> sendRestItemsToSearchAll() {
+        List<AddSkillModel> searcallModelList = new ArrayList<>();
+
+        if (addSkillFilteredList != null && addSkillFilteredList.size() < 4)
+            return searcallModelList;
+
+        for (int j = 0; j < addSkillFilteredList.size(); j++) {
+            if (j > 4)
+                searcallModelList.add(addSkillFilteredList.get(j));
+
+        }
+
+        return searcallModelList;
+    }
+
 
     public List<AddSkillModel> filterTheSelectedSkill(String selectedSkill) {
 
@@ -513,7 +550,6 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
             if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
                 generateBreadcrumb(breadcrumbItemsList);
-
             }
 
         }
@@ -525,11 +561,11 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public List<ContentValues> generateTagsList(List<AddSkillModel> skillModelList) {
         List<ContentValues> tagsList = new ArrayList<>();
 
-        int breadSkillLimit = 4;
-        if (skillModelList.size() < 4)
+        int breadSkillLimit = 5;
+        if (skillModelList.size() < 5)
             breadSkillLimit = skillModelList.size();
         else
-            breadSkillLimit = 4;
+            breadSkillLimit = 5;
 
         for (int i = 0; i < breadSkillLimit; i++) {
             ContentValues cvBreadcrumbItem = new ContentValues();
@@ -620,11 +656,12 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
     public void removeItemFromBreadcrumbListByLevel(int level) {
 
         if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
-
             addSkillToMySkillApi(breadcrumbItemsList.get(level).getAsString("preferenceId"));
             breadcrumbItemsList.remove(level);
         }
-
+        if (breadcrumbItemsList != null && breadcrumbItemsList.size() == 0) {
+            getAddSkillsdata();
+        }
     }
 
 //    public void removeItemFromBreadcrumbList(String categoryName) {
@@ -653,7 +690,8 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
         addSkillMenu.setVisible(true);
         FrameLayout rootView = (FrameLayout) addSkillMenu.getActionView();
         addSkillText = (TextView) rootView.findViewById(R.id.txtaddskill);
-        addSkillMenu.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.mycompetency_label_addskilslabel) + "</font>"));
+
+        addSkillText.setText(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.mycompetency_label_addskilslabel) + "</font>"));
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -688,15 +726,23 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         switch (item.getItemId()) {
             case R.id.add_skill_menu:
-                if (layoutHeader.getVisibility() == View.VISIBLE) {
-                    // Its visible
-                    layoutHeader.setVisibility(View.GONE);
-                } else {
-                    // Either gone or invisible
-                    layoutHeader.setVisibility(View.VISIBLE);
-                    getAddSkillsdata();
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    if (layoutHeader.getVisibility() == View.VISIBLE) {
+                        // Its visible
+                        layoutHeader.setVisibility(View.GONE);
+                    } else {
+                        // Either gone or invisible
+                        layoutHeader.setVisibility(View.VISIBLE);
+                        getAddSkillsdata();
 
+                    }
+
+                } else {
+
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                 }
+
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -758,9 +804,14 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
 
         Menu menu = popup.getMenu();
 
-        menu.getItem(0).setVisible(true);
-        menu.getItem(1).setVisible(true);
 
+        if (isValidString(skillCountModel.skillcontentviewlink) && !skillCountModel.skillcontentviewlink.equalsIgnoreCase("disabled")) {
+            menu.getItem(0).setVisible(true);
+        } else {
+            menu.getItem(0).setVisible(false);
+        }
+
+        menu.getItem(1).setVisible(true);
         menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.myskills_actionsheet_viewcontentoption));//view  ctx_view
         menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.myskills_actionsheet_deleteoption));//add   ctx_add
 
@@ -779,7 +830,22 @@ public class MySkillFragment extends Fragment implements SwipeRefreshLayout.OnRe
                         break;
                     case R.id.ctx_delete:
                         if (isNetworkConnectionAvailable(context, -1)) {
-                            deleteMySkill(skillCountModel.prefCatID);
+                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+                            alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage(getLocalizationValue(JsonLocalekeys.myskill_alertsubtitle_areyousureyouwanttodeletethisskill))
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption), new DialogInterface.OnClickListener() {
+                                        public void onClick(final DialogInterface dialogBox, int id) {
+                                            // ToDo get user input here
+                                            deleteMySkill(skillCountModel.prefCatID);
+                                        }
+                                    }).setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_canceloption),
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialogBox, int id) {
+                                            dialogBox.cancel();
+                                        }
+                                    });
+
+                            AlertDialog alertDialogAndroid = alertDialog.create();
+                            alertDialogAndroid.show();
                         } else {
 
                             Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();

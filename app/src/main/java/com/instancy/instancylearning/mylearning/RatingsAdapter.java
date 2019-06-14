@@ -22,6 +22,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.helper.FontManager;
@@ -71,7 +72,6 @@ public class RatingsAdapter extends BaseAdapter {
         preferencesManager = PreferencesManager.getInstance();
         appUserModel = AppUserModel.getInstance();
 
-
     }
 
     public void refreshList(List<ReviewRatingModel> ratingModelList) {
@@ -116,7 +116,11 @@ public class RatingsAdapter extends BaseAdapter {
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         String imgUrl = appUserModel.getSiteURL() + ratingModelList.get(position).picture;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 
         holder.txtName.setText(ratingModelList.get(position).userName);
         holder.txtDate.setText(ratingModelList.get(position).reviewDate);

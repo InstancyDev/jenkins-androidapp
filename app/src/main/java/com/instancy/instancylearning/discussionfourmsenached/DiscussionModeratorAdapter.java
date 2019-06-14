@@ -3,6 +3,7 @@ package com.instancy.instancylearning.discussionfourmsenached;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -15,12 +16,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -39,6 +42,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -106,24 +110,32 @@ public class DiscussionModeratorAdapter extends BaseAdapter {
         ViewHolder holder;
 
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        convertView = inflater.inflate(R.layout.discussionmoderatorcell, null);
+        convertView = inflater.inflate(R.layout.discussionmoderatorcellmultiselect, null);
         holder = new ViewHolder(convertView);
         holder.parent = parent;
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtUserName.setText(discussionModeratorModelList.get(position).userName);
-        holder.txtAddress.setText(discussionModeratorModelList.get(position).userAddress + "" + discussionModeratorModelList.get(position).userDesg);
-
+//        if (isValidString(discussionModeratorModelList.get(position).userDesg)) {
+//            holder.txtAddress.setText(discussionModeratorModelList.get(position).userAddress + ", " + discussionModeratorModelList.get(position).userDesg);
+//        } else {
+            holder.txtAddress.setText(discussionModeratorModelList.get(position).userAddress);
+//        }
         String imgUrl = appUserModel.getSiteURL() + discussionModeratorModelList.get(position).userThumb;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imagethumb);
 
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imagethumb);
         holder.txtUserName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAddress.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.checkBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
+        holder.checkBox.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.checkBox.setChecked(discussionModeratorModelList.get(position).isSelected);
 
         convertView.setTag(holder);
         return convertView;
     }
-
 
     public void filter(String charText) {
         charText = charText.toLowerCase(Locale.getDefault());
@@ -139,6 +151,22 @@ public class DiscussionModeratorAdapter extends BaseAdapter {
         }
         notifyDataSetChanged();
     }
+
+
+//    public void filter(String charText) {
+//        charText = charText.toLowerCase(Locale.getDefault());
+//        discussionModeratorModelList.clear();
+//        if (charText.length() == 0) {
+//            discussionModeratorModelList.addAll(searchList);
+//        } else {
+//            for (DiscussionModeratorModel s : searchList) {
+//                if (s.userName.toLowerCase(Locale.getDefault()).contains(charText) || s.userAddress.toLowerCase(Locale.getDefault()).contains(charText)) {
+//                    discussionModeratorModelList.add(s);
+//                }
+//            }
+//        }
+//        notifyDataSetChanged();
+//    }
 
 
     static class ViewHolder {
@@ -170,8 +198,12 @@ public class DiscussionModeratorAdapter extends BaseAdapter {
         @BindView(R.id.card_view)
         CardView card_view;
 
+        @Nullable
+        @BindView(R.id.chxBox)
+        CheckBox checkBox;
 
-        @OnClick({R.id.card_view})
+
+        @OnClick({R.id.card_view, R.id.chxBox})
         public void actionsForMenu(View view) {
 
             ((ListView) parent).performItemClick(view, getPosition, 0);

@@ -25,10 +25,13 @@
 
     <string name="healthhelp">HealthHelp IE</string>
 
-    <string name="younextyou"> YouNextU </string>
+    <string name="younextyou"> YourNextU </string>
 
     <string name="mciswitchinstitute"> MCI Institute Switch </string>
 
     <string name="app_esperanza"> AEI para Ti </string>
+
+    <string name="app_medmentor"> MedMentor Education </string>
+
 
 </resources>

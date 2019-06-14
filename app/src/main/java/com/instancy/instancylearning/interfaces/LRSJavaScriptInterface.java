@@ -160,14 +160,14 @@ public class LRSJavaScriptInterface {
     @JavascriptInterface
     public String LMSGetRandomQuestionNos() {
 
-
+        Log.d("SaveQuesWD", "LMSGetRandomQuestionNos");
         return "";
     }
 
     @JavascriptInterface
     public String LMSTrackGetValue(String value, String tracksqno) {
 
-
+        Log.d("SaveQuesWD", value);
         return "";
     }
 
@@ -178,6 +178,7 @@ public class LRSJavaScriptInterface {
         Log.d("SaveQuesWD", quesData);
         String status = databaseHandler.SaveQuestionDataWithQuestionDataMethod(_learningModel, quesData, "");
     }
+
 
     @JavascriptInterface
     public void SaveLocationWithLocation(String location) {
@@ -261,6 +262,35 @@ public class LRSJavaScriptInterface {
         return "";
     }
 
+    @JavascriptInterface
+    public String updatePercentCompleted(String progressValue) {
+
+        Log.d(TAG, "updatePercentCompleted: " + progressValue);
+
+        databaseHandler.updateContentStatusFromLRSInterface(_learningModel, progressValue);
+
+        databaseHandler.updateContentStatusInTrackListLRS(_learningModel, progressValue, false);
+
+        databaseHandler.saveScoreInCMI(_learningModel, progressValue);
+
+        return "";
+    }
+
+    @JavascriptInterface
+    public String updatePercentCompletedWithProgressValue(String progressValue) {
+
+        Log.d(TAG, "updatePercentCompletedWithProgressValue: " + progressValue);
+
+        databaseHandler.updateContentStatusFromLRSInterface(_learningModel, progressValue);
+
+        databaseHandler.updateContentStatusInTrackListLRS(_learningModel, progressValue, false);
+
+        databaseHandler.saveScoreInCMI(_learningModel, progressValue);
+
+        return "";
+    }
+
+
     public String SCORM_LMSGetValue(String getvalue, String tempsco) {
 
         String returntring = "";
@@ -306,6 +336,7 @@ public class LRSJavaScriptInterface {
         return returntring;
 
     }
+
 
 //    public String SCORM_LMSSetValue(String getname, String getvalue,
 //                                    String tempsco) {

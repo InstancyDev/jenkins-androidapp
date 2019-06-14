@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.discussionfourmsenached;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -48,6 +49,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.askexpertenached.BasicAuthInterceptor;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -86,11 +88,20 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.Utilities.getAttachedFileTypeDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtension;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
+import static com.instancy.instancylearning.utils.Utilities.getPath;
 import static com.instancy.instancylearning.utils.Utilities.getRealPathFromURI;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
+import static com.instancy.instancylearning.utils.Utilities.isBigFileThanExpected;
+import static com.instancy.instancylearning.utils.Utilities.isFilevalidFileFound;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.toRequestBody;
 
 /**
@@ -112,6 +123,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
     DiscussionTopicModelDg discussionTopicModel;
 
     DiscussionCommentsModelDg discussionCommentsModel;
+
+    DiscussionForumModelDg discussionForumModelDg;
 
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
@@ -170,14 +183,13 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
     private int GALLERY = 1;
 
-    Bitmap bitmapAttachment = null;
-    String endocedImageStr = "";
-
     boolean isUpdateForum = false;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,AddNewCommentActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, AddNewCommentActivity.this);
 
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -201,6 +213,9 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         vollyService = new VollyService(resultCallback, context);
         discussionTopicModel = (DiscussionTopicModelDg) getIntent().getSerializableExtra("topicModel");
+
+        discussionForumModelDg = (DiscussionForumModelDg) getIntent().getSerializableExtra("forumModel");
+
 
         if (getIntent().getBooleanExtra("isfromedit", false)) {
 
@@ -251,15 +266,24 @@ public class AddNewCommentActivity extends AppCompatActivity {
 
         // Change base URL to your upload server URL.
         service = new Retrofit.Builder().baseUrl(appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment/").client(client).build().create(Service.class);
+        attacmentisNoAllowed();
+    }
 
+    public void attacmentisNoAllowed() {
+
+        if (discussionForumModelDg!=null && !discussionForumModelDg.attachFile) {
+            btnUpload.setVisibility(View.GONE);
+            attachmentThumb.setVisibility(View.GONE);
+            txtAttachment.setVisibility(View.GONE);
+        }
     }
 
     public void updateUiForEditQuestion() {
 
         if (discussionCommentsModel.commentFileUploadPath.length() > 0) {
 
-            String imgUrl = appUserModel.getSiteURL() + discussionCommentsModel.commentFileUploadPath;
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(attachmentThumb);
+            //String imgUrl = appUserModel.getSiteURL() + discussionCommentsModel.commentFileUploadPath;
+            //  Glide.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(attachmentThumb);
             attachmentThumb.setVisibility(View.VISIBLE);
 
             changeBtnValue(true);
@@ -279,6 +303,19 @@ public class AddNewCommentActivity extends AppCompatActivity {
             btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumremoveimagebutton));
             attachmentThumb.setVisibility(View.VISIBLE);
             btnUpload.setTag(1);
+            if (isUpdateForum) {
+                final String fileExtesnion = getFileExtensionWithPlaceHolderImage(discussionCommentsModel.commentFileUploadPath);
+                String imgUrl = appUserModel.getSiteURL() + discussionCommentsModel.commentFileUploadPath;
+                int resourceId = 0;
+
+                resourceId = gettheContentTypeNotImg(fileExtesnion);
+                if (resourceId == 0)
+                    Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
+                else
+                    attachmentThumb.setImageDrawable(getDrawableFromStringWithColor(this, resourceId, uiSettingsModel.getAppButtonBgColor()));
+
+            }
+
         } else {
             editAttachment.setText("");
             btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
@@ -313,7 +350,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         txtAttachment.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         SpannableString styledDescription
-                = new SpannableString("*"+getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel));
+                = new SpannableString("*" + getLocalizationValue(JsonLocalekeys.discussionforum_label_newtopictitlelabel));
         styledDescription.setSpan(new SuperscriptSpan(), 0, 1, 0);
         styledDescription.setSpan(new RelativeSizeSpan(0.9f), 0, 1, 0);
         styledDescription.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -405,35 +442,125 @@ public class AddNewCommentActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult first:");
         super.onActivityResult(requestCode, resultCode, data);
-        if (data != null) {
-            Uri contentURI = data.getData();
-            try {
-                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
 
-                final String fileName = getFileNameFromPath(contentURI, this);
-                final String mimeType = getMimeTypeFromUri(contentURI);
-                Log.d(TAG, "onActivityResult: " + fileName);
-                bitmapAttachment = bitmap;
-                editAttachment.setText(fileName);
-                attachmentThumb.setImageBitmap(bitmap);
-                contentURIFinal = contentURI;
+        if (requestCode == GALLERY) {
 
-                btnUpload.setTag(1);
-                finalPath = getRealPathFromURI(context, contentURI);
-                contentURIFinal = contentURI;
-                if (fileName.length() > 0) {
-                    changeBtnValue(true);
-                } else {
-                    changeBtnValue(false);
+            if (data != null) {
+                Uri contentURI = data.getData();
+                try {
+                    final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+
+                    final String fileName = getFileNameFromPath(contentURI, this);
+
+                    final String filePathHere = getPath(context, contentURI);
+
+                    if (!isValidString(filePathHere) || filePathHere.toLowerCase().contains(".zip") || filePathHere.toLowerCase().contains(".rar")) {
+                        Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    File file = new File(filePathHere);
+                    final String fileExtesnion = getFileExtensionWithPlaceHolderImage(filePathHere);
+                    if (!isFilevalidFileFound(uiSettingsModel.getDiscussionForumFileTypes(), fileExtesnion)) {
+                        Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int requiredSize = Integer.parseInt(uiSettingsModel.getUserUploadFileSize()) / 1048576;
+
+                    if (isBigFileThanExpected(uiSettingsModel.getUserUploadFileSize(), file)) {
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.maximum_allowed_file_size) + " " + requiredSize, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    Log.d(TAG, "onActivityResult: " + fileName);
+                    Drawable typeIcon = getAttachedFileTypeDrawable(fileExtesnion, this, uiSettingsModel.getAppButtonBgColor());
+
+                    if (fileName.length() > 0) {
+                        changeBtnValue(true);
+                    } else {
+                        changeBtnValue(false);
+                    }
+
+                    if (bitmap != null) {
+                        attachmentThumb.setImageBitmap(bitmap);
+                    } else {
+                        attachmentThumb.setImageDrawable(typeIcon);
+                    }
+                    editAttachment.setText(fileName);
+                    contentURIFinal = contentURI;
+                    finalPath = getPath(context, contentURI);
+                    contentURIFinal = contentURI;
+                    finalfileName = fileName;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
+
                 }
-                finalfileName = fileName;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
-
             }
         }
+
+
+//        if (data != null) {
+//            Uri contentURI = data.getData();
+//            try {
+//                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+//
+//                final String fileName = getFileNameFromPath(contentURI, this);
+////                final String mimeType = getMimeTypeFromUri(contentURI);
+//
+//                final String fileExtension = getFileExtension(contentURI);
+//
+//                final String filePathHere = getPath(context, contentURI);
+//
+//                assert filePathHere != null;
+//                File file = new File(filePathHere);
+//
+//                if (!isValidString(filePathHere)) {
+//                    Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                int requiredSize = Integer.parseInt(uiSettingsModel.getUserUploadFileSize()) / 1048576;
+//
+//                if (isBigFileThanExpected(uiSettingsModel.getUserUploadFileSize(), file)) {
+//                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.maximum_allowed_file_size) + " " + requiredSize, Toast.LENGTH_LONG).show();
+//                    return;
+//                }
+//
+//                Log.d(TAG, "onActivityResult: " + fileName);
+//
+//                Drawable typeIcon = getAttachedFileTypeDrawable(fileExtension, this, uiSettingsModel.getAppButtonBgColor());
+//
+//                if (fileName.length() > 0) {
+//                    changeBtnValue(true);
+//                } else {
+//                    changeBtnValue(false);
+//                }
+//
+//                if (bitmap != null) {
+//                    attachmentThumb.setImageBitmap(bitmap);
+//                } else {
+//                    attachmentThumb.setImageDrawable(typeIcon);
+//                }
+//
+//                bitmapAttachment = bitmap;
+//                editAttachment.setText(fileName);
+//                contentURIFinal = contentURI;
+//
+//                btnUpload.setTag(1);
+////                finalPath = getRealPathFromURI(context, contentURI);
+//                finalPath = getPath(context, contentURI);
+//                contentURIFinal = contentURI;
+//
+//                finalfileName = fileName;
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
+//
+//            }
+//        }
 
     }
 
@@ -471,21 +598,16 @@ public class AddNewCommentActivity extends AppCompatActivity {
     }
 
     public void choosePhotoFromGallary() {
-//        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-//                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        galleryIntent.setType("image/*");
-//        startActivityForResult(galleryIntent, GALLERY);
 
-        Intent intent = new Intent();
-        intent.setType("video/*,image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, GALLERY);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        try {
+            startActivityForResult(intent, GALLERY);
+        } catch (ActivityNotFoundException notFound) {
+            notFound.printStackTrace();
+        }
 
-
-//        string[] applicationExtensionArray = { "xls", "xlsx", "mpp", "pdf", "ppt", "pptx", "doc", "docx" };
-//        string[] audioExtensionArray  = { "mp3", "wav", "rmj", "m3u", "ogg", "webm" };
-//        string[] videoExtensionArray = { "m4a", "dat", "wmi", "avi", "wm", "wmv", "flv", "rmvb", "mp4", "ogv" };
-//        string[] imageExtensionArray = { "bmp", "jpg", "jpeg", "gif", "tif", "tiff", "png" };
     }
 
 
@@ -499,9 +621,13 @@ public class AddNewCommentActivity extends AppCompatActivity {
         if (isUpdateForum) {
             replyID = "" + discussionCommentsModel.replyID;
             commentID = "" + discussionCommentsModel.commentID;
-            if (finalfileName != null && finalfileName.length() == 0) {
+            if (contentURIFinal == null) {
                 finalfileName = discussionCommentsModel.commentFileUploadName;
             }
+        }
+
+        if (isUpdateForum && (Integer) btnUpload.getTag() == 0) {
+            finalfileName = "";
         }
 
         if (descriptionStr.length() < 1) {
@@ -543,7 +669,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                svProgressHUD.dismiss();
+
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("success")) {
@@ -569,12 +695,15 @@ public class AddNewCommentActivity extends AppCompatActivity {
                         parameters.put("ReplyID", toRequestBody(replyID));
                         parameters.put("isTopic", toRequestBody("" + false));
 
+                        //     String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UploadForumAttachment?fileName=" + fileName + "&TopicID=" + topicID + "&ReplyID=&isTopic=true&isEdit=false";
+
+
                         //          ["Image": "", "TopicID": "d0f45ba2-0050-414a-908a-1395cdb9998a", "ReplyID": "62a39967-a547-445f-8d9e-60be0070217b", "intUserID": 3, "intSiteID": 374, "isTopic": false, "strLocale": "en-us"])
 
                         uploadFileThroughMultiPart(parameters, contentURIFinal);
                     } else {
-                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
+                        svProgressHUD.dismiss();
                         closeForum(true);
                     }
 
@@ -612,8 +741,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;
@@ -668,7 +797,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
 
-                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddNewCommentActivity.this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
+
                 svProgressHUD.dismiss();
                 closeForum(true);
             }

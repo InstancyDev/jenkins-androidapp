@@ -27,6 +27,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -35,6 +36,7 @@ import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.interfaces.DownloadInterface;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
@@ -76,10 +78,11 @@ public class CatalogAdapter extends BaseAdapter {
     private int MY_SOCKET_TIMEOUT_MS = 5000;
     private List<MyLearningModel> searchList;
     AppController appcontroller;
-    boolean isEvent = false;
+    boolean isEvent = false, isIconEnabled = false;
+    MembershipModel membershipModel = null;
 
 
-    public CatalogAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, boolean isEvent) {
+    public CatalogAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, boolean isEvent, MembershipModel membershipModel, boolean isIconEnabled) {
         this.activity = activity;
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
@@ -94,6 +97,8 @@ public class CatalogAdapter extends BaseAdapter {
         appUserModel = AppUserModel.getInstance();
         this.isEvent = isEvent;
         appcontroller = AppController.getInstance();
+        this.membershipModel = membershipModel;
+        this.isIconEnabled = isIconEnabled;
 
     }
 
@@ -106,7 +111,6 @@ public class CatalogAdapter extends BaseAdapter {
 
     private String getLocalizationValue(String key) {
         return JsonLocalization.getInstance().getStringForKey(key, activity);
-
     }
 
     @Override
@@ -154,6 +158,7 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
             holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
             holder.txtTimeZone.setVisibility(View.GONE);
+
             if (myLearningModel.get(position).getTypeofevent() == 2) {
                 holder.locationlayout.setVisibility(View.GONE);
             }
@@ -187,23 +192,13 @@ public class CatalogAdapter extends BaseAdapter {
                 }
             }
 
-        } else
-
-        {
+        } else {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
         }
 
-        holder.txtShortDisc.setText(myLearningModel.get(position).
+        holder.txtShortDisc.setText(myLearningModel.get(position).getShortDes());
 
-                getShortDes());
-
-        if (myLearningModel.get(position).
-
-                getSiteName().
-
-                equalsIgnoreCase(""))
-
-        {
+        if (myLearningModel.get(position).getSiteName().equalsIgnoreCase("")) {
             holder.consolidateLine.setVisibility(View.GONE);
 
         } else
@@ -222,11 +217,7 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtPrice.setText("");
         }
 
-        if (myLearningModel.get(position).
-
-                getAddedToMylearning() == 1)
-
-        {
+        if (myLearningModel.get(position).getAddedToMylearning() == 1) {
             holder.txtPrice.setVisibility(View.GONE);
 
         }
@@ -273,25 +264,31 @@ public class CatalogAdapter extends BaseAdapter {
         holder.txtLocationIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtEvntIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
         holder.btnDownload.setTag(position);
 
-
+// commented for image heavy
         String imgUrl = myLearningModel.get(position).getImageData();
 
-        Picasso.with(vi.getContext()).
+
+        Glide.with(vi.getContext()).
                 load(imgUrl).
                 placeholder(R.drawable.cellimage).
                 into(holder.imgThumb);
 
+        holder.fabbtnthumb.setVisibility(View.VISIBLE);
         String thumbUrl = myLearningModel.get(position).getSiteURL() + "/Content/SiteFiles/ContentTypeIcons/" + myLearningModel.get(position).getContentTypeImagePath();
 
-        Picasso.with(vi.getContext()).
-                load(thumbUrl).
+        Glide.with(vi.getContext()).
+                load(thumbUrl.trim()).
                 into(holder.fabbtnthumb);
 
+        if (isIconEnabled)
+            holder.fabbtnthumb.setVisibility(View.VISIBLE);
+        else
+            holder.fabbtnthumb.setVisibility(View.GONE);
+
         holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorWhite)));
-        holder.fabbtnthumb.setVisibility(View.VISIBLE);
+
         if (myLearningModel.get(position).getShortDes().isEmpty())
 
         {
@@ -302,7 +299,7 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
 
-        if (myLearningModel.get(position).getObjecttypeId(). equalsIgnoreCase("70")) {
+        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
             holder.txtPrice.setVisibility(View.GONE);
@@ -312,7 +309,17 @@ public class CatalogAdapter extends BaseAdapter {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
 //            String toDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventendTime(), "yyyy-MM-dd hh:mm:ss");
-            holder.txtEventFromTo.setText(fromDate);
+
+            if (isValidString(fromDate)) {
+                holder.txtEventFromTo.setText(fromDate);
+                holder.txtEvntIcon.setVisibility(View.VISIBLE);
+                holder.txtEventFromTo.setVisibility(View.VISIBLE);
+            } else {
+                holder.txtEvntIcon.setVisibility(View.GONE);
+                holder.txtEventFromTo.setVisibility(View.GONE);
+                holder.txtEventFromTo.setText("");
+            }
+
             holder.txtEventLocation.setText(myLearningModel.get(position).getLocationName());
             if (myLearningModel.get(position).getTypeofevent() == 2) {
                 holder.locationlayout.setVisibility(View.GONE);
@@ -322,7 +329,7 @@ public class CatalogAdapter extends BaseAdapter {
             if (isValidString(myLearningModel.get(position).getLocationName())) {
                 holder.locationlayout.setVisibility(View.VISIBLE);
                 holder.txtLocationIcon.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 holder.locationlayout.setVisibility(View.GONE);
                 holder.txtLocationIcon.setVisibility(View.GONE);
             }
@@ -330,7 +337,7 @@ public class CatalogAdapter extends BaseAdapter {
             if (isValidString(myLearningModel.get(position).getAuthor())) {
                 holder.txtAuthor.setVisibility(View.VISIBLE);
                 holder.txtAthrIcon.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 holder.txtAuthor.setVisibility(View.GONE);
                 holder.txtAthrIcon.setVisibility(View.GONE);
             }
@@ -338,9 +345,7 @@ public class CatalogAdapter extends BaseAdapter {
 //            holder.txtTimeZone.setText(myLearningModel.get(position).getTimeZone());
             holder.txtTimeZone.setVisibility(View.GONE);
 
-        } else
-
-        {
+        } else {
             holder.txtAuthor.setText(myLearningModel.get(position).getAuthor() + " ");
             holder.eventLayout.setVisibility(View.GONE);
             holder.txtLocationIcon.setVisibility(View.GONE);
@@ -365,7 +370,7 @@ public class CatalogAdapter extends BaseAdapter {
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                     holder.btnDownload.setVisibility(View.GONE);
                 }
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2") && !myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
                     holder.btnDownload.setVisibility(View.VISIBLE);
                 }
 
@@ -739,6 +744,26 @@ public class CatalogAdapter extends BaseAdapter {
 
                 @Override
                 public void addToArchive(boolean added) {
+
+                }
+
+                @Override
+                public void removeFromMylearning(boolean isRemoved) {
+
+                }
+
+                @Override
+                public void resheduleTheEvent(boolean isReshedule) {
+
+                }
+
+                @Override
+                public void badCancelEnrollment(boolean cancelIt) {
+
+                }
+
+                @Override
+                public void viewCertificateLink(boolean viewIt) {
 
                 }
 

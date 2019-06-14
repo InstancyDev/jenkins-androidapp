@@ -81,7 +81,7 @@ public class GlobalMethods {
     private static DatabaseHandler databaseH;
     PreferencesManager preferencesManager;
 
-    public static void launchCourseViewFromGlobalClass(MyLearningModel myLearningModel, Context context) {
+    public static void launchCourseViewFromGlobalClass(MyLearningModel myLearningModel, Context context, boolean isIconEnabled) {
         databaseH = new DatabaseHandler(context);
         File myFile = new File(myLearningModel.getOfflinepath());
         PreferencesManager.initializeInstance(context);
@@ -442,7 +442,7 @@ public class GlobalMethods {
 
             }
 
-            /// ONLINEVIEW UPENDRA
+            /// ONLINEVIEW
         } else {
 
             boolean isAngularLaunch = true;
@@ -450,6 +450,7 @@ public class GlobalMethods {
             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
                 Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
                 intentDetail.putExtra("myLearningDetalData", myLearningModel);
+                intentDetail.putExtra("ISICONENABLED", isIconEnabled);
                 intentDetail.putExtra("ISTRACKLIST", true);
                 ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
             } else {
@@ -766,7 +767,7 @@ public class GlobalMethods {
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
-                        relatedContentView(myLearningModel, context);
+                        relatedContentView(myLearningModel, context, isIconEnabled);
 
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
 
@@ -792,22 +793,23 @@ public class GlobalMethods {
         return df.format(c.getTime());
     }
 
-    public static void relatedContentView(MyLearningModel myLearningModel, Context context) {
+    public static void relatedContentView(MyLearningModel myLearningModel, Context context, boolean isIconEnabled) {
         Integer relatedCount = Integer.parseInt(myLearningModel.getRelatedContentCount());
         if (relatedCount > 0) {
 //            Intent intentDetail = new Intent(context, TrackList_Activity.class);
             Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", false);
+            intentDetail.putExtra("ISICONENABLED", isIconEnabled);
             ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
         } else {
-
-            Toast.makeText(context, " No Content found for this event ", Toast.LENGTH_SHORT).show();
-
+            if (myLearningModel.getAddedToMylearning() != 1) {
+                //   Toast.makeText(context, " No Content found for this event ", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel, final SideMenusModel sideMenusModel) {
+    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel, final SideMenusModel sideMenusModel, final boolean isIconEnabled) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -821,13 +823,17 @@ public class GlobalMethods {
         menu.getItem(3).setVisible(false);
         menu.getItem(4).setVisible(false);
         menu.getItem(5).setVisible(false);// reports
-        menu.getItem(6).setVisible(false);
+        menu.getItem(6).setVisible(false);// addtocalendar
         menu.getItem(7).setVisible(false);
         menu.getItem(8).setVisible(false); // related content
         menu.getItem(9).setVisible(false); // cancel
         menu.getItem(10).setVisible(false);
         menu.getItem(11).setVisible(false);
         menu.getItem(12).setVisible(false);
+        menu.getItem(13).setVisible(false);
+        menu.getItem(14).setVisible(true);//reshedule
+        menu.getItem(15).setVisible(false);//certificateaction
+
 
         menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_playoption, v.getContext()));
         menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewoption, v.getContext()));
@@ -847,7 +853,11 @@ public class GlobalMethods {
         menu.getItem(10).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_deleteoption, v.getContext()));
         menu.getItem(11).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_archiveoption, v.getContext()));
         menu.getItem(12).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_unarchiveoption, v.getContext()));
+        menu.getItem(13).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_removefrommylearning, v.getContext()));
 
+        menu.getItem(14).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionbutton_rescheduleactionbutton, v.getContext()));
+
+        menu.getItem(15).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption, v.getContext()));
 
         if (myLearningDetalData.isArchived()) {
             menu.getItem(11).setVisible(false);
@@ -857,11 +867,33 @@ public class GlobalMethods {
             menu.getItem(12).setVisible(false);
         }
 
+        if (isValidString(myLearningDetalData.getReSheduleEvent())) {
+            menu.getItem(14).setVisible(true);
+        } else {
+            menu.getItem(14).setVisible(false);
+        }
+
+        if (isValidString(myLearningDetalData.getCertificateAction())) {
+            menu.getItem(15).setVisible(true);
+        } else {
+            menu.getItem(15).setVisible(false);
+        }
+
+        if (v.getContext().getResources().getString(R.string.app_name).equalsIgnoreCase(v.getContext().getResources().getString(R.string.app_esperanza))) {
+            menu.getItem(11).setVisible(false);
+            menu.getItem(12).setVisible(false);
+        }
+
+        if (myLearningDetalData.isRemoveFromMylearning()) { //Commented fo Playground apps
+            menu.getItem(13).setVisible(true);
+        } else {
+            menu.getItem(13).setVisible(false);
+        }
+
         final File myFile = new File(myLearningDetalData.getOfflinepath());
 
         if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") && myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("36") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("27") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70")) {
             menu.getItem(4).setVisible(false);
-
         } else {
             menu.getItem(4).setVisible(true);
         }
@@ -916,7 +948,10 @@ public class GlobalMethods {
             // returnEventCompleted
 
             if (!returnEventCompleted(myLearningDetalData.getEventstartTime())) {
-                if (myLearningDetalData.getEventScheduleType()<1){
+//                if (myLearningDetalData.getEventScheduleType() < 1 && myLearningDetalData.isCancelEventEnabled()) {
+//                    menu.getItem(9).setVisible(true);
+//                }
+                if (myLearningDetalData.isCancelEventEnabled()) {
                     menu.getItem(9).setVisible(true);
                 }
                 menu.getItem(6).setVisible(true);
@@ -943,8 +978,7 @@ public class GlobalMethods {
             } else {
                 menu.getItem(5).setVisible(true);
             }
-            // uncomment for report false
-//
+
             menu.getItem(1).setVisible(true);
         }
 
@@ -952,6 +986,7 @@ public class GlobalMethods {
             menu.getItem(2).setVisible(false);
             menu.getItem(11).setVisible(false);
             menu.getItem(12).setVisible(false);
+            //  menu.getItem(5).setVisible(false);// uncomment for esperanza
         }
 
         if (!isReportEnabled) {
@@ -959,6 +994,8 @@ public class GlobalMethods {
             menu.getItem(5).setVisible(false);
 
         }
+
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
@@ -966,13 +1003,15 @@ public class GlobalMethods {
                     case R.id.ctx_detail:
                         Intent intentDetail = new Intent(v.getContext(), MyLearningDetailActivity1.class);
                         intentDetail.putExtra("IFROMCATALOG", false);
+                        intentDetail.putExtra("ISICONENABLED", isIconEnabled);
                         intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
                         intentDetail.putExtra("typeFrom", typeFrom);
                         intentDetail.putExtra("sideMenusModel", sideMenusModel);
+//                        intentDetail.putExtra("reschdule", true);
                         ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
                         break;
                     case R.id.ctx_view:
-                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
                         break;
                     case R.id.ctx_report:
                         Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
@@ -988,7 +1027,7 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_relatedcontent:
-                        relatedContentView(myLearningDetalData, v.getContext());
+                        relatedContentView(myLearningDetalData, v.getContext(), isIconEnabled);
                         break;
                     case R.id.ctx_delete:
                         if (isNetworkConnectionAvailable(v.getContext(), -1)) {
@@ -1011,7 +1050,7 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_play:
-                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
                         break;
                     case R.id.ctx_join:
                         String joinUrl = myLearningDetalData.getJoinurl();
@@ -1027,23 +1066,29 @@ public class GlobalMethods {
                         downloadInterface.cancelEnrollment(false);
                         break;
                     case R.id.ctx_cancelenrollment:
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                        builder.setMessage(v.getResources().getString(R.string.canceleventmessage)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure, v.getContext()))
-                                .setCancelable(false).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.dismiss();
-                            }
-                        }).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                //do things
-                                dialog.dismiss();
-                                downloadInterface.cancelEnrollment(true);
+                        if (myLearningDetalData.isBadCancellationEnabled()) {
 
-                            }
-                        });
-                        AlertDialog alert = builder.create();
-                        alert.show();
+                            downloadInterface.badCancelEnrollment(true);
+                            // bad cancel
+                        } else {
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent, v.getContext())).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure, v.getContext()))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_cancelbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                    dialog.dismiss();
+                                    downloadInterface.cancelEnrollment(true);
+
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        }
                         break;
                     case R.id.ctx_addtoarchive:
                         downloadInterface.addToArchive(true);
@@ -1051,70 +1096,58 @@ public class GlobalMethods {
                     case R.id.ctx_removearchive:
                         downloadInterface.addToArchive(false);
                         break;
+                    case R.id.ctx_removefrommylearning:
+                        if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+                            final AlertDialog.Builder builders = new AlertDialog.Builder(v.getContext());
+                            builders.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_removethecontentitem, v.getContext())).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure, v.getContext()))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_cancelbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                    dialog.dismiss();
+                                    downloadInterface.removeFromMylearning(true);
+
+                                }
+                            });
+                            AlertDialog alerts = builders.create();
+                            alerts.show();
+                        } else {
+                            showToast(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()));
+                        }
+                        break;
+                    case R.id.ctx_reshedule:
+                        downloadInterface.resheduleTheEvent(true);
+                        break;
+                    case R.id.ctx_certificateaction:
+                        if (myLearningDetalData.getCertificateAction().equalsIgnoreCase("notearned")) {
+                            if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+                                final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                                builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_forviewcertificate, v.getContext())).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption, v.getContext()))
+                                        .setCancelable(false)
+                                        .setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_closebuttonaction_closebuttonalerttitle, v.getContext()), new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                //do things
+                                                dialog.dismiss();
+
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            } else {
+                                showToast(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()));
+                            }
+                        } else {
+                            downloadInterface.viewCertificateLink(true);
+
+                        }
+
+                        break;
                 }
 
-//                if (item.getTitle().toString().equalsIgnoreCase("details")) {
-//                    Intent intentDetail = new Intent(v.getContext(), MyLearningDetailActivity1.class);
-//                    intentDetail.putExtra("IFROMCATALOG", false);
-//                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-//                    intentDetail.putExtra("typeFrom", typeFrom);
-////                    v.getContext().startActivity(intentDetail);
-////                context.startActivity(iWeb);
-////                context.startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-//                    ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
-//
-//                }
-//                if (item.getItemId() == R.id.ctx_view) {
-//                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport)+"")) {
-//
-//                    Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
-//                    intentReports.putExtra("myLearningDetalData", myLearningDetalData);
-//                    intentReports.putExtra("typeFrom", typeFrom);
-//                    v.getContext().startActivity(intentReports);
-//
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase("Download")) {
-//
-//                    Toast.makeText(v.getContext(), "You Clicked : " + item.getTitle() + " on position " + position, Toast.LENGTH_SHORT).show();
-//
-//                }
-//
-//                if (item.getItemId() == R.id.ctx_relatedcontent) {
-//
-//
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Delete")) {
-//
-//
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Set Complete")) {
-//                    Log.d("GLB", "onMenuItemClick: Set Complete ");
-//
-//
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Play")) {
-////                    deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
-//
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase("Join")) {
-//
-//
-//                }
-//
-//                if (item.getTitle().toString().equalsIgnoreCase(v.getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_addtocalendaroption))) {
-//
-//                    downloadInterface.cancelEnrollment(false);
-//                }
-//                if (item.getTitle().toString().equalsIgnoreCase(v.getResources().getString(R.string.btn_txt_cancel_enrolment))) {
-//
-//
-//                }
                 return true;
             }
         });
@@ -1259,13 +1292,14 @@ public class GlobalMethods {
     }
 
 
-    public static void launchCoursePreviewViewFromGlobalClass(MyLearningModel myLearningModel, Context context) {
+    public static void launchCoursePreviewViewFromGlobalClass(MyLearningModel myLearningModel, Context context, boolean isIconEnabled) {
 
 
         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
             Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", true);
+            intentDetail.putExtra("ISICONENABLED", isIconEnabled);
             ((Activity) context).startActivity(intentDetail);
 //                context.startActivity(intentDetail);
         } else {
@@ -1280,13 +1314,13 @@ public class GlobalMethods {
 
                 if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
 
-                   // urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO";
+                    // urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=NO";
 
                     urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/false/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappURL=true";
 //
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11")) {
 
-                 //   urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&ContentID=" + myLearningModel.getContentID();
+                    //   urlForView = myLearningModel.getSiteURL() + "/PublicModules/AJAXPreview.aspx?Path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&ContentID=" + myLearningModel.getContentID();
 
                     if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && isValidString(myLearningModel.getJwvideokey())) {
 
@@ -1346,8 +1380,6 @@ public class GlobalMethods {
                 } else {
                     encodedStr = replace(urlForView);
                 }
-
-
                 Log.d("DBG", "launchCourseView: " + encodedStr);
                 if (encodedStr.endsWith(".pdf")) {
                     Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
@@ -1358,11 +1390,9 @@ public class GlobalMethods {
 //                        context.startActivity(pdfIntent);
                     ((Activity) context).startActivity(pdfIntent);
 
-                } else if (encodedStr.toLowerCase().contains(".ppt")
-                        || encodedStr.toLowerCase().contains(".pptx")) {
+                } else if (encodedStr.toLowerCase().contains(".ppt") || encodedStr.toLowerCase().contains(".pptx")) {
 
                     encodedStr = encodedStr.replace("file://", "");
-
 
                     String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                     Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
@@ -1385,8 +1415,6 @@ public class GlobalMethods {
                 } else if (encodedStr.toLowerCase().contains(".xlsx")
                         || encodedStr.toLowerCase().contains(".xls")) {
                     encodedStr = encodedStr.replace("file://", "");
-
-
                     String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                     Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
                     iWeb.putExtra("COURSE_URL", src);
@@ -1418,7 +1446,7 @@ public class GlobalMethods {
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
-                    relatedContentView(myLearningModel, context);
+                    relatedContentView(myLearningModel, context, false);
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
 
@@ -1452,6 +1480,7 @@ public class GlobalMethods {
             Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
             intentDetail.putExtra("myLearningDetalData", myLearningModel);
             intentDetail.putExtra("ISTRACKLIST", true);
+            intentDetail.putExtra("ISICONENABLED", false);
             ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
         } else
 
@@ -1621,11 +1650,9 @@ public class GlobalMethods {
 //                        context.startActivity(pdfIntent);
                     ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
 
-                } else if (encodedStr.toLowerCase().contains(".ppt")
-                        || encodedStr.toLowerCase().contains(".pptx")) {
+                } else if (encodedStr.toLowerCase().contains(".ppt") || encodedStr.toLowerCase().contains(".pptx")) {
 
                     encodedStr = encodedStr.replace("file://", "");
-
 
                     String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                     Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
@@ -1633,11 +1660,9 @@ public class GlobalMethods {
                     iWeb.putExtra("myLearningDetalData", myLearningModel);
                     ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
 
-                } else if (encodedStr.toLowerCase().contains(".doc")
-                        || encodedStr.toLowerCase().contains(".docx")) {
+                } else if (encodedStr.toLowerCase().contains(".doc") || encodedStr.toLowerCase().contains(".docx")) {
 
                     encodedStr = encodedStr.replace("file://", "");
-
 
 //                        String doc = "<iframe src='http://docs.google.com/viewer?url=" + encodedStr + "'" +
 //                                "width = '100%' height = '100%'" +
@@ -1743,7 +1768,7 @@ public class GlobalMethods {
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
 
-                    relatedContentView(myLearningModel, context);
+                    relatedContentView(myLearningModel, context, false);
 
                 } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
 
@@ -1836,6 +1861,8 @@ public class GlobalMethods {
         myLearningModel.setEventstartUtcTime(globalSearchResultModelNew.eventstartdatetime);
 
         myLearningModel.setEventendUtcTime(globalSearchResultModelNew.eventenddatetime);
+
+        myLearningModel.setBadCancellationEnabled(globalSearchResultModelNew.isBadCancellationEnabled);
 
         return myLearningModel;
     }

@@ -51,6 +51,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
@@ -86,6 +87,9 @@ import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_AS
 import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_ASKRESPONSES_DIGI;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -147,6 +151,8 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
     TextView txtNoAnswers;
 
+    TextView noDataLabelFootor;
+
     boolean nextLevel = false;
 
     private String getLocalizationValue(String key) {
@@ -188,7 +194,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getLocalizationValue(JsonLocalekeys.answers) + "</font>"));
+                askExpertQuestionModel.userQuestion + "</font>"));
 
         askExpertAnswerAdapter = new AskExpertAnswerAdapter(this, BIND_ABOVE_CLIENT, askExpertAnswerModelList);
         askExpertsListView.setAdapter(askExpertAnswerAdapter);
@@ -203,10 +209,10 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         } catch (RuntimeException ex) {
-
             ex.printStackTrace();
         }
-
+        noDataLabelFootor = (TextView) footor.findViewById(R.id.nodata_label);
+        noDataLabelFootor.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
         initilizeHeaderView(header);
 
         noDataLabel.setVisibility(View.INVISIBLE);
@@ -313,8 +319,8 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         txtAllActivites.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedbylabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.userName + "   |   " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_askedonlabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.postedDate + "   |   " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_lastactivelabel, AskExpertsAnswersActivity.this) + " " + askExpertQuestionModel.postedDate);
 
-        txtNoAnswers.setText(askExpertQuestionModel.totalAnswers + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, AskExpertsAnswersActivity.this));
-        txtNoViews.setText(askExpertQuestionModel.totalViews + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, AskExpertsAnswersActivity.this));
+        txtNoAnswers.setText(askExpertQuestionModel.totalAnswers + " " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, AskExpertsAnswersActivity.this));
+        txtNoViews.setText(askExpertQuestionModel.totalViews + " " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, AskExpertsAnswersActivity.this));
         txtDescription.setText(askExpertQuestionModel.userQuestionDescription);
 
         txtQuestion.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -325,18 +331,26 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
 
         card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-        if (askExpertQuestionModel.userQuestionImage.length() > 0) {
-
-            String imgUrl = appUserModel.getSiteURL() + askExpertQuestionModel.userQuestionImagePath;
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(imagethumb);
+        String imgUrl = appUserModel.getSiteURL() + askExpertQuestionModel.userQuestionImagePath;
+        if (isValidString(askExpertQuestionModel.userQuestionImage)) {
 
             imagethumb.setVisibility(View.VISIBLE);
+
+            final String fileExtesnion = getFileExtensionWithPlaceHolderImage(askExpertQuestionModel.userQuestionImagePath);
+
+            int resourceId = 0;
+
+            resourceId = gettheContentTypeNotImg(fileExtesnion);
+            if (resourceId == 0)
+                Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(imagethumb);
+            else
+                imagethumb.setImageDrawable(getDrawableFromStringWithColor(this, resourceId, uiSettingsModel.getAppButtonBgColor()));
 
         } else {
 
             imagethumb.setVisibility(View.GONE);
-
         }
+
 
         List<ContentValues> breadcrumbItemsList = null;
 
@@ -381,7 +395,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             footor.setVisibility(View.VISIBLE);
         }
 
-        txtNoAnswers.setText(askExpertAnswerModelList.size() + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, AskExpertsAnswersActivity.this));
+        txtNoAnswers.setText(askExpertAnswerModelList.size() + " " + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answerslabel, AskExpertsAnswersActivity.this));
 
         if (nextLevel) {
             if (askExpertAnswerModelList != null && askExpertAnswerModelList.size() > 0) {
@@ -617,12 +631,12 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
                     case R.id.ctx_delete:
                         AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
                         alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage("Are you sure you want to permanently delete the Answer :")
-                                .setPositiveButton(JsonLocalekeys.asktheexpert_alertbutton_deletebutton, new DialogInterface.OnClickListener() {
+                                .setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_deletebutton), new DialogInterface.OnClickListener() {
                                     public void onClick(final DialogInterface dialogBox, int id) {
                                         // ToDo get user input here
                                         deleteAnswerFromServer(askExpertAnswerModel);
                                     }
-                                }).setNegativeButton(JsonLocalekeys.asktheexpert_alertbutton_cancelbutton,
+                                }).setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_cancelbutton),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialogBox, int id) {
                                         dialogBox.cancel();
@@ -653,8 +667,15 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             public void onResponse(String s) {
                 svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
+                int respValu = 0;
+                try {
+                    respValu = Integer.parseInt(s);
+                } catch (NumberFormatException ex) {
+                    ex.printStackTrace();
+                }
 
-                if (s.contains("2")) {
+//                if (s.contains("2")) {
+                if (respValu >= 2) {
                     Toast.makeText(AskExpertsAnswersActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAnswers = true;
 //                    db.deleteAnswerFromLocalDB(answerModel);

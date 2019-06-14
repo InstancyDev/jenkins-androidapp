@@ -12,4 +12,11 @@ public interface EventInterface {
     void cancelEnrollment(MyLearningModel learningModel, boolean isCancelEnrollment);
 
     void archiveAndUnarchive(boolean isArchived);
+
+    void removedFromMylearning(MyLearningModel learningModel);
+
+    void badCancelEnrollment(MyLearningModel learningModel, boolean isCancelEnrollment);
+
+    void viewCertificateLink(MyLearningModel learningModel);
+
 }

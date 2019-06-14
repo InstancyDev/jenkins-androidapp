@@ -30,11 +30,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
-import com.blankj.utilcode.util.ToastUtils;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -53,8 +58,7 @@ import com.instancy.instancylearning.utils.ApiConstants;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
-import com.instancy.instancylearning.utils.SweetAlert;
-import com.squareup.picasso.Picasso;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -180,8 +184,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         if (bundleAutoSignIn != null) {
             autoSignInUserName = bundleAutoSignIn.getString(StaticValues.BUNDLE_USERNAME, "");
             autoSignInPassword = bundleAutoSignIn.getString(StaticValues.BUNDLE_PASSWORD, "");
-            if (isValidString(autoSignInUserName)
-                    && isValidString(autoSignInPassword)) {
+            if (isValidString(autoSignInUserName) && isValidString(autoSignInPassword)) {
                 isAutoSignIn = true;
             }
         }
@@ -228,8 +231,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 //        imglogo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppLogoBackgroundColor()));
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(getResources().getDrawable(R.drawable.youbottom)).into(imglogo);
-
+            Glide.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(imglogo);
         }
 //       uncomment for backgroundcolor purpose
 
@@ -344,7 +346,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 popupMenu.show();
                 break;
             case R.id.btnewuser:
-                methodCallByTag(5);
+                if (isNetworkConnectionAvailable(this, -1)) {
+                    methodCallByTag(5);
+                } else {
+                    Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.btnforgot:
                 methodCallByTag(6);
@@ -382,7 +388,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 startActivity(intentSocial);
                 break;
             case 5:
-
                 signUpMethodForMemberShipOrNativeSignUp();
                 break;
             case 6:
@@ -394,7 +399,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         }
 
     }
-
 
     public void signUpMethodForMemberShipOrNativeSignUp() {
 
@@ -419,6 +423,140 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     }
 
 
+    public void logininitPostVollyCall(final String postData, final String userName, final String password) {
+
+        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                JSONObject response = null;
+                try {
+                    response = new JSONObject(s);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (response.has("faileduserlogin")) {
+
+                    try {
+                        JSONArray jsonArray = response.getJSONArray("faileduserlogin");
+                        if (jsonArray != null && jsonArray.length() > 0) {
+                            JSONObject innerObj = jsonArray.getJSONObject(0);
+                            if (innerObj.has("userstatus")) {
+
+                                if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")) {
+                                    alertText.setVisibility(View.VISIBLE);
+                                } else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration")) {
+
+                                    Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_youraccountisnotyetactivated), Toast.LENGTH_LONG).show();
+
+                                }
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                } else if (response.has("successfulluserlogin")) {
+                    alertText.setVisibility(View.GONE);
+                    try {
+                        JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
+                        if (loginResponseAry.length() != 0) {
+
+
+                            JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+                            JSONObject jsonObject = new JSONObject();
+                            String userId = jsonobj.get("userid").toString();
+                            profileWebCall(userId);
+                            fcmRegister(userId);
+                            jsonObject.put("userid", jsonobj.get("userid").toString());
+                            jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
+                            jsonObject.put("userstatus", jsonobj.get("userstatus"));
+                            jsonObject.put("displayname", jsonobj.get("username"));
+                            jsonObject.put("siteid", jsonobj.get("siteid"));
+                            jsonObject.put("username", userName);
+                            jsonObject.put("password", password);
+                            jsonObject.put("siteurl", appUserModel.getSiteURL());
+
+                            db.insertUserCredentialsForOfflineLogin(jsonObject);
+
+                            Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
+                            preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
+                            preferencesManager.setStringValue(password, StaticValues.KEY_USERPASSWORD);
+                            preferencesManager.setStringValue(jsonobj.get("userid").toString(), StaticValues.KEY_USERID);
+                            preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.KEY_USERNAME);
+                            preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
+                            preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
+
+
+                            appUserModel.setUserIDValue(userId);
+                            MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+                            CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+                            Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+                            intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intentSideMenu);
+
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(Login_activity.this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
     public void loginMethod() throws JSONException {
 
         String userName = editUserName.getText().toString().trim();
@@ -432,7 +570,18 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             if (isNetworkConnectionAvailable(this, -1)) {
                 svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-                loginVollyWebCall(userName, passWord);
+                //loginVollyWebCall(userName, passWord);
+
+                JSONObject parameters = new JSONObject();
+                parameters.put("UserName", userName);
+                parameters.put("Password", passWord);
+                parameters.put("MobileSiteURL", appUserModel.getSiteURL());
+                parameters.put("DownloadContent", "");
+                parameters.put("SiteID", appUserModel.getSiteIDValue());
+                parameters.put("isFromSignUp", isAutoSignIn);
+                String parameterString = parameters.toString();
+                logininitPostVollyCall(parameterString, userName, passWord);
+                isAutoSignIn = false;
             } else {
 
                 JSONObject jsonObject = new JSONObject();
@@ -472,7 +621,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 } else {
                     appController.setAlreadyViewd(false);
                     preferencesManager.setStringValue("false", StaticValues.KEY_HIDE_ANNOTATION);
-                    SweetAlert.sweetAlertNoNet(Login_activity.this, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection));
+
+                    Toast.makeText(this, JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.network_alerttitle_nointernet, this), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -673,11 +823,11 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             lineView2.setVisibility(View.VISIBLE);
             lineView1.setVisibility(View.VISIBLE);
         }
-
+        btnSignup.setText(getLocalizationValue(JsonLocalekeys.login_button_signupbutton));
         if (uiSettingsModel.getSelfRegistrationAllowed().equalsIgnoreCase("true")) {
 
             btnSignup.setVisibility(View.VISIBLE);
-            btnSignup.setText(getLocalizationValue(JsonLocalekeys.login_button_signupbutton));
+
 
         } else {
             btnSignup.setVisibility(View.INVISIBLE);
@@ -694,7 +844,6 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         if (isAutoSignIn) {
             editUserName.setText(autoSignInUserName);
             editPassword.setText(autoSignInPassword);
-            isAutoSignIn = false;
             try {
                 loginMethod();
             } catch (JSONException e) {
@@ -830,19 +979,5 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
             }
         }
     }
-
-    public void updateLocalization() {
-//
-//        String jsonString = "{\"en\":{\"no_games_avaliable\":\"English Name\"},\"nl\":{\"no_games_avaliable\":\"Dutch Name\"}}";
-//
-//        String key = getResources().getString(R.string.alert_text_event_add_success);
-//        JsonLocalization.getInstance().loadFromData(jsonString);
-//       // String localizedName = JsonLocalization.getInstance().stringForKey(key, this);
-//        Log.d("JsonLocaliztion", localizedName);
-//
-//        editUserName.setHint(localizedName);
-
-    }
-
 }
 

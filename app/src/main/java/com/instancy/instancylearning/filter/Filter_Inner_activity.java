@@ -102,7 +102,6 @@ public class Filter_Inner_activity extends AppCompatActivity implements AdapterV
 
         btnApply = (Button) findViewById(R.id.btninnerapply);
         btnApply.setOnClickListener(this);
-
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
     }
 

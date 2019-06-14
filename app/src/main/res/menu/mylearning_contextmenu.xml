@@ -68,6 +68,25 @@
         android:title="@string/mylearning_actionsheet_removefromarchive"
         android:visible="false" />
 
+    <item
+        android:id="@+id/ctx_removefrommylearning"
+        android:orderInCategory="100"
+        android:title="@string/mylearning_actionsheet_removefrommylearning"
+        android:visible="false" />
+
+
+    <item
+        android:id="@+id/ctx_reshedule"
+        android:orderInCategory="100"
+        android:title="@string/mylearning_actionbutton_rescheduleactionbutton"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/ctx_certificateaction"
+        android:orderInCategory="100"
+        android:title="@string/mylearning_actionsheet_viewcertificateoption"
+        android:visible="false" />
+
 
 </menu>
 

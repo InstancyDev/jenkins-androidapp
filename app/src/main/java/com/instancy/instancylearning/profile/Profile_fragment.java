@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -39,6 +40,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -84,12 +86,14 @@ import butterknife.ButterKnife;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 import static android.util.Base64.encodeToString;
+import static com.bumptech.glide.load.resource.bitmap.TransformationUtils.rotateImage;
 import static com.instancy.instancylearning.utils.StaticValues.EDUCATION_ACT;
 
 import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
 import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
+import static com.instancy.instancylearning.utils.Utilities.getPath;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
@@ -144,9 +148,11 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -194,8 +200,11 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
 
-        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
-        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
+        if (profileIma.startsWith("http:"))
+            profileIma = profileIma.replace("http:", "https:");
+
+        Glide.with(context).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+        Glide.with(context).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
 
         educationModelArrayList = db.fetchUserEducationModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
         experienceModelArrayList = db.fetchUserExperienceModel(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
@@ -281,12 +290,12 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         uploadIconFont.setVisibility(View.VISIBLE);
 
-        uploadIconFont.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        uploadIconFont.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
 
         FontManager.markAsIconContainer(header.findViewById(R.id.uploadPhotoFont), iconFon);
 
-        userName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-        userLocation.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        userName.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
+        userLocation.setTextColor(Color.parseColor(uiSettingsModel.getHeaderTextColor()));
 
         boolean isProfileExists = getALlProfilesDetailsFromDB();
 
@@ -366,7 +375,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue()+"&strlocaleId="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetUserDetailsv1?UserID=" + userId + "&siteURL=" + appUserModel.getSiteURL() + "&siteid=" + appUserModel.getSiteIDValue() + "&strlocaleId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         urlStr = urlStr.replaceAll(" ", "%20");
 
@@ -391,8 +400,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
 //        String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
 //
-//        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
-//        Picasso.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
+//        Glide.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+//        Glide.with(getContext()).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileRound);
 
         profileImage.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
 
@@ -467,14 +476,47 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 final String fileName = getFileNameFromPath(contentURI, context);
                 final String mimeType = getMimeTypeFromUri(contentURI);
                 Log.d(TAG, "onActivityResult: " + fileName);
+
                 profileImage.setImageBitmap(bitmap);
                 profileRound.setImageBitmap(bitmap);
+
+                final String filePathHere = getPath(context, contentURI);
+
+                ExifInterface exif = new ExifInterface(filePathHere);
+
+                //  int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+                int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED);
+
+                Bitmap rotatedBitmap = null;
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotatedBitmap = rotateImage(bitmap, 90);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotatedBitmap = rotateImage(bitmap, 180);
+                        break;
+
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotatedBitmap = rotateImage(bitmap, 270);
+                        break;
+                    case ExifInterface.ORIENTATION_NORMAL:
+                    default:
+                        rotatedBitmap = bitmap;
+                }
+
+                profileImage.setImageBitmap(rotatedBitmap);
+                profileRound.setImageBitmap(rotatedBitmap);
+
+                final Bitmap finalRotatedBitmap = rotatedBitmap;
                 new CountDownTimer(1000, 1000) {
                     public void onTick(long millisUntilFinished) {
                     }
 
                     public void onFinish() {
-                        String endocedImageStr = convertToBase64(bitmap);
+                        String endocedImageStr = convertToBase64(finalRotatedBitmap);
                         try {
                             encodeAttachment(fileName, endocedImageStr);
 
@@ -489,7 +531,6 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
 
             }
-
 
         } else if (requestCode == CAMERA) {
 //            Uri contentURI = data.getData();
@@ -543,6 +584,13 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
         }
 
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
+                matrix, true);
     }
 
     private String convertToBase64(Bitmap bitmap) {
@@ -694,7 +742,7 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(context);
         pictureDialog.setTitle(getLocalizationValue(JsonLocalekeys.commoncomponent_label_select_action));
         String[] pictureDialogItems = {
-               getLocalizationValue(JsonLocalekeys.commoncomponent_label_selectfromgallery),
+                getLocalizationValue(JsonLocalekeys.commoncomponent_label_selectfromgallery),
                 getLocalizationValue(JsonLocalekeys.commoncomponent_label_capturefromcamera)};
         pictureDialog.setItems(pictureDialogItems,
                 new DialogInterface.OnClickListener() {
@@ -743,8 +791,15 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
 //                    profileWebCall(appUserModel.getUserIDValue(), true);
 
                     ISPROFILENAMEORIMAGEUPDATED = 1;
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+                        profileWebCall(appUserModel.getUserIDValue(), true);
+
+                    }
+
                 } else {
-                    Toast.makeText(context,getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -777,8 +832,8 @@ public class Profile_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 String base64EncodedCredentials = encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
 //                headers.put("Content-Type", "application/json; charset=utf-8");
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
                 return headers;
             }
 

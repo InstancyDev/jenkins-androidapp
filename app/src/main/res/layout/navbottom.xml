@@ -80,7 +80,6 @@
             android:textColor="@color/colorBlack" />
     </RelativeLayout>
 
-
     <RelativeLayout
         android:id="@+id/settings_layout"
         android:layout_width="match_parent"
@@ -168,7 +167,7 @@
         android:background="@color/colorWhite"
         android:padding="3dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/youbottom"
+        android:src="@drawable/espbanner"
         android:visibility="visible" />
 
 </LinearLayout>

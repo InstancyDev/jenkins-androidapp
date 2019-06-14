@@ -329,8 +329,28 @@ public class UiSettingsModel {
         NoOfDaysForCourseTargetDate = noOfDaysForCourseTargetDate;
     }
 
-    private String MinimimRatingRequiredToShowRating = "0";  //639
+    private String MinimimRatingRequiredToShowRating = "0";
     private int NoOfDaysForCourseTargetDate = 0; //640
+
+    public String getDiscussionForumFileTypes() {
+        return discussionForumFileTypes;
+    }
+
+    public void setDiscussionForumFileTypes(String discussionForumFileTypes) {
+        this.discussionForumFileTypes = discussionForumFileTypes;
+    }
+
+    public String getUserUploadFileSize() {
+        return userUploadFileSize;
+    }
+
+    public void setUserUploadFileSize(String userUploadFileSize) {
+        this.userUploadFileSize = userUploadFileSize;
+    }
+
+    private String discussionForumFileTypes = "jpg,jpeg,png";
+    private String userUploadFileSize = "";
+
 
     public int getShowEventAvailableFewSeatsLeft() {
         return showEventAvailableFewSeatsLeft;
@@ -342,6 +362,16 @@ public class UiSettingsModel {
 
     private int showEventAvailableFewSeatsLeft = 0;
 
+
+    public boolean isPricebyStrikeThrough() {
+        return pricebyStrikeThrough;
+    }
+
+    public void setPricebyStrikeThrough(boolean pricebyStrikeThrough) {
+        this.pricebyStrikeThrough = pricebyStrikeThrough;
+    }
+
+    public boolean pricebyStrikeThrough = false;
 
     public boolean isEnableMultipleInstancesforEvent() {
         return EnableMultipleInstancesforEvent;

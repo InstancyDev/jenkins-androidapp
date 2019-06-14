@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.discussionfourmsenached;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +28,6 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,24 +43,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.askexpertenached.AskQuestionActivity;
 import com.instancy.instancylearning.askexpertenached.BasicAuthInterceptor;
-import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.interfaces.Service;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -70,7 +61,6 @@ import com.instancy.instancylearning.myskills.AddSkillModel;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,6 +69,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,10 +89,15 @@ import retrofit2.Retrofit;
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
-import static com.instancy.instancylearning.utils.StaticValues.GALLERYCLOSED;
+import static com.instancy.instancylearning.utils.Utilities.getAttachedFileTypeDrawable;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtension;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
-import static com.instancy.instancylearning.utils.Utilities.getRealPathFromURI;
+import static com.instancy.instancylearning.utils.Utilities.getMimeTypeFromUri;
+import static com.instancy.instancylearning.utils.Utilities.getPath;
+import static com.instancy.instancylearning.utils.Utilities.isBigFileThanExpected;
+import static com.instancy.instancylearning.utils.Utilities.isFilevalidFileFound;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.toRequestBody;
@@ -174,7 +170,6 @@ public class CreateNewForumActivity extends AppCompatActivity {
     @Nullable
     @BindView(R.id.editModerator)
     EditText editModerator;
-
 
     @Nullable
     @BindView(R.id.attachedimg)
@@ -252,6 +247,9 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
     List<ContentValues> selectedCategories = new ArrayList<ContentValues>();
 
+    List<String> selectedModeraArray = null;
+
+//    List<String> selectedModerators = new ArrayList<>();
 
     boolean allowNotification = true, allowNewTopic = true, allowAttachFile = true, isUpdateForum = false, allowShare = true, allowLikeTopic = true, allowPin = true, allowPrivate = true;
 
@@ -309,8 +307,15 @@ public class CreateNewForumActivity extends AppCompatActivity {
             isUpdateForum = false;
             clearCategory();
             txtSave.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumsavebutton));
-
         }
+
+        List<DiscussionCategoriesModel> discussionCategoriesModelList = db.fetchDiscussionCategories(appUserModel.getSiteIDValue());
+
+        if (discussionCategoriesModelList == null || discussionCategoriesModelList.size() == 0) {
+            tagsRelative.setVisibility(View.GONE);
+            txtCategories.setVisibility(View.GONE);
+        }
+
         editTitle.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textfield_newtopictitletextfieldplaceholder));
         editDescription.setHint(getLocalizationValue(JsonLocalekeys.discussionforum_textview_newtopicdescriptionplaceholder));
         txtCancel.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newfourmcancelbutton));
@@ -340,7 +345,6 @@ public class CreateNewForumActivity extends AppCompatActivity {
         btnSelect.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonTextColor()));
         btnSelect.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnSelect.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_selectbutton));
-
 
         // Multipart
 
@@ -385,7 +389,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
         if (discussionForumModel.forumThumbnailPath.length() > 0) {
 
             String imgUrl = appUserModel.getSiteURL() + discussionForumModel.forumThumbnailPath;
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachedImg);
+            Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachedImg);
             attachedImg.setVisibility(View.VISIBLE);
             changeBtnValue(true);
 
@@ -690,29 +694,31 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
         String categoryIds = generateCategoryIds();
 
-        boolean isAttachmentRmoved = false;
-
         if (isUpdateForum && contentURIFinal == null) {
             finalfileName = discussionForumModel.forumThumbnailPath;
         }
-
         if (isUpdateForum && (Integer) btnUpload.getTag() == 0) {
-            isAttachmentRmoved = true;
             finalfileName = "";
         }
 
         String dateString = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
         int forumID = -1;
-        int moderatorId = 0;
+        String moderatorId = "0";
         if (isUpdateForum) {
             forumID = discussionForumModel.forumID;
-            moderatorId = discussionForumModel.moderatorID;
-        } else {
-
-            if (discussionModeratorModel != null) {
-                moderatorId = discussionModeratorModel.userID;
+            if (selectedModeraArray != null && selectedModeraArray.size() > 0) {
+                moderatorId = getSelectedModeratorsIds(selectedModeraArray);
             } else {
-                moderatorId = 0;
+                moderatorId = discussionForumModel.moderatorID;
+            }
+        } else {
+//            if (discussionModeratorModel != null) {
+            if (selectedModeraArray != null && selectedModeraArray.size() > 0) {
+                moderatorId = getSelectedModeratorsIds(selectedModeraArray);
+//                }
+                // moderatorId = "" + discussionModeratorModel.userID;
+            } else {
+                moderatorId = "0";
             }
         }
 
@@ -720,7 +726,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_enterforum), Toast.LENGTH_SHORT).show();
         } else if (!allowAttachFile && !allowShare && !allowLikeTopic && !allowNewTopic && !allowNotification && !allowPin && !allowPrivate) {
             Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_selectonesetting), Toast.LENGTH_SHORT).show();
-        } else if (moderatorId == 0) {
+        } else if (moderatorId.equalsIgnoreCase("0")) {
             Toast.makeText(this, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_select_moderator), Toast.LENGTH_SHORT).show();
         } else {
 
@@ -744,7 +750,7 @@ public class CreateNewForumActivity extends AppCompatActivity {
             parameters.put("UpdatedDate", toRequestBody(dateString));
             parameters.put("UpdatedUserID", toRequestBody(appUserModel.getUserIDValue()));
             parameters.put("AllowShare", toRequestBody("" + allowShare));
-            parameters.put("ModeratorID", toRequestBody("" + moderatorId));
+            parameters.put("ModeratorID", toRequestBody(moderatorId));
             parameters.put("ForumThumbnailName", toRequestBody("" + finalfileName));
 
             String parameterString = parameters.toString();
@@ -838,29 +844,71 @@ public class CreateNewForumActivity extends AppCompatActivity {
             if (data != null) {
                 boolean refresh = data.getBooleanExtra("ISSELECTED", false);
                 if (refresh) {
-                    discussionModeratorModel = (DiscussionModeratorModel) data.getSerializableExtra("moderatorModel");
-                    editModerator.setText(discussionModeratorModel.userName);
+//                    discussionModeratorModel = (DiscussionModeratorModel) data.getSerializableExtra("moderatorModel");
+
+                    String selectedModerators = data.getStringExtra("selectedModerators");
+
+                    selectedModeraArray = (List<String>) data.getSerializableExtra("selectedModeratorsIds");
+
+                    // selectedModeraArray = getArrayListFromString(selectedModerators);
+
+//                    List<DiscussionModeratorModel> discussionModeratorModelist = (List<DiscussionModeratorModel>) data.getSerializableExtra("discussionModeratorModelList");
+
+                    editModerator.setText(selectedModerators);
+//                    editModerator.setText(discussionModeratorModel.userName);
                 }
             }
         }
 
         if (requestCode == GALLERY) {
+
             if (data != null) {
                 Uri contentURI = data.getData();
                 try {
                     final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+
                     final String fileName = getFileNameFromPath(contentURI, this);
-//                final String mimeType = getMimeTypeFromUri(contentURI);
+
+                    final String filePathHere = getPath(context, contentURI);
+
+                    if (!isValidString(filePathHere) || filePathHere.toLowerCase().contains(".zip") || filePathHere.toLowerCase().contains(".rar")) {
+                        Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    File file = new File(filePathHere);
+
+                    final String fileExtesnion = getFileExtensionWithPlaceHolderImage(filePathHere);
+                    if (!isFilevalidFileFound(uiSettingsModel.getDiscussionForumFileTypes(), fileExtesnion)) {
+                        Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int requiredSize = Integer.parseInt(uiSettingsModel.getUserUploadFileSize()) / 1048576;
+
+                    if (isBigFileThanExpected(uiSettingsModel.getUserUploadFileSize(), file)) {
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.maximum_allowed_file_size) + " " + requiredSize, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
                     Log.d(TAG, "onActivityResult: " + fileName);
-                    attachedImg.setImageBitmap(bitmap);
-                    btnUpload.setTag(1);
-                    finalPath = getRealPathFromURI(context, contentURI);
-                    contentURIFinal = contentURI;
+
+                    Drawable typeIcon = getAttachedFileTypeDrawable(fileExtesnion, this, uiSettingsModel.getAppButtonBgColor());
+
                     if (fileName.length() > 0) {
                         changeBtnValue(true);
                     } else {
                         changeBtnValue(false);
                     }
+
+                    if (bitmap != null) {
+                        attachedImg.setImageBitmap(bitmap);
+                    } else {
+                        attachedImg.setImageDrawable(typeIcon);
+                    }
+                    contentURIFinal = contentURI;
+                    finalPath = getPath(context, contentURI);
+                    contentURIFinal = contentURI;
                     finalfileName = fileName;
 
                 } catch (IOException e) {
@@ -869,8 +917,50 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
                 }
             }
-
         }
+
+
+//        if (requestCode == GALLERY) {
+//            if (data != null) {
+//                Uri contentURI = data.getData();
+//                try {
+//                    final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+//                    final String fileName = getFileNameFromPath(contentURI, this);
+//                    final String mimeType = getMimeTypeFromUri(contentURI);
+//                    if (!isValidString(mimeType)) {
+////                        Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+////                        return;
+//                    }
+//                    Log.d(TAG, "onActivityResult: fileName=" + fileName + " mimeType =" + mimeType);
+//                    final String fileExtension = getFileExtension(contentURI);
+//                    Drawable typeIcon = getAttachedFileTypeDrawable(fileExtension, this, uiSettingsModel.getAppButtonBgColor());
+//
+////                    if (bitmap != null) {
+////                        attachedImg.setImageBitmap(bitmap);
+////                    } else {
+////                        attachedImg.setImageDrawable(typeIcon);
+////                    }
+//
+//                    btnUpload.setTag(1);
+//                    finalPath = getPath(context, contentURI);
+//                    contentURIFinal = contentURI;
+//                    if (fileName.length() > 0) {
+//                        changeBtnValue(true);
+//                    } else {
+//                        changeBtnValue(false);
+//                    }
+//                    attachedImg.setImageBitmap(bitmap);
+//
+//                    finalfileName = fileName;
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(CreateNewForumActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
+//
+//                }
+//            }
+//
+//        }
 
         if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
             if (data != null) {
@@ -899,6 +989,39 @@ public class CreateNewForumActivity extends AppCompatActivity {
 
             }
         }
+
+    }
+
+    public String getSelectedModeratorsIds(List<String> selectedModeraArray) {
+        String generatedStr = "";
+
+        if (selectedModeraArray != null) {
+            for (int i = 0; i < selectedModeraArray.size(); i++) {
+
+                if (generatedStr.length() > 0) {
+                    generatedStr = generatedStr.concat("," + selectedModeraArray.get(i));
+                } else {
+                    generatedStr = "" + selectedModeraArray.get(i);
+                }
+            }
+        }
+        return generatedStr;
+    }
+
+
+    public List<String> getArrayListFromString(String moderatorsSelected) {
+
+        List<String> questionCategoriesArray = new ArrayList<>();
+
+        if (moderatorsSelected == null)
+            return questionCategoriesArray;
+
+        if (moderatorsSelected.length() <= 0)
+            return questionCategoriesArray;
+
+        questionCategoriesArray = Arrays.asList(moderatorsSelected.split(","));
+
+        return questionCategoriesArray;
 
     }
 
@@ -1001,17 +1124,25 @@ public class CreateNewForumActivity extends AppCompatActivity {
         startActivityForResult(intentDetail, FILTER_CLOSE_CODE);
     }
 
-
     public void chooseModerator() {
         Intent intentDetail = new Intent(context, DiscussionModeratorListActivity.class);
+        if (selectedModeraArray != null && selectedModeraArray.size() > 0) {
+            intentDetail.putExtra("moderatorIDArray", (Serializable) selectedModeraArray);
+        } else {
+            intentDetail.putExtra("moderatorIDArray", (Serializable) discussionForumModel.moderatorIDArray);
+        }
+
         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
     }
 
     public void choosePhotoFromGallary() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-        startActivityForResult(galleryIntent, GALLERY);
+        try {
+            startActivityForResult(galleryIntent, GALLERY);
+        } catch (ActivityNotFoundException notFound) {
+            notFound.printStackTrace();
+        }
     }
 
     public void closeForum(boolean refresh) {

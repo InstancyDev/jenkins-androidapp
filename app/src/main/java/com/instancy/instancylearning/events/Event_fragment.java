@@ -86,6 +86,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -101,6 +102,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Member;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,7 +169,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
-    boolean isFromCatogories = false;
+    boolean isFromCatogories = false, isIconEnabled = false;
 
     @BindView(R.id.segmentedswitch)
     SegmentedGroup segmentedSwitch;
@@ -259,6 +261,15 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
             filterContentType = "";
         }
 
+        if (responMap != null && responMap.containsKey("ContentProperties")) {
+
+            String contentProperties = responMap.get("ContentProperties");
+            if (contentProperties.toLowerCase().contains("thumbnailiconpath"))
+                isIconEnabled = true;
+            else
+                isIconEnabled = false;
+        }
+
 
     }
 
@@ -297,7 +308,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (requestType.equalsIgnoreCase("CATALOGDATA")) {
                     if (response != null) {
                         try {
-                            db.injectEventCatalog(response, TABBALUE, 1, "",1,false);
+                            db.injectEventCatalog(response, TABBALUE, 1, "", 1, false);
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -375,8 +386,8 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setEnabled(false);
-
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true);
+        MembershipModel membershipModel = new MembershipModel();
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true, membershipModel, isIconEnabled);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -413,7 +424,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
-        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), "", "", "",false);
+        catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), "", "", "", false);
         if (catalogModelsList != null) {
             catalogAdapter.refreshList(catalogModelsList);
         } else {
@@ -808,7 +819,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 
                 if (item.getItemId() == R.id.ctx_view) {
-                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
+                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(),isIconEnabled);
                 }
 
                 if (item.getItemId() == R.id.ctx_cancelenrollment) {
@@ -1477,7 +1488,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatus(myLearningModel, status, progress);
+                        i = db.updateContentStatus(myLearningModel, status, progress,"");
                         if (i == 1) {
 
                             injectFromDbtoModel(false);
@@ -1682,7 +1693,7 @@ public class Event_fragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
         if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
-            GlobalMethods.relatedContentView(eventModel, context);
+            GlobalMethods.relatedContentView(eventModel, context,isIconEnabled);
         }
 
         try {

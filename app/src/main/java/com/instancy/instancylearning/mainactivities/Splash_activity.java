@@ -67,6 +67,7 @@ import static android.Manifest.permission.READ_CALENDAR;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_CALENDAR;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.instancy.instancylearning.utils.Utilities.deleteCache;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -107,10 +108,22 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         setContentView(R.layout.splash_activity);
         ButterKnife.bind(this);
         context = this;
+
+        try {
+            deleteCache(context);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         imageBrandLogo = (ImageView) findViewById(R.id.brandlogo);
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, this);
+
         db = new DatabaseHandler(context);
+        db.getWritableDatabase();
+
+//        Log.d(TAG, "onCreate: "+db.getv);
+
         Fabric.with(this, new Crashlytics());
 
         appUserModel = AppUserModel.getInstance();
@@ -127,8 +140,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
         if (siteID.length() == 0) {
             preferencesManager.setStringValue("374", StaticValues.KEY_SITEID);
         }
-
-
 //        Message contextmenuid menuid siteid contentid
 
         parameters = new JSONObject();
@@ -290,7 +301,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
                     Intent intent = new Intent(this, SideMenu.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-
                 } else {
                     if (uiSettingsModel.isEnableAzureSSOForLearner()) {
                         Intent intentSignup = new Intent(this, SignUp_Activity.class);
@@ -363,14 +373,12 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
                         callWebMethods();
 
-
                     } else {
 
 //                        Toast.makeText(Splash_activity.this, "Permission Denied, You cannot login.", Toast.LENGTH_SHORT).show();
 
                     }
                 }
-
 
                 break;
         }
@@ -404,9 +412,12 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     public void postExecuteIn(String results) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
+            String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
-            CmiSynchTask cmiSynchTask = new CmiSynchTask(context);
-            cmiSynchTask.execute();
+            if (userID != null && !userID.equalsIgnoreCase("")) {
+                CmiSynchTask cmiSynchTask = new CmiSynchTask(context);
+                cmiSynchTask.execute();
+            }
         }
         progressStatus = 100;
         progressBar.setProgress(progressStatus);
@@ -435,41 +446,42 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
             e.printStackTrace();
         }
         navigationType = 2;
-        //   getLocaleFileForLocalazation();
 
-        String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
+        getLocaleFileForLocalazation();
 
-        if (userID != null && !userID.equalsIgnoreCase("")) {
+//        String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
-            Intent intent = new Intent(this, SideMenu.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-// push values
-            intent.putExtra("PUSH", isFromPush);
-            intent.putExtra(StaticValues.FCM_OBJECT, (Serializable) parameters.toString());
-            startActivity(intent);
-
-        } else {
-
-            if (i > 0) {
-                Intent intent = new Intent(this, Branding_activity.class);
-                intent.putStringArrayListExtra("slideimages", imagesArray);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            } else {
-
-                if (uiSettingsModel.isEnableAzureSSOForLearner()) {
-                    Intent intentSignup = new Intent(this, SignUp_Activity.class);
-                    startActivity(intentSignup);
-
-                } else {
-                    Intent intent = new Intent(this, Login_activity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
-
-            }
-
-        }
+//        if (userID != null && !userID.equalsIgnoreCase("")) {
+//
+//            Intent intent = new Intent(this, SideMenu.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//// push values
+//            intent.putExtra("PUSH", isFromPush);
+//            intent.putExtra(StaticValues.FCM_OBJECT, (Serializable) parameters.toString());
+//            startActivity(intent);
+//
+//        } else {
+//
+//            if (i > 0) {
+//                Intent intent = new Intent(this, Branding_activity.class);
+//                intent.putStringArrayListExtra("slideimages", imagesArray);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                startActivity(intent);
+//            } else {
+//
+//                if (uiSettingsModel.isEnableAzureSSOForLearner()) {
+//                    Intent intentSignup = new Intent(this, SignUp_Activity.class);
+//                    startActivity(intentSignup);
+//
+//                } else {
+//                    Intent intent = new Intent(this, Login_activity.class);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                    startActivity(intent);
+//                }
+//
+//            }
+//
+//        }
     }
 
     public void getLocaleFileForLocalazation() {

@@ -10,11 +10,14 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,6 +48,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -107,7 +111,7 @@ import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionA
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class Notifications_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class Notifications_fragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, View.OnClickListener {
 
     String TAG = Notifications_fragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -123,6 +127,15 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
+
+    @BindView(R.id.txtMarkAllBtn)
+    TextView txtMarkAllBtn;
+
+    @BindView(R.id.txtClearAll)
+    TextView txtClearAll;
+
+    @BindView(R.id.lytTopBtns)
+    LinearLayout lytTopBtns;
 
     NotificationAdapter notificationAdapter;
 
@@ -180,6 +193,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
+    public void markAllAsReadApiCall() {
+
+        vollyService.getStringResponseVolley("REMOVENOTIFICATIONCOUNT", appUserModel.getWebAPIUrl() + "/UserNotifications/Removenotificationcount?UserID=" + appUserModel.getUserIDValue(), appUserModel.getAuthHeaders());
+
+    }
+
+
     void initVolleyCallback() {
         resultCallback = new IResult() {
             @Override
@@ -216,6 +236,24 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
+                if (requestType.equalsIgnoreCase("REMOVENOTIFICATIONCOUNT")) {
+                    if (response != null) {
+                        Log.d(TAG, "notifySuccess:REMOVENOTIFICATIONCOUNT " + response);
+                        txtMarkAllBtn.setVisibility(View.GONE);
+                        refreshCatalog(true);
+                    }
+                }
+
+                if (requestType.equalsIgnoreCase("CLEARALL")) {
+                    if (response != null) {
+                        Log.d(TAG, "notifySuccess:CLEARALL  " + response);
+                        txtMarkAllBtn.setVisibility(View.GONE);
+                        txtClearAll.setVisibility(View.GONE);
+                        refreshCatalog(true);
+                    }
+                }
+
+
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
 
@@ -273,8 +311,37 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         View customNav = LayoutInflater.from(context).inflate(R.layout.iconforum, null);
         FontManager.markAsIconContainer(customNav.findViewById(R.id.homeicon), iconFont);
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
+        txtMarkAllBtn.setOnClickListener(this);
+        txtClearAll.setOnClickListener(this);
+        txtMarkAllBtn.setBackground(getShapeDrawable());
+        txtMarkAllBtn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+            txtMarkAllBtn.setVisibility(View.GONE);
+        }
+        txtMarkAllBtn.setVisibility(View.GONE);
         return rootView;
+    }
+
+    public ShapeDrawable getShapeDrawable() {
+
+        ShapeDrawable sd = new ShapeDrawable();
+
+        // Specify the shape of ShapeDrawable
+        sd.setShape(new RectShape());
+
+        // Specify the border color of shape
+        sd.getPaint().setColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+
+        // Set the border width
+        sd.getPaint().setStrokeWidth(10f);
+
+        // Specify the style is a Stroke
+        sd.getPaint().setStyle(Paint.Style.STROKE);
+
+        // Finally, add the drawable background to TextView
+
+        return sd;
     }
 
 
@@ -286,6 +353,19 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             notificationModelList = new ArrayList<NotificationModel>();
             notificationAdapter.refreshList(notificationModelList);
             nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+            lytTopBtns.setVisibility(View.GONE);
+        }
+
+        boolean isCompleted = isALlNotificationsAreSeen();
+
+        if (isCompleted) {
+            txtMarkAllBtn.setVisibility(View.GONE);
+        } else {
+            txtMarkAllBtn.setVisibility(View.VISIBLE);
+        }
+
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza)))       {
+            lytTopBtns.setVisibility(View.GONE);
         }
 
 //        if (item_search != null && notificationModelList.size() > 5) {
@@ -295,6 +375,28 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 //        }
 
     }
+
+
+    public boolean isALlNotificationsAreSeen() {
+
+        boolean isCompleted = true;
+
+        if (notificationModelList != null && notificationModelList.size() > 0) {
+
+            for (int j = 0; j < notificationModelList.size(); j++) {
+
+                if (notificationModelList.get(j).markasread.toLowerCase().contains("false")) {
+                    isCompleted = false;
+                    break;
+                }
+
+            }
+
+        }
+
+        return isCompleted;
+    }
+
 
     public void initilizeView() {
         ActionBar actionBar = getActionBar();
@@ -315,9 +417,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
-
+        MenuItem itemWaitlist = menu.findItem(R.id.mylearning_addwaitlist);
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
+        itemWaitlist.setVisible(false);
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -417,10 +520,14 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         switch (view.getId()) {
             case R.id.card_view:
                 markAsReadWebCall(notificationModelList.get(position), position);
-
                 break;
             case R.id.txtDelete:
-                deleteAlert(notificationModelList.get(position));
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    deleteAlert(notificationModelList.get(position));
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -434,10 +541,9 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     public void markAsReadWebCall(NotificationModel notificationModel, int position) {
 
-        requiredFunctionalityForTheSelectedCell(notificationModel);
+//        requiredFunctionalityForTheSelectedCell(notificationModel);
 
-//        markAsReadNotification(notificationModel, position);
-
+        markAsReadNotification(notificationModel, position);
         notificationModelList.get(position).markasread = "true";
         notificationAdapter.notifyDataSetChanged();
     }
@@ -493,6 +599,36 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.NewConnectionRequest) && notificationModel.contentid.length() == 4) {
 
             ((SideMenu) getActivity()).homeControllClicked(true, 10, "", false, "");
+
+        } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.AssignedToMyCatalog) && notificationModel.contentid.length() > 4) {
+
+
+            boolean myLearningExists = myLearningAction(notificationModel.contentid);
+            boolean myCatalogExists = false;
+            if (!myLearningExists)
+                myCatalogExists = myCatalogAction(notificationModel.contentid);
+
+            if (myLearningExists) {
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid, false, "");
+            } else if (myCatalogExists) {
+                ((SideMenu) getActivity()).homeControllClicked(true, 2, notificationModel.contentid, false, "");
+            } else {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(notificationModel.notificationsubject).setTitle(notificationModel.notificationtitle)
+                        .setCancelable(false)
+                        .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //do things
+                                dialog.dismiss();
+
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+            }
+//            ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid, false, "");
 
         } else {
 
@@ -645,13 +781,12 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
-
     public void markAsReadNotification(final NotificationModel notificationModel, final int position) {
 
-//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
+//        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);7013465807
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UpdateNotificationMarkAsRead?NotificationId=" + notificationModel.usernotificationid + "&userID=" + notificationModel.touserid;
-
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/UpdateNotificationMarkAsRead?NotificationId=" + notificationModel.notificationid + "&userID=" + appUserModel.getUserIDValue() + "&userNotificationId=" + notificationModel.usernotificationid;
+        Log.d(TAG, "markAsReadNotificationAPI: " + urlString);
         final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -660,14 +795,13 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert) + " \n" + getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert), Toast.LENGTH_SHORT).show();
-
+//                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_successnotificationalert) + " \n" + getLocalizationValue(JsonLocalekeys.notifications_label_successfullydeletenotificationalert), Toast.LENGTH_SHORT).show();
                     notificationModelList.get(position).markasread = "true";
                     notificationAdapter.notifyDataSetChanged();
-
+                    requiredFunctionalityForTheSelectedCell(notificationModel);
+                    // refreshCatalog(true);
 //                    deleteAnswerFromLocalDB(notificationModel);
                 } else {
-
                     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_deletenotificationalertcontactadmin), Toast.LENGTH_SHORT).show();
                 }
 
@@ -701,5 +835,37 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
 
     }
 
+    public void clearAllNotificationApiCall() {
+        String urlStr = appUserModel.getWebAPIUrl() + "/UserNotifications/clearnotification";
+        JSONObject parameters = new JSONObject();
+
+        try {
+
+            parameters.put("UserID", appUserModel.getUserIDValue());
+            parameters.put("UserNotificationID", "-1");
+            parameters.put("GameID", -1);
+            parameters.put("fromAchievement", true);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String parameterString = parameters.toString();
+
+        vollyService.getStringResponseFromPostMethod(parameterString, "CLEARALL", urlStr);
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        switch (view.getId()) {
+            case R.id.txtMarkAllBtn:
+                markAllAsReadApiCall();
+                break;
+            case R.id.txtClearAll:
+                clearAllNotificationApiCall();
+                break;
+
+        }
+    }
 
 }

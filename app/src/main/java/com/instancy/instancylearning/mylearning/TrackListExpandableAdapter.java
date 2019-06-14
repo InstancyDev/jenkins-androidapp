@@ -31,6 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
@@ -73,6 +74,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 /**
@@ -101,10 +103,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     PreferencesManager preferencesManager;
     boolean autoLaunch = true;
     String typeFrom;
-    boolean isReportEnabled = true;
+    boolean isReportEnabled = true, isIconEnabled = false;
     MyLearningModel myLearningModel;
 
-    public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView, String typeFrom, MyLearningModel myLearningModel) {
+    public TrackListExpandableAdapter(Activity activity, Context context, List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList, ExpandableListView expandableListView, String typeFrom, MyLearningModel myLearningModel, boolean isIconEnabled) {
         this._context = context;
         this._blockNames = blockNames;
         this._trackList = trackList;
@@ -122,6 +124,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         appController = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
         this.myLearningModel = myLearningModel;
+        this.isIconEnabled = isIconEnabled;
     }
 
     public void refreshList(List<String> blockNames, HashMap<String, List<MyLearningModel>> trackList) {
@@ -152,8 +155,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public Object getChild(int groupPosition, int childPosition) {
 
-        return this._trackList.get(this._blockNames.get(groupPosition))
-                .get(childPosition);
+        return this._trackList.get(this._blockNames.get(groupPosition)).get(childPosition);
     }
 
     @Override
@@ -223,6 +225,12 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         } else {
             holder.txtShortDisc.setVisibility(View.VISIBLE);
         }
+
+        if (isIconEnabled)
+            holder.contentIcon.setVisibility(View.VISIBLE);
+        else
+            holder.contentIcon.setVisibility(View.GONE);
+
         if (trackChildList.getObjecttypeId().equalsIgnoreCase("70")) {
             holder.circleProgressBar.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
@@ -252,108 +260,170 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                         holder.btnDownload.setVisibility(View.GONE);
                     }
                 }
-
-//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-//                    if (trackChildList.getViewType().equalsIgnoreCase("1")) {
-//                        holder.btnDownload.setVisibility(View.VISIBLE);
-//                    }
-////                    if (myLearningModel.get(position).getAddedToMylearning() == 0) {
-////                        holder.btnDownload.setVisibility(View.GONE);
-////                    }
-//                }
-
-//                holder.btnDownload.setVisibility(View.VISIBLE);
             }
             holder.progressBar.setVisibility(View.VISIBLE);
             holder.txtCourseStatus.setVisibility(View.VISIBLE);
-            String courseStatus = "";
-            if (trackChildList.getStatusActual().equalsIgnoreCase("Completed") || trackChildList.getStatusActual().toLowerCase().contains("passed") || trackChildList.getStatusActual().toLowerCase().contains("failed")) {
-                String progressPercent = "100";
-                String statusValue = trackChildList.getStatusActual();
-                if (trackChildList.getStatusActual().equalsIgnoreCase("Completed")) {
 
-//                    statusValue = "Completed";
-                    statusValue = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
-
-
-                } else if (trackChildList.getStatusActual().equalsIgnoreCase("failed")) {
-
-//                    statusValue = "Completed(failed)";
-                    statusValue = getLocalizationValue(JsonLocalekeys.status_completed_failed);
-
-                } else if (trackChildList.getStatusActual().equalsIgnoreCase("passed")) {
-
-//                    statusValue = "Completed(passed)";
-                    statusValue = getLocalizationValue(JsonLocalekeys.status_completed_passed);
-
-                }
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusCompleted)));
-                holder.progressBar.setProgress(Integer.parseInt(progressPercent));
-                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
-//                courseStatus = trackChildList.getStatusActual() + " (" + trackChildList.getProgress();
-                courseStatus = statusValue + " (" + progressPercent;
-            } else if (trackChildList.getStatusActual().equalsIgnoreCase("Not Started")) {
-
-//                holder.progressBar.setBackgroundColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-                String statusValue = getLocalizationValue(JsonLocalekeys.mylearning_label_notstartedlabel);
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusNotStarted)));
-                holder.progressBar.setProgress(0);
-                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
-                courseStatus = statusValue + "  (0";
-
-            } else if (trackChildList.getStatusActual().equalsIgnoreCase("incomplete") || (trackChildList.getStatusActual().toLowerCase().contains("inprogress")) || (trackChildList.getStatusActual().toLowerCase().contains("in progress"))) {
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
-                String status = "";
-
-                if (trackChildList.getStatusActual().equalsIgnoreCase("incomplete")) {
-
-//                    status = "In Progress";
-                    status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
-                } else if (trackChildList.getStatusActual().length() == 0) {
-//                    status = "In Progress";
-                    status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
-                } else {
-                    status = trackChildList.getStatusActual();
-                }
-
-                holder.progressBar.setProgress(50);
-                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
-                courseStatus = status + "(" + 50;
-
-            } else if (trackChildList.getStatusActual().equalsIgnoreCase("pending review") || (trackChildList.getStatusActual().toLowerCase().contains("pendingreview")) || (trackChildList.getStatusActual().toLowerCase().contains("grade"))) {
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
-                String status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
-                status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
-                holder.progressBar.setProgress(100);
-                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
-                courseStatus = status + "(" + 100;
-            } else {
-
-                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorGray)));
-                holder.progressBar.setProgress(0);
-                String status = "";
-                status = trackChildList.getStatusActual();
-//                status =childView.getContext().getString(R.string.status_pending_review);
-                courseStatus = status + "(" + 0;
-
-            }
-//            else {
-//                String statusValue = "In Progress";
-//
-//                if (trackChildList.getStatusActual().toLowerCase().equalsIgnoreCase("incomplete") || trackChildList.getStatusActual().equalsIgnoreCase("") || trackChildList.getStatusActual().toLowerCase().equalsIgnoreCase("in complete")) {
-//                    statusValue = "In Progress";
+            // started
+//            String courseStatus = "";
+//            if (trackChildList.getStatusActual().equalsIgnoreCase("Completed") || trackChildList.getStatusActual().toLowerCase().contains("passed") || trackChildList.getStatusActual().toLowerCase().contains("failed")) {
+//                String progressPercent = "100";
+//                String statusValue = trackChildList.getStatusActual();
+//                if (trackChildList.getStatusActual().equalsIgnoreCase("Completed")) {
+//                    statusValue = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
+//                } else if (trackChildList.getStatusActual().equalsIgnoreCase("failed")) {
+//                    statusValue = getLocalizationValue(JsonLocalekeys.status_completed_failed);
+//                } else if (trackChildList.getStatusActual().equalsIgnoreCase("passed")) {
+//                    statusValue = getLocalizationValue(JsonLocalekeys.status_completed_passed);
 //                }
+//            }
+//                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusCompleted)));
+//                holder.progressBar.setProgress(Integer.parseInt(progressPercent));
+//                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
+//                courseStatus = statusValue + " (" + progressPercent;
+//            } else if (trackChildList.getStatusActual().equalsIgnoreCase("Not Started")) {
+//                String statusValue = getLocalizationValue(JsonLocalekeys.mylearning_label_notstartedlabel);
+//                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusNotStarted)));
+//                holder.progressBar.setProgress(0);
+//                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
+//                courseStatus = statusValue + "  (0";
 //
+//            } else if (trackChildList.getStatusActual().equalsIgnoreCase("incomplete") || (trackChildList.getStatusActual().toLowerCase().contains("inprogress")) || (trackChildList.getStatusActual().toLowerCase().contains("in progress"))) {
 //
 //                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
-//                holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
+//                String status = "";
+//
+//                if (trackChildList.getStatusActual().equalsIgnoreCase("incomplete")) {
+//
+////                    status = "In Progress";
+//                    status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
+//                } else if (trackChildList.getStatusActual().length() == 0) {
+////                    status = "In Progress";
+//                    status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
+//                } else {
+//                    status = trackChildList.getStatusActual();
+//                }
+//
+//                holder.progressBar.setProgress(50);
 //                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
-//                courseStatus = statusValue + " (" + trackChildList.getProgress();
+//                courseStatus = status + "(" + 50;
+//
+//            } else if (trackChildList.getStatusActual().equalsIgnoreCase("pending review") || (trackChildList.getStatusActual().toLowerCase().contains("pendingreview")) || (trackChildList.getStatusActual().toLowerCase().contains("grade"))) {
+//                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
+//                String status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
+//                status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
+//                holder.progressBar.setProgress(100);
+//                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
+//                courseStatus = status + "(" + 100;
+//            } else {
+//
+//                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorGray)));
+//                holder.progressBar.setProgress(0);
+//                String status = "";
+//                status = trackChildList.getStatusActual();
+////                status =childView.getContext().getString(R.string.status_pending_review);
+//                courseStatus = status + "(" + 0;
 //
 //            }
-            holder.txtCourseStatus.setText(courseStatus + "%)");
+////            else {
+////                String statusValue = "In Progress";
+////
+////                if (trackChildList.getStatusActual().toLowerCase().equalsIgnoreCase("incomplete") || trackChildList.getStatusActual().equalsIgnoreCase("") || trackChildList.getStatusActual().toLowerCase().equalsIgnoreCase("in complete")) {
+////                    statusValue = "In Progress";
+////                }
+////
+////
+////                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
+////                holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
+////                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
+////                courseStatus = statusValue + " (" + trackChildList.getProgress();
+////
+////            }
+//            holder.txtCourseStatus.setText(courseStatus + "%)");
+            /// ended
+
+
+            int progressPercentage = 0;
+            String statusFromModel = trackChildList.getStatusActual();
+            String statusDisplay = trackChildList.getStatusDisplay();
+
+            Log.d("TRACK", "getView: statusFromModel" + statusFromModel);
+            Log.d("TRACK", "getView: statusFromModel" + statusDisplay);
+
+
+            if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusCompleted)));
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
+
+                File myFile = new File(trackChildList.getOfflinepath());
+                if (myFile.exists()) {
+                    if (statusFromModel.toLowerCase().equalsIgnoreCase("completed")) {
+                        statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
+                    } else if (statusFromModel.equalsIgnoreCase("failed")) {
+                        statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel_failed);
+                    } else if (statusFromModel.equalsIgnoreCase("passed")) {
+                        statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel_passed);
+                    }
+                }
+
+                progressPercentage = 100;
+            } else if (statusFromModel.equalsIgnoreCase("Not Started") || statusFromModel.length() == 0) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusNotStarted)));
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusNotStarted));
+                progressPercentage = 0;
+            } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
+                progressPercentage = 50;
+            } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
+                progressPercentage = 100;
+            } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorGray)));
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusCompleted));
+                if (trackChildList.getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                    holder.txtCourseStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+                }
+                progressPercentage = -1;
+            } else if (statusFromModel.toLowerCase().contains("attended") || statusFromModel.toLowerCase().contains("Expired") || statusFromModel.toLowerCase().contains("waitlisted")) {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusOther)));
+                holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusOther));
+                progressPercentage = -1;
+            } else {
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorGray)));
+                progressPercentage = 0;
+            }
+
+            if (trackChildList.getObjecttypeId().equalsIgnoreCase("70")) {
+                if (trackChildList.getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                    holder.txtCourseStatus.setText(getLocalizationValue(JsonLocalekeys.details_label_tobeshedule));
+                } else {
+                    holder.txtCourseStatus.setText(statusDisplay);
+                }
+            } else {
+                if (isValidString(trackChildList.getProgress())) {
+                    holder.txtCourseStatus.setText(statusDisplay + "(" + trackChildList.getProgress() + "%)");
+                    try {
+                        if (isValidString(trackChildList.getProgress()) && trackChildList.getProgress().contains(".")) {
+                            float i = Float.valueOf(trackChildList.getProgress());
+                            int progressValue = (int) i;
+                            holder.progressBar.setProgress(progressValue);
+                            progressPercentage = progressValue;
+                        } else {
+                            holder.progressBar.setProgress(Integer.parseInt(trackChildList.getProgress()));
+                            progressPercentage = Integer.parseInt(trackChildList.getProgress());
+                        }
+                    } catch (NumberFormatException ex) {
+                        ex.printStackTrace();
+                        holder.progressBar.setProgress(progressPercentage);
+                    }
+
+                } else {
+                    holder.txtCourseStatus.setText(statusDisplay + "(" + progressPercentage + "%)");
+                    holder.progressBar.setProgress(progressPercentage);
+                }
+            }
         }
 
         String isViewd = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
@@ -433,15 +503,28 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.txtTitle.setEnabled(true);
         }
 
-        String imgUrl = trackChildList.getImageData();
+        if (trackChildList.getSequenceNumber() != trackChildList.getBookmarkID()) {
+            assert holder.borderLayout != null;
+            holder.borderLayout.setBackground(null);
+        }
 
-        Picasso.with(childView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+        String imgUrl = "";
+        if (trackChildList.getImageData().toLowerCase().contains("http")) {
+            imgUrl = trackChildList.getImageData();
+        } else {
+            imgUrl = trackChildList.getSiteURL() + trackChildList.getImageData();
+        }
+
+        if (imgUrl.contains("http:/"))
+            imgUrl = imgUrl.replaceAll("http:/", "https:/");
+
+        Glide.with(childView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
         String thumbUrl = trackChildList.getSiteURL() + "/Content/SiteFiles/ContentTypeIcons/" + trackChildList.getContentTypeImagePath();
 
-        Picasso.with(childView.getContext()).
-                load(thumbUrl).
-                into(holder.contentIcon);
+
+        if (isIconEnabled)
+            Glide.with(childView.getContext()).load(thumbUrl.trim()).into(holder.contentIcon);
 
         holder.contentIcon.setBackgroundTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorWhite)));
 
@@ -481,6 +564,10 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         RelativeLayout relativeLayout;
 
         @Nullable
+        @BindView(R.id.borderLayout)
+        RelativeLayout borderLayout;
+
+        @Nullable
         @BindView(R.id.txtShortDesc)
         TextView txtShortDisc;
 
@@ -512,15 +599,13 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         @BindView(R.id.btntxt_download)
         TextView btnDownload;
 
-//        @Nullable
-//        @BindView(R.id.fabbtnthumb)
-//        FloatingActionButton fabbtnthumb;
-
+        @Nullable
+        @BindView(R.id.txtLock)
+        TextView txtLock;
 
         @Nullable
         @BindView(R.id.fabbtnthumb)
         FloatingActionButton contentIcon;
-
 
         @Nullable
         @BindView(R.id.circle_progress_track)
@@ -530,6 +615,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(view.findViewById(R.id.btntxt_download), iconFont);
+            FontManager.markAsIconContainer(view.findViewById(R.id.txtLock), iconFont);
             downloadInterface = new DownloadInterface() {
                 @Override
                 public void deletedTheContent(int updateProgress) {
@@ -546,6 +632,26 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 public void addToArchive(boolean added) {
 
                 }
+
+                @Override
+                public void removeFromMylearning(boolean isRemoved) {
+
+                }
+
+                @Override
+                public void resheduleTheEvent(boolean isReshedule) {
+
+                }
+
+                @Override
+                public void badCancelEnrollment(boolean cancelIt) {
+
+                }
+
+                @Override
+                public void viewCertificateLink(boolean viewIt) {
+
+                }
             };
 
             setCompleteListner = new SetCompleteListner() {
@@ -559,7 +665,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 //                        ((TrackList_Activity) _context).executeWorkFlowRules("onitemChange");
 //                    }
 
-                    if (_context instanceof EventTrackList_Activity &&  typeFrom.equalsIgnoreCase("track")) {
+                    if (_context instanceof EventTrackList_Activity && typeFrom.equalsIgnoreCase("track")) {
                         ((EventTrackList_Activity) _context).executeWorkFlowRules("onitemChange");
                     }
                 }
@@ -573,15 +679,17 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             };
         }
 
-        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name})
+        @OnClick({R.id.btntxt_download, R.id.btn_contextmenu, R.id.imagethumb, R.id.txt_title_name, R.id.txtLock})
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, false, downloadStart, uiSettingsModel, sideMenusModel, false);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext());
+                GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext(), false);
+            } else if (view.getId() == R.id.txtLock) {
+                showToast(_context, "Item Locked complete previousone");
             } else {
 //                ((ExpandableListView) parent).performItemClick(view, getChildPosition, getGroupPosition);
                 if (isNetworkConnectionAvailable(_context, -1)) {

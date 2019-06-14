@@ -3,6 +3,7 @@ package com.instancy.instancylearning.askexpertenached;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -19,18 +20,23 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
+import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.AskExpertAnswerModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
+import com.instancy.instancylearning.utils.StaticValues;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -43,6 +49,8 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
@@ -121,9 +129,13 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         holder.txtName.setText(askExpertAnswerModelList.get(position).respondedUserName);
         holder.txtDaysAgo.setText(" "+ JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_answeredonlabel, activity)+" " + askExpertAnswerModelList.get(position).daysAgo);
         holder.txtMessage.setText(askExpertAnswerModelList.get(position).response + " ");
-        holder.txtTotalViews.setText(askExpertAnswerModelList.get(position).viewsCount + JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, activity));
-        holder.txtComments.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_commentstitlelabel, activity)+" " + askExpertAnswerModelList.get(position).commentCount);
+        holder.txtTotalViews.setText(askExpertAnswerModelList.get(position).viewsCount +" "+ JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_viewslabel, activity));
+        holder.txtComments.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_commentslabel, activity)+" " + askExpertAnswerModelList.get(position).commentCount);
         holder.txtUpvote.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_upvotetitlelabel, activity)+" " + askExpertAnswerModelList.get(position).upvotesCount);
+
+        holder.txtDownnvote.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.asktheexpert_label_downvotetitlelabel, activity));
+
+        holder.txtComment.setText(JsonLocalization.getInstance().getStringForKey(JsonLocalekeys.discussionforum_label_commentlabel, activity));
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtDaysAgo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -166,14 +178,57 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         String userImgUrl = appUserModel.getSiteURL() + askExpertAnswerModelList.get(position).picture;
         String atchimgUrl = appUserModel.getSiteURL() + askExpertAnswerModelList.get(position).userResponseImagePath;
 
+//        if (isValidString(askExpertAnswerModelList.get(position).userResponseImagePath)) {
+//            holder.attachedImg.setVisibility(View.VISIBLE);
+//            Glide.with(convertView.getContext()).load(atchimgUrl).placeholder(R.drawable.cellimage).into(holder.attachedImg);
+//        } else {
+//            holder.attachedImg.setVisibility(View.GONE);
+//        }
+
         if (isValidString(askExpertAnswerModelList.get(position).userResponseImagePath)) {
+
+//            String imgUrl = appUserModel.getSiteURL() + askExpertQuestionModelList.get(position).userQuestionImagePath;
+//            Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imageThumb);
+
+            final String attachimgUrl = appUserModel.getSiteURL() + askExpertAnswerModelList.get(position).userResponseImagePath;
+
+            String fileExtesnion = "";
+            if (isValidString(askExpertAnswerModelList.get(position).userResponseImagePath)) {
+                fileExtesnion = getFileExtensionWithPlaceHolderImage(askExpertAnswerModelList.get(position).userResponseImagePath);
+            }
+
+            int resourceId = gettheContentTypeNotImg(fileExtesnion);
+
+            if (isValidString(askExpertAnswerModelList.get(position).userResponseImagePath)) {
+                holder.attachedImg.setVisibility(View.VISIBLE);
+                if (resourceId == 0)
+                    Glide.with(convertView.getContext()).load(attachimgUrl).placeholder(R.drawable.cellimage).into(holder.attachedImg);
+                else
+                    holder.attachedImg.setImageDrawable(getDrawableFromStringWithColor(activity, resourceId, uiSettingsModel.getAppButtonBgColor()));
+
+            } else {
+                holder.attachedImg.setVisibility(View.GONE);
+            }
+
+            final int finalResourceId = resourceId;
+            final String finalFileExtesnion = fileExtesnion;
+            holder.attachedImg.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                  gotoRespectiveActivity(finalResourceId, finalFileExtesnion, askExpertAnswerModelList.get(position), attachimgUrl);
+                }
+            });
+
             holder.attachedImg.setVisibility(View.VISIBLE);
-            Picasso.with(convertView.getContext()).load(atchimgUrl).placeholder(R.drawable.cellimage).into(holder.attachedImg);
         } else {
+
             holder.attachedImg.setVisibility(View.GONE);
+
         }
 
-        Picasso.with(convertView.getContext()).load(userImgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+        if (userImgUrl.startsWith("http:"))
+            userImgUrl = userImgUrl.replace("http:", "https:");
+
+        Glide.with(convertView.getContext()).load(userImgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 
         return convertView;
     }
@@ -277,6 +332,65 @@ public class AskExpertAnswerAdapter extends BaseAdapter {
         Drawable d = new BitmapDrawable(context.getResources(), createBitmapFromView(context, customNav));
 
         return d;
+    }
+
+
+    void gotoRespectiveActivity(int finalResourceId, String finalFileExtesnion, AskExpertAnswerModelDg askExpertQuestionModel, String attachimgUrl) {
+
+        if (finalResourceId == 0) {
+            return;
+        } else {
+            String attachedURL = "http://docs.google.com/gview?embedded=true&url=" + attachimgUrl;
+            Intent intentSocial = new Intent(activity, SocialWebLoginsActivity.class);
+            switch (finalFileExtesnion) {
+                case "pdf":
+                case ".pdf":
+                    Intent pdfIntent = new Intent(activity, PdfViewer_Activity.class);
+                    pdfIntent.putExtra("PDF_URL", attachimgUrl);
+                    pdfIntent.putExtra("ISONLINE", "YES");
+                    pdfIntent.putExtra("PDF_FILENAME", askExpertQuestionModel.userResponseImagePath);
+                    activity.startActivity(pdfIntent);
+                    break;
+                case ".mp3":
+                case ".wav":
+                case ".rmj":
+                case ".m3u":
+                case ".ogg":
+                case ".webm":
+                case ".m4a":
+                case ".dat":
+                case ".wmi":
+                case ".avi":
+                case ".wm":
+                case ".wmv":
+                case ".flv":
+                case ".rmvb":
+                case ".mp4":
+                case ".ogv":
+                    intentSocial.putExtra("ATTACHMENT", true);
+                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, attachimgUrl);
+                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, askExpertQuestionModel.response);
+                    activity.startActivity(intentSocial);
+                    break;
+                case "":
+                    Toast.makeText(activity, getLocalizationValue(JsonLocalekeys.commonalerttitle_subtitle_invalidfiletypetitle), Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    intentSocial.putExtra("ATTACHMENT", true);
+                    intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, attachedURL);
+                    intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, askExpertQuestionModel.response);
+                    activity.startActivity(intentSocial);
+                    break;
+
+            }
+        }
+
+
+    }
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
+
     }
 
 }

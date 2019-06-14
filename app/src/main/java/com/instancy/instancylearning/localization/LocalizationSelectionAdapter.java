@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.discussionfourmsenached.DiscussionCategoriesModel;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -31,6 +32,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 6/20/2017 Working on InstancyLearning.
@@ -93,16 +96,21 @@ public class LocalizationSelectionAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.cardView.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtLanguageName.setText(localizationSelectionModelList.get(position).languageName);
-        holder.txtDescription.setText(localizationSelectionModelList.get(position).languageDescription);
+
+        if (isValidString(localizationSelectionModelList.get(position).languageDescription)){
+            holder.txtDescription.setText(localizationSelectionModelList.get(position).languageDescription);
+        }
+        else {
+            holder.txtDescription.setText(localizationSelectionModelList.get(position).languageName);
+        }
 
         holder.txtLanguageName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-
         String thumbUrl = appUserModel.getSiteURL() + "Content/SiteFiles/FlagIcons/"+localizationSelectionModelList.get(position).getCountryFlag();
         //+ localizationSelectionModelList.get(position).countryFlag;
 
-        Picasso.with(activity).
+        Glide.with(activity).
                 load(thumbUrl).
                 placeholder(R.drawable.cellimage).
                 into(holder.imgFlag);

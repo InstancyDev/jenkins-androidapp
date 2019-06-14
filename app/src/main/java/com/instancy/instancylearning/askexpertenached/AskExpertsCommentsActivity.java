@@ -48,6 +48,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.askexpert.AskExpertAnswerAdapter;
 import com.instancy.instancylearning.askexpert.AskExpertsAnswersActivity;
@@ -86,7 +87,10 @@ import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBi
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
@@ -204,14 +208,13 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentstitlelabel) + "</font>"));
+                getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentslabel) + "</font>"));
 
         askExpertCommentAdapter = new AskExpertCommentAdapter(this, BIND_ABOVE_CLIENT, askExpertCommentModelList);
         askExpertsListView.setAdapter(askExpertCommentAdapter);
 
         askExpertsListView.setOnItemClickListener(this);
         askExpertsListView.setEmptyView(findViewById(R.id.nodata_label));
-
 
         askExpertCommentModelList = new ArrayList<AskExpertCommentModel>();
 
@@ -367,10 +370,12 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
 
         txtName.setText(askExpertAnswerModel.respondedUserName);
-        txtDaysAgo.setText(" "+getLocalizationValue(JsonLocalekeys.asktheexpert_label_answeredonlabel)+" " + askExpertAnswerModel.daysAgo);
+        txtDaysAgo.setText(" " + getLocalizationValue(JsonLocalekeys.asktheexpert_label_answeredonlabel) + " " + askExpertAnswerModel.daysAgo);
         txtMessage.setText(askExpertAnswerModel.response + " ");
-        txtTotalViews.setText(askExpertAnswerModel.upvotesCount + getLocalizationValue(JsonLocalekeys.asktheexpert_label_viewslabel));
-        txtComments.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentstitlelabel)+" " + askExpertAnswerModel.commentCount);
+        txtTotalViews.setText(askExpertAnswerModel.upvotesCount + " " + getLocalizationValue(JsonLocalekeys.asktheexpert_label_viewslabel));
+        txtComments.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentslabel) + " " + askExpertAnswerModel.commentCount);
+
+        txtComment.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentslabel));
 
         txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtDaysAgo.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -410,13 +415,20 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
 
         card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-
-        if (askExpertAnswerModel.userResponseImage.length() > 0) {
-
-            String imgUrl = appUserModel.getSiteURL() + askExpertAnswerModel.userResponseImagePath;
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachedImg);
+        String imgUrl = appUserModel.getSiteURL() + askExpertAnswerModel.userResponseImagePath;
+        if (isValidString(askExpertAnswerModel.userResponseImage)) {
 
             attachedImg.setVisibility(View.VISIBLE);
+
+            final String fileExtesnion = getFileExtensionWithPlaceHolderImage(askExpertAnswerModel.userResponseImagePath);
+
+            int resourceId = 0;
+
+            resourceId = gettheContentTypeNotImg(fileExtesnion);
+            if (resourceId == 0)
+                Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachedImg);
+            else
+                attachedImg.setImageDrawable(getDrawableFromStringWithColor(this, resourceId, uiSettingsModel.getAppButtonBgColor()));
 
         } else {
 
@@ -424,7 +436,11 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
         }
 
         String imgUrls = appUserModel.getSiteURL() + askExpertAnswerModel.picture;
-        Picasso.with(this).load(imgUrls).placeholder(R.drawable.user_placeholder).into(imgThumb);
+
+        if (imgUrls.startsWith("http:"))
+            imgUrls = imgUrls.replace("http:", "https:");
+
+        Glide.with(this).load(imgUrls).placeholder(R.drawable.user_placeholder).into(imgThumb);
 
 
     }
@@ -439,7 +455,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
             askExpertCommentAdapter.refreshList(askExpertCommentModelList);
         }
 
-        txtComments.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentstitlelabel) + askExpertCommentModelList.size());
+        txtComments.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_commentslabel) + " " + askExpertCommentModelList.size());
     }
 
     @Override
@@ -551,7 +567,8 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);//edit
         menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption));
-        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));;
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));
+        ;
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -596,7 +613,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 Log.d(TAG, "onResponse: " + s);
 
                 if (s.contains("1")) {
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alerttsubtitle_commentdeletesuccess_message), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alerttsubtitle_commentdeletesuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAnswers = true;
                     db.deleteCommentFromLocalDB(askExpertCommentModel);
                     injectFromDbtoModel();
@@ -712,7 +729,7 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                         insertSingleAsktheExpertAnswerDataIntoSqLite(askExpertAnswerModel, 1);
                     }
 
-                    Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+ "\n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answersuccessfullyposted), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AskExpertsCommentsActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess) + "\n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answersuccessfullyposted), Toast.LENGTH_SHORT).show();
 
 
                 } else {
@@ -904,8 +921,9 @@ public class AskExpertsCommentsActivity extends AppCompatActivity implements Swi
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key, AskExpertsCommentsActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, AskExpertsCommentsActivity.this);
 
     }
 }

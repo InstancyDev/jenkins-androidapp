@@ -88,6 +88,7 @@ import com.instancy.instancylearning.helper.VollyService;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -239,6 +240,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         StaticValues.PASTCALLED = 0;
         StaticValues.CALENDARCALLED = 0;
         StaticValues.UPCOMINGCALLED = 0;
+        StaticValues.MYEVENTS = 0;
         String isViewed = preferencesManager.getStringValue(StaticValues.KEY_HIDE_ANNOTATION);
         if (isViewed.equalsIgnoreCase("true")) {
             appcontroller.setAlreadyViewd(true);
@@ -381,6 +383,23 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     }
 
 
+    public void getBottomTabs() {
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+            // http://yournextuapi.instancysoft.com/api/Mobilelms/GetpeopleListingTab?ComponentID=153&ComponentInsID=3497&SiteID=374&Locale=en-us
+
+            String paramsString = appUserModel.getWebAPIUrl() + "/Mobilelms/GetpeopleListingTab?ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&SiteID=" + appUserModel.getSiteIDValue() + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
+
+            vollyService.getStringResponseVolley("GetpeopleListingTab", paramsString, appUserModel.getAuthHeaders());
+
+        } else {
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+
     public void getMobileCatalogObjectsData(Boolean isRefreshed) {
 
         if (!isRefreshed) {
@@ -421,7 +440,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 parameters.put("UserID", appUserModel.getUserIDValue());
                 parameters.put("SiteID", appUserModel.getSiteIDValue());
                 parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
-                parameters.put("Locale", "en-us");
+                parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
                 parameters.put("groupBy", applyFilterModel.groupBy);
                 parameters.put("categories", applyFilterModel.categories);
                 parameters.put("objecttypes", applyFilterModel.objectTypes);
@@ -459,7 +478,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                 parameters.put("UserID", appUserModel.getUserIDValue());
                 parameters.put("SiteID", appUserModel.getSiteIDValue());
                 parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
-                parameters.put("Locale", "en-us");
+                parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
                 parameters.put("groupBy", "");
                 parameters.put("categories", "");
                 parameters.put("objecttypes", "");
@@ -506,7 +525,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         }
                         try {
                             totalRecordsCount = countOfTotalRecords(response);
-                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount,applyFilterModel.filterApplied);
+                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
 
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
@@ -586,7 +605,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         try {
                             if (jsonObj != null) {
                                 totalRecordsCount = countOfTotalRecords(jsonObj);
-                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount,applyFilterModel.filterApplied);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
 
                             }
                             injectFromDbtoModel(true);
@@ -597,6 +616,38 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                     }
                 }
+
+                if (requestType.equalsIgnoreCase("GetpeopleListingTab")) {
+
+                    if (response != null && response.length() > 0) {
+                        if (TABBALUE.equalsIgnoreCase("upcoming")) {
+                            StaticValues.UPCOMINGCALLED = 1;
+                        } else if (TABBALUE.equalsIgnoreCase("calendar")) {
+                            pageIndex = 1;
+                            StaticValues.CALENDARCALLED = 1;
+                        } else if (TABBALUE.equalsIgnoreCase("past")) {
+                            StaticValues.PASTCALLED = 1;
+                        }
+                        JSONObject jsonObj = null;
+                        try {
+                            jsonObj = new JSONObject(response);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            if (jsonObj != null) {
+                                totalRecordsCount = countOfTotalRecords(jsonObj);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
+
+                            }
+                            injectFromDbtoModel(true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
             }
@@ -635,8 +686,8 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         ButterKnife.bind(this, rootView);
         swipeRefreshLayout.setOnRefreshListener(this);
 //        swipeRefreshLayout.setEnabled(true);
-
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true);
+        MembershipModel membershipModel = new MembershipModel();
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true,membershipModel,false);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -710,7 +761,6 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             }
 
-
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
             }
@@ -746,7 +796,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         } else {
             if (isNetworkConnectionAvailable(getContext(), -1)) {
                 if (isDigimedica) {
-                    getMobileCatalogObjectsData(false);
+                    // getMobileCatalogObjectsData(false);
+                    getBottomTabs();
+
                 } else {
                     refreshCatalog(true);
                 }
@@ -760,6 +812,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
         return rootView;
     }
+
 
     public void injectFromDbtoModel(boolean sortToUpcoming) {
         catalogModelsList = db.fetchEventCatalogModel(sideMenusModel.getComponentId(), TABBALUE, ddlSortList, ddlSortType, applyFilterModel.filterApplied);
@@ -833,7 +886,15 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
         itemInfo.setVisible(false);
-        item_filter.setVisible(true);
+        if (responMap != null && responMap.containsKey("ShowIndexes")) {
+            String showIndexes = responMap.get("ShowIndexes");
+            if (showIndexes.equalsIgnoreCase("top")) {
+                item_filter.setVisible(true);
+            }
+        } else {
+            // No such key
+            item_filter.setVisible(false);
+        }
 
         if (isFromGlobalSearch) {
             item_search.setVisible(false);
@@ -1131,50 +1192,112 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 //            }
 
         } else {
-            if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
+
+            if (myLearningDetalData.getViewType().equalsIgnoreCase("1") || myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
+
                 menu.getItem(0).setVisible(false);
-                menu.getItem(1).setVisible(true);
                 menu.getItem(2).setVisible(false);
                 menu.getItem(3).setVisible(true);
                 menu.getItem(4).setVisible(false);//cancel enrollment
 
-//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+                if (isValidString(myLearningDetalData.getEventstartUtcTime()) && !returnEventCompleted(myLearningDetalData.getEventstartUtcTime())) {
+// Commented for actionWaitlist
+//                    if (isValidString(myLearningDetalData.getAviliableSeats())) {
+//                        int avaliableSeats = 0;
+//                        try {
+//                            avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+//                        } catch (NumberFormatException nf) {
+//                            avaliableSeats = 0;
+//                            nf.printStackTrace();
+//                        }
+//                        if (avaliableSeats > 0) {
 //
-//                    File myFile = new File(myLearningDetalData.getOfflinepath());
+//                            menu.getItem(1).setVisible(true);
 //
-//                    if (myFile.exists()) {
+//                        } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+//                            menu.getItem(1).setVisible(true);
 //
-//                        menu.getItem(4).setVisible(true);
+//                        } else {
 //
+//                            menu.getItem(1).setVisible(false);
+//                        }
 //                    } else {
-//
-//                        menu.getItem(4).setVisible(false);
+//                        menu.getItem(1).setVisible(true);
 //                    }
-//                }
-            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
-                menu.getItem(0).setVisible(false);
-                menu.getItem(1).setVisible(true);
-                menu.getItem(3).setVisible(true);
 
-//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-//
-//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
-//                        menu.getItem(4).setVisible(false);
-//                    }
-//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-//
-//                        menu.getItem(4).setVisible(true);
-//                    }
-//                }
-                if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
-                    menu.getItem(1).setVisible(false);
+                    if (isValidString(myLearningDetalData.getActionWaitlist()) && myLearningDetalData.getActionWaitlist().equalsIgnoreCase("true")) {
+                        menu.getItem(1).setVisible(true);
+                        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_waitlistoption));
+                    } else {
+                        menu.getItem(1).setVisible(true);
+                    }
+
+                } else if (myLearningDetalData.getEventScheduleType() == 1) {
+                    if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+
+                    }
+                } else {
+                    if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
+                        menu.getItem(1).setVisible(true);
+                    } else {
+                        // btnsLayout.setVisibility(View.GONE);
+                        menu.getItem(1).setVisible(true);
+                    }
                 }
 
-//                if (myLearningDetalData.isCompletedEvent()){
-//                    menu.getItem(1).setVisible(false);
-//                    menu.getItem(4).setVisible(false);
-//                }
 
+//                if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) { // commented for ENroll error
+//                menu.getItem(0).setVisible(false);
+//                menu.getItem(1).setVisible(true);
+//                menu.getItem(2).setVisible(false);
+//                menu.getItem(3).setVisible(true);
+//                menu.getItem(4).setVisible(false);//cancel enrollment
+//
+////                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+////
+////                    File myFile = new File(myLearningDetalData.getOfflinepath());
+////
+////                    if (myFile.exists()) {
+////
+////                        menu.getItem(4).setVisible(true);
+////
+////                    } else {
+////
+////                        menu.getItem(4).setVisible(false);
+////                    }
+////                }
+//            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
+//                menu.getItem(0).setVisible(false);
+//                menu.getItem(1).setVisible(true);
+//                menu.getItem(3).setVisible(true);
+//
+//                if (myLearningDetalData.getEventScheduleType() == 2) {
+//
+//                    menu.getItem(1).setVisible(false);
+//                }
+//
+//
+////                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+////
+////                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+////                        menu.getItem(4).setVisible(false);
+////                    }
+////                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+////
+////                        menu.getItem(4).setVisible(true);
+////                    }
+////                }
+//                if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
+//                    menu.getItem(1).setVisible(false);
+//                }
+//
+////                if (myLearningDetalData.isCompletedEvent()){
+////                    menu.getItem(1).setVisible(false);
+////                    menu.getItem(4).setVisible(false);
+////                }
+//
+//
+//            }
             } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
                 menu.getItem(0).setVisible(false);
                 menu.getItem(3).setVisible(true);
@@ -1187,7 +1310,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         }
 
         // expired event functionality
-        if (returnEventCompleted(myLearningDetalData.getEventendUtcTime()) && uiSettingsModel.isAllowExpiredEventsSubscription()) {
+        if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
 
             if (myLearningDetalData.getAddedToMylearning() == 1) {
 
@@ -1196,9 +1319,8 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                     menu.getItem(1).setVisible(false);//enroll
                 }
             } else {
-                if (myLearningDetalData.getViewType().equalsIgnoreCase("2") && uiSettingsModel.isAllowExpiredEventsSubscription()) {
+                if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
                     menu.getItem(1).setVisible(true);//enroll
-
                 }
             }
 
@@ -1207,58 +1329,68 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
             menu.getItem(2).setVisible(false);//buy
             menu.getItem(3).setVisible(true);//detail
             menu.getItem(4).setVisible(false);//cancel enrollment
+        } else if (uiSettingsModel.isAllowExpiredEventsSubscription()) {
+            menu.getItem(1).setVisible(true);//enroll
         }
 
-        int avaliableSeats = 0;
-        try {
-            avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
-        } catch (NumberFormatException nf) {
-            avaliableSeats = 0;
-            nf.printStackTrace();
-        }
-        if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
-//        if (avaliableSeats <= 0) {
-//            if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
-//                menu.getItem(1).setVisible(true);//enroll
+//        int avaliableSeats = 0;
+//        try {
+//            avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+//        } catch (NumberFormatException nf) {
+//            avaliableSeats = 0;
+//            nf.printStackTrace();
+//        }
+//        if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
+////        if (avaliableSeats <= 0) {
+////            if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+////                menu.getItem(1).setVisible(true);//enroll
+////
+////            } else if (avaliableSeats > 0) {
+////
+////                menu.getItem(1).setVisible(true);//enroll
+////
+////            }else {
+////
+//////                menu.getItem(1).setVisible(false);//enroll
+////
+////            }
+////        }
 //
-//            } else if (avaliableSeats > 0) {
+//            if (avaliableSeats > 0) {
 //
-//                menu.getItem(1).setVisible(true);//enroll
+//                if (myLearningDetalData.getAddedToMylearning() == 0) {// remove thi if condition if required
+//                    menu.getItem(1).setVisible(true);//enroll
+//                    if (myLearningDetalData.getEventScheduleType() == 2) {
 //
-//            }else {
+//                        menu.getItem(1).setVisible(false);
+//                    }
+//                }
 //
-////                menu.getItem(1).setVisible(false);//enroll
+//            } else if (avaliableSeats <= 0) {
 //
+//                if (myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls())
+////                if (myLearningDetalData.getEnrollmentlimit() == myLearningDetalData.getNoofusersenrolled() && myLearningDetalData.getWaitlistlimit() == 0 || (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() == myLearningDetalData.getWaitlistenrolls()))
+//
+//                {
+//
+//                    menu.getItem(1).setVisible(true);//enroll
+//
+//
+//                } else if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+//
+//                    int waitlistSeatsLeftout = myLearningDetalData.getWaitlistlimit() - myLearningDetalData.getWaitlistenrolls();
+//
+//                    if (waitlistSeatsLeftout > 0) {
+//                        //  menu.getItem(1).setVisible(true);
+//                    }
+//                } else {
+//                    if (myLearningDetalData.getEventScheduleType() == 2) {
+//
+//                        menu.getItem(1).setVisible(false);
+//                    }
+//                }
 //            }
 //        }
-
-            if (avaliableSeats > 0) {
-
-                if (myLearningDetalData.getAddedToMylearning() == 0) {// remove thi if condition if required
-                    menu.getItem(1).setVisible(true);//enroll
-
-                }
-
-            } else if (avaliableSeats <= 0) {
-
-                if (myLearningDetalData.getEnrollmentlimit() == myLearningDetalData.getNoofusersenrolled() && myLearningDetalData.getWaitlistlimit() == 0 || (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() == myLearningDetalData.getWaitlistenrolls())) {
-
-                    menu.getItem(1).setVisible(false);//enroll
-
-
-                } else if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
-
-                    int waitlistSeatsLeftout = myLearningDetalData.getWaitlistlimit() - myLearningDetalData.getWaitlistenrolls();
-
-                    if (waitlistSeatsLeftout > 0) {
-
-
-                    }
-                }
-            }
-
-
-        }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -1275,7 +1407,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
                 if (item.getItemId() == R.id.ctx_view) {
 //                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
+                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(),false);
                 }
 
                 if (item.getItemId() == R.id.ctx_cancelenrollment) {
@@ -1322,14 +1454,23 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             }
                             if (avaliableSeats > 0) {
                                 addToMyLearningCheckUser(myLearningDetalData, position, false);
-                            } else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
-
+                            } else if (isValidString(myLearningDetalData.getActionWaitlist()) && myLearningDetalData.getActionWaitlist().equalsIgnoreCase("true")) {
                                 try {
                                     addToWaitList(myLearningDetalData);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                            } else {
+                            }
+//                            else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
+//
+//                                try {
+//                                    addToWaitList(myLearningDetalData);
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+
+                            else {
                                 addToMyLearningCheckUser(myLearningDetalData, position, false);
                             }
 
@@ -1356,7 +1497,13 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
-                checkUserLogin(myLearningDetalData, position, isInapp);
+                //    checkUserLogin(myLearningDetalData, position, isInapp);
+
+                try {
+                    checkUserLoginPost(myLearningDetalData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             } else {
 
 //                if (isInapp) {
@@ -1460,67 +1607,78 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-    public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
+    public void checkUserLoginPost(final MyLearningModel learningModel) throws JSONException {
 
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
-                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
 
-        urlStr = urlStr.replaceAll(" ", "%20");
-        Log.d(TAG, "inside catalog login : " + urlStr);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObj) {
-                        svProgressHUD.dismiss();
-                        if (jsonObj.has("faileduserlogin")) {
+        JSONObject parameters = new JSONObject();
+        parameters.put("UserName", learningModel.getUserName());
+        parameters.put("Password", learningModel.getPassword());
+        parameters.put("MobileSiteURL", appUserModel.getSiteURL());
+        parameters.put("DownloadContent", "");
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("isFromSignUp", false);
 
-                            JSONArray userloginAry = null;
-                            try {
-                                userloginAry = jsonObj
-                                        .getJSONArray("faileduserlogin");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+        final String postData = parameters.toString();
 
-                            if (userloginAry.length() > 0) {
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                JSONObject jsonObj = null;
+                try {
+                    jsonObj = new JSONObject(s);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
+                if (jsonObj.has("faileduserlogin")) {
 
-                                String response = null;
-                                try {
-                                    response = userloginAry
-                                            .getJSONObject(0)
-                                            .get("userstatus")
-                                            .toString();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                    JSONArray userloginAry = null;
+                    try {
+                        userloginAry = jsonObj
+                                .getJSONArray("faileduserlogin");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                                if (response.contains("Login Failed")) {
-                                    Toast.makeText(context,
-                                            getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
-                                            Toast.LENGTH_LONG)
-                                            .show();
+                    if (userloginAry.length() > 0) {
+                        String response = null;
+                        try {
+                            response = userloginAry
+                                    .getJSONObject(0)
+                                    .get("userstatus")
+                                    .toString();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-                                }
-                                if (response.contains("Pending Registration")) {
+                        if (response.contains("Login Failed")) {
+                            Toast.makeText(context,
+                                    getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
+                                    Toast.LENGTH_LONG)
+                                    .show();
 
-                                    Toast.makeText(context, "getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval)",
-                                            Toast.LENGTH_LONG)
-                                            .show();
-                                }
-                            }
-                        } else if (jsonObj.has("successfulluserlogin")) {
+                        }
+                        if (response.contains("Pending Registration")) {
 
-                            try {
-                                JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
-                                if (loginResponseAry.length() != 0) {
-                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+                            Toast.makeText(context, "getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval)",
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                } else if (jsonObj.has("successfulluserlogin")) {
 
-                                    String userIdresponse = loginResponseAry
-                                            .getJSONObject(0)
-                                            .get("userid").toString();
-                                    if (userIdresponse.length() != 0) {
+                    try {
+                        JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                        if (loginResponseAry.length() != 0) {
+                            JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                            String userIdresponse = loginResponseAry
+                                    .getJSONObject(0)
+                                    .get("userid").toString();
+                            if (userIdresponse.length() != 0) {
 
 //                                        if (isInapp) {
 //
@@ -1530,18 +1688,140 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 //                                            addToMyLearning(learningModel, position);
 //                                        }
 
-                                    }
-                                }
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
-
                         }
 
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                },
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
+                + learningModel.getUserName() + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
+                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+        Log.d(TAG, "inside catalog login : " + urlStr);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObj) {
+                svProgressHUD.dismiss();
+                if (jsonObj.has("faileduserlogin")) {
+
+                    JSONArray userloginAry = null;
+                    try {
+                        userloginAry = jsonObj
+                                .getJSONArray("faileduserlogin");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (userloginAry.length() > 0) {
+
+
+                        String response = null;
+                        try {
+                            response = userloginAry
+                                    .getJSONObject(0)
+                                    .get("userstatus")
+                                    .toString();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (response.contains("Login Failed")) {
+                            Toast.makeText(context,
+                                    getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+
+                        }
+                        if (response.contains("Pending Registration")) {
+
+                            Toast.makeText(context, "getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval)",
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                } else if (jsonObj.has("successfulluserlogin")) {
+
+                    try {
+                        JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                        if (loginResponseAry.length() != 0) {
+                            JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                            String userIdresponse = loginResponseAry
+                                    .getJSONObject(0)
+                                    .get("userid").toString();
+                            if (userIdresponse.length() != 0) {
+
+//                                        if (isInapp) {
+//
+//                                            inAppActivityCall(learningModel);
+//
+//                                        } else {
+//                                            addToMyLearning(learningModel, position);
+//                                        }
+
+                            }
+                        }
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+        },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
@@ -1896,7 +2176,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatus(myLearningModel, status, progress);
+                        i = db.updateContentStatus(myLearningModel, status, progress,"");
                         if (i == 1) {
 
                             injectFromDbtoModel(false);
@@ -2180,7 +2460,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
         if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
-            GlobalMethods.relatedContentView(eventModel, context);
+            GlobalMethods.relatedContentView(eventModel, context,false);
         }
 
         try {
@@ -3155,7 +3435,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                             }
                             break;
                         case "ecommerceprice":
-                            if (uiSettingsModel.isEnableEcommerce() &&  responMap != null && responMap.containsKey("EnableEcommerce")) {
+                            if (uiSettingsModel.isEnableEcommerce() && responMap != null && responMap.containsKey("EnableEcommerce")) {
                                 String showrRatings = responMap.get("EnableEcommerce");
                                 if (showrRatings.contains("true") && contentFilterByModelList.size() > 0) {
                                     contentFilterByModel.categoryName = "EnableEcommerce";

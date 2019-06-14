@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -155,7 +156,11 @@ public class DiscussionTopicAdapter extends BaseAdapter {
 
 
         String imgUrl = appUserModel.getSiteURL() + discussionTopicModelList.get(position).imagedata;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
+
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imgThumb);
 
         return convertView;
     }

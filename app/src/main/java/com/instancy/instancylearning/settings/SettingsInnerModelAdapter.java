@@ -23,7 +23,6 @@ import java.util.List;
 
 public class SettingsInnerModelAdapter extends BaseExpandableListAdapter {
 
-
     private Context context;
     private List<String> expandableListTitle;
     private HashMap<String, List<InnerSettingsModel>> expandableListDetail;
@@ -97,7 +96,7 @@ public class SettingsInnerModelAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.askexpertskillcell, null);
+            convertView = layoutInflater.inflate(R.layout.loclaeselect, null);
         }
 
         Switch switchSkill = (Switch) convertView.findViewById(R.id.swtchskills);

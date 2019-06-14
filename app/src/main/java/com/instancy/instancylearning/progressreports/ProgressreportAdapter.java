@@ -372,7 +372,6 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
 
                 }
-
                 if (item.getItemId() == R.id.ctx_details) {
 
                     if (isNetworkConnectionAvailable(context, -1)) {

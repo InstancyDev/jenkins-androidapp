@@ -44,7 +44,7 @@
                 android:divider="@android:color/transparent"
                 android:dividerHeight="10dp"
                 android:padding="6dp"
-                android:scrollbars="none"> </ListView>
+                android:scrollbars="none"></ListView>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 

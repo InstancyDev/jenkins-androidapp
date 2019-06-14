@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -263,7 +264,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtCommentsCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         String imgUrl = appUserModel.getSiteURL() + discussionForumModel.imagedata;
-        Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
+
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
     }
 
     public void refreshMyLearning(Boolean isRefreshed) {

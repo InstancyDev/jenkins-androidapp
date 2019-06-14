@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+
+    <!--// enterprise color-->
+    <color name="colorPrimary">#5db100</color>
+
     <!--// cvcta color-->
     <!--<color name="colorPrimary">#006da5</color>-->
 
-    <color name="colorPrimary">#ff5b04</color>
+
+    <!--// yournextU color-->
+    <!--<color name="colorPrimary">#ff5b04</color>-->
+
+    <!--<color name="colorPrimary">#1a628f</color>-->
 
     <!-- MCI -->
     <!--<color name="colorPrimary">#ED1F62</color>-->
@@ -17,7 +25,7 @@
     <color name="colorDefault">#ffff</color>
     <color name="colorRed">#EA4941</color>
     <color name="colorFaceBookSilver">#f7f7f7</color>
-
+    <color name="colorRead">#e6e6e6</color>
     <color name="colorStatusCompleted">#4ad963</color>
     <color name="colorStatusNotStarted">#fe2c53</color>
     <color name="colorStatusInProgress">#ff9503</color>
@@ -59,7 +67,6 @@
     <color name="dayOfMonthColor">#808080</color>
     <color name="currentDayOfMonthColor">#33b5e5</color>
     <color name="currentDayOfMonthSelectorColor">#33b5e5</color>
-
 
     <color name="colorInGreen">#28a745</color>
     <color name="colorOutTealGreen">#20c997</color>

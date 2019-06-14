@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.askexpertenached;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 
@@ -35,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -74,8 +76,16 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
+import static com.instancy.instancylearning.utils.Utilities.getAttachedFileTypeDrawable;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtension;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
 import static com.instancy.instancylearning.utils.Utilities.getFileNameFromPath;
+import static com.instancy.instancylearning.utils.Utilities.getPath;
 import static com.instancy.instancylearning.utils.Utilities.getRealPathFromURI;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
+import static com.instancy.instancylearning.utils.Utilities.isBigFileThanExpected;
+import static com.instancy.instancylearning.utils.Utilities.isFilevalidFileFound;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.toRequestBody;
@@ -175,6 +185,9 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
         bottomLayout.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
+        txtSave.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_submitbutton));
+        txtCancel.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_cancelbutton));
+
         vollyService = new VollyService(resultCallback, context);
         askExpertQuestionModel = (AskExpertQuestionModelDg) getIntent().getSerializableExtra("AskExpertQuestionModelDg");
 
@@ -190,26 +203,32 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         if (isAskAnswer) {
-            titleStr = "Answer";
+            titleStr = getLocalizationValue(JsonLocalekeys.asktheexpert_answerheader);
 
             service = new Retrofit.Builder().baseUrl(appUserModel.getWebAPIUrl() + "/MobileLMS/InsertEditQuestionResponse/").client(client).build().create(Service.class);
             if (isEdit) {
                 askExpertAnswerModelDg = (AskExpertAnswerModelDg) getIntent().getSerializableExtra("AskExpertAnswerModelDg");
                 updateUiForEditQuestion();
+            } else {
+                askExpertAnswerModelDg = new AskExpertAnswerModelDg();
             }
+            editDescription.setHint(getLocalizationValue(JsonLocalekeys.asktheexpert_textview_entertheanswerplaceholder));
+            labelTitle.setText(getLocalizationValue(JsonLocalekeys.asktheexpert_label_answerlabel));
         } else {
-            titleStr = "Comment";
+            titleStr = getLocalizationValue(JsonLocalekeys.asktheexpert_commentheader);
             askExpertAnswerModelDg = (AskExpertAnswerModelDg) getIntent().getSerializableExtra("AskExpertAnswerModelDg");
             service = new Retrofit.Builder().baseUrl(appUserModel.getWebAPIUrl() + "/MobileLMS/InsertEditResponseComments/").client(client).build().create(Service.class);
             if (isEdit) {
                 askExpertCommentModel = (AskExpertCommentModel) getIntent().getSerializableExtra("AskExpertCommentModel");
                 updateUiForEditComment();
+            } else {
+                askExpertCommentModel = new AskExpertCommentModel();
             }
+            editDescription.setHint(getLocalizationValue(JsonLocalekeys.asktheexpert_textview_enterthecommentplaceholder));
+            labelTitle.setText(titleStr);
         }
         // Change base URL to your upload server URL.
 
-        labelTitle.setText(getLocalizationValue(JsonLocalekeys.answers));
-        editDescription.setHint(getLocalizationValue(JsonLocalekeys.asktheexpert_label_enteryour) + titleStr.toLowerCase() + getLocalizationValue(JsonLocalekeys.asktheexpert_label_here));
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
@@ -231,16 +250,16 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
         if (isValidString(askExpertAnswerModelDg.userResponseImagePath)) {
 
-            String imgUrl = appUserModel.getSiteURL() + askExpertAnswerModelDg.userResponseImagePath;
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
-            attachmentThumb.setVisibility(View.VISIBLE);
-            editAttachment.setText("");
-            changeBtnValue(true);
-
+//            String imgUrl = appUserModel.getSiteURL() + askExpertAnswerModelDg.userResponseImagePath;
+//            Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
+//            attachmentThumb.setVisibility(View.VISIBLE);
+//            editAttachment.setText("");
+//            changeBtnValue(true);
+            changeBtnValue(true, true);
         } else {
 
             attachmentThumb.setVisibility(View.GONE);
-
+            changeBtnValue(false, true);
         }
 
     }
@@ -250,15 +269,15 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
         if (isValidString(askExpertCommentModel.commentImage)) {
 
-            String imgUrl = appUserModel.getSiteURL() + askExpertCommentModel.usercCmntImagePath;
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
-            attachmentThumb.setVisibility(View.VISIBLE);
-            editAttachment.setText("");
-            changeBtnValue(true);
-
+//            String imgUrl = appUserModel.getSiteURL() + askExpertCommentModel.usercCmntImagePath;
+//            Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
+//            attachmentThumb.setVisibility(View.VISIBLE);
+//            editAttachment.setText("");
+            // changeBtnValue(true);
+            changeBtnValue(true, false);
         } else {
-
-            attachmentThumb.setVisibility(View.GONE);
+            changeBtnValue(false, false);
+//            attachmentThumb.setVisibility(View.GONE);
 
         }
 
@@ -266,11 +285,18 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
 
     public void choosePhotoFromGallary() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 
-        startActivityForResult(galleryIntent, GALLERY);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        try {
+            startActivityForResult(intent, GALLERY);
+        } catch (ActivityNotFoundException notFound) {
+            notFound.printStackTrace();
+        }
+
     }
+
 
     @Override
     public void onBackPressed() {
@@ -344,6 +370,44 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
     }
 
+    public void changeBtnValue(boolean isAttachmentFound, boolean isAskAnswer) {
+
+        if (isAttachmentFound) {
+            btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_remove), null, null, null);
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newforumremoveimagebutton));
+            attachmentThumb.setVisibility(View.VISIBLE);
+            btnUpload.setTag(1);
+            if (isEdit) {
+                String imgUrl = "";
+                String fileExtesnion = "";
+                if (isAskAnswer) {
+                    imgUrl = appUserModel.getSiteURL() + askExpertAnswerModelDg.userResponseImagePath;
+                    fileExtesnion = getFileExtensionWithPlaceHolderImage(askExpertAnswerModelDg.userResponseImagePath);
+                } else {
+                    imgUrl = appUserModel.getSiteURL() + askExpertCommentModel.usercCmntImagePath;
+                    fileExtesnion = getFileExtensionWithPlaceHolderImage(askExpertCommentModel.usercCmntImagePath);
+                }
+
+                int resourceId = 0;
+
+                resourceId = gettheContentTypeNotImg(fileExtesnion);
+                if (resourceId == 0)
+                    Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachmentThumb);
+                else
+                    attachmentThumb.setImageDrawable(getDrawableFromStringWithColor(this, resourceId, uiSettingsModel.getAppButtonBgColor()));
+            }
+
+        } else {
+            btnUpload.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_upload), null, null, null);
+            btnUpload.setTag(0);
+            btnUpload.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_newtopicselectfileuploadbutton));
+            attachmentThumb.setVisibility(View.GONE);
+            finalfileName = "";
+        }
+        btnUpload.setPadding(10, 2, 2, 2);
+    }
+
+
     public void changeBtnValue(boolean isAttachmentFound) {
 
         if (isAttachmentFound) {
@@ -372,21 +436,51 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             Uri contentURI = data.getData();
             try {
                 final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+
                 final String fileName = getFileNameFromPath(contentURI, this);
-//                final String mimeType = getMimeTypeFromUri(contentURI);
-                Log.d(TAG, "onActivityResult: " + fileName);
-//                bitmapAttachment = bitmap;
-                editAttachment.setText(fileName);
-                attachmentThumb.setImageBitmap(bitmap);
-                btnUpload.setTag(1);
-//                uploadFile(contentURI);
-                finalPath = getRealPathFromURI(context, contentURI);
-                contentURIFinal = contentURI;
-                if (fileName.length() > 0) {
-                    changeBtnValue(true);
-                } else {
-                    changeBtnValue(false);
+
+                final String filePathHere = getPath(context, contentURI);
+
+                if (!isValidString(filePathHere) || filePathHere.toLowerCase().contains(".zip") || filePathHere.toLowerCase().contains(".rar")) {
+                    Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                File file = new File(filePathHere);
+
+                final String fileExtesnion = getFileExtensionWithPlaceHolderImage(filePathHere);
+                if (!isFilevalidFileFound(uiSettingsModel.getDiscussionForumFileTypes(), fileExtesnion)) {
+                    Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                int requiredSize = Integer.parseInt(uiSettingsModel.getUserUploadFileSize()) / 1048576;
+
+                if (isBigFileThanExpected(uiSettingsModel.getUserUploadFileSize(), file)) {
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.maximum_allowed_file_size) + " " + requiredSize, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                Log.d(TAG, "onActivityResult: " + fileName);
+
+                // final String fileExtension = getFileExtension(contentURI);
+
+                Drawable typeIcon = getAttachedFileTypeDrawable(fileExtesnion, this, uiSettingsModel.getAppButtonBgColor());
+
+                if (fileName.length() > 0) {
+                    changeBtnValue(true, isAskAnswer);
+                } else {
+                    changeBtnValue(false, isAskAnswer);
+                }
+
+                if (bitmap != null) {
+                    attachmentThumb.setImageBitmap(bitmap);
+                } else {
+                    attachmentThumb.setImageDrawable(typeIcon);
+                }
+                editAttachment.setText(fileName);
+                contentURIFinal = contentURI;
+                finalPath = getPath(context, contentURI);
+                contentURIFinal = contentURI;
                 finalfileName = fileName;
 
             } catch (IOException e) {
@@ -396,6 +490,53 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             }
         }
 
+
+//        if (data != null) {
+//            Uri contentURI = data.getData();
+//            try {
+//                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), contentURI);
+//                final String fileName = getFileNameFromPath(contentURI, this);
+//
+//                final String filePathHere = getPath(context, contentURI);
+//
+//                if (!isValidString(filePathHere)) {
+//                    Toast.makeText(context, "Invalid file type", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//
+//                final String fileExtension = getFileExtension(contentURI);
+//                Drawable typeIcon = getAttachedFileTypeDrawable(fileExtension, this, uiSettingsModel.getAppButtonBgColor());
+//
+//                if (fileName.length() > 0) {
+//                    changeBtnValue(true, isAskAnswer);
+//                } else {
+//                    changeBtnValue(false, isAskAnswer);
+//                }
+//
+//                if (bitmap != null) {
+//                    attachmentThumb.setImageBitmap(bitmap);
+//                } else {
+//                    attachmentThumb.setImageDrawable(typeIcon);
+//                }
+//
+//                Log.d(TAG, "onActivityResult: " + fileName);
+//                editAttachment.setText(fileName);
+////                attachmentThumb.setImageBitmap(bitmap);
+//                btnUpload.setTag(1);
+////                uploadFile(contentURI);
+//                finalPath = getPath(context, contentURI);
+//
+//                contentURIFinal = contentURI;
+//
+//                finalfileName = fileName;
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_labelfailed), Toast.LENGTH_SHORT).show();
+//
+//            }
+//        }
+
     }
 
     public void validateAnswerCreation(String messageStr) {
@@ -404,16 +545,20 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
         int responseID = -1;
 
         if (isEdit && (Integer) btnUpload.getTag() == 0) {
-            isAttachmentRmoved = true;
-//            finalfileName="";
+            finalfileName = askExpertAnswerModelDg.userResponseImage;
             if (!messageStr.equalsIgnoreCase(askExpertAnswerModelDg.response)) {
-                isAttachmentRmoved = false;
+                if (isEdit && contentURIFinal == null && (Integer) btnUpload.getTag() == 0) {
+                    isAttachmentRmoved = true;
+                } else {
+                    isAttachmentRmoved = false;
+                }
+            } else {
+                isAttachmentRmoved = true;
             }
         }
 
         if (isEdit && contentURIFinal == null) {
             finalfileName = askExpertAnswerModelDg.userResponseImage;
-
         }
 
         if (isEdit) {
@@ -443,7 +588,6 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(AskExpertsAskAnsCmtActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
 
-
             }
         }
     }
@@ -452,15 +596,35 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
         boolean isAttachmentRmoved = false;
         int commentId = -1;
-        if (isEdit && contentURIFinal == null) {
-            finalfileName = askExpertCommentModel.commentImage;
-        }
+
         if (isEdit && (Integer) btnUpload.getTag() == 0) {
             isAttachmentRmoved = true;
+            finalfileName = askExpertCommentModel.commentImage;
             if (!messageStr.equalsIgnoreCase(askExpertAnswerModelDg.response)) {
-                isAttachmentRmoved = false;
+                if (isEdit && contentURIFinal == null && (Integer) btnUpload.getTag() == 0) {
+                    isAttachmentRmoved = true;
+                } else {
+                    isAttachmentRmoved = false;
+                }
+            } else {
+                isAttachmentRmoved = true;
             }
         }
+        if (isEdit && contentURIFinal == null) {
+            finalfileName = askExpertCommentModel.commentImage;
+            //isAttachmentRmoved = false;
+        }
+
+//        if (isEdit && contentURIFinal == null) {
+//            finalfileName = askExpertCommentModel.commentImage;
+//        }
+//        if (isEdit && (Integer) btnUpload.getTag() == 0) {
+//            isAttachmentRmoved = true;
+//            if (!messageStr.equalsIgnoreCase(askExpertAnswerModelDg.response)) {
+//                isAttachmentRmoved = false;
+//            }
+//        }
+
         if (isEdit) {
             commentId = askExpertCommentModel.commentID;
         }
@@ -525,7 +689,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
         return d;
     }
 
-    private void respondToQuestion(Map<String, RequestBody> parameters, Uri fileUri, final AskExpertAnswerModelDg askExpertAnswerModelDg) {
+    private void respondToQuestion(Map<String, RequestBody> parameters, Uri fileUri, final AskExpertAnswerModelDg askExpertAnswerModel) {
         // create upload service client
 
         // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
@@ -555,7 +719,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+ "\n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answersuccessfullyposted), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess) + "\n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_answersuccessfullyposted), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 refreshAnswers = true;
                 closeForum(refreshAnswers);
@@ -594,23 +758,24 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
 
                             JSONObject columnObj = jsonArray.getJSONObject(0);
 
+                            //       {"QuestionID":30,"UserID":373,"UserName":"View User","UserQuestion":"QA","UserEmail":"view@mail.com","CreatedDate":"Mar 04, 2019","RespondedUserID":1,"ResponseID":1,"ResponseDate":"2019-03-15T12:38:00.227","Response":"answer","RespondedUserName":"?????? ??????????? ?????? ????????????????? ???????????","RespondedDate":"15\/03\/2019","UserResponseImage":""}
 
-                            askExpertAnswerModelDg.questionID = columnObj.optInt("QuestionID");
-                            askExpertAnswerModelDg.userID = columnObj.optInt("UserID");
-                            askExpertAnswerModelDg.respondedUserName = columnObj.optString("UserName");
-                            askExpertAnswerModelDg.questionForMail = columnObj.optString("UserQuestion");
-                            askExpertAnswerModelDg.userMail = columnObj.optString("UserEmail");
-                            askExpertAnswerModelDg.createdDateMail = columnObj.optString("CreatedDate");
-                            askExpertAnswerModelDg.respondedUserId = columnObj.optInt("RespondedUserID");
-                            askExpertAnswerModelDg.responseID = columnObj.optInt("ResponseID");
-                            askExpertAnswerModelDg.respondeDate = columnObj.optString("ResponseDate");
-                            askExpertAnswerModelDg.response = columnObj.optString("Response");
-                            askExpertAnswerModelDg.respondeDate = columnObj.optString("RespondedDate");
-                            askExpertAnswerModelDg.userResponseImage = columnObj.optString("UserResponseImage");
+                            askExpertAnswerModel.questionID = columnObj.optInt("QuestionID");
+                            askExpertAnswerModel.userID = columnObj.optInt("UserID");
+                            askExpertAnswerModel.respondedUserName = columnObj.optString("UserName");
+                            askExpertAnswerModel.questionForMail = columnObj.optString("UserQuestion");
+                            askExpertAnswerModel.userMail = columnObj.optString("UserEmail");
+                            askExpertAnswerModel.createdDateMail = columnObj.optString("CreatedDate");
+                            askExpertAnswerModel.respondedUserId = columnObj.optInt("RespondedUserID");
+                            askExpertAnswerModel.responseID = columnObj.optInt("ResponseID");
+                            askExpertAnswerModel.respondeDate = columnObj.optString("ResponseDate");
+                            askExpertAnswerModel.response = columnObj.optString("Response");
+                            askExpertAnswerModel.respondeDate = columnObj.optString("RespondedDate");
+                            askExpertAnswerModel.userResponseImage = columnObj.optString("UserResponseImage");
 //                            askExpertAnswerModelDg. = columnObj.optInt("NotifyMessage");
 
                             try {
-                                callSendExpertMailsForAnswer(askExpertAnswerModelDg);
+                                callSendExpertMailsForAnswer(askExpertAnswerModel);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -661,7 +826,7 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
                 Log.v("Upload", "success");
-                Toast.makeText(AskExpertsAskAnsCmtActivity.this,getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_commentsuccessfullyposted), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AskExpertsAskAnsCmtActivity.this, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_commentsuccessfullyposted), Toast.LENGTH_SHORT).show();
                 svProgressHUD.dismiss();
                 refreshAnswers = true;
                 closeForum(refreshAnswers);
@@ -686,10 +851,10 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
                     "&userId=" + appUserModel.getUserIDValue() +
                     "&response=" + answerModelDg.response +
                     "&siteId=" + appUserModel.getSiteIDValue() +
-                    "&localeId="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"" +
+                    "&localeId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "" +
                     "&toEmail=" + answerModelDg.userMail +
                     "&userquestion=" + askExpertQuestionModel.userQuestion +
-                    "&fromEmail="+appUserModel.getUserLoginId();
+                    "&fromEmail=" + appUserModel.getUserLoginId();
 
             parmStringUrl = parmStringUrl.replaceAll(" ", "%20");
 
@@ -700,8 +865,9 @@ public class AskExpertsAskAnsCmtActivity extends AppCompatActivity {
         }
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key, AskExpertsAskAnsCmtActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, AskExpertsAskAnsCmtActivity.this);
 
     }
 

@@ -44,7 +44,6 @@
             android:layout_height="32dp"
             android:touchscreenBlocksFocus="false"
             android:visibility="visible">
-
             <include layout="@layout/askexpertstagslayout" />
         </LinearLayout>
 

@@ -299,7 +299,6 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
         return values;
     }
 
-
     public void resetArrayList() {
 
         contentFilterByModel.selectedSkillIdsArry = addAllValues(resetBtnForList());
@@ -321,7 +320,6 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
                     for (int k = 0; k < contentFilterByModel.selectedSkillIdsArry.size(); k++) {
 
                         if (previousSelectedArrayList.get(i).equalsIgnoreCase(contentFilterByModel.selectedSkillIdsArry.get(k))) {
-
                             resetTheValues.remove(previousSelectedArrayList.get(i));
                         }
 
@@ -465,7 +463,7 @@ public class FilterBySelectedCategoryActivity extends AppCompatActivity implemen
 
             filterByModel.categoryName = jsonColumnObj.optString("CategoryName");
             filterByModel.categoryID = jsonColumnObj.optString("CategoryID");
-            filterByModel.parentID = jsonColumnObj.optString("ParentID","0");
+            filterByModel.parentID = jsonColumnObj.optString("ParentID", "0");
             filterByModel.categoryIcon = jsonColumnObj.optString("CategoryIcon");
 
             if (filterByModel.parentID.equalsIgnoreCase("0")) {

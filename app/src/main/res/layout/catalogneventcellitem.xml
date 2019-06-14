@@ -127,7 +127,6 @@
                     android:textColor="@color/colorGray"
                     android:textSize="14sp" />
 
-
                 <LinearLayout
                     android:id="@+id/eventlayout"
                     android:layout_width="match_parent"
@@ -316,6 +315,8 @@
                         android:textSize="24sp" />
 
                     <TextView
+                        android:layout_below="@+id/btntxt_download"
+
                         android:id="@+id/btn_price"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -323,7 +324,6 @@
                         android:background="@android:color/transparent"
                         android:gravity="center"
                         android:text="$122.0"
-
                         android:textColor="@color/colorStatusOther"
                         android:textSize="12sp"
                         android:textStyle="bold" />

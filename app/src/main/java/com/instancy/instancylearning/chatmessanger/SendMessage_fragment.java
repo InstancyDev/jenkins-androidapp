@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -20,10 +21,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
 
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -42,7 +45,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
@@ -71,8 +81,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,7 +116,6 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     ResultListner resultListner = null;
 
     SVProgressHUD svProgressHUD;
-    DatabaseHandler db;
 
     @BindView(R.id.userschatlist)
     SwipeMenuListView usersChatListView;
@@ -119,6 +130,8 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
     MenuItem item_search;
 
     int selectedId = 0;
+
+    TextView nodata_label;
 
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
@@ -313,12 +326,13 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             e.printStackTrace();
         }
         chatListModelList = new ArrayList<ChatListModel>();
-        initilizeSwipe();
+        //   initilizeSwipe();
         chatMessageAdapter = new SendMessageAdapter(getActivity(), BIND_ABOVE_CLIENT, chatListModelList);
         usersChatListView.setAdapter(chatMessageAdapter);
         usersChatListView.setOnItemClickListener(this);
         usersChatListView.setEmptyView(rootView.findViewById(R.id.nodata_label));
-
+        nodata_label = (TextView) rootView.findViewById(R.id.nodata_label);
+        nodata_label.setText(getLocalizationValue(JsonLocalekeys.message_label_nouserlabel));
         initilizeView();
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             getChatConnectionUserList();
@@ -355,14 +369,13 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
                 switch (index) {
                     case 0:
                         // open
-                        Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Archived", Toast.LENGTH_SHORT).show();
                         break;
                     case 1:
                         // delete
-//					delete(item);
-                        chatListModelList.remove(position);
-                        chatMessageAdapter.notifyDataSetChanged();
-                        Toast.makeText(context, "Archived", Toast.LENGTH_SHORT).show();
+//                        chatListModelList.remove(position);
+//                        chatMessageAdapter.notifyDataSetChanged();
+                        deleteMethod(chatListModelList.get(position));
                         break;
                     default:
 
@@ -456,9 +469,100 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
             });
 
         }
+    }
 
+    public void deleteMethod(ChatListModel chatListModel) {
+
+        final JSONObject parameters = new JSONObject();
+
+        try {
+            parameters.put("FromUserID", appUserModel.getSiteIDValue());
+            parameters.put("ToUserID", chatListModel.chatConnectionUserId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setCancelable(false).setTitle(getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringconfirmation)).setMessage(getLocalizationValue(JsonLocalekeys.asktheexpert_alertsubtitle_areyousurewanttopermanentlydeletequestion))
+                .setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption), new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialogBox, int id) {
+                        // ToDo get user input here
+                        deleteChatConverFromServer(parameters.toString());
+                    }
+                }).setNegativeButton(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_canceloption),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+                        dialogBox.cancel();
+                    }
+                });
+
+        AlertDialog alertDialogAndroid = alertDialog.create();
+        alertDialogAndroid.show();
+    }
+
+    public void deleteChatConverFromServer(final String postData) {
+
+
+        String urlString = appUserModel.getWebAPIUrl() + "/Chat/DeleteChatConversation";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+
+                if (s.contains("success")) {
+
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
+
+                } else {
+
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
+
 
     public static Drawable setTintDrawable(Drawable drawable, @ColorInt int color) {
         drawable.clearColorFilter();
@@ -842,11 +946,15 @@ public class SendMessage_fragment extends Fragment implements AdapterView.OnItem
 
         ArrayList<String> userRoles = new ArrayList<>();
 
-        userRoles.add("All");
-        userRoles.add("Group Admin");//16
-        userRoles.add("Admin");//8
-        userRoles.add("Manager");//12
+//        userRoles.add("All");
+//        userRoles.add("Group Admin");//16
+//        userRoles.add("Admin");//8
+//        userRoles.add("Manager");//12
 
+        userRoles.add(getLocalizationValue(JsonLocalekeys.myconnections_label_alllabel));
+        userRoles.add(getLocalizationValue(JsonLocalekeys.myconnections_label_groupadminlabel));//16
+        userRoles.add(getLocalizationValue(JsonLocalekeys.myconnections_label_adminlabel));//8
+        userRoles.add(getLocalizationValue(JsonLocalekeys.myconnections_label_managerlabel));//12
 
         return userRoles;
     }

@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -115,10 +116,10 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
         holder.getPosition = position;
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
         holder.txtName.setText(discussionReplyModelList.get(position).replyBy);
-        holder.txtAskedWhen.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel)+": " + discussionReplyModelList.get(position).dtPostedOnDate);
+        holder.txtAskedWhen.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_repliedlabel) + ": " + discussionReplyModelList.get(position).dtPostedOnDate);
         holder.txtmessage.setText(discussionReplyModelList.get(position).message);
         holder.txtmessage.setMaxLines(200);
-        holder.txtLike.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel));
+        holder.txtLike.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_likelabel));
 
 
         assert holder.txtLike != null;
@@ -126,7 +127,11 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
 
 
         String imgUrl = appUserModel.getSiteURL() + discussionReplyModelList.get(position).replyProfile;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imagethumb);
+
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.user_placeholder).into(holder.imagethumb);
 
         holder.attachedimg.setVisibility(View.GONE);
 
@@ -138,7 +143,6 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
 
         assert holder.txtLike != null;
         holder.txtLike.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(convertView.getContext(), R.string.fa_icon_thumbs_o_up), null, null, null);
-
 
         if (discussionReplyModelList.get(position).likeState) {
             holder.txtLike.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -156,7 +160,6 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
 //        } else {
 //            holder.txtLike.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 //        }
-
 
         if (discussionReplyModelList.get(position).likeState) {
             holder.txtLike.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
@@ -256,8 +259,9 @@ public class DiscussionRepliesAdapter extends BaseAdapter {
 
         return d;
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,activity);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
 
     }
 }

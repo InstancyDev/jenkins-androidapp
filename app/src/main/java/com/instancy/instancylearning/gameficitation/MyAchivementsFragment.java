@@ -40,6 +40,7 @@ import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -639,7 +640,11 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         txtPoints.setText("" + achUserOverAllData1.overAllPoints);
         txtLevel.setText(achUserOverAllData1.userLevel);
         String imgUrl = appUserModel.getSiteURL() + achUserOverAllData1.userProfilePath;
-        Picasso.with(context).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imageAchived);
+
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(context).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imageAchived);
 
         if (achUserOverAllData1.neededPoints > 0 && isValidString(achUserOverAllData1.neededLevel)) {
             txtPointsawarded.setText(achUserOverAllData1.neededPoints + " " + getLocalizationValue(JsonLocalekeys.filter_label_points) + " " + achUserOverAllData1.neededLevel + " " + getLocalizationValue(JsonLocalekeys.filter_label_level));
@@ -651,9 +656,18 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
         //   Math.round(((this.UserAchieveDashBoardData.OverAllPoints) / (this.UserAchieveDashBoardData.OverAllPoints + this.UserAchieveDashBoardData.NeededPoints)) * 100)
 
 
+//        int progressValue = (achUserOverAllData1.overAllPoints / (achUserOverAllData1.overAllPoints + achUserOverAllData1.neededPoints)) * 100;
+
         int progressValue = (achUserOverAllData1.overAllPoints / (achUserOverAllData1.overAllPoints + achUserOverAllData1.neededPoints)) * 100;
 
-        progressBar.setProgress(progressValue);
+
+        Double doubl1 = (double) (achUserOverAllData1.overAllPoints + achUserOverAllData1.neededPoints);
+        Double doubl2 = (double) (achUserOverAllData1.overAllPoints / doubl1);
+        Double doubleTheValue = (double) (doubl2 * 100.0);
+
+        Log.d(TAG, "updateLeaderBoard: " + doubleTheValue);
+
+        progressBar.setProgress(doubleTheValue.intValue());
 
         //color update
         txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

@@ -45,6 +45,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.discussionfourms.AddNewCommentActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -77,6 +78,8 @@ import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_TO
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -128,10 +131,12 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
     View footor;
 
     TextView txtRepliesCount;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,DiscussionRepliesActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, DiscussionRepliesActivity.this);
 
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -257,12 +262,12 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         txtLike.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_likelabel));
 
         txtName.setText(discussionCommentsModel.commentedBy);
-        txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel)+" " + discussionCommentsModel.commentedFromDays);
+        txtDaysAgo.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel) + " " + discussionCommentsModel.commentedFromDays);
         txtMessage.setText(discussionCommentsModel.message);
         txtMessage.setMaxLines(200);
 
-        txtLikesCount.setText(discussionCommentsModel.commentLikes + ""+getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
-        txtRepliesCount.setText(discussionCommentsModel.commentRepliesCount + " "+getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
+        txtLikesCount.setText(discussionCommentsModel.commentLikes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        txtRepliesCount.setText(discussionCommentsModel.commentRepliesCount + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
 
 
 //        assert txtLike != null;
@@ -285,27 +290,40 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
 
         String imgUrl = appUserModel.getSiteURL() + discussionCommentsModel.commentUserProfile;
-        Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imagethumb);
 
-        if (discussionCommentsModel.commentFileUploadPath.length() == 0) {
-            attachedImg.setVisibility(View.GONE);
-        } else {
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
 
+        Glide.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imagethumb);
+
+        if (isValidString(discussionCommentsModel.commentFileUploadPath)) {
             attachedImg.setVisibility(View.VISIBLE);
             String attachimgUrl = appUserModel.getSiteURL() + discussionCommentsModel.commentFileUploadPath;
-            Picasso.with(this).load(attachimgUrl).into(attachedImg);
 
 
-            if (attachimgUrl.contains(".mp4")) {
-                attachedImg.setVisibility(View.GONE);
-                videoLayout.setVisibility(View.VISIBLE);
-                assert videoView != null;
-                videoView.setVideoUrl(attachimgUrl);
-            }
+            final String fileExtesnion = getFileExtensionWithPlaceHolderImage(discussionCommentsModel.commentFileUploadPath);
 
+            int resourceId = 0;
+
+            resourceId = gettheContentTypeNotImg(fileExtesnion);
+
+            if (resourceId == 0)
+                Glide.with(this).load(attachimgUrl).into(attachedImg);
+            else
+                attachedImg.setImageDrawable(getDrawableFromStringWithColor(this
+                        , resourceId, uiSettingsModel.getAppButtonBgColor()));
+
+        } else {
+            attachedImg.setVisibility(View.GONE);
+
+//            if (attachimgUrl.contains(".mp4")) {
+//                attachedImg.setVisibility(View.GONE);
+//                videoLayout.setVisibility(View.VISIBLE);
+//                assert videoView != null;
+//                videoView.setVideoUrl(attachimgUrl);
+//            }
 
         }
-
 
     }
 
@@ -407,12 +425,13 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         if (discussionReplyModelList != null) {
             repliesAdapter.refreshList(discussionReplyModelList);
             footor.setVisibility(View.GONE);
+            footor.setVisibility(View.GONE);
         } else {
             discussionReplyModelList = new ArrayList<DiscussionReplyModelDg>();
             repliesAdapter.refreshList(discussionReplyModelList);
             footor.setVisibility(View.VISIBLE);
         }
-        txtRepliesCount.setText(discussionReplyModelList.size() + getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
+        txtRepliesCount.setText(discussionReplyModelList.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_repliesbutton));
     }
 
     @Override
@@ -524,7 +543,7 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
         //registering popup with OnMenuItemClickListene
 
         Menu menu = popup.getMenu();
-        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_alertsubtitle_areyousuretodeletereply));
+        menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_deletecommentoption));
         menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.discussionforum_actionsheet_editcommentoption));
         menu.getItem(0).setVisible(true);//delete
         menu.getItem(1).setVisible(true);//edit
@@ -596,14 +615,13 @@ public class DiscussionRepliesActivity extends AppCompatActivity implements Swip
 
                 if (s.contains("success")) {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess)+" \n"+getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
                     refreshAnyThing = true;
                     refreshMyLearning(true);
                 } else {
 
                     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_SHORT).show();
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override

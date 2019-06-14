@@ -8,34 +8,34 @@
 
     <RelativeLayout
         android:id="@+id/layoutHeader"
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/linearlayoutaddskill"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="3dp"
             android:weightSum="2">
 
             <Spinner
                 android:id="@+id/spnrSkillCategory"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="35dp"
-                android:layout_below="@+id/txtself"
                 android:layout_weight="1"
                 android:background="@drawable/spinnerdrawablesortupdown"
-                android:padding="10dp"> </Spinner>
+                android:padding="10dp"></Spinner>
 
             <TextView
-                android:layout_width="2dp"
-                android:layout_height="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
 
             <TextView
                 android:id="@+id/txtSearch"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="left"
                 android:layout_weight="1"
@@ -56,6 +56,7 @@
             android:layout_below="@+id/linearlayoutaddskill"
             android:orientation="horizontal"
             android:visibility="visible">
+
             <include layout="@layout/askexpertstagslayout" />
         </LinearLayout>
 

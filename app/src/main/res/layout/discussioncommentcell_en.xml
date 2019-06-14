@@ -132,11 +132,9 @@
                     android:layout_height="140dp"
                     android:layout_below="@+id/txtmessage"
                     android:adjustViewBounds="true"
-                    android:background="@android:color/transparent"
                     android:clickable="true"
                     android:padding="2dp"
                     android:src="@drawable/cellimage" />
-
 
                 <FrameLayout
                     android:id="@+id/videoLayout"

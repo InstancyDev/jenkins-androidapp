@@ -81,6 +81,7 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
     SVProgressHUD svProgressHUD;
 
     DiscussionForumCategoriesAdapter discussionForumCategoriesAdapter;
+
     List<DiscussionCategoriesModel> discussionCategoriesModelList;
 
     RelativeLayout globalHeaderLayout;
@@ -134,7 +135,6 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 
         btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
 
-
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         toolbar.setVisibility(View.VISIBLE);
@@ -143,7 +143,6 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
 //        toolbar.setTitle("My Toolbar");
 
         setSupportActionBar(toolbar);
-
 
         try {
             Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
@@ -424,7 +423,6 @@ public class DiscussionforumCategories extends AppCompatActivity implements View
         CheckBox checkBox = (CheckBox) view.findViewById(R.id.chxBox);
         switch (view.getId()) {
             case R.id.chxBox:
-
                 if (checkBox.isChecked()) {
                     updateListViewAtPosition(true, i);
                 } else {

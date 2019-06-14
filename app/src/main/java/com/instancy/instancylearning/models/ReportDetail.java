@@ -20,4 +20,5 @@ public class ReportDetail implements Serializable {
     public String isListView = "";
     public String userId = "";
     public String siteId = "";
+    public String mediaTypeId = "";
 }

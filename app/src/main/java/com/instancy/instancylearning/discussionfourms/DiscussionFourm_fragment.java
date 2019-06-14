@@ -108,7 +108,6 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
-    Menu search_menu;
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
     ResultListner resultListner = null;
@@ -126,9 +125,9 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
 
     boolean isPrivilageForDiscussion = false;
 
-    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
-    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
-    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
+//    private Calendar currentCalender = Calendar.getInstance(Locale.getDefault());
+//    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
+//    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMMM - yyyy", Locale.getDefault());
 
     public DiscussionFourm_fragment() {
 

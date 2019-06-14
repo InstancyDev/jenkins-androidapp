@@ -165,7 +165,7 @@ public class AddReplyActivity extends AppCompatActivity {
 
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
-                getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel) + "  " + discussionCommentsModel.message + "</font>"));
+                getLocalizationValue(JsonLocalekeys.discussionforum_label_replylabel) + "</font>"));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -364,7 +364,7 @@ public class AddReplyActivity extends AppCompatActivity {
                     if (jsonTableAry != null && jsonTableAry.length() > 0) {
 
                         closeForum(true);
-                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess) + " \n" + getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.discussionforum_alerttitle_stringsuccess), Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
@@ -401,9 +401,8 @@ public class AddReplyActivity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
-
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }

@@ -121,9 +121,11 @@ public class NativeSignupActivity extends AppCompatActivity {
     TextView termsTxt;
 
     String termsString = "";
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,NativeSignupActivity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, NativeSignupActivity.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,6 +152,7 @@ public class NativeSignupActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 getLocalizationValue(JsonLocalekeys.login_button_signupbutton) + "</font>"));
 
+        txtSave.setText(getLocalizationValue(JsonLocalekeys.login_button_signupbutton));
 
         try {
             final Drawable upArrow = ContextCompat.getDrawable(context, R.drawable.abc_ic_ab_back_material);
@@ -261,6 +264,7 @@ public class NativeSignupActivity extends AppCompatActivity {
                             if (signUpConfigAry.length() > 0) {
 
                                 try {
+
                                     db.injectSignUpConfigDetails(signUpConfigAry);
 
                                     boolean isPresent = db.checkChoiceTxtPresent();
@@ -320,7 +324,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     public void injectFromDbToModel(JSONArray termsWebAry, JSONArray signUpConfigAry) {
 
-        signUpConfigsModelList = db.fetchUserSignConfigs(context);
+        signUpConfigsModelList = db.fetchUserSignConfigs(context,getLocalizationValue(JsonLocalekeys.signupconfirmpassword_title_confirmpasswordtitle));
 
         if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
             nativeSignupAdapter.refreshList(signUpConfigsModelList);
@@ -550,7 +554,7 @@ public class NativeSignupActivity extends AppCompatActivity {
         }
 
         String apiURL = "";
-        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCreateSignUp?Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&SiteURL=" + appUserModel.getSiteURL();
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileCreateSignUp?Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&SiteURL=" + appUserModel.getSiteURL();
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         final byte[] finalEncrpt = encrpt;
@@ -594,8 +598,8 @@ public class NativeSignupActivity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -658,19 +662,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
-//        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=es-es&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
-
-        String urlStr = "";
-        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
-
-            urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=es-es&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
-
-        } else {
-
-            urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
-
-        }// esperanza call
-
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetSignUpDetails?ComponentID=47&ComponentInstanceID=3104&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&SiteID=" + appUserModel.getSiteIDValue() + "&SiteURL=" + appUserModel.getSiteURL();
 
         urlStr = urlStr.replaceAll(" ", "%20");
 

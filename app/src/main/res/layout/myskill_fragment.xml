@@ -6,6 +6,13 @@
     android:orientation="vertical"
     android:padding="4dp">
 
+    <RelativeLayout
+        android:id="@+id/skillheader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <include layout="@layout/myskillheaderview" />
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/nodata_label"
         android:layout_width="fill_parent"
@@ -19,7 +26,7 @@
         android:id="@+id/swipemylearning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/topicheader">
+        android:layout_below="@+id/skillheader">
 
         <ExpandableListView
             android:id="@+id/myskillList"
@@ -30,7 +37,7 @@
             android:padding="8dp"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
-            android:scrollbars="none"> </ExpandableListView>
+            android:scrollbars="none"></ExpandableListView>
 
 
     </android.support.v4.widget.SwipeRefreshLayout>

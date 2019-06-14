@@ -10,6 +10,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.Ach_UserBadges;
@@ -194,7 +195,7 @@ public class AchiviExpandAdapter extends BaseExpandableListAdapter {
                 textAwardedBadge.setText(getLocalizationValue(JsonLocalekeys.achievements_label_awardedonlabel) + " " + achUserBadgesList.get(childPosition).badgeReceivedDate);
                 textDesc.setText("" + achUserBadgesList.get(childPosition).badgeDescription);
                 String imgUrl = achUserBadgesList.get(childPosition).badgeImage;
-                Picasso.with(context).load(imgUrl).placeholder(R.drawable.badge).into(badgeImage);
+                Glide.with(context).load(imgUrl).placeholder(R.drawable.badge).into(badgeImage);
                 txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                 textDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
                 textAwardedBadge.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

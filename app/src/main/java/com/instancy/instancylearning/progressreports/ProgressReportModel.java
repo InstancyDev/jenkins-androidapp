@@ -44,7 +44,10 @@ public class ProgressReportModel implements Serializable {
     public String jobrolename = "";
     public String SCOID = "";
     public String categoryID = "";
-    public int seqId = 0;
+    public int seqId = -1;
+
+    public String eventID = "";
+    public String trackID = "";
 
     public List<ProgressReportChildModel> progressReportChildModelList;
 }

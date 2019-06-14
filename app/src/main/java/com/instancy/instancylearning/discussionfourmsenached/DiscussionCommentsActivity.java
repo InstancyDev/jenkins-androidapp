@@ -46,6 +46,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourmsenached.AddNewCommentActivity;
@@ -59,6 +60,7 @@ import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.DiscussionCommentsModel;
+import com.instancy.instancylearning.models.DiscussionForumModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
@@ -82,6 +84,8 @@ import static com.instancy.instancylearning.databaseutils.DatabaseHandler.TBL_TO
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.createBitmapFromView;
 import static com.instancy.instancylearning.utils.StaticValues.FORUM_CREATE_NEW_FORUM;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringWithColor;
+import static com.instancy.instancylearning.utils.Utilities.getFileExtensionWithPlaceHolderImage;
+import static com.instancy.instancylearning.utils.Utilities.gettheContentTypeNotImg;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
@@ -104,6 +108,9 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
     ListView discussionFourmlistView;
     DiscussionTopicModelDg discussionTopicModel;
+
+    DiscussionForumModelDg discussionForumModel;
+
     PreferencesManager preferencesManager;
     RelativeLayout relativeLayout;
     AppController appController;
@@ -163,6 +170,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         discussionTopicModel = (DiscussionTopicModelDg) getIntent().getSerializableExtra("topicModel");
+        discussionForumModel = (DiscussionForumModelDg) getIntent().getSerializableExtra("forumModel");
         isFromGlobalSearch = getIntent().getBooleanExtra("ISGLOBALSEARCH", false);
         if (isFromGlobalSearch) {
 
@@ -187,7 +195,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                 getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel) + "</font>"));
         discussionCommentsModelList = new ArrayList<DiscussionCommentsModelDg>();
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
-        commentsAdapter = new DiscussionCommentsAdapter(this, BIND_ABOVE_CLIENT, discussionCommentsModelList);
+        commentsAdapter = new DiscussionCommentsAdapter(this, BIND_ABOVE_CLIENT, discussionCommentsModelList, discussionForumModel.likePosts);
         discussionFourmlistView.setAdapter(commentsAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
 //        discussionFourmlistView.setEmptyView(findViewById(R.id.nodata_label));
@@ -224,6 +232,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
                 Intent intentDetail = new Intent(context, AddNewCommentActivity.class);
                 intentDetail.putExtra("topicModel", discussionTopicModel);
+                intentDetail.putExtra("forumModel", discussionForumModel);
                 startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
 
             }
@@ -258,16 +267,16 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         txtLikesCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtCommentCount.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
-        txtComment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
-        txtLikes.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        txtComment.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_commentlabel));
+        txtLikes.setText(getLocalizationValue(JsonLocalekeys.discussionforum_label_likelabel));
 
         txtName.setText(discussionTopicModel.name);
         txtShortDesc.setText(discussionTopicModel.longDescription);
 
-        txtLikesCount.setText(discussionTopicModel.likes + "" + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        txtLikesCount.setText(discussionTopicModel.likes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
         txtCommentCount.setText(discussionTopicModel.noOfReplies + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
 
-        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel) + ": ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + " ";
 
         if (isValidString(discussionTopicModel.author)) {
 
@@ -276,7 +285,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         if (isValidString(discussionTopicModel.modifiedUserName)) {
 
-            totalActivityStr = totalActivityStr + " |  " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel) + ":" + discussionTopicModel.author + " " + discussionTopicModel.updatedTime;
+            totalActivityStr = totalActivityStr + " |  " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel) + " " + discussionTopicModel.author + " " + discussionTopicModel.updatedTime;
         }
 
         txtAuthor.setText(totalActivityStr);
@@ -292,32 +301,48 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
 
         String imgUrl = appUserModel.getSiteURL() + discussionTopicModel.uploadFileName;
 
+        String topicProfileImg = appUserModel.getSiteURL() + discussionTopicModel.topicUserProfile;
+        if (topicProfileImg.startsWith("http:"))
+            topicProfileImg = topicProfileImg.replace("http:", "https:");
+        if (isValidString(discussionTopicModel.topicUserProfile)) {
+            Glide.with(this).load(topicProfileImg).placeholder(R.drawable.user_placeholder).into(imagethumb);
+        }
+
         if (isValidString(discussionTopicModel.uploadFileName)) {
+
             attachedImg.setVisibility(View.VISIBLE);
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(attachedImg);
+
+            final String fileExtesnion = getFileExtensionWithPlaceHolderImage(discussionTopicModel.uploadFileName);
+
+            int resourceId = 0;
+
+            resourceId = gettheContentTypeNotImg(fileExtesnion);
+            if (resourceId == 0)
+                Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachedImg);
+            else
+                attachedImg.setImageDrawable(getDrawableFromStringWithColor(this, resourceId, uiSettingsModel.getAppButtonBgColor()));
+
         } else {
 
             attachedImg.setVisibility(View.GONE);
         }
 
-//        assert txtLikes != null;
-//        txtLikes.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_thumbs_o_up), null, null, null);
-
-
         if (discussionTopicModel.likeState) {
             txtLikes.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
             assert txtLikes != null;
             txtLikes.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(this, R.string.fa_icon_thumbs_o_up, uiSettingsModel.getAppButtonBgColor()), null, null, null);
-        } else {
+        } else
+
+        {
             txtLikes.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
             txtLikes.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromStringWithColor(this, R.string.fa_icon_thumbs_o_up, uiSettingsModel.getAppTextColor()), null, null, null);
 
         }
 
-
         assert txtComment != null;
-        txtComment.setCompoundDrawablesWithIntrinsicBounds(getDrawableFromString(this, R.string.fa_icon_comment), null, null, null);
+        txtComment.setCompoundDrawablesWithIntrinsicBounds(
 
+                getDrawableFromString(this, R.string.fa_icon_comment), null, null, null);
 
 
     }
@@ -340,7 +365,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         if (!isRefreshed) {
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         }
-        vollyService.getStringResponseVolley("GetCommentList", appUserModel.getWebAPIUrl() + "/MobileLMS/GetCommentList?intSiteID=" + appUserModel.getSiteIDValue() + "&ForumID=" + discussionTopicModel.forumId + "&TopicID=" + discussionTopicModel.contentID + "&intUserID=" + appUserModel.getUserIDValue() + "&strLocale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"", appUserModel.getAuthHeaders());
+        vollyService.getStringResponseVolley("GetCommentList", appUserModel.getWebAPIUrl() + "/MobileLMS/GetCommentList?intSiteID=" + appUserModel.getSiteIDValue() + "&ForumID=" + discussionTopicModel.forumId + "&TopicID=" + discussionTopicModel.contentID + "&intUserID=" + appUserModel.getUserIDValue() + "&strLocale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "", appUserModel.getAuthHeaders());
 
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -426,7 +451,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
             commentsAdapter.refreshList(discussionCommentsModelList);
             footor.setVisibility(View.VISIBLE);
         }
-        txtCommentCount.setText(discussionCommentsModelList.size() + " "+ getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
+        txtCommentCount.setText(discussionCommentsModelList.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_commentslabel));
     }
 
     @Override
@@ -569,8 +594,8 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
                         intentDetail.putExtra("isfromedit", true);
                         intentDetail.putExtra("topicModel", discussionTopicModel);
                         intentDetail.putExtra("commentModel", discussionCommentsModelList.get(position));
+                        intentDetail.putExtra("forumModel", discussionForumModel);
                         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
-
                         break;
                     case R.id.ctx_delete:
                         try {
@@ -626,10 +651,6 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     public void deleteCommentFromServerBuildObj(DiscussionCommentsModelDg commentsModel) throws JSONException {
 
         JSONObject parameters = new JSONObject();
-
-
-
-
 
         parameters.put("SiteID", appUserModel.getSiteIDValue());
         parameters.put("TopicID", commentsModel.topicID);
@@ -722,7 +743,7 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
     public void getForumLevelLikeList(DiscussionCommentsModelDg commentsModel) {
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetTopicCommentLevelLikeList?strObjectID=" + commentsModel.commentID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale="+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&intTypeID=2";
+            String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetTopicCommentLevelLikeList?strObjectID=" + commentsModel.commentID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getUserIDValue() + "&strLocale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&intTypeID=2";
 
             vollyService.getStringResponseVolley("GetTopicCommentLevelLikeList", parmStringUrl, appUserModel.getAuthHeaders());
 

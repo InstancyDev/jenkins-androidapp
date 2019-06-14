@@ -137,7 +137,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     MenuItem item_search;
     SideMenusModel sideMenusModel = null;
     String filterContentType = "", consolidationType = "all", sortBy = "", contentFilterType = "";
-    ;
+
     ResultListner resultListner = null;
 
     AppController appcontroller;
@@ -160,7 +160,8 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.pendingbtn)
     RadioButton pendingBtn;
 
-    String TABBALUE = "Experts";
+    //    String TABBALUE = "Experts";
+    String TABBALUE = "All";
 
     String recepientID = "default";
 
@@ -579,7 +580,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
             }
         });
-
+        expertsBtn.setVisibility(View.GONE);
         pendingBtn.setTextColor(getResources().getColor(R.color.colorWhite));
         allPBtn.setTextColor(getResources().getColor(R.color.colorWhite));
         expertsBtn.setTextColor(getResources().getColor(R.color.colorWhite));
@@ -705,7 +706,16 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
 
 
         itemInfo.setVisible(false);
-        item_filter.setVisible(true);
+
+        if (responMap != null && responMap.containsKey("ShowIndexes")) {
+            String showIndexes = responMap.get("ShowIndexes");
+            if (showIndexes.equalsIgnoreCase("top")) {
+                item_filter.setVisible(true);
+            }
+        } else {
+            // No such key
+            item_filter.setVisible(false);
+        }
 
         if (isFromGlobalSearch) {
             item_search.setVisible(false);
@@ -867,21 +877,21 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "locations";
-                            contentFilterByModel.categoryDisplayName =  getLocalizationValue(JsonLocalekeys.filter_lbl_location);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_location);
                             contentFilterByModel.goInside = true;
                             break;
                         case "skills":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "skills";
-                            contentFilterByModel.categoryDisplayName =  getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
                             contentFilterByModel.goInside = true;
                             break;
                         case "jobroles":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "jobroles";
-                            contentFilterByModel.categoryDisplayName =  getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
                             contentFilterByModel.goInside = false;
                             break;
                         case "company":
@@ -895,7 +905,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
                             contentFilterByModel.categoryName = "Userinfo";
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "userinfo";
-                            contentFilterByModel.categoryDisplayName =getLocalizationValue(JsonLocalekeys.filter_lbl_userinfotitlelabel);
+                            contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_userinfotitlelabel);
                             contentFilterByModel.goInside = false;
                             break;
                     }
@@ -922,7 +932,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             String enableGroupby = responMap.get("EnableGroupby");
             if (enableGroupby != null && enableGroupby.equalsIgnoreCase("true")) {
                 AllFilterModel groupFilterModel = new AllFilterModel();
-                groupFilterModel.categoryName =getLocalizationValue(JsonLocalekeys.filter_lbl_groupbytitlelabel);
+                groupFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_groupbytitlelabel);
                 groupFilterModel.categoryID = 2;
                 if (responMap != null && responMap.containsKey("ddlGroupby")) {
 
@@ -1248,7 +1258,7 @@ public class PeopleListing_fragment extends Fragment implements SwipeRefreshLayo
             if (data != null) {
                 queryString = data.getStringExtra("queryString");
                 if (queryString.length() > 0) {
-
+                    pageIndex = 1;
                     if (isDigimedica) {
                         getPeopleList(true);
                     } else {

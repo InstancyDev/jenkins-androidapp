@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -133,7 +134,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if (message.attachemnt.length() > 5) {
                 attachmentImage.setVisibility(View.VISIBLE);
                 final String attachment = appUserModel.getSiteURL() + message.attachemnt;
-                Picasso.with(itemView.getContext()).load(attachment).placeholder(itemView.getResources().getDrawable(R.drawable.cellimage)).into(attachmentImage);
+                Glide.with(itemView.getContext()).load(attachment).placeholder(itemView.getResources().getDrawable(R.drawable.cellimage)).into(attachmentImage);
 
                 attachmentImage.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -206,12 +207,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             String profileIma = appUserModel.getSiteURL() + message.profilePic;
 
-            Picasso.with(itemView.getContext()).load(profileIma).placeholder(itemView.getResources().getDrawable(R.drawable.defaulttechguy)).into(profileImage);
+            Glide.with(itemView.getContext()).load(profileIma).placeholder(itemView.getResources().getDrawable(R.drawable.defaulttechguy)).into(profileImage);
 
             if (message.attachemnt.length() > 5) {
                 attachmentImage.setVisibility(View.VISIBLE);
                 final String attachment = appUserModel.getSiteURL() + message.attachemnt;
-                Picasso.with(itemView.getContext()).load(attachment).placeholder(itemView.getResources().getDrawable(R.drawable.cellimage)).into(attachmentImage);
+                Glide.with(itemView.getContext()).load(attachment).placeholder(itemView.getResources().getDrawable(R.drawable.cellimage)).into(attachmentImage);
 
                 attachmentImage.setOnClickListener(new View.OnClickListener() {
                     @Override

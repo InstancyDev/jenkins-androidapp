@@ -72,8 +72,8 @@
                 android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
                 android:padding="2dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/cellimage" />
+                android:scaleType="fitCenter"
+                />
 
             <EditText
                 android:id="@+id/edit_attachment"

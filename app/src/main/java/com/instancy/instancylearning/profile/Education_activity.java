@@ -156,9 +156,11 @@ public class Education_activity extends AppCompatActivity {
     boolean toCheck = false;
 
     UserEducationModel userEducationModel;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,Education_activity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, Education_activity.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -566,9 +568,9 @@ public class Education_activity extends AppCompatActivity {
                 if (s.contains("true")) {
 
                     if (isNewRecord) {
-                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\nYou have successfully added the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess) + "\nYou have successfully added the education", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\nYou have successfully updated the education", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess) + "\nYou have successfully updated the education", Toast.LENGTH_SHORT).show();
                     }
                     closeForum(true);
                 } else {
@@ -603,8 +605,8 @@ public class Education_activity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -756,7 +758,7 @@ public class Education_activity extends AppCompatActivity {
 
                 if (s.contains("true")) {
 
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess)+"\n"+getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_educationdeleteSuccessfully), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.profile_alerttitle_stringsuccess) + "\n" + getLocalizationValue(JsonLocalekeys.profile_alertsubtitle_educationdeleteSuccessfully), Toast.LENGTH_SHORT).show();
                     closeForum(true);
                 } else {
 
@@ -790,8 +792,8 @@ public class Education_activity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }

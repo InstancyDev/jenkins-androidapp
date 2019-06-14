@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.localization.JsonLocalization;
@@ -103,7 +104,7 @@ public class LeaderBoardAdapter extends BaseAdapter {
         holder.txtRank.setText(""+leaderboardListList.get(position).rank);
 
         String imgUrl = leaderboardListList.get(position).userPicturePath;
-        Picasso.with(convertView.getContext()).load(imgUrl).into(holder.userImage);
+        Glide.with(convertView.getContext()).load(imgUrl).into(holder.userImage);
 
         holder.txtRank.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtDescription.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));

@@ -213,7 +213,8 @@
 
         <activity
             android:name=".discussionfourmsenached.DiscussionModeratorListActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity
             android:name=".discussionfourmsenached.CreateNewTopicActivity"

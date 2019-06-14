@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.interfaces.RecyclerViewClickListener;
 import com.instancy.instancylearning.models.AppUserModel;
@@ -69,14 +70,13 @@ public class ButtonAdapter extends RecyclerView.Adapter<ButtonAdapter.ViewHolder
         ImageView imageView = (ImageView) holder.relativeLayout.findViewById(R.id.imagethumb);
         txtCategoryName.setText(categoryButtonModelList.get(position).getCategoryName());
         txtCategoryName.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
-
+        txtCategoryName.setVisibility(View.VISIBLE);
         String categoryThumbnail = appUserModel.getSiteURL() + categoryButtonModelList.get(position).getCategoryIcon();
 
-        Picasso.with(holder.itemView.getContext()).load(categoryThumbnail).placeholder(R.drawable.cellimage).into(imageView);
+        Glide.with(holder.itemView.getContext()).load(categoryThumbnail).placeholder(R.drawable.cellimage).into(imageView);
 
-        Log.d("CAT", "onBindViewHolder: " + categoryThumbnail);
+        // Log.d("CAT", "onBindViewHolder: " + categoryThumbnail);
     }
-
 
     @Override
     public int getItemCount() {

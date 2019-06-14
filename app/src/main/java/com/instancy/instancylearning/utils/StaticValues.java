@@ -11,7 +11,12 @@ public class StaticValues {
     /**
      * Version of Database.
      */
-    public static final int DATABASE_VERSION = 1;
+
+    public static final int DATABASE_VERSION = 2; // Esperanza DB Version
+
+  //  public static final int DATABASE_VERSION = 1; // Esperanza DB Version
+
+
     public static final int DEFAULTSITEID = -1;
     public static final int DEFAULTUSERID = -1;
 
@@ -295,6 +300,7 @@ public class StaticValues {
 
     public static int CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
 
+    public static int SHEDULED_EVENT_IS_ENROLLED = 0;
 
     public static int EVENT_FRAGMENT_OPENED_FIRSTTIME = 0;
 
@@ -315,6 +321,8 @@ public class StaticValues {
     public static int PASTCALLED = 0;
 
     public static int UPCOMINGCALLED = 0;
+
+    public static int MYEVENTS = 0;
 
     public static int REPORTPREVILAGEID = 1072;
 

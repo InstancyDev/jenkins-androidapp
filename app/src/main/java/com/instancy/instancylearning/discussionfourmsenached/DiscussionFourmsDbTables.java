@@ -51,7 +51,7 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("forumList");
 
-        if (jsonTableAry==null)
+        if (jsonTableAry == null)
             return;
 
         // for deleting records in table for respective table
@@ -71,12 +71,11 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
             discussionForumModel.parentForumID = jsonMyLearningColumnObj.optInt("ParentForumID");
             discussionForumModel.displayOrder = jsonMyLearningColumnObj.optInt("DisplayOrder");
 
-            String formattedDate = formatDate(jsonMyLearningColumnObj.optString("CreatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+//            String formattedDate = formatDate(jsonMyLearningColumnObj.optString("CreatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+            //    Log.d(TAG, "injectEventCatalog: " + formattedDate);
+//            discussionForumModel.createdDate = convertDateToSortDateFormatUpdated(formattedDate);
 
-            Log.d(TAG, "injectEventCatalog: " + formattedDate);
-
-
-            discussionForumModel.createdDate = convertDateToSortDateFormatUpdated(formattedDate);
+            discussionForumModel.createdDate = jsonMyLearningColumnObj.optString("CreatedDate");
 
             discussionForumModel.siteID = jsonMyLearningColumnObj.optInt("SiteID");
             discussionForumModel.createdUserID = jsonMyLearningColumnObj.optInt("CreatedUserID");
@@ -86,6 +85,8 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
             discussionForumModel.createNewTopic = jsonMyLearningColumnObj.optBoolean("CreateNewTopic");
             discussionForumModel.attachFile = jsonMyLearningColumnObj.optBoolean("AttachFile");
             discussionForumModel.likePosts = jsonMyLearningColumnObj.optBoolean("LikePosts");
+
+
             discussionForumModel.sendEmail = jsonMyLearningColumnObj.optBoolean("SendEmail");
             discussionForumModel.moderation = jsonMyLearningColumnObj.optBoolean("Moderation");
             discussionForumModel.isPrivate = jsonMyLearningColumnObj.optBoolean("IsPrivate");
@@ -104,17 +105,28 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
             discussionForumModel.totalPosts = jsonMyLearningColumnObj.optInt("TotalPosts");
             discussionForumModel.existing = jsonMyLearningColumnObj.optInt("Existing");
             discussionForumModel.totalLikes = jsonMyLearningColumnObj.optInt("TotalLikes");
+
+            if (jsonMyLearningColumnObj.has("TotalLikes")) {
+
+                JSONArray likesListArray = jsonMyLearningColumnObj.optJSONArray("TotalLikes");
+
+                if (likesListArray != null)
+                    discussionForumModel.totalLikes = likesListArray.length();
+            }
+
             discussionForumModel.dfProfileImage = jsonMyLearningColumnObj.optString("DFProfileImage");
             discussionForumModel.dfUpdateTime = jsonMyLearningColumnObj.optString("DFUpdateTime");
             discussionForumModel.dfChangeUpdateTime = jsonMyLearningColumnObj.optString("DFChangeUpdateTime");
             discussionForumModel.forumThumbnailPath = jsonMyLearningColumnObj.optString("ForumThumbnailPath");
             discussionForumModel.descriptionWithLimit = jsonMyLearningColumnObj.optString("DescriptionWithLimit");
-            discussionForumModel.moderatorID = jsonMyLearningColumnObj.optInt("ModeratorID");
+            discussionForumModel.moderatorID = jsonMyLearningColumnObj.optString("ModeratorID");
             discussionForumModel.updatedAuthor = jsonMyLearningColumnObj.optString("UpdatedAuthor");
 
-            String updatedDate = formatDate(jsonMyLearningColumnObj.optString("UpdatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+//            String updatedDate = formatDate(jsonMyLearningColumnObj.optString("UpdatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+//
+//            discussionForumModel.updatedDate = convertDateToSortDateFormatUpdated(updatedDate);
 
-            discussionForumModel.updatedDate = convertDateToSortDateFormatUpdated(updatedDate);
+            discussionForumModel.updatedDate = jsonMyLearningColumnObj.optString("UpdatedDate");
 
             discussionForumModel.moderatorName = jsonMyLearningColumnObj.optString("ModeratorName");
 
@@ -288,12 +300,10 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
                     discussionForumModel.forumThumbnailPath = cursor.getString(cursor
                             .getColumnIndex("forumThumbnailPath"));
 
-
                     discussionForumModel.descriptionWithLimit = cursor.getString(cursor
                             .getColumnIndex("descriptionWithLimit"));
 
-
-                    discussionForumModel.moderatorID = cursor.getInt(cursor
+                    discussionForumModel.moderatorID = cursor.getString(cursor
                             .getColumnIndex("moderatorID"));
 
 
@@ -303,10 +313,8 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
                     discussionForumModel.updatedDate = cursor.getString(cursor
                             .getColumnIndex("updatedDate"));
 
-
                     discussionForumModel.moderatorName = cursor.getString(cursor
                             .getColumnIndex("moderatorName"));
-
 
                     discussionForumModel.allowShare = cursor.getInt(cursor
                             .getColumnIndex("allowShare")) > 0;
@@ -319,6 +327,11 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
 
                     discussionForumModel.categoriesIDArray = getArrayListFromString(discussionForumModel.categoryIDs);
 
+                    if (isValidString(discussionForumModel.moderatorName)) {
+                        discussionForumModel.moderatorIDArray = getArrayListFromString(discussionForumModel.moderatorID);
+                    } else {
+                        discussionForumModel.moderatorIDArray = new ArrayList<>();
+                    }
                     discussionForumModelList.add(discussionForumModel);
                 } while (cursor.moveToNext());
             }
@@ -346,7 +359,6 @@ public class DiscussionFourmsDbTables extends DatabaseHandler {
         questionCategoriesArray = Arrays.asList(questionCategoriesString.split(","));
 
         return questionCategoriesArray;
-
     }
 
     public void injectDiscussionTopics(JSONObject jsonObject, DiscussionForumModelDg discussionForumModel) throws JSONException {

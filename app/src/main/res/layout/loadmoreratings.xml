@@ -6,12 +6,12 @@
     android:padding="4dip">
 
     <TextView
-        android:padding="4dp"
         android:id="@+id/txtLoadMore"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Load More" />
+        android:padding="4dp"
+        android:text="@string/details_button_loadmorebutton" />
 
 </LinearLayout>

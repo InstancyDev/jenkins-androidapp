@@ -44,6 +44,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -299,7 +300,11 @@ public class DiscussionCommentsActivity extends AppCompatActivity implements Swi
         }
 
         String imgUrl = appUserModel.getSiteURL() + discussionTopicModel.imagedata;
-        Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
+
+        if (imgUrl.startsWith("http:"))
+            imgUrl = imgUrl.replace("http:", "https:");
+
+        Glide.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(imgThumb);
 
 
     }

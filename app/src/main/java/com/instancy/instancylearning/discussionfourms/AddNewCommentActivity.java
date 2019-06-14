@@ -476,8 +476,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;
@@ -581,8 +581,8 @@ public class AddNewCommentActivity extends AppCompatActivity {
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
 
                 return headers;

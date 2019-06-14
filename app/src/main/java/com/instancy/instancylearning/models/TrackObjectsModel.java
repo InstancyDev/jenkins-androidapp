@@ -72,4 +72,13 @@ public class TrackObjectsModel {
     private String objTypeId = "";
     private String name = "";
 
+    public String getMediaTypeId() {
+        return mediaTypeId;
+    }
+
+    public void setMediaTypeId(String mediaTypeId) {
+        this.mediaTypeId = mediaTypeId;
+    }
+
+    private String mediaTypeId = "";
 }

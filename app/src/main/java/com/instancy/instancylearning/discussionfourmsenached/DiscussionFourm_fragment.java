@@ -323,8 +323,16 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
                 if (requestType.equalsIgnoreCase("GetCategories")) {
                     if (response != null) {
                         try {
-                            db.injectDiscussionCategoriesResponse(response);
 
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonTableAry = jsonObject.getJSONArray("Table1");
+
+                            if (jsonTableAry == null || jsonTableAry.length() == 0) {
+                                tagsRelative.setVisibility(View.GONE);
+                            } else {
+                                tagsRelative.setVisibility(View.VISIBLE);
+                            }
+                            db.injectDiscussionCategoriesResponse(response);
                             Log.d(TAG, "notifySuccess: ");
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -435,7 +443,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
         txtCategoriesName.setOnClickListener(this);
         txtCategoriesName.setText(getLocalizationValue(JsonLocalekeys.discussionforum_button_categorytitle));
 
-        tagsRelative.setVisibility(View.VISIBLE);
+        tagsRelative.setVisibility(View.GONE);
         tagsRelative.setOnClickListener(this);
 
         lltagslayout.setVisibility(View.VISIBLE);
@@ -498,7 +506,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
             discussionForumModel.dfChangeUpdateTime = jsonMyLearningColumnObj.optString("DFChangeUpdateTime");
             discussionForumModel.forumThumbnailPath = jsonMyLearningColumnObj.optString("ForumThumbnailPath");
             discussionForumModel.descriptionWithLimit = jsonMyLearningColumnObj.optString("DescriptionWithLimit");
-            discussionForumModel.moderatorID = jsonMyLearningColumnObj.optInt("ModeratorID");
+            discussionForumModel.moderatorID = jsonMyLearningColumnObj.optString("ModeratorID");
             discussionForumModel.updatedAuthor = jsonMyLearningColumnObj.optString("UpdatedAuthor");
             discussionForumModel.updatedDate = jsonMyLearningColumnObj.optString("UpdatedDate");
             discussionForumModel.moderatorName = jsonMyLearningColumnObj.optString("ModeratorName");
@@ -1051,6 +1059,7 @@ public class DiscussionFourm_fragment extends Fragment implements SwipeRefreshLa
     }
 
     public void chooseCategory() {
+
         Intent intentDetail = new Intent(context, DiscussionforumCategories.class);
         if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
             intentDetail.putExtra("breadcrumbItemsList", (Serializable) breadcrumbItemsList);

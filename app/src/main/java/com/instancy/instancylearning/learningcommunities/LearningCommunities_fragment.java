@@ -52,9 +52,13 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.blankj.utilcode.util.LogUtils;
 import com.instancy.instancylearning.R;
@@ -84,7 +88,7 @@ import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
-import com.instancy.instancylearning.utils.SweetAlert;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -96,6 +100,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -148,9 +153,11 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
     }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -185,7 +192,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
             sideMenusModel.setComponentId("189");
         }
 
-        String apiURL = appUserModel.getWebAPIUrl() + "/Mobilelms/GetPortalListing?siteid=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Locale="+ preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"&compid=" + sideMenusModel.getComponentId() + "&CompInsID=" + sideMenusModel.getRepositoryId();
+        String apiURL = appUserModel.getWebAPIUrl() + "/Mobilelms/GetPortalListing?siteid=" + appUserModel.getSiteIDValue() + "&userid=" + appUserModel.getUserIDValue() + "&Locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&compid=" + sideMenusModel.getComponentId() + "&CompInsID=" + sideMenusModel.getRepositoryId();
 
         vollyService.getJsonObjResponseVolley("COMMSLIST", apiURL, appUserModel.getAuthHeaders());
 
@@ -492,15 +499,38 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
-                if (item.getItemId()==R.id.ctx_gotocommunity) {
+                if (item.getItemId() == R.id.ctx_gotocommunity) {
 
 //                    Toast.makeText(context, "this is got to " + communitiesModelList.get(position).siteurl, Toast.LENGTH_SHORT).show();
-                    loginVollyWebCall(communitiesModelList.get(position));
-                }
-                if (item.getItemId()==R.id.ctx_joincommunity) {
+//                    loginVollyWebCall(communitiesModelList.get(position));
 
-//                    Toast.makeText(context, "this is join Community", Toast.LENGTH_SHORT).show();
-                    loginVollyWebCall(communitiesModelList.get(position));
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        try {
+                            checkUserLoginPost(communitiesModelList.get(position));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }
+                if (item.getItemId() == R.id.ctx_joincommunity) {
+
+                    if (isNetworkConnectionAvailable(getContext(), -1)) {
+                        try {
+                            checkUserLoginPost(communitiesModelList.get(position));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                    }
                 }
                 return true;
             }
@@ -645,6 +675,163 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
         }
     }
 
+
+    public void checkUserLoginPost(final CommunitiesModel communitiesModel) throws JSONException {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
+
+        final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
+        final String passWord = preferencesManager.getStringValue(StaticValues.KEY_USERPASSWORD);
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("UserName", userName);
+        parameters.put("Password", passWord);
+        parameters.put("MobileSiteURL", appUserModel.getSiteURL());
+        parameters.put("DownloadContent", "");
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("isFromSignUp", false);
+
+        final String postData = parameters.toString();
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                JSONObject jsonObj = null;
+                try {
+                    jsonObj = new JSONObject(s);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                if (jsonObj.has("faileduserlogin")) {
+
+                    JSONArray userloginAry = null;
+                    try {
+                        userloginAry = jsonObj
+                                .getJSONArray("faileduserlogin");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (userloginAry.length() > 0) {
+
+                        String resultForLogin = null;
+                        try {
+                            resultForLogin = userloginAry.getJSONObject(0)
+                                    .get("userstatus").toString();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (resultForLogin.contains("Login Failed")) {
+
+                            Toast.makeText(context,
+                                    getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_authenticationfailedcontactsiteadmin),
+                                    Toast.LENGTH_LONG).show();
+
+                        }
+
+                        if (resultForLogin.contains("Pending Registration")) {
+
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_pleasebepatientawaitingapproval),
+                                    Toast.LENGTH_LONG).show();
+
+                            refreshCatalog(false);
+                        }
+
+                    }
+
+                    svProgressHUD.dismiss();
+                } else if (jsonObj.has("successfulluserlogin")) {
+
+                    try {
+                        JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                        if (loginResponseAry.length() != 0) {
+
+                            JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+                            JSONObject jsonObject = new JSONObject();
+//                            String userId = jsonobj.get("userid").toString();
+//                                    profileWebCall(userId);
+                            jsonObject.put("userid", jsonobj.get("userid").toString());
+                            jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
+                            jsonObject.put("userstatus", jsonobj.get("userstatus"));
+                            jsonObject.put("displayname", jsonobj.get("username"));
+                            jsonObject.put("siteid", jsonobj.get("siteid"));
+                            jsonObject.put("username", userName);
+                            jsonObject.put("password", passWord);
+                            jsonObject.put("siteurl", communitiesModel.siteurl);
+
+//                                        db.insertUserCredentialsForOfflineLogin(jsonObject);
+
+                            Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
+                            preferencesManager.setStringValue(userName, StaticValues.SUB_KEY_USERLOGINID);
+                            preferencesManager.setStringValue(passWord, StaticValues.SUB_KEY_USERPASSWORD);
+                            preferencesManager.setStringValue(jsonobj.get("userid").toString(), StaticValues.SUB_KEY_USERID);
+                            preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.SUB_KEY_USERNAME);
+                            preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.SUB_KEY_USERSTATUS);
+                            preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.SUB_KEY_USERPROFILEIMAGE);
+
+                            MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+
+//                                    Intent intentSideMenu = new Intent(context, SideMenu.class);
+//                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                    startActivity(intentSideMenu);
+
+                            subsiteApiCalls(jsonObject.getString("siteurl"), jsonObject.getString("siteid"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -653,9 +840,20 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
     public void attachFragment(CommunitiesModel communitiesModel) {
 
-        if (communitiesModel.actiongoto == 1) {
-            loginVollyWebCall(communitiesModel);
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+            if (communitiesModel.actiongoto == 1) {
+                try {
+                    checkUserLoginPost(communitiesModel);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        } else {
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+
         }
+
 
     }
 
@@ -704,7 +902,7 @@ public class LearningCommunities_fragment extends Fragment implements SwipeRefre
 
             } else {
 
-//                LogUtils.d("already running ");
+                LogUtils.d("already running subsitelogin ");
             }
         }
 

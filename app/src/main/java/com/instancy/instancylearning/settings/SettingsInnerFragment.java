@@ -98,7 +98,6 @@ public class SettingsInnerFragment extends Fragment {
 
     UiSettingsModel uiSettingsModel;
 
-    SettingsInnerAdapter settingsInnerAdapter;
 
     SettingsInnerModelAdapter settingsInnerModelAdapter;
 

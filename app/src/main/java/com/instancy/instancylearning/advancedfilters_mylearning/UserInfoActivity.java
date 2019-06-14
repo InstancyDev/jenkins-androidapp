@@ -140,6 +140,12 @@ public class UserInfoActivity extends AppCompatActivity implements View.OnClickL
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setText(getLocalizationValue(JsonLocalekeys.filter_btn_applybutton));
         btnReset.setText(getLocalizationValue(JsonLocalekeys.filter_btn_resetbutton));
+
+        txtFname.setText(getLocalizationValue(JsonLocalekeys.filter_lbl_fname));
+        txtLname.setText(getLocalizationValue(JsonLocalekeys.filter_lbl_lname));
+        editFirstName.setHint(getLocalizationValue(JsonLocalekeys.filter_lbl_fname));
+        editLastName.setHint(getLocalizationValue(JsonLocalekeys.filter_lbl_lname));
+
     }
 
     private String getLocalizationValue(String key) {

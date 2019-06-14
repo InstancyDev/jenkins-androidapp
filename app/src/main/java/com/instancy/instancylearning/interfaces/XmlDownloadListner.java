@@ -7,4 +7,6 @@ package com.instancy.instancylearning.interfaces;
 public interface XmlDownloadListner {
 
     public void completedXmlFileDownload();
+
+
 }

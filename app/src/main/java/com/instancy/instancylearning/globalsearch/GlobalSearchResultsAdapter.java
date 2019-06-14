@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
@@ -285,7 +286,6 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
 
         }
 
-
 //        if (expandedListText.contextMenuId == 10) {
 //            if (expandedListText.authordisplayname != null) {
 //
@@ -304,7 +304,7 @@ public class GlobalSearchResultsAdapter extends BaseExpandableListAdapter {
 //
 //            }
 //        } else {
-        Picasso.with(vi.getContext()).load(imgUrl).placeholder(vi.getResources().getDrawable(R.drawable.cellimage)).into(holder.imageThumb);
+        Glide.with(vi.getContext()).load(imgUrl).placeholder(vi.getResources().getDrawable(R.drawable.cellimage)).into(holder.imageThumb);
 
 //        }
         return vi;

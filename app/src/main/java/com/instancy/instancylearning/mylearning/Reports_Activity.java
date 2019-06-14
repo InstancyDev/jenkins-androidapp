@@ -92,6 +92,10 @@ public class Reports_Activity extends AppCompatActivity {
     TextView txtName;
 
     @Nullable
+    @BindView(R.id.txt_statustitle)
+    TextView txtStatustitle;
+
+    @Nullable
     @BindView(R.id.card_view)
     CardView card_view;
 
@@ -124,9 +128,11 @@ public class Reports_Activity extends AppCompatActivity {
     boolean isFromProgressReport = false;
 
     View header;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,Reports_Activity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, Reports_Activity.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,6 +158,7 @@ public class Reports_Activity extends AppCompatActivity {
         header = (View) getLayoutInflater().inflate(R.layout.detailsheader, null);
         TextView headerTextView = (TextView) header.findViewById(R.id.track_details);
         headerTextView.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        headerTextView.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_detailsoption) + ": ");
         initVolleyCallback();
         vollyService = new VollyService(resultCallback, context);
         learningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
@@ -187,7 +194,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
         nodataLabel.setText("");
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?SiteURL=" + appUserModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid=" + learningModel.getUserID() + "&DelivoryMode=1&IsDownload=0&IsDownload=0";
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?SiteURL=" + appUserModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid=" + learningModel.getUserID() + "&DelivoryMode=1&IsDownload=0&IsDownload=0&localeId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         vollyService.getJsonObjResponseVolley("DMCD", urlString, appUserModel.getAuthHeaders());
 
@@ -382,42 +389,48 @@ public class Reports_Activity extends AppCompatActivity {
         txtName.setText(learningModel.getCourseName());
 
         if (isValidString(reportDetail.dateCompleted)) {
-            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" " + reportDetail.dateCompleted);
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel) + " " + reportDetail.dateCompleted);
+        } else {
+            txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel));
         }
 
         if (isValidString(reportDetail.dateStarted)) {
-            txtStartDate.setText("Date Started  : " + reportDetail.dateStarted);
+            txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel) + " " + reportDetail.dateStarted);
+        } else {
+            txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel));
         }
 
         if (isValidString(reportDetail.timeSpent)) {
-            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel)+" " + reportDetail.timeSpent);
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + " " + reportDetail.timeSpent);
         } else {
-            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel)+ " 0:00:00");
+            txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + " 0:00:00");
         }
 
         nodataLabel.setText("");
 
         txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
+
+        txtStatustitle.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_statuslabel));
 //        txtStatus.setTextSize(12);
 
         String statusFromModel = learningModel.getStatusActual();
 
-        String displayStatus = learningModel.getStatusActual();
+        String displayStatus = learningModel.getStatusDisplay();
 
         String displayScore = "";
 
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
             if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")) {
-                displayStatus = getLocalizationValue(JsonLocalekeys.status_completed_failed);
+                displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel_failed);
             }
 
             if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")) {
-                displayStatus = getLocalizationValue(JsonLocalekeys.status_completed_passed);
+                displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel_passed);
             }
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
-            displayScore = "100";
+//            displayScore = "100";
         } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
             displayScore = "0";
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
@@ -425,13 +438,13 @@ public class Reports_Activity extends AppCompatActivity {
         } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
-            displayScore = "50";
+//            displayScore = "50";
             displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
             displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
-            displayScore = "100";
+//            displayScore = "100";
         } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
 
             displayStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_registerlabel);
@@ -462,7 +475,7 @@ public class Reports_Activity extends AppCompatActivity {
 
         }
 
-        txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + displayScore);
+        txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + " " + reportDetail.score);
         txtStatus.setText(upperCaseWords(displayStatus));
     }
 

@@ -997,6 +997,120 @@ public class AskExpertDbTables extends DatabaseHandler {
 
     }
 
+    public void injectAsktheExpertSortOptions(String responseStr) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject(responseStr);
+
+        JSONArray jsonTableAry = jsonObject.getJSONArray("Table");
+
+        // for deleting records in table for respective table
+        ejectRecordsinTable(TBL_ASKSORT);
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+            AskExpertSortModel askExpertSortModel = new AskExpertSortModel();
+
+            //  {"ID":462,"SiteID":374,"ComponentID":161,"LocalID":"en-us","OptionText":"Recently Added","OptionValue":"LastActiveDate Desc","EnableColumn":null}
+
+            askExpertSortModel.siteID = jsonMyLearningColumnObj.optInt("SiteID");
+            askExpertSortModel.componentID = jsonMyLearningColumnObj.optInt("ComponentID");
+            askExpertSortModel.localID = jsonMyLearningColumnObj.optString("LocalID");
+            askExpertSortModel.optionText = jsonMyLearningColumnObj.optString("OptionText");
+            askExpertSortModel.optionValue = jsonMyLearningColumnObj.optString("OptionValue");
+            askExpertSortModel.enableColumn = jsonMyLearningColumnObj.optString("EnableColumn");
+            askExpertSortModel.sortID = jsonMyLearningColumnObj.optInt("ID");
+
+            injectAsktheExpertSortOptionsIntoSQLite(askExpertSortModel);
+        }
+
+    }
+
+
+    public void injectAsktheExpertSortOptionsIntoSQLite(AskExpertSortModel askExpertSortModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = null;
+        try {
+
+            //    db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_ASKSORT + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, siteID INTEGER, ComponentID INTEGER, LocalID TEXT, OptionText TEXT, OptionValue TEXT, LastActiveDate TEXT,EnableColumn TEXT)");
+
+
+            contentValues = new ContentValues();
+            contentValues.put("LocalID", askExpertSortModel.localID);
+            contentValues.put("ComponentID", askExpertSortModel.componentID);
+            contentValues.put("siteID", askExpertSortModel.siteID);
+            contentValues.put("OptionText", askExpertSortModel.optionText);
+            contentValues.put("OptionValue", askExpertSortModel.optionValue);
+            contentValues.put("sortID", askExpertSortModel.sortID);
+            contentValues.put("EnableColumn", askExpertSortModel.siteID);
+
+
+            db.insert(TBL_ASKSORT, null, contentValues);
+        } catch (SQLiteException exception) {
+
+            exception.printStackTrace();
+        }
+
+    }
+
+    public List<AskExpertSortModel> fetchAskSortModelList() {
+        List<AskExpertSortModel> askExpertSortModelList = null;
+        AskExpertSortModel askExpertSortModel = new AskExpertSortModel();
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String strSelQuerys = "SELECT * FROM " + TBL_ASKSORT + " WHERE siteid  = " + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "fetchCatalogModel: " + strSelQuerys);
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuerys, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                askExpertSortModelList = new ArrayList<AskExpertSortModel>();
+                do {
+
+                    askExpertSortModel = new AskExpertSortModel();
+
+                    askExpertSortModel.localID = cursor.getString(cursor
+                            .getColumnIndex("LocalID"));
+
+                    askExpertSortModel.componentID = cursor.getInt(cursor
+                            .getColumnIndex("ComponentID"));
+
+                    askExpertSortModel.siteID = cursor.getInt(cursor
+                            .getColumnIndex("siteID"));
+
+                    askExpertSortModel.optionText = cursor.getString(cursor
+                            .getColumnIndex("OptionText"));
+
+                    askExpertSortModel.optionValue = cursor.getString(cursor
+                            .getColumnIndex("OptionValue"));
+
+                    askExpertSortModel.sortID = cursor.getInt(cursor
+                            .getColumnIndex("sortID"));
+
+                    askExpertSortModel.enableColumn = cursor.getString(cursor
+                            .getColumnIndex("EnableColumn"));
+
+                    askExpertSortModelList.add(askExpertSortModel);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+
+        }
+
+        return askExpertSortModelList;
+    }
+
+
 }
 
 

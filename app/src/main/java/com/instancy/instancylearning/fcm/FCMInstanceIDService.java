@@ -26,7 +26,11 @@ public class FCMInstanceIDService extends FirebaseInstanceIdService {
         preferencesManager = PreferencesManager.getInstance();
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token string: " + refreshedToken);
-        preferencesManager.setStringValue(refreshedToken, StaticValues.FCM_KEY);
+
+        if (preferencesManager != null)
+            preferencesManager.setStringValue(refreshedToken, StaticValues.FCM_KEY);
+        else
+            Log.d(TAG, "onTokenRefresh: Refreshed not updated ");
 
     }
 }

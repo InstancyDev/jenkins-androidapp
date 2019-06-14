@@ -73,7 +73,6 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
- *
  */
 
 public class TrackList_Activity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, XmlDownloadListner {
@@ -104,9 +103,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
     LinearLayout linearLayout;
     AppController appController;
     UiSettingsModel uiSettingsModel;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,TrackList_Activity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, TrackList_Activity.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,7 +138,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
                 myLearningModel.getCourseName() + "</font>"));
-        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView,"",myLearningModel);
+        trackListExpandableAdapter = new TrackListExpandableAdapter(this, this, blockNames, trackListHashMap, expandableListView, "", myLearningModel, false);
 //        expandableListView.setOnChildClickListener(this);
         // setting list adapter
         expandableListView.setAdapter(trackListExpandableAdapter);
@@ -191,7 +192,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         String paramsString = "SiteURL=" + appUserModel.getSiteURL()
                 + "&ContentID=" + myLearningModel.getContentID()
                 + "&userid=" + appUserModel.getUserIDValue()
-                + "&DelivoryMode=1&IsDownload=0";
+                + "&DelivoryMode=1&IsDownload=0&localeId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
         vollyService.getJsonObjResponseVolley("GETCALL", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString, appUserModel.getAuthHeaders());
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -300,15 +301,16 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             }
 
 
-
         }
     }
+
     public void callMobileGetContentTrackedData(MyLearningModel learningModel) {
         String paramsString = "_studid=" + learningModel.getUserID() + "&_scoid=" + learningModel.getScoId() + "&_SiteURL=" + learningModel.getSiteURL() + "&_contentId=" + learningModel.getContentID() + "&_trackId=";
 
         vollyService.getJsonObjResponseVolley("MLADP", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentTrackedData?" + paramsString, appUserModel.getAuthHeaders(), learningModel);
 
     }
+
     public HashMap<String, List<MyLearningModel>> prepareHashMap(List<MyLearningModel> trackList, List<String> blockNamesAry) {
 
         HashMap<String, List<MyLearningModel>> hashMaps = new HashMap<String, List<MyLearningModel>>();
@@ -337,13 +339,13 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
     @Override
     public void onBackPressed() {
-        boolean isCompleted=false;
-        if (trackListModelList!=null) {
-             isCompleted = onTrackListClose(myLearningModel, trackListModelList);
+        boolean isCompleted = false;
+        if (trackListModelList != null) {
+            isCompleted = onTrackListClose(myLearningModel, trackListModelList);
         }
         if (isCompleted) {
 
-            db.updateCMIstatus(myLearningModel, "Completed");
+            db.updateCMIstatus(myLearningModel, "Completed", 100);
             myLearningModel.setStatusActual("Completed");
         }
         myLearningModel.setStatusActual("waste");
@@ -364,12 +366,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         itemInfo.setIcon(setTintDrawable(myIcon, Color.parseColor(uiSettingsModel.getMenuHeaderTextColor())));
 
 
-             if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
-                 itemInfo.setVisible(true);
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
+            itemInfo.setVisible(true);
+        } else {
+            itemInfo.setVisible(false);
         }
-        else {
-                 itemInfo.setVisible(false);
-             }
 
 
         return true;
@@ -398,14 +399,14 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
             case android.R.id.home:
                 // app icon in action bar clicked; go home
                 Log.d("DEBUG", "onOptionsItemSelected: ");
-                boolean isCompleted=false;
-                if (trackListModelList!=null) {
+                boolean isCompleted = false;
+                if (trackListModelList != null) {
                     isCompleted = onTrackListClose(myLearningModel, trackListModelList);
                 }
 
                 if (isCompleted) {
 
-                    db.updateCMIstatus(myLearningModel, "Completed");
+                    db.updateCMIstatus(myLearningModel, "Completed", 100);
                     myLearningModel.setStatusActual("Completed");
                 }
                 Intent intent = getIntent();
@@ -490,12 +491,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                         if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                             int i = -1;
 
-                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
-                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",true);
+                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true,"");
 
-                            }
-                            else {
-                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",false);
+                            } else {
+                                i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false,"");
                             }
 
                             if (i == 1) {
@@ -512,12 +512,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
                     if (myLearningModelLocal.getStatusActual().equalsIgnoreCase("Not Started")) {
                         int i = -1;
-                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
-                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",true);
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", true,"");
 
-                        }
-                        else {
-                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50",false);
+                        } else {
+                            i = db.updateContentStatusInTrackList(myLearningModelLocal, getResources().getString(R.string.metadata_status_progress), "50", false,"");
                         }
 
                     }
@@ -580,12 +579,11 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
                             progress = jsonObject.get("progress").toString();
                         }
 
-                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")){
-                            i = db.updateContentStatusInTrackList(myLearningModel, status, progress,true);
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                            i = db.updateContentStatusInTrackList(myLearningModel, status, progress, true,"");
 
-                        }
-                        else {
-                            i = db.updateContentStatusInTrackList(myLearningModel, status, progress,false);
+                        } else {
+                            i = db.updateContentStatusInTrackList(myLearningModel, status, progress, false,"");
                         }
 
 

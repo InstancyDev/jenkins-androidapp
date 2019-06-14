@@ -73,7 +73,7 @@ public class ContentFilterByActivity extends AppCompatActivity implements View.O
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
         contentFilterByModelList = (List<ContentFilterByModel>) getIntent().getExtras().getSerializable("contentFilterByModelList");
 
-        String filtersTitle = "Filters";
+        String filtersTitle = getLocalizationValue(JsonLocalekeys.filter_lbl_filtertitlelabel);
         if (isFromMylearning == 0) {
             allFilterModel = (AllFilterModel) getIntent().getExtras().getSerializable("allFilterModel");
             filtersTitle = allFilterModel.categoryName;

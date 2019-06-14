@@ -11,4 +11,12 @@ public interface DownloadInterface {
     void cancelEnrollment(boolean cancelIt);
 
     void addToArchive(boolean added);
+
+    void removeFromMylearning(boolean isRemoved);
+
+    void resheduleTheEvent(boolean isReshedule);
+
+    void badCancelEnrollment(boolean cancelIt);
+
+    void viewCertificateLink(boolean viewIt);
 }

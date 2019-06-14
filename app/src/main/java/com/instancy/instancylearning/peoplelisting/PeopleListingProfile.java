@@ -42,6 +42,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -236,8 +237,8 @@ public class PeopleListingProfile extends AppCompatActivity implements SwipeRefr
 
         String imgUrl = peopleListingModel.siteURL + peopleListingModel.memberProfileImage;
 
-        Picasso.with(this).load(imgUrl).placeholder(R.drawable.defaulttechguy).into(profileImage);
-        Picasso.with(this).load(imgUrl).placeholder(R.drawable.defaulttechguy).into(profileRound);
+        Glide.with(this).load(imgUrl).placeholder(R.drawable.defaulttechguy).into(profileImage);
+        Glide.with(this).load(imgUrl).placeholder(R.drawable.defaulttechguy).into(profileRound);
         profileImage.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
         profileImage.setImageAlpha(25);
 

@@ -15,6 +15,7 @@ public class MySkillModel implements Serializable {
     public int siteID = 374;
     public int userId = 0;
     public JSONArray skilCount = null;
+    public String skillcontentviewlink = "disabled";
     public List<SkillCountModel> skillCountModelList = null;
 
 }

@@ -1,7 +1,9 @@
 package com.instancy.instancylearning.catalog;
 
+
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -9,6 +11,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -78,7 +81,9 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static android.app.Activity.RESULT_OK;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 
@@ -114,7 +119,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
     ResultListner resultListner = null;
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
-
+    Boolean iscatalogclicked = false;
     RecyclerView catalogRecycler;
 
     CustomFlowLayout category_breadcrumb = null;
@@ -162,6 +167,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
             paramStrings = generateParametersHashmap(sideMenusModel.getParameterStrings());
             Boolean isFromCatogories = bundle.getBoolean("ISFROMCATEGORIES");
+
 
             if (isFromCatogories) {
 
@@ -274,7 +280,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             } else {
 
             }
-
             breadCrumbPlusButtonInit(rootView);
 
         }
@@ -319,20 +324,28 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         LinearLayout llCatalogGridCatageory = (LinearLayout) rootView.findViewById(R.id.llCatalogGridCatageory);
         llCatalogGridCatageory.setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppBGColor())));
         category_breadcrumb = (CustomFlowLayout) rootView.findViewById(R.id.cflBreadcrumb);
-        breadcrumbItemsList = new ArrayList<>();
-        addItemToBreadcrumbList("0", getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton));
 
         llCatalogGridCatageory.setVisibility(View.VISIBLE);
+        if (!iscatalogclicked && breadcrumbItemsList == null) {
+            breadcrumbItemsList = new ArrayList<>();
+            addItemToBreadcrumbList("0", getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton));
+        }
 
         generateBreadcrumb(breadcrumbItemsList);
-
         catalogRecycler = (RecyclerView) rootView.findViewById(R.id.catalog_recycler);
 
         catalogRecycler.setHasFixedSize(true);
 
-        categoryButtonModelList1 = new ArrayList<>();
-
-        categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
+        if (!iscatalogclicked && categoryButtonModelList1 == null) {
+            categoryButtonModelList1 = new ArrayList<>();
+            categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
+        } else if (iscatalogclicked && breadcrumbItemsList.size() == 1) {
+            categoryButtonModelList1 = new ArrayList<>();
+            categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
+        } else if (iscatalogclicked && breadcrumbItemsList.size() > 1) {
+            categoryButtonModelList1 = new ArrayList<>();
+            categoryButtonModelList1 = db.openSubCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId(), "" + breadcrumbItemsList.get(breadcrumbItemsList.size() - 1).getAsString("categoryid"));
+        }
 
         if (categoryButtonModelList1.size() == 0) {
             nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
@@ -349,7 +362,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         } else {
             catalogRecycler.setLayoutManager(new GridLayoutManager(context, 2));
         }
-
 
 //        recyclerView.setLayoutManager(mLayoutManager);
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -379,7 +391,13 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                     mAdapter.reloadAllContent(categoryButtonModelList2);
                 } else {
 
-                    getSelectedCategoryData(finalCategoryButtonModelList.get(position), position);
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        getSelectedCategoryData(finalCategoryButtonModelList.get(position), position);
+                    } else {
+
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                    }
+
 
 //                    List<MyLearningModel> myLearningModelList = db.openCategoryContentDetailsFromSQLite("" + finalCategoryButtonModelList.get(position).getCategoryId(), sideMenusModel.getComponentId(), ddlsortBy);
 //
@@ -634,7 +652,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
         if (breadcrumbItemsList != null)
             for (int k = 0; breadcrumbItemsList.size() > k; k++) {
-                if (k != categoryLevel+1) {
+                if (k != categoryLevel + 1) {
                     tempBreadCrumb.add(breadcrumbItemsList.get(k));
                 }
             }
@@ -642,7 +660,6 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         breadcrumbItemsList.addAll(tempBreadCrumb);
 //        breadcrumbItemsList = breadcrumbItemsList.subList(0, categoryLevel + 1);
     }
-
 
     public void generateBreadcrumb(List<ContentValues> dicBreadcrumbItems) {
         boolean isFirstCategory = true;
@@ -668,9 +685,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                 // + categoryId + "\nName: "
                 // + tv.getText().toString(),
                 // R.string.alert_btntext_OK, false);
-
                 if (categoryId.equals("0")) {
-
                     categoryButtonModelList1 = db.openNewCategoryDetailsFromSQLite(appUserModel.getSiteIDValue(), sideMenusModel.getComponentId());
                     mAdapter.reloadAllContent(categoryButtonModelList1);
                 } else {
@@ -874,11 +889,12 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
                     Bundle bundle = new Bundle();
 
-                    Catalog_fragment nextFrag = new Catalog_fragment();
-                    fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                    Catalog_fragment nextFrag = new Catalog_fragment();
+//                    fragmentManager.popBackStack(BACK_STACK_ROOT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     bundle.putSerializable("sidemenumodel", sideMenusModel);
                     bundle.putSerializable("cataloglist", (Serializable) myLearningModelList);
                     bundle.putString("categoryid", "" + catalogCategoryButtonModel.getCategoryId());
+
                     try {
                         bundle.putSerializable("breadicrumblist", (Serializable) breadcrumbItemsList);
                     } catch (ClassCastException ex) {
@@ -886,13 +902,21 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                     }
 
                     bundle.putBoolean("ISFROMCATEGORIES", true);
+//
+//                    nextFrag.setArguments(bundle);
+//                    getActivity().getSupportFragmentManager()
+//                            .beginTransaction()
+//                            .replace(R.id.container_body, nextFrag)
+//                            .addToBackStack(BACK_STACK_ROOT_TAG)
+//                            .commit();
 
+                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                    Catalog_fragment nextFrag = new Catalog_fragment();
                     nextFrag.setArguments(bundle);
-                    getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.container_body, nextFrag)
-                            .addToBackStack(BACK_STACK_ROOT_TAG)
-                            .commit();
+                    nextFrag.setTargetFragment(CatalogCategories_Fragment.this, DETAIL_CLOSE_CODE);
+                    ft.replace(R.id.container_body, nextFrag);
+                    ft.addToBackStack(BACK_STACK_ROOT_TAG);
+                    ft.commit();
 
                 } else {
 
@@ -943,4 +967,20 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == DETAIL_CLOSE_CODE) {
+                breadcrumbItemsList = (List<ContentValues>) data.getSerializableExtra("breadicrumblist");
+                iscatalogclicked = data.getBooleanExtra("iscatalogclicked", false);
+                Log.d(TAG, "onActivityResult: breadicrumblist" + breadcrumbItemsList);
+                if (breadcrumbItemsList != null && breadcrumbItemsList.size() > 0) {
+                    generateBreadcrumb(breadcrumbItemsList);
+                    Log.d(TAG, "onActivityResult: " + categoryButtonModelList1.size());
+                }
+            }
+        }
+    }
 }

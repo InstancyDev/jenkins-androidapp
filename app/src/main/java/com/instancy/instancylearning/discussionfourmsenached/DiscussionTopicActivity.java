@@ -46,6 +46,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -116,7 +117,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     View footor;
 
-    TextView txtLikes;
+    TextView txtLikes, txtTopics;
 
     @Nullable
     @BindView(R.id.fab_comment_button)
@@ -196,7 +197,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel) + "</font>"));
         discussionFourmlistView = (ListView) findViewById(R.id.discussionfourmlist);
         discussionTopicModels = new ArrayList<DiscussionTopicModelDg>();
-        fourmAdapter = new DiscussionTopicAdapter(this, BIND_ABOVE_CLIENT, discussionTopicModels);
+        fourmAdapter = new DiscussionTopicAdapter(this, BIND_ABOVE_CLIENT, discussionTopicModels, discussionForumModel.likePosts);
         discussionFourmlistView.setAdapter(fourmAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
         discussionFourmlistView.addFooterView(footor);
@@ -234,8 +235,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         floatingActionButton.setImageDrawable(d);
 
-
         if (!isAbleCreateTopic) {
+            floatingActionButton.setVisibility(View.GONE);
+        }
+
+        if (!discussionForumModel.createNewTopic) {
             floatingActionButton.setVisibility(View.GONE);
         }
 
@@ -259,7 +263,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     public void initilizeHeaderView(View view) {
 
         TextView txtName = (TextView) view.findViewById(R.id.txt_name);
-        TextView txtTopics = (TextView) view.findViewById(R.id.txtTopics);
+        txtTopics = (TextView) view.findViewById(R.id.txtTopics);
         txtLikes = (TextView) view.findViewById(R.id.txtLikes);
         TextView txtAuthor = (TextView) view.findViewById(R.id.txt_author);
         final TextView txtShortDesc = (TextView) view.findViewById(R.id.txtShortDesc);
@@ -282,7 +286,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
         txtTopics.setText(discussionForumModel.noOfTopics + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
         txtLikes.setText(discussionForumModel.totalLikes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
 
-        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel) + ": ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel) + " ";
 
         if (isValidString(discussionForumModel.moderatorName)) {
 
@@ -296,7 +300,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         if (isValidString(discussionForumModel.updatedAuthor)) {
 
-            totalActivityStr = totalActivityStr + " | " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel) + " : " + discussionForumModel.updatedAuthor + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel) + " " + discussionForumModel.updatedDate;
+            totalActivityStr = totalActivityStr + " | " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel) + "  " + discussionForumModel.updatedAuthor + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel) + " " + discussionForumModel.updatedDate;
         }
 
         txtAuthor.setText(totalActivityStr);
@@ -311,7 +315,11 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         if (isValidString(discussionForumModel.forumThumbnailPath)) {
             attachedImg.setVisibility(View.VISIBLE);
-            Picasso.with(this).load(imgUrl).placeholder(R.drawable.user_placeholder).into(attachedImg);
+
+//            if (imgUrl.startsWith("http:"))
+//                imgUrl = imgUrl.replace("http:", "https:");
+
+            Glide.with(this).load(imgUrl).placeholder(R.drawable.cellimage).into(attachedImg);
         } else {
 
             attachedImg.setVisibility(View.GONE);
@@ -351,7 +359,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
     public void refreshMyLearning(Boolean isRefreshed) {
 
-        vollyService.getJsonObjResponseVolley("GetForumTopics", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&strLocale=preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))", appUserModel.getAuthHeaders());
+        vollyService.getJsonObjResponseVolley("GetForumTopics", appUserModel.getWebAPIUrl() + "/MobileLMS/GetForumTopics?ForumID=" + discussionForumModel.forumID + "&intUserID=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&strLocale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)), appUserModel.getAuthHeaders());
         swipeRefreshLayout.setRefreshing(false);
 
     }
@@ -448,6 +456,9 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             totalCount = totalCount + noofreplies;
 
         }
+
+        txtTopics.setText(discussionTopicModels.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+
 //        txtCommentsCount.setText(totalCount + " Comment(s)");
 //        txtTopicsCount.setText(discussionTopicModels.size() + " Topic(s)");
     }
@@ -585,7 +596,14 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 break;
             case R.id.btn_contextmenu:
                 View v = discussionFourmlistView.getChildAt(position - discussionFourmlistView.getFirstVisiblePosition());
-                ImageButton txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+                assert v != null;
+                ImageButton txtBtnDownload = null;
+                try {
+                    txtBtnDownload = (ImageButton) v.findViewById(R.id.btn_contextmenu);
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace();
+                }
+
                 catalogContextMenuMethod(position, view, txtBtnDownload, discussionTopicModels.get(position));
                 break;
             case R.id.btn_attachment:
@@ -622,6 +640,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
         Intent intentDetail = new Intent(context, AddNewCommentActivity.class);
         intentDetail.putExtra("topicModel", discussionTopicModel);
+        intentDetail.putExtra("forumModel", discussionForumModel);
         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
 
     }
@@ -640,9 +659,10 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
     }
 
 
-    public void attachFragment(DiscussionTopicModelDg forumModel) {
+    public void attachFragment(DiscussionTopicModelDg topicModelDg) {
         Intent intentDetail = new Intent(context, DiscussionCommentsActivity.class);
-        intentDetail.putExtra("topicModel", forumModel);
+        intentDetail.putExtra("topicModel", topicModelDg);
+        intentDetail.putExtra("forumModel", discussionForumModel);
         startActivityForResult(intentDetail, FORUM_CREATE_NEW_FORUM);
     }
 
@@ -732,7 +752,7 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
             LikesAdapter upvotersAdapter = new LikesAdapter(this, likesModelList);
             lv_languages.setAdapter(upvotersAdapter);
             TextView txtCountVoted = view.findViewById(R.id.txtCountVoted);
-            txtCountVoted.setText(likesModelList.size() + " Likes");
+            txtCountVoted.setText(likesModelList.size() + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
             bottomSheetDialog = new BottomSheetDialog(context);
             bottomSheetDialog.setContentView(view);
             bottomSheetDialog.show();
@@ -915,7 +935,6 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
 
                 return headers;
             }
-
         };
 
         RequestQueue rQueue = Volley.newRequestQueue(context);
@@ -926,7 +945,5 @@ public class DiscussionTopicActivity extends AppCompatActivity implements SwipeR
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
     }
-
-
 }
 

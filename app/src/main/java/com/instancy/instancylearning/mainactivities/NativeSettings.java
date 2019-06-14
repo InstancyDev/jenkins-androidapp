@@ -307,7 +307,6 @@ public class NativeSettings extends AppCompatActivity {
 
         String requestURL = getResources().getString(R.string.app_default_auth_url) + "Authentication/GetAPIAuth?AppURL=" + newUrl;
 
-
         VolleySingleton.stringRequests(requestURL, new StringResultListner<String>() {
             @Override
             public void getResult(String result) {

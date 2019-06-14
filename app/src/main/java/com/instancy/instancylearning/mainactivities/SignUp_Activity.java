@@ -41,9 +41,11 @@ public class SignUp_Activity extends AppCompatActivity {
     private AdvancedWebView webView;
     private SVProgressHUD svProgressHUD;
     Context context;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,SignUp_Activity.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, SignUp_Activity.this);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,7 +90,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
         if (uiSettingsModel.isEnableAzureSSOForLearner()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> "+getLocalizationValue(JsonLocalekeys.login_header_logintitlelabel)+"< /font>"));
+            getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'> " + getLocalizationValue(JsonLocalekeys.login_header_logintitlelabel) + "< /font>"));
             url = appDefaultUrl + "fromnative/true";
         } else {
 //            url = appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true"; old login data

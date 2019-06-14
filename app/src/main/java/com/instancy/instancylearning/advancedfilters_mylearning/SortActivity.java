@@ -444,7 +444,6 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
         return sortModelList;
     }
 
-
     public List<SortModel> generateGroupBy() {
 
         List<SortModel> sortModelList = new ArrayList<>();
@@ -455,16 +454,19 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
             sortModel.optionIdValue = allFilterModel.groupArrayList.get(i);
             switch (allFilterModel.groupArrayList.get(i)) {
                 case "DueDates":
-                    sortModel.optionDisplayText = "Due Dates";
+                    sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_duedates);
                     break;
                 case "Job":
-                    sortModel.optionDisplayText = "Job Roles";
+                    sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_jobroles_header);
                     break;
                 case "Skills":
-                    sortModel.optionDisplayText = "Skills";
+                    sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_byskills);
                     break;
                 case "ContentTypes":
-                    sortModel.optionDisplayText = "Content Types";
+                    sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_contenttype);
+                    break;
+                case "Categories":
+                    sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_caegoriestitlelabel);
                     break;
 
             }

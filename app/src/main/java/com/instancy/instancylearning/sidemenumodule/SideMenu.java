@@ -35,8 +35,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.adapters.MenuDrawerDynamicAdapter;
 import com.instancy.instancylearning.askexpert.AskExpertFragment;
@@ -48,6 +50,7 @@ import com.instancy.instancylearning.chatmessanger.SignalAServiceMicrosoft;
 
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.discussionfourmsenached.DiscussionFourm_fragment;
+import com.instancy.instancylearning.events.Event_fragment_DynamicBottomButtons;
 import com.instancy.instancylearning.events.Event_fragment_new;
 import com.instancy.instancylearning.gameficitation.LeaderboardFragment;
 import com.instancy.instancylearning.gameficitation.MyAchivementsFragment;
@@ -61,6 +64,7 @@ import com.instancy.instancylearning.learningcommunities.LearningCommunities_fra
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Login_activity;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProfileDetailsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
@@ -102,6 +106,7 @@ import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_
 import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
+import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
@@ -271,6 +276,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         }
 
+
         backLayout.setOnClickListener(this);
         sendMessageLayout.setOnClickListener(this);
         notificationLayout.setOnClickListener(this);
@@ -290,6 +296,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 //            signalAService = SignalAService.newInstance(this);
 //            signalAService.startSignalA();
         }
+
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_medmentor))) {
+            sendMessageLayout.setVisibility(View.GONE);
+        }
+
         Log.d(TAG, "onCreate: appname " + getResources().getString(R.string.app_name));
 
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -333,10 +344,11 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
                     sendMessageLayout.setVisibility(View.GONE);
                 } else {
-                    sendMessageLayout.setVisibility(View.VISIBLE);
+                    if (!getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.younextyou))) {
+                        sendMessageLayout.setVisibility(View.VISIBLE);
+                    }
 
                 }
-
 
 //                startSignalService();
 
@@ -375,7 +387,13 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 // on first time to display view for first time navigation item based on the number
                 homeModel = model;
                 tempHomeModel = model;
-                homeIndex = Integer.parseInt(indexed);
+                try {
+                    homeIndex = Integer.parseInt(indexed);
+                } catch (NumberFormatException nmEx) {
+                    nmEx.printStackTrace();
+                    homeIndex = 0;
+                }
+
                 lastClicked = 0;
 
             }
@@ -456,6 +474,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             navDrawerExpandableView.expandGroup(lastClicked);
         }
 
+        navDrawerExpandableView.smoothScrollToPosition(0);
+
         if (bundle != null) {
             JSONObject pushObj = new JSONObject();
             isFromPushNotification = bundle.getBoolean("PUSH");
@@ -479,7 +499,22 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             selectItem(homeIndex, homeModel, false, "", ""); // 2 is your fragment's number for "CollectionFragment"
         }
 
+        // checkMemberShipExpiry();
+    }
 
+    public void checkMemberShipExpiry() {
+
+        MembershipModel membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+        boolean isMemberExpired = isMemberyExpry(membershipModel.expirydate);
+
+        if (isMemberExpired) {
+            //  Toast.makeText(this, "Membership Expired ", Toast.LENGTH_SHORT).show();
+        } else {
+            // Toast.makeText(this, "Membership not Expired ", Toast.LENGTH_SHORT).show();
+        }
+
+        Log.d(TAG, "checkMemberShipExpiry: Here");
     }
 
     public void startSignalService() {
@@ -517,7 +552,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         String profileIma = appUserModel.getSiteURL() + "/Content/SiteFiles/374/ProfileImages/" + profileDetailsModel.profileimagepath;
 
-        Picasso.with(this).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
+        if (profileIma.startsWith("http:"))
+            profileIma = profileIma.replace("http:", "https:");
+
+        Glide.with(this).load(profileIma).placeholder(R.drawable.defaultavatar).into(profileImage);
         String name = strAry[0];
 
 //        if (name.contains("Anonymous") || name.contains("null")) {
@@ -533,7 +571,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-//            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.younextyoubanner).into(bottomLogo);
+//            Glide.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).placeholder(R.drawable.younextyoubanner).into(bottomLogo);
 //            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
         }
 
@@ -638,7 +676,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 break;
             case 8:
 //                fragment = new Event_fragment();
-                fragment = new Event_fragment_new();
+//                fragment = new Event_fragment_new();
+                fragment = new Event_fragment_DynamicBottomButtons();
                 break;
             case 4:
 //                fragment = new DiscussionFourm_fragment();
@@ -736,7 +775,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         notificationLayout.setVisibility(View.VISIBLE);
 
         if (isValidString(uiSettingsModel.getNativeAppLoginLogo())) {
-//            Picasso.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(bottomLogo);
+//            Glide.with(this).load(uiSettingsModel.getNativeAppLoginLogo()).into(bottomLogo);
 //            bottomLogo.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppLoginBGColor())));
         }
     }
@@ -797,15 +836,20 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             MAIN_MENU_POSITION = groupPosition;
             SUB_MENU_POSITION = childPosition;
             List<SideMenusModel> mList = hmSubMenuList.get(sideMenumodelList.get(MAIN_MENU_POSITION).getMenuId());
-            SideMenusModel m = mList.get(childPosition);
-
-            if (m.getIsOfflineMenu().equals("true")) {
-                navDrawerExpandableView.setSelectedGroup(groupPosition);
-                navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "", "");
-            } else {
-
+            SideMenusModel m = new SideMenusModel();
+            if (mList != null) {
+                m = mList.get(childPosition);
             }
+
+            if (m==null)
+                return;
+//            if (m.getIsOfflineMenu().equals("true")) {
+//                navDrawerExpandableView.setSelectedGroup(groupPosition);
+//                navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
+//                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "", "");
+//            } else {
+//
+//            }
         }
     }
 
@@ -1102,11 +1146,27 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                             JSONArray jsonTableAry = response.getJSONArray("notificationsdata");
 
-                            if (jsonTableAry.length() > 0) {
-                                txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton) + "(" + jsonTableAry.length() + ")");
+
+                            if (jsonTableAry != null && jsonTableAry.length() > 0) {
+
+                                int notificationCount = getNotificationCount(jsonTableAry);
+
+                                if (notificationCount > 0) {
+                                    txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton) + "(" + notificationCount + ")");
+                                } else {
+                                    txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton));
+                                }
+
                             } else {
                                 txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton));
                             }
+
+
+//                            if (jsonTableAry.length() > 0) {
+//                                txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton) + "(" + jsonTableAry.length() + ")");
+//                            } else {
+//                                txtBtnNotification.setText(getLocalizationValue(JsonLocalekeys.sidemenu_button_notificationbutton));
+//                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1137,6 +1197,31 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
             }
         };
+    }
+
+    public int getNotificationCount(JSONArray jsonTableAry) {
+
+        int notoficationCount = 0;
+
+        for (int i = 0; i < jsonTableAry.length(); i++) {
+            JSONObject jsonMyLearningColumnObj = null;
+            try {
+                jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            // groupid
+            if (jsonMyLearningColumnObj.has("markasread")) {
+
+                boolean markasread = jsonMyLearningColumnObj.optBoolean("markasread", false);
+                if (!markasread)
+                    notoficationCount = notoficationCount + 1;
+
+            }
+        }
+        return notoficationCount;
     }
 
     public void triggerPushNotification(JSONObject jsonObject) {

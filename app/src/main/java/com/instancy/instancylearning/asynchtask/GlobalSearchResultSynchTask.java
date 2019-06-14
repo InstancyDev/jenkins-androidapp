@@ -64,7 +64,7 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
                     "&source=0&type=0&fType=&fValue=&sortBy=PublishedDate&sortType=desc&keywords=&ComponentID=225&ComponentInsID=4021&UserID=" + appUserModel.getUserIDValue() +
                     "&SiteID=" + appUserModel.getSiteIDValue() +
                     "&OrgUnitID=" + appUserModel.getSiteIDValue() +
-                    "&Locale="+ PreferencesManager.getInstance().getLocalizationStringValue("locale_name")+"&AuthorID=-1&groupBy=PublishedDate" +
+                    "&Locale=" + PreferencesManager.getInstance().getLocalizationStringValue("locale_name") + "&AuthorID=-1&groupBy=PublishedDate" +
                     "&objComponentList=" + gLobalSearchSelectedModelList.get(i).componentID + "&intComponentSiteID=" + gLobalSearchSelectedModelList.get(i).siteID;
 
             Log.d(TAG, "doInBackground: " + i);
@@ -215,7 +215,6 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
                         globalSearchResultModel.eventenddatedisplay = formatDate(endDisplayDate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
 
-
                         globalSearchResultModel.eventstartdatetime = formatDate(startDate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
 
                         globalSearchResultModel.eventenddatetime = formatDate(endDate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
@@ -270,6 +269,8 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
 
 
                         globalSearchResultModel.siteurl = resultList.optString("siteurl", "");
+
+                        globalSearchResultModel.isBadCancellationEnabled = resultList.optBoolean("isbadcancellationenabled", false);
 
                         globalSearchResultModel.componentName = selectedModel.componentName;
                         globalSearchResultModel.componentid = selectedModel.componentID;

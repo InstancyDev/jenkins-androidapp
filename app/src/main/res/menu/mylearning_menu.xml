@@ -34,11 +34,10 @@
         app:showAsAction="always|collapseActionView" />
 
 
-    <!--<item-->
-    <!--android:id="@+id/action_search"-->
-    <!--android:actionViewClass="android.widget.SearchView"-->
-    <!--android:icon="@drawable/ic_search_black_24dp"-->
-    <!--android:title="Search"-->
-    <!--app:showAsAction="always" />-->
+    <item
+        android:id="@+id/mylearning_addwaitlist"
+        android:icon="@drawable/filter_icon"
+        android:title="Waitlist"
+        app:showAsAction="always|collapseActionView" />
 
 </menu>

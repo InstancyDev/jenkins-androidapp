@@ -363,7 +363,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             }
         }
 
-        if(contentTypesModelList != null  && contentTypesModelList.size()>13){
+        if (contentTypesModelList != null && contentTypesModelList.size() > 13) {
             contentChart.setMinimumHeight(1000);
         }
 
@@ -416,6 +416,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         progressExpandList.setOnItemClickListener(this);
         progressExpandList.setEmptyView(rootView.findViewById(R.id.nodata_label));
 
+        progressExpandList.setGroupIndicator(null);
 
         progressExpandList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
@@ -449,8 +450,8 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
                     return false;
                 } else {
-                    openReportsActivity(progressReportModel);
 
+                    openReportsActivity(progressReportModel);
 
                     return true;
                 }
@@ -470,7 +471,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         titleContentTypes.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentstypeslabel));
 
         titleContent = (TextView) header.findViewById(R.id.titleContent);
-        titleContent.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contenttitlelabel));
+        titleContent.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentslabel));
 
         titleScore = (TextView) header.findViewById(R.id.titleScore);
         titleScore.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_scorelabel));
@@ -519,9 +520,14 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
 
+        MenuItem itemArchive = menu.findItem(R.id.ctx_archive);
+        MenuItem itemWaitlist = menu.findItem(R.id.mylearning_addwaitlist);
+
         itemInfo.setVisible(false);
         item_filter.setVisible(false);
         item_search.setVisible(false);
+        itemArchive.setVisible(false);
+        itemWaitlist.setVisible(false);
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -1026,6 +1032,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                     progressReportModel.overScore = "";
                 }
 
+                if (progressReportModel.objectTypeID.equalsIgnoreCase("9")){
+                    progressReportModel.overScore = " NA";
+                }
+
             }
             // ObjectID
             if (jsonMyLearningColumnObj.has("skillname")) {
@@ -1052,6 +1062,20 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
             }
 
+            // ObjectID
+            if (jsonMyLearningColumnObj.has("seqid")) {
+
+                progressReportModel.seqId = jsonMyLearningColumnObj.optInt("seqid");
+//                Log.d(TAG, "getChildDataFor: "+jsonMyLearningColumnObj.optInt("seqid"));
+            }
+
+            if (jsonMyLearningColumnObj.has("ParentID")) {
+
+                progressReportModel.eventID = jsonMyLearningColumnObj.optString("ParentID");
+                progressReportModel.trackID = jsonMyLearningColumnObj.optString("ParentID");
+
+            }
+
             progressReportModel.siteID = appUserModel.getSiteIDValue();
 
             progressReportModelList.add(progressReportModel);
@@ -1062,7 +1086,6 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
 
     public void openReportsActivity(ProgressReportModel progressReportModel) {
-
 
         Intent intentReports = new Intent(context, ProgressReportsActivity.class);
         intentReports.putExtra("progressReportModel", progressReportModel);
@@ -1099,6 +1122,9 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
             progressReportModel.SCOID = progressReportChildModel.SCOID;
             progressReportModel.categoryID = progressReportChildModel.categoryID;
             progressReportModel.seqId = progressReportChildModel.seqId;
+            progressReportModel.trackID = progressReportChildModel.trackID;
+            progressReportModel.eventID = progressReportChildModel.eventID;
+
 
         }
         return progressReportModel;

@@ -32,6 +32,7 @@
 
     <com.github.barteksc.pdfviewer.ScrollBar
         android:id="@+id/scrollBar"
+        app:sb_handlerColor="@color/colorDarkGrey"
         android:layout_width="4dp"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"

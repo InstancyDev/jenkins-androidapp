@@ -186,9 +186,10 @@ public class WriteReviewAcitiviy extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+            } else {
+                txtCancel.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_canceloption));
             }
 
-            txtCancel.setText(getLocalizationValue(JsonLocalekeys.details_button_cancelbutton));
             txtSave.setText(getLocalizationValue(JsonLocalekeys.details_button_submitbutton));
 
         }

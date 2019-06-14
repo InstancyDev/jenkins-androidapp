@@ -49,9 +49,11 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     hideProgressListner hideProgressListner = null;
 
     boolean isCloseEnable = false;
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,AdvancedWebCourseLaunch.this);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, AdvancedWebCourseLaunch.this);
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,11 +81,10 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
             if (courseUrl.startsWith("file:///")) {
                 isOffline = true;
-
             } else {
+                courseUrl = courseUrl.replaceAll("\\?", "%3F");
                 isOffline = false;
             }
-
 
             if (savedInstanceState == null) {
                 adWebView.loadUrl(courseUrl);
@@ -187,7 +188,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //                                                   cmiDetails.set_sitrurl(myLearningModel.getSiteURL());
 //                                                   int seqNo = databaseHandler.insertCMI(cmiDetails, true);
 
-
                                                }
 
                                            }
@@ -206,7 +206,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
                                        @Override
                                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                           Log.d(TAG, "shouldOverrideUrlLoading: from normal web " + url);
+                                           Log.d(TAG, "shouldOverrideUrlLoading: " + url);
                                            url = url.toLowerCase();
 
                                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
@@ -295,7 +295,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                svProgressHUD.dismiss();
                                                Log.d(TAG, "onReceivedError: from normal web " + failingUrl);
                                            }
-                                           if (failingUrl.toLowerCase().contains("blank.html?ioscourseclose=true")){
+                                           if (failingUrl.toLowerCase().contains("blank.html?ioscourseclose=true")) {
                                                view.stopLoading();
                                                finish();
                                            }
@@ -337,7 +337,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 
     }
 
-    public void closeCourse(){
+    public void closeCourse() {
 
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);

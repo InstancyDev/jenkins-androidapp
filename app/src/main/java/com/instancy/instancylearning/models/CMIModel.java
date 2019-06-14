@@ -30,6 +30,15 @@ public class CMIModel implements Serializable {
     private String _pooledqusseq = "";
     private String _textResponses = "";
 
+    public String getPercentageCompleted() {
+        return percentageCompleted;
+    }
+
+    public void setPercentageCompleted(String percentageCompleted) {
+        this.percentageCompleted = percentageCompleted;
+    }
+
+    private String percentageCompleted = "";
 
 
     public String getParentObjTypeId() {

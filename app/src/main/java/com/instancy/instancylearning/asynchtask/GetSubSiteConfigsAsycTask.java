@@ -37,8 +37,8 @@ public class GetSubSiteConfigsAsycTask extends AsyncTask<String, Integer, Void> 
     protected Void doInBackground(String... params) {
         int i = 10;
         publishProgress(i);
-        String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0], false);
-
+       // String tempWebApiUrl = webAPIClient.getSiteAPIDetails(params[0], false);
+        String tempWebApiUrl = webAPIClient.getSiteAPIDetailsForDigi(params[0], false,context);
         if (tempWebApiUrl.length() != 0) {
             i = i + 10;
             publishProgress(i);

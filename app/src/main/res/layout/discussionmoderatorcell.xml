@@ -60,10 +60,10 @@
                 android:typeface="sans" />
 
             <TextView
-                android:layout_below="@+id/txtUserName"
                 android:id="@+id/txtAddress"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/txtUserName"
                 android:ellipsize="end"
                 android:gravity="center_vertical|fill_horizontal"
                 android:maxLines="2"
@@ -75,6 +75,7 @@
 
 
         </RelativeLayout>
+
 
     </LinearLayout>
 

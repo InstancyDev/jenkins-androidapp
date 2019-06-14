@@ -176,7 +176,6 @@
 
         <TextView
             android:id="@+id/txtScore"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -189,7 +188,6 @@
 
         <TextView
             android:id="@+id/txtPercentCompleted"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"

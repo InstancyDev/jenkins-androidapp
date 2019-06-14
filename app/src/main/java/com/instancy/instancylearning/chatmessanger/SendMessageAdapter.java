@@ -20,6 +20,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
@@ -62,8 +63,6 @@ public class SendMessageAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
-
-
     }
 
     public void refreshList(List<ChatListModel> peopleListingModelList) {
@@ -131,7 +130,7 @@ public class SendMessageAdapter extends BaseAdapter {
         if (imagePath.length() > 2) {
             String imgUrl = appUserModel.getSiteURL() + chatListModelList.get(position).profPic;
 
-            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
+            Glide.with(convertView.getContext()).load(imgUrl).placeholder(convertView.getResources().getDrawable(R.drawable.defaulttechguy)).into(holder.imgThumb);
 
         } else {
 
@@ -150,7 +149,6 @@ public class SendMessageAdapter extends BaseAdapter {
         } else {
             holder.statusImg.setBackground(getDrawableFromStringWithColorWithSize(convertView.getContext(), R.string.fa_icon_circle_o, "#008000"));
         }
-
 
         holder.txtName.setOnClickListener(new View.OnClickListener() {
 

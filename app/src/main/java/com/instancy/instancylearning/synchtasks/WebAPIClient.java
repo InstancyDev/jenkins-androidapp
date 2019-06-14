@@ -189,8 +189,8 @@ public class WebAPIClient {
         }
     }
 
-    public String getSiteAPIDetailsForDigi(String siteUrl, boolean isMainSite,Context context) {
-        String requestURL =context.getResources().getString(R.string.app_default_auth_url)+ "Authentication/GetAPIAuth?AppURL=" + siteUrl;
+    public String getSiteAPIDetailsForDigi(String siteUrl, boolean isMainSite, Context context) {
+        String requestURL = context.getResources().getString(R.string.app_default_auth_url) + "Authentication/GetAPIAuth?AppURL=" + siteUrl;
 //        String requestURL = "http://angularbasicapi.instancysoft.com/api/Authentication/GetAPIAuth?AppURL=" + siteUrl;
 
         String webApiUrl = "";
@@ -311,8 +311,7 @@ public class WebAPIClient {
     }
 
 
-    public InputStream synchronousPostMethod(String requestURL, String authentication,
-                                             String postData) {
+    public InputStream synchronousPostMethod(String requestURL, String authentication, String postData) {
         inputStream = null;
         httpURLConnection = null;
 

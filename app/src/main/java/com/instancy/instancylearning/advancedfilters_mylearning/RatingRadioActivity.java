@@ -274,7 +274,6 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
             sortModelList.add(sortModel);
         }
 
-
         return sortModelList;
     }
 
@@ -287,7 +286,18 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
                 rbn.setText(sortModelList.get(i).optionDisplayText);
                 rbn.setTextSize(14.0f);
                 rbn.setPadding(4, 18, 4, 18);
-                rbn.setCompoundDrawablesWithIntrinsicBounds(getDrawableForStars((float) 1.5, this), null, null, null);
+
+                float floatValue = 1;
+
+                try {
+                    floatValue = Float.parseFloat(sortModelList.get(i).optionIdValue);
+                } catch (NumberFormatException nExc) {
+                    nExc.printStackTrace();
+                    floatValue = 2;
+                }
+
+
+                rbn.setCompoundDrawablesWithIntrinsicBounds(getDrawableForStars(floatValue, this), null, null, null);
 
                 rbn.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
                 if (contentFilterByModel.categorySelectedID == sortModelList.get(i).categoryID) {

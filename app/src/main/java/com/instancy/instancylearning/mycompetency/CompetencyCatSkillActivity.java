@@ -100,7 +100,6 @@ public class CompetencyCatSkillActivity extends AppCompatActivity implements Swi
     IResult resultCallback = null;
     DatabaseHandler db;
 
-
     String jobRoleName = "", jobTag = "";
 
     int jobRoleID = 0;

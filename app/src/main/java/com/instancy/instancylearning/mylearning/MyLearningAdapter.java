@@ -40,6 +40,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.florent37.viewtooltip.ViewTooltip;
 import com.instancy.instancylearning.R;
@@ -77,6 +78,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -103,8 +105,10 @@ public class MyLearningAdapter extends BaseAdapter {
     AppController appcontroller;
     EventInterface eventInterface;
     boolean isReportEnabled = true;
+    boolean isWaitListedContent = false;
+    boolean isIconEnabled = false;
 
-    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface, boolean isReportEnabled, SideMenusModel sideMenusModel) {
+    public MyLearningAdapter(Activity activity, int resource, List<MyLearningModel> myLearningModel, EventInterface eventInterface, boolean isReportEnabled, SideMenusModel sideMenusModel, boolean isIconEnabled) {
         this.eventInterface = eventInterface;
         this.activity = activity;
         this.myLearningModel = myLearningModel;
@@ -121,12 +125,14 @@ public class MyLearningAdapter extends BaseAdapter {
         appUserModel.getWebAPIUrl();
         /* setup enter and exit animation */
         appcontroller = AppController.getInstance();
+        this.isIconEnabled = isIconEnabled;
     }
 
-    public void refreshList(List<MyLearningModel> myLearningModel) {
+    public void refreshList(List<MyLearningModel> myLearningModel, boolean isWaitListedContent) {
         this.myLearningModel = myLearningModel;
         this.searchList = new ArrayList<MyLearningModel>();
         this.searchList.addAll(myLearningModel);
+        this.isWaitListedContent = isWaitListedContent;
         this.notifyDataSetChanged();
     }
 
@@ -364,34 +370,6 @@ public class MyLearningAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-
-//    public String returnGroupID(String groupName) {
-//
-//        String groupID = "";
-//
-//        switch (groupName) {
-//            case "Authors":
-//                groupID = "authors";
-//                break;
-//            case "Job":
-//                groupID = "job";
-//                break;
-//            case "Categories":
-//                groupID = "categories";
-//                break;
-//            case "Skills":
-//                groupID = "skills";
-//                break;
-//            case "ContentTypes":
-//                groupID = "contenttypes";
-//                break;
-//
-//        }
-//
-//        return groupID;
-//    }
-
-
     @Override
     public int getCount() {
         return myLearningModel.size();
@@ -475,15 +453,16 @@ public class MyLearningAdapter extends BaseAdapter {
             ratingRequired = 0;
         }
 
-        if (myLearningModel.get(position).getStatusActual().toLowerCase().contains("completed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("attended") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("passed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("failed")) {
-            holder.ratingBar.setVisibility(View.GONE);
-            holder.txtWriteReview.setVisibility(View.VISIBLE);
-
-        }
-
         if (myLearningModel.get(position).getTotalratings() >= uiSettingsModel.getNumberOfRatingsRequiredToShowRating() && ratingValue >= ratingRequired) {
             holder.txtWriteReview.setVisibility(View.GONE);
             holder.ratingBar.setVisibility(View.VISIBLE);
+        }
+
+        if (myLearningModel.get(position).getStatusActual().toLowerCase().contains("completed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("attended") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("passed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("failed")) {
+            holder.ratingBar.setVisibility(View.GONE);
+            holder.txtWriteReview.setVisibility(View.VISIBLE);
+        } else {
+            holder.ratingBar.setIsIndicator(true);
         }
 
         // apply colors
@@ -541,7 +520,6 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.btnDownload.setVisibility(View.GONE);
             holder.circleProgressBar.setVisibility(View.GONE);
 
-
 //            holder.progressBar.setVisibility(View.GONE);
 
         } else {
@@ -586,153 +564,204 @@ public class MyLearningAdapter extends BaseAdapter {
         }
 
         holder.txtCourseStatus.setVisibility(View.VISIBLE);
-        String courseStatus = "";
-//            int progressPercentage = 1;
-//
-//            try {
-//                progressPercentage = Integer.parseInt(myLearningModel.get(position).getProgress());
-//            } catch (NumberFormatException ex) {
-//                progressPercentage = 0;
-//                ex.printStackTrace();
-//            }
 
+//        String courseStatus = "";
+//        int progressPercentage = 0;
+//        String statusFromModel = myLearningModel.get(position).getStatusActual();
+//        String statusDisplay = myLearningModel.get(position).getStatusDisplay();
+//
+//        Log.d(TAG, "getView: statusFromModel" + statusFromModel);
+
+//        if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
+//            if (statusFromModel.equalsIgnoreCase("Completed")) {
+//                statusFromModel = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
+//            } else if (statusFromModel.equalsIgnoreCase("failed")) {
+//
+//                statusFromModel = vi.getContext().getString(R.string.status_completed_failed);
+//            } else if (statusFromModel.equalsIgnoreCase("passed")) {
+//                statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_passed);
+//            }
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
+//            courseStatus = statusFromModel;
+//            progressPercentage = 100;
+//        } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
+//            courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_notstartedlabel);
+//            progressPercentage = 0;
+//        } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
+//
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
+//            String status = "";
+//            if (statusFromModel.equalsIgnoreCase("incomplete")) {
+//
+//                status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
+//            } else if (statusFromModel.length() == 0) {
+//
+//                status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
+//            } else {
+//                status = statusFromModel;
+//
+//            }
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
+//            courseStatus = status;
+//            progressPercentage = 50;
+//        } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+//            courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
+//            ;
+//            progressPercentage = 100;
+//        } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
+//            courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_registerlabel);
+//
+//            if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+//                courseStatus = getLocalizationValue(JsonLocalekeys.details_label_tobeshedule);
+//                holder.txtCourseStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+//            }
+//            progressPercentage = -1;
+//        } else if (statusFromModel.toLowerCase().contains("attended")) {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+//            courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_attendedlabel);
+//            progressPercentage = -1;
+//        } else if (statusFromModel.toLowerCase().contains("Expired")) {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+//            courseStatus = getLocalizationValue(JsonLocalekeys.mylearning_label_expiredlabel);
+//            ;
+//            progressPercentage = -1;
+//        } else if (statusFromModel.toLowerCase().contains("waitlisted")) {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+//            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+//            courseStatus = statusFromModel;
+//            progressPercentage = -1;
+//        } else {
+//            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
+//            courseStatus = statusFromModel;
+//            progressPercentage = 0;
+//        }
+//        if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+//            holder.txtCourseStatus.setText(courseStatus);
+//        } else {
+//            if (isValidString(myLearningModel.get(position).getPercentCompleted())) {
+//                holder.txtCourseStatus.setText(courseStatus + "(" + myLearningModel.get(position).getPercentCompleted() + "%)");
+//                try {
+//                    holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getPercentCompleted()));
+//                } catch (NumberFormatException ex) {
+//                    ex.printStackTrace();
+//                    holder.progressBar.setProgress(progressPercentage);
+//                }
+//
+//            } else {
+//                holder.txtCourseStatus.setText(courseStatus + "(" + progressPercentage + "%)");
+//                holder.progressBar.setProgress(progressPercentage);
+//            }
+//
+//        }
+
+        int progressPercentage = 0;
         String statusFromModel = myLearningModel.get(position).getStatusActual();
+        String statusDisplay = myLearningModel.get(position).getStatusDisplay();
 
         Log.d(TAG, "getView: statusFromModel" + statusFromModel);
 
         if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
-
-            if (statusFromModel.equalsIgnoreCase("Completed")) {
-
-//                statusFromModel = "Completed";
-                statusFromModel = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
-
-
-            } else if (statusFromModel.equalsIgnoreCase("failed")) {
-
-//                statusFromModel = "Completed(failed)";
-                statusFromModel = vi.getContext().getString(R.string.status_completed_failed);
-            } else if (statusFromModel.equalsIgnoreCase("passed")) {
-
-//                statusFromModel = "Completed(passed)";
-                statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_passed);
-            }
-
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusCompleted)));
-            holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-            courseStatus = statusFromModel + " (" + 100;
-        } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
+            File myFile = new File(myLearningModel.get(position).getOfflinepath());
+            if (myFile.exists()) {
+                if (statusFromModel.toLowerCase().equalsIgnoreCase("completed")) {
+                    statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
+                } else if (statusFromModel.equalsIgnoreCase("failed")) {
+                    statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel_failed);
+                } else if (statusFromModel.equalsIgnoreCase("passed")) {
+                    statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel_passed);
+                }
 
+            }
+            progressPercentage = 100;
+        } else if (statusFromModel.equalsIgnoreCase("Not Started") || statusFromModel.length() == 0) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusNotStarted)));
-            holder.progressBar.setProgress(1);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusNotStarted));
-            courseStatus = statusFromModel + "  (0";
-
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
-                courseStatus = statusFromModel;
-            } else {
-                courseStatus = statusFromModel + "(" + 0;
-            }
-
+            progressPercentage = 0;
         } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
-
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusInProgress)));
-            String status = "";
-
-            if (statusFromModel.equalsIgnoreCase("incomplete")) {
-//                status = "In Progress ";
-                status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
-            } else if (statusFromModel.length() == 0) {
-//                status = "In Progress ";
-                status = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
-            } else {
-                status = statusFromModel;
-
-            }
-            holder.progressBar.setProgress(50);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusInProgress));
-
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
-                courseStatus = status;
-            } else {
-                courseStatus = status + " (" + 50;
-            }
-
-
-
+            progressPercentage = 50;
         } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
-            String status = "Pending Review";
-
-            status = getLocalizationValue(JsonLocalekeys.mylearning_label_pendingreviewlabel);
-
-            holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status + "(" + 100;
+            progressPercentage = 100;
         } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
-            String status = "";
-
-//            status = statusFromModel;
-            status = getLocalizationValue(JsonLocalekeys.mylearning_label_registerlabel);
-            holder.progressBar.setProgress(100);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusCompleted));
-            courseStatus = status;
-
             if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
-                courseStatus = getLocalizationValue(JsonLocalekeys.details_label_tobeshedule);
                 holder.txtCourseStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
             }
-
-        } else if (statusFromModel.toLowerCase().contains("attended")) {
+            progressPercentage = -1;
+        } else if (statusFromModel.toLowerCase().contains("attended") || statusFromModel.toLowerCase().contains("Expired") || statusFromModel.toLowerCase().contains("waitlisted")) {
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
-            String status = "";
-
-//            status = statusFromModel;
-
-            status = getLocalizationValue(JsonLocalekeys.mylearning_label_attendedlabel);
             holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status;
-        } else if (statusFromModel.toLowerCase().contains("Expired")) {
-            holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
-            String status = "";
-
-//            status = statusFromModel;
-            status = getLocalizationValue(JsonLocalekeys.mylearning_label_expiredlabel);
-            holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
-            courseStatus = status;
+            progressPercentage = -1;
         } else {
-
             holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorGray)));
-            holder.progressBar.setProgress(0);
-            String status = "";
-            status = statusFromModel;
-            if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
-                courseStatus = status;
-            } else {
-                courseStatus = status + "(" + 0;
-            }
+            progressPercentage = 0;
+        }
 
-        }
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
-            holder.txtCourseStatus.setText(courseStatus);
+            if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                holder.txtCourseStatus.setText(getLocalizationValue(JsonLocalekeys.details_label_tobeshedule));
+            } else {
+                holder.txtCourseStatus.setText(statusDisplay);
+            }
         } else {
-            holder.txtCourseStatus.setText(courseStatus + "%)");
+            if (isValidString(myLearningModel.get(position).getPercentCompleted())) {
+                holder.txtCourseStatus.setText(statusDisplay + "(" + myLearningModel.get(position).getPercentCompleted() + "%)");
+                try {
+                    if (isValidString(myLearningModel.get(position).getPercentCompleted()) && myLearningModel.get(position).getPercentCompleted().contains(".")) {
+                        float i = Float.valueOf(myLearningModel.get(position).getPercentCompleted());
+                        int progressValue = (int) i;
+                        holder.progressBar.setProgress(progressValue);
+                        progressPercentage = progressValue;
+                    } else {
+                        holder.progressBar.setProgress(Integer.parseInt(myLearningModel.get(position).getPercentCompleted()));
+                        progressPercentage = Integer.parseInt(myLearningModel.get(position).getPercentCompleted());
+                    }
+                } catch (NumberFormatException ex) {
+                    ex.printStackTrace();
+                    holder.progressBar.setProgress(progressPercentage);
+                }
+
+            } else {
+                holder.txtCourseStatus.setText(statusDisplay + "(" + progressPercentage + "%)");
+                holder.progressBar.setProgress(progressPercentage);
+            }
         }
+
         String imgUrl = myLearningModel.get(position).getImageData();
 
-        Picasso.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+
+        Glide.with(vi.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
         String thumbUrl = myLearningModel.get(position).getSiteURL() + "/Content/SiteFiles/ContentTypeIcons/" + myLearningModel.get(position).getContentTypeImagePath();
 
-        Picasso.with(vi.getContext()).
-                load(thumbUrl).
-                into(holder.fabbtnthumb);
+        if (isIconEnabled)
+            holder.fabbtnthumb.setVisibility(View.VISIBLE);
+        else
+            holder.fabbtnthumb.setVisibility(View.GONE);
+
+        if (isIconEnabled)
+            Glide.with(vi.getContext()).
+                    load(thumbUrl.trim()).
+                    into(holder.fabbtnthumb);
 
         holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorWhite)));
 
-//        holder.btnContextMenu.setImageTintList(ColorStateList.valueOf(Color.parseColor("#ff0000")));
+//        holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
 
         if (myLearningModel.get(position).getIsRequired() == 1) {
             holder.lbRequired.setVisibility(View.VISIBLE);
@@ -741,6 +770,7 @@ public class MyLearningAdapter extends BaseAdapter {
         }
 
         final float oldRating = ratingValue;
+
 
         holder.ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
 
@@ -769,6 +799,12 @@ public class MyLearningAdapter extends BaseAdapter {
                 }
             }
         });
+
+        if (isWaitListedContent) {
+            holder.btnContextMenu.setVisibility(View.INVISIBLE);
+        } else {
+            holder.btnContextMenu.setVisibility(View.VISIBLE);
+        }
 
         // do something for phones running an SDK before lollipop
 
@@ -999,6 +1035,43 @@ public class MyLearningAdapter extends BaseAdapter {
                         e.printStackTrace();//
                     }
                 }
+
+                @Override
+                public void removeFromMylearning(boolean isRemoved) {
+
+                    Toast.makeText(activity, "Removed ", Toast.LENGTH_SHORT).show();
+
+                    eventInterface.removedFromMylearning(myLearningDetalData);
+                }
+
+                @Override
+                public void resheduleTheEvent(boolean isReshedule) {
+
+                    Intent intentDetail = new Intent(activity, MyLearningDetailActivity1.class);
+//                    myLearningDetalData.setContentID(myLearningDetalData.getReSheduleEvent());
+                    intentDetail.putExtra("IFROMCATALOG", false);
+                    intentDetail.putExtra("sideMenusModel", sideMenusModel);
+                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                    intentDetail.putExtra("typeFrom", "tab");
+                    intentDetail.putExtra("reschdule", true);
+                    activity.startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+
+
+                }
+
+                @Override
+                public void badCancelEnrollment(boolean cancelIt) {
+
+                    eventInterface.badCancelEnrollment(myLearningDetalData, cancelIt);
+                    notifyDataSetChanged();
+
+                }
+
+                @Override
+                public void viewCertificateLink(boolean viewIt) {
+
+                    eventInterface.viewCertificateLink(myLearningDetalData);
+                }
             };
 
             setCompleteListner = new SetCompleteListner() {
@@ -1022,7 +1095,7 @@ public class MyLearningAdapter extends BaseAdapter {
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel, isIconEnabled);
             } else if (view.getId() == R.id.txtWriteReview) {
                 try {
 

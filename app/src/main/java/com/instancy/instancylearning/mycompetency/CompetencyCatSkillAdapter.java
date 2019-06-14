@@ -70,7 +70,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
-import static com.instancy.instancylearning.utils.Utilities.isValidEmail;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 

@@ -272,7 +272,13 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
             MyLearningModel myLearningDetalData = convertGlobalModelToMylearningModel(globalSearchResultModel, appUserModel);
 
-            checkUserLogin(myLearningDetalData, false, true, globalSearchResultModel);
+//            checkUserLogin(myLearningDetalData, false, true, globalSearchResultModel);
+
+            try {
+                checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModel);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
         }
 
@@ -564,12 +570,17 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         }
                     } else {
                         if (!returnEventCompleted(globalSearchResultModel.eventstartdatetime)) {
-                            menu.getItem(12).setVisible(true);
+                            //   menu.getItem(12).setVisible(true);
                             if (globalSearchResultModel.viewtype == 3) {
                                 menu.getItem(1).setVisible(true);//buy
                             }
                         }
-
+                    }
+                } else if (globalSearchResultModel.isaddedtomylearning == 1) {
+                    if (!returnEventCompleted(globalSearchResultModel.eventstartdatetime)) {
+                        if (globalSearchResultModel.isBadCancellationEnabled) {
+                            menu.getItem(12).setVisible(true);
+                        }
                     }
                 }
                 menu.getItem(6).setVisible(true);//Detail
@@ -622,7 +633,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_inappserviceunavailable), Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.ctx_relatedcontent:
-                        relatedContentView(myLearningDetalData, GlobalSearchResultsActivity.this);
+                        relatedContentView(myLearningDetalData, GlobalSearchResultsActivity.this,false);
                         break;
                     case R.id.ctx_enroll:
                         enrollEventCall(myLearningDetalData, globalSearchResultModel);
@@ -902,33 +913,119 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public void cancelEnrollment(final MyLearningModel myLearningDetalData) {
+    public void badCancelEnrollmentMethod(final MyLearningModel eventModel) {
 
-        final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
-        builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure))
-                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.profile_button_editprofilecancelbutton), new DialogInterface.OnClickListener() {
+//        http://yournextuapi.instancysoft.com/api/EventSchedule/CheckIsFallUnderbadCancellation?EventID=f22fd42a-f10c-421a-a984-c46c26614736&SiteID=374
+
+        String urlStr = appUserModel.getWebAPIUrl() + "EventSchedule/CheckIsFallUnderbadCancellation?EventID="
+                + eventModel.getContentID() + "&SiteID=" + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        StringRequest jsonObjectRequest = new StringRequest(urlStr,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        svProgressHUD.dismiss();
+                        Log.d("Response: ", " " + response);
+
+                        if (response.contains("true")) {
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
+
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_enrollcancelalersubttitle_alertsubtitle))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertnobuttontitle_nobuttontitle), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                    dialog.dismiss();
+
+                                    cancelEnrollmentMethod(eventModel, true);
+
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        } else if (response.contains("false")) {
+
+                            //  cancelEnrollmentMethod(eventModel, false);
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
             @Override
-            public void onClick(DialogInterface dialog, int i) {
-                dialog.dismiss();
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
             }
-        }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //do things
-                dialog.dismiss();
-                cancelEnrollmentMethod(myLearningDetalData);
+        };
 
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-
-
+        VolleySingleton.getInstance(GlobalSearchResultsActivity.this).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void cancelEnrollmentMethod(final MyLearningModel eventModel) {
+
+    public void cancelEnrollment(final MyLearningModel myLearningDetalData) {
+
+        if (myLearningDetalData.isBadCancellationEnabled()) {
+
+            badCancelEnrollmentMethod(myLearningDetalData);
+
+        } else {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
+            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure))
+                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int i) {
+                    dialog.dismiss();
+                }
+            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //do things
+                    dialog.dismiss();
+                    cancelEnrollmentMethod(myLearningDetalData, false);
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+//        final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
+//        builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_doyouwanttocancelenrolledevent)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_alerttitle_stringareyousure))
+//                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.profile_button_editprofilecancelbutton), new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int i) {
+//                dialog.dismiss();
+//            }
+//        }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog, int id) {
+//                //do things
+//                dialog.dismiss();
+//                cancelEnrollmentMethod(myLearningDetalData);
+//            }
+//        });
+//        AlertDialog alert = builder.create();
+//        alert.show();
+    }
+
+    public void cancelEnrollmentMethod(final MyLearningModel eventModel, boolean isBadCancal) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/CancelEnrolledEvent?EventContentId="
-                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue();
+                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue() + "&isBadCancel=" + isBadCancal + "&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
+
 
         Log.d(TAG, "main login : " + urlStr);
 
@@ -962,7 +1059,6 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                             alert.show();
 
                         }
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -1016,7 +1112,14 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
-                checkUserLogin(myLearningDetalData, false, false, globalSearchResultModelNew);
+//                checkUserLogin(myLearningDetalData, false, false, globalSearchResultModelNew);
+
+                try {
+                    checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModelNew);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
 
             } else {
 
@@ -1138,6 +1241,148 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
+
+    public void checkUserLoginPost(final MyLearningModel learningModel, final boolean isInApp, final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew) throws JSONException {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("UserName", learningModel.getUserName());
+        parameters.put("Password", learningModel.getPassword());
+        parameters.put("MobileSiteURL", appUserModel.getSiteURL());
+        parameters.put("DownloadContent", "");
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("isFromSignUp", false);
+
+        final String postData = parameters.toString();
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                JSONObject jsonObj = null;
+                try {
+                    jsonObj = new JSONObject(s);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if (jsonObj.has("faileduserlogin")) {
+
+                    JSONArray userloginAry = null;
+                    try {
+                        userloginAry = jsonObj
+                                .getJSONArray("faileduserlogin");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    if (userloginAry.length() > 0) {
+
+                        String response = null;
+                        try {
+                            response = userloginAry
+                                    .getJSONObject(0)
+                                    .get("userstatus")
+                                    .toString();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (response.contains("Login Failed")) {
+                            Toast.makeText(GlobalSearchResultsActivity.this,
+                                    getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+
+                        }
+                        if (response.contains("Pending Registration")) {
+
+                            Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                } else if (jsonObj.has("successfulluserlogin")) {
+
+                    try {
+                        JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                        if (loginResponseAry.length() != 0) {
+                            JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                            String userIdresponse = loginResponseAry
+                                    .getJSONObject(0)
+                                    .get("userid").toString();
+
+                            if (userIdresponse.length() != 0) {
+
+                                if (!seeAll) {
+
+                                    if (!isInApp) {
+                                        learningModel.setUserID(userIdresponse);
+                                        addToMyLearning(learningModel, true, true);
+                                    } else {
+//                                            inAppActivityCall(learningModel);
+                                    }
+                                } else {
+
+                                    SideMenusModel sideModel = convertGlobalModelToSideMenuModel(globalSearchResultModelNew);
+
+                                    selectedFragmentForSubsite(sideModel);
+
+                                }
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(GlobalSearchResultsActivity.this);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
 
     public void addExpiryEvets(MyLearningModel catalogModel) throws JSONException {
 
@@ -1640,10 +1885,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
             public void onErrorResponse(VolleyError volleyError) {
 
             }
-        })
-
-        {
-
+        }) {
             @Override
             public String getBodyContentType() {
                 return "application/json";
@@ -1732,7 +1974,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 discussionForumModel.dfChangeUpdateTime = jsonMyLearningColumnObj.optString("DFChangeUpdateTime");
                 discussionForumModel.forumThumbnailPath = jsonMyLearningColumnObj.optString("ForumThumbnailPath");
                 discussionForumModel.descriptionWithLimit = jsonMyLearningColumnObj.optString("DescriptionWithLimit");
-                discussionForumModel.moderatorID = jsonMyLearningColumnObj.optInt("ModeratorID");
+                discussionForumModel.moderatorID = jsonMyLearningColumnObj.optString("ModeratorID");
                 discussionForumModel.updatedAuthor = jsonMyLearningColumnObj.optString("UpdatedAuthor");
 
                 String updatedDate = formatDate(jsonMyLearningColumnObj.optString("UpdatedDate").toString(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");

@@ -120,6 +120,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     AskExpertAdapter askExpertAdapter;
     List<AskExpertQuestionModelDg> askExpertQuestionModelList = null;
 
+    List<AskExpertSortModel> askExpertSortModelList = null;
+
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
@@ -265,6 +267,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                             injectFromDbtoModel();
                             getUserQuestionSkills();
                             getFilterUserSkills();
+                            getSortList();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -296,6 +299,23 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
                             db.injectAsktheExpertsSkills(response);
                             askExpertSkillsModelList = db.fetchAskExpertSkillsList();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+                if (requestType.equalsIgnoreCase("SORT")) {
+                    if (response != null) {
+                        try {
+
+                            db.injectAsktheExpertSortOptions(response);
+                            svProgressHUD.dismiss();
+                            askExpertSortModelList = db.fetchAskSortModelList();
+                            if (askExpertSortModelList != null)
+                                Log.d(TAG, "notifySuccess: askExpertSortModelList = " + askExpertSortModelList.size());
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -357,6 +377,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
         if (isNetworkConnectionAvailable(getContext(), -1)) {
             refreshAskQuestions(false);
+
         } else {
             injectFromDbtoModel();
         }
@@ -364,11 +385,16 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         skillTxt.setOnClickListener(this);
         sortbyTxt.setOnClickListener(this);
 
+        skillTxt.setText(getLocalizationValue(JsonLocalekeys.myconnections_label_alllabel));
+        sortbyTxt.setText(getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel));
+
         if (isFromGlobalSearch) {
             swipeRefreshLayout.setEnabled(false);
         }
         nodata_Label.setText("");
+
         initilizeView();
+
         initilizeFloatBtn(context);
 
         return rootView;
@@ -577,7 +603,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(false);
         if (isNetworkConnectionAvailable(getContext(), -1)) {
-            queryText="";
+            queryText = "";
             refreshAskQuestions(true);
             MenuItemCompat.collapseActionView(item_search);
         } else {
@@ -673,7 +699,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         menu.getItem(0).setVisible(true);//delete ctx_edit
         menu.getItem(1).setVisible(true);// ctx_edit
         menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_deleteoption));//view
-        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));;//enroll
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.asktheexpert_actionsheet_editoption));
+        ;//enroll
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -723,7 +750,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                 if (s.contains("success")) {
 
                     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_stringsuccess)
-                            +" \n"+getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_questiondeletesuccess_message), Toast.LENGTH_SHORT).show();
+                            + " \n" + getLocalizationValue(JsonLocalekeys.asktheexpert_alerttitle_questiondeletesuccess_message), Toast.LENGTH_SHORT).show();
                     refreshAskQuestions(true);
 //                    deleteQuestionFromLocalDB(questionModel);
                 } else {
@@ -825,7 +852,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                 filterPopUp();
                 break;
             case R.id.sortbyTxt:
-                showSortPopup(view);
+//                showSortPopup(view);
+                showDynamicSortPopup(view);
                 break;
             case R.id.fab_ask_question:
                 callAskQuestion(-1);
@@ -859,14 +887,17 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
                     case R.id.ctx_sort_activity:
                         askExpertAdapter.applySortBy(false, "0");
                         break;
-                    case R.id.ctx_sort_answers:
-                        askExpertAdapter.applySortBy(false, "1");
-                        break;
+//                    case R.id.ctx_sort_answers:
+//                        askExpertAdapter.applySortBy(false, "1");
+//                        break;
                     case R.id.ctx_sort_views:
                         askExpertAdapter.applySortBy(true, "2");
                         break;
-                    case R.id.ctx_sort_title:
+                    case R.id.ctx_sort_atoz:
                         askExpertAdapter.applySortBy(true, "3");
+                        break;
+                    case R.id.ctx_sort_ztoa:
+                        askExpertAdapter.applySortBy(false, "3");
                         break;
                     default:
                         break;
@@ -877,6 +908,53 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         popup.show();
     }
 
+
+    private void showDynamicSortPopup(View v) {
+        if (askExpertSortModelList != null && askExpertSortModelList.size() > 0) {
+            PopupMenu menu = new PopupMenu(context, v);
+            menu.getMenu().add("Select");
+            menu.getMenu().findItem(0).setEnabled(false);
+
+            for (int k = 0; k < askExpertSortModelList.size(); k++) {
+//                menu.getMenu().add(askExpertSortModelList.get(k).optionText);
+                menu.getMenu().add(Menu.NONE, askExpertSortModelList.get(k).sortID, 2, askExpertSortModelList.get(k).optionText);
+
+            }
+            // Inflate the menu from xml
+            menu.show();
+            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case 0:
+                            //askExpertAdapter.applySortBy(true, "-1");
+                            break;
+                        case 462: //"Recently Added"
+                            askExpertAdapter.applySortBy(false, "0");
+                            break;
+                        case 463:// "Answers Desc"
+                            askExpertAdapter.applySortBy(false, "1");
+                            break;
+                        case 464://"Most Views"
+                            askExpertAdapter.applySortBy(true, "2");
+                            break;
+                        case 465: //"Title A-Z"
+                            askExpertAdapter.applySortBy(true, "3");
+                            break;
+                        case 466: //"Title Z-A"
+                            askExpertAdapter.applySortBy(false, "3");
+                            break;
+                        default:
+                            break;
+                    }
+                    return false;
+                }
+            });
+
+        } else {
+            Toast.makeText(context, "No Sort options found", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
     public void filterPopUp() {
 
@@ -923,7 +1001,7 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
 
                         }
-                    }).setPositiveButton(getLocalizationValue(JsonLocalekeys.asktheexpert_alertbutton_allbutton), new DialogInterface.OnClickListener() {
+                    }).setPositiveButton(getLocalizationValue(JsonLocalekeys.myconnections_label_alllabel), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -977,21 +1055,44 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
 
     }
 
+    public void getSortList() {
+
+        if (isNetworkConnectionAvailable(context, -1)) {
+
+            String urlStr = "OrgUnitID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&ComponentID=" + sideMenusModel.getComponentId() + "&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "";
+
+            vollyService.getStringResponseVolley("SORT", appUserModel.getWebAPIUrl() + "/catalog/GetComponentSortOptions?" + urlStr, appUserModel.getAuthHeaders());
+
+        } else {
+
+            Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+
     @Override
     public void tagClickedInterface(String categoryName) {
 
-        Toast.makeText(context, "" + categoryName, Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(context, "" + categoryName, Toast.LENGTH_SHORT).show();
         String categoryId = getCategoryIdFrom(categoryName);
+        if (categoryId.length()==0){
+            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.asktheexpert_label_filtersnotconfigured), Toast.LENGTH_SHORT).show();
+        }
         filteredByCategory(categoryId, categoryName);
 
     }
 
     public String getCategoryIdFrom(String skillName) {
         String categoryID = "";
+
+        if (askExpertCategoriesModelsList == null) {
+            return "";
+        }
         if (askExpertCategoriesModelsList != null && askExpertCategoriesModelsList.size() == 0) {
             askExpertCategoriesModelsList = db.fetchAskFilterSkillsList();
         }
-
+//giuogiu
         for (int s = 0; s < askExpertCategoriesModelsList.size(); s++) {
             if (skillName.trim().toLowerCase().equalsIgnoreCase(askExpertCategoriesModelsList.get(s).category.trim().toLowerCase())) {
                 categoryID = askExpertCategoriesModelsList.get(s).categoryID;
@@ -1001,8 +1102,8 @@ public class AskExpertFragment extends Fragment implements SwipeRefreshLayout.On
         return categoryID;
     }
 
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,getActivity());
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, getActivity());
 
     }
 

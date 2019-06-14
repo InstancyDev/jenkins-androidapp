@@ -8,5 +8,6 @@ class SkillCountModel implements Serializable {
     public String porefCatName = "";
     public String prefCatDescription = "";
     public int prefCatID = 0;
+    public String skillcontentviewlink = "disabled";
 
 }

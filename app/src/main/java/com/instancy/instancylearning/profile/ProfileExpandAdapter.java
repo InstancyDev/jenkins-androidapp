@@ -24,6 +24,8 @@ import com.instancy.instancylearning.models.UserExperienceModel;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
+
 /**
  * Created by Upendranath on 5/29/2017. used tutorial
  * http://www.journaldev.com/9942/android-expandablelistview-example-tutorial
@@ -198,23 +200,54 @@ public class ProfileExpandAdapter extends BaseExpandableListAdapter {
             profileDegree.setText(this.userEducationModelList.get(childPosition).titleeducation);
             profileDuration.setText(this.userEducationModelList.get(childPosition).totalperiod);
             profileDuration.setVisibility(View.VISIBLE);
+
+            if (isValidString(this.userEducationModelList.get(childPosition).titleeducation)) {
+                profileDegree.setText(this.userEducationModelList.get(childPosition).titleeducation);
+
+            } else {
+                profileDegree.setText("NA");
+            }
+
         } else if (expandableListTitle.get(groupPosition).groupname.equalsIgnoreCase("Experience")) {
             profileSchool.setText(this.userExperienceModelList.get(childPosition).title);
-            profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
+            //  profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
+
+            if (isValidString(this.userExperienceModelList.get(childPosition).companyName)) {
+                profileDegree.setText(this.userExperienceModelList.get(childPosition).companyName);
+            } else {
+                profileDegree.setText("NA");
+            }
+
             profileDuration.setText(this.userExperienceModelList.get(childPosition).fromDate + " - " + this.userExperienceModelList.get(childPosition).toDate);
             profileDuration.setVisibility(View.VISIBLE);
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("1")) {
             profileSchool.setText(configsModel.attributedisplaytext);
-            profileDegree.setText(configsModel.valueName);
+//            profileDegree.setText(configsModel.valueName);
+            if (isValidString(configsModel.valueName)) {
+                profileDegree.setText(configsModel.valueName);
+            } else {
+                profileDegree.setText("NA");
+            }
             profileDuration.setVisibility(View.GONE);
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("2")) {
             profileSchool.setText(configsModel.attributedisplaytext);
-            profileDegree.setText(configsModel.valueName);
+//            profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
+
+            if (isValidString(configsModel.valueName)) {
+                profileDegree.setText(configsModel.valueName);
+            } else {
+                profileDegree.setText("NA");
+            }
+
         } else if (expandableListTitle.get(groupPosition).groupId.equalsIgnoreCase("6")) {
             profileSchool.setText(configsModel.attributedisplaytext);
-            profileDegree.setText(configsModel.valueName);
             profileDuration.setVisibility(View.GONE);
+            if (isValidString(configsModel.valueName)) {
+                profileDegree.setText(configsModel.valueName);
+            } else {
+                profileDegree.setText("NA");
+            }
         }
 
         if (isLastChild) {

@@ -36,7 +36,7 @@ public class DiscussionForumModelDg implements Serializable {
     public String dfChangeUpdateTime = "";
     public String forumThumbnailPath = "";
     public String descriptionWithLimit = "";
-    public int moderatorID = 0;
+    public String moderatorID = "";
     public String updatedAuthor = "";
     public String updatedDate = "";
     public String moderatorName = "";
@@ -44,6 +44,7 @@ public class DiscussionForumModelDg implements Serializable {
     public String descriptionWithoutLimit = "";
     public String categoryIDs = "";
     public List<String> categoriesIDArray = null;
+    public List<String> moderatorIDArray = null;
 
     public String SqlQuery = "(ID INTEGER PRIMARY KEY AUTOINCREMENT,forumID INTEGER,name TEXT,description TEXT,parentForumID INTEGER,displayOrder INTEGER,siteID INTEGER,createdUserID INTEGER,createdDate TEXT,active BOOLEAN,requiresSubscription BOOLEAN, createNewTopic BOOLEAN, attachFile BOOLEAN, likePosts BOOLEAN,sendEmail BOOLEAN,moderation BOOLEAN,isPrivate BOOLEAN,author TEXT,noOfTopics INTEGER,totalPosts INTEGER, existing INTEGER, totalLikes INTEGER,dfProfileImage TEXT,dfUpdateTime TEXT,dfChangeUpdateTime TEXT,forumThumbnailPath TEXT,descriptionWithLimit TEXT,moderatorID INTEGER,updatedAuthor TEXT,updatedDate TEXT,moderatorName TEXT,allowShare BOOLEAN,descriptionWithoutLimit TEXT)";
 

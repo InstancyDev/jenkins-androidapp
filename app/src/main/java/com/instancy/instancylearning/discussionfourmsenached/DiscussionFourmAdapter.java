@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -117,22 +118,21 @@ public class DiscussionFourmAdapter extends BaseAdapter {
         holder.txtShortDisc.setText(discussionForumModelList.get(position).description);
 //        holder.txtAuthor.setText("Moderator: " + discussionForumModelList.get(position).moderatorName + " | Created by: " + discussionForumModelList.get(position).author + " on " + discussionForumModelList.get(position).createdDate + " | Last Updated by : " + discussionForumModelList.get(position).updatedAuthor + " on " + discussionForumModelList.get(position).updatedDate);
 
-        holder.txtTopics.setText(discussionForumModelList.get(position).noOfTopics + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
-        holder.txtLikes.setText(discussionForumModelList.get(position).totalLikes + " "+getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
+        holder.txtTopics.setText(discussionForumModelList.get(position).noOfTopics + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_topicslabel));
+        holder.txtLikes.setText(discussionForumModelList.get(position).totalLikes + " " + getLocalizationValue(JsonLocalekeys.discussionforum_button_likesbutton));
 
-        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel)+" ";
+        String totalActivityStr = getLocalizationValue(JsonLocalekeys.discussionforum_label_moderatorlabel) + " ";
 
         if (isValidString(discussionForumModelList.get(position).moderatorName)) {
-
             totalActivityStr = totalActivityStr + discussionForumModelList.get(position).moderatorName;
         }
 
         if (isValidString(discussionForumModelList.get(position).author)) {
-            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel)+": " + discussionForumModelList.get(position).author + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_commentedonlabel)+" " + discussionForumModelList.get(position).createdDate;
+            totalActivityStr = totalActivityStr + " | " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdbylabel) + " " + discussionForumModelList.get(position).author + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel) + " " + discussionForumModelList.get(position).createdDate;
         }
 
         if (isValidString(discussionForumModelList.get(position).updatedAuthor)) {
-            totalActivityStr = totalActivityStr + " | "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel)+": " + discussionForumModelList.get(position).updatedAuthor + " "+getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatelabel)+" " +discussionForumModelList.get(position).updatedDate;
+            totalActivityStr = totalActivityStr + " | " + getLocalizationValue(JsonLocalekeys.discussionforum_label_lastupdatedbylabel) + " " + discussionForumModelList.get(position).updatedAuthor + " " + getLocalizationValue(JsonLocalekeys.discussionforum_label_createdonlabel) + " " + discussionForumModelList.get(position).updatedDate;
         }
 
         holder.txtAuthor.setText(totalActivityStr);
@@ -166,7 +166,7 @@ public class DiscussionFourmAdapter extends BaseAdapter {
 
         if (isValidString(discussionForumModelList.get(position).forumThumbnailPath)) {
             holder.attachedImg.setVisibility(View.VISIBLE);
-            Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.attachedImg);
+            Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.attachedImg);
         } else {
 
             holder.attachedImg.setVisibility(View.GONE);
@@ -267,8 +267,9 @@ public class DiscussionFourmAdapter extends BaseAdapter {
 
         this.notifyDataSetChanged();
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,activity);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
 
     }
 }

@@ -65,12 +65,12 @@ public class MySkillDbTables extends DatabaseHandler {
             mySkillModel.siteID = Integer.parseInt(appUserModel.getSiteIDValue());
             mySkillModel.userId = Integer.parseInt(appUserModel.getUserIDValue());
 
-            injectDiscussionForums(mySkillModel);
+            injectSkilladded(mySkillModel);
         }
 
     }
 
-    public void injectDiscussionForums(MySkillModel mySkillModel) {
+    public void injectSkilladded(MySkillModel mySkillModel) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = null;
         try {
@@ -82,7 +82,7 @@ public class MySkillDbTables extends DatabaseHandler {
             contentValues.put("userid", mySkillModel.userId);
             contentValues.put("skillcountObj", "" + mySkillModel.skilCount);
             contentValues.put("skillname", mySkillModel.skillName);
-
+            contentValues.put("skillcontentviewlink", mySkillModel.skillcontentviewlink);
             db.insert(TBL_MYSKILLS, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -120,6 +120,10 @@ public class MySkillDbTables extends DatabaseHandler {
 
                     String jsonString = (cursor.getString(cursor.getColumnIndex("skillcountObj")));
 
+
+                    mySkillModel.skillcontentviewlink = cursor.getString(cursor
+                            .getColumnIndex("skillcontentviewlink"));
+
                     if (jsonString.length() > 0) {
                         mySkillModel.skilCount = new JSONArray(jsonString);
                     }
@@ -144,7 +148,6 @@ public class MySkillDbTables extends DatabaseHandler {
         return mySkillModelList;
     }
 
-
     public List<SkillCountModel> generateSkillCount(JSONArray jsonArray) throws JSONException {
         List<SkillCountModel> skillCountModelList = new ArrayList<>();
 
@@ -157,7 +160,7 @@ public class MySkillDbTables extends DatabaseHandler {
             skillCountModel.prefCatID = jsonMyLearningColumnObj.optInt("PrefCatID");
             skillCountModel.porefCatName = jsonMyLearningColumnObj.optString("PrefCatName");
             skillCountModel.expertLevel = jsonMyLearningColumnObj.optInt("ExpertLevel");
-
+            skillCountModel.skillcontentviewlink = jsonMyLearningColumnObj.optString("skillcontentviewlink", "disabled");
             skillCountModelList.add(skillCountModel);
         }
 

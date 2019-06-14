@@ -318,6 +318,8 @@
                     android:padding="2dp"
                     android:text=""
                     android:textColor="@color/colorGray"
+                    android:background="@android:color/transparent"
+
                     android:textSize="14sp"
                     android:visibility="gone" />
 
@@ -361,6 +363,7 @@
                     android:layout_below="@+id/txtDescription"
                     android:layout_marginTop="2dp"
                     android:ellipsize="end"
+                    android:background="@android:color/transparent"
                     android:gravity="left"
                     android:padding="2dp"
                     android:text=""

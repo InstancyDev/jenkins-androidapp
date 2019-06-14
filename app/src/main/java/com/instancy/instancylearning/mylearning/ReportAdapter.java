@@ -106,15 +106,16 @@ public class ReportAdapter extends BaseAdapter {
 
         holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
+        holder.txtStatusTitle.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_statuslabel));
 
         if (isAssesment) {
             holder.txtName.setText(reportDetailsForQuestionsList.get(position).questionID + ". " + reportDetailsForQuestionsList.get(position).questionName);
 
             holder.txtName.setTypeface(null, Typeface.NORMAL);
 
-            if (reportDetailsForQuestionsList.get(position).questionAnswer.equalsIgnoreCase("na")){
+            if (reportDetailsForQuestionsList.get(position).questionAnswer.equalsIgnoreCase("na")) {
                 holder.txtDateCompleted.setText(" " + reportDetailsForQuestionsList.get(position).questionAnswer);
-            }else {
+            } else {
                 holder.txtDateCompleted.setText(" " + upperCaseWords(reportDetailsForQuestionsList.get(position).questionAnswer));
             }
 
@@ -140,22 +141,19 @@ public class ReportAdapter extends BaseAdapter {
             String dateCompleted = reportDetailList.get(position).dateCompleted;
 
 
-
             String dateStarted = reportDetailList.get(position).dateStarted;
 
             if (isValidString(dateCompleted)) {
-                holder.txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" " + dateCompleted);
+                holder.txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel) + " " + dateCompleted);
             } else {
-                holder.txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel)+" ");
+                holder.txtDateCompleted.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datecompletedlabel) + " ");
             }
-
-
 
             if (isValidString(dateStarted)) {
 
-                holder.txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" "+ dateStarted + " ");
+                holder.txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel) + " " + dateStarted + " ");
             } else {
-                holder.txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel)+" "+ " ");
+                holder.txtStartDate.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_datestartedlabel) + " " + " ");
             }
 
 
@@ -165,7 +163,7 @@ public class ReportAdapter extends BaseAdapter {
             if (isValidString(reportDetailList.get(position).timeSpent)) {
                 holder.txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + reportDetailList.get(position).timeSpent);
             } else {
-                holder.txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) +"0:00:00");
+                holder.txtTimeSpent.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_timespentlabel) + "0:00:00");
             }
 
             String statusFromModel = reportDetailList.get(position).status;
@@ -173,45 +171,44 @@ public class ReportAdapter extends BaseAdapter {
             if (isValidString(statusFromModel)) {
                 if (statusFromModel.equalsIgnoreCase("Completed") || (statusFromModel.toLowerCase().contains("passed") || statusFromModel.toLowerCase().contains("failed")) || statusFromModel.equalsIgnoreCase("completed")) {
 
-                    if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")){
-                        statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_failed);
+                    if (statusFromModel.toLowerCase().equalsIgnoreCase("failed")) {
+                        statusFromModel = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
                     }
 
-                    if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")){
-                        statusFromModel = getLocalizationValue(JsonLocalekeys.status_completed_passed);
+                    if (statusFromModel.toLowerCase().equalsIgnoreCase("passed")) {
+                        statusFromModel = getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel);
                     }
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusCompleted));
-                    reportDetailList.get(position).score = "100";
+                    //  reportDetailList.get(position).score = "100";
                 } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
-                    reportDetailList.get(position).score = "0";
+                    //  reportDetailList.get(position).score = "0";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusNotStarted));
 
-
                 } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
-                    reportDetailList.get(position).score = "50";
+                    //   reportDetailList.get(position).score = "50";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusInProgress));
                     holder.txtStatus.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
-                } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview"))  || (statusFromModel.toLowerCase().contains("grade"))) {
-                    reportDetailList.get(position).score = "50";
+                } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
+                    //   reportDetailList.get(position).score = "50";
                     statusFromModel = "Pending Review";
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
                 } else if (statusFromModel.equalsIgnoreCase("Registered") || (statusFromModel.toLowerCase().contains("registered"))) {
-                    reportDetailList.get(position).score = "100";
+                    //    reportDetailList.get(position).score = "100";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
 
 
                 } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
-                    reportDetailList.get(position).score = "100";
+                    //    reportDetailList.get(position).score = "100";
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
 
                 } else if (statusFromModel.toLowerCase().contains("Expired")) {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorStatusOther));
-                    reportDetailList.get(position).score = "0";
+                    //   reportDetailList.get(position).score = "0";
                 } else {
 
                     holder.txtStatus.setTextColor(convertView.getResources().getColor(R.color.colorGray));
@@ -229,12 +226,16 @@ public class ReportAdapter extends BaseAdapter {
             }
 
             if (isValidString(reportDetailList.get(position).score)) {
-                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + reportDetailList.get(position).score);
+                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + " " + reportDetailList.get(position).score);
             } else {
-                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel)+" 0");
+                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + " 0");
             }
-        }
 
+            if (reportDetailList.get(position).objectTypeID.equalsIgnoreCase("9")) {
+                holder.txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + " NA");
+            }
+
+        }
 
         holder.txtName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -297,8 +298,9 @@ public class ReportAdapter extends BaseAdapter {
         View lineview;
 
     }
-    private String getLocalizationValue(String key){
-        return  JsonLocalization.getInstance().getStringForKey(key,activity);
+
+    private String getLocalizationValue(String key) {
+        return JsonLocalization.getInstance().getStringForKey(key, activity);
     }
 }
 

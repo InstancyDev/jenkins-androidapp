@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -24,6 +25,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -45,11 +47,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.instancy.instancylearning.R;
@@ -57,7 +62,10 @@ import com.instancy.instancylearning.advancedfilters_mylearning.AllFilterModel;
 import com.instancy.instancylearning.advancedfilters_mylearning.AllFiltersActivity;
 import com.instancy.instancylearning.advancedfilters_mylearning.ApplyFilterModel;
 import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByModel;
+import com.instancy.instancylearning.helper.NetworkChangeReceiver;
+import com.instancy.instancylearning.interfaces.SynchCompleted;
 import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
 import com.instancy.instancylearning.normalfilters.AdvancedFilterActivity;
 import com.instancy.instancylearning.asynchtask.CmiSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
@@ -112,8 +120,11 @@ import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
+import static com.instancy.instancylearning.utils.StaticValues.SHEDULED_EVENT_IS_ENROLLED;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
+import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 /**
@@ -122,7 +133,7 @@ import static com.instancy.instancylearning.utils.Utilities.showToast;
  * https://github.com/majidgolshadi/Android-Download-Manager-Pro
  */
 
-public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, SynchCompleted {
 
     String TAG = MyLearningFragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -142,7 +153,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     Context context;
     Toolbar toolbar;
     Menu search_menu;
-    MenuItem item_search, itemArchive;
+    MenuItem item_search, itemArchive, itemWaitlist, itemFilter;
     SideMenusModel sideMenusModel = null;
     String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "", searchText = "", contentFilterType = "";
     ResultListner resultListner = null;
@@ -151,8 +162,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     UiSettingsModel uiSettingsModel;
     AppController appcontroller;
     boolean firstTimeVisible = true;
-
+    boolean isIconEnabled = false;
     boolean isReportEnabled = true;
+
+    //  ContentProperties=objecttypeid,Thumbnailiconpath,createduserid,contentstatus,name,shortdescription
 
     @BindView(R.id.nodata_label)
     TextView nodata_Label;
@@ -163,14 +176,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     EventInterface eventInterface = null;
 
-    int pageIndex = 1, totalRecordsCount = 0, pageSize = 10;
+    int pageIndex = 1, totalRecordsCount = 0, pageSize = 25;
 
     boolean isDigimedica = true;
 
     boolean isSearching = false;
     boolean userScrolled = false;
     boolean isArchived = false;
+    boolean isWaitlisted = false;
     int isArchi = 0;
+    int isWait = 0;
+
+    NetworkChangeReceiver networkChangeReceiver;
 
     ProgressBar progressBar;
     HashMap<String, String> responMap = null;
@@ -194,7 +211,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         db = new DatabaseHandler(context);
 
         initVolleyCallback();
+
         cmiSynchTask = new CmiSynchTask(context);
+        cmiSynchTask.synchCompleted = this;
+
+        // registeredfornetworkchange
+        registerInternetCheckReceiver();
+
         uiSettingsModel = UiSettingsModel.getInstance();
         appcontroller = AppController.getInstance();
         preferencesManager = PreferencesManager.getInstance();
@@ -271,13 +294,20 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             contentFilterType = "";
         }
 
+        if (responMap != null && responMap.containsKey("ContentProperties")) {
+            String contentProperties = responMap.get("ContentProperties");
+
+            if (contentProperties.toLowerCase().contains("thumbnailiconpath"))
+                isIconEnabled = true;
+            else
+                isIconEnabled = false;
+        }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: ");
-
         setHasOptionsMenu(true);
     }
 
@@ -312,9 +342,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             db.injectMyLearningData(response, pageIndex);
                             totalRecordsCount = countOfTotalRecords(response);
                             injectFromDbtoModel();
-
+                            svProgressHUD.dismiss();
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            svProgressHUD.dismiss();
                         }
                     } else {
                         nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
@@ -340,8 +371,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             Intent intent = new Intent(context, AdvancedFilterActivity.class);
                             intent.putExtra("isFrom", 1);
                             startActivityForResult(intent, FILTER_CLOSE_CODE);
+                            svProgressHUD.dismiss();
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            svProgressHUD.dismiss();
                         }
                     } else {
 
@@ -350,6 +383,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     }
 
                 }
+
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -361,21 +395,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
                 if (requestType.equalsIgnoreCase("FILTER")) {
-
                     Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.mylearning_label_filtersnotconfigured), Toast.LENGTH_SHORT).show();
                 }
-
                 if (requestType.equalsIgnoreCase("MYLEARNINGDATA")) {
-
                     nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                 }
-
             }
 
             @Override
             public void notifySuccess(String requestType, String response) {
                 Log.d(TAG, "Volley String post" + response);
-
                 if (requestType.equalsIgnoreCase("MYLEARNINGDATA")) {
                     if (response != null) {
                         try {
@@ -384,7 +413,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             totalRecordsCount = countOfTotalRecords(jsonObj);
                             if (totalRecordsCount == 0) {
                                 myLearningModelsList = new ArrayList<MyLearningModel>();
-                                myLearningAdapter.refreshList(myLearningModelsList);
+                                myLearningAdapter.refreshList(myLearningModelsList, isWaitlisted);
                                 nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                             } else {
                                 injectFromDbtoModel();
@@ -392,6 +421,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            svProgressHUD.dismiss();
                         }
                     } else {
                         nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
@@ -412,6 +442,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             db.injectCMIDataInto(response, myLearningModel);
                         } catch (JSONException e) {
                             e.printStackTrace();
+                            svProgressHUD.dismiss();
                         }
                     } else {
 
@@ -428,11 +459,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearningModelsList = db.fetchMylearningModel();
         if (myLearningModelsList != null) {
 //            Log.d(TAG, "dataLoaded: " + myLearningModelsList.size());
-            myLearningAdapter.refreshList(myLearningModelsList);
+            myLearningAdapter.refreshList(myLearningModelsList, isWaitlisted);
 //            myLearninglistView.setVisibility(View.VISIBLE);
         } else {
             myLearningModelsList = new ArrayList<MyLearningModel>();
-            myLearningAdapter.refreshList(myLearningModelsList);
+            myLearningAdapter.refreshList(myLearningModelsList, isWaitlisted);
 //            myLearninglistView.setVisibility(View.GONE);
             nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
         }
@@ -495,10 +526,10 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     try {
                         Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
                         intentDetail.putExtra("IFROMCATALOG", false);
+                        intentDetail.putExtra("ISICONENABLED", isIconEnabled);
                         intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
                         startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
                         intentDetail.putExtra("sideMenusModel", sideMenusModel);
-                        isFromNotification = false;
                     } catch (IndexOutOfBoundsException ex) {
 //                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
                     }
@@ -534,10 +565,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         myLearningModelsList = new ArrayList<MyLearningModel>();
         isReportEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         initilizeInterface();
-        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface, isReportEnabled, sideMenusModel);
+        myLearningAdapter = new MyLearningAdapter(getActivity(), BIND_ABOVE_CLIENT, myLearningModelsList, eventInterface, isReportEnabled, sideMenusModel, isIconEnabled);
         myLearninglistView.setAdapter(myLearningAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+        ((AppCompatTextView) rootView.findViewById(R.id.nodata_label)).setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+
 //        myLearninglistView.setOnScrollListener(new AbsListView.OnScrollListener() {
 //            @Override
 //            public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -596,9 +629,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             }
                         } else {
                             progressBar.setVisibility(View.GONE);
-
                         }
-
                     }
 
                 } else {
@@ -622,13 +653,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                        refreshMyLearning(true);
 //                    } else {
 //                        progressBar.setVisibility(View.GONE);
-//
 //                    }
 //
 //                } else {
 //                    progressBar.setVisibility(View.GONE);
 //                }
-//
             }
         });
 
@@ -645,7 +674,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         if (isNetworkConnectionAvailable(getContext(), -1) && MYLEARNING_FRAGMENT_OPENED_FIRSTTIME == 0) {
 
-//            refreshMyLearning(false);
             if (isDigimedica) {
                 getMobileMyCatalogObjectsNew(false);
             } else {
@@ -666,7 +694,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void cancelEnrollment(MyLearningModel learningModel, boolean isCancel) {
                 if (isCancel) {
-                    cancelEnrollmentMethod(learningModel);
+                    cancelEnrollmentMethod(learningModel, false);
                 } else {
                     GlobalMethods.addEventToDeviceCalendar(learningModel, context);
                 }
@@ -680,6 +708,37 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     getMobileMyCatalogObjectsNew(true);
                 } else {
                     refreshMyLearning(true);
+                }
+            }
+
+            @Override
+            public void removedFromMylearning(MyLearningModel learningModel) {
+
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    removeContentFromMyLearning(learningModel);
+
+                } else {
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void badCancelEnrollment(MyLearningModel learningModel, boolean isCancelEnrollment) {
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    badCancelEnrollmentMethod(learningModel);
+
+                } else {
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void viewCertificateLink(MyLearningModel learningModel) {
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    certificateAPICallForGenerate(learningModel);
+                } else {
+                    Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -698,9 +757,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: in Mylearning fragment");
-
         MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 2;
-
+        unregisterNetworkReciever();
     }
 
     @Override
@@ -710,18 +768,35 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.mylearning_menu, menu);
         item_search = menu.findItem(R.id.mylearning_search);
-        MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
+        itemFilter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
         itemArchive = menu.findItem(R.id.ctx_archive);
+        itemWaitlist = menu.findItem(R.id.mylearning_addwaitlist);
+
+        itemWaitlist.setVisible(true);
         itemArchive.setVisible(true);
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) {
             itemInfo.setVisible(true);
         } else {
             itemInfo.setVisible(false);
+
+        }
+        if (responMap != null && responMap.containsKey("ShowIndexes")) {
+            String showIndexes = responMap.get("ShowIndexes");
+            if (showIndexes.equalsIgnoreCase("top")) {
+                itemFilter.setVisible(true);
+            }
+        } else {
+            // No such key
+            itemFilter.setVisible(false);
         }
 
-        item_filter.setVisible(true);
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+            itemFilter.setVisible(false);
+            itemWaitlist.setVisible(false);
+            itemArchive.setVisible(false);
+        }
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -757,15 +832,22 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
 
         if (itemArchive != null) {
-            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
             itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
         }
 
-        if (item_filter != null) {
-            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
-            item_filter.setIcon(filterDrawable);
-            item_filter.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_filtertitlelabel));
+        if (itemWaitlist != null) {
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_list_alt, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWaitlist.setIcon(filterDrawable);
+            // itemWaitlist.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
+        }
+
+
+        if (itemFilter != null) {
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_filter, context, uiSettingsModel.getAppHeaderTextColor());
+            itemFilter.setIcon(filterDrawable);
+            itemFilter.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_filtertitlelabel));
         }
 
         if (itemInfo != null) {
@@ -850,22 +932,27 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                 }
                 break;
+            case R.id.mylearning_addwaitlist:
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    getWaitListCall();
+                } else {
+                    showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
+                }
+                break;
 
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void gotoGlobalSearch() {
-
         Intent intent = new Intent(context, GlobalSearchActivity.class);
         intent.putExtra("sideMenusModel", sideMenusModel);
         startActivityForResult(intent, GLOBAL_SEARCH);
-
     }
 
     public void isArchivedCall() {
         if (isArchived) {
-            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
             itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
             isArchived = false;
@@ -873,7 +960,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             pageIndex = 1;
             updateActionbarTitle(true);
         } else {
-            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_leanpub, context, uiSettingsModel.getAppHeaderTextColor());
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_leanpub, context, uiSettingsModel.getAppHeaderTextColor());
             itemArchive.setIcon(filterDrawable);
             itemArchive.setTitle(sideMenusModel.getDisplayName());
             isArchived = true;
@@ -888,6 +975,56 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             refreshMyLearning(true);
         }
     }
+
+
+    public void getWaitListCall() {
+        if (isWaitlisted) {
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_list_alt, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWaitlist.setIcon(filterDrawable);
+            itemWaitlist.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
+            isWaitlisted = false;
+            pageIndex = 1;
+            isWait = 0;
+            updateActionbarTitleForWaitList(true);
+            if (responMap != null && responMap.containsKey("ShowIndexes")) {
+                String showIndexes = responMap.get("ShowIndexes");
+                if (showIndexes.equalsIgnoreCase("top")) {
+                    itemFilter.setVisible(true);
+                }
+            } else {
+                // No such key
+                itemFilter.setVisible(false);
+            }
+            itemArchive.setVisible(true);
+        } else {
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_leanpub, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWaitlist.setIcon(filterDrawable);
+            itemWaitlist.setTitle(sideMenusModel.getDisplayName());
+            isWaitlisted = true;
+            pageIndex = 1;
+            isWait = 1;
+            updateActionbarTitleForWaitList(false);
+
+            itemFilter.setVisible(false);
+            itemArchive.setVisible(false);
+        }
+        if (isDigimedica) {
+            getMobileMyCatalogObjectsNew(true);
+        } else {
+            refreshMyLearning(true);
+        }
+    }
+
+    public void updateActionbarTitleForWaitList(boolean forMylearning) {
+        String titleName = "";
+        if (forMylearning) {
+            titleName = sideMenusModel.getDisplayName();
+        } else {
+            titleName = sideMenusModel.getDisplayName() + "-" + getLocalizationValue(JsonLocalekeys.mylearning_waitlistheader_waitlisttitle);
+        }
+        toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + titleName + "</font>"));
+    }
+
 
     public void updateActionbarTitle(boolean forMylearning) {
         String titleName = "";
@@ -957,7 +1094,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 break;
             case R.id.imagethumb:
             case R.id.txt_title_name:
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext());
+                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext(), isIconEnabled);
                 break;
             case R.id.fabbtnthumb:
                 break;
@@ -968,7 +1105,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 Toast.makeText(context, "review", Toast.LENGTH_SHORT).show();
                 break;
             default:
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext());
+                //   GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext(), isIconEnabled);
         }
 
     }
@@ -1025,6 +1162,17 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
     public void onResume() {
         super.onResume();
 //        triggerActionForFirstItem();
+
+        if (SHEDULED_EVENT_IS_ENROLLED == 1) {
+            pageIndex = 1;
+            if (isDigimedica) {
+                getMobileMyCatalogObjectsNew(true);
+            } else {
+                refreshMyLearning(true);
+            }
+            SHEDULED_EVENT_IS_ENROLLED = 0;
+        }
+
     }
 
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
@@ -1036,7 +1184,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 int conditionCount = conditionsArray.length;
                 if (conditionCount > 0) {
                     responMap = generateHashMap(conditionsArray);
-
                 }
             }
         }
@@ -1259,7 +1406,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         String paramsString = "SiteURL=" + learningModel.getSiteURL()
                 + "&ContentID=" + learningModel.getContentID()
                 + "&userid=" + learningModel.getUserID()
-                + "&DelivoryMode=1&IsDownload=1";
+                + "&DelivoryMode=1&IsDownload=1&localeId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
 
         String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
@@ -1274,6 +1421,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        svProgressHUD.dismiss();
                     }
                 } else {
 
@@ -1319,201 +1467,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult first:");
-
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
-
-            if (data != null) {
-                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
-
-                File myFile = new File(myLearningModel.getOfflinepath());
-
-                if (!myFile.exists()) {
-
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
-
-                        if (isNetworkConnectionAvailable(getContext(), -1)) {
-                            getStatusFromServer(myLearningModel);
-                        }
-
-                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") && myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
-                            int i = -1;
-                            i = db.updateContentStatus(myLearningModel, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50");
-                            if (i == 1) {
-//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-                                injectFromDbtoModel();
-                            } else {
-
-//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-
-
-                    } else {
-                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
-                            int i = -1;
-                            i = db.updateContentStatus(myLearningModel, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50");
-                            if (i == 1) {
-//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-                                injectFromDbtoModel();
-                            } else {
-
-//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                } else {
-                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
-                        int i = -1;
-                        i = db.updateContentStatus(myLearningModel, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50");
-
-                        if (i == 1) {
-//                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
-//                            myLearningAdapter.notifyDataSetChanged();
-//                            injectFromDbtoModel();
-                        } else {
-
-//                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    MenuItemCompat.collapseActionView(item_search);
-                    injectFromDbtoModel();
-                }
-                if (isNetworkConnectionAvailable(getContext(), -1)) {
-                    cmiSynchTask = new CmiSynchTask(context);
-                    cmiSynchTask.execute();
-                }
-            }
-        }
-
-        if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
-//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
-            if (data.getStringExtra("refresh").equalsIgnoreCase("refresh")) {
-                injectFromDbtoModel();
-            } else {
-                boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
-                if (refresh) {
-
-                    if (isDigimedica) {
-                        getMobileMyCatalogObjectsNew(true);
-                    } else {
-                        refreshMyLearning(true);
-                    }
-                }
-            }
-        }
-        if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0) {
-//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
-            if (data == null) {
-                pageIndex = 1;
-                if (isDigimedica) {
-                    getMobileMyCatalogObjectsNew(true);
-                } else {
-                    refreshMyLearning(true);
-                }
-
-            }
-//            boolean refresh = data.getBooleanExtra("SHEDULE", false);
-//            if (refresh) {
-//
-//            }
-        }
-
-
-        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
-
-            boolean resetFilter = data.getBooleanExtra("FILTER", false);
-
-            if (resetFilter) {
-
-                injectFromDbtoModel();
-
-            } else {
-                String sortName = data.getStringExtra("coursetype");
-                boolean filterAscend = data.getBooleanExtra("sortby", false);
-                String configId = data.getStringExtra("configid");
-                myLearningAdapter.applySortBy(filterAscend, configId);
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject = new JSONObject(data.getStringExtra("jsonInnerValues"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                if (jsonObject.length() > 0) {
-                    myLearningAdapter.applyGroupBy(jsonObject);
-                }
-
-                if (jsonObject.length() > 0) {
-                    myLearningAdapter.filterByObjTypeId(jsonObject);
-                }
-
-            }
-
-            if (myLearningModelsList.size() <= 0) {
-                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
-            }
-
-
-        }
-
-        if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK) {
-            if (data != null) {
-                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
-                boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
-                if (refresh) {
-                    if (isDigimedica) {
-                        getMobileMyCatalogObjectsNew(true);
-                    } else {
-                        refreshMyLearning(true);
-                    }
-                }
-
-            }
-        }
-
-        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
-            if (data != null) {
-                searchText = data.getStringExtra("queryString");
-                if (searchText.length() > 0) {
-                    pageIndex = 1;
-                    if (isDigimedica) {
-                        getMobileMyCatalogObjectsNew(true);
-                    } else {
-                        refreshMyLearning(true);
-                    }
-
-                }
-            }
-        }
-
-        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
-            if (data != null) {
-                boolean isApplied = data.getBooleanExtra("APPLY", false);
-                if (isApplied) {
-
-                    contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
-
-                    applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
-                    Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
-                    pageIndex = 1;
-                    if (isDigimedica) {
-                        getMobileMyCatalogObjectsNew(true);
-                    } else {
-                        refreshMyLearning(true);
-                    }
-
-                }
-            }
-        }
-
-
-    }
-
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
 //        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
         String paramsString = "";
@@ -1531,13 +1484,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     + "&SiteID=" + myLearningModel.getSiteID()
                     + "&OrgUnitID=" + myLearningModel.getSiteID()
                     + "&isonexist=onexit";
-
         } else {
             paramsString = "userID="
                     + myLearningModel.getUserID()
                     + "&scoid="
                     + myLearningModel.getScoId();
-
         }
 
         vollyService.getJsonObjResponseVolley("UPDATESTATUS", appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetContentStatus?" + paramsString, appUserModel.getAuthHeaders());
@@ -1559,20 +1510,24 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
                         String status = "";
+
                         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
 
                             status = jsonObject.optString("Name").trim();
                         } else {
-
+                            //    {"ContentStatus":"En Progreso","status":"En Progreso","Name":"incomplete","progress":"2.00"}
                             status = jsonObject.optString("status").trim();
                         }// esperanza call
 
-
+                        String localeStatus = "";
+                        if (jsonObject.has("ContentStatus")) {
+                            localeStatus = jsonObject.get("ContentStatus").toString();
+                        }
                         String progress = "";
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatus(myLearningModel, status, progress);
+                        i = db.updateContentStatus(myLearningModel, status, progress, localeStatus);
                         if (i == 1) {
 
                             injectFromDbtoModel();
@@ -1587,6 +1542,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    svProgressHUD.dismiss();
                 }
             }
         };
@@ -1616,10 +1572,12 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-    public void cancelEnrollmentMethod(final MyLearningModel eventModel) {
+    public void cancelEnrollmentMethod(final MyLearningModel eventModel, boolean isBadCancal) {
+
+        //   http://yournextuapi.instancysoft.com/api//MobileLMS/CancelEnrolledEvent?EventContentId=ffdd7e69-14c6-47c4-bec6-9f71ce07a67a&UserID=1&SiteID=374&isBadCancel=trueLocaleID=en-us
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/CancelEnrolledEvent?EventContentId="
-                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue();
+                + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue() + "&isBadCancel=" + isBadCancal + "&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         Log.d(TAG, "main login : " + urlStr);
 
@@ -1673,6 +1631,72 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
+
+    public void badCancelEnrollmentMethod(final MyLearningModel eventModel) {
+
+//        http://yournextuapi.instancysoft.com/api/EventSchedule/CheckIsFallUnderbadCancellation?EventID=f22fd42a-f10c-421a-a984-c46c26614736&SiteID=374
+
+        String urlStr = appUserModel.getWebAPIUrl() + "EventSchedule/CheckIsFallUnderbadCancellation?EventID="
+                + eventModel.getContentID() + "&SiteID=" + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        StringRequest jsonObjectRequest = new StringRequest(urlStr,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        svProgressHUD.dismiss();
+                        Log.d("Response: ", " " + response);
+
+                        if (response.contains("true")) {
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_enrollcancelalersubttitle_alertsubtitle))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertnobuttontitle_nobuttontitle), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_yesbutton), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                    dialog.dismiss();
+
+                                    cancelEnrollmentMethod(eventModel, true);
+
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        } else if (response.contains("false")) {
+
+                            cancelEnrollmentMethod(eventModel, false);
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
 
     public int countOfTotalRecords(JSONObject jsonObject) throws JSONException {
 
@@ -1889,7 +1913,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     }
 
-
     public void getMobileMyCatalogObjectsNew(Boolean isRefreshed) {
 
         if (!isRefreshed) {
@@ -1928,12 +1951,413 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             parameters.put("duration", applyFilterModel.duration);
             parameters.put("instructors", applyFilterModel.instructors);
             parameters.put("IsArchived", isArchi);
+            parameters.put("IsWaitlist", isWait);
+            parameters.put("ContentID", contentIDFromNotification);
+            contentIDFromNotification = "";
 
         } catch (JSONException e) {
             e.printStackTrace();
+            svProgressHUD.dismiss();
         }
         String parameterString = parameters.toString();
 
         vollyService.getStringResponseFromPostMethod(parameterString, "MYLEARNINGDATA", urlStr);
     }
+
+    public void removeContentFromMyLearning(final MyLearningModel myLearningModel) {
+
+        String urlStr = appUserModel.getWebAPIUrl() + "catalog/RemoveFromMyCatalog?ContentID="
+                + myLearningModel.getContentID() + "&UserID=" + myLearningModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue();
+
+        Log.d(TAG, "main login : " + urlStr);
+
+        urlStr = urlStr.replaceAll(" ", "%20");
+
+        StringRequest jsonObjectRequest = new StringRequest(urlStr,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        svProgressHUD.dismiss();
+                        Log.d("Response: ", " " + response);
+
+                        if (response.contains("true")) {
+
+                            db.ejectEventsFromDownloadData(myLearningModel);
+                            //   db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 0);
+                            injectFromDbtoModel();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+//                        Log.e("Error: ", error.getMessage());
+//                        svProgressHUD.dismiss();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                return headers;
+            }
+        };
+
+        VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public void certificateAPICallForGenerate(final MyLearningModel learningModel) {
+
+        svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
+
+        // 'http://angularwebapi.instancysoft.com/api/MobileLMS/MobiledownloadHTMLasPDF?UserID=1&CID=96662109-ddab-476b-8762-8de6fc7d955f&CertID=9a4d9a11-2ff1-40ad-a175-518af8d24e96&CertPage=certificate.html&SiteID=374&siteURL=http://www.instancyangularsoft.com
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobiledownloadHTMLasPDF?UserID=" + learningModel.getUserID() + "&CID=" + learningModel.getContentID() + "&CertID=" + learningModel.getCertificateId() + "&CertPage=" + learningModel.getCertificatePage() + "&SiteID=" + learningModel.getSiteID() + "&siteURL=" + learningModel.getSiteURL();
+
+        Log.d(TAG, "certificateAPICallForGenerate: " + urlString);
+
+        final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismissImmediately();
+                Log.d(TAG, "onResponse: " + s);
+
+                String replaceString = s.replaceAll("^\"|\"$", "");
+
+                String encodedStr = appUserModel.getSiteURL() + replaceString.replaceAll(" ", "%20");
+
+                if (isValidString(s) && s.contains(".pdf")) {
+                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+                    pdfIntent.putExtra("PDF_URL", encodedStr);
+                    Log.d(TAG, "onResponse: " + encodedStr);
+                    pdfIntent.putExtra("ISONLINE", "YES");
+                    pdfIntent.putExtra("ISCERTIFICATE", true);
+                    pdfIntent.putExtra("PDF_FILENAME", getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption));
+                    pdfIntent.putExtra("myLearningDetalData", learningModel);
+                    startActivity(pdfIntent);
+                }
+                svProgressHUD.dismissImmediately();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                svProgressHUD.dismissImmediately();
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult first:");
+        super.onActivityResult(requestCode, resultCode, data);
+        SHEDULED_EVENT_IS_ENROLLED = 0;
+        if (requestCode == COURSE_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
+
+            if (data != null) {
+                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+
+                File myFile = new File(myLearningModel.getOfflinepath());
+
+                if (!myFile.exists()) {
+
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28") || myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
+
+                        if (isNetworkConnectionAvailable(getContext(), -1)) {
+                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+                                if (myLearningModel.getPercentCompleted().equalsIgnoreCase("100")) {
+                                    db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_complete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel));
+                                    if (isDigimedica) {
+                                        pageIndex = 1;
+                                        getMobileMyCatalogObjectsNew(true);
+                                    } else {
+                                        refreshMyLearning(true);
+                                    }
+                                } else {
+                                    db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_incomplete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
+                                    injectFromDbtoModel();
+                                }
+                            } else {
+                                getStatusFromServer(myLearningModel);
+                            }
+                        } else {
+                            if (myLearningModel.getPercentCompleted().equalsIgnoreCase("100")) {
+                                db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_complete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel));
+                            } else {
+                                db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_incomplete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
+                            }
+                            injectFromDbtoModel();
+                        }
+
+//                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") && myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+//                            int i = -1;
+//                            i = db.updateContentStatus(myLearningModel, getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel), "50");
+//                            if (i == 1) {
+////                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+//                                injectFromDbtoModel();
+//                            } else {
+//
+////                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+
+
+                    } else {
+                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
+                            int i = -1;
+
+                            i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_incomplete_mylearning), "50", getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
+                            if (i == 1) {
+//                                Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+                                injectFromDbtoModel();
+                            } else {
+
+//                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        injectFromDbtoModel();
+                    }
+                } else {
+//                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
+                    int i = -1;
+                    i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_incomplete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
+////
+////                        if (i == 1) {
+//////                            Toast.makeText(context, "Status updated!", Toast.LENGTH_SHORT).show();
+//////                            myLearningAdapter.notifyDataSetChanged();
+//////                            injectFromDbtoModel();
+////                        } else {
+////
+//////                            Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
+////                        }
+//                    }
+
+                    if (i == 1) {
+                        injectFromDbtoModel();
+                    } else {
+
+                    }
+
+                    MenuItemCompat.collapseActionView(item_search);
+
+                }
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    cmiSynchTask = new CmiSynchTask(context);
+//                    cmiSynchTask.synchCompleted = this;
+                    cmiSynchTask.execute();
+                }
+            }
+        }
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
+//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
+            if (data.getStringExtra("refresh").equalsIgnoreCase("refresh")) {
+                injectFromDbtoModel();
+            } else {
+                boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
+                if (refresh || isFromNotification) {
+                    isFromNotification = false;
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
+                }
+            }
+        }
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0) {
+//            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
+            if (data == null) {
+                pageIndex = 1;
+                if (isDigimedica) {
+                    getMobileMyCatalogObjectsNew(true);
+                } else {
+                    refreshMyLearning(true);
+                }
+            }
+//            boolean refresh = data.getBooleanExtra("SHEDULE", false);
+//            if (refresh) {
+//
+//            }
+        }
+
+        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
+
+            boolean resetFilter = data.getBooleanExtra("FILTER", false);
+
+            if (resetFilter) {
+
+                injectFromDbtoModel();
+
+            } else {
+                String sortName = data.getStringExtra("coursetype");
+                boolean filterAscend = data.getBooleanExtra("sortby", false);
+                String configId = data.getStringExtra("configid");
+                myLearningAdapter.applySortBy(filterAscend, configId);
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject = new JSONObject(data.getStringExtra("jsonInnerValues"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
+                }
+
+                if (jsonObject.length() > 0) {
+                    myLearningAdapter.applyGroupBy(jsonObject);
+                }
+
+                if (jsonObject.length() > 0) {
+                    myLearningAdapter.filterByObjTypeId(jsonObject);
+                }
+            }
+
+            if (myLearningModelsList.size() <= 0) {
+                nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+            }
+        }
+
+        if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK) {
+            if (data != null) {
+                MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+                boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
+                if (refresh) {
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
+                }
+
+            }
+        }
+
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+            if (data != null) {
+                searchText = data.getStringExtra("queryString");
+                if (searchText.length() > 0) {
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
+
+                }
+            }
+        }
+
+        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
+            if (data != null) {
+                boolean isApplied = data.getBooleanExtra("APPLY", false);
+                if (isApplied) {
+                    contentFilterByModelList = (List<ContentFilterByModel>) data.getExtras().getSerializable("contentFilterByModelList");
+                    applyFilterModel = (ApplyFilterModel) data.getExtras().getSerializable("applyFilterModel");
+                    Log.d(TAG, "onActivityResult: applyFilterModel : " + applyFilterModel.categories);
+                    pageIndex = 1;
+                    if (isDigimedica) {
+                        getMobileMyCatalogObjectsNew(true);
+                    } else {
+                        refreshMyLearning(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void completedSynch() {
+//        if (isDigimedica) {
+//            getMobileMyCatalogObjectsNew(true);
+//        } else {
+//            refreshMyLearning(true);
+//        }
+        Log.d(TAG, "completedSynch: getMobileMyCatalogObjectsNew");
+    }
+
+    private void registerInternetCheckReceiver() {
+
+        // Create an IntentFilter instance.
+        IntentFilter intentFilter = new IntentFilter();
+
+        // Add network connectivity change action.
+        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+
+        // Set broadcast receiver priority.
+        intentFilter.setPriority(100);
+
+        // Create a network change broadcast receiver.
+        networkChangeReceiver = new NetworkChangeReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                super.onReceive(context, intent);
+                try {
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        Log.d(TAG, "Conectivity Success !!! Mylearning");
+                        callAPIafterSynch();
+                    } else {
+                        Log.d(TAG, "Conectivity Failure !!! Mylearning");
+
+                    }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        // Register the broadcast receiver with the intent filter object.
+        context.registerReceiver(networkChangeReceiver, intentFilter);
+
+    }
+
+    private void unregisterNetworkReciever() {
+
+        // If the broadcast receiver is not null then unregister it.
+        // This action is better placed in activity onDestroy() method.
+        if (this.networkChangeReceiver != null) {
+            context.unregisterReceiver(this.networkChangeReceiver);
+        }
+    }
+
+    public void callAPIafterSynch() {
+
+        new CountDownTimer(500, 1000) {
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            public void onFinish() {
+                pageIndex = 1;
+                if (isDigimedica) {
+                    getMobileMyCatalogObjectsNew(true);
+                } else {
+                    refreshMyLearning(true);
+                }
+            }
+        }.start();
+
+    }
+
+
 }

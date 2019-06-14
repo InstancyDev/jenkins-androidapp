@@ -13,5 +13,5 @@ public class DiscussionModeratorModel implements Serializable {
     public String userName = "";
     public String userDesg = "";
     public String userAddress = "";
-
+    public boolean isSelected = false;
 }

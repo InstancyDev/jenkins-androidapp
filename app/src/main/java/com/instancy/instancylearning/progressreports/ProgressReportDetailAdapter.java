@@ -97,9 +97,7 @@ public class ProgressReportDetailAdapter extends BaseAdapter {
 
 //        holder.card_view.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppBGColor()));
 
-
         holder.txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
-
 
         holder.txtTitle.setText(reportDetailsForQuestionsList.get(position).questionTitle);
 

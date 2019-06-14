@@ -71,7 +71,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
         // Action Bar Color And Tint
         UiSettingsModel uiSettingsModel = UiSettingsModel.getInstance();
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor(uiSettingsModel.getAppHeaderColor())));
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>"+ getLocalizationValue(JsonLocalekeys.filter_lbl_filtertitlelabel)+"</font>"));
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + getLocalizationValue(JsonLocalekeys.filter_lbl_filtertitlelabel) + "</font>"));
 
         isFromMylearning = getIntent().getIntExtra("isFrom", 0);
         sideMenusModel = (SideMenusModel) getIntent().getSerializableExtra("sideMenusModel");
@@ -240,7 +240,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                 if (contentFilterByModelList.get(i).selectedChildSkillIdsArry != null && contentFilterByModelList.get(i).selectedChildSkillIdsArry.size() > 0 || contentFilterByModelList.get(i).selectedSkillIdsArry != null && contentFilterByModelList.get(i).selectedSkillIdsArry.size() > 0) {
 
                     if (nameSelectedCats.length() > 0) {
-                        nameSelectedCats = nameSelectedCats.concat("," + contentFilterByModelList.get(i).categoryDisplayName);
+                        nameSelectedCats = nameSelectedCats.concat(", " + contentFilterByModelList.get(i).categoryDisplayName);
                     } else {
                         nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
                     }
@@ -250,7 +250,7 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                 if (contentFilterByModelList.get(i).categorySelectedID != -1 && contentFilterByModelList.get(i).categorySelectedID > 0) {
 
                     if (nameSelectedCats.length() > 0) {
-                        nameSelectedCats = nameSelectedCats.concat("," + contentFilterByModelList.get(i).categoryDisplayName);
+                        nameSelectedCats = nameSelectedCats.concat(", " + contentFilterByModelList.get(i).categoryDisplayName);
                     } else {
                         nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
                     }

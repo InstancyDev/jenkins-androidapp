@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
+
 /**
  * Created by Upendranath on 8/10/2017 Working on InstancyLearning.
  */
@@ -58,14 +60,6 @@ public class SynchData {
 //        cmiList.addAll(cmiEventRelated);
         hs.addAll(cmiMylearningList);
         cmiList.addAll(hs);
-
-//        List<String> al = new ArrayList<>();
-//// add elements to al, including duplicates
-//        Set<String> hs = new HashSet<>();
-//        hs.addAll(cmiList);
-//        al.clear();
-//        al.addAll(hs);
-
 
         for (CMIModel tempCmi : cmiList) {
 
@@ -142,15 +136,34 @@ public class SynchData {
                         || tempCmi.get_score() == null
                         || tempCmi.get_score().equals("null")) {
                     sb.append("<Score>0</Score>");
+
+
                 } else {
                     sb.append("<Score>" + tempCmi.get_score() + "</Score>");
+
                 }
             } catch (Exception ex) {
                 sb.append("<Score>0</Score>");
+
             }
+
+            try {
+                if (isValidString(tempCmi.getPercentageCompleted())) {
+
+
+                    sb.append("<PercentCompleted>" + tempCmi.getPercentageCompleted() + "</PercentCompleted>");
+                } else {
+
+                    sb.append("<PercentCompleted>0</PercentCompleted>");
+                }
+            } catch (Exception ex) {
+
+                sb.append("<PercentCompleted>0</PercentCompleted>");
+            }
+
+
             sb.append("<ObjectTypeId>" + tempCmi.get_objecttypeid()
                     + "</ObjectTypeId>");
-
 
             try {
                 if (tempCmi.get_seqNum().equals("")
@@ -409,6 +422,31 @@ public class SynchData {
             } catch (Exception e) {
                 Log.d("UpdateMessage:", e.getMessage());
             }
+
+            // newly added here for
+
+//            sb.append("<LearnerTrack>");
+//
+//            sb.append(bindXML("AccessedNumber", "" +
+//                    tempCmi.get_noofattempts(), ""));
+//            sb.append(bindXML("NoOfAttempts", "" +
+//                    tempCmi.get_noofattempts(), ""));
+//            sb.append(bindXML("DateCompleted",
+//                    tempCmi.get_datecompleted(), ""));
+//            sb.append(bindXML("TotalSessionTime",
+//                    "", ""));
+//            sb.append(bindXML("StartDate",
+//                    tempCmi.get_startdate(), ""));
+//            sb.append(bindXML("UserID", "" +
+//                    tempCmi.get_userId(), ""));
+//            sb.append(bindXML("SCOID", "" +
+//                    tempCmi.get_scoId(), ""));
+//            sb.append(bindXML("PercentCompleted",
+//                    tempCmi.get_score(), ""));
+//
+//            sb.append("</LearnerTrack>");
+
+
             sb.append("</TrackedData>");
 
             Log.d("SynchUpdateOffline", sb.toString());
@@ -419,6 +457,7 @@ public class SynchData {
                     + "&_scoId=" + String.valueOf(tempCmi.get_scoId())
                     + "&_siteURL=" + tempCmi.get_sitrurl()
                     + "&_siteID=" + tempCmi.get_siteId();
+            Log.d("SyncData", "SyncData: "+requestURL);
             InputStream inputStream = null;
             inputStream = webAPIClient.synchronousPostMethod(requestURL, appUserModel.getAuthHeaders(), sb.toString());
             if (inputStream != null) {

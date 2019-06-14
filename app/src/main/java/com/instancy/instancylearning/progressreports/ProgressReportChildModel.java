@@ -32,7 +32,7 @@ public class ProgressReportChildModel implements Serializable {
     public String SCOID = "";
     public String categoryID = "";
     public String overScore = "";
-    public int seqId = 0;
-
-
+    public int seqId = -1;
+    public String eventID = "";
+    public String trackID = "";
 }

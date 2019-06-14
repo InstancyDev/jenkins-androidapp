@@ -202,6 +202,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     boolean isReportEnabled = true;
     boolean isFromNotification = false;
     boolean isFromGlobalSearch = false;
+    boolean isIconEnabled = false;
 
     WebAPIClient webAPIClient;
 
@@ -407,6 +408,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             contentFilterType = "";
         }
 
+        if (responMap != null && responMap.containsKey("ContentProperties")) {
+
+            String contentProperties = responMap.get("ContentProperties");
+            if (contentProperties.toLowerCase().contains("thumbnailiconpath"))
+                isIconEnabled = true;
+            else
+                isIconEnabled = false;
+        }
     }
 
     public void refreshCatalog(Boolean isRefreshed) {
@@ -640,7 +649,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                     nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                 }
-
             }
 
             @Override
@@ -719,7 +727,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         if (isFromCatogories) {
             breadCrumbPlusButtonInit(rootView);
         }
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, false);
+        membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
+
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, false, membershipModel, isIconEnabled);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -906,7 +916,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         triggerActionForFirstItem();
 
-        membershipModel = db.fetchMembership(appUserModel.getSiteIDValue(), appUserModel.getUserIDValue());
 
 //        if (uiSettingsModel.isGlobasearch() && queryString.length() > 0) {
 //
@@ -986,12 +995,25 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         itemWishList = menu.findItem(R.id.ctx_archive);
         itemWishList.setVisible(true);
 
-        if (isFromMyCompetency || isFromGlobalSearch) {
-            item_search.setVisible(false);
-        }
         itemInfo.setVisible(false);
 
-        item_filter.setVisible(true);
+        if (responMap != null && responMap.containsKey("ShowIndexes")) {
+            String showIndexes = responMap.get("ShowIndexes");
+            if (showIndexes.equalsIgnoreCase("top")) {
+                item_filter.setVisible(true);
+            } else {
+                item_filter.setVisible(false);
+            }
+        } else {
+            // No such key
+            item_filter.setVisible(false);
+        }
+
+        if (isFromMyCompetency || isFromGlobalSearch) {
+            item_search.setVisible(false);
+            item_filter.setVisible(false);
+            itemWishList.setVisible(false);
+        }
 
         if (item_search != null) {
             Drawable myIcon = getResources().getDrawable(R.drawable.search);
@@ -1328,14 +1350,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         } else {
-            if (myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
+            if (myLearningDetalData.getViewType().equalsIgnoreCase("1") || myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
 
-                if (myLearningDetalData.getAddedToMylearning() == 0) {
-                    menu.getItem(0).setVisible(true);
-
-                } else {
-                    menu.getItem(0).setVisible(false);
-                }
+//                if (myLearningDetalData.getAddedToMylearning() == 0) {
+//                    menu.getItem(0).setVisible(true);
+//                } else {
+//                    menu.getItem(0).setVisible(false);
+//                }
                 menu.getItem(1).setVisible(true);
                 menu.getItem(2).setVisible(false);
                 menu.getItem(3).setVisible(true);
@@ -1354,33 +1375,52 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         menu.getItem(4).setVisible(false);
 //                        menu.getItem(5).setVisible(true);
                     }
-                }
-            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) {
-                menu.getItem(0).setVisible(false);
-                menu.getItem(1).setVisible(true);
-                menu.getItem(3).setVisible(true);
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
-
-                    File myFile = new File(myLearningDetalData.getOfflinepath());
-
-                    if (myFile.exists()) {
-
-                        menu.getItem(4).setVisible(true);
-                        menu.getItem(5).setVisible(false);
-                    } else {
-
-                        menu.getItem(4).setVisible(false);
-                    }
 
                     if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                         menu.getItem(4).setVisible(false);
                     }
-//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+                    if (isValidString(myLearningDetalData.getEventstartUtcTime()) && !returnEventCompleted(myLearningDetalData.getEventstartUtcTime())) {
+                        if (isValidString(myLearningDetalData.getActionWaitlist()) && myLearningDetalData.getActionWaitlist().equalsIgnoreCase("true")) {
+                            menu.getItem(1).setVisible(true);
+                            menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_waitlistoption));
+                        } else {
+                            menu.getItem(1).setVisible(true);
+                        }
+                    } else if (myLearningDetalData.getEventScheduleType() == 1) {
+                        if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+
+                        }
+                    }
+
+                }
+            }
+//            else if (myLearningDetalData.getViewType().equalsIgnoreCase("2")) { commented as per events comparision
+//                menu.getItem(0).setVisible(false);
+//                menu.getItem(1).setVisible(true);
+//                menu.getItem(3).setVisible(true);
+//                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("1") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+//
+//                    File myFile = new File(myLearningDetalData.getOfflinepath());
+//
+//                    if (myFile.exists()) {
 //
 //                        menu.getItem(4).setVisible(true);
+//                        menu.getItem(5).setVisible(false);
+//                    } else {
+//
+//                        menu.getItem(4).setVisible(false);
 //                    }
-                }
-            } else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
+//
+//                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+//                        menu.getItem(4).setVisible(false);
+//                    }
+////                    if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2")) {
+////
+////                        menu.getItem(4).setVisible(true);
+////                    }
+//                }
+//            }
+            else if (myLearningDetalData.getViewType().equalsIgnoreCase("3")) {
                 boolean isMemberExpired = isMemberyExpry(membershipModel.expirydate);
                 if (isMemberExpired) {
                     menu.getItem(0).setVisible(false);
@@ -1418,10 +1458,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 menu.getItem(6).setVisible(true);//isWishListed
             }
         }
-        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")  || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
+        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("10") || myLearningDetalData.getIsListView().equalsIgnoreCase("true") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("28") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688") || myLearningDetalData.getObjecttypeId().equalsIgnoreCase("102") || uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
             menu.getItem(5).setVisible(false);
         }
-
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -1429,11 +1468,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 switch (item.getItemId()) {
                     case R.id.ctx_view:
                         if (myLearningDetalData.getAddedToMylearning() == 0 && myLearningDetalData.getViewType().equalsIgnoreCase("1")) {
-                            GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext());
+                            GlobalMethods.launchCoursePreviewViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
                         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && myLearningDetalData.getIsListView().equalsIgnoreCase("true")) {
-                            GlobalMethods.relatedContentView(myLearningDetalData, v.getContext());
+                            GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(), isIconEnabled);
                         } else {
-                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
+                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
                         }
                         break;
                     case R.id.ctx_add:
@@ -1449,10 +1488,27 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                             Intent intentDetail = new Intent(context, MyLearningDetailActivity1.class);
                             intentDetail.putExtra("IFROMCATALOG", false);
+                            intentDetail.putExtra("ISICONENABLED", isIconEnabled);
                             intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
                             intentDetail.putExtra("typeFrom", "tab");
                             intentDetail.putExtra("sideMenusModel", sideMenusModel);
                             startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+
+                        } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && isValidString(myLearningDetalData.getActionWaitlist()) && myLearningDetalData.getActionWaitlist().equalsIgnoreCase("true")) {
+                            int avaliableSeats = 0;
+                            try {
+                                avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+                            } catch (NumberFormatException nf) {
+                                avaliableSeats = 0;
+                                nf.printStackTrace();
+                            }
+                            if (avaliableSeats == 0) {
+                                try {
+                                    addToWaitList(myLearningDetalData);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                         } else {
                             if (uiSettingsModel.getNoOfDaysForCourseTargetDate() > 0) {
@@ -1473,10 +1529,18 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         break;
                     case R.id.ctx_detail:
                         Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
-                        intentDetail.putExtra("IFROMCATALOG", true);
-                        intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
-                        ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+
+                        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && !returnEventCompleted(myLearningDetalData.getEventstartTime()) && uiSettingsModel.isAllowExpiredEventsSubscription()) {
+                            intentDetail.putExtra("IFROMCATALOG", false);
+                            intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                            intentDetail.putExtra("sideMenusModel", sideMenusModel);
+                            ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                        } else {
+                            intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
+                            intentDetail.putExtra("sideMenusModel", sideMenusModel);
+                            intentDetail.putExtra("IFROMCATALOG", true);
+                            ((Activity) getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
+                        }
                         break;
                     case R.id.ctx_delete:
 
@@ -1532,7 +1596,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
             if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
 
-                checkUserLogin(myLearningDetalData, position, isInapp);
+                //  checkUserLogin(myLearningDetalData, position, isInapp); commented for  get Method
+
+                try {
+                    checkUserLoginPost(myLearningDetalData, position, isInapp);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             } else {
 
@@ -1568,7 +1638,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
             }
 
         }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-
+        datePickerDialog.setButton(DatePickerDialog.BUTTON_POSITIVE, "Save", datePickerDialog);
         datePickerDialog.show();
 
     }
@@ -1599,7 +1669,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         Log.d(TAG, "add to mylearning data " + response.toString());
                         if (response.equalsIgnoreCase("true")) {
                             catalogModelsList.get(position).setAddedToMylearning(1);
-
+//                            catalogModelsList.get(position).setArchived(false);
                             db.updateContenToCatalog(catalogModelsList.get(position));
                             catalogAdapter.notifyDataSetChanged();
                             getMobileGetMobileContentMetaData(myLearningDetalData, position);
@@ -1619,6 +1689,12 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                         });
                                 AlertDialog alert = builder.create();
                                 alert.show();
+                            }
+                            Log.d(TAG, "onResponse: isWishlisted " + isWishlisted);
+                            Log.d(TAG, "onResponse: isWsh " + isWsh);
+
+                            if (isWishlisted && isWsh == 1) {
+                                getMobileCatalogObjectsData(true);
                             }
 
                         } else {
@@ -1663,8 +1739,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
 
-    public void checkUserLogin(final MyLearningModel learningModel, final int position,
-                               final boolean isInapp) {
+    public void checkUserLogin(final MyLearningModel learningModel, final int position, final boolean isInapp) {
 
 
         final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
@@ -1767,6 +1842,143 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         VolleySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
+
+
+    public void checkUserLoginPost(final MyLearningModel learningModel, final int position, final boolean isInapp) throws JSONException {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("UserName", learningModel.getUserName());
+        parameters.put("Password", learningModel.getPassword());
+        parameters.put("MobileSiteURL", appUserModel.getSiteURL());
+        parameters.put("DownloadContent", "");
+        parameters.put("SiteID", appUserModel.getSiteIDValue());
+        parameters.put("isFromSignUp", false);
+
+        final String postData = parameters.toString();
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                JSONObject jsonObj = null;
+                try {
+                    jsonObj = new JSONObject(s);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (jsonObj.has("faileduserlogin")) {
+
+                    JSONArray userloginAry = null;
+                    try {
+                        userloginAry = jsonObj
+                                .getJSONArray("faileduserlogin");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (userloginAry.length() > 0) {
+
+
+                        String response = null;
+                        try {
+                            response = userloginAry
+                                    .getJSONObject(0)
+                                    .get("userstatus")
+                                    .toString();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (response.contains("Login Failed")) {
+                            Toast.makeText(context,
+                                    getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_authenticationfailedcontactsiteadmin),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+
+                        }
+                        if (response.contains("Pending Registration")) {
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_pleasebepatientawaitingapproval),
+                                    Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    }
+                } else if (jsonObj.has("successfulluserlogin")) {
+
+                    try {
+                        JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+                        if (loginResponseAry.length() != 0) {
+                            JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                            String userIdresponse = loginResponseAry
+                                    .getJSONObject(0)
+                                    .get("userid").toString();
+                            if (userIdresponse.length() != 0) {
+
+                                if (isInapp) {
+
+                                    inAppActivityCall(learningModel);
+
+                                } else {
+                                    learningModel.setUserID(userIdresponse);
+                                    addToMyLearning(learningModel, position, false, true);
+                                }
+
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
 
     public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel,
                                                   final int position) {
@@ -2200,7 +2412,13 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatus(myLearningModel, status, progress);
+
+                        String localeStatus = "";
+                        if (jsonObject.has("ContentStatus")) {
+                            localeStatus = jsonObject.get("ContentStatus").toString();
+                        }
+
+                        i = db.updateContentStatus(myLearningModel, status, progress,localeStatus);
                         if (i == 1) {
 
                             injectFromDbtoModel();
@@ -2280,7 +2498,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "cat";
                             contentFilterByModel.categoryDisplayName = getLocalizationValue(JsonLocalekeys.filter_lbl_caegoriestitlelabel);
-                            contentFilterByModel.selectedSkillIdsArry.add(applyFilterModel.categories.length() > 0 ? applyFilterModel.categories : "");
+                            if (isValidString(applyFilterModel.categories)) {
+                                contentFilterByModel.selectedSkillIdsArry.add(applyFilterModel.categories);
+                            }
                             contentFilterByModel.goInside = true;
                             break;
                         case "skills":
@@ -2483,6 +2703,10 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 generateBreadcrumb(breadcrumbItemsList);
                 if (getFragmentManager().getBackStackEntryCount() > 0) {
 
+                    Intent intent = new Intent(context, Catalog_fragment.class);
+                    intent.putExtra("breadicrumblist", (Serializable) breadcrumbItemsList);
+                    intent.putExtra("iscatalogclicked", true);
+                    getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_OK, intent);
                     getFragmentManager().popBackStack();
 
                 }
@@ -2536,7 +2760,21 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     public void removeItemFromBreadcrumbList(int categoryLevel) {
-        breadcrumbItemsList = breadcrumbItemsList.subList(0, categoryLevel + 1);
+        List<ContentValues> tempBreadCrumb = new ArrayList<>();
+
+        if (categoryLevel == 0) {
+            tempBreadCrumb.add(breadcrumbItemsList.get(categoryLevel));
+        } else if (breadcrumbItemsList != null) {
+            for (int k = 0; breadcrumbItemsList.size() > k; k++) {
+                if (k != categoryLevel + 1) {
+                    tempBreadCrumb.add(breadcrumbItemsList.get(k));
+                }
+            }
+        }
+
+        breadcrumbItemsList = new ArrayList<>();
+        breadcrumbItemsList.addAll(tempBreadCrumb);
+//        breadcrumbItemsList = breadcrumbItemsList.subList(0, categoryLevel + 1);
     }
 
     public void downloadTheCourse(final MyLearningModel learningModel, final View view,
@@ -2748,7 +2986,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         String paramsString = "SiteURL=" + learningModel.getSiteURL()
                 + "&ContentID=" + learningModel.getContentID()
                 + "&userid=" + learningModel.getUserID()
-                + "&DelivoryMode=1&IsDownload=1";
+                + "&DelivoryMode=1&IsDownload=1&localeId=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
 
         String metaDataUrl = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileGetMobileContentMetaData?" + paramsString;
 
@@ -3321,6 +3559,14 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
                 }
 
+//                //folderpath
+//                if (jsonMyLearningColumnObj.has("folderpath")) {
+//
+//                    myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.get("folderpath").toString());
+//
+//                }
+                myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
+
                 //jwvideokey
                 if (jsonMyLearningColumnObj.has("jwvideokey")) {
 
@@ -3468,8 +3714,8 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 final Map<String, String> headers = new HashMap<>();
                 String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
                 headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                headers.put("Content-Type", "application/json");
-                headers.put("Accept", "application/json");
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
 
                 return headers;
             }
@@ -3492,6 +3738,9 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
         parameters.put("ContentID", learningModel.getContentID());
         parameters.put("AddedDate", addedDate);
         parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("ComponentID", sideMenusModel.getComponentId());
+        parameters.put("ComponentInstanceID", sideMenusModel.getRepositoryId());
+
 
         final String parameterString = parameters.toString();
 
@@ -3568,4 +3817,119 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
     }
 
+    public void addToWaitList(MyLearningModel catalogModel) throws JSONException {
+
+        JSONObject parameters = new JSONObject();
+        //mandatory
+        parameters.put("WLContentID", catalogModel.getContentID());
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("siteid", catalogModel.getSiteID());
+        parameters.put("locale", "" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
+
+        String parameterString = parameters.toString();
+        boolean isSubscribed = db.isSubscribedContent(catalogModel);
+        if (isSubscribed) {
+            Toast toast = Toast.makeText(
+                    context,
+                    getLocalizationValue(JsonLocalekeys.catalog_label_alreadyinmylearning),
+                    Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        } else {
+            sendWaitlistEventData(parameterString, catalogModel);
+        }
+    }
+
+    public void sendWaitlistEventData(final String postData, final MyLearningModel catalogModel) {
+        String apiURL = "";
+
+        apiURL = appUserModel.getWebAPIUrl() + "/MobileLMS/EnrollWaitListEvent";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+                Log.d("CMP", "onResponse: " + s);
+
+                if (s != null && s.length() > 0) {
+                    try {
+                        JSONObject jsonObj = new JSONObject(s);
+                        if (jsonObj.has("IsSuccess")) {
+
+                            int waitlistEnrolls = catalogModel.getWaitlistenrolls() + 1;
+
+                            catalogModel.setWaitlistenrolls(waitlistEnrolls);
+
+                            Log.d(TAG, "onResponse: " + catalogModel.getWaitlistenrolls());
+                            db.updateEventAddedToMyLearningInEventCatalog(catalogModel, 1);
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setMessage(jsonObj.optString("Message"))
+                                    .setCancelable(false)
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
+
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            Toast toast = Toast.makeText(
+                                    context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
+                                    Toast.LENGTH_SHORT);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+                    } catch (Throwable t) {
+                        Log.e("My App", "Could not parse malformed JSON: \"" + s + "\"");
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return postData.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
 }

@@ -21,6 +21,76 @@ public class MyLearningModel implements Serializable {
 
     boolean completedEvent = false;
 
+    public boolean isRemoveFromMylearning() {
+        return removeFromMylearning;
+    }
+
+    public void setRemoveFromMylearning(boolean removeFromMylearning) {
+        this.removeFromMylearning = removeFromMylearning;
+    }
+
+    boolean removeFromMylearning = false;
+
+    public String getReSheduleEvent() {
+        return reSheduleEvent;
+    }
+
+    public void setReSheduleEvent(String reSheduleEvent) {
+        this.reSheduleEvent = reSheduleEvent;
+    }
+
+    String reSheduleEvent = "";
+
+    public String getCertificateAction() {
+        return CertificateAction;
+    }
+
+    public void setCertificateAction(String certificateAction) {
+        CertificateAction = certificateAction;
+    }
+
+    String CertificateAction = "";
+
+    public String getCertificateId() {
+        return CertificateId;
+    }
+
+    public void setCertificateId(String certificateId) {
+        CertificateId = certificateId;
+    }
+
+    public String getCertificatePage() {
+        return CertificatePage;
+    }
+
+    public void setCertificatePage(String certificatePage) {
+        CertificatePage = certificatePage;
+    }
+
+    public String getWindowProperties() {
+        return WindowProperties;
+    }
+
+    public void setWindowProperties(String windowProperties) {
+        WindowProperties = windowProperties;
+    }
+
+    String CertificateId = "";
+
+    String CertificatePage = "";
+
+    String WindowProperties = "";
+
+    public boolean isCancelEventEnabled() {
+        return cancelEventEnabled;
+    }
+
+    public void setCancelEventEnabled(boolean cancelEventEnabled) {
+        this.cancelEventEnabled = cancelEventEnabled;
+    }
+
+    boolean cancelEventEnabled = false;
+
     public boolean isArchived() {
         return isArchived;
     }
@@ -30,6 +100,48 @@ public class MyLearningModel implements Serializable {
     }
 
     boolean isArchived = false;
+
+    public boolean isEnrollFutureInstance() {
+        return isEnrollFutureInstance;
+    }
+
+    public void setEnrollFutureInstance(boolean enrollFutureInstance) {
+        isEnrollFutureInstance = enrollFutureInstance;
+    }
+
+    public boolean isBadCancellationEnabled() {
+        return isBadCancellationEnabled;
+    }
+
+    public void setBadCancellationEnabled(boolean badCancellationEnabled) {
+        isBadCancellationEnabled = badCancellationEnabled;
+    }
+
+    boolean isEnrollFutureInstance = false;
+
+
+    boolean isBadCancellationEnabled = false;
+
+
+    public String getActionWaitlist() {
+        return actionWaitlist;
+    }
+
+    public void setActionWaitlist(String actionWaitlist) {
+        this.actionWaitlist = actionWaitlist;
+    }
+
+    String actionWaitlist = "";
+
+    public String getPercentCompleted() {
+        return percentCompleted;
+    }
+
+    public void setPercentCompleted(String percentCompleted) {
+        this.percentCompleted = percentCompleted;
+    }
+
+    String percentCompleted = "";
 
     public int getIsRequired() {
         return isRequired;
@@ -149,6 +261,16 @@ public class MyLearningModel implements Serializable {
     int EventScheduleType = 0;
     String TableofContent = "";
     String LearningObjectives = "";
+
+    public int getBookmarkID() {
+        return bookmarkID;
+    }
+
+    public void setBookmarkID(int bookmarkID) {
+        this.bookmarkID = bookmarkID;
+    }
+
+    int bookmarkID = 0;
 
     public int getTotalratings() {
         return totalratings;

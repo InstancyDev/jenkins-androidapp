@@ -277,11 +277,14 @@ public class SocialWebLoginsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        webView.destroy();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        webView.destroy();
+        webView.pauseTimers();
     }
 
     @Override

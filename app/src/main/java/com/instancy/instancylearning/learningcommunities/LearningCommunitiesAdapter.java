@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.bumptech.glide.Glide;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
@@ -134,7 +135,7 @@ public class LearningCommunitiesAdapter extends BaseAdapter {
         }
 
         String imgUrl = communitiesModelList.get(position).imagepath;
-        Picasso.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
+        Glide.with(convertView.getContext()).load(imgUrl).placeholder(R.drawable.cellimage).into(holder.imgThumb);
 
         return convertView;
     }

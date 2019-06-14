@@ -42,6 +42,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
+import static com.instancy.instancylearning.utils.Utilities.getOneWeekBeforeData;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.upperCaseWords;
@@ -143,9 +144,14 @@ public class ProgressReportsActivity extends AppCompatActivity {
     public void getProgressdataDetails(ProgressReportModel reportModel) {
 
         svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
+        int seqID = 0;
+        if (reportModel.seqId == 0)
+            seqID = -1;
+        else
+            seqID = reportModel.seqId;
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getprogressdatadetails?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + reportModel.datestarted + "&EndDate=" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") +
-                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&siteid=" + reportModel.siteID + "&locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&EventID=" + reportModel.SCOID;
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getprogressdatadetails?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + getOneWeekBeforeData("MM/dd/yyyy") + "&EndDate=" + getCurrentDateTime("MM/dd/yyyy") +
+                "&SeqID=" + seqID + "&TrackID=" + reportModel.trackID + "&siteid=" + reportModel.siteID + "&locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&EventID=" + reportModel.eventID;
 
         urlString = urlString.replaceAll(" ", "%20");
 
@@ -155,8 +161,14 @@ public class ProgressReportsActivity extends AppCompatActivity {
 
     public void getSummaryData(ProgressReportModel reportModel) {
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getsummarydata?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + reportModel.datestarted + "&EndDate=" + getCurrentDateTime("yyyy-MM-dd HH:mm:ss") +
-                "&SeqID=" + reportModel.seqId + "&TrackID=" + reportModel.objectID + "&locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&EventID=" + reportModel.SCOID;
+        int seqID = 0;
+        if (reportModel.seqId == 0)
+            seqID = -1;
+        else
+            seqID = reportModel.seqId;
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/getsummarydata?CID=" + reportModel.objectID + "&ObjectTypeID=" + reportModel.objectTypeID + "&UserID=" + reportModel.userid + "&StartDate=" + getOneWeekBeforeData("MM/dd/yyyy") + "&EndDate=" + getCurrentDateTime("MM/dd/yyyy") +
+                "&SeqID=" + seqID + "&TrackID=" + reportModel.trackID + "&locale=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&EventID=" + reportModel.eventID;
 
         urlString = urlString.replaceAll(" ", "%20");
 
@@ -272,7 +284,7 @@ public class ProgressReportsActivity extends AppCompatActivity {
         } else {
             txtDetails.setVisibility(View.GONE);
         }
-        txtDetails.setText(getLocalizationValue(JsonLocalekeys.progressreports_label_details));
+        txtDetails.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_detailsoption) + ":");
         if (isValidString(summaryModel.courseName)) {
             reportTitle.setText(getLocalizationValue(JsonLocalekeys.details_tablesection_headerreport) + ": " + summaryModel.courseName);
         } else {
@@ -331,8 +343,12 @@ public class ProgressReportsActivity extends AppCompatActivity {
 
         if (isValidString(summaryModel.score)) {
             txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + summaryModel.score);
+
+            if (progressReportModel.objectTypeID.equalsIgnoreCase("9") && summaryModel.contentType.toLowerCase().equalsIgnoreCase("survey")) {
+                txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + " NA");
+            }
         } else {
-            txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel));
+            txtScore.setText(getLocalizationValue(JsonLocalekeys.mylearning_label_scorelabel) + " NA");
         }
 
 //        if (isValidString(summaryModel.percentageCompleted)) {
@@ -364,17 +380,18 @@ public class ProgressReportsActivity extends AppCompatActivity {
 
         } else if (summaryModel.result.equalsIgnoreCase("Registered") || (summaryModel.result.toLowerCase().contains("registered"))) {
 
-            txtStatus.setTextColor(getResources().getColor(R.color.colorGray));
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
 
         } else if (summaryModel.result.toLowerCase().contains("attended") || (summaryModel.result.toLowerCase().contains("registered"))) {
 
-            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
+            txtStatus.setTextColor(getResources().getColor(R.color.colorStatusCompleted));
 
         } else if (summaryModel.result.toLowerCase().contains("Expired")) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
 
         }
+
 
         txtStatus.setText(upperCaseWords(summaryModel.result));
 

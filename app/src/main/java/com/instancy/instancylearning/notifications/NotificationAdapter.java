@@ -125,14 +125,14 @@ public class NotificationAdapter extends BaseAdapter {
         }
 
 
-//        if (notificationModelList.get(position).markasread.equalsIgnoreCase("false")) {
-//
-//            holder.card_view.setBackgroundColor(convertView.getResources().getColor(R.color.colorGray));
-//
-//        } else {
-//
-//            holder.card_view.setBackgroundColor(convertView.getResources().getColor(R.color.colorWhite));
-//        }
+        if (notificationModelList.get(position).markasread.equalsIgnoreCase("false")) {
+            holder.card_view.setBackgroundColor(convertView.getResources().getColor(R.color.colorWhite));
+
+
+        } else {
+            holder.card_view.setBackgroundColor(convertView.getResources().getColor(R.color.colorRead));
+
+        }
 
 //        String dateNew = formatDate(notificationModelList.get(position).notificationstartdate, "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd");
 
