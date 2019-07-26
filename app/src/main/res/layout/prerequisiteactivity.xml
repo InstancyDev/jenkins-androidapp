@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="2dp"
+    tools:context="com.instancy.instancylearning.events.PrerequisiteContentActivity">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/noDataLabel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:textSize="24sp" />
+
+        <ExpandableListView
+            android:id="@+id/schedule_expandablelistview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/bottomLayout"
+            android:layout_marginTop="10dp"
+            android:dividerHeight="14dp"
+            android:groupIndicator="@null"
+            android:scrollbars="none" />
+
+        <LinearLayout
+            android:id="@+id/bottomLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:padding="1dp"
+            android:visibility="visible"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnAddtoMy"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text=""
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite" />
+
+            <android.support.v4.widget.Space
+                android:layout_width="1dp"
+                android:layout_height="40dp" />
+
+            <Button
+                android:id="@+id/btnCancal"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@color/colorPrimary"
+                android:text=""
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>

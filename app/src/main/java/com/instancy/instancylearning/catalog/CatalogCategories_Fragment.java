@@ -255,6 +255,13 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
         super.onResume();
 //        mAdapter.reloadAllContent(categoryButtonModelList1);
         mAdapter.notifyDataSetChanged();
+
+        if (mAdapter.getItemCount() > 0) {
+            nodata_Label.setVisibility(View.GONE);
+        } else {
+            nodata_Label.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Nullable
@@ -652,7 +659,7 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
 
         if (breadcrumbItemsList != null)
             for (int k = 0; breadcrumbItemsList.size() > k; k++) {
-                if (k != categoryLevel + 1) {
+                if (k < categoryLevel + 1) {
                     tempBreadCrumb.add(breadcrumbItemsList.get(k));
                 }
             }
@@ -983,4 +990,5 @@ public class CatalogCategories_Fragment extends Fragment implements SwipeRefresh
             }
         }
     }
+
 }

@@ -35,4 +35,7 @@ public class ProgressReportChildModel implements Serializable {
     public int seqId = -1;
     public String eventID = "";
     public String trackID = "";
+
+    public String certificateAction = "";
+    public String credits = "";
 }

@@ -525,7 +525,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         }
                         try {
                             totalRecordsCount = countOfTotalRecords(response);
-                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
+                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied,false);
 
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
@@ -605,7 +605,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         try {
                             if (jsonObj != null) {
                                 totalRecordsCount = countOfTotalRecords(jsonObj);
-                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied,false);
 
                             }
                             injectFromDbtoModel(true);
@@ -637,7 +637,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         try {
                             if (jsonObj != null) {
                                 totalRecordsCount = countOfTotalRecords(jsonObj);
-                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied,false);
 
                             }
                             injectFromDbtoModel(true);

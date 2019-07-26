@@ -167,7 +167,7 @@
         android:background="@color/colorWhite"
         android:padding="3dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/espbanner"
+        android:src="@drawable/medmentor"
         android:visibility="visible" />
 
 </LinearLayout>

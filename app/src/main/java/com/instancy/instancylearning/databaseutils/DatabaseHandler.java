@@ -124,6 +124,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public static final String TBL_CATALOGDATA = "CATALOGDATA";
     /**
+     *To store the  content view metadata details
+     */
+    public static final String TBL_CONTENTVIEW = "CONTENTVIEW";
+    /**
      * To store the user session details which tracked in offline course viewing
      */
     public static final String TBL_USERSESSION = "USERSESSION";
@@ -406,7 +410,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
-                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT,appLoginLogoBackgroundcolorColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER, CCEventStartdate TEXT,isGlobalSearch INTEGER,enableMemberShipConfig  INTEGER,enableIndidvidualPurchaseConfig  INTEGER,enableSkillstobeMappedwithJobRoles  INTEGER,EnableMultipleInstancesforEvent BOOLEAN,NumberOfRatingsRequiredToShowRating INTEGER,MinimimRatingRequiredToShowRating String,NoOfDaysForCourseTargetDate INTEGER,showEventAvailableFewSeatsLeft INTEGER,EnableEcommerce INTEGER,pricebyStrikeThrough INTEGER,DiscussionForumFileTypes TEXT,UserUploadFileSize TEXT)");
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT,appLoginLogoBackgroundcolorColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER, CCEventStartdate TEXT,isGlobalSearch INTEGER,enableMemberShipConfig  INTEGER,enableIndidvidualPurchaseConfig  INTEGER,enableSkillstobeMappedwithJobRoles  INTEGER,EnableMultipleInstancesforEvent BOOLEAN,NumberOfRatingsRequiredToShowRating INTEGER,MinimimRatingRequiredToShowRating String,NoOfDaysForCourseTargetDate INTEGER,showEventAvailableFewSeatsLeft INTEGER,EnableEcommerce INTEGER,pricebyStrikeThrough INTEGER,DiscussionForumFileTypes TEXT,UserUploadFileSize TEXT,Autocompletenontrackablecontent BOOLEAN)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LOCALIZATION
@@ -418,19 +422,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,isarchived BOOLEAN,isRequired BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,ThumbnailVideoPath TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,removeFromMylearning BOOLEAN,reSheduleEvent TEXT,isBadCancellationEnabled BOOLEAN,isEnrollFutureInstance BOOLEAN,percentcompleted TEXT,certificateaction TEXT,certificateid TEXT,certificatepage TEXT,windowproperties TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,isarchived BOOLEAN,isRequired BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,ThumbnailVideoPath TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,removeFromMylearning BOOLEAN,reSheduleEvent TEXT,isBadCancellationEnabled BOOLEAN,isEnrollFutureInstance BOOLEAN,percentcompleted TEXT,certificateaction TEXT,certificateid TEXT,certificatepage TEXT,windowproperties TEXT,bit4 BOOLEAN,qrCodeImagePath TEXT,QRImageName TEXT,offlineQrCodeImagePath TEXT,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA_REPORTS
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT)");
 
-
         //used upto here
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT,isContentEnrolled TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERSESSION
@@ -441,9 +444,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_QUESTIONS
                 + "(RESPONSEID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,scoid INTEGER,userid INTEGER,questionid INTEGER,quesname TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CMI
                 + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid INTEGER,scoid INTEGER,userid INTEGER,location TEXT,status TEXT,suspenddata TEXT,isupdate TEXT,siteurl TEXT,datecompleted DATETIME,noofattempts INTEGER,score TEXT,sequencenumber INTEGER,startdate DATETIME,timespent TEXT,coursemode TEXT,scoremin TEXT,scoremax TEXT,submittime TEXT,randomquesseq TEXT,pooledquesseq TEXT,textResponses TEXT, objecttypeid TEXT,percentageCompleted TEXT)");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_TRACKOBJECTS
                 + "(RESPONSEID INTEGER PRIMARY KEY AUTOINCREMENT,trackscoid INTEGER,scoid INTEGER,sequencenumber INTEGER,siteid INTEGER,userid INTEGER,objecttypeid INTEGER,name TEXT,mediatypeid TEXT)");
@@ -467,7 +472,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN,iswishlisted BOOLEAN)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
@@ -710,6 +715,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_DETAILS_SCHEDULE + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, EventID TEXT, ContentID TEXT, Name TEXT, Duration TEXT, EventStartDateTime TEXT,EventEndDateTime TEXT,Location TEXT,TimeZone TEXT, PresenterID TEXT, Email TEXT, AccountType TEXT, Picture TEXT, DisplayName TEXT, About TEXT, Bit4 TEXT, AuthorName TEXT, EnrollmentLimit TEXT, AvailableSeats TEXT, TotalEnrolls TEXT, WaitListEnrolls TEXT, LocationImage TEXT,alreadyexist TEXT,showenroll TEXT,showwaitlis TEXT,WaitListLimit TEXT)");
 
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_CONTENTVIEW
+                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, coursename TEXT, authorname TEXT, contenttype TEXT, shortdesc TEXT, thumbnailimage TEXT, thumbnailicon TEXT, scoid TEXT, siteid TEXT, userid TEXT,medianame TEXT,parentscoid TEXT)");
+
         Log.d(TAG, "onCreate:  TABLES CREATED");
     }
 
@@ -720,6 +730,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (newVersion > oldVersion) {
             upgradeTables(db);
         }
+
     }
 
     public void dropTableOnUpdating(SQLiteDatabase db, String TableToDrop) {
@@ -734,11 +745,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         dropTableOnUpdating(db, TBL_CATALOGDATA);
         dropTableOnUpdating(db, TBL_EVENTCONTENTDATA);
         dropTableOnUpdating(db, TBL_DETAILS_SCHEDULE);
+        dropTableOnUpdating(db, TBL_APP_SETTINGS);
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_APP_SETTINGS + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, appTextColor TEXT, appBGColor TEXT, menuTextColor TEXT, menuBGColor TEXT, selectedMenuTextColor TEXT, selectedMenuBGColor TEXT, listBGColor TEXT, listBorderColor TEXT, menuHeaderBGColor TEXT, menuHeaderTextColor TEXT, menuBGAlternativeColor TEXT, menuBGSelectTextColor TEXT, appButtonBGColor TEXT, appButtonTextColor TEXT, appHeaderTextColor TEXT, appHeaderColor TEXT, appLoginBGColor TEXT,appLoginPGTextColor TEXT,appLoginLogoBackgroundcolorColor TEXT, selfRegistrationAllowed TEXT, contentDownloadType TEXT, courseAppContent TEXT, enableNativeCatlog TEXT, enablePushNotification TEXT, nativeAppType TEXT, autodownloadsizelimit TEXT, catalogContentDownloadType TEXT, fileUploadButtonColor TEXT, firstTarget TEXT, secondTarget TEXT, thirdTarget TEXT, contentAssignment TEXT, newContentAvailable TEXT, contentUnassigned TEXT,enableNativeLogin TEXT, nativeAppLoginLogo TEXT,enableBranding TEXT,selfRegDisplayName TEXT,AutoLaunchFirstContentInMyLearning TEXT, firstEvent TEXT, isFacebook  TEXT, isLinkedin TEXT, isGoogle TEXT, isTwitter TEXT, siteID TEXT, siteURL TEXT, AddProfileAdditionalTab TEXT,EnableContentEvaluation INTEGER,CommonPasswordValue TEXT,EnableAzureSSOForLearner INTEGER,AllowExpiredEventsSubscription INTEGER, CCEventStartdate TEXT,isGlobalSearch INTEGER,enableMemberShipConfig  INTEGER,enableIndidvidualPurchaseConfig  INTEGER,enableSkillstobeMappedwithJobRoles  INTEGER,EnableMultipleInstancesforEvent BOOLEAN,NumberOfRatingsRequiredToShowRating INTEGER,MinimimRatingRequiredToShowRating String,NoOfDaysForCourseTargetDate INTEGER,showEventAvailableFewSeatsLeft INTEGER,EnableEcommerce INTEGER,pricebyStrikeThrough INTEGER,DiscussionForumFileTypes TEXT,UserUploadFileSize TEXT,Autocompletenontrackablecontent BOOLEAN)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_DOWNLOADDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,isarchived BOOLEAN,isRequired BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,ThumbnailVideoPath TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,removeFromMylearning BOOLEAN,reSheduleEvent TEXT,isBadCancellationEnabled BOOLEAN,isEnrollFutureInstance BOOLEAN,percentcompleted TEXT,certificateaction TEXT,certificateid TEXT,certificatepage TEXT,windowproperties TEXT)");
-
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,username TEXT,userid TEXT,siteid TEXT,siteurl TEXT,sitename TEXT,contentid TEXT,objectid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,status TEXT,displaystatus TEXT,password TEXT,displayname TEXT,islistview TEXT,isdownloaded TEXT,courseattempts TEXT,eventcontentid TEXT,relatedcontentcount TEXT,durationenddate TEXT,ratingid TEXT,publisheddate TEXT,isExpiry TEXT, mediatypeid TEXT, dateassigned TEXT, keywords TEXT, downloadurl TEXT, offlinepath TEXT, presenter TEXT, eventaddedtocalender TEXT, joinurl TEXT, typeofevent TEXT,progress TEXT, membershiplevel INTEGER, membershipname TEXT ,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,isarchived BOOLEAN,isRequired BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,ThumbnailVideoPath TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,removeFromMylearning BOOLEAN,reSheduleEvent TEXT,isBadCancellationEnabled BOOLEAN,isEnrollFutureInstance BOOLEAN,percentcompleted TEXT,certificateaction TEXT,certificateid TEXT,certificatepage TEXT,windowproperties TEXT,bit4 BOOLEAN,qrCodeImagePath TEXT,QRImageName TEXT,offlineQrCodeImagePath TEXT,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CMI
@@ -752,13 +767,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN,iswishlisted BOOLEAN)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT,isContentEnrolled TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_DETAILS_SCHEDULE + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, EventID TEXT, ContentID TEXT, Name TEXT, Duration TEXT, EventStartDateTime TEXT,EventEndDateTime TEXT,Location TEXT,TimeZone TEXT, PresenterID TEXT, Email TEXT, AccountType TEXT, Picture TEXT, DisplayName TEXT, About TEXT, Bit4 TEXT, AuthorName TEXT, EnrollmentLimit TEXT, AvailableSeats TEXT, TotalEnrolls TEXT, WaitListEnrolls TEXT, LocationImage TEXT,alreadyexist TEXT,showenroll TEXT,showwaitlis TEXT,WaitListLimit TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_CONTENTVIEW
+                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, coursename TEXT, authorname TEXT, contenttype TEXT, shortdesc TEXT, thumbnailimage TEXT, thumbnailicon TEXT, scoid TEXT, siteid TEXT, userid TEXT,medianame TEXT,parentscoid TEXT)");
 
     }
 
@@ -3052,14 +3071,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                 String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                 String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                        + "/.Mydownloads/Contentdownloads" + "/" + contentid;
+                        + "/Mydownloads/Contentdownloads" + "/" + contentid;
 
                 String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
                 myLearningModel.setOfflinepath(finalDownloadedFilePath);
             }
-//
-
             // wresult
             if (jsonMyLearningColumnObj.has("wresult")) {
 
@@ -3176,11 +3193,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             myLearningModel.setWindowProperties(jsonMyLearningColumnObj.optString("windowproperties", ""));
 
+            myLearningModel.setBit4(jsonMyLearningColumnObj.optBoolean("bit4", false));
 
-            //  certificateid TEXT,certificatepage TEXT
+            myLearningModel.setQrCodeImagePath(jsonMyLearningColumnObj.optString("qrcodeimagepath", ""));
+
+            myLearningModel.setQRImageName(jsonMyLearningColumnObj.optString("qrimagename", ""));
+
+            myLearningModel.setViewprerequisitecontentstatus(jsonMyLearningColumnObj.optString("viewprerequisitecontentstatus", ""));
+
+            myLearningModel.setCredits(jsonMyLearningColumnObj.optString("credittypes", ""));
+
+            myLearningModel.setDecimal2(jsonMyLearningColumnObj.optString("decimal2", ""));
+
+            myLearningModel.setDuration(jsonMyLearningColumnObj.optString("duration", ""));
 
             if (isCotentExists(myLearningModel, TBL_DOWNLOADDATA)) {
                 continue;
+            }
+
+            if (isValidString(myLearningModel.getQRImageName()) && isValidString(myLearningModel.getQrCodeImagePath())) {
+                String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
+                        + "/.Mydownloads/Contentdownloads" + "/" + contentid;
+
+                String finalDownloadedFilePath = downloadDestFolderPath + "/" + myLearningModel.getQRImageName();
+
+                myLearningModel.setOfflineQrCodeImagePath(finalDownloadedFilePath);
             }
 
             injectMyLearningIntoTable(myLearningModel, false, false);
@@ -3280,6 +3318,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             contentValues.put("windowproperties", myLearningModel.getWindowProperties());
 
+            contentValues.put("bit4", myLearningModel.getBit4());
+
+            contentValues.put("QRImageName", myLearningModel.getQRImageName());
+
+            contentValues.put("qrCodeImagePath", myLearningModel.getQrCodeImagePath());
+
+            contentValues.put("offlineQrCodeImagePath", myLearningModel.getOfflineQrCodeImagePath());
+
+            contentValues.put("offlineQrCodeImagePath", myLearningModel.getOfflineQrCodeImagePath());
+
+            contentValues.put("viewprerequisitecontentstatus", myLearningModel.getViewprerequisitecontentstatus());
+
+            contentValues.put("credits", myLearningModel.getCredits());
+
+            contentValues.put("decimal2", myLearningModel.getDecimal2());
+
+            contentValues.put("duration", myLearningModel.getDuration());
+
             if (!isFromprogressReport) {
                 if (subscibed) {
 
@@ -3316,7 +3372,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             exception.printStackTrace();
         }
 
-
     }
 
     public void updateMylearningDetailPageDataWithContentValues(MyLearningModel myLearningModel) {
@@ -3334,9 +3389,61 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         } catch (Exception e) {
 
-            Log.e("updateMylearningDetailPage", e.toString());
+            Log.e("updateDetailPage", e.toString());
         }
 
+    }
+
+    public void updateCatalogDetailPageDataWithContentValues(MyLearningModel myLearningModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put("LongDescription", myLearningModel.getLongDes()); //These Fields should be your String values of actual column names
+            cv.put("totalratings", myLearningModel.getTotalratings());
+            cv.put("LearningObjectives", myLearningModel.getLearningObjectives());
+            cv.put("TableofContent", myLearningModel.getLearningObjectives());
+            cv.put("isContentEnrolled", myLearningModel.getContentEnrolled());
+
+            db.update(TBL_CATALOGDATA, cv, "siteid=" + myLearningModel.getSiteID() + " AND scoid=" + myLearningModel.getScoId(), null);
+
+        } catch (Exception e) {
+
+            Log.e("updateDetailPage", e.toString());
+        }
+
+    }
+
+    public MyLearningModel fetchCatalogModel(MyLearningModel learningModel) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSelQuery = "SELECT * from " + TBL_CATALOGDATA + " WHERE userid =" + learningModel.getUserID() + " AND siteid = " + learningModel.getSiteID() + " AND scoid = " + learningModel.getScoId() + " AND contentid = '" + learningModel.getContentID() + "'";
+
+        try {
+            Cursor cursor = null;
+            cursor = db.rawQuery(strSelQuery, null);
+
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    learningModel.setEventScheduleType(cursor.getInt(cursor.getColumnIndex("EventScheduleType")));
+                    learningModel.setTableofContent(cursor.getString(cursor.getColumnIndex("TableofContent")));
+                    learningModel.setLearningObjectives(cursor.getString(cursor.getColumnIndex("LearningObjectives")));
+                    learningModel.setContentEnrolled((cursor.getString(cursor.getColumnIndex("isContentEnrolled"))));
+                    learningModel.setLongDes((cursor.getString(cursor.getColumnIndex("LongDescription"))));
+                }
+            }
+            cursor.close();
+            db.close();
+        } catch (Exception e) {
+            if (db.isOpen()) {
+                db.close();
+            }
+            Log.d("fetchmylearningfrom db",
+                    e.getMessage() != null ? e.getMessage()
+                            : "Error getting menus");
+        }
+
+        return learningModel;
     }
 
 
@@ -3561,6 +3668,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setWindowProperties(cursor.getString(cursor
                             .getColumnIndex("windowproperties")));
+
+                    myLearningModel.setBit4(cursor.getInt(cursor
+                            .getColumnIndex("bit4")) > 0);
+
+                    myLearningModel.setQrCodeImagePath(cursor.getString(cursor
+                            .getColumnIndex("qrCodeImagePath")));
+
+                    myLearningModel.setQRImageName(cursor.getString(cursor
+                            .getColumnIndex("QRImageName")));
+
+                    myLearningModel.setOfflineQrCodeImagePath(cursor.getString(cursor
+                            .getColumnIndex("offlineQrCodeImagePath")));
+
+                    myLearningModel.setViewprerequisitecontentstatus(cursor.getString(cursor
+                            .getColumnIndex("viewprerequisitecontentstatus")));
+
+                    myLearningModel.setCredits(cursor.getString(cursor
+                            .getColumnIndex("credits")));
+
+                    myLearningModel.setDecimal2(cursor.getString(cursor
+                            .getColumnIndex("decimal2")));
+
+                    myLearningModel.setDuration(cursor.getString(cursor
+                            .getColumnIndex("duration")));
+
 
                     myLearningModel.setAddedToMylearning(1);
 
@@ -4087,7 +4219,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("contenttypethumbnail", ""));
 
-
                 int isWishListed = jsonMyLearningColumnObj.optInt("iswishlistcontent", 0);
 
                 if (isWishListed == 0) {
@@ -4108,6 +4239,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 myLearningModel.setActivityId(jsonMyLearningColumnObj.optString("activityid", ""));
 
                 myLearningModel.setCancelEventEnabled(jsonMyLearningColumnObj.optBoolean("bit2", false));
+
+                myLearningModel.setViewprerequisitecontentstatus(jsonMyLearningColumnObj.optString("viewprerequisitecontentstatus",""));
+
+                myLearningModel.setCredits(jsonMyLearningColumnObj.optString("credittypes",""));
+
+                myLearningModel.setDecimal2(jsonMyLearningColumnObj.optString("decimal2",""));
+
+                myLearningModel.setDuration(jsonMyLearningColumnObj.optString("duration", ""));
 
                 if (isCotentExists(myLearningModel, TBL_CATALOGDATA)) {
                     continue;
@@ -4210,6 +4349,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("groupName", myLearningModel.getGroupName());
             contentValues.put("activityid", myLearningModel.getActivityId());
             contentValues.put("cancelEventEnabled", myLearningModel.isCancelEventEnabled());
+            contentValues.put("viewprerequisitecontentstatus", myLearningModel.getViewprerequisitecontentstatus());
+            contentValues.put("credits", myLearningModel.getCredits());
+            contentValues.put("decimal2", myLearningModel.getDecimal2());
+
+            contentValues.put("duration", myLearningModel.getDuration());
+
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
 
@@ -4434,12 +4579,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setGroupName(cursor.getString(cursor
                             .getColumnIndex("activityid")));
 
+                    myLearningModel.setViewprerequisitecontentstatus(cursor.getString(cursor
+                            .getColumnIndex("viewprerequisitecontentstatus")));
+
+                    myLearningModel.setCredits(cursor.getString(cursor
+                            .getColumnIndex("credits")));
+
+                    myLearningModel.setDecimal2(cursor.getString(cursor
+                            .getColumnIndex("decimal2")));
+
+                    myLearningModel.setDuration(cursor.getString(cursor
+                            .getColumnIndex("duration")));
+
 
                     myLearningModel.setEventAddedToCalender(false);
 
                     myLearningModel.setCancelEventEnabled(cursor.getInt(cursor
                             .getColumnIndex("cancelEventEnabled")) > 1);
-
 
                     myLearningModelList.add(myLearningModel);
                 } while (cursor.moveToNext());
@@ -4462,19 +4618,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 // inject eventcatalog data to table
 
-    public void injectEventCatalog(JSONObject jsonObject, String tabValue, int pageIndex, String ComponentId, int recondCount, boolean filterApplied) throws JSONException {
+    public void injectEventCatalog(JSONObject jsonObject, String tabValue, int pageIndex, String ComponentId, int recondCount, boolean filterApplied, boolean isWishlisted) throws JSONException {
 
         JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
         // for deleting records in table for respective table
 
-//        ejectRecordsinTable(TBL_EVENTCONTENTDATA);
 
         if (pageIndex == 1 || recondCount == 0) {
             ejectRecordsInEventByTab(tabValue, ComponentId);
         }
 
-        if (filterApplied) {
+        if (filterApplied && pageIndex == 1) {
             ejectRecordsInEventByTabValue(tabValue, ComponentId);
+        }
+
+        if (isWishlisted && pageIndex == 1) {
+            ejectRecordsinTable(TBL_EVENTCONTENTDATA);
         }
 
         for (int i = 0; i < jsonTableAry.length(); i++) {
@@ -4980,6 +5139,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setArchived(jsonMyLearningColumnObj.optBoolean("iswishlistcontent", false));
 
+                if (jsonMyLearningColumnObj.has("iswishlistcontent")){
+                    int isArchivedInt=jsonMyLearningColumnObj.optInt("iswishlistcontent", 0);
+                    if (isArchivedInt==1){
+                        myLearningModel.setArchived(true);
+                    }else {
+                        myLearningModel.setArchived(false);
+                    }
+                }
+
                 myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
 
                 myLearningModel.setEventScheduleType(jsonMyLearningColumnObj.optInt("eventscheduletype", 0));
@@ -5078,6 +5246,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("cancelEventEnabled", myLearningModel.isCancelEventEnabled());
             contentValues.put("actionwaitlist", myLearningModel.getActionWaitlist());
             contentValues.put("isBadCancellationEnabled", myLearningModel.isBadCancellationEnabled());
+
+            contentValues.put("iswishlisted", myLearningModel.isArchived());
 
             db.insert(TBL_EVENTCONTENTDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -5326,13 +5496,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setEventAddedToCalender(false);
 
                     myLearningModel.setCancelEventEnabled(cursor.getInt(cursor
-                            .getColumnIndex("cancelEventEnabled")) > 1);
+                            .getColumnIndex("cancelEventEnabled")) > 0);
 
                     myLearningModel.setActionWaitlist(cursor.getString(cursor
                             .getColumnIndex("actionwaitlist")));
 
                     myLearningModel.setBadCancellationEnabled(cursor.getInt(cursor
-                            .getColumnIndex("isBadCancellationEnabled")) > 1);
+                            .getColumnIndex("isBadCancellationEnabled")) > 0);
+
+                    myLearningModel.setArchived(cursor.getInt(cursor
+                            .getColumnIndex("iswishlisted")) > 0);
 
 
                     Log.d(TAG, "fetchEventCatalogModel: is event added " + myLearningModel.getAddedToMylearning() + "  with getCourseName  " + myLearningModel.getCourseName());
@@ -5626,7 +5799,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                     String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                     String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                            + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                     String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -5854,7 +6027,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     } else {
                         trackLearningModel.setJwvideokey("");
                     }
-
                 }
 
                 //cloudmediaplayerkey
@@ -5870,10 +6042,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         trackLearningModel.setCloudmediaplayerkey("");
                     }
                 }
+
+                if (jsonMyLearningColumnObj.has("jwstartpage")) {
+
+                    String jwstartpage = jsonMyLearningColumnObj.getString("jwstartpage");
+
+                    if (isValidString(trackLearningModel.getCloudmediaplayerkey()) && isValidString(trackLearningModel.getJwvideokey())) {
+                        trackLearningModel.setStartPage(jwstartpage);
+                    } else {
+                      //  trackLearningModel.setStartPage("");
+                    }
+                }
+
                 //sitename
                 if (jsonMyLearningColumnObj.has("progress")) {
 
                     trackLearningModel.setProgress(jsonMyLearningColumnObj.get("progress").toString());
+                } // percentcompleted
+
+                //sitename
+                if (!isTrackList) {
+                    trackLearningModel.setProgress(jsonMyLearningColumnObj.optString("percentcompleted"));
                 }
 
                 trackLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
@@ -6117,7 +6306,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                         String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                         String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                                + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                                + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                         String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -6573,17 +6762,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                             .getColumnIndex("activityid")));
 
 
+                    trackListModel.setProgress(cursor.getString(cursor
+                            .getColumnIndex("progress")));
+
+                    trackListModel.setPercentCompleted(cursor.getString(cursor
+                            .getColumnIndex("progress")));
+
                     if (isTrackListView) {
 
                         trackListModel.setParentID(cursor.getString(cursor
                                 .getColumnIndex("parentid")));
-
-
-                        trackListModel.setProgress(cursor.getString(cursor
-                                .getColumnIndex("progress")));
-
-                        trackListModel.setPercentCompleted(cursor.getString(cursor
-                                .getColumnIndex("progress")));
 
                         trackListModel.setTimeDelay(cursor.getString(cursor
                                 .getColumnIndex("timedelay")));
@@ -7291,6 +7479,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("randomquesseq", cmiModel.get_qusseq());
             contentValues.put("pooledquesseq", cmiModel.get_pooledqusseq());
             contentValues.put("textResponses", cmiModel.get_textResponses());
+            contentValues.put("percentageCompleted", cmiModel.getPercentageCompleted());
 
             db.insert(TBL_CMI, null, contentValues);
         } catch (SQLiteException exception) {
@@ -9220,7 +9409,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    public String saveScoreInCMI(MyLearningModel cmiNew, String progressValue) {
+    public String savePercentCompletedInCMI(MyLearningModel cmiNew, String progressValue) {
 
         boolean isRecordExists = isCMIRecordExists(cmiNew);
         try {
@@ -11579,6 +11768,67 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setTotalratings(jsonMyLearningColumnObj.optInt("totalratings", 0));
 
+                // added from inject mylearning on July 4th
+
+                myLearningModel.setEventScheduleType(jsonMyLearningColumnObj.optInt("eventscheduletype", 0));
+
+                myLearningModel.setGroupName(jsonMyLearningColumnObj.optString("headerlocationname", ""));
+
+                myLearningModel.setActivityId(jsonMyLearningColumnObj.optString("activityid", ""));
+
+                myLearningModel.setCancelEventEnabled(jsonMyLearningColumnObj.optBoolean("bit2", false));
+
+                myLearningModel.setReSheduleEvent(jsonMyLearningColumnObj.optString("reschduleparentid", ""));
+
+                myLearningModel.setRemoveFromMylearning(jsonMyLearningColumnObj.optBoolean("removelink", false));
+
+                myLearningModel.setBadCancellationEnabled(jsonMyLearningColumnObj.optBoolean("isbadcancellationenabled", false));
+
+                myLearningModel.setEnrollFutureInstance(jsonMyLearningColumnObj.optBoolean("isenrollfutureinstance", false));
+
+                myLearningModel.setPercentCompleted(jsonMyLearningColumnObj.optString("percentcompleted", ""));
+
+                myLearningModel.setCertificateAction(jsonMyLearningColumnObj.optString("certificateaction", ""));
+
+                myLearningModel.setCertificateId(jsonMyLearningColumnObj.optString("certificateid", ""));
+
+                myLearningModel.setCertificatePage(jsonMyLearningColumnObj.optString("certificatepage", ""));
+
+                myLearningModel.setWindowProperties(jsonMyLearningColumnObj.optString("windowproperties", ""));
+
+                myLearningModel.setBit4(jsonMyLearningColumnObj.optBoolean("bit4", false));
+
+                myLearningModel.setQrCodeImagePath(jsonMyLearningColumnObj.optString("qrcodeimagepath", ""));
+
+                myLearningModel.setQRImageName(jsonMyLearningColumnObj.optString("qrimagename", ""));
+
+                myLearningModel.setViewprerequisitecontentstatus(jsonMyLearningColumnObj.optString("viewprerequisitecontentstatus", ""));
+
+                myLearningModel.setCredits(jsonMyLearningColumnObj.optString("credittypes", ""));
+
+                myLearningModel.setDecimal2(jsonMyLearningColumnObj.optString("decimal2", ""));
+
+                myLearningModel.setDuration(jsonMyLearningColumnObj.optString("duration", ""));
+
+
+                if (isCotentExists(myLearningModel, TBL_DOWNLOADDATA)) {
+                    continue;
+                }
+
+                if (isValidString(myLearningModel.getQRImageName()) && isValidString(myLearningModel.getQrCodeImagePath())) {
+
+                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
+                    String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
+                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
+
+                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + myLearningModel.getQRImageName();
+
+                    myLearningModel.setOfflineQrCodeImagePath(finalDownloadedFilePath);
+
+                }
+
+                myLearningModel.setViewprerequisitecontentstatus(jsonMyLearningColumnObj.optString("viewprerequisitecontentstatus", ""));
+
                 getTrackScoIdsAndDeleteCMI(myLearningModel);
 
 
@@ -11966,7 +12216,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                         confirmPasswordModel.attributeconfigid = "-1";
                         signUpConfigsModelList.add(confirmPasswordModel);
                     }
-
                 }
             }
         } catch (SQLException ex) {
@@ -18827,7 +19076,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String formattedDate = formatDate(profilePrivObj.getString("UserReceivedDate"), "yyyy-MM-dd'T'HH:mm:ss", "MMM dd, yyyy");
 
-                    achipoints.userReceivedDate = formattedDate;
+                    if (isValidString(formattedDate)) {
+                        achipoints.userReceivedDate = formattedDate;
+                    } else {
+                        achipoints.userReceivedDate = profilePrivObj.optString("UserReceivedDate");
+                    }
+
 
                 }
 
@@ -18897,7 +19151,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     if (formattedDate.contains("0001")) {
                         achUserLevel.levelReceivedDate = "";
                     } else {
-                        achUserLevel.levelReceivedDate = formattedDate;
+
+                        if (isValidString(formattedDate)) {
+                            achUserLevel.levelReceivedDate = formattedDate;
+                        } else {
+                            String datestr = profilePrivObj.optString("LevelRecivedDate");
+                            if (isValidString(datestr)) {
+                                achUserLevel.levelReceivedDate = datestr;
+                            }
+
+                        }
+
                     }
 
                 }
@@ -18963,7 +19227,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     String formattedDate = formatDate(profilePrivObj.getString("BadgeReceivedDate"), "yyyy-MM-dd'T'HH:mm:ss", "MMM dd, yyyy");
 
-                    achUserBadges.badgeReceivedDate = formattedDate;
+                    if (isValidString(formattedDate)) {
+                        achUserBadges.badgeReceivedDate = formattedDate;
+                    } else {
+                        achUserBadges.badgeReceivedDate = profilePrivObj.optString("BadgeReceivedDate");
+                    }
 
                 }
 

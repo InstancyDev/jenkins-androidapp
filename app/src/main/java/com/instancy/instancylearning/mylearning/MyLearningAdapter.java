@@ -2,6 +2,7 @@ package com.instancy.instancylearning.mylearning;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Base64;
 import android.util.Log;
@@ -39,7 +41,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.bumptech.glide.Glide;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.github.florent37.viewtooltip.ViewTooltip;
@@ -47,7 +48,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
-import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.MylearningInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.EventInterface;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
@@ -59,7 +60,6 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -97,7 +97,7 @@ public class MyLearningAdapter extends BaseAdapter {
     private UiSettingsModel uiSettingsModel;
     AppUserModel appUserModel;
     SideMenusModel sideMenusModel;
-    SVProgressHUD svProgressHUD;
+    //  SVProgressHUD svProgressHUD;
     PreferencesManager preferencesManager;
     private String TAG = MyLearningAdapter.class.getSimpleName();
     private int MY_SOCKET_TIMEOUT_MS = 5000;
@@ -119,7 +119,7 @@ public class MyLearningAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
         uiSettingsModel = UiSettingsModel.getInstance();
         appUserModel = AppUserModel.getInstance();
-        svProgressHUD = new SVProgressHUD(activity);
+        // svProgressHUD = new SVProgressHUD(activity);
         this.sideMenusModel = sideMenusModel;
         preferencesManager = PreferencesManager.getInstance();
         appUserModel.getWebAPIUrl();
@@ -458,9 +458,19 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.ratingBar.setVisibility(View.VISIBLE);
         }
 
-        if (myLearningModel.get(position).getStatusActual().toLowerCase().contains("completed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("attended") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("passed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("failed")) {
+        if (!myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70") && myLearningModel.get(position).getStatusActual().toLowerCase().contains("completed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("passed") || myLearningModel.get(position).getStatusActual().equalsIgnoreCase("failed")) {
             holder.ratingBar.setVisibility(View.GONE);
             holder.txtWriteReview.setVisibility(View.VISIBLE);
+        } else if (myLearningModel.get(position).getStatusActual().toLowerCase().equalsIgnoreCase("completed") && myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+
+            holder.ratingBar.setVisibility(View.GONE);
+            holder.txtWriteReview.setVisibility(View.GONE);
+
+        } else if (myLearningModel.get(position).getStatusActual().equalsIgnoreCase("attended") && myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
+
+            holder.ratingBar.setVisibility(View.GONE);
+            holder.txtWriteReview.setVisibility(View.VISIBLE);
+
         } else {
             holder.ratingBar.setIsIndicator(true);
         }
@@ -484,7 +494,19 @@ public class MyLearningAdapter extends BaseAdapter {
         holder.txtAthrIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtLocationIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtEvntIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.lbCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.app_medmentor))) {
+            if (isValidString(myLearningModel.get(position).getCredits())) {
+                holder.txtCredits.setText(myLearningModel.get(position).getDecimal2());
+                holder.lbCredits.setText(" CME");
+
+            }
+            holder.creditsLayout.setVisibility(View.VISIBLE);
+        } else {
+            holder.creditsLayout.setVisibility(View.GONE);
+        }
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
@@ -557,11 +579,28 @@ public class MyLearningAdapter extends BaseAdapter {
             holder.authorLayout.setVisibility(View.GONE);
             holder.eventLayout.setVisibility(View.GONE);
             holder.locationlayout.setVisibility(View.GONE);
+        }
+//        else {
+//
+//            holder.txtEnrollShedule.setVisibility(View.GONE);
+//        }
+
+        else if (myLearningModel.get(position).getEventScheduleType() == 2 && myLearningModel.get(position).isEnrollFutureInstance()) {
+            holder.txtEnrollShedule.setVisibility(View.VISIBLE);
+            holder.authorLayout.setVisibility(View.GONE);
+            holder.eventLayout.setVisibility(View.GONE);
+            holder.locationlayout.setVisibility(View.GONE);
+        } else if (isWaitListedContent && isValidString(myLearningModel.get(position).getReSheduleEvent())) {
+            holder.txtEnrollShedule.setVisibility(View.VISIBLE);
+            holder.authorLayout.setVisibility(View.GONE);
+            holder.eventLayout.setVisibility(View.GONE);
+            holder.locationlayout.setVisibility(View.GONE);
 
         } else {
 
             holder.txtEnrollShedule.setVisibility(View.GONE);
         }
+
 
         holder.txtCourseStatus.setVisibility(View.VISIBLE);
 
@@ -715,12 +754,23 @@ public class MyLearningAdapter extends BaseAdapter {
         if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("70")) {
             if (myLearningModel.get(position).getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
                 holder.txtCourseStatus.setText(getLocalizationValue(JsonLocalekeys.details_label_tobeshedule));
+            } else if (myLearningModel.get(position).getBit4()) {
+                holder.txtCourseStatus.setText(getLocalizationValue(JsonLocalekeys.mylearningcanceled_labletitle_canceledlbltitle));
+                holder.progressBar.setProgressTintList(ColorStateList.valueOf(vi.getResources().getColor(R.color.colorStatusOther)));
+                holder.txtCourseStatus.setTextColor(vi.getResources().getColor(R.color.colorStatusOther));
+                progressPercentage = 100;
             } else {
                 holder.txtCourseStatus.setText(statusDisplay);
             }
         } else {
             if (isValidString(myLearningModel.get(position).getPercentCompleted())) {
-                holder.txtCourseStatus.setText(statusDisplay + "(" + myLearningModel.get(position).getPercentCompleted() + "%)");
+
+                if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true")) {
+                    holder.txtCourseStatus.setText(statusDisplay + "(" + myLearningModel.get(position).getPercentCompleted() + "%)");
+                } else {
+                    holder.txtCourseStatus.setText(statusDisplay);
+                }
+
                 try {
                     if (isValidString(myLearningModel.get(position).getPercentCompleted()) && myLearningModel.get(position).getPercentCompleted().contains(".")) {
                         float i = Float.valueOf(myLearningModel.get(position).getPercentCompleted());
@@ -737,7 +787,13 @@ public class MyLearningAdapter extends BaseAdapter {
                 }
 
             } else {
-                holder.txtCourseStatus.setText(statusDisplay + "(" + progressPercentage + "%)");
+
+                if (myLearningModel.get(position).getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.get(position).getIsListView().equalsIgnoreCase("true")) {
+                    holder.txtCourseStatus.setText(statusDisplay + "(" + progressPercentage + "%)");
+                } else {
+                    holder.txtCourseStatus.setText(statusDisplay);
+                }
+
                 holder.progressBar.setProgress(progressPercentage);
             }
         }
@@ -885,7 +941,7 @@ public class MyLearningAdapter extends BaseAdapter {
         public int getPosition;
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
-        public DownloadInterface downloadInterface;
+        public MylearningInterface mylearningInterface;
         public SetCompleteListner setCompleteListner;
         public DownloadStart downloadStart;
 
@@ -999,6 +1055,20 @@ public class MyLearningAdapter extends BaseAdapter {
         @BindView(R.id.lbRequired)
         TextView lbRequired;
 
+        // credits layout
+
+        @Nullable
+        @BindView(R.id.creditsLayout)
+        LinearLayout creditsLayout;
+
+        @Nullable
+        @BindView(R.id.lbCredits)
+        TextView lbCredits;
+
+        @Nullable
+        @BindView(R.id.txtCredits)
+        TextView txtCredits;
+
         @Nullable
         @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
@@ -1012,7 +1082,8 @@ public class MyLearningAdapter extends BaseAdapter {
             FontManager.markAsIconContainer(view.findViewById(R.id.txteventicon), iconFont);
             FontManager.markAsIconContainer(view.findViewById(R.id.txtlocationicon), iconFont);
 
-            downloadInterface = new DownloadInterface() {
+
+            mylearningInterface = new MylearningInterface() {
                 @Override
                 public void deletedTheContent(int updateProgress) {
                     notifyDataSetChanged();
@@ -1047,16 +1118,11 @@ public class MyLearningAdapter extends BaseAdapter {
                 @Override
                 public void resheduleTheEvent(boolean isReshedule) {
 
-                    Intent intentDetail = new Intent(activity, MyLearningDetailActivity1.class);
-//                    myLearningDetalData.setContentID(myLearningDetalData.getReSheduleEvent());
-                    intentDetail.putExtra("IFROMCATALOG", false);
-                    intentDetail.putExtra("sideMenusModel", sideMenusModel);
-                    intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
-                    intentDetail.putExtra("typeFrom", "tab");
-                    intentDetail.putExtra("reschdule", true);
-                    activity.startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
-
-
+                    if (myLearningDetalData.getEventScheduleType() == 2 && myLearningDetalData.isEnrollFutureInstance()) {
+                        dialogForFutureInstances(myLearningDetalData);
+                    } else {
+                        gotoEventSheduleTab(myLearningDetalData);
+                    }
                 }
 
                 @Override
@@ -1079,6 +1145,8 @@ public class MyLearningAdapter extends BaseAdapter {
                 public void completedStatus() {
                     myLearningDetalData.setStatusActual("Completed");
                     myLearningDetalData.setProgress("100");
+                    myLearningDetalData.setPercentCompleted("100");
+                    myLearningDetalData.setStatusDisplay(" " + getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel));
                     notifyDataSetChanged();
                 }
             };
@@ -1095,7 +1163,7 @@ public class MyLearningAdapter extends BaseAdapter {
         public void actionsForMenu(View view) {
 
             if (view.getId() == R.id.btn_contextmenu) {
-                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel, isIconEnabled);
+                GlobalMethods.myLearningContextMenuMethod(view, getPosition, btnContextMenu, myLearningDetalData, mylearningInterface, setCompleteListner, "", isReportEnabled, downloadStart, uiSettingsModel, sideMenusModel, isIconEnabled);
             } else if (view.getId() == R.id.txtWriteReview) {
                 try {
 
@@ -1127,6 +1195,43 @@ public class MyLearningAdapter extends BaseAdapter {
         }
     }
 
+    public void dialogForFutureInstances(final MyLearningModel learningModel) {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_enrollalertsubttitle_subtitle)).setTitle(getLocalizationValue(JsonLocalekeys.details_label_enroll))
+                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.dismiss();
+            }
+        }).setPositiveButton(getLocalizationValue(JsonLocalekeys.details_label_enroll), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //do things
+                dialog.dismiss();
+                gotoEventSheduleTab(learningModel);
+
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
+
+    }
+
+    public void gotoEventSheduleTab(MyLearningModel learningModel) {
+
+        Intent intentDetail = new Intent(activity, MyLearningDetailActivity1.class);
+//                    myLearningDetalData.setContentID(myLearningDetalData.getReSheduleEvent());
+        intentDetail.putExtra("IFROMCATALOG", false);
+        intentDetail.putExtra("sideMenusModel", sideMenusModel);
+        intentDetail.putExtra("myLearningDetalData", learningModel);
+        intentDetail.putExtra("typeFrom", "tab");
+        intentDetail.putExtra("reschdule", true);
+        activity.startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+
+    }
+
+
     public void getUserRatingsOfTheContent(final int position, final float rating) throws JSONException {
 
         JSONObject parameters = new JSONObject();
@@ -1151,7 +1256,7 @@ public class MyLearningAdapter extends BaseAdapter {
         final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                svProgressHUD.dismiss();
+                //  svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
 //                initilizeRatingsListView();
                 if (s != null) {
@@ -1166,7 +1271,7 @@ public class MyLearningAdapter extends BaseAdapter {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
 
-                svProgressHUD.dismiss();
+                //    svProgressHUD.dismiss();
             }
         })
 
@@ -1258,7 +1363,7 @@ public class MyLearningAdapter extends BaseAdapter {
         final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                svProgressHUD.dismiss();
+                // svProgressHUD.dismiss();
                 Log.d(TAG, "onResponse: " + s);
                 if (finalArchV == 1) {
                     Toast.makeText(activity, " " + getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_archivedsuccesfully), Toast.LENGTH_SHORT).show();
@@ -1273,7 +1378,7 @@ public class MyLearningAdapter extends BaseAdapter {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
 
-                svProgressHUD.dismiss();
+                // svProgressHUD.dismiss();
             }
         })
 

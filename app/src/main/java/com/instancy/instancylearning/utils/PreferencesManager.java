@@ -49,27 +49,23 @@ public class PreferencesManager {
         return mPref.getString(KEY_VALUE, "");
     }
 
-//    public String getLocalizationStringValue(String KEY_VALUE) {
-//        return mPref.getString(KEY_VALUE, "en-us");
-//    }
-//
-//    public String getLocalizationDisplayStringValue(String KEY_VALUE) {
-//        return mPref.getString(KEY_VALUE, "English");
-//    }
-
     public String getLocalizationStringValue(String KEY_VALUE) {
-
-        String keyValue = mPref.getString(KEY_VALUE, "es-es");
-
-        Log.d("TAG", "getLocalizationStringValue: keyValue: " + keyValue);
-
-        return keyValue;
-
+        return mPref.getString(KEY_VALUE, "en-us");
     }
 
     public String getLocalizationDisplayStringValue(String KEY_VALUE) {
-        return mPref.getString(KEY_VALUE, "Spanish");
+        return mPref.getString(KEY_VALUE, "English");
     }
+
+//    public String getLocalizationStringValue(String KEY_VALUE) {
+//
+//        return mPref.getString(KEY_VALUE, "es-es");
+//
+//    }
+//
+//    public String getLocalizationDisplayStringValue(String KEY_VALUE) {
+//        return mPref.getString(KEY_VALUE, "Spanish");
+//    }
 
 
     public void setBooleanValue(boolean value, String KEY_VALUE) {

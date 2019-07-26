@@ -51,13 +51,10 @@ public class SynchData {
         Set<CMIModel> hs = new HashSet<>();
 
         List<CMIModel> cmiMylearningList = dbh.getAllCmiDownloadDataDetails();
-//        cmiList.addAll(cmiMylearningList);
         hs.addAll(cmiMylearningList);
         List<CMIModel> cmitrackList = dbh.getAllCmiTrackListDetails();
         cmiList.addAll(cmitrackList);
-//        hs.addAll(cmiMylearningList);
         List<CMIModel> cmiEventRelated = dbh.getAllCmiRelatedContentDetails();
-//        cmiList.addAll(cmiEventRelated);
         hs.addAll(cmiMylearningList);
         cmiList.addAll(hs);
 

@@ -50,6 +50,12 @@ import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.mainactivities.Splash_activity;
 
 import org.json.JSONObject;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -71,10 +77,15 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.MediaType;
@@ -221,7 +232,7 @@ public class Utilities {
      * @param format Format in which the datetime is to be returned
      * @return Date time in specified format.
      * Date time in yyyy-MM-dd HH:mm:ss format if empty string is passed
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getCurrentDateTime(String format) {
 
@@ -270,7 +281,7 @@ public class Utilities {
      * @param currentFormat The current date time format.
      * @param newFormat     Format in which the date time is to be returned.
      * @return The new Date time string in {@code newFormat}.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String formatDate(String dateTime, String currentFormat, String newFormat) {
 
@@ -333,7 +344,7 @@ public class Utilities {
      * @param in  InputStream
      * @param out OutputStream
      * @throws IOException
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static void copyFile(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[1024];
@@ -353,7 +364,7 @@ public class Utilities {
      *
      * @param str String to validate
      * @return {@code true} if {@code String} is valid, {@code false} otherwise.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static boolean isValidString(String str) {
         try {
@@ -378,7 +389,7 @@ public class Utilities {
      *
      * @param str String
      * @return value of {@code String} if {@code String} is valid, otherwise empty String ("")
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getStringOrEmpty(String str) {
         if (isValidString(str)) {
@@ -394,7 +405,7 @@ public class Utilities {
      * @param str          String
      * @param defaultValue
      * @return value of {@code String} if {@code String} is valid, otherwise the defaultValue
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getStringOrDefault(String str, String defaultValue) {
         if (isValidString(str)) {
@@ -411,7 +422,7 @@ public class Utilities {
      * @param ifValid
      * @param ifInValid
      * @return value of ifValid if {@code String} is valid, otherwise the value of ifInValid
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getStringOneOrTwo(String str, String ifValid, String ifInValid) {
         if (isValidString(str)) {
@@ -426,7 +437,7 @@ public class Utilities {
      *
      * @param is Input stream
      * @return Input stream as string
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -455,7 +466,7 @@ public class Utilities {
      * @param ctx Context
      * @param dp  Dimension to be converted to px
      * @return Dimension in px
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static int dpToPx(Context ctx, int dp) {
         DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
@@ -469,7 +480,7 @@ public class Utilities {
      * @param ctx Context
      * @param px  Dimension to be converted to dp
      * @return Dimension in dp
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static int pxToDp(Context ctx, int px) {
         DisplayMetrics displayMetrics = ctx.getResources().getDisplayMetrics();
@@ -486,7 +497,7 @@ public class Utilities {
      * To exit the app.
      *
      * @param ctx Context
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static void exitApp(Context ctx) {
         Intent intent = new Intent(ctx, Splash_activity.class);
@@ -502,7 +513,7 @@ public class Utilities {
      * @param networkType The network type integer specifying for which the status is to be known for ex. {@code ConnectivityManager.TYPE_WIFI}.
      *                    Pass '-1' if want to know the Active Internet connection status.
      * @return {@code true} if the requested network is available, {@code false } otherwise.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static boolean isNetworkConnectionAvailable(Context ctx, int networkType) {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -527,7 +538,7 @@ public class Utilities {
      * To make the app go to background
      *
      * @param ctx Context
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static void sendAppToBackground(Context ctx) {
         Intent startHome = new Intent(Intent.ACTION_MAIN);
@@ -542,7 +553,7 @@ public class Utilities {
      *
      * @param ctx        Context
      * @param strMessage Message to show in {@code Toast}.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static void showToast(final Context ctx, final String strMessage) {
         ((Activity) ctx).runOnUiThread(new Runnable() {
@@ -565,7 +576,7 @@ public class Utilities {
      *
      * @param ctx          Context
      * @param messageResId Resource Id of the message to show.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static void showToast(final Context ctx, final int messageResId) {
         ((Activity) ctx).runOnUiThread(new Runnable() {
@@ -589,7 +600,7 @@ public class Utilities {
      *
      * @param url URL to format
      * @return {@code URL} String with "/" appended at the end.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String formatURL(String url) {
         if (!url.endsWith("/")) {
@@ -604,7 +615,7 @@ public class Utilities {
      * @param str       {@code String} to check the length.
      * @param maxLength Maximum characters.
      * @return if the {@code String} length is greater than the {@code maxLength} returns a {@code String} with "..." appended to the end. Other wise the original {@code String}.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getSafeString(String str, int maxLength) {
         if (str.length() > maxLength) {
@@ -636,7 +647,7 @@ public class Utilities {
      * @param extension   Extension of the profile image to create.
      * @param createNew   {@code true} means creates the folder if not exists, otherwise {@code false}.
      * @return The local path where the user profile image is stored.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getProfileImageLocalPath(Context ctx, String siteId, String userId, String folderName, String displayName, String extension, boolean createNew) {
 
@@ -666,7 +677,7 @@ public class Utilities {
      * @param siteId  {@code siteId}.
      * @param picName Profile image name along with extension.
      * @return The path of the source profile image.
-     * @author Venu
+     * @author UpendraNathReddy
      */
     public static String getProfileImageSourcePath(String siteUrl, String siteId, String picName) {
 
@@ -699,7 +710,7 @@ public class Utilities {
 //     *
 //     * @param bitmap Image for which the rounded corners to be generated.
 //     * @param pixels Radius of rounded corner.
-//     * @author Venu
+//     * @author UpendraNathReddy
 //     * @return {@code Bitmap} image with rounded corners.
 //     */
 //	public static Bitmap getRoundedRectBitmap(Bitmap bitmap, int pixels) {
@@ -825,7 +836,7 @@ public class Utilities {
      * To get the available space on the file system for application (in kB).
      *
      * @return
-     * @author Venu
+     * @author UpendraNathReddy
      */
     @SuppressWarnings("deprecation")
     public static long getAvailableSpace() {
@@ -1545,6 +1556,19 @@ public class Utilities {
         return newDate;
     }
 
+    public static String convertToEventDisplayDateFormatCreatedOn(String dateTime, String currentFormat) {
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat preFormat = new SimpleDateFormat(currentFormat);
+        SimpleDateFormat postFormater = new SimpleDateFormat("MM/dd/yyyy");
+        String newDate = null;
+        try {
+            newDate = postFormater.format(preFormat.parse(dateTime));
+        } catch (Exception e) {
+            Log.d("In getCurrentDateTime", e.getMessage());
+        }
+        return newDate;
+    }
+
 
     public static String getCurrentDateTimeInUTC(String format) {
 
@@ -1948,5 +1972,177 @@ public class Utilities {
         } else {
             return false;
         }
+    }
+
+    public static boolean isJwFileExist(File file) {
+
+        boolean isJwExist = false;
+        File[] list = file.listFiles();
+        if (list == null)
+            return false;
+        int count = 0;
+        for (File f : list) {
+            if (f != null && f.isDirectory()) {
+                File[] listChilds = f.listFiles();
+                for (File cFIle : listChilds) {
+                    String name = cFIle.getName();
+                    if (name.contains("jwvideoslist.xml")) {
+                        isJwExist = true;
+                        return true;
+                    }
+                }
+            } else if (f != null && f.isFile()) {
+
+                String name = f.getName();
+                if (name.contains("jwvideoslist.xml")) {
+                    count++;
+                    System.out.println("jwvideoslist " + count);
+                    System.out.println("jwvideoslist " + f.getAbsolutePath());
+                    isJwExist = true;
+                    return true;
+                }
+            }
+
+        }
+        return isJwExist;
+    }
+
+
+    public static List<String> getAllJwFileLocalPaths(File file) {
+
+        List<String> jwFileURLArray = new ArrayList<>();
+
+        File[] list = file.listFiles();
+        if (list == null)
+            return jwFileURLArray;
+        int count = 0;
+        for (File f : list) {
+            if (f != null && f.isDirectory()) {
+                File[] listChilds = f.listFiles();
+                for (File cFIle : listChilds) {
+                    String name = cFIle.getName();
+                    if (name.contains("jwvideoslist.xml")) {
+
+                        jwFileURLArray.add(cFIle.getAbsolutePath());
+                    }
+                }
+            } else if (f != null && f.isFile()) {
+
+                String name = f.getName();
+                if (name.contains("jwvideoslist.xml")) {
+                    count++;
+                    System.out.println("jwvideoslist " + count);
+                    System.out.println("jwvideoslist " + f.getAbsolutePath());
+
+                    jwFileURLArray.add(f.getAbsolutePath());
+                }
+            }
+
+        }
+        return jwFileURLArray;
+    }
+
+    public static List<String> getAllJwUrlPath(List<String> xmlFilePaths) throws IOException, SAXException, ParserConfigurationException {
+
+        List<String> jwFileURLArray = new ArrayList<>();
+
+        if (xmlFilePaths != null && xmlFilePaths.size() > 0) {
+
+            for (int i = 0; i < xmlFilePaths.size(); i++) {
+
+                File fileAtPosition = new File(xmlFilePaths.get(i));
+                if (fileAtPosition.exists()) {
+
+                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+                            .newInstance();
+                    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                    Document doc = null;
+                    try {
+                        doc = dBuilder.parse(fileAtPosition);
+                    } catch (DOMException sax) {
+                        sax.printStackTrace();
+                        return jwFileURLArray;
+                    }
+
+                    doc.getDocumentElement().normalize();
+                    NodeList workflowList = doc.getElementsByTagName("jwvideos");
+                    int workflowCount = workflowList.getLength();
+
+
+                    for (int wfItem = 0; wfItem < workflowCount; wfItem++) {
+
+                        Node workflowNode = workflowList.item(wfItem);
+
+                        if (workflowNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                            Element workflowElement = (Element) workflowNode;
+
+                            String jwVideo = getValue("jwvideo", workflowElement);
+
+                            Log.d("JW", "getTagName: " + jwVideo);
+                            if (isValidString(jwVideo))
+                                jwFileURLArray.add(jwVideo);
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+        return jwFileURLArray;
+    }
+
+    private static String getValue(String tag, Element element) {
+        NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
+        Node node = (Node) nodeList.item(0);
+        return node.getNodeValue();
+    }
+
+
+    public static String toCSVString(List<String> array) {
+        String result = "";
+        if (array.size() > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (String s : array) {
+                sb.append(s).append(",");
+            }
+            result = sb.deleteCharAt(sb.length() - 1).toString();
+        }
+        return result;
+    }
+
+
+    public static String caluculateDuration(String duration, String hoursStr, String minStr) {
+        String result = "";
+
+        if (!isValidString(duration))
+            return result;
+
+
+        if (isValidString(duration)) {
+            int intTime = 0;
+            try {
+                intTime = Integer.parseInt(duration);
+
+                int intHr = intTime / 60;
+
+                int intMin = intTime % 60;
+
+                if (intHr > 0) {
+                    result = "" + intHr + " " + hoursStr;
+                }
+                if (intMin > 0) {
+                    result = result + " " + intMin + " " + minStr;
+                }
+
+            } catch (NumberFormatException exception) {
+                intTime = 0;
+                return result;
+            }
+
+        }
+
+        return result;
     }
 }

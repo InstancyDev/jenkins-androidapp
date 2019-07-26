@@ -95,8 +95,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.instancy.instancylearning.globalpackage.GlobalMethods.getToolbarLogoIcon;
+import static com.instancy.instancylearning.utils.StaticValues.AUTOLAUNCHCONTENTID_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.ISAUTOLAUNCH_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.IS_MENUS_FIRST_TIME;
 import static com.instancy.instancylearning.utils.StaticValues.MAIN_MENU_POSITION;
@@ -105,6 +107,7 @@ import static com.instancy.instancylearning.utils.StaticValues.NOTIFICATIONVIWED
 import static com.instancy.instancylearning.utils.StaticValues.PROFILE_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SIDEMENUOPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.SUB_MENU_POSITION;
+import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
 import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
@@ -202,7 +205,14 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     SideMenusModel homeModel, tempHomeModel;
     int homeIndex = 0;
 
+
+    boolean isChatEnabled = true;
+
     boolean isFromPushNotification = false;
+
+    boolean isAutoLaunchEnabled = false;
+
+    String autoLaunchContentID = "";
 
     RelativeLayout drawerHeaderView;
     public View logoView;
@@ -217,6 +227,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_side_menu);
+
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -227,6 +239,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         initVolleyCallback();
 
+        isChatEnabled = db.isPrivilegeExistsFor(StaticValues.REPORTPREVILAGEID);
         mNetworkReceiver = new NetworkChangeReceiver();
         registerNetworkBroadcastForNougat();
         vollyService = new VollyService(resultCallback, this);
@@ -235,8 +248,10 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (bundle != null) {
             isFromPushNotification = bundle.getBoolean("PUSH");
-
+            isAutoLaunchEnabled = bundle.getBoolean(ISAUTOLAUNCH_KEY, false);
+            autoLaunchContentID = bundle.getString(AUTOLAUNCHCONTENTID_KEY, "");
         }
+
 
         appUserModel.setUserName(preferencesManager.getStringValue(StaticValues.KEY_USERNAME));
         appUserModel.setProfileImage(preferencesManager.getStringValue(StaticValues.KEY_USERPROFILEIMAGE));
@@ -264,7 +279,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             public void onClick(View v) {
                 //logo clicked
                 homeControllClicked(false, 0, "", false, "");
-
 
             }
         });
@@ -339,17 +353,17 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
             }
 
-            if (menu.getContextMenuId().equals("10")) {
+            if (menu.getContextMenuId().equals("10") && isChatEnabled) {
 
-                if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
-                    sendMessageLayout.setVisibility(View.GONE);
-                } else {
-                    if (!getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.younextyou))) {
-                        sendMessageLayout.setVisibility(View.VISIBLE);
-                    }
-
-                }
-
+//                if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.mciswitchinstitute))) {
+//                    sendMessageLayout.setVisibility(View.GONE);
+//                } else {
+//                    if (!getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.younextyou))) {
+//                        sendMessageLayout.setVisibility(View.VISIBLE);
+//                    }
+//
+//                }
+                sendMessageLayout.setVisibility(View.VISIBLE);
 //                startSignalService();
 
 //                signalAServiceMicrosoft = SignalAServiceMicrosoft.newInstance(this);
@@ -358,6 +372,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 //                Intent intent = new Intent();
 //                intent.setClass(this, SignalRService.class);
 //                bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+            } else {
+                sendMessageLayout.setVisibility(View.GONE);
             }
             i++;
         }
@@ -369,19 +385,33 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             SideMenusModel model = new SideMenusModel();
             if (savedInstanceState == null) {
                 String indexed = "0";
-                for (int j = 0; j < sideMenumodelList.size(); j++) {
 
-                    if (sideMenumodelList.get(j).getDisplayOrder() == 1) {
-                        indexed = sideMenumodelList.get(j).getContextMenuId();
-                        model = sideMenumodelList.get(j);
-
-                    } else {
-
-                        indexed = sideMenumodelList.get(0).getContextMenuId();
-                        model = sideMenumodelList.get(0);
-
+                if (isAutoLaunchEnabled && isValidString(autoLaunchContentID)) {
+                    for (int j = 0; j < sideMenumodelList.size(); j++) {
+                        if (sideMenumodelList.get(j).getContextMenuId().equalsIgnoreCase("1")) {
+                            indexed = sideMenumodelList.get(j).getContextMenuId();
+                            model = sideMenumodelList.get(j);
+                            lastClicked = j;
+                            break;
+                        } else {
+                            indexed = sideMenumodelList.get(0).getContextMenuId();
+                            model = sideMenumodelList.get(0);
+                        }
                     }
+                } else {
+                    for (int j = 0; j < sideMenumodelList.size(); j++) {
 
+                        if (sideMenumodelList.get(j).getDisplayOrder() == 1) {
+                            indexed = sideMenumodelList.get(j).getContextMenuId();
+                            model = sideMenumodelList.get(j);
+
+
+                        } else {
+
+                            indexed = sideMenumodelList.get(0).getContextMenuId();
+                            model = sideMenumodelList.get(0);
+                        }
+                    }
                 }
 
                 // on first time to display view for first time navigation item based on the number
@@ -393,8 +423,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     nmEx.printStackTrace();
                     homeIndex = 0;
                 }
-
-                lastClicked = 0;
+                    lastClicked = 0;
 
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
@@ -490,7 +519,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 }
 
             }
-
 
         }
 
@@ -652,7 +680,22 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
     public void selectItem(int menuid, SideMenusModel sideMenusModel, boolean isFromNotification, String contentID, String topicID) {
 
+        HashMap<String, String> responMap = generateConditionsHashmap(sideMenusModel.getConditions());
+
         Fragment fragment = null; //
+
+        if (responMap != null && responMap.containsKey("CategoryStyle")) {
+            String categoryStyle = responMap.get("CategoryStyle");
+
+            if (categoryStyle.contains("thumbnails")) {
+                sideMenusModel.setLandingPageType("1");
+            } else {
+                sideMenusModel.setLandingPageType("0");
+            }
+
+        } else {
+            sideMenusModel.setLandingPageType("0");
+        }
 
         switch (menuid) {
             case 1:
@@ -736,19 +779,32 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
                 bundle.putString("TOPICID", topicID);
                 bundle.putString("CONTENTID", contentID);
+
+                if (isAutoLaunchEnabled && isValidString(autoLaunchContentID) && menuid == 1) {
+
+                    bundle.putString(AUTOLAUNCHCONTENTID_KEY, autoLaunchContentID);
+                    bundle.putBoolean(ISAUTOLAUNCH_KEY, isAutoLaunchEnabled);
+                    isAutoLaunchEnabled = false;
+                    autoLaunchContentID = "";
+                    navDrawerExpandableView.setItemChecked(lastClicked, true);
+                    navDrawerExpandableView.setSelection(lastClicked);
+                    lastClicked = 0;
+                } else {
+                    navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
+                    navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
+                }
+
                 fragment.setArguments(bundle);
-
-                navDrawerExpandableView.setItemChecked(sideMenusModel.getDisplayOrder(), true);
-                navDrawerExpandableView.setSelection(sideMenusModel.getDisplayOrder());
-
+            }
+            if (isAutoLaunchEnabled && isValidString(autoLaunchContentID)) {
+                navDrawerExpandableView.setItemChecked(lastClicked, true);
+                navDrawerExpandableView.setSelection(lastClicked);
             }
             if (menuid == 99 || menuid == 100 || menuid == 101) {
-
                 lastClicked = -1;
                 navDrawerExpandableView.setItemChecked(lastClicked, false);
                 menuDynamicAdapter.notifyDataSetChanged();
             }
-
             drawer.closeDrawer(Gravity.LEFT);
         } else {
             Log.e("MainActivity", "Error in creating fragment");
@@ -829,7 +885,6 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         }
     }
 
-
     private void subMenuItemClickListener(int groupPosition, int childPosition) {
 
         if (!(MAIN_MENU_POSITION == groupPosition && SUB_MENU_POSITION == childPosition)) {
@@ -840,16 +895,15 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
             if (mList != null) {
                 m = mList.get(childPosition);
             }
-
-            if (m==null)
+            if (m == null)
                 return;
-//            if (m.getIsOfflineMenu().equals("true")) {
-//                navDrawerExpandableView.setSelectedGroup(groupPosition);
-//                navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
-//                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "", "");
-//            } else {
-//
-//            }
+            if (m.getIsOfflineMenu().equals("true")) {
+                navDrawerExpandableView.setSelectedGroup(groupPosition);
+                navDrawerExpandableView.setSelectedChild(groupPosition, childPosition, true);
+                selectItem(Integer.parseInt(m.getContextMenuId()), m, false, "", "");
+            } else {
+
+            }
         }
     }
 
@@ -1297,4 +1351,19 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 //            mBound = false;
 //        }
 //    };
+    public HashMap<String, String> generateConditionsHashmap(String conditions) {
+
+        HashMap<String, String> responMap = null;
+        if (conditions != null && !conditions.equals("")) {
+            if (conditions.contains("#@#")) {
+                String[] conditionsArray = conditions.split("#@#");
+                int conditionCount = conditionsArray.length;
+                if (conditionCount > 0) {
+                    responMap = generateHashMap(conditionsArray);
+                }
+            }
+        }
+        return responMap;
+    }
+
 }

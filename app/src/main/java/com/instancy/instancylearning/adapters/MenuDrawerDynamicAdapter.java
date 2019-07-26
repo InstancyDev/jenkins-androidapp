@@ -174,7 +174,7 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
 //            if (parentPosition % 2 == 0) {
 //                pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGAlternativeColor()));
 //            } else {
-                pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
+            pView.setBackgroundColor(Color.parseColor(uiSettingsModel.getMenuBGColor()));
 //            }
             txtTitle.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
             fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuTextColor()));
@@ -253,6 +253,26 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
 
         return pView;
     }
+
+
+    public String getRequiredIconForCatalog(String faIconFromServer) {
+        String fa_Icon = ctx.getResources().getString(R.string.fa_icon_bar_chart);
+
+        if (faIconFromServer.contains("far fa-book-reader")) {
+            fa_Icon = ctx.getResources().getString(R.string.fa_icon_book);
+        } else if (faIconFromServer.contains("far fa-chart-bar")) {
+            fa_Icon = ctx.getResources().getString(R.string.fa_icon_bar_chart);
+        } else if (faIconFromServer.contains("far fa-book-open")) {
+            fa_Icon = ctx.getResources().getString(R.string.fa_icon_book);
+        } else if (faIconFromServer.contains("far fa-project-diagram")) {
+            fa_Icon = ctx.getResources().getString(R.string.fa_icon_diamond);
+        } else {
+
+        }
+
+        return fa_Icon;
+    }
+
 
     @Override
     public View getChildView(int parentPosition, int childPosition,
@@ -348,8 +368,8 @@ public class MenuDrawerDynamicAdapter extends BaseExpandableListAdapter {
                 fontIcon.setTextColor(Color.parseColor(uiSettingsModel.getMenuBGSelectTextColor()));
             } else {
 //                if (parentPosition % 2 == 0) {
-                    cView.setBackgroundColor(Color
-                            .parseColor(uiSettingsModel.getMenuBGColor()));
+                cView.setBackgroundColor(Color
+                        .parseColor(uiSettingsModel.getMenuBGColor()));
 //                } else {
 //                    cView.setBackgroundColor(Color
 //                            .parseColor(uiSettingsModel.getMenuBGAlternativeColor()));

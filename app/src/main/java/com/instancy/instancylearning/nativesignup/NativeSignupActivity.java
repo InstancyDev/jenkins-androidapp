@@ -324,7 +324,7 @@ public class NativeSignupActivity extends AppCompatActivity {
 
     public void injectFromDbToModel(JSONArray termsWebAry, JSONArray signUpConfigAry) {
 
-        signUpConfigsModelList = db.fetchUserSignConfigs(context,getLocalizationValue(JsonLocalekeys.signupconfirmpassword_title_confirmpasswordtitle));
+        signUpConfigsModelList = db.fetchUserSignConfigs(context, getLocalizationValue(JsonLocalekeys.signupconfirmpassword_title_confirmpasswordtitle));
 
         if (signUpConfigsModelList != null && signUpConfigsModelList.size() > 0) {
             nativeSignupAdapter.refreshList(signUpConfigsModelList);
@@ -468,15 +468,38 @@ public class NativeSignupActivity extends AppCompatActivity {
                 }
             }
 
-            if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15")) {
+            if (signUpConfigsModelList.get(i).isrequired.contains("true") && signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15")) {
 
-                if (isValidEmail(signUpConfigsModelList.get(i).valueName)) {
+                if (isValidEmail(signUpConfigsModelList.get(i).valueName) && signUpConfigsModelList.get(i).valueName.contains("@")) {
                     isValidationCompleted = true;
                 } else {
                     isValidationCompleted = false;
                     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.signup_alertsubtitle_invalidemail), Toast.LENGTH_SHORT).show();
                 }
+            } else if (signUpConfigsModelList.get(i).isrequired.contains("false") && signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15")) {
+
+                if (signUpConfigsModelList.get(i).valueName.length() > 0) {
+                    if (isValidEmail(signUpConfigsModelList.get(i).valueName)) {
+                        isValidationCompleted = true;
+                    } else {
+                        isValidationCompleted = false;
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.signup_alertsubtitle_invalidemail), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    isValidationCompleted = true;
+                }
             }
+
+
+//            if ( signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("15")) {
+//
+//                if (isValidEmail(signUpConfigsModelList.get(i).valueName)) {
+//                    isValidationCompleted = true;
+//                } else {
+//                    isValidationCompleted = false;
+//                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.signup_alertsubtitle_invalidemail), Toast.LENGTH_SHORT).show();
+//                }
+//            }
 
             if (signUpConfigsModelList.get(i).attributeconfigid.equalsIgnoreCase("6")) {
                 passwordStr = signUpConfigsModelList.get(i).valueName;
@@ -621,7 +644,6 @@ public class NativeSignupActivity extends AppCompatActivity {
         setResult(RESULT_OK, intent);
         finish();
     }
-
 
     public void autoLoginEnabled(String responseStr) {
         try {

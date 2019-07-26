@@ -41,6 +41,36 @@ public class MyLearningModel implements Serializable {
 
     String reSheduleEvent = "";
 
+
+    public String getViewprerequisitecontentstatus() {
+        return getViewPrerqusite(viewprerequisitecontentstatus);
+    }
+
+    public String getViewPrerqusite(String viewprerequisitecontentstatus) {
+
+        String fullNamePreq = "";
+
+        if (isValidString(viewprerequisitecontentstatus)) {
+
+            String[] prerequsiteArry = viewprerequisitecontentstatus.split("\\$;");
+
+            if (prerequsiteArry.length > 1) {
+                fullNamePreq = prerequsiteArry[1];
+            } else {
+                fullNamePreq = viewprerequisitecontentstatus;
+            }
+
+        }
+
+        return fullNamePreq;
+    }
+
+    public void setViewprerequisitecontentstatus(String viewprerequisitecontentstatus) {
+        this.viewprerequisitecontentstatus = viewprerequisitecontentstatus;
+    }
+
+    String viewprerequisitecontentstatus = "";
+
     public String getCertificateAction() {
         return CertificateAction;
     }
@@ -48,6 +78,8 @@ public class MyLearningModel implements Serializable {
     public void setCertificateAction(String certificateAction) {
         CertificateAction = certificateAction;
     }
+
+    public boolean isFromPrereq = false;
 
     String CertificateAction = "";
 
@@ -75,11 +107,52 @@ public class MyLearningModel implements Serializable {
         WindowProperties = windowProperties;
     }
 
+    public Boolean getBit4() {
+        return bit4;
+    }
+
+    public void setBit4(Boolean bit4) {
+        this.bit4 = bit4;
+    }
+
+    Boolean bit4 = false;
+
     String CertificateId = "";
 
     String CertificatePage = "";
 
     String WindowProperties = "";
+
+
+    public String getQrCodeImagePath() {
+        return qrCodeImagePath;
+    }
+
+    public void setQrCodeImagePath(String qrCodeImagePath) {
+        this.qrCodeImagePath = qrCodeImagePath;
+    }
+
+    String QRImageName = "";
+
+    public String getQRImageName() {
+        return QRImageName;
+    }
+
+    public void setQRImageName(String QRImageName) {
+        this.QRImageName = QRImageName;
+    }
+
+    String qrCodeImagePath = "";
+
+    public String getOfflineQrCodeImagePath() {
+        return offlineQrCodeImagePath;
+    }
+
+    public void setOfflineQrCodeImagePath(String offlineQrCodeImagePath) {
+        this.offlineQrCodeImagePath = offlineQrCodeImagePath;
+    }
+
+    String offlineQrCodeImagePath = "";
 
     public boolean isCancelEventEnabled() {
         return cancelEventEnabled;
@@ -261,6 +334,47 @@ public class MyLearningModel implements Serializable {
     int EventScheduleType = 0;
     String TableofContent = "";
     String LearningObjectives = "";
+
+    public String getContentEnrolled() {
+        return contentEnrolled;
+    }
+
+    public void setContentEnrolled(String contentEnrolled) {
+        this.contentEnrolled = contentEnrolled;
+    }
+
+    String contentEnrolled = "false";
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    String duration = "";
+
+    public String getCredits() {
+        return credits;
+    }
+
+    public void setCredits(String credits) {
+        this.credits = credits;
+    }
+
+    String credits = "";
+
+    public String getDecimal2() {
+        return decimal2;
+    }
+
+    public void setDecimal2(String decimal2) {
+        this.decimal2 = decimal2;
+    }
+
+    String decimal2 = "";
+
 
     public int getBookmarkID() {
         return bookmarkID;
@@ -1034,6 +1148,4 @@ public class MyLearningModel implements Serializable {
     public void setRelatedContentCount(String relatedContentCount) {
         this.relatedContentCount = relatedContentCount;
     }
-
-
 }

@@ -366,6 +366,11 @@
             android:name=".advancedfilters_mylearning.CtryCmpnyActivity"
             android:screenOrientation="portrait"></activity>
 
+
+        <activity
+            android:name=".events.PrerequisiteContentActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!-- Push Notification  issue icon -->
 
         <meta-data
@@ -390,7 +395,8 @@
         <activity
             android:name=".inappbilling.InAppBilling_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent"></activity>
+            android:theme="@style/Theme.AppCompat.Translucent"> </activity>
+        <activity android:name=".catalog.ContentViewActivity" />
 
         <!-- Used for transferring files  after a successful connection -->
         <service

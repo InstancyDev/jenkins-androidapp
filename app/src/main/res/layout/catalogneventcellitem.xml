@@ -269,6 +269,37 @@
                         android:textColor="@color/colorSiteName"
                         android:textSize="14sp" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/creditsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/author_site_layout"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/txtCredits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="1dp"
+                        android:textColor="@color/colorDarkGrey"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/lbCredits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:maxLines="2"
+                        android:padding="3dp"
+                        android:paddingLeft="6dp"
+                        android:text=""
+                        android:textSize="14sp" />
+
+                </LinearLayout>
             </RelativeLayout>
 
             <!-- download and contextmenu place -->

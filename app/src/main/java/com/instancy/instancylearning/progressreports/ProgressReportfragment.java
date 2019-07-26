@@ -29,6 +29,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -50,9 +51,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -70,17 +76,19 @@ import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.helper.IResult;
-import com.instancy.instancylearning.helper.VolleySingleton;
+
 import com.instancy.instancylearning.helper.VollyService;
+import com.instancy.instancylearning.interfaces.ProgressReportInterface;
 import com.instancy.instancylearning.interfaces.ReportSummeryResponseListner;
 import com.instancy.instancylearning.interfaces.ResultListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
+
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.ProgressChartsModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.instancy.instancylearning.mylearning.Reports_Activity;
+
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -89,9 +97,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -115,7 +123,7 @@ import static com.instancy.instancylearning.utils.Utilities.isValidString;
  */
 
 @TargetApi(Build.VERSION_CODES.N)
-public class ProgressReportfragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener {
+public class ProgressReportfragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AdapterView.OnItemClickListener, ProgressReportInterface {
 
     String TAG = ProgressReportfragment.class.getSimpleName();
     AppUserModel appUserModel;
@@ -148,11 +156,13 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
     TextView txtContentScore;
 
-    TextView titleStatus, titleContent, titleScore, titleContentTypes;
+    TextView titleStatus, titleContent, titleScore, titleContentTypes, txtMiddle;
 
     PieChart mChart, contentChart;
 
     TrackingRingView ringcharts;
+
+    CardView contentTypeCard;
 
     ReportSummeryResponseListner reportSummeryResponseListner = null;
 
@@ -396,6 +406,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         contentChart.highlightValues(null);
         contentChart.invalidate();
 
+        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_medmentor)))) {
+            contentTypeCard.setVisibility(View.GONE);
+        }
+
     }
 
     @Override
@@ -465,6 +479,9 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         mChart = (PieChart) header.findViewById(R.id.statuschart);
         contentChart = (PieChart) header.findViewById(R.id.contenttypechart);
         ringcharts = (TrackingRingView) header.findViewById(R.id.ringcharts);
+        txtMiddle = (TextView) header.findViewById(R.id.txtMiddle);
+
+        contentTypeCard = (CardView) header.findViewById(R.id.contentTypeCard);
 
         /// Localazation
         titleContentTypes = (TextView) header.findViewById(R.id.titleContentTypes);
@@ -474,7 +491,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
         titleContent.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentslabel));
 
         titleScore = (TextView) header.findViewById(R.id.titleScore);
-        titleScore.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_scorelabel));
+        titleScore.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_averagescorelabel));
 
         titleStatus = (TextView) header.findViewById(R.id.titleStatus);
         titleStatus.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_statuslabel));
@@ -769,10 +786,12 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
 
         // ringcharts function
         final List<DataEntry> entrie = new ArrayList<>();
+        entrie.add(new DataEntry(0, "", context.getResources().getColor(R.color.colorWhite), context.getResources().getColor(R.color.colorWhite)));
         entrie.add(new DataEntry(overAllScore, "" + overAllScore, context.getResources().getColor(R.color.colorInGreen), Color.LTGRAY));
-        entrie.add(new DataEntry(scoreMax, "" + scoreMax, context.getResources().getColor(R.color.colorOutTealGreen), Color.LTGRAY));
         final DataSet datasets = new DataSet(entrie);
         ringcharts.setDataSet(datasets);
+
+        txtMiddle.setText("" + overAllScore + "%");
     }
 
     public List<ProgressReportModel> generateProgressReport(JSONObject jsonObject) throws
@@ -903,6 +922,11 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 progressReportModel.categoryID = jsonMyLearningColumnObj.getString("categoryID");
 
             }
+            //certificateAction
+
+            progressReportModel.certificateAction = jsonMyLearningColumnObj.optString("CertificateAction");
+
+            progressReportModel.credits=jsonMyLearningColumnObj.optString("Credit");
 
             progressReportModel.siteID = appUserModel.getUserIDValue();
             // ObjectID here one more loop
@@ -1032,7 +1056,7 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                     progressReportModel.overScore = "";
                 }
 
-                if (progressReportModel.objectTypeID.equalsIgnoreCase("9")){
+                if (progressReportModel.objectTypeID.equalsIgnoreCase("9")) {
                     progressReportModel.overScore = " NA";
                 }
 
@@ -1075,6 +1099,10 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
                 progressReportModel.trackID = jsonMyLearningColumnObj.optString("ParentID");
 
             }
+
+            progressReportModel.certificateAction = jsonMyLearningColumnObj.optString("CertificateAction");
+
+            progressReportModel.credits=jsonMyLearningColumnObj.optString("Credit");
 
             progressReportModel.siteID = appUserModel.getSiteIDValue();
 
@@ -1131,4 +1159,11 @@ public class ProgressReportfragment extends Fragment implements SwipeRefreshLayo
     }
 
 
+    @Override
+    public void viewCertificateLink(boolean fromChild, ProgressReportModel progressReportModel, ProgressReportChildModel progressReportChildModel) {
+
+
+
+
+    }
 }

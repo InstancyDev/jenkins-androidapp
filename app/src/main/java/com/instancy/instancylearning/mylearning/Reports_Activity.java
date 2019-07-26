@@ -434,7 +434,7 @@ public class Reports_Activity extends AppCompatActivity {
         } else if (statusFromModel.equalsIgnoreCase("Not Started")) {
             displayScore = "0";
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusNotStarted));
-            displayStatus = learningModel.getStatusActual();
+            displayStatus = learningModel.getStatusDisplay();
         } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusInProgress));
@@ -454,7 +454,7 @@ public class Reports_Activity extends AppCompatActivity {
         } else if (statusFromModel.toLowerCase().contains("attended") || (statusFromModel.toLowerCase().contains("registered"))) {
 
             txtStatus.setTextColor(getResources().getColor(R.color.colorStatusOther));
-            displayStatus = learningModel.getStatusActual();
+            displayStatus = learningModel.getStatusDisplay();
             displayScore = "100";
         } else if (statusFromModel.toLowerCase().contains("Expired")) {
 

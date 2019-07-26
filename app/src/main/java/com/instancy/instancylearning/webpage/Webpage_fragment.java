@@ -201,15 +201,40 @@ public class Webpage_fragment extends Fragment {
 
             String replaceString = splitFirst[1];
 
-            replaceString = replaceString.replace("#$#", "=");
-            String splitSecond[] = replaceString.split("=");
-            if (splitSecond.length > 0) {
+//            replaceString = replaceString.replace("#$#", "=");
+//            String splitSecond[] = replaceString.split("=");
+            if (replaceString.length() > 0) {
 
-                urlStr = "" + appUserModel.getSiteURL() + "/content/sitefiles/" + splitSecond[0];
+                urlStr = "" + appUserModel.getSiteURL() + "/content/PublishFiles/" + replaceString;
+
             }
         }
         return urlStr;
     }
+
+
+//    public String getUrlFromParmString(String parmString) {
+//        String urlStr = "";
+//
+//        if (!isValidString(parmString))
+//            return "";
+//
+//
+//        String splitFirst[] = parmString.split("=");
+//
+//        if (splitFirst.length > 0) {
+//
+//            String replaceString = splitFirst[1];
+//
+//            replaceString = replaceString.replace("#$#", "=");
+//            String splitSecond[] = replaceString.split("=");
+//            if (splitSecond.length > 0) {
+//
+//                urlStr = "" + appUserModel.getSiteURL() + "/content/sitefiles/" + splitSecond[0];
+//            }
+//        }
+//        return urlStr;
+//    }
 
     public static void clearWebViewAbsolutely(WebView webView) {
         webView.clearCache(true);

@@ -25,18 +25,32 @@
             android:textColor="@color/black"
             android:textSize="30dp" />
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/titleScore"
             android:gravity="center">
 
+            <TextView
+                android:id="@+id/txtMiddle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:padding="3dp"
+                android:text="45%"
+                android:textColor="@color/black"
+                android:textSize="32dp" />
+
+
             <mg.yra.lib.trackingring.TrackingRingView
-                android:padding="10dp"
                 android:id="@+id/ringcharts"
                 android:layout_width="match_parent"
-                android:layout_height="230dp" />
+                android:maxHeight="20dp"
+                android:layout_height="230dp"
+                android:background="@android:color/transparent"
+                android:padding="15dp"
+                android:visibility="visible" />
 
         </RelativeLayout>
 

@@ -78,16 +78,16 @@ android {
 //        versionName "1.0"
 
 //        applicationId "com.instancy.development"
-//        versionCode 18
-//        versionName "1.3.1"
+//        versionCode 19
+//        versionName "1.4.3"
 
-        applicationId "com.instancy.esperanza"
-        versionCode 20
-        versionName "2.8"
+//        applicationId "com.instancy.esperanza"
+//        versionCode 22
+//        versionName "2.9"
 
 //        applicationId "com.yournextyou"
-//        versionCode 7
-//        versionName "1.0.6"
+//        versionCode 8
+//        versionName "1.0.7"
 
 //        applicationId "com.instancy.ppdlife"
 //        versionCode 6
@@ -105,9 +105,9 @@ android {
 //        versionCode 3
 //        versionName "1.2"
 
-//        applicationId "com.instancy.medmind"
-//        versionCode 1
-//        versionName "1.0"
+        applicationId "com.instancy.medmind"
+        versionCode 1
+        versionName "1.0"
 
 
     }

@@ -15,9 +15,9 @@
 
     <!--<string name="app_name"> Development </string>-->
 
-    <!--<string name="app_name"> MedMentor Education </string>-->
+    <string name="app_name"> MedMentor Education </string>
 
-    <string name="app_name"> AEI para Ti </string>
+    <!--<string name="app_name"> AEI para Ti </string>-->
 
     <!--<string name="app_name">HealthHelp IE</string>-->
 
@@ -47,7 +47,6 @@
     <string name="no_games_avaliable">There are no games available at this time.</string>
 
     <string name="no_users_to_display">No users</string>
-
 
     <string name="loadingtxt">Loading...</string>
 

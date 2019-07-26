@@ -291,8 +291,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
 
             } else {
 
-                //    getLocaleFileForLocalazation();
-
                 String userID = preferencesManager.getStringValue(StaticValues.KEY_USERID);
 
                 if (userID != null && !userID.equalsIgnoreCase("")) {
@@ -355,7 +353,6 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
     private void requestPermission() {
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, WRITE_CALENDAR, READ_CALENDAR}, PERMISSION_REQUEST_CODE);
-
 
     }
 
@@ -507,6 +504,16 @@ public class Splash_activity extends Activity implements SiteConfigInterface {
             public void notifyError(String requestType, VolleyError error) {
                 Log.d(TAG, "Volley requester " + requestType);
                 Log.d(TAG, "Volley JSON post" + "That didn't work!");
+                try {
+                    preferencesManager.setBooleanValue(true, getResources().getString(R.string.locale_changed));
+                    if (navigationType == 1)
+                        navigateToNextScreen();
+                    else
+                        navigateToNextScreen2();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override

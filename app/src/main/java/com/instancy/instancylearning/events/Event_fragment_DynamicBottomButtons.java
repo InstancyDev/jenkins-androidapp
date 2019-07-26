@@ -171,7 +171,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
     PreferencesManager preferencesManager;
     Context context;
     Toolbar toolbar;
-    MenuItem item_search;
+    MenuItem item_search, itemWishList;
     SideMenusModel sideMenusModel = null;
     String filterContentType = "", consolidationType = "all", sortBy = "", ddlSortList = "", ddlSortType = "", contentFilterType = "";
     ResultListner resultListner = null;
@@ -179,6 +179,9 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
     AppController appcontroller;
     UiSettingsModel uiSettingsModel;
     BillingProcessor billingProcessor;
+
+    boolean isWishlisted = false;
+    int isWsh = 0;
 
     boolean isFromGlobalSearch = false, isIconEnabled = false;
     String queryString = "";
@@ -215,6 +218,8 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
     List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
 
     ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+
+    ActionBar actionBar = null;
 
     public Event_fragment_DynamicBottomButtons() {
 
@@ -418,6 +423,9 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsData";
 
         JSONObject parameters = new JSONObject();
+
+        //   applyFilterModel.sortBy = "Publisheddate desc"; // uncomment after prerequsite
+
         if (!TABBALUE.equalsIgnoreCase("calendar")) {
 
             filterContentType = "%20C.ObjectTypeID%20=%2070%20And%20C.bit4%20Is%20null%20";
@@ -444,7 +452,12 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                 parameters.put("pageSize", pageSize);
                 parameters.put("SearchText", queryString);
                 parameters.put("ContentID", "");
+//                if (isValidString(queryString)) {
+//                    parameters.put("sortBy", "");
+//                } else {
+//                }
                 parameters.put("sortBy", applyFilterModel.sortBy.length() > 0 ? applyFilterModel.sortBy : ddlSortList);
+
                 parameters.put("ComponentID", sideMenusModel.getComponentId());
                 parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
 //                parameters.put("AdditionalParams", "EventComponentID=153~FilterContentType=70~eventtype=" + TABBALUE + "~HideCompleteStatus=true");
@@ -470,7 +483,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                 parameters.put("certification", "");
                 parameters.put("duration", applyFilterModel.duration);
                 parameters.put("instructors", applyFilterModel.instructors);
-                parameters.put("iswishlistcontent", "");
+                parameters.put("iswishlistcontent", isWsh);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -542,7 +555,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         }
                         try {
                             totalRecordsCount = countOfTotalRecords(response);
-                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
+                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied, isWishlisted);
 
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
@@ -579,6 +592,19 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                     swipeRefreshLayout.setRefreshing(false);
                 }
 
+                if (requestType.equalsIgnoreCase("WISHLIST")) {
+                    if (response != null) {
+                        if (isDigimedica) {
+                            pageIndex = 1;
+                            getMobileCatalogObjectsData(true);
+                        } else {
+                            refreshCatalog(true);
+                        }
+                        Toast.makeText(context, getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_itemremovedtowishlistsuccesfully), Toast.LENGTH_SHORT).show();
+                    } else {
+
+                    }
+                }
 
                 svProgressHUD.dismiss();
             }
@@ -624,7 +650,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         try {
                             if (jsonObj != null) {
                                 totalRecordsCount = countOfTotalRecords(jsonObj);
-                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied, isWishlisted);
 
                             }
                             injectFromDbtoModel(true);
@@ -766,6 +792,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         } else {
                             injectFromDbtoModel(false);
                         }
+                        itemWishList.setVisible(true);
                         break;
                     case "Calendar-View":
                         compactCalendarView.setVisibility(View.VISIBLE);
@@ -782,6 +809,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         } else {
                             refreshCatalog(false);
                         }
+                        itemWishList.setVisible(false);
                         break;
                     case "Past-Courses":
                         compactCalendarView.setVisibility(View.GONE);
@@ -801,6 +829,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         } else {
                             injectFromDbtoModel(false);
                         }
+                        itemWishList.setVisible(true);
                         break;
                     case "My-Events":
                         TABBALUE = "myevents";
@@ -819,6 +848,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         } else {
                             injectFromDbtoModel(false);
                         }
+                        itemWishList.setVisible(true);
                         break;
                     case "Additional-Program-Details":
                         StaticValues.MYEVENTS = 0;
@@ -1031,7 +1061,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
     }
 
     public void initilizeView() {
-        ActionBar actionBar = getActionBar();
+        actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         setHasOptionsMenu(true);
@@ -1051,6 +1081,9 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         item_search = menu.findItem(R.id.mylearning_search);
         MenuItem item_filter = menu.findItem(R.id.mylearning_filter);
         MenuItem itemInfo = menu.findItem(R.id.mylearning_info_help);
+
+        itemWishList = menu.findItem(R.id.ctx_archive);
+        itemWishList.setVisible(true);
 
         itemInfo.setVisible(false);
         if (responMap != null && responMap.containsKey("ShowIndexes")) {
@@ -1130,6 +1163,11 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
 
         }
 
+        if (itemWishList != null) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_heart, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWishList.setIcon(filterDrawable);
+            itemWishList.setTitle(getLocalizationValue(JsonLocalekeys.catalog_header_wishlisttitlelabel));
+        }
 
     }
 
@@ -1184,6 +1222,12 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
             case R.id.mylearning_filter:
                 advancedFilters();
                 break;
+            case R.id.ctx_archive:
+                if (isNetworkConnectionAvailable(getContext(), -1)) {
+                    isWishListCall();
+                } else {
+                    showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
+                }
 
         }
 
@@ -1208,7 +1252,46 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         }
     }
 
-    //
+
+    public void isWishListCall() {
+
+        if (isWishlisted) {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_heart, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWishList.setIcon(filterDrawable);
+            itemWishList.setTitle(getLocalizationValue(JsonLocalekeys.catalog_header_wishlisttitlelabel));
+            isWishlisted = false;
+            isWsh = 0;
+            pageIndex = 1;
+            updateActionbarTitle(true);
+        } else {
+            Drawable filterDrawable = getDrawableFromStringHOmeMethod(R.string.fa_icon_book, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWishList.setIcon(filterDrawable);
+            itemWishList.setTitle(sideMenusModel.getDisplayName());
+            isWishlisted = true;
+            isWsh = 1;
+            pageIndex = 1;
+            updateActionbarTitle(false);
+        }
+
+        if (isDigimedica) {
+            getMobileCatalogObjectsData(true);
+        } else {
+            refreshCatalog(true);
+        }
+    }
+
+    public void updateActionbarTitle(boolean forMylearning) {
+        String titleName = "";
+        if (forMylearning) {
+            titleName = sideMenusModel.getDisplayName();
+        } else {
+            titleName = getLocalizationValue(JsonLocalekeys.catalog_header_wishlisttitlelabel);
+        }
+        actionBar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + titleName + "</font>"));
+
+    }
+
+
     public HashMap<String, String> generateConditionsHashmap(String conditions) {
 
         HashMap<String, String> responMap = null;
@@ -1312,6 +1395,8 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         menu.getItem(4).setTitle(getLocalizationValue(JsonLocalekeys.events_actionsheet_cancelenrollmentoption));
 //        menu.getItem(4).setTitle("Cancel");
 
+        menu.getItem(5).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_wishlistoption));//addwishlist  ctx_addtowishlist
+        menu.getItem(6).setTitle(getLocalizationValue(JsonLocalekeys.catalog_actionsheet_removefromwishlistoption));//rmwishlist  ctx_removefromwishlist
 
         ;//cancel enrollment
 
@@ -1320,6 +1405,10 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         menu.getItem(2).setVisible(false);//buy
         menu.getItem(3).setVisible(false);//detail
         menu.getItem(4).setVisible(false);//cancel enrollment
+
+        menu.getItem(5).setVisible(false);//addwishlist  ctx_addtowishlist
+        menu.getItem(6).setVisible(false);//rmwishlist  ctx_removefromwishlist
+
 
 //      boolean subscribedContent = databaseH.isSubscribedContent(myLearningDetalData);
 
@@ -1497,6 +1586,15 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
             menu.getItem(1).setVisible(true);//enroll
         }
 
+        if (myLearningDetalData.getAddedToMylearning() == 0) {
+            if (myLearningDetalData.isArchived()) {
+                menu.getItem(6).setVisible(true);//removeWishListed
+            } else {
+                menu.getItem(5).setVisible(true);//isWishListed
+            }
+        }
+
+
 //        int avaliableSeats = 0;
 //        try {
 //            avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
@@ -1563,6 +1661,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                     Intent intentDetail = new Intent(v.getContext(), MyLearningDetailActivity1.class);
                     intentDetail.putExtra("ISICONENABLED", isIconEnabled);
                     intentDetail.putExtra("IFROMCATALOG", true);
+                    intentDetail.putExtra("sideMenusModel", sideMenusModel);
                     intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
 
                     ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
@@ -1603,33 +1702,61 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                 }
                 if (item.getItemId() == R.id.ctx_add) {
                     if (isNetworkConnectionAvailable(context, -1)) {
+                        if (myLearningDetalData.getAddedToMylearning() == 2) {
 
-                        if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
-
-                            try {
-                                addExpiryEvets(myLearningDetalData, position);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            Intent intent = new Intent(context, PrerequisiteContentActivity.class);
+                            intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                            intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
+                            startActivity(intent);
 
                         } else {
 
-                            int avaliableSeats = 0;
-                            try {
-                                avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
-                            } catch (NumberFormatException nf) {
-                                avaliableSeats = 0;
-                                nf.printStackTrace();
-                            }
-                            if (avaliableSeats > 0) {
-                                addToMyLearningCheckUser(myLearningDetalData, position, false);
-                            } else if (isValidString(myLearningDetalData.getActionWaitlist()) && myLearningDetalData.getActionWaitlist().equalsIgnoreCase("true")) {
+                            if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(myLearningDetalData.getEventendUtcTime())) {
+
                                 try {
-                                    addToWaitList(myLearningDetalData);
+                                    addExpiryEvets(myLearningDetalData, position);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                            }
+
+                            } else {
+
+                                int avaliableSeats = 0;
+                                try {
+                                    avaliableSeats = Integer.parseInt(myLearningDetalData.getAviliableSeats());
+                                } catch (NumberFormatException nf) {
+                                    avaliableSeats = 0;
+                                    nf.printStackTrace();
+                                }
+                                if (avaliableSeats > 0) {
+                                    addToMyLearningCheckUser(myLearningDetalData, position, false);
+                                } else if (isValidString(myLearningDetalData.getActionWaitlist()) && myLearningDetalData.getActionWaitlist().equalsIgnoreCase("true")) {
+
+                                    final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                                    builder.setMessage(getLocalizationValue(JsonLocalekeys.eventdetailsenrollement_alertsubtitle_eventenrollmentlimit))
+                                            .setTitle(getLocalizationValue(JsonLocalekeys.eventenrolltitle_alerttitle_enrollalerttitle))
+                                            .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_closebuttonaction_closebuttonalerttitle), new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int i) {
+                                            dialog.dismiss();
+                                        }
+                                    }).setPositiveButton(getLocalizationValue(JsonLocalekeys.myskill_alerttitle_stringconfirm), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            try {
+                                                addToWaitList(myLearningDetalData);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                            //do things
+                                            dialog.dismiss();
+
+
+                                        }
+                                    });
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
+
+                                }
 //                            else if (avaliableSeats <= 0 && myLearningDetalData.getWaitlistlimit() != 0 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
 //
 //                                try {
@@ -1639,11 +1766,16 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
 //                                }
 //                            }
 
-                            else {
-                                addToMyLearningCheckUser(myLearningDetalData, position, false);
+                                else {
+                                    addToMyLearningCheckUser(myLearningDetalData, position, false);
+                                }
+
                             }
 
                         }
+
+                    } else {
+                        Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
                     }
 
                     Log.d(TAG, "onMenuItemClick:  Enroll here");
@@ -1653,6 +1785,27 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
 //
 //                    Toast.makeText(context, "Buy here", Toast.LENGTH_SHORT).show();
                 }
+
+                if (item.getItemId() == R.id.ctx_addtowishlist) {
+
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        try {
+                            addToWishListApiCall(catalogModelsList.get(position));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
+                    }
+                }
+
+                if (item.getItemId() == R.id.ctx_removefromwishlist) {
+                    if (isNetworkConnectionAvailable(context, -1)) {
+                        removeFromWishList(catalogModelsList.get(position).getContentID());
+                    } else {
+                        showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
+                    }
+                }
                 return true;
             }
         });
@@ -1660,29 +1813,125 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
 
     }
 
+    public void removeFromWishList(String contentID) {
+
+        //    http://angular6api.instancysoft.com/api/WishList/DeleteItemFromWishList?ContentID=d2e3b4de-94f5-42db-8806-85400cc7e3f8&instUserID=1
+
+        String paramsString = "ContentID=" + contentID + "&instUserID=" + appUserModel.getUserIDValue();
+
+        vollyService.getJsonObjResponseVolley("WISHLIST", appUserModel.getWebAPIUrl() + "/WishList/DeleteItemFromWishList?" + paramsString, appUserModel.getAuthHeaders());
+
+    }
+
+
+    public void addToWishListApiCall(MyLearningModel learningModel) throws
+            JSONException {
+        String addedDate = getCurrentDateTime("yyyy-MM-dd HH:mm:ss");
+        JSONObject parameters = new JSONObject();
+        parameters.put("ContentID", learningModel.getContentID());
+        parameters.put("AddedDate", addedDate);
+        parameters.put("UserID", appUserModel.getUserIDValue());
+        parameters.put("ComponentID", sideMenusModel.getComponentId());
+        parameters.put("ComponentInstanceID", sideMenusModel.getRepositoryId());
+
+
+        final String parameterString = parameters.toString();
+
+        String urlString = appUserModel.getWebAPIUrl() + "/Catalog/AddToWishList";
+
+        final StringRequest request = new StringRequest(Request.Method.POST, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                svProgressHUD.dismiss();
+                Log.d(TAG, "onResponse: " + s);
+                if (s != null && s.length() > 0) {
+                    if (isDigimedica) {
+                        pageIndex = 1;
+                        getMobileCatalogObjectsData(true);
+                    } else {
+                        refreshCatalog(true);
+                    }
+
+                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_itemaddedtowishlistsuccesfully), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+                svProgressHUD.dismiss();
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws com.android.volley.AuthFailureError {
+                return parameterString.getBytes();
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                headers.put("Content-Type", "application/json");
+//                headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
     public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, int position, boolean isInapp) {
 
         if (isNetworkConnectionAvailable(context, -1)) {
 
-            if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
+            if (myLearningDetalData.getAddedToMylearning() == 2 && !myLearningDetalData.isFromPrereq) {
 
-                //    checkUserLogin(myLearningDetalData, position, isInapp);
-
-                try {
-                    checkUserLoginPost(myLearningDetalData);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(context, PrerequisiteContentActivity.class);
+                intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
+                startActivity(intent);
             } else {
+
+
+                if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
+
+                    //    checkUserLogin(myLearningDetalData, position, isInapp);
+
+                    try {
+                        checkUserLoginPost(myLearningDetalData);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
 
 //                if (isInapp) {
 //                    inAppActivityCall(myLearningDetalData);
 //
 //                } else {
-                addToMyLearning(myLearningDetalData, position);
+                    addToMyLearning(myLearningDetalData, position);
 //
 //                }
-
+                }
             }
         }
     }
@@ -2351,7 +2600,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                             localeStatus = jsonObject.get("ContentStatus").toString();
                         }
 
-                        i = db.updateContentStatus(myLearningModel, status, progress,localeStatus);
+                        i = db.updateContentStatus(myLearningModel, status, progress, localeStatus);
                         if (i == 1) {
 
                             injectFromDbtoModel(false);
@@ -2688,7 +2937,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         }
     }
 
-    public void cancelEnrollment(final MyLearningModel eventModel, boolean isBadCancal) {
+    public void cancelEnrollment(final MyLearningModel eventModel, final boolean isBadCancal) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/CancelEnrolledEvent?EventContentId="
                 + eventModel.getContentID() + "&UserID=" + eventModel.getUserID() + "&SiteID=" + appUserModel.getSiteIDValue() + "&isBadCancel=" + isBadCancal + "&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name));
@@ -2706,9 +2955,12 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                         Log.d("Response: ", " " + response);
 
                         if (response.contains("true")) {
-
+                            String dialogAlertMessage = getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_youhavesuccessfullycancelledenrolledevent);
+                            if (isBadCancal) {
+                                dialogAlertMessage = getLocalizationValue(JsonLocalekeys.mylearningbadcanceled_alerttitle_badcanceldstart) + "  " + eventModel.getCourseName() + "  " + getCurrentDateTime("dd MMMM yyyy") + " " + getLocalizationValue(JsonLocalekeys.mylearningbadcanceled_alerttitle_badcanceldend);
+                            }
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_youhavesuccessfullycancelledenrolledevent))
+                            builder.setMessage(dialogAlertMessage)
                                     .setCancelable(false)
                                     .setPositiveButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
@@ -3510,9 +3762,21 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
         }
 
 
-        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
-            String enableSortby = responMap.get("EnableFilterSort");
-            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+//        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
+//            String enableSortby = responMap.get("EnableFilterSort");
+//            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+//                AllFilterModel sortFilterModel = new AllFilterModel();
+//                sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
+//                sortFilterModel.categoryID = 3;
+//                sortFilterModel.categorySelectedData = applyFilterModel.sortBy;
+//                sortFilterModel.categorySelectedDataDisplay = applyFilterModel.sortByDisplay;
+//                allFilterModelList.add(sortFilterModel);
+//            }
+//        }
+
+        if (responMap != null && responMap.containsKey("ContentFilterBy")) {
+            String enableSortby = responMap.get("ContentFilterBy");
+            if (enableSortby != null && enableSortby.toLowerCase().contains("sortitemsby")) {
                 AllFilterModel sortFilterModel = new AllFilterModel();
                 sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
                 sortFilterModel.categoryID = 3;
@@ -3572,6 +3836,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                             contentFilterByModel.goInside = false;
                             break;
                         case "jobroles":
+                        case "job":
                             contentFilterByModel.categoryName = filterCategoriesArray.get(i);
                             contentFilterByModel.categoryIcon = "";
                             contentFilterByModel.categoryID = "jobroles";

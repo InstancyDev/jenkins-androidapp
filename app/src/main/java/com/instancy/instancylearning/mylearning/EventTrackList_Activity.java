@@ -321,7 +321,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
                     if (response.toLowerCase().contains("true")) {
                         if (isNetworkConnectionAvailable(context, -1)) {
                             if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-//                                refreshMyLearning(false, true);
+//                                refreshContentlisting(false, true);
                             } else {
                                 if (!getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
                                     refreshMyLearning(true, false);
@@ -560,9 +560,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
         String paramsString = "&trackUserID=" + myLearningModel.getUserID()
                 + "&trackscoid=" + myLearningModel.getScoId();
-
         paramsString = paramsString.replace(" ", "%20");
-
         vollyService.getStringResponseVolley("COURSETRACKING", appUserModel.getWebAPIUrl() + "/CourseTracking/updateTrackProgressOnCommit?" + paramsString, appUserModel.getAuthHeaders());
 
     }

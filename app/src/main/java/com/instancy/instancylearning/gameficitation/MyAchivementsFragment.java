@@ -279,7 +279,6 @@ public class MyAchivementsFragment extends Fragment implements SwipeRefreshLayou
 
     public void getAchivmentsByGameID(String gameID) {
 
-
         String urlStr = appUserModel.getWebAPIUrl() + "/UserAchievement/GetUserAchievementData";
 
         JSONObject parameters = new JSONObject();

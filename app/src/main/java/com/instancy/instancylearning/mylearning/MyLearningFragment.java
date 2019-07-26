@@ -62,6 +62,7 @@ import com.instancy.instancylearning.advancedfilters_mylearning.AllFilterModel;
 import com.instancy.instancylearning.advancedfilters_mylearning.AllFiltersActivity;
 import com.instancy.instancylearning.advancedfilters_mylearning.ApplyFilterModel;
 import com.instancy.instancylearning.advancedfilters_mylearning.ContentFilterByModel;
+import com.instancy.instancylearning.asynchtask.JwVideosDownloadAsynch;
 import com.instancy.instancylearning.helper.NetworkChangeReceiver;
 import com.instancy.instancylearning.interfaces.SynchCompleted;
 import com.instancy.instancylearning.localization.JsonLocalization;
@@ -97,8 +98,10 @@ import com.thin.downloadmanager.ThinDownloadManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,21 +110,27 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.BIND_ABOVE_CLIENT;
+import static com.instancy.instancylearning.utils.StaticValues.AUTOLAUNCHCONTENTID_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.BACKTOMAINSITE;
 import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE_ADV;
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
+import static com.instancy.instancylearning.utils.StaticValues.ISAUTOLAUNCH_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.StaticValues.REVIEW_REFRESH;
 import static com.instancy.instancylearning.utils.StaticValues.SHEDULED_EVENT_IS_ENROLLED;
-import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringHOmeMethod;
+import static com.instancy.instancylearning.utils.Utilities.getAllJwFileLocalPaths;
+import static com.instancy.instancylearning.utils.Utilities.getAllJwUrlPath;
+import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
 import static com.instancy.instancylearning.utils.Utilities.getDrawableFromStringMethod;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
@@ -189,10 +198,16 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     NetworkChangeReceiver networkChangeReceiver;
 
+    JwVideosDownloadAsynch jwVideosDownloadAsynch;
+
     ProgressBar progressBar;
     HashMap<String, String> responMap = null;
     List<ContentFilterByModel> contentFilterByModelList = new ArrayList<>();
     ApplyFilterModel applyFilterModel = new ApplyFilterModel();
+
+    boolean isAutoLaunchEnabled = false;
+
+    String autoLaunchContentID = "";
 
     public MyLearningFragment() {
 
@@ -242,8 +257,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                 contentIDFromNotification = bundle.getString("CONTENTID");
             }
-
             responMap = generateConditionsHashmap(sideMenusModel.getConditions());
+
+            isAutoLaunchEnabled = bundle.getBoolean(ISAUTOLAUNCH_KEY, false);
+            autoLaunchContentID = bundle.getString(AUTOLAUNCHCONTENTID_KEY, "");
+
         }
         if (responMap != null && responMap.containsKey("showconsolidatedlearning")) {
             String consolidate = responMap.get("showconsolidatedlearning");
@@ -517,17 +535,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
 
         } else {
-            if (isFromNotification) {
-                int selectedPostion = getPositionForNotification(contentIDFromNotification);
+            if (isFromNotification && contentIDFromNotification.length() > 1) {
+//                int selectedPostion = getPositionForNotification(contentIDFromNotification);
+                contentIDFromNotification = "";
 //                myLearninglistView.setSelection(selectedPostion);
 
-                if (myLearningModelsList != null) {
-
+                if (myLearningModelsList.size() == 1) {
+                    contentIDFromNotification = "";
                     try {
                         Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
                         intentDetail.putExtra("IFROMCATALOG", false);
                         intentDetail.putExtra("ISICONENABLED", isIconEnabled);
-                        intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(selectedPostion));
+                        intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(0));
                         startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
                         intentDetail.putExtra("sideMenusModel", sideMenusModel);
                     } catch (IndexOutOfBoundsException ex) {
@@ -535,9 +554,28 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     }
 
                 } else {
-                    Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
+                    //     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel), Toast.LENGTH_SHORT).show();
+                }
+            } else if (isAutoLaunchEnabled && autoLaunchContentID.length() > 1) {
+//                int selectedPostion = getPositionForNotification(contentIDFromNotification);
+                autoLaunchContentID = "";
+
+
+                if (myLearningModelsList.size() == 1) {
+                    autoLaunchContentID = "";
+                    try {
+                        Intent intentDetail = new Intent(getContext(), MyLearningDetailActivity1.class);
+                        intentDetail.putExtra("IFROMCATALOG", false);
+                        intentDetail.putExtra("ISICONENABLED", isIconEnabled);
+                        intentDetail.putExtra("myLearningDetalData", myLearningModelsList.get(0));
+                        intentDetail.putExtra(ISAUTOLAUNCH_KEY, true);
+                        startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
+                    } catch (IndexOutOfBoundsException ex) {
+                    }
                 }
             }
+
         }
     }
 
@@ -635,7 +673,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 } else {
                     progressBar.setVisibility(View.GONE);
                 }
-                appcontroller.setAlreadyViewd(true);
+                //  appcontroller.setAlreadyViewd(true);
                 preferencesManager.setStringValue("true", StaticValues.KEY_HIDE_ANNOTATION);
             }
 
@@ -650,7 +688,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //
 //                    if (!isSearching) {
 //                        progressBar.setVisibility(View.VISIBLE);
-//                        refreshMyLearning(true);
+//                        refreshContentlisting(true);
 //                    } else {
 //                        progressBar.setVisibility(View.GONE);
 //                    }
@@ -934,7 +972,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 break;
             case R.id.mylearning_addwaitlist:
                 if (isNetworkConnectionAvailable(getContext(), -1)) {
-                    getWaitListCall();
+                    getWaitListCall(false);
                 } else {
                     showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
                 }
@@ -967,17 +1005,51 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             isArchi = 1;
             pageIndex = 1;
             updateActionbarTitle(false);
+            updateActionBarMenues(false);
         }
-
         if (isDigimedica) {
             getMobileMyCatalogObjectsNew(true);
         } else {
             refreshMyLearning(true);
         }
+// just added
+//        if (isWaitlisted) {
+//            if (isNetworkConnectionAvailable(getContext(), -1)) {
+//                getWaitListCall(true);
+//            } else {
+//                showToast(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet));
+//            }
+//        }
+
     }
 
+    public void updateActionBarMenues(boolean isFromWait) {
+        if (isFromWait) {
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_archive, context, uiSettingsModel.getAppHeaderTextColor());
+            itemArchive.setIcon(filterDrawable);
+            itemArchive.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
+            isArchived = false;
+            isArchi = 0;
+        } else {
+            Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_list_alt, context, uiSettingsModel.getAppHeaderTextColor());
+            itemWaitlist.setIcon(filterDrawable);
+            itemWaitlist.setTitle(getLocalizationValue(JsonLocalekeys.mylearning_header_archivetitlelabel));
+            isWaitlisted = false;
+            pageIndex = 1;
+            isWait = 0;
+            if (responMap != null && responMap.containsKey("ShowIndexes")) {
+                String showIndexes = responMap.get("ShowIndexes");
+                if (showIndexes.equalsIgnoreCase("top")) {
+                    itemFilter.setVisible(true);
+                }
+            } else {
+                // No such key
+                itemFilter.setVisible(false);
+            }
+        }
+    }
 
-    public void getWaitListCall() {
+    public void getWaitListCall(boolean fromArchive) {
         if (isWaitlisted) {
             Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_list_alt, context, uiSettingsModel.getAppHeaderTextColor());
             itemWaitlist.setIcon(filterDrawable);
@@ -995,7 +1067,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 // No such key
                 itemFilter.setVisible(false);
             }
-            itemArchive.setVisible(true);
+//            itemArchive.setVisible(true);
         } else {
             Drawable filterDrawable = getDrawableFromStringMethod(R.string.fa_icon_leanpub, context, uiSettingsModel.getAppHeaderTextColor());
             itemWaitlist.setIcon(filterDrawable);
@@ -1003,16 +1075,18 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             isWaitlisted = true;
             pageIndex = 1;
             isWait = 1;
+            updateActionBarMenues(true);
             updateActionbarTitleForWaitList(false);
 
             itemFilter.setVisible(false);
-            itemArchive.setVisible(false);
+//            itemArchive.setVisible(false);
         }
         if (isDigimedica) {
             getMobileMyCatalogObjectsNew(true);
         } else {
             refreshMyLearning(true);
         }
+
     }
 
     public void updateActionbarTitleForWaitList(boolean forMylearning) {
@@ -1024,7 +1098,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
         toolbar.setTitle(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" + titleName + "</font>"));
     }
-
 
     public void updateActionbarTitle(boolean forMylearning) {
         String titleName = "";
@@ -1094,12 +1167,32 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 break;
             case R.id.imagethumb:
             case R.id.txt_title_name:
-                GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext(), isIconEnabled);
+                if (isValidString(myLearningModelsList.get(position).getViewprerequisitecontentstatus())) {
+                    String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6);
+                    alertMessage = alertMessage + " " + myLearningModelsList.get(position).getViewprerequisitecontentstatus();
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert))
+                            .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningModelsList.get(position), getContext(), isIconEnabled);
+
+                }
                 break;
             case R.id.fabbtnthumb:
                 break;
             case R.id.txtEnrollShedule:
-                gotoEventSheduleTab(myLearningModelsList.get(position));
+                if (myLearningModelsList.get(position).getEventScheduleType() == 2 && myLearningModelsList.get(position).isEnrollFutureInstance()) {
+                    dialogForFutureInstances(myLearningModelsList.get(position));
+                } else {
+                    gotoEventSheduleTab(myLearningModelsList.get(position));
+                }
                 break;
             case R.id.txtWriteReview:
                 Toast.makeText(context, "review", Toast.LENGTH_SHORT).show();
@@ -1118,6 +1211,29 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         intentDetail.putExtra("myLearningDetalData", learningModel);
         intentDetail.putExtra("typeFrom", "tab");
         startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+
+    }
+
+    public void dialogForFutureInstances(final MyLearningModel learningModel) {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_enrollalertsubttitle_subtitle)).setTitle(getLocalizationValue(JsonLocalekeys.details_label_enroll))
+                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.mylearning_alertbutton_cancelbutton), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.dismiss();
+            }
+        }).setPositiveButton(getLocalizationValue(JsonLocalekeys.details_label_enroll), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //do things
+                dialog.dismiss();
+                gotoEventSheduleTab(learningModel);
+
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+
 
     }
 
@@ -1267,7 +1383,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         });
         thread.start();
-
     }
 
     public void downloadThin(String downloadStruri, View view, final MyLearningModel learningModel, final int position) {
@@ -1311,11 +1426,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();
@@ -1336,7 +1451,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                             String unzipLocation = finalDownloadDestFolderPath;
                             UnZip d = new UnZip(zipFile,
                                     unzipLocation);
-//                            File zipfile = new File(zipFile);
+                            File unzipFile = new File(unzipLocation);
 //                            zipfile.delete();
 //
 //                            UnzipUtility unzipper = new UnzipUtility();
@@ -1347,10 +1462,14 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                                ex.printStackTrace();
 //                            }
 //
-
 //                            ZipArchive zipArchive = new ZipArchive();
 //                            zipArchive.unzip(zipFile,unzipLocation,"");
+//                            if (unzipFile.exists()) {
+//                                boolean isJwExists = isJwFileExist(unzipFile);
+//                                Log.d(TAG, "onDownloadComplete: " + isJwExists);
+//                            }
 
+                            checkAndDownloadJwVideos(learningModel);
                         }
                         myLearningAdapter.notifyDataSetChanged();
 
@@ -1360,7 +1479,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                                 callMobileGetMobileContentMetaData(learningModel);
                             } else {
                                 callMobileGetMobileContentMetaData(learningModel);
-
                             }
 
                         } else {
@@ -1572,7 +1690,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         }
     }
 
-    public void cancelEnrollmentMethod(final MyLearningModel eventModel, boolean isBadCancal) {
+    public void cancelEnrollmentMethod(final MyLearningModel eventModel, final boolean isBadCancal) {
 
         //   http://yournextuapi.instancysoft.com/api//MobileLMS/CancelEnrolledEvent?EventContentId=ffdd7e69-14c6-47c4-bec6-9f71ce07a67a&UserID=1&SiteID=374&isBadCancel=trueLocaleID=en-us
 
@@ -1592,8 +1710,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                         if (response.contains("true")) {
 
+                            String dialogAlertMessage = getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_youhavesuccessfullycancelledenrolledevent);
+                            if (isBadCancal) {
+                                dialogAlertMessage = getLocalizationValue(JsonLocalekeys.mylearningbadcanceled_alerttitle_badcanceldstart) + "  " + eventModel.getCourseName() + "  " + getCurrentDateTime("dd MMMM yyyy") + " " + getLocalizationValue(JsonLocalekeys.mylearningbadcanceled_alerttitle_badcanceldend);
+                            }
+
                             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setMessage(getLocalizationValue(JsonLocalekeys.events_alertsubtitle_youhavesuccessfullycancelledenrolledevent))
+                            builder.setMessage(dialogAlertMessage)
                                     .setCancelable(false)
                                     .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
@@ -1765,9 +1888,21 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
 
-        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
-            String enableSortby = responMap.get("EnableFilterSort");
-            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+//        if (responMap != null && responMap.containsKey("EnableFilterSort")) {
+//            String enableSortby = responMap.get("EnableFilterSort");
+//            if (enableSortby != null && enableSortby.equalsIgnoreCase("true")) {
+//                AllFilterModel sortFilterModel = new AllFilterModel();
+//                sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
+//                sortFilterModel.categoryID = 3;
+//                sortFilterModel.categorySelectedData = applyFilterModel.sortBy;
+//                sortFilterModel.categorySelectedDataDisplay = applyFilterModel.sortByDisplay;
+//                allFilterModelList.add(sortFilterModel);
+//            }
+//        }
+
+        if (responMap != null && responMap.containsKey("ContentFilterBy")) {
+            String enableSortby = responMap.get("ContentFilterBy");
+            if (enableSortby != null && enableSortby.toLowerCase().contains("sortitemsby")) {
                 AllFilterModel sortFilterModel = new AllFilterModel();
                 sortFilterModel.categoryName = getLocalizationValue(JsonLocalekeys.filter_lbl_sortbytitlelabel);
                 sortFilterModel.categoryID = 3;
@@ -1776,6 +1911,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 allFilterModelList.add(sortFilterModel);
             }
         }
+
 
         return allFilterModelList;
     }
@@ -1952,8 +2088,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             parameters.put("instructors", applyFilterModel.instructors);
             parameters.put("IsArchived", isArchi);
             parameters.put("IsWaitlist", isWait);
-            parameters.put("ContentID", contentIDFromNotification);
-            contentIDFromNotification = "";
+
+            if (isAutoLaunchEnabled && isValidString(autoLaunchContentID)) {
+                parameters.put("ContentID", autoLaunchContentID);
+            } else {
+                parameters.put("ContentID", contentIDFromNotification);
+            }
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -2013,7 +2154,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
         // 'http://angularwebapi.instancysoft.com/api/MobileLMS/MobiledownloadHTMLasPDF?UserID=1&CID=96662109-ddab-476b-8762-8de6fc7d955f&CertID=9a4d9a11-2ff1-40ad-a175-518af8d24e96&CertPage=certificate.html&SiteID=374&siteURL=http://www.instancyangularsoft.com
 
-        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobiledownloadHTMLasPDF?UserID=" + learningModel.getUserID() + "&CID=" + learningModel.getContentID() + "&CertID=" + learningModel.getCertificateId() + "&CertPage=" + learningModel.getCertificatePage() + "&SiteID=" + learningModel.getSiteID() + "&siteURL=" + learningModel.getSiteURL();
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobiledownloadHTMLasPDF?UserID=" + learningModel.getUserID() + "&CID=" + learningModel.getContentID() + "&CertID=" + learningModel.getCertificateId() + "&CertPage=" + learningModel.getCertificatePage() + "&SiteID=" + learningModel.getSiteID() + "&siteURL=" + learningModel.getSiteURL() + "&height=500&width=900";
 
         Log.d(TAG, "certificateAPICallForGenerate: " + urlString);
 
@@ -2099,6 +2240,13 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                                     db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_incomplete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
                                     injectFromDbtoModel();
                                 }
+                            } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9")) {
+                                if (isDigimedica) {
+                                    pageIndex = 1;
+                                    getMobileMyCatalogObjectsNew(true);
+                                } else {
+                                    refreshMyLearning(true);
+                                }
                             } else {
                                 getStatusFromServer(myLearningModel);
                             }
@@ -2137,9 +2285,29 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                                Toast.makeText(context, "Unable to update the status", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        injectFromDbtoModel();
+                        if (isNetworkConnectionAvailable(getContext(), -1)) {
+                            pageIndex = 1;
+                            if (isDigimedica) {
+                                getMobileMyCatalogObjectsNew(true);
+                            } else {
+                                refreshMyLearning(true);
+                            }
+                        } else {
+                            injectFromDbtoModel();
+                        }
+
                     }
                 } else {
+
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9")) {
+                        if (isDigimedica) {
+                            pageIndex = 1;
+                            getMobileMyCatalogObjectsNew(true);
+                        } else {
+                            refreshMyLearning(true);
+                        }
+                    }
+
 //                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started")) {
                     int i = -1;
                     i = db.updateContentStatus(myLearningModel, getResources().getString(R.string.status_incomplete_mylearning), myLearningModel.getPercentCompleted(), getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel));
@@ -2170,14 +2338,17 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
         }
-        if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK) {
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK)
+
+        {
 //            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
             if (data.getStringExtra("refresh").equalsIgnoreCase("refresh")) {
                 injectFromDbtoModel();
             } else {
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
-                if (refresh || isFromNotification) {
+                if (refresh || isFromNotification || isAutoLaunchEnabled) {
                     isFromNotification = false;
+                    isAutoLaunchEnabled = false;
                     pageIndex = 1;
                     if (isDigimedica) {
                         getMobileMyCatalogObjectsNew(true);
@@ -2187,7 +2358,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
         }
-        if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0) {
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0)
+
+        {
 //            Toast.makeText(context, "Detail Status updated!", Toast.LENGTH_SHORT).show();
             if (data == null) {
                 pageIndex = 1;
@@ -2203,7 +2376,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //            }
         }
 
-        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK) {
+        if (requestCode == FILTER_CLOSE_CODE && resultCode == RESULT_OK)
+
+        {
 
             boolean resetFilter = data.getBooleanExtra("FILTER", false);
 
@@ -2238,7 +2413,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
 
-        if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK) {
+        if (requestCode == REVIEW_REFRESH && resultCode == RESULT_OK)
+
+        {
             if (data != null) {
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
                 boolean refresh = data.getBooleanExtra("NEWREVIEW", false);
@@ -2254,7 +2431,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
 
-        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK) {
+        if (requestCode == GLOBAL_SEARCH && resultCode == RESULT_OK)
+
+        {
             if (data != null) {
                 searchText = data.getStringExtra("queryString");
                 if (searchText.length() > 0) {
@@ -2269,7 +2448,9 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
 
-        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK) {
+        if (requestCode == FILTER_CLOSE_CODE_ADV && resultCode == RESULT_OK)
+
+        {
             if (data != null) {
                 boolean isApplied = data.getBooleanExtra("APPLY", false);
                 if (isApplied) {
@@ -2285,6 +2466,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                 }
             }
         }
+
     }
 
     @Override
@@ -2292,7 +2474,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //        if (isDigimedica) {
 //            getMobileMyCatalogObjectsNew(true);
 //        } else {
-//            refreshMyLearning(true);
+//            refreshContentlisting(true);
 //        }
         Log.d(TAG, "completedSynch: getMobileMyCatalogObjectsNew");
     }
@@ -2359,5 +2541,61 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
     }
 
+    public void checkAndDownloadJwVideos(MyLearningModel learningModel) {
+
+        List<String> jwFileURLArray = new ArrayList<>();
+        List<String> jwFileLocalPathsArray = new ArrayList<>();
+        String offlinePathWithLastSlash = learningModel.getOfflinepath();
+        int index = offlinePathWithLastSlash.lastIndexOf('/');
+        String offlinePathWithoutStartPage = offlinePathWithLastSlash.substring(0, index);
+        File someFile = new File(offlinePathWithoutStartPage);
+        if (someFile.exists()) {
+            jwFileLocalPathsArray = getAllJwFileLocalPaths(someFile);
+            Log.d(TAG, "onDownloadComplete: " + jwFileLocalPathsArray.size());
+            try {
+                jwFileURLArray = getAllJwUrlPath(jwFileLocalPathsArray);
+                Log.d(TAG, "onDownloadComplete: " + jwFileURLArray.size());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (ParserConfigurationException e) {
+                e.printStackTrace();
+            }
+        }
+        if (jwFileURLArray.size() > 0 && jwFileLocalPathsArray.size() > 0) {
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            final List<String> finalJwFileURLArray = jwFileURLArray;
+            final List<String> finalJwFileLocalPathsArray = jwFileLocalPathsArray;
+            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_jwcontentdownloading)).setTitle("Alert")
+                    .setCancelable(false)
+                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                            dialog.dismiss();
+                            if (finalJwFileLocalPathsArray.size() > 0 && finalJwFileURLArray.size() > 0) {
+                                startAsynchTask(finalJwFileURLArray, finalJwFileLocalPathsArray);
+                            } else {
+                                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong), Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+
+    }
+
+    public void startAsynchTask(List<String> jwFileURLArray, List<String> jwFileLocalPathsArray) {
+
+        if (jwFileURLArray.size() > 0) {
+            jwVideosDownloadAsynch = new JwVideosDownloadAsynch(context, jwFileURLArray, jwFileLocalPathsArray);
+            jwVideosDownloadAsynch.execute();
+        }
+
+
+    }
 
 }

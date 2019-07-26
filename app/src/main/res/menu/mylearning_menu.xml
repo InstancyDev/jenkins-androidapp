@@ -38,6 +38,7 @@
         android:id="@+id/mylearning_addwaitlist"
         android:icon="@drawable/filter_icon"
         android:title="Waitlist"
+        android:visible="false"
         app:showAsAction="always|collapseActionView" />
 
 </menu>

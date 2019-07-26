@@ -54,6 +54,7 @@ import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidEmail;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 public class ForgotPasswordActivity extends AppCompatActivity {
@@ -164,7 +165,16 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         if (isValidEmail(editResetMail.getText().toString().trim())) {
 
             if (isNetworkConnectionAvailable(this, -1)) {
-                resetPasswordVollyCall(editResetMail.getText().toString().trim());
+                resetPasswordVollyCall(editResetMail.getText().toString().trim(), true);
+            } else {
+
+                Toast.makeText(this, getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection), Toast.LENGTH_SHORT).show();
+            }
+
+        } else if (isValidString(editResetMail.getText().toString().trim())) {
+
+            if (isNetworkConnectionAvailable(this, -1)) {
+                resetPasswordVollyCall(editResetMail.getText().toString().trim(), false);
             } else {
 
                 Toast.makeText(this, getLocalizationValue(JsonLocalekeys.network_alertsubtitle_pleasecheckyournetworkconnection), Toast.LENGTH_SHORT).show();
@@ -178,7 +188,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     }
 
-    public void resetPasswordVollyCall(String registeredEmail) {
+    public void resetPasswordVollyCall(final String registeredEmail, final boolean isEmail) {
 
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
@@ -200,13 +210,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
                             if (forgotResponseAry != null && forgotResponseAry.length() != 0) {
                                 JSONObject jsonobj = forgotResponseAry.getJSONObject(0);
-                                Log.d(TAG, "onResponse: " + jsonobj.get("active"));
-                                jsonobj.get("userid").toString();
-                                jsonobj.get("siteid").toString();
-                                jsonobj.get("active").toString();
-                                jsonobj.get("userstatus").toString();
+//                                Log.d(TAG, "onResponse: " + jsonobj.get("active"));
+//                                jsonobj.get("userid").toString();
+//                                jsonobj.get("siteid").toString();
+//                                jsonobj.get("active").toString();
+//                                jsonobj.get("userstatus").toString();
                                 isEmailiDValid = true;
-                                isEmailIdCheck(jsonobj);
+                                isEmailIdCheck(jsonobj, isEmail, registeredEmail);
 
                             } else {
                                 Toast.makeText(ForgotPasswordActivity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_emailenteredisinvalid), Toast.LENGTH_SHORT).show();
@@ -239,8 +249,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-
-    public void isEmailIdCheck(JSONObject jsonobj) throws JSONException {
+    public void isEmailIdCheck(JSONObject jsonobj, final boolean isEmail, String registeredEmail) throws JSONException {
 
 
         Log.d(TAG, "onResponse: " + jsonobj.get("active"));
@@ -248,20 +257,28 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         String siteID = jsonobj.get("siteid").toString();
         String active = jsonobj.get("active").toString();
         String userstatus = jsonobj.get("userstatus").toString();
+        String userEmail = "";
+        if (!isEmail)
+            userEmail = jsonobj.optString("email");
+        else
+            userEmail = registeredEmail;
+
 
         if (active.equalsIgnoreCase("true") || active.equalsIgnoreCase("1")) {
-
             String uniqueID = null;
 
             if (uniqueID == null) {
                 uniqueID = UUID.randomUUID().toString();
             }
 
-            final String pwdResetLink = appUserModel.getWebAPIUrl() + "/PasswordRecovery/Uid/" + userID + "/Gid/" + uniqueID;
+            final String pwdResetLink = appUserModel.getSiteURL() + "PasswordRecovery/Uid/" + userID + "/Gid/" + uniqueID;
+
+
             String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/UsersPasswordResetDataFromMobile?Userid=" + userID + "&ResetID=" + uniqueID;
 
             LogUtils.d("here reset url  " + urlStr);
 
+            final String finalUserEmail = userEmail;
             StringRequest stringRequest = new StringRequest(Request.Method.GET, urlStr,
                     new Response.Listener<String>() {
                         @Override
@@ -270,8 +287,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                             Log.d("logr  _response =", _response);
 
                             if (_response.contains("true")) {
-
-                                isResetLinkGenerated(pwdResetLink, userID);
+                                isResetLinkGenerated(pwdResetLink, userID, isEmail, finalUserEmail);
                             } else {
 
                             }
@@ -309,9 +325,16 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         }
     }
 
-    public void isResetLinkGenerated(String pwdResetLink, String userID) {
+    public void isResetLinkGenerated(String pwdResetLink, String userID, boolean isEmail, String userEmail) {
 
-        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/SendPasswordResetEmail?SiteID=" + appUserModel.getSiteIDValue() + "&Userid=" + userID + "&ToEmailID=" + editResetMail.getText().toString() + "&PublicContentURL=" + pwdResetLink;
+       String emailId = "";
+//        if (isEmail) {
+            emailId = editResetMail.getText().toString().trim();
+//        } else {
+//            emailId = userEmail;
+//        }
+
+        String urlStr = appUserModel.getWebAPIUrl() + "/MobileLMS/SendPasswordResetEmail?SiteID=" + appUserModel.getSiteIDValue() + "&Userid=" + userID + "&ToEmailID=" + emailId + "&PublicContentURL=" + pwdResetLink;
 
         LogUtils.d("here reset url  " + urlStr);
 

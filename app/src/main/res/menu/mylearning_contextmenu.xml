@@ -87,6 +87,13 @@
         android:title="@string/mylearning_actionsheet_viewcertificateoption"
         android:visible="false" />
 
+    <item
+        android:id="@+id/ctx_qrcode"
+        android:orderInCategory="100"
+        android:title="View qrcode"
+        android:visible="false" />
+
+
 
 </menu>
 

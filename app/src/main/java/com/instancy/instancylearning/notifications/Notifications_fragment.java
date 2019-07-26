@@ -125,8 +125,8 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
     @BindView(R.id.notificationlist)
     ListView discussionFourmlistView;
 
-    @BindView(R.id.nodata_label)
-    TextView nodata_Label;
+    @BindView(R.id.noDataLabel)
+    TextView noDataLabel;
 
     @BindView(R.id.txtMarkAllBtn)
     TextView txtMarkAllBtn;
@@ -216,7 +216,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                             e.printStackTrace();
                         }
                     } else {
-                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+                        noDataLabel.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
@@ -283,7 +283,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         notificationAdapter = new NotificationAdapter(getActivity(), BIND_ABOVE_CLIENT, notificationModelList);
         discussionFourmlistView.setAdapter(notificationAdapter);
         discussionFourmlistView.setOnItemClickListener(this);
-        discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
+        discussionFourmlistView.setEmptyView(rootView.findViewById(R.id.noDataLabel));
         notificationModelList = new ArrayList<NotificationModel>();
 
 //        discussionFourmlistView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -313,8 +313,8 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         Drawable d = new BitmapDrawable(getResources(), createBitmapFromView(context, customNav));
         txtMarkAllBtn.setOnClickListener(this);
         txtClearAll.setOnClickListener(this);
-        txtMarkAllBtn.setBackground(getShapeDrawable());
-        txtMarkAllBtn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
+//        txtMarkAllBtn.setBackground(getShapeDrawable());
+//        txtMarkAllBtn.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
             txtMarkAllBtn.setVisibility(View.GONE);
@@ -349,10 +349,11 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
         notificationModelList = db.fetchNotificationModel(appUserModel.getSiteIDValue());
         if (notificationModelList != null) {
             notificationAdapter.refreshList(notificationModelList);
+            lytTopBtns.setVisibility(View.VISIBLE);
         } else {
             notificationModelList = new ArrayList<NotificationModel>();
             notificationAdapter.refreshList(notificationModelList);
-            nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+            noDataLabel.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
             lytTopBtns.setVisibility(View.GONE);
         }
 
@@ -364,7 +365,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
             txtMarkAllBtn.setVisibility(View.VISIBLE);
         }
 
-        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza)))       {
+        if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
             lytTopBtns.setVisibility(View.GONE);
         }
 
@@ -446,10 +447,10 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                     notificationAdapter.filter(newText.toLowerCase(Locale.getDefault()));
 
                     if (notificationAdapter.getCount() < 1) {
-                        nodata_Label.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
+                        noDataLabel.setText(getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_noitemstodisplay));
 
                     } else {
-                        nodata_Label.setText("");
+                        noDataLabel.setText("");
                     }
 
                     return true;
@@ -566,6 +567,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                     });
             AlertDialog alert = builder.create();
             alert.show();
+            refreshCatalog(true);
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.General) && notificationModel.contentid.length() > 4) {
 
             boolean myLearningExists = myLearningAction(notificationModel.contentid);
@@ -591,7 +593,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
-
+                refreshCatalog(true);
             }
         } else if (notificationModel.notificationid.equalsIgnoreCase(notificationEnumModel.ForumCommentNotification) && notificationModel.contentid.length() > 4) {
 
@@ -626,13 +628,14 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                         });
                 AlertDialog alert = builder.create();
                 alert.show();
-
+                refreshCatalog(true);
             }
 //            ((SideMenu) getActivity()).homeControllClicked(true, 1, notificationModel.contentid, false, "");
 
         } else {
 
             Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notification_alert_subtitlerespectivecontentnotavailablealert), Toast.LENGTH_SHORT).show();
+
         }
 
     }
@@ -799,7 +802,7 @@ public class Notifications_fragment extends Fragment implements SwipeRefreshLayo
                     notificationModelList.get(position).markasread = "true";
                     notificationAdapter.notifyDataSetChanged();
                     requiredFunctionalityForTheSelectedCell(notificationModel);
-                    // refreshCatalog(true);
+
 //                    deleteAnswerFromLocalDB(notificationModel);
                 } else {
                     Toast.makeText(context, getLocalizationValue(JsonLocalekeys.notifications_label_deletenotificationalertcontactadmin), Toast.LENGTH_SHORT).show();

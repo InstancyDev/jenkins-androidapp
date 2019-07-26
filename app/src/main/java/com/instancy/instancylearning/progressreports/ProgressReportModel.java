@@ -9,19 +9,6 @@ import java.util.List;
 
 public class ProgressReportModel implements Serializable {
 
-
-//                "CID":detailContentModel.contentID,
-//            "ObjectTypeID":detailContentModel.objectTypeID,
-//            "UserID":detailContentModel.userID,
-//            "StartDate":detailContentModel.startDate,
-//            "EndDate":self.getCurrentDate(),
-//            "SeqID":-1,//detailContentModel.sequenceNumber,
-//            "TrackID":detailContentModel.trackID,
-//            "siteid":detailContentModel.siteID == "" ? "374":detailContentModel.siteID,
-//            "locale":""+preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name))+"",
-//            "EventID":detailContentModel.trackID
-
-
     public String jobrolID = "";
     public String userid = "";
     public String skillname = "";
@@ -45,6 +32,8 @@ public class ProgressReportModel implements Serializable {
     public String SCOID = "";
     public String categoryID = "";
     public int seqId = -1;
+    public String certificateAction = "";
+    public String credits = "";
 
     public String eventID = "";
     public String trackID = "";

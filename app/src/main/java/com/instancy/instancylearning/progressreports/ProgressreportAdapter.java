@@ -1,9 +1,14 @@
 package com.instancy.instancylearning.progressreports;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,16 +20,30 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.helper.FontManager;
 import com.instancy.instancylearning.localization.JsonLocalization;
+import com.instancy.instancylearning.mainactivities.PdfViewer_Activity;
 import com.instancy.instancylearning.models.AppUserModel;
+import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
+import static com.instancy.instancylearning.utils.Utilities.showToast;
 
 /**
  * Created by Upendranath on 5/29/2017. used tutorial
@@ -103,7 +122,7 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.progressreportscell, null);//lbczzcw
+            convertView = layoutInflater.inflate(R.layout.progressreportscell, null);//
         }
 
         CardView cardView = (CardView) convertView
@@ -133,7 +152,6 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
 
         FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
 
-        txtContextmenu.setVisibility(View.GONE);
 
         TextView txtContentTitle = (TextView) convertView
                 .findViewById(R.id.txt_contenttitle);
@@ -177,6 +195,12 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         TextView titleScore = (TextView) convertView
                 .findViewById(R.id.titleScore);
 
+        TextView lblCredits = (TextView) convertView
+                .findViewById(R.id.lblCredits);
+
+        TextView txtCredits = (TextView) convertView
+                .findViewById(R.id.txtCredits);
+
         txtTitle.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contenttitlelabel) + " :");
         titleSiteName.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_sitenamelabel) + " :");
         titleContentType.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentstypeslabel) + " :");
@@ -199,6 +223,11 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         txtStatus.setText(listTitle.status);
         txtScore.setText(listTitle.overScore);
 
+        if (isValidString(listTitle.credits)) {
+
+            txtCredits.setText(listTitle.credits);
+        }
+
         txtContentTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtSiteName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtContentType.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -207,6 +236,12 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         txtStatus.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtScore.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         txtContextmenu.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        if (isValidString(listTitle.certificateAction)) {
+            txtContextmenu.setVisibility(View.VISIBLE);
+        } else {
+            txtContextmenu.setVisibility(View.GONE);
+        }
 
         txtContextmenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -284,6 +319,12 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         TextView titleScore = (TextView) convertView
                 .findViewById(R.id.titleScore);
 
+        TextView lblCredits = (TextView) convertView
+                .findViewById(R.id.lblCredits);
+
+        TextView txtCredits = (TextView) convertView
+                .findViewById(R.id.txtCredits);
+
         txtTitle.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contenttitlelabel) + " :");
         titleSiteName.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_sitenamelabel) + " :");
         titleContentType.setText(getLocalizationValue(JsonLocalekeys.myprogressreport_label_contentstypeslabel) + " :");
@@ -297,6 +338,8 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         final TextView txtContextmenu = (TextView) convertView
                 .findViewById(R.id.txt_contextmenu);
 
+        FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
+
         txtContentTitle.setText(progressReportModel.contenttitle);
         txtSiteName.setText(progressReportModel.orgname);
         txtContentType.setText(progressReportModel.contenttype);
@@ -304,6 +347,10 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         txtDateCompleted.setText(progressReportModel.datecompleted);
         txtStatus.setText(progressReportModel.status);
         txtScore.setText(progressReportModel.overScore);
+        if (isValidString(progressReportModel.credits)) {
+
+            txtCredits.setText(progressReportModel.credits);
+        }
 
         FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
 
@@ -341,7 +388,11 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
             }
         });
 
-        txtContextmenu.setVisibility(View.GONE);
+        if (isValidString(progressReportModel.certificateAction)) {
+            txtContextmenu.setVisibility(View.VISIBLE);
+        } else {
+            txtContextmenu.setVisibility(View.GONE);
+        }
         txtContentTitle.setTextColor(convertView.getResources().getColor(R.color.colorDarkGrey));
         return convertView;
     }
@@ -364,12 +415,50 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         popup.getMenuInflater().inflate(R.menu.progressreport_menu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
         Menu menu = popup.getMenu();
+        String certificationAction = "";
+        String objectID = "";
+        if (isFromChild) {
+            certificationAction = progressReportChildModel.certificateAction;
+            objectID = progressReportChildModel.objectID;
+        } else {
+            certificationAction = progressReportModel.certificateAction;
+            objectID = progressReportModel.objectID;
+        }
 
+        final String finalCertificationAction = certificationAction;
+
+        final String finalObjectID = objectID;
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
 
                 if (item.getItemId() == R.id.ctx_viewcertificate) {
+                    if (finalCertificationAction.equalsIgnoreCase("notearned")) {
+                        if (isNetworkConnectionAvailable(txtContextmenu.getContext(), -1)) {
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(txtContextmenu.getContext());
+                            builder.setMessage(getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_forviewcertificate)).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption))
+                                    .setCancelable(false)
+                                    .setPositiveButton(getLocalizationValue(JsonLocalekeys.mylearning_closebuttonaction_closebuttonalerttitle), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            //do things
+                                            dialog.dismiss();
 
+                                        }
+                                    });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+                        } else {
+                            Toast.makeText(context, getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+
+                        String[] contentIDnStartPage = getSplitString(finalCertificationAction);
+
+                        if (contentIDnStartPage != null && contentIDnStartPage.length > 0) {
+                            certificateAPICallForGenerate(contentIDnStartPage[0], contentIDnStartPage[1], finalObjectID);
+
+                        }
+
+                    }
 
                 }
                 if (item.getItemId() == R.id.ctx_details) {
@@ -390,7 +479,77 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         popup.show();//showing popup menu
     }
 
+    public void certificateAPICallForGenerate(String certificateID, String certificatePage, String contentID) {
+
+        String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/MobiledownloadHTMLasPDF?UserID=" + appUserModel.getUserIDValue() + "&CID=" + contentID + "&CertID=" + certificateID + "&CertPage=" + certificatePage + "&SiteID=" + appUserModel.getSiteIDValue() + "&siteURL=" + appUserModel.getSiteURL() + "&height=400&width=900";
+
+        final StringRequest request = new StringRequest(Request.Method.GET, urlString, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+
+
+                String replaceString = s.replaceAll("^\"|\"$", "");
+
+                String encodedStr = appUserModel.getSiteURL() + replaceString.replaceAll(" ", "%20");
+                MyLearningModel learningModel = new MyLearningModel();
+                learningModel.setCourseName("Certificate");
+                if (isValidString(s) && s.contains(".pdf")) {
+                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+                    pdfIntent.putExtra("PDF_URL", encodedStr);
+                    pdfIntent.putExtra("ISONLINE", "YES");
+                    pdfIntent.putExtra("ISCERTIFICATE", true);
+                    pdfIntent.putExtra("PDF_FILENAME", getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption));
+                    pdfIntent.putExtra("myLearningDetalData", learningModel);
+                    context.startActivity(pdfIntent);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+                Toast.makeText(context, getLocalizationValue(JsonLocalekeys.error_alertsubtitle_somethingwentwrong) + volleyError, Toast.LENGTH_LONG).show();
+
+            }
+        })
+
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+
+                return headers;
+            }
+
+        };
+
+        RequestQueue rQueue = Volley.newRequestQueue(context);
+        rQueue.add(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                5000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+
     private String getLocalizationValue(String key) {
         return JsonLocalization.getInstance().getStringForKey(key, context);
     }
+
+    public String[] getSplitString(String parmString) {
+        String[] contenIDnStartAry = null;
+
+        if (!isValidString(parmString))
+            return contenIDnStartAry;
+
+        if (parmString.contains(":,")) {
+            contenIDnStartAry = parmString.split(":,");
+        }
+
+        return contenIDnStartAry;
+    }
+
 }

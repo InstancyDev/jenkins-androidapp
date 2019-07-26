@@ -27,7 +27,7 @@ import android.widget.Toast;
 import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
-import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.MylearningInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
@@ -54,7 +54,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,7 +62,9 @@ import static com.instancy.instancylearning.utils.StaticValues.COURSE_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.convertStringToLong;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
+
 import static com.instancy.instancylearning.utils.Utilities.isCourseEndDateCompleted;
+
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 import static com.instancy.instancylearning.utils.Utilities.replace;
@@ -79,7 +80,7 @@ public class GlobalMethods {
     static String TAG = GlobalMethods.class.getSimpleName();
 
     private static DatabaseHandler databaseH;
-    PreferencesManager preferencesManager;
+
 
     public static void launchCourseViewFromGlobalClass(MyLearningModel myLearningModel, Context context, boolean isIconEnabled) {
         databaseH = new DatabaseHandler(context);
@@ -230,9 +231,10 @@ public class GlobalMethods {
                     model.set_startdate(GetCurrentDateTime());
                     model.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
                     model.set_isupdate("false");
-                    model.set_status("In Progress");
+                    model.set_status("incomplete");
                     model.set_seqNum("0");
                     model.set_timespent("");
+                    model.setPercentageCompleted("50");
                     model.set_objecttypeid(myLearningModel.getObjecttypeId());
                     model.set_sitrurl(myLearningModel.getSiteURL());
                     databaseH.injectIntoCMITable(model, "false");
@@ -469,8 +471,9 @@ public class GlobalMethods {
                             model.set_startdate(GetCurrentDateTime());
                             model.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
                             model.set_isupdate("false");
-                            model.set_status("In Progress");
+                            model.set_status("incomplete");
                             model.set_seqNum("0");
+                            model.setPercentageCompleted("50");
                             model.set_timespent("");
                             model.set_objecttypeid(myLearningModel.getObjecttypeId());
                             model.set_contentId(myLearningModel.getContentID());
@@ -574,7 +577,16 @@ public class GlobalMethods {
 
 //                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
 
-                            urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html";
+//                            urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html"; // commented on 20th June 2019
+
+                            String jwstartpage = myLearningModel.getStartPage();
+                            jwstartpage = jwstartpage.replaceAll("/", "~");
+
+                            urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + jwstartpage + "?nativeappURL=true/JWVideoParentID/" + myLearningModel.getTrackOrRelatedContentID();
+
+                            //                        jwstartpage = jwstartpage.replacingOccurrences(of: "/", with: "~")
+//
+//                        urlForView = "\(objectData.siteURL)ajaxcourse/ContentName/" + "\(objectData.courseName)" + "/ScoID/" + "\(objectData.scoid)" + "/ContentTypeId/"  + "\(objectData.objectTypeID)" + "/ContentID/" + "\(objectData.contentID)" + "/AllowCourseTracking/true/trackuserid/" + "\(objectData.userID)" + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + "\(objectData.folderpath)" + "~" + "\(jwstartpage)" + "?nativeappURL=true" + "/JWVideoParentID/" + "\(objectData.parentContentID)"
 
                         } else {
                             urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
@@ -607,13 +619,14 @@ public class GlobalMethods {
                     } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
                         String encodedString = "";
 //                        try {
-////                            encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+//////                            encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
 //                            encodedString = lrsActor.replace(" ", "%20");
-////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
-//
+//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+////
 //                        } catch (UnsupportedEncodingException e) {
 //                            e.printStackTrace();
 //                        }
+
                         encodedString = lrsActor.replace(" ", "%20");
                         urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + /*&registration=*/ "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
 
@@ -809,7 +822,7 @@ public class GlobalMethods {
         }
     }
 
-    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final DownloadInterface downloadInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel, final SideMenusModel sideMenusModel, final boolean isIconEnabled) {
+    public static void myLearningContextMenuMethod(final View v, final int position, ImageButton btnselected, final MyLearningModel myLearningDetalData, final MylearningInterface mylearningInterface, final SetCompleteListner setcompleteLitner, final String typeFrom, boolean isReportEnabled, final DownloadStart downloadStart, UiSettingsModel uiSettingsModel, final SideMenusModel sideMenusModel, final boolean isIconEnabled) {
 
         PopupMenu popup = new PopupMenu(v.getContext(), btnselected);
         //Inflating the Popup using xml file
@@ -833,6 +846,7 @@ public class GlobalMethods {
         menu.getItem(13).setVisible(false);
         menu.getItem(14).setVisible(true);//reshedule
         menu.getItem(15).setVisible(false);//certificateaction
+        menu.getItem(16).setVisible(false);//qrCodeACtion
 
 
         menu.getItem(0).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_playoption, v.getContext()));
@@ -858,6 +872,9 @@ public class GlobalMethods {
         menu.getItem(14).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionbutton_rescheduleactionbutton, v.getContext()));
 
         menu.getItem(15).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption, v.getContext()));
+
+        menu.getItem(16).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewqrcode, v.getContext()));
+
 
         if (myLearningDetalData.isArchived()) {
             menu.getItem(11).setVisible(false);
@@ -889,6 +906,7 @@ public class GlobalMethods {
         } else {
             menu.getItem(13).setVisible(false);
         }
+
 
         final File myFile = new File(myLearningDetalData.getOfflinepath());
 
@@ -936,7 +954,6 @@ public class GlobalMethods {
             Integer relatedCount = Integer.parseInt(myLearningDetalData.getRelatedContentCount());
             if (relatedCount > 0) {
                 menu.getItem(8).setVisible(true);
-
             }
 
 //            if (!myLearningDetalData.getStatusActual().toLowerCase().contains("completed")) {
@@ -955,6 +972,11 @@ public class GlobalMethods {
                     menu.getItem(9).setVisible(true);
                 }
                 menu.getItem(6).setVisible(true);
+// for schedule events
+                if (myLearningDetalData.getEventScheduleType() == 1 && uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                    menu.getItem(6).setVisible(false);
+                    menu.getItem(9).setVisible(false);
+                }
             }
 
             if (!returnEventCompleted(myLearningDetalData.getEventendTime())) {
@@ -966,6 +988,10 @@ public class GlobalMethods {
                 }
 
 //                menu.getItem(3).setVisible(true);
+            }
+
+            if (isValidString(myLearningDetalData.getQRImageName()) && isValidString(myLearningDetalData.getQrCodeImagePath())) {
+                menu.getItem(16).setVisible(true);
             }
 
         } else if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("688")) {
@@ -995,6 +1021,14 @@ public class GlobalMethods {
 
         }
 
+        if (myLearningDetalData.getObjecttypeId().equalsIgnoreCase("70") && myLearningDetalData.getBit4()) {
+            menu.getItem(13).setVisible(true);
+            menu.getItem(2).setVisible(false);
+            menu.getItem(11).setVisible(false);
+            menu.getItem(12).setVisible(false);
+            menu.getItem(9).setVisible(false);
+            menu.getItem(6).setVisible(false);
+        }
 
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
@@ -1011,7 +1045,24 @@ public class GlobalMethods {
                         ((Activity) v.getContext()).startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
                         break;
                     case R.id.ctx_view:
-                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
+                        if (isValidString(myLearningDetalData.getViewprerequisitecontentstatus())) {
+                            String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6, v.getContext());
+                            alertMessage = alertMessage  +"  "+ myLearningDetalData.getViewprerequisitecontentstatus();
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                            builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert, v.getContext()))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
+                        }
+
                         break;
                     case R.id.ctx_report:
                         Intent intentReports = new Intent(v.getContext(), Reports_Activity.class);
@@ -1032,7 +1083,7 @@ public class GlobalMethods {
                     case R.id.ctx_delete:
                         if (isNetworkConnectionAvailable(v.getContext(), -1)) {
 
-                            deleteDownloadedFile(v, myLearningDetalData, downloadInterface);
+                            deleteDownloadedFile(v, myLearningDetalData, mylearningInterface);
                         } else {
 
                             Toast.makeText(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()), Toast.LENGTH_SHORT).show();
@@ -1050,7 +1101,23 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_play:
-                        GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
+                        if (isValidString(myLearningDetalData.getViewprerequisitecontentstatus())) {
+                            String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6, v.getContext());
+                            alertMessage = alertMessage + "  " + myLearningDetalData.getViewprerequisitecontentstatus();
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                            builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert, v.getContext()))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext(), isIconEnabled);
+                        }
                         break;
                     case R.id.ctx_join:
                         String joinUrl = myLearningDetalData.getJoinurl();
@@ -1063,12 +1130,12 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_addtocalender:
-                        downloadInterface.cancelEnrollment(false);
+                        mylearningInterface.cancelEnrollment(false);
                         break;
                     case R.id.ctx_cancelenrollment:
                         if (myLearningDetalData.isBadCancellationEnabled()) {
 
-                            downloadInterface.badCancelEnrollment(true);
+                            mylearningInterface.badCancelEnrollment(true);
                             // bad cancel
                         } else {
                             final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -1082,7 +1149,7 @@ public class GlobalMethods {
                                 public void onClick(DialogInterface dialog, int id) {
                                     //do things
                                     dialog.dismiss();
-                                    downloadInterface.cancelEnrollment(true);
+                                    mylearningInterface.cancelEnrollment(true);
 
                                 }
                             });
@@ -1091,10 +1158,10 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_addtoarchive:
-                        downloadInterface.addToArchive(true);
+                        mylearningInterface.addToArchive(true);
                         break;
                     case R.id.ctx_removearchive:
-                        downloadInterface.addToArchive(false);
+                        mylearningInterface.addToArchive(false);
                         break;
                     case R.id.ctx_removefrommylearning:
                         if (isNetworkConnectionAvailable(v.getContext(), -1)) {
@@ -1109,7 +1176,7 @@ public class GlobalMethods {
                                 public void onClick(DialogInterface dialog, int id) {
                                     //do things
                                     dialog.dismiss();
-                                    downloadInterface.removeFromMylearning(true);
+                                    mylearningInterface.removeFromMylearning(true);
 
                                 }
                             });
@@ -1120,7 +1187,7 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_reshedule:
-                        downloadInterface.resheduleTheEvent(true);
+                        mylearningInterface.resheduleTheEvent(true);
                         break;
                     case R.id.ctx_certificateaction:
                         if (myLearningDetalData.getCertificateAction().equalsIgnoreCase("notearned")) {
@@ -1141,10 +1208,33 @@ public class GlobalMethods {
                                 showToast(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()));
                             }
                         } else {
-                            downloadInterface.viewCertificateLink(true);
+                            mylearningInterface.viewCertificateLink(true);
 
                         }
+                        break;
+                    case R.id.ctx_qrcode:
+                        if (isNetworkConnectionAvailable(v.getContext(), -1)) {
+                            Intent iWeb = new Intent(v.getContext(), AdvancedWebCourseLaunch.class);
+                            iWeb.putExtra("COURSE_URL", myLearningDetalData.getQrCodeImagePath());
+                            iWeb.putExtra("myLearningDetalData", myLearningDetalData);
+                            iWeb.putExtra("QRCODE", true);
+                            Log.d(TAG, "actionsforDetail: " + myLearningDetalData.getOfflineQrCodeImagePath());
+                            ((Activity) v.getContext()).startActivity(iWeb);
+                        } else {
 
+                            File file = new File(myLearningDetalData.getOfflineQrCodeImagePath());
+                            if (file.exists()) {
+                                String offlinePath = "file://" + myLearningDetalData.getQrCodeImagePath();
+                                Intent iWeb = new Intent(v.getContext(), AdvancedWebCourseLaunch.class);
+                                iWeb.putExtra("COURSE_URL", offlinePath);
+                                iWeb.putExtra("myLearningDetalData", myLearningDetalData);
+                                iWeb.putExtra("QRCODE", false);
+
+                            } else {
+                                Toast.makeText(v.getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet, v.getContext()), Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
                         break;
                 }
 
@@ -1154,15 +1244,15 @@ public class GlobalMethods {
         popup.show();//showing popup menu
     }
 
-    public static void deleteDownloadedFile(View v, MyLearningModel myLearningModel, DownloadInterface downloadInterface) {
+    public static void deleteDownloadedFile(View v, MyLearningModel myLearningModel, MylearningInterface mylearningInterface) {
 
         File myFile = new File(myLearningModel.getOfflinepath());
         String parentFilePath = myFile.getParent();
         File parentFile = new File(parentFilePath);
         if (myFile.exists()) {
             deleteDirectory(parentFile);
-            if (downloadInterface != null) {
-                downloadInterface.deletedTheContent(1);
+            if (mylearningInterface != null) {
+                mylearningInterface.deletedTheContent(1);
                 Toast.makeText(v.getContext(), getLocalizationValue(JsonLocalekeys.mylearning_alertsubtitle_youhavesuccessfullydeleteddownloadedcontent, v.getContext()), Toast.LENGTH_LONG).show();
                 databaseH = new DatabaseHandler(v.getContext());
                 databaseH.ejectRecordsinCmi(myLearningModel);
@@ -1327,6 +1417,11 @@ public class GlobalMethods {
 //                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
 
                         urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html";
+
+                        //                        jwstartpage = jwstartpage.replacingOccurrences(of: "/", with: "~")
+//
+//                        urlForView = "\(objectData.siteURL)ajaxcourse/ContentName/" + "\(objectData.courseName)" + "/ScoID/" + "\(objectData.scoid)" + "/ContentTypeId/"  + "\(objectData.objectTypeID)" + "/ContentID/" + "\(objectData.contentID)" + "/AllowCourseTracking/true/trackuserid/" + "\(objectData.userID)" + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + "\(objectData.folderpath)" + "~" + "\(jwstartpage)" + "?nativeappURL=true" + "/JWVideoParentID/" + "\(objectData.parentContentID)"
+
 
                     } else {
                         urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
@@ -1500,7 +1595,8 @@ public class GlobalMethods {
                         model.set_startdate(GetCurrentDateTime());
                         model.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
                         model.set_isupdate("false");
-                        model.set_status("In Progress");
+                        model.set_status("incomplete");
+                        model.setPercentageCompleted("50");
                         model.set_seqNum("0");
                         model.set_timespent("");
                         model.set_objecttypeid(myLearningModel.getObjecttypeId());
@@ -1508,6 +1604,7 @@ public class GlobalMethods {
                         model.set_sitrurl(myLearningModel.getSiteURL());
                         databaseH = new DatabaseHandler(context);
                         databaseH.injectIntoCMITable(model, "false");
+
 
                         int attempts = databaseH.getLatestAttempt(myLearningModel);
                         LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
@@ -1587,7 +1684,13 @@ public class GlobalMethods {
 
 //                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
 
-                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html";
+                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html"; // commented on 20th June 2019
+
+
+//                        jwstartpage = jwstartpage.replacingOccurrences(of: "/", with: "~")
+//
+//                        urlForView = "\(objectData.siteURL)ajaxcourse/ContentName/" + "\(objectData.courseName)" + "/ScoID/" + "\(objectData.scoid)" + "/ContentTypeId/"  + "\(objectData.objectTypeID)" + "/ContentID/" + "\(objectData.contentID)" + "/AllowCourseTracking/true/trackuserid/" + "\(objectData.userID)" + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + "\(objectData.folderpath)" + "~" + "\(jwstartpage)" + "?nativeappURL=true" + "/JWVideoParentID/" + "\(objectData.parentContentID)"
+
 
                     } else {
                         urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
@@ -1680,7 +1783,6 @@ public class GlobalMethods {
                 } else if (encodedStr.toLowerCase().contains(".xlsx")
                         || encodedStr.toLowerCase().contains(".xls")) {
                     encodedStr = encodedStr.replace("file://", "");
-
 
                     String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
                     Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);

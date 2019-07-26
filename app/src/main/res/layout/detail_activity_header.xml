@@ -167,6 +167,8 @@
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="1dp"
+                        android:paddingLeft="2dp"
+                        android:paddingRight="2dp"
                         android:text="@string/fa_icon_user"
                         android:textColor="@color/colorDarkGrey"
                         android:textSize="16sp" />
@@ -290,18 +292,82 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/creditsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/eventlayout"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/iconCredits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="1dp"
+                        android:text="@string/fa_icon_credit_card"
+                        android:textColor="@color/colorDarkGrey"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtCredits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:maxLines="2"
+                        android:padding="3dp"
+                        android:paddingLeft="6dp"
+                        android:text=""
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/durationLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/creditsLayout"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/iconDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="1dp"
+                        android:text="@string/fa_icon_clock_o"
+                        android:textColor="@color/colorDarkGrey"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/txtDuration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:maxLines="2"
+                        android:padding="3dp"
+                        android:paddingLeft="6dp"
+                        android:text=""
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/txtWhatYouLearnTitle"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/rating_layout"
-                    android:layout_below="@+id/eventlayout"
+                    android:layout_below="@+id/durationLayout"
                     android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:gravity="left"
                     android:maxLines="2"
                     android:padding="2dp"
-                    android:text="What to learn"
+                    android:text="@string/details_label_whattolearnlabel"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
                     android:textColor="@color/colorGray"
                     android:visibility="gone" />
@@ -313,12 +379,12 @@
                     android:layout_alignLeft="@+id/rating_layout"
                     android:layout_below="@+id/txtWhatYouLearnTitle"
                     android:layout_marginTop="2dp"
+                    android:background="@android:color/transparent"
                     android:ellipsize="end"
                     android:gravity="left"
                     android:padding="2dp"
                     android:text=""
                     android:textColor="@color/colorGray"
-                    android:background="@android:color/transparent"
 
                     android:textSize="14sp"
                     android:visibility="gone" />
@@ -362,8 +428,8 @@
                     android:layout_alignLeft="@+id/rating_layout"
                     android:layout_below="@+id/txtDescription"
                     android:layout_marginTop="2dp"
-                    android:ellipsize="end"
                     android:background="@android:color/transparent"
+                    android:ellipsize="end"
                     android:gravity="left"
                     android:padding="2dp"
                     android:text=""
@@ -396,7 +462,7 @@
                     android:gravity="left"
                     android:maxLines="2"
                     android:padding="2dp"
-                    android:text="Table of Content: "
+                    android:text="@string/details_label_tableofcontentlabel"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
                     android:textColor="@color/colorGray"
                     android:visibility="gone" />

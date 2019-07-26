@@ -103,7 +103,11 @@ public class PdfViewer_Activity extends AppCompatActivity implements OnPageChang
         pdfView.setHorizontalScrollBarEnabled(false);
         pdfView.setVerticalScrollBarEnabled(false);
         TextView pdfTitleText = (TextView) findViewById(R.id.pdf_course_title);
-        pdfTitleText.setText(courseName);
+//        pdfTitleText.setText(courseName);
+
+        pdfTitleText.setText(Html.fromHtml("<font color='" + uiSettingsModel.getHeaderTextColor() + "'>" +
+                courseName + "</font>"));
+
         if (isOnline.equalsIgnoreCase("YES")) {
             new RetriveStreamFromAsynchTask().execute(coursePdf);
         } else {

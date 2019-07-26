@@ -333,7 +333,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
     @Override
     public void onRefresh() {
         if (isNetworkConnectionAvailable(context, -1)) {
-//            refreshMyLearning(true);
+//            refreshContentlisting(true);
 
             swipeRefreshLayout.setRefreshing(false);
         } else {
@@ -353,7 +353,7 @@ public class AskExpertsAnswersActivity extends AppCompatActivity implements Swip
             if (data != null) {
                 boolean refresh = data.getBooleanExtra("NEWFORUM", false);
                 if (refresh) {
-//                    refreshMyLearning(false);
+//                    refreshContentlisting(false);
                 }
             }
         }

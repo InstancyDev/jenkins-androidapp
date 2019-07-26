@@ -212,15 +212,15 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-
     public void getSelectedCategories() {
 
         for (int i = 0; i < sortModelList.size(); i++) {
 
             if (sortModelList.get(i).isSelected) {
 
-                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionDisplayText;
+                contentFilterByModel.selectedSkillsCatIdString = sortModelList.get(i).optionIdValue;
                 contentFilterByModel.categorySelectedID = sortModelList.get(i).categoryID;
+                contentFilterByModel.selectedSkillsNameString = contentFilterByModel.categoryDisplayName;
 
             }
         }
@@ -302,6 +302,7 @@ public class RatingRadioActivity extends AppCompatActivity implements View.OnCli
                 rbn.setButtonTintList(ColorStateList.valueOf(Color.parseColor(uiSettingsModel.getAppButtonBgColor())));
                 if (contentFilterByModel.categorySelectedID == sortModelList.get(i).categoryID) {
                     rbn.setChecked(true);
+                    contentFilterByModel.selectedSkillsNameString = contentFilterByModel.categoryDisplayName;
                 }
                 radioGroup.addView(rbn);
             }

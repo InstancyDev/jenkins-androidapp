@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
@@ -30,6 +32,13 @@ import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
+import com.thin.downloadmanager.DownloadRequest;
+import com.thin.downloadmanager.DownloadStatusListenerV1;
+import com.thin.downloadmanager.ThinDownloadManager;
+
+import java.io.File;
+
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 
 /**
@@ -47,6 +56,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
     boolean isOffline = false;
     public SVProgressHUD svProgressHUD;
     hideProgressListner hideProgressListner = null;
+
+    boolean isQRCode = false;
 
     boolean isCloseEnable = false;
 
@@ -72,6 +83,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
 //            courseUrl="file:///storage/emulated/0/Android/data/com.instancy.development/files/.Mydownloads/Contentdownloads/cd443d3a-fc86-4be8-9ced-bf6d911491cd/start.html?nativeappURL=true&cid=11&stid=4&lloc=10$1@2$2&lstatus=incomplete&susdata=&tbookmark=2&LtSusdata=%23pgvs_start%231;2;3;4;5;6;7;8;9;10;%23pgvs_end%23$1@%23pgvs_start%231;2;%23pgvs_end%23$2&LtQuesData=1-9@2@correct@$10@2@incorrect@$11@1@incorrect@&LtStatus=completed$1@incomplete$2&sname=Instancy%20Test&IsInstancyContent=true";
             isCloseEnable = bundle.getBoolean("ISCLOSE", false);
 
+            isQRCode = bundle.getBoolean("QRCODE", false);
+
 //            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
             svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
             myLearningModel = (MyLearningModel) getIntent().getSerializableExtra("myLearningDetalData");
@@ -82,7 +95,14 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
             if (courseUrl.startsWith("file:///")) {
                 isOffline = true;
             } else {
-                courseUrl = courseUrl.replaceAll("\\?", "%3F");
+                if (isValidString(myLearningModel.getCloudmediaplayerkey()) && isValidString(myLearningModel.getJwvideokey())) {
+                    courseUrl = courseUrl;
+                } else if (!courseUrl.toLowerCase().contains("docs.google.com") && !myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                    courseUrl = courseUrl.replaceAll("\\?", "%3F");
+                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") && myLearningModel.getSiteURL().toLowerCase().contains("www.medmentor.com")) {
+
+                    courseUrl = courseUrl.replaceAll("http://", "https://");
+                }
                 isOffline = false;
             }
 
@@ -108,6 +128,11 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 ex.printStackTrace();
             }
         }
+        File file = new File(myLearningModel.getOfflineQrCodeImagePath());
+        if (isQRCode && !file.exists()) {
+            downloadCertificate(myLearningModel.getQrCodeImagePath(), myLearningModel);
+        }
+
 //        closeSvProgress();
         WebSettings webSettings = this.adWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -139,6 +164,8 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                 WebView.setWebContentsDebuggingEnabled(true);
             }
         }
+
+
         // Add Class in js
 
         LRSJavaScriptInterface lrsInterface = new LRSJavaScriptInterface(this, myLearningModel, this, hideProgressListner, isOffline);
@@ -219,9 +246,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                    if (url.toLowerCase().contains("lstatus=completed")) {
                                                        myLearningModel.setStatusActual("Completed");
                                                    }
-//                                                   Intent intent = getIntent();
-//                                                   intent.putExtra("myLearningDetalData", myLearningModel);
-//                                                   setResult(RESULT_OK, intent);
+
                                                    closeCourse();
                                                    view.stopLoading();
                                                    finish();
@@ -233,9 +258,6 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                                    }
 
 
-//                                                   Intent intent = getIntent();
-//                                                   intent.putExtra("myLearningDetalData", myLearningModel);
-//                                                   setResult(RESULT_OK, intent);
                                                    closeCourse();
                                                    view.stopLoading();
                                                    finish();
@@ -250,9 +272,7 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
                                            }
 
                                            if (url.contains("logoff")) {
-//                                               Intent intent = getIntent();
-//                                               intent.putExtra("myLearningDetalData", myLearningModel);
-//                                               setResult(RESULT_OK, intent);
+
                                                closeCourse();
                                                view.stopLoading();
                                                finish();
@@ -402,4 +422,50 @@ public class AdvancedWebCourseLaunch extends AppCompatActivity {
         adWebView.restoreState(savedInstanceState);
     }
 
+
+    public void downloadCertificate(String downloadStruri, final MyLearningModel learningModel) {
+
+        ThinDownloadManager downloadManager = new ThinDownloadManager();
+        Uri downloadUri = Uri.parse(downloadStruri);
+
+//        String localizationFolder = "";
+//        String[] startPage = null;
+//        if (learningModel.getStartPage().contains("/")) {
+//            startPage = learningModel.getStartPage().split("/");
+//            localizationFolder = "/" + startPage[0];
+//        } else {
+//            localizationFolder = "";
+//        }
+
+        File file = new File(learningModel.getOfflineQrCodeImagePath());
+
+        final Uri destinationUri = Uri.parse(file.getAbsolutePath());
+
+        Log.d(TAG, "downloadThin: " + downloadUri);
+        DownloadRequest downloadRequest = new DownloadRequest(downloadUri)
+                .setRetryPolicy(new com.thin.downloadmanager.DefaultRetryPolicy())
+                .setDestinationURI(destinationUri).setPriority(DownloadRequest.Priority.HIGH).setDeleteDestinationFileOnFailure(false)
+                .setStatusListener(new DownloadStatusListenerV1() {
+                    @Override
+                    public void onDownloadComplete(DownloadRequest downloadRequest) {
+
+                        //    Toast.makeText(AdvancedWebCourseLaunch.this, getLocalizationValue(JsonLocalekeys.certificatedownloadedalert_alerttitile) + " " + destinationUri.getPath(), Toast.LENGTH_LONG).show();
+
+                    }
+
+                    @Override
+                    public void onDownloadFailed(DownloadRequest downloadRequest, int errorCode, String errorMessage) {
+
+                        //     Toast.makeText(AdvancedWebCourseLaunch.this, getLocalizationValue(JsonLocalekeys.certificatedownloadedfailedalert_alerttitile), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onProgress(DownloadRequest downloadRequest, long totalBytes, long downloadedBytes, int progress) {
+//
+                    }
+
+
+                });
+        int downloadId = downloadManager.add(downloadRequest);
+    }
 }

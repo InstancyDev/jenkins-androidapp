@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -33,7 +34,7 @@ import com.instancy.instancylearning.R;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.FontManager;
-import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.MylearningInterface;
 import com.instancy.instancylearning.localization.JsonLocalization;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.MembershipModel;
@@ -41,7 +42,6 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -57,6 +57,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
+import static com.instancy.instancylearning.utils.Utilities.isMemberyExpry;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
@@ -146,7 +147,12 @@ public class CatalogAdapter extends BaseAdapter {
         holder.myLearningDetalData = myLearningModel.get(position);
         holder.txtTitle.setText(myLearningModel.get(position).getCourseName());
         holder.txtCourseName.setText(myLearningModel.get(position).getMediaName());
-        holder.ratingBar.setVisibility(View.GONE);
+
+        if (activity.getResources().getString(R.string.app_name).equalsIgnoreCase(activity.getResources().getString(R.string.app_medmentor))) {
+            holder.ratingBar.setVisibility(View.VISIBLE);
+
+        }
+        holder.ratingBar.setIsIndicator(true);
         if (isEvent) {
 
             String fromDate = convertToEventDisplayDateFormat(myLearningModel.get(position).getEventstartTime(), "yyyy-MM-dd hh:mm:ss");
@@ -208,6 +214,12 @@ public class CatalogAdapter extends BaseAdapter {
         }
 
         if (myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
+
+            boolean isMemberExpired = isMemberyExpry(membershipModel.expirydate);
+            if (!isMemberExpired) {
+                holder.txtPrice.setPaintFlags(holder.txtPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            }
+
             holder.txtPrice.setText("$" + myLearningModel.get(position).getPrice());
             holder.txtPrice.setVisibility(View.VISIBLE);
             holder.btnDownload.setVisibility(View.GONE);
@@ -241,9 +253,7 @@ public class CatalogAdapter extends BaseAdapter {
         LayerDrawable stars = (LayerDrawable) holder.ratingBar.getProgressDrawable();
         stars.getDrawable(2).
 
-                setColorFilter(vi.getResources().
-
-                        getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
+                setColorFilter(vi.getResources().getColor(R.color.colorRating), PorterDuff.Mode.SRC_ATOP);
 
         Drawable progress = holder.ratingBar.getProgressDrawable();
         DrawableCompat.setTint(progress, Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -264,11 +274,23 @@ public class CatalogAdapter extends BaseAdapter {
         holder.txtLocationIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtEvntIcon.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        holder.lbCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+        holder.txtCredits.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+
+        if (vi.getResources().getString(R.string.app_name).equalsIgnoreCase(vi.getResources().getString(R.string.app_medmentor))) {
+            if (isValidString(myLearningModel.get(position).getCredits())) {
+                holder.txtCredits.setText(myLearningModel.get(position).getDecimal2());
+                holder.lbCredits.setText(" CME");
+
+            }
+            holder.creditsLayout.setVisibility(View.VISIBLE);
+        } else {
+            holder.creditsLayout.setVisibility(View.GONE);
+        }
+
         holder.btnDownload.setTag(position);
 
-// commented for image heavy
         String imgUrl = myLearningModel.get(position).getImageData();
-
 
         Glide.with(vi.getContext()).
                 load(imgUrl).
@@ -370,7 +392,7 @@ public class CatalogAdapter extends BaseAdapter {
                 if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("0")) {
                     holder.btnDownload.setVisibility(View.GONE);
                 }
-                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2") && !myLearningModel.get(position).getViewType().equalsIgnoreCase("3")) {
+                if (uiSettingsModel.getCatalogContentDownloadType().equalsIgnoreCase("2") && !myLearningModel.get(position).getViewType().equalsIgnoreCase("3") && myLearningModel.get(position).getAddedToMylearning() != 2) {
                     holder.btnDownload.setVisibility(View.VISIBLE);
                 }
 
@@ -632,7 +654,7 @@ public class CatalogAdapter extends BaseAdapter {
         public int getPosition;
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
-        public DownloadInterface downloadInterface;
+        public MylearningInterface mylearningInterface;
         @Nullable
         @BindView(R.id.txt_title_name)
         TextView txtTitle;
@@ -724,6 +746,20 @@ public class CatalogAdapter extends BaseAdapter {
         @BindView(R.id.circle_progress)
         CircleProgressBar circleProgressBar;
 
+        // credits layout
+
+        @Nullable
+        @BindView(R.id.creditsLayout)
+        LinearLayout creditsLayout;
+
+        @Nullable
+        @BindView(R.id.lbCredits)
+        TextView lbCredits;
+
+        @Nullable
+        @BindView(R.id.txtCredits)
+        TextView txtCredits;
+
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
@@ -731,7 +767,7 @@ public class CatalogAdapter extends BaseAdapter {
             FontManager.markAsIconContainer(view.findViewById(R.id.txtathricon), iconFont);
             FontManager.markAsIconContainer(view.findViewById(R.id.txteventicon), iconFont);
             FontManager.markAsIconContainer(view.findViewById(R.id.txtlocationicon), iconFont);
-            downloadInterface = new DownloadInterface() {
+            mylearningInterface = new MylearningInterface() {
                 @Override
                 public void deletedTheContent(int updateProgress) {
                     notifyDataSetChanged();

@@ -74,7 +74,6 @@ public class NativeSetttingsModel {
 
             List<String> basketball = new ArrayList<String>();
 
-
             basketball.add(jsonLocalization.getStringForKey(JsonLocalekeys.insidesettings_tablerow_autodownloadstatuslabel, context));
 
             List<String> localization = new ArrayList<String>();

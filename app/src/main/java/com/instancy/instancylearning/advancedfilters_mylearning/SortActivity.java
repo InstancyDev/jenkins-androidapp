@@ -453,7 +453,7 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
             SortModel sortModel = new SortModel();
             sortModel.optionIdValue = allFilterModel.groupArrayList.get(i);
             switch (allFilterModel.groupArrayList.get(i)) {
-                case "DueDates":
+                case "duedates":
                     sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_duedates);
                     break;
                 case "Job":
@@ -467,6 +467,9 @@ public class SortActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case "Categories":
                     sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_caegoriestitlelabel);
+                    break;
+                case "progress":
+                    sortModel.optionDisplayText = getLocalizationValue(JsonLocalekeys.filter_lbl_progresstitlelabel);
                     break;
 
             }

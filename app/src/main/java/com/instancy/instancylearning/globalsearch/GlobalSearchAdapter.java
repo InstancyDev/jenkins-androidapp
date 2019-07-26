@@ -143,7 +143,6 @@ public class GlobalSearchAdapter extends BaseExpandableListAdapter {
 
         final View finalVi = convertView;
 
-
         holder.txtTitle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -151,7 +150,6 @@ public class GlobalSearchAdapter extends BaseExpandableListAdapter {
                 long packedPos = ExpandableListView.getPackedPositionForChild(groupPosition, childPosition);
                 int flatPos = expandableListView.getFlatListPosition(packedPos);
 
-//Getting the ID for our child
                 long id = expandableListView.getExpandableListAdapter().getChildId(groupPosition, childPosition);
 
                 ((ExpandableListView) parent).performItemClick(finalVi, flatPos, id);

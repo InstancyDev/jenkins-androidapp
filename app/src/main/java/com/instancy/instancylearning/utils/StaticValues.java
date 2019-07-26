@@ -12,10 +12,9 @@ public class StaticValues {
      * Version of Database.
      */
 
-    public static final int DATABASE_VERSION = 2; // Esperanza DB Version
+//    public static final int DATABASE_VERSION = 2; // Esperanza DB Version
 
-  //  public static final int DATABASE_VERSION = 1; // Esperanza DB Version
-
+    public static final int DATABASE_VERSION = 2; // Regular DB Version
 
     public static final int DEFAULTSITEID = -1;
     public static final int DEFAULTUSERID = -1;
@@ -91,6 +90,12 @@ public class StaticValues {
     public static final String FCM_OBJECT = "FCM_OBJECT";
 
     public static final String BACK_STACK_ROOT_TAG = "root_fragment";
+
+
+    public static final String AUTOLAUNCHCONTENTID_KEY = "AUTOLAUNCHCONTENTID_KEY";
+    public static final String ISAUTOLAUNCH_KEY = "ISAUTOLAUNCH_KEY";
+
+
     /**
      * To get the FontAwsome font .ttf asset path
      *
@@ -345,6 +350,12 @@ public class StaticValues {
 
     public static int CREATETOPIC = 435;
 
+    public static int CHATENABLED = 1227;
+
+    public static String AUTOLAUNCHCONTENTID = "";
+
+
+    public static boolean ISAUTOLAUNCH = false;
 
     /// all app configurations
 

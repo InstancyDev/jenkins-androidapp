@@ -10,7 +10,6 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +42,7 @@ import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.UnZip;
 import com.instancy.instancylearning.helper.VolleySingleton;
 import com.instancy.instancylearning.helper.VollyService;
-import com.instancy.instancylearning.interfaces.DownloadInterface;
+import com.instancy.instancylearning.interfaces.MylearningInterface;
 import com.instancy.instancylearning.interfaces.DownloadStart;
 import com.instancy.instancylearning.interfaces.SetCompleteListner;
 import com.instancy.instancylearning.localization.JsonLocalization;
@@ -56,7 +55,6 @@ import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
 
-import com.squareup.picasso.Picasso;
 import com.thin.downloadmanager.DownloadRequest;
 import com.thin.downloadmanager.DownloadStatusListenerV1;
 import com.thin.downloadmanager.ThinDownloadManager;
@@ -373,6 +371,11 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 progressPercentage = 0;
             } else if (statusFromModel.equalsIgnoreCase("incomplete") || (statusFromModel.toLowerCase().contains("inprogress")) || (statusFromModel.toLowerCase().contains("in progress"))) {
                 holder.progressBar.setProgressTintList(ColorStateList.valueOf(childView.getResources().getColor(R.color.colorStatusInProgress)));
+
+                if (statusFromModel.toLowerCase().equalsIgnoreCase("incomplete")) {
+                    statusDisplay = getLocalizationValue(JsonLocalekeys.mylearning_label_inprogresslabel);
+                }
+
                 holder.txtCourseStatus.setTextColor(childView.getResources().getColor(R.color.colorStatusInProgress));
                 progressPercentage = 50;
             } else if (statusFromModel.equalsIgnoreCase("pending review") || (statusFromModel.toLowerCase().contains("pendingreview")) || (statusFromModel.toLowerCase().contains("grade"))) {
@@ -502,11 +505,14 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             holder.imgThumb.setEnabled(true);
             holder.txtTitle.setEnabled(true);
         }
-
-        if (trackChildList.getSequenceNumber() != trackChildList.getBookmarkID()) {
-            assert holder.borderLayout != null;
-            holder.borderLayout.setBackground(null);
-        }
+//        if (!isNetworkConnectionAvailable(_context, -1)) {
+//
+//            trackChildList.setBookmarkID(0);
+//        }
+//        if (trackChildList.getSequenceNumber() != trackChildList.getBookmarkID()) { commented for esperanza
+        assert holder.borderLayout != null;
+        holder.borderLayout.setBackground(null);
+//        }
 
         String imgUrl = "";
         if (trackChildList.getImageData().toLowerCase().contains("http")) {
@@ -552,7 +558,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
         public int getGroupPosition;
         public MyLearningModel myLearningDetalData;
         public ViewGroup parent;
-        DownloadInterface downloadInterface;
+        MylearningInterface mylearningInterface;
         SetCompleteListner setCompleteListner;
         DownloadStart downloadStart;
         @Nullable
@@ -616,7 +622,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
             Typeface iconFont = FontManager.getTypeface(view.getContext(), FontManager.FONTAWESOME);
             FontManager.markAsIconContainer(view.findViewById(R.id.btntxt_download), iconFont);
             FontManager.markAsIconContainer(view.findViewById(R.id.txtLock), iconFont);
-            downloadInterface = new DownloadInterface() {
+            mylearningInterface = new MylearningInterface() {
                 @Override
                 public void deletedTheContent(int updateProgress) {
 
@@ -659,6 +665,9 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
                 public void completedStatus() {
                     myLearningDetalData.setStatusActual("Completed");
                     myLearningDetalData.setProgress("100");
+                    myLearningModel.setPercentCompleted("100");
+                    myLearningModel.setStatusDisplay(" " + getLocalizationValue(JsonLocalekeys.mylearning_label_completedlabel));
+
                     notifyDataSetChanged();
 //                    db.updateCMIstatus(myLearningDetalData, "Completed");
 //                    if (_context instanceof TrackList_Activity) {
@@ -684,7 +693,7 @@ public class TrackListExpandableAdapter extends BaseExpandableListAdapter {
 
             if (view.getId() == R.id.btn_contextmenu) {
 
-                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, downloadInterface, setCompleteListner, typeFrom, false, downloadStart, uiSettingsModel, sideMenusModel, false);
+                GlobalMethods.myLearningContextMenuMethod(view, getChildPosition, btnContextMenu, myLearningDetalData, mylearningInterface, setCompleteListner, typeFrom, false, downloadStart, uiSettingsModel, sideMenusModel, false);
 
             } else if (view.getId() == R.id.imagethumb || view.getId() == R.id.txt_title_name) {
                 GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, view.getContext(), false);

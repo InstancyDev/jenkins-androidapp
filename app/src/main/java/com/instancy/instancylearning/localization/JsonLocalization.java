@@ -98,12 +98,13 @@ public class JsonLocalization {
 
 
     public String getStringForKey(String key, Context ctx) {
-
+        PreferencesManager preferencesManager = PreferencesManager.getInstance();
         String value = getStringFromResource(key, ctx);
         //String value = "";
         JSONObject localData = null;
         try {
-            localData = new JSONObject(readLocaleFileFromInternalStorage(ctx, PreferencesManager.getInstance().getStringValue(ctx.getResources().getString(R.string.locale_name))));
+            assert PreferencesManager.getInstance() != null;
+            localData = new JSONObject(readLocaleFileFromInternalStorage(ctx, preferencesManager.getStringValue(ctx.getResources().getString(R.string.locale_name))));
             // key is the default value returned if key is not found in json
             if (localData != null) {
                 if (localData.has(key)) {

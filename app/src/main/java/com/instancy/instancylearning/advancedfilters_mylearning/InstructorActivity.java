@@ -120,7 +120,7 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
     public void getIntructorList() {
 
         if (isNetworkConnectionAvailable(this, -1)) {
-
+            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
             String urlStr = "instSiteID=" + appUserModel.getSiteIDValue() + "&instUserID=" + appUserModel.getUserIDValue();
 
@@ -129,7 +129,7 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
         } else {
 
             Toast.makeText(this, getString(R.string.alert_headtext_no_internet), Toast.LENGTH_SHORT).show();
-
+            svProgressHUD.dismiss();
         }
     }
 
@@ -266,7 +266,7 @@ public class InstructorActivity extends AppCompatActivity implements View.OnClic
                     contentFilterByModel = (ContentFilterByModel) data.getExtras().getSerializable("contentFilterByModel");
                     Log.d(TAG, "selectedCategories: " + contentFilterByModel.selectedSkillsNameString);
 
-
+                    svProgressHUD.dismiss();
                 }
 
             }

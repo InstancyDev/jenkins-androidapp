@@ -202,6 +202,11 @@ public class VollyService {
                 }
             };
             VolleySingleton.getInstance(mContext).addToRequestQueue(stringRequest);
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    50000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
 
         } catch (Exception e) {
 
@@ -227,6 +232,76 @@ public class VollyService {
 
                 if (mResultCallback != null)
                     mResultCallback.notifySuccess(requestType, _response);
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        })
+
+        {
+
+            @Override
+            public String getBodyContentType() {
+                return "application/json";
+
+            }
+
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return finalEncrpt;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                final Map<String, String> headers = new HashMap<>();
+                String base64EncodedCredentials = Base64.encodeToString(appUserModel.getAuthHeaders().getBytes(), Base64.NO_WRAP);
+                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                // commented 415 Error for YounextYou
+                // headers.put("Content-Type", "application/json");
+                // headers.put("Accept", "application/json");
+
+                return headers;
+            }
+
+        };
+
+        VolleySingleton.getInstance(mContext).addToRequestQueue(request);
+        request.setRetryPolicy(new DefaultRetryPolicy(
+                50000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+    }
+
+    public void getStringResponseFromPostMethodWithMylearningModel(final String postData, final String requestType, String apiURL, final MyLearningModel learningModel) {
+
+        byte[] encrpt = new byte[0];
+        try {
+            encrpt = postData.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        final byte[] finalEncrpt = encrpt;
+        final StringRequest request = new StringRequest(Request.Method.POST, apiURL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String _response) {
+
+                Log.d(TAG, "onResponse: " + _response);
+
+                if (mResultCallback != null) {
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(_response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mResultCallback.notifySuccessLearningModel(requestType, jsonObject, learningModel);
+                }
 
 
             }

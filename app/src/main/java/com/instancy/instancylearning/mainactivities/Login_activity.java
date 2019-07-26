@@ -75,7 +75,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.AUTOLAUNCHCONTENTID;
+import static com.instancy.instancylearning.utils.StaticValues.AUTOLAUNCHCONTENTID_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.CATALOG_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.ISAUTOLAUNCH;
+import static com.instancy.instancylearning.utils.StaticValues.ISAUTOLAUNCH_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.ISPROFILENAMEORIMAGEUPDATED;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
 import static com.instancy.instancylearning.utils.Utilities.copyFile;
@@ -247,7 +251,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         }
         if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.cle_academy))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.crop_life))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.ppdlife))) || (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.younextyou)))) {
 
-            settingTxt.setVisibility(View.VISIBLE);
+            settingTxt.setVisibility(View.INVISIBLE);
             btnSignup.setVisibility(View.INVISIBLE);
 
         } else {
@@ -402,23 +406,28 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
     public void signUpMethodForMemberShipOrNativeSignUp() {
 
-//        if (uiSettingsModel.isEnableMemberShipConfig() && uiSettingsModel.isEnableIndidvidualPurchaseConfig()) {
-        // uncomment for web signup
-//                Intent intentSignup = new Intent(this, SignUp_Activity.class);
-        Intent intentSignup = new Intent(this, NativeSignupActivity.class);
-//                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://www.mci-institute.com");
-//                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Azure");
+
+        Intent intentSignup = null;
+
+        if (uiSettingsModel.isEnableMemberShipConfig()) {
+
+            intentSignup = new Intent(this, SignUp_Activity.class);
+        } else {
+            intentSignup = new Intent(this, NativeSignupActivity.class);
+        }
         startActivity(intentSignup);
 
+//        if (uiSettingsModel.isEnableMemberShipConfig() && uiSettingsModel.isEnableIndidvidualPurchaseConfig()) {
+        // uncomment for web signup
+//                intentSocial.putExtra(StaticValues.KEY_SOCIALLOGIN, "http://www.mci-institute.com");
+//                intentSocial.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Azure");
 //        } else {
-//            // uncomment for web signup
+//            // uncomment for web social signup
 //            Intent intentSignup = new Intent(this, SignUp_Activity.class);
 //            intentSignup.putExtra(StaticValues.KEY_SOCIALLOGIN, appUserModel.getSiteURL() + "Sign%20Up/profiletype/selfregistration/nativeapp/true");
 //            intentSignup.putExtra(StaticValues.KEY_ACTIONBARTITLE, "Membership");
 //            startActivity(intentSignup);
-//
 //        }
-
 
     }
 
@@ -469,9 +478,10 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                     try {
                         JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
                         if (loginResponseAry.length() != 0) {
-
-
                             JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+
+                            String autolaunchcontentID = jsonobj.optString("autolaunchcontent");
+
                             JSONObject jsonObject = new JSONObject();
                             String userId = jsonobj.get("userid").toString();
                             profileWebCall(userId);
@@ -495,13 +505,21 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                             preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
                             preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
 
-
                             appUserModel.setUserIDValue(userId);
                             MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
                             CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
 
                             Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                             intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                         //   autolaunchcontentID = "19235365-ac2d-499d-9896-b7dd5b7e15b5";
+
+                            if (isValidString(autolaunchcontentID)) {
+//                                AUTOLAUNCHCONTENTID = autolaunchcontentID;
+//                                ISAUTOLAUNCH = true;
+                                intentSideMenu.putExtra(AUTOLAUNCHCONTENTID_KEY, autolaunchcontentID);
+                                intentSideMenu.putExtra(ISAUTOLAUNCH_KEY, true);
+                            }
                             startActivity(intentSideMenu);
 
                         }
@@ -629,113 +647,113 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         }
     }
 
-    public void loginVollyWebCall(final String userName, final String password) {
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
-                + userName + "&Password=" + password + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
-
-        Log.d(TAG, "main login : " + urlStr);
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        svProgressHUD.dismiss();
-                        Log.d("Response: ", " " + response.has("faileduserlogin"));
-                        if (response.has("faileduserlogin")) {
-
-                            try {
-                                JSONArray jsonArray = response.getJSONArray("faileduserlogin");
-                                if (jsonArray != null && jsonArray.length() > 0) {
-                                    JSONObject innerObj = jsonArray.getJSONObject(0);
-                                    if (innerObj.has("userstatus")) {
-
-                                        if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")) {
-                                            alertText.setVisibility(View.VISIBLE);
-                                        } else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration")) {
-
-                                            Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_youraccountisnotyetactivated), Toast.LENGTH_LONG).show();
-
-                                        }
-                                    }
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-
-                        } else if (response.has("successfulluserlogin")) {
-                            alertText.setVisibility(View.GONE);
-                            try {
-                                JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
-                                if (loginResponseAry.length() != 0) {
-
-
-                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
-                                    JSONObject jsonObject = new JSONObject();
-                                    String userId = jsonobj.get("userid").toString();
-                                    profileWebCall(userId);
-                                    fcmRegister(userId);
-                                    jsonObject.put("userid", jsonobj.get("userid").toString());
-                                    jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
-                                    jsonObject.put("userstatus", jsonobj.get("userstatus"));
-                                    jsonObject.put("displayname", jsonobj.get("username"));
-                                    jsonObject.put("siteid", jsonobj.get("siteid"));
-                                    jsonObject.put("username", userName);
-                                    jsonObject.put("password", password);
-                                    jsonObject.put("siteurl", appUserModel.getSiteURL());
-
-                                    db.insertUserCredentialsForOfflineLogin(jsonObject);
-
-                                    Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
-                                    preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
-                                    preferencesManager.setStringValue(password, StaticValues.KEY_USERPASSWORD);
-                                    preferencesManager.setStringValue(jsonobj.get("userid").toString(), StaticValues.KEY_USERID);
-                                    preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.KEY_USERNAME);
-                                    preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
-                                    preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
-
-
-                                    appUserModel.setUserIDValue(userId);
-                                    MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
-                                    CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
-
-                                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
-                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    startActivity(intentSideMenu);
-
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-//                        Log.e("Error: ", error.getMessage());
+//    public void loginVollyWebCall(final String userName, final String password) {
+//
+//        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
+//                + userName + "&Password=" + password + "&MobileSiteURL="
+//                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + appUserModel.getSiteIDValue();
+//
+//        Log.d(TAG, "main login : " + urlStr);
+//
+//        urlStr = urlStr.replaceAll(" ", "%20");
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
 //                        svProgressHUD.dismiss();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                return headers;
-            }
-        };
-
-        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
-    }
+//                        Log.d("Response: ", " " + response.has("faileduserlogin"));
+//                        if (response.has("faileduserlogin")) {
+//
+//                            try {
+//                                JSONArray jsonArray = response.getJSONArray("faileduserlogin");
+//                                if (jsonArray != null && jsonArray.length() > 0) {
+//                                    JSONObject innerObj = jsonArray.getJSONObject(0);
+//                                    if (innerObj.has("userstatus")) {
+//
+//                                        if (innerObj.getString("userstatus").equalsIgnoreCase("Login Failed")) {
+//                                            alertText.setVisibility(View.VISIBLE);
+//                                        } else if (innerObj.getString("userstatus").equalsIgnoreCase("Pending Registration")) {
+//
+//                                            Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_youraccountisnotyetactivated), Toast.LENGTH_LONG).show();
+//
+//                                        }
+//                                    }
+//                                }
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//
+//                        } else if (response.has("successfulluserlogin")) {
+//                            alertText.setVisibility(View.GONE);
+//                            try {
+//                                JSONArray loginResponseAry = response.getJSONArray("successfulluserlogin");
+//                                if (loginResponseAry.length() != 0) {
+//
+//
+//                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+//                                    JSONObject jsonObject = new JSONObject();
+//                                    String userId = jsonobj.get("userid").toString();
+//                                    profileWebCall(userId);
+//                                    fcmRegister(userId);
+//                                    jsonObject.put("userid", jsonobj.get("userid").toString());
+//                                    jsonObject.put("orgunitid", jsonobj.get("orgunitid"));
+//                                    jsonObject.put("userstatus", jsonobj.get("userstatus"));
+//                                    jsonObject.put("displayname", jsonobj.get("username"));
+//                                    jsonObject.put("siteid", jsonobj.get("siteid"));
+//                                    jsonObject.put("username", userName);
+//                                    jsonObject.put("password", password);
+//                                    jsonObject.put("siteurl", appUserModel.getSiteURL());
+//
+//                                    db.insertUserCredentialsForOfflineLogin(jsonObject);
+//
+//                                    Log.d(TAG, "onResponse userid: " + jsonobj.get("userid"));
+//                                    preferencesManager.setStringValue(userName, StaticValues.KEY_USERLOGINID);
+//                                    preferencesManager.setStringValue(password, StaticValues.KEY_USERPASSWORD);
+//                                    preferencesManager.setStringValue(jsonobj.get("userid").toString(), StaticValues.KEY_USERID);
+//                                    preferencesManager.setStringValue(jsonobj.get("username").toString(), StaticValues.KEY_USERNAME);
+//                                    preferencesManager.setStringValue(jsonobj.get("userstatus").toString(), StaticValues.KEY_USERSTATUS);
+//                                    preferencesManager.setStringValue(jsonobj.get("image").toString(), StaticValues.KEY_USERPROFILEIMAGE);
+//
+//
+//                                    appUserModel.setUserIDValue(userId);
+//                                    MYLEARNING_FRAGMENT_OPENED_FIRSTTIME = 0;
+//                                    CATALOG_FRAGMENT_OPENED_FIRSTTIME = 0;
+//
+//                                    Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
+//                                    intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                                    startActivity(intentSideMenu);
+//
+//                                }
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+////                        Log.e("Error: ", error.getMessage());
+////                        svProgressHUD.dismiss();
+//                    }
+//                }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                final Map<String, String> headers = new HashMap<>();
+//                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+//                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                return headers;
+//            }
+//        };
+//
+//        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+//    }
 
     private void profileWebCall(String userId) {
 

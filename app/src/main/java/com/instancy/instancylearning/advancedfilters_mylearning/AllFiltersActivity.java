@@ -254,6 +254,13 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                     } else {
                         nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
                     }
+                } else if (contentFilterByModelList.get(i).categorySelectedID != -1 && contentFilterByModelList.get(i).categorySelectedID == 0) {
+                    if (nameSelectedCats.length() > 0) {
+                        nameSelectedCats = nameSelectedCats.concat(", " + contentFilterByModelList.get(i).categoryDisplayName);
+                    } else {
+                        nameSelectedCats = "" + contentFilterByModelList.get(i).categoryDisplayName;
+                    }
+
                 }
             }
 
@@ -328,7 +335,8 @@ public class AllFiltersActivity extends AppCompatActivity implements View.OnClic
                     applyFilterModel.instructors = generateSelectedCategories(contentFilterByModelList.get(i));
                     break;
                 case "rate":
-                    applyFilterModel.ratings = generateSelectedCategories(contentFilterByModelList.get(i));
+//                    applyFilterModel.ratings = generateSelectedCategories(contentFilterByModelList.get(i));
+                    applyFilterModel.ratings = "" + contentFilterByModelList.get(i).categorySelectedID;
                     break;
                 case "eventdates": //IDS
                     applyFilterModel.firstName = contentFilterByModelList.get(i).categorySelectedStartDate.length() > 0 ? contentFilterByModelList.get(i).categorySelectedStartDate : contentFilterByModelList.get(i).selectedSkillsCatIdString;

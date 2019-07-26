@@ -345,15 +345,14 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
         }
         if (isCompleted) {
 
-            db.updateCMIstatus(myLearningModel, "Completed", 100);
+            db.updateCMIstatus(myLearningModel, "completed", 100);
             myLearningModel.setStatusActual("Completed");
         }
-        myLearningModel.setStatusActual("waste");
+//        myLearningModel.setStatusActual("waste");
         Intent intent = getIntent();
         intent.putExtra("myLearningDetalData", myLearningModel);
         setResult(RESULT_OK, intent);
         finish();
-
 
         super.onBackPressed();
     }
@@ -406,7 +405,7 @@ public class TrackList_Activity extends AppCompatActivity implements SwipeRefres
 
                 if (isCompleted) {
 
-                    db.updateCMIstatus(myLearningModel, "Completed", 100);
+                    db.updateCMIstatus(myLearningModel, "completed", 100);
                     myLearningModel.setStatusActual("Completed");
                 }
                 Intent intent = getIntent();

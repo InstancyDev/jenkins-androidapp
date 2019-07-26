@@ -54,6 +54,7 @@ import com.instancy.instancylearning.discussionfourmsenached.DiscussionCommentsA
 import com.instancy.instancylearning.discussionfourmsenached.DiscussionForumModelDg;
 import com.instancy.instancylearning.discussionfourmsenached.DiscussionTopicActivity;
 import com.instancy.instancylearning.discussionfourmsenached.DiscussionTopicModelDg;
+import com.instancy.instancylearning.events.PrerequisiteContentActivity;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.helper.IResult;
 import com.instancy.instancylearning.helper.VolleySingleton;
@@ -71,6 +72,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetailActivity1;
 import com.instancy.instancylearning.peoplelisting.PeopleListingProfile;
+import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 import com.instancy.instancylearning.utils.StaticValues;
@@ -79,6 +81,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -275,7 +278,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 //            checkUserLogin(myLearningDetalData, false, true, globalSearchResultModel);
 
             try {
-                checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModel);
+                checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModel, sideMenusModel);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -621,7 +624,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
                 switch (item.getItemId()) {
                     case R.id.ctx_add:
-                        addToMyLearningCheckUser(myLearningDetalData, false, globalSearchResultModel);
+                        addToMyLearningCheckUser(myLearningDetalData, false, globalSearchResultModel, sideMenusModel);
                         break;
                     case R.id.ctx_view:
                         launchCourseForGlobalSearch(myLearningDetalData, GlobalSearchResultsActivity.this);
@@ -633,10 +636,10 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_inappserviceunavailable), Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.ctx_relatedcontent:
-                        relatedContentView(myLearningDetalData, GlobalSearchResultsActivity.this,false);
+                        relatedContentView(myLearningDetalData, GlobalSearchResultsActivity.this, false);
                         break;
                     case R.id.ctx_enroll:
-                        enrollEventCall(myLearningDetalData, globalSearchResultModel);
+                        enrollEventCall(myLearningDetalData, globalSearchResultModel, sideMenusModel);
                         break;
                     case R.id.ctx_cancel:
                         cancelEnrollment(myLearningDetalData);
@@ -1088,8 +1091,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
-
-    public void enrollEventCall(MyLearningModel learningModel, GlobalSearchResultModelNew globalSearchResultModelNew) {
+    public void enrollEventCall(MyLearningModel learningModel, GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
 
         if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(learningModel.getEventstartUtcTime())) {
 
@@ -1101,12 +1103,12 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
             }
 
         } else {
-            addToMyLearningCheckUser(learningModel, false, globalSearchResultModelNew);
+            addToMyLearningCheckUser(learningModel, false, globalSearchResultModelNew, sideMenusModel);
         }
 
     }
 
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, boolean isInApp, GlobalSearchResultModelNew globalSearchResultModelNew) {
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, boolean isInApp, GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
@@ -1115,7 +1117,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 //                checkUserLogin(myLearningDetalData, false, false, globalSearchResultModelNew);
 
                 try {
-                    checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModelNew);
+                    checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModelNew, sideMenusModel);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1126,123 +1128,123 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 if (isInApp) {
 //                    inAppActivityCall(myLearningDetalData);
                 } else {
-                    addToMyLearning(myLearningDetalData, false, false);
+                    addToMyLearning(myLearningDetalData, false, false, sideMenusModel);
                 }
 
             }
         }
     }
 
-    public void checkUserLogin(final MyLearningModel learningModel, final boolean isInApp, final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew) {
-
-        final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
-                + userName + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
-                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + learningModel.getSiteID();
-
-
-        urlStr = urlStr.replaceAll(" ", "%20");
-        Log.d(TAG, "inside catalog login : " + urlStr);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObj) {
-                        svProgressHUD.dismiss();
-                        if (jsonObj.has("faileduserlogin")) {
-
-                            JSONArray userloginAry = null;
-                            try {
-                                userloginAry = jsonObj
-                                        .getJSONArray("faileduserlogin");
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            if (userloginAry.length() > 0) {
-
-                                String response = null;
-                                try {
-                                    response = userloginAry
-                                            .getJSONObject(0)
-                                            .get("userstatus")
-                                            .toString();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                                if (response.contains("Login Failed")) {
-                                    Toast.makeText(GlobalSearchResultsActivity.this,
-                                            getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
-                                            Toast.LENGTH_LONG)
-                                            .show();
-
-                                }
-                                if (response.contains("Pending Registration")) {
-
-                                    Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval),
-                                            Toast.LENGTH_LONG)
-                                            .show();
-                                }
-                            }
-                        } else if (jsonObj.has("successfulluserlogin")) {
-
-                            try {
-                                JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
-                                if (loginResponseAry.length() != 0) {
-                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
-
-                                    String userIdresponse = loginResponseAry
-                                            .getJSONObject(0)
-                                            .get("userid").toString();
-
-                                    if (userIdresponse.length() != 0) {
-
-                                        if (!seeAll) {
-
-                                            if (!isInApp) {
-                                                learningModel.setUserID(userIdresponse);
-                                                addToMyLearning(learningModel, true, true);
-                                            } else {
-//                                            inAppActivityCall(learningModel);
-                                            }
-                                        } else {
-
-                                            SideMenusModel sideModel = convertGlobalModelToSideMenuModel(globalSearchResultModelNew);
-
-                                            selectedFragmentForSubsite(sideModel);
-
-                                        }
-                                    }
-                                }
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-//                        Log.e("Error: ", error.getMessage());
+//    public void checkUserLogin(final MyLearningModel learningModel, final boolean isInApp, final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew,SideMenusModel sideMenusModel) {
+//
+//        final String userName = preferencesManager.getStringValue(StaticValues.KEY_USERLOGINID);
+//
+//        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/LoginDetails?UserName="
+//                + userName + "&Password=" + learningModel.getPassword() + "&MobileSiteURL="
+//                + appUserModel.getSiteURL() + "&DownloadContent=&SiteID=" + learningModel.getSiteID();
+//
+//
+//        urlStr = urlStr.replaceAll(" ", "%20");
+//        Log.d(TAG, "inside catalog login : " + urlStr);
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(urlStr, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject jsonObj) {
 //                        svProgressHUD.dismiss();
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                final Map<String, String> headers = new HashMap<>();
-                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                return headers;
-            }
-        };
+//                        if (jsonObj.has("faileduserlogin")) {
+//
+//                            JSONArray userloginAry = null;
+//                            try {
+//                                userloginAry = jsonObj
+//                                        .getJSONArray("faileduserlogin");
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                            if (userloginAry.length() > 0) {
+//
+//                                String response = null;
+//                                try {
+//                                    response = userloginAry
+//                                            .getJSONObject(0)
+//                                            .get("userstatus")
+//                                            .toString();
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//
+//                                if (response.contains("Login Failed")) {
+//                                    Toast.makeText(GlobalSearchResultsActivity.this,
+//                                            getLocalizationValue(JsonLocalekeys.events_alertsubtitle_authenticationfailedcontactsiteadmin),
+//                                            Toast.LENGTH_LONG)
+//                                            .show();
+//
+//                                }
+//                                if (response.contains("Pending Registration")) {
+//
+//                                    Toast.makeText(GlobalSearchResultsActivity.this, getLocalizationValue(JsonLocalekeys.events_alertsubtitle_pleasebepatientawaitingapproval),
+//                                            Toast.LENGTH_LONG)
+//                                            .show();
+//                                }
+//                            }
+//                        } else if (jsonObj.has("successfulluserlogin")) {
+//
+//                            try {
+//                                JSONArray loginResponseAry = jsonObj.getJSONArray("successfulluserlogin");
+//                                if (loginResponseAry.length() != 0) {
+//                                    JSONObject jsonobj = loginResponseAry.getJSONObject(0);
+//
+//                                    String userIdresponse = loginResponseAry
+//                                            .getJSONObject(0)
+//                                            .get("userid").toString();
+//
+//                                    if (userIdresponse.length() != 0) {
+//
+//                                        if (!seeAll) {
+//
+//                                            if (!isInApp) {
+//                                                learningModel.setUserID(userIdresponse);
+//                                                addToMyLearning(learningModel, true, true,sideMenusModel);
+//                                            } else {
+////                                            inAppActivityCall(learningModel);
+//                                            }
+//                                        } else {
+//
+//                                            SideMenusModel sideModel = convertGlobalModelToSideMenuModel(globalSearchResultModelNew);
+//
+//                                            selectedFragmentForSubsite(sideModel);
+//
+//                                        }
+//                                    }
+//                                }
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+////                        Log.e("Error: ", error.getMessage());
+////                        svProgressHUD.dismiss();
+//                    }
+//                }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                final Map<String, String> headers = new HashMap<>();
+//                String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+//                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+//                return headers;
+//            }
+//        };
+//
+//        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
+//    }
 
-        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
-    }
-
-    public void checkUserLoginPost(final MyLearningModel learningModel, final boolean isInApp, final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew) throws JSONException {
+    public void checkUserLoginPost(final MyLearningModel learningModel, final boolean isInApp, final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew, final SideMenusModel sideMenusModel) throws JSONException {
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
 
@@ -1319,7 +1321,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
                                     if (!isInApp) {
                                         learningModel.setUserID(userIdresponse);
-                                        addToMyLearning(learningModel, true, true);
+                                        addToMyLearning(learningModel, true, true, sideMenusModel);
                                     } else {
 //                                            inAppActivityCall(learningModel);
                                     }
@@ -1535,7 +1537,6 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                             if (isJoinedCommunity) {
                                 succesMessage = succesMessage + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_youhavesuccessfullyjoinedcommunity) + learningModel.getSiteName();
                             }
-
                             if (learningModel.getObjecttypeId().equalsIgnoreCase("70")) {
                                 succesMessage = getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
 //                                            db.updateEventAddedToMyLearningInEventCatalog(myLearningModel, 1);
@@ -1553,7 +1554,6 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                                     });
                             AlertDialog alert = builder.create();
                             alert.show();
-
 
                         }
                     }
@@ -1577,89 +1577,101 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final boolean isAutoAdd, final boolean isJoinedCommunity) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData, final boolean isAutoAdd, final boolean isJoinedCommunity, SideMenusModel sideMenusModel) {
 
         if (isNetworkConnectionAvailable(GlobalSearchResultsActivity.this, -1)) {
 //            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
-            if (false) {
-                Toast toast = Toast.makeText(
-                        GlobalSearchResultsActivity.this,
-                        GlobalSearchResultsActivity.this.getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel),
-                        Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+            if (myLearningDetalData.getAddedToMylearning() == 2) {
+
+                Intent intent = new Intent(this, PrerequisiteContentActivity.class);
+                intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
+                intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
+                startActivity(intent);
+
             } else {
-                String requestURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileAddtoMyCatalog?"
-                        + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
-                        + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
 
-                requestURL = requestURL.replaceAll(" ", "%20");
-                Log.d(TAG, "inside catalog login : " + requestURL);
+                if (false) {
+                    Toast toast = Toast.makeText(
+                            GlobalSearchResultsActivity.this,
+                            GlobalSearchResultsActivity.this.getLocalizationValue(JsonLocalekeys.events_alertsubtitle_thiseventitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel),
+                            Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                } else {
+                    String requestURL = appUserModel.getWebAPIUrl() + "/MobileLMS/MobileAddtoMyCatalog?"
+                            + "UserID=" + myLearningDetalData.getUserID() + "&SiteURL=" + myLearningDetalData.getSiteURL()
+                            + "&ContentID=" + myLearningDetalData.getContentID() + "&SiteID=" + myLearningDetalData.getSiteID();
 
-                StringRequest strReq = new StringRequest(Request.Method.GET,
-                        requestURL, new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, "add to mylearning data " + response.toString());
-                        if (response.equalsIgnoreCase("true")) {
+                    requestURL = requestURL.replaceAll(" ", "%20");
+                    Log.d(TAG, "inside catalog login : " + requestURL);
+
+                    StringRequest strReq = new StringRequest(Request.Method.GET,
+                            requestURL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d(TAG, "add to mylearning data " + response.toString());
+                            if (response.equalsIgnoreCase("true")) {
 //                            catalogModelsList.get(position).setAddedToMylearning(1);
 
 //                            db.updateContenToCatalog(catalogModelsList.get(position));
 //                            catalogAdapter.notifyDataSetChanged();
 //                            getMobileGetMobileContentMetaData(myLearningDetalData, position);
-                            if (!isAutoAdd) {
-                                String succesMessage = getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
-                                if (isJoinedCommunity) {
-                                    succesMessage = succesMessage + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_youhavesuccessfullyjoinedcommunity) + myLearningDetalData.getSiteName();
+                                if (!isAutoAdd) {
+                                    String succesMessage = getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
+                                    if (isJoinedCommunity) {
+                                        succesMessage = succesMessage + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_youhavesuccessfullyjoinedcommunity) + myLearningDetalData.getSiteName();
+                                    }
+                                    final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
+                                    builder.setMessage(succesMessage)
+                                            .setCancelable(false)
+                                            .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    //do things
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    AlertDialog alert = builder.create();
+                                    alert.show();
                                 }
-                                final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
-                                builder.setMessage(succesMessage)
-                                        .setCancelable(false)
-                                        .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                //do things
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                AlertDialog alert = builder.create();
-                                alert.show();
+                                refreshCatagories(true);
+                            } else {
+                                Toast toast = Toast.makeText(GlobalSearchResultsActivity.
+                                                this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
+                                        Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                toast.show();
+
                             }
-                            refreshCatagories(true);
-                        } else {
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            VolleyLog.d(TAG, "Error: " + error.getMessage());
                             Toast toast = Toast.makeText(GlobalSearchResultsActivity.
                                             this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
                                     Toast.LENGTH_SHORT);
                             toast.setGravity(Gravity.CENTER, 0, 0);
                             toast.show();
-
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.d(TAG, "Error: " + error.getMessage());
-                        Toast toast = Toast.makeText(GlobalSearchResultsActivity.
-                                        this, getLocalizationValue(JsonLocalekeys.commoncomponent_label_unabletoprocess),
-                                Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
 //                        refreshCatagories(true);
-                    }
-                }) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        final Map<String, String> headers = new HashMap<>();
-                        String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
-                        headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                        return headers;
-                    }
-                };
-                ;
-                VolleySingleton.getInstance(this).addToRequestQueue(strReq);
+                        }
+                    }) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            final Map<String, String> headers = new HashMap<>();
+                            String base64EncodedCredentials = Base64.encodeToString(String.format(appUserModel.getAuthHeaders()).getBytes(), Base64.NO_WRAP);
+                            headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                            return headers;
+                        }
+                    };
+                    ;
+                    VolleySingleton.getInstance(this).addToRequestQueue(strReq);
 
+                }
             }
+
+
         }
     }
 

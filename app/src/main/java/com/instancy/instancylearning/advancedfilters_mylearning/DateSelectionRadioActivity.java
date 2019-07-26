@@ -157,7 +157,6 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
         btnReset.setTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
         btnApply.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor()));
 
-
         btnStartDate = (Button) findViewById(R.id.btnStartDate);
         btnStartDate.setOnClickListener(this);
 
@@ -237,16 +236,17 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
 
         if (contentFilterByModel != null) {
             Intent intent = getIntent();
-            if (contentFilterByModel.categorySelectedID == 7) {
+            if (contentFilterByModel.categorySelectedID == 7 && isApplied) {
                 if (contentFilterByModel.categorySelectedStartDate.length() == 0) {
                     Toast.makeText(this, "Select Start Date", Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
-            if (startDate.after(endDate)) {
-                Toast.makeText(this, "Start date not after End Date", Toast.LENGTH_SHORT).show();
+            if (startDate.after(endDate) && isApplied) {
+                Toast.makeText(this, "Please select start date greater than end date", Toast.LENGTH_SHORT).show();
                 return;
             }
+
             intent.putExtra("contentFilterByModel", (Serializable) contentFilterByModel);
             intent.putExtra("ISFROM", 3);
             intent.putExtra("FILTER", true);
@@ -337,6 +337,8 @@ public class DateSelectionRadioActivity extends AppCompatActivity implements Vie
                     sortModelList.get(k).isSelected = true;
                     if (sortModelList.get(k).categoryID == 7) {
                         linearDateLayout.setVisibility(View.VISIBLE);
+                        btnStartDate.setText("Start Date");
+                        btnEndDate.setText("End Date");
                     } else {
                         linearDateLayout.setVisibility(View.GONE);
                     }

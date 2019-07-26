@@ -271,7 +271,7 @@ public class LRSJavaScriptInterface {
 
         databaseHandler.updateContentStatusInTrackListLRS(_learningModel, progressValue, false);
 
-        databaseHandler.saveScoreInCMI(_learningModel, progressValue);
+        databaseHandler.savePercentCompletedInCMI(_learningModel, progressValue);
 
         return "";
     }
@@ -285,7 +285,7 @@ public class LRSJavaScriptInterface {
 
         databaseHandler.updateContentStatusInTrackListLRS(_learningModel, progressValue, false);
 
-        databaseHandler.saveScoreInCMI(_learningModel, progressValue);
+        databaseHandler.savePercentCompletedInCMI(_learningModel, progressValue);
 
         return "";
     }

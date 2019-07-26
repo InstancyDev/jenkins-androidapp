@@ -34,5 +34,17 @@
         android:orderInCategory="100"
         android:title="@string/btn_txt_cancel_enrolment" />
 
+    <item
+        android:id="@+id/ctx_addtowishlist"
+        android:orderInCategory="100"
+        android:title="@string/catalog_actionsheet_wishlistoption"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/ctx_removefromwishlist"
+        android:orderInCategory="100"
+        android:title="@string/catalog_actionsheet_removefromwishlistoption"
+        android:visible="false" />
+
 </menu>
 
