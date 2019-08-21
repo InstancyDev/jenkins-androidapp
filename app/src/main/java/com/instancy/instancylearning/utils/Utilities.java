@@ -1569,7 +1569,6 @@ public class Utilities {
         return newDate;
     }
 
-
     public static String getCurrentDateTimeInUTC(String format) {
 
         Calendar c = Calendar.getInstance();

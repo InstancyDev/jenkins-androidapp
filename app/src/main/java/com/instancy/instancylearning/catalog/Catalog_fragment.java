@@ -95,6 +95,7 @@ import com.instancy.instancylearning.mainactivities.SocialWebLoginsActivity;
 import com.instancy.instancylearning.models.MembershipModel;
 import com.instancy.instancylearning.models.PeopleListingModel;
 
+import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.synchtasks.WebAPIClient;
 import com.instancy.instancylearning.utils.CustomFlowLayout;
 import com.instancy.instancylearning.R;
@@ -150,6 +151,7 @@ import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.PREREQ_CLOSE;
 import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.generateHashMap;
 import static com.instancy.instancylearning.utils.Utilities.getCurrentDateTime;
@@ -1557,7 +1559,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                                     Intent intent = new Intent(context, PrerequisiteContentActivity.class);
                                     intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                                     intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
-                                    startActivity(intent);
+                                    startActivityForResult(intent, PREREQ_CLOSE);
                                 } else {
                                     selectTheDueDate(myLearningDetalData, position, uiSettingsModel.getNoOfDaysForCourseTargetDate());
 
@@ -1647,7 +1649,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Intent intent = new Intent(context, PrerequisiteContentActivity.class);
                 intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                 intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
-                startActivity(intent);
+                startActivityForResult(intent, PREREQ_CLOSE);
             } else {
 
                 if (myLearningDetalData.getUserID().equalsIgnoreCase("-1")) {
@@ -1710,7 +1712,7 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 Intent intent = new Intent(context, PrerequisiteContentActivity.class);
                 intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                 intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
-                startActivity(intent);
+                startActivityForResult(intent, PREREQ_CLOSE);
 
             } else {
                 boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -2281,13 +2283,11 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (requestCode == DETAIL_CATALOG_CODE && resultCode == RESULT_OK && data != null) {
 
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("REFRESH", false);
-                if (refresh) {
-                    if (!isFromPeopleListing) {
-                        injectFromDbtoModel();
-                        MenuItemCompat.collapseActionView(item_search);
-                    }
+            boolean refresh = data.getBooleanExtra("REFRESH", false);
+            if (refresh) {
+                if (!isFromPeopleListing) {
+                    injectFromDbtoModel();
+                    MenuItemCompat.collapseActionView(item_search);
 
                 }
             }
@@ -2416,6 +2416,19 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
                 }
             }
         }
+
+        if (requestCode == PREREQ_CLOSE && resultCode == RESULT_OK && data != null) {
+
+            boolean refresh = data.getBooleanExtra("REFRESH", false);
+
+            if (refresh) {
+
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, "", false, "");
+
+            }
+        }
+
+
     }
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
@@ -2717,30 +2730,6 @@ public class Catalog_fragment extends Fragment implements SwipeRefreshLayout.OnR
 
         }
 
-    }
-
-
-    public void filterApiCall() {
-
-        if (isNetworkConnectionAvailable(getContext(), -1)) {
-//            svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
-//            svProgressHUD.showWithStatus(getLocalizationValue(JsonLocalekeys.commoncomponent_label_loaderlabel));
-            String urlStr = "UserID=1&ComponentID=1&SiteID=374&ShowAllItems=true&FilterContentType=&FilterMediaType=&SprateEvents=&EventType=&IsCompetencypath=false&LocaleID=" + preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)) + "&CompInsID=3131";
-            vollyService.getJsonObjResponseVolley("FILTER", appUserModel.getWebAPIUrl() + "/Mobilelms/GetMyLearningFilters?" + urlStr, appUserModel.getAuthHeaders());
-
-        } else {
-
-            JSONObject jsonObject = db.fetchFilterObject(appUserModel, 0);
-            if (jsonObject != null) {
-                Intent intent = new Intent(context, AdvancedFilterActivity.class);
-                intent.putExtra("isFrom", 0);
-                startActivityForResult(intent, FILTER_CLOSE_CODE);
-                REFRESH = 0;
-            } else {
-                Toast.makeText(getContext(), getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
-            }
-
-        }
     }
 
     public void breadCrumbPlusButtonInit(View rootView) {

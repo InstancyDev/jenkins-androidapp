@@ -335,6 +335,16 @@ public class MyLearningModel implements Serializable {
     String TableofContent = "";
     String LearningObjectives = "";
 
+    public String getInstanceparentcontentid() {
+        return instanceparentcontentid;
+    }
+
+    public void setInstanceparentcontentid(String instanceparentcontentid) {
+        this.instanceparentcontentid = instanceparentcontentid;
+    }
+
+    String instanceparentcontentid = "";
+
     public String getContentEnrolled() {
         return contentEnrolled;
     }
@@ -430,6 +440,15 @@ public class MyLearningModel implements Serializable {
 
     String contentTypeImagePath = "";
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    String eventType = "";
 
     public String getThumbnailVideoPath() {
         return thumbnailVideoPath;

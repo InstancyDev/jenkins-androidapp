@@ -101,7 +101,7 @@ public class GlobalSearchResultModelNew implements Serializable {
     public String eventstartdatedisplay = "";
     public String siteurl = "";
     public boolean isBadCancellationEnabled = false;
-
+    public String viewprerequisitecontentstatus = "";
 
     public static HashMap<String, List<GlobalSearchResultModelNew>> fetchCategoriesData(List<GlobalSearchResultModelNew> advancedFilterModelList) {
         HashMap<String, List<GlobalSearchResultModelNew>> expandableListDetail = new HashMap<String, List<GlobalSearchResultModelNew>>();

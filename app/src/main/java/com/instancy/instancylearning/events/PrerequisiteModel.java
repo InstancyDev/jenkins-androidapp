@@ -68,4 +68,8 @@ public class PrerequisiteModel implements Serializable {
 
     public String viewType = "";
 
+    public boolean isInstanceSelected = false;
+
+    public String itIsInstanceID = "";
+
 }

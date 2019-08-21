@@ -525,7 +525,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         }
                         try {
                             totalRecordsCount = countOfTotalRecords(response);
-                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied,false);
+                            db.injectEventCatalog(response, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied, false);
 
                             injectFromDbtoModel(true);
                         } catch (JSONException e) {
@@ -605,7 +605,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         try {
                             if (jsonObj != null) {
                                 totalRecordsCount = countOfTotalRecords(jsonObj);
-                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied,false);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied, false);
 
                             }
                             injectFromDbtoModel(true);
@@ -637,7 +637,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         try {
                             if (jsonObj != null) {
                                 totalRecordsCount = countOfTotalRecords(jsonObj);
-                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied,false);
+                                db.injectEventCatalog(jsonObj, TABBALUE, pageIndex, sideMenusModel.getComponentId(), totalRecordsCount, applyFilterModel.filterApplied, false);
 
                             }
                             injectFromDbtoModel(true);
@@ -687,7 +687,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
         swipeRefreshLayout.setOnRefreshListener(this);
 //        swipeRefreshLayout.setEnabled(true);
         MembershipModel membershipModel = new MembershipModel();
-        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true,membershipModel,false);
+        catalogAdapter = new CatalogAdapter(getActivity(), BIND_ABOVE_CLIENT, catalogModelsList, true, membershipModel, false);
         myLearninglistView.setAdapter(catalogAdapter);
         myLearninglistView.setOnItemClickListener(this);
         myLearninglistView.setEmptyView(rootView.findViewById(R.id.nodata_label));
@@ -1407,7 +1407,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
                 if (item.getItemId() == R.id.ctx_view) {
 //                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(),false);
+                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(), false);
                 }
 
                 if (item.getItemId() == R.id.ctx_cancelenrollment) {
@@ -2039,11 +2039,9 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
 
         if (requestCode == DETAIL_CATALOG_CODE && resultCode == RESULT_OK && data != null) {
 
-            if (data != null) {
-                boolean refresh = data.getBooleanExtra("REFRESH", false);
-                if (refresh) {
-                    injectFromDbtoModel(true);
-                }
+            boolean refresh = data.getBooleanExtra("REFRESH", false);
+            if (refresh) {
+                injectFromDbtoModel(true);
             }
         }
 
@@ -2176,7 +2174,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
                         if (jsonObject.has("progress")) {
                             progress = jsonObject.get("progress").toString();
                         }
-                        i = db.updateContentStatus(myLearningModel, status, progress,"");
+                        i = db.updateContentStatus(myLearningModel, status, progress, "");
                         if (i == 1) {
 
                             injectFromDbtoModel(false);
@@ -2460,7 +2458,7 @@ public class Event_fragment_new extends Fragment implements SwipeRefreshLayout.O
     public void addEventToAndroidDevice(MyLearningModel eventModel) {
 
         if (!eventModel.getRelatedContentCount().equalsIgnoreCase("0")) {
-            GlobalMethods.relatedContentView(eventModel, context,false);
+            GlobalMethods.relatedContentView(eventModel, context, false);
         }
 
         try {

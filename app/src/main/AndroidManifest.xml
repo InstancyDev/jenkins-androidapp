@@ -17,6 +17,8 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+
+
     <uses-feature
         android:name="android.hardware.wifi.direct"
         android:required="true" />
@@ -43,7 +45,6 @@
             android:name=".mainactivities.Splash_activity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -54,19 +55,19 @@
         <activity
             android:name=".mainactivities.Branding_activity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"> </activity>
 
         <!-- Login screen -->
         <activity
             android:name=".mainactivities.Login_activity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"></activity>
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan"> </activity>
 
         <!-- forgot screen -->
         <activity
             android:name=".mainactivities.ForgotPasswordActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"> </activity>
 
         <!-- social screen -->
         <activity
@@ -395,8 +396,11 @@
         <activity
             android:name=".inappbilling.InAppBilling_Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Translucent"> </activity>
+            android:theme="@style/Theme.AppCompat.Translucent"></activity>
+
         <activity android:name=".catalog.ContentViewActivity" />
+
+        <activity android:name=".mylearning.SessionViewActivity" />
 
         <!-- Used for transferring files  after a successful connection -->
         <service

@@ -156,6 +156,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
     private String TAG = Login_activity.class.getSimpleName();
     String autoSignInUserName = "";
     String autoSignInPassword = "";
+    String autoLaunchFromRegister = "";
     boolean isAutoSignIn = false;
     DatabaseHandler db;
     AppController appController;
@@ -188,6 +189,9 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
         if (bundleAutoSignIn != null) {
             autoSignInUserName = bundleAutoSignIn.getString(StaticValues.BUNDLE_USERNAME, "");
             autoSignInPassword = bundleAutoSignIn.getString(StaticValues.BUNDLE_PASSWORD, "");
+            autoLaunchFromRegister = bundleAutoSignIn.getString(StaticValues.AUTOLAUNCHCONTENTID_KEY, "");
+
+            // AUTOLAUNCHCONTENTID_KEY
             if (isValidString(autoSignInUserName) && isValidString(autoSignInPassword)) {
                 isAutoSignIn = true;
             }
@@ -253,12 +257,14 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
 
             settingTxt.setVisibility(View.INVISIBLE);
             btnSignup.setVisibility(View.INVISIBLE);
-
         } else {
-
             settingTxt.setVisibility(View.VISIBLE);
-
         }
+
+//        if ((getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_medmentor))))
+//        {
+//            settingTxt.setVisibility(View.INVISIBLE);
+//        }
 
         Drawable drawablePass = editPassword.getBackground(); // get current EditText drawable
         drawablePass.setColorFilter(Color.parseColor(uiSettingsModel.getAppButtonBgColor()), PorterDuff.Mode.SRC_ATOP); // change the drawable color
@@ -465,6 +471,13 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                                     Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.forgotpassword_alertsubtitle_youraccountisnotyetactivated), Toast.LENGTH_LONG).show();
 
                                 }
+//                                else if (innerObj.getString("userstatus").contains("groupactivationdate")) {
+//
+//                                    //"userstatus": "groupactivationdate~Aug 15 2019",
+//
+//                                    Toast.makeText(Login_activity.this, getLocalizationValue(JsonLocalekeys.logingroupalert_showActivationdatloginealert) + " " + getLocalizationValue(JsonLocalekeys.logingroupalert_showActivationdatloginealert1), Toast.LENGTH_LONG).show();
+//
+//                                }
                             }
                         }
 
@@ -481,6 +494,7 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                             JSONObject jsonobj = loginResponseAry.getJSONObject(0);
 
                             String autolaunchcontentID = jsonobj.optString("autolaunchcontent");
+
 
                             JSONObject jsonObject = new JSONObject();
                             String userId = jsonobj.get("userid").toString();
@@ -512,16 +526,18 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                             Intent intentSideMenu = new Intent(Login_activity.this, SideMenu.class);
                             intentSideMenu.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-                         //   autolaunchcontentID = "19235365-ac2d-499d-9896-b7dd5b7e15b5";
+                            //   autolaunchcontentID = "19235365-ac2d-499d-9896-b7dd5b7e15b5";
 
                             if (isValidString(autolaunchcontentID)) {
-//                                AUTOLAUNCHCONTENTID = autolaunchcontentID;
-//                                ISAUTOLAUNCH = true;
                                 intentSideMenu.putExtra(AUTOLAUNCHCONTENTID_KEY, autolaunchcontentID);
                                 intentSideMenu.putExtra(ISAUTOLAUNCH_KEY, true);
                             }
-                            startActivity(intentSideMenu);
+                            if (isValidString(autoLaunchFromRegister)) {
+                                intentSideMenu.putExtra(AUTOLAUNCHCONTENTID_KEY, autoLaunchFromRegister);
+                                intentSideMenu.putExtra(ISAUTOLAUNCH_KEY, true);
+                            }
 
+                            startActivity(intentSideMenu);
                         }
 
                     } catch (JSONException e) {
@@ -596,7 +612,8 @@ public class Login_activity extends Activity implements PopupMenu.OnMenuItemClic
                 parameters.put("MobileSiteURL", appUserModel.getSiteURL());
                 parameters.put("DownloadContent", "");
                 parameters.put("SiteID", appUserModel.getSiteIDValue());
-                parameters.put("isFromSignUp", isAutoSignIn);
+//                parameters.put("isFromSignUp", isAutoSignIn);
+                parameters.put("isFromSignUp", false);
                 String parameterString = parameters.toString();
                 logininitPostVollyCall(parameterString, userName, passWord);
                 isAutoSignIn = false;

@@ -1,5 +1,6 @@
 package com.instancy.instancylearning.events;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -9,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Html;
@@ -49,6 +51,7 @@ import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetailActivity1;
 import com.instancy.instancylearning.mylearning.MyLearningScheduleChildModel;
+import com.instancy.instancylearning.mylearning.MyLearningSchedulelActivity;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
 
@@ -57,20 +60,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CATALOG_CODE;
+
+import static com.instancy.instancylearning.utils.StaticValues.DETAIL_CLOSE_CODE;
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormat;
 import static com.instancy.instancylearning.utils.Utilities.convertToEventDisplayDateFormatCreatedOn;
-import static com.instancy.instancylearning.utils.Utilities.fromHtml;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidString;
-import static com.instancy.instancylearning.utils.Utilities.returnEventCompleted;
 import static com.instancy.instancylearning.utils.Utilities.toCSVString;
 
 
@@ -161,7 +166,7 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
                     } else {
                         prerequisiteModel.isItemChecked = false;
                     }
-                    updateCheckList(prerequisiteModel, groupPosition, childPosition);
+                    updateCheckList(prerequisiteModel);
                 }
 
                 return false;
@@ -189,7 +194,6 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
         btnCancal.setText(getLocalizationValue(JsonLocalekeys.details_button_cancelbutton));
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -213,7 +217,16 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
         if (isNetworkConnectionAvailable(PrerequisiteContentActivity.this, -1)) {
 
-            String urlString = appUserModel.getWebAPIUrl() + "/AssociatedContent/GetAssociatedContent?ContentID=" + myLearningModel.getContentID() + "&ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&Instancedata=&Locale=" + preferencesManager.getLocalizationStringValue(preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
+            String parentId = myLearningModel.getContentID();
+
+            String instanceId = myLearningModel.getContentID();
+
+            if (isValidString(myLearningModel.getInstanceparentcontentid())) {
+                parentId = myLearningModel.getInstanceparentcontentid();
+                instanceId = myLearningModel.getContentID();
+            }
+
+            String urlString = appUserModel.getWebAPIUrl() + "/AssociatedContent/GetAssociatedContent?ContentID=" + parentId + "&ComponentID=" + sideMenusModel.getComponentId() + "&ComponentInstanceID=" + sideMenusModel.getRepositoryId() + "&SiteID=" + appUserModel.getSiteIDValue() + "&UserID=" + appUserModel.getUserIDValue() + "&Instancedata=" + instanceId + "&Locale=" + preferencesManager.getLocalizationStringValue(preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
 
             vollyService.getJsonObjResponseVolley("GetAssociatedContent", urlString, appUserModel.getAuthHeaders());
         } else {
@@ -283,8 +296,16 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
                 if (requestType.equalsIgnoreCase("GetContentDetails")) {
 
                     if (response != null) {
-
-
+                        myLearningModel = getDetailMylearningModel(response, myLearningModel);
+                        Intent intentDetail = new Intent(PrerequisiteContentActivity.this, MyLearningDetailActivity1.class);
+                        intentDetail.putExtra("myLearningDetalData", myLearningModel);
+                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
+                        intentDetail.putExtra("IFROMCATALOG", true);
+                        intentDetail.putExtra("ISICONENABLED", true);
+                        intentDetail.putExtra("rescheduleenroll", true);
+                        startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
+//                        startActivity(intentDetail);
+                        // getMobileCatalogObjectsData(myLearningModel);
                     }
 
                 }
@@ -354,7 +375,6 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
             }
 
             if (prerequisiteModelArrayListCompletion.size() > 0) {
-
                 expandableListDetail.put(getLocalizationValue(JsonLocalekeys.prerequistes_completiontitle_completiontitlelbl), prerequisiteModelArrayListCompletion);
             }
         }
@@ -372,8 +392,13 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
         prerequisiteModel.ThumbnailIconPath = "/Content/SiteFiles/ContentTypeIcons/" + myLearningModel.getContentTypeImagePath();
 
-        String createdOn = convertToEventDisplayDateFormatCreatedOn(myLearningModel.getCreatedDate(), "yyyy-MM-dd'T'HH:mm:ss");
+        String createdOn = "";
 
+        if (isValidString(myLearningModel.getCreatedDate()) && myLearningModel.getCreatedDate().contains("T")) {
+            createdOn = convertToEventDisplayDateFormatCreatedOn(myLearningModel.getCreatedDate(), "yyyy-MM-dd'T'HH:mm:ss");
+        } else {
+            createdOn = convertToEventDisplayDateFormatCreatedOn(myLearningModel.getCreatedDate(), "yyyy-MM-dd HH:mm:ss");
+        }
         prerequisiteModel.CreatedOn = createdOn;
 
         prerequisiteModel.AuthorDisplayName = myLearningModel.getAuthor();
@@ -508,18 +533,28 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
                 switch (item.getItemId()) {
                     case R.id.ctx_add:
                         if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70") && uiSettingsModel.isEnableMultipleInstancesforEvent() && myLearningModel.getEventScheduleType() == 1) {
-
+                            Log.d(TAG, "onMenuItemClick: multi instancy");
                             // multi instance
+                            if (myLearningModel.getEventScheduleType() == 1) {
+                                if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
+                                    Intent intent = new Intent(PrerequisiteContentActivity.this, MyLearningSchedulelActivity.class);
+                                    intent.putExtra("myLearningDetalData", myLearningModel);
+                                    intent.putExtra("sideMenusModel", sideMenusModel);
+                                    intent.putExtra("rescheduleenroll", true);
+                                    startActivityForResult(intent, DETAIL_CLOSE_CODE);
+
+                                }
+                            } else if (myLearningModel.getEventScheduleType() == 2 && myLearningModel.isEnrollFutureInstance()) {
+                                Intent intent = new Intent(PrerequisiteContentActivity.this, MyLearningSchedulelActivity.class);
+                                intent.putExtra("myLearningDetalData", myLearningModel);
+                                intent.putExtra("sideMenusModel", sideMenusModel);
+                                intent.putExtra("rescheduleenroll", true);
+                                startActivityForResult(intent, DETAIL_CLOSE_CODE);
+
+                            }
                         }
                         break;
                     case R.id.ctx_detail:
-//                        Intent intentDetail = new Intent(PrerequisiteContentActivity.this, MyLearningDetailActivity1.class);
-//                        intentDetail.putExtra("myLearningDetalData", myLearningModel);
-//                        intentDetail.putExtra("sideMenusModel", sideMenusModel);
-//                        intentDetail.putExtra("IFROMCATALOG", true);
-//                        intentDetail.putExtra("ISICONENABLED", true);
-//                        startActivityForResult(intentDetail, DETAIL_CATALOG_CODE);
-//                        getMobileCatalogObjectsData(myLearningModel);
                         GetContentDetails(myLearningModel.getContentID(), myLearningModel);
                         break;
 
@@ -651,7 +686,7 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 //    }
 
 
-    public void updateCheckList(PrerequisiteModel prerequisiteModel, int groupPosition, int childPosition) {
+    public void updateCheckList(PrerequisiteModel prerequisiteModel) {
 
         List<PrerequisiteModel> prerequisiteModelList = getAllDataFromHashMap(true);
 
@@ -661,6 +696,7 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
                 if (prerequisiteModelList.get(k).ContentID.equalsIgnoreCase(prerequisiteModel.ContentID)) {
                     prerequisiteModelList.get(k).isItemChecked = prerequisiteModel.isItemChecked;
+
                 }
             }
             prerequisiteExpandableList = getPrerequisiteContent(false, prerequisiteModelList);
@@ -678,7 +714,32 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
             noDataLabel.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
         }
 
-        Log.d(TAG, "updateCheckList: " + prerequisiteModel.isItemChecked);
+    }
+
+    public void updateSelectedScheduleEvent(PrerequisiteModel prerequisiteModel, String contentID) {
+
+        List<PrerequisiteModel> prerequisiteModelList = getAllDataFromHashMap(true);
+
+        if (prerequisiteModelList != null && prerequisiteModelList.size() > 0) {
+
+            for (int k = 0; k < prerequisiteModelList.size(); k++) {
+
+                if (prerequisiteModelList.get(k).ContentID.equalsIgnoreCase(contentID)) {
+                    prerequisiteModelList.get(k).EventStartDateTime = prerequisiteModel.EventStartDateTime;
+                    prerequisiteModelList.get(k).EventEndDateTime = prerequisiteModel.EventEndDateTime;
+                    prerequisiteModelList.get(k).isInstanceSelected = prerequisiteModel.isInstanceSelected;
+                    prerequisiteModelList.get(k).itIsInstanceID = prerequisiteModel.itIsInstanceID;
+                    break;
+                }
+            }
+            prerequisiteExpandableList = getPrerequisiteContent(false, prerequisiteModelList);
+        }
+
+        prerequisiteExpandableAdapter.refreshList(prerequisiteExpandableList);
+
+        if (prerequisiteExpandableAdapter.getGroupCount() == 0) {
+            noDataLabel.setText(getLocalizationValue(JsonLocalekeys.commoncomponent_label_nodatalabel));
+        }
 
     }
 
@@ -692,6 +753,10 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
             boolean parentChecked = isParentChecked(prerequisiteModelList);
 
+            boolean isInstanceSelected = isInstanceIsSelected(prerequisiteModelList);
+
+            boolean isMultiInstanceContentExists = isMultiInstanceContent(prerequisiteModelList);
+
             if (parentChecked) {
                 boolean validationRequired = checkValidation(prerequisiteModelList, true);
                 boolean validationCompletion = checkValidation(prerequisiteModelList, false);
@@ -704,10 +769,26 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
                     boolean isManuallyChecked = isManuallyChecked(prerequisiteModelList);
                     if (contentArrays.size() > 0 && isManuallyChecked) {
 // call api from here
-                        try {
-                            callAPiForAddtoMylearning(toCSVString(contentArrays));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (isMultiInstanceContentExists) {
+
+                            if (isInstanceSelected) {
+
+                                try {
+                                    callAPiForAddtoMylearning(toCSVString(contentArrays));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            } else {
+                                Toast.makeText(this, getLocalizationValue(JsonLocalekeys.prerequistesalerttitle5_alerttitle7), Toast.LENGTH_LONG).show();
+                            }
+
+                        } else {
+                            try {
+                                callAPiForAddtoMylearning(toCSVString(contentArrays));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     } else {
 
@@ -721,12 +802,31 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
                 boolean isManuallyChecked = isManuallyChecked(prerequisiteModelList);
 
+
                 if (contentArrays.size() > 0 && isManuallyChecked) {
 // call api from here
-                    try {
-                        callAPiForAddtoMylearning(toCSVString(contentArrays));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if (isMultiInstanceContentExists) {
+
+                        if (isInstanceSelected) {
+
+                            try {
+                                callAPiForAddtoMylearning(toCSVString(contentArrays));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+
+                            Toast.makeText(this, getLocalizationValue(JsonLocalekeys.prerequistesalerttitle5_alerttitle7), Toast.LENGTH_LONG).show();
+
+                        }
+
+                    } else {
+                        try {
+                            callAPiForAddtoMylearning(toCSVString(contentArrays));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                 } else {
@@ -796,6 +896,38 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
     }
 
 
+    public boolean isInstanceIsSelected(List<PrerequisiteModel> prerequisiteModelList) {
+
+        boolean isInstanceSelected = false;
+
+        for (int i = 0; i < prerequisiteModelList.size(); i++) {
+
+            PrerequisiteModel prerequisiteModel = prerequisiteModelList.get(i);
+            if (isValidString(prerequisiteModel.itIsInstanceID)) {
+                isInstanceSelected = true;
+            }
+        }
+
+        return isInstanceSelected;
+    }
+
+    public boolean isMultiInstanceContent(List<PrerequisiteModel> prerequisiteModelList) {
+
+        boolean isMultiInstanceContent = false;
+//        myLearningModel.getObjecttypeId().equalsIgnoreCase("70") && uiSettingsModel.isEnableMultipleInstancesforEvent() && myLearningModel.getEventScheduleType() == 1
+
+        for (int i = 0; i < prerequisiteModelList.size(); i++) {
+            PrerequisiteModel prerequisiteModel = prerequisiteModelList.get(i);
+
+            if (prerequisiteModel.ContentTypeId.equalsIgnoreCase("70") && uiSettingsModel.isEnableMultipleInstancesforEvent() && prerequisiteModel.EventScheduleType.equalsIgnoreCase("1")) {
+                isMultiInstanceContent = true;
+            }
+
+        }
+
+        return isMultiInstanceContent;
+    }
+
     public List<PrerequisiteModel> getAllDataFromHashMap(boolean isForWholeContent) {
 
         List<PrerequisiteModel> getPrerequsiteList = new ArrayList<>();
@@ -841,7 +973,14 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
             for (int i = 0; i < prerequisiteModelList.size(); i++) {
                 if (prerequisiteModelList.get(i).isItemChecked) {
-                    contentArrays.add(prerequisiteModelList.get(i).ContentID);
+                    if (!prerequisiteModelList.get(i).Ischecked && !prerequisiteModelList.get(i).IsLearnerContent) {
+
+                        if (isValidString(prerequisiteModelList.get(i).itIsInstanceID)) {
+                            contentArrays.add(prerequisiteModelList.get(i).itIsInstanceID);
+                        } else {
+                            contentArrays.add(prerequisiteModelList.get(i).ContentID);
+                        }
+                    }
                     boolean isExpired = checkEventValidation(prerequisiteModelList.get(i));
                     if (isExpired) {
                         contentArrays = new ArrayList<>();
@@ -902,12 +1041,11 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
             Log.d(TAG, "validateNewForumCreation: " + parameterString);
 
             if (isNetworkConnectionAvailable(this, -1)) {
-                sendNewAddMylearningDataToServer(parameterString);
+                    sendNewAddMylearningDataToServer(parameterString);
             } else {
                 Toast.makeText(PrerequisiteContentActivity.this, "" + getLocalizationValue(JsonLocalekeys.network_alerttitle_nointernet), Toast.LENGTH_SHORT).show();
             }
         }
-
     }
 
     public void sendNewAddMylearningDataToServer(final String postData) {
@@ -924,7 +1062,23 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
                 if (isValidString(responseStr) && responseStr.contains("true")) {
 
-                    finish();
+                    String succesMessage = getLocalizationValue(JsonLocalekeys.catalog_alertsubtitle_thiscontentitemhasbeenaddedto) + " " + getLocalizationValue(JsonLocalekeys.mylearning_header_mylearningtitlelabel);
+
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(PrerequisiteContentActivity.this);
+                    builder.setMessage(succesMessage)
+                            .setCancelable(false)
+                            .setPositiveButton(getLocalizationValue(JsonLocalekeys.commoncomponent_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                    dialog.dismiss();
+                                    Intent intent = getIntent();
+                                    intent.putExtra("REFRESH", true);
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
 
                 } else {
 
@@ -1006,499 +1160,6 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
         return prerequisiteModelArrayListLocal;
     }
 
-
-    public void getMobileCatalogObjectsData(MyLearningModel myLearningModellocal) {
-
-        svProgressHUD.showWithStatus(getResources().getString(R.string.loadingtxt));
-
-        String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileCatalogObjectsData";
-
-        JSONObject parameters = new JSONObject();
-
-        try {
-
-            parameters.put("pageIndex", "1");
-            parameters.put("pageSize", "10");
-            parameters.put("SearchText", "");
-            parameters.put("ContentID", myLearningModellocal.getContentID());
-            parameters.put("sortBy", "");
-            parameters.put("ComponentID", sideMenusModel.getComponentId());
-            parameters.put("ComponentInsID", sideMenusModel.getRepositoryId());
-            parameters.put("AdditionalParams", "");
-            parameters.put("SelectedTab", "");
-            parameters.put("AddtionalFilter", "");
-            parameters.put("LocationFilter", "");
-            parameters.put("UserID", appUserModel.getUserIDValue());
-            parameters.put("SiteID", appUserModel.getSiteIDValue());
-            parameters.put("OrgUnitID", appUserModel.getSiteIDValue());
-            parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
-            parameters.put("groupBy", "");
-            parameters.put("categories", "");
-            parameters.put("objecttypes", "");
-            parameters.put("skillcats", "");
-            parameters.put("skills", "");
-            parameters.put("jobroles", "");
-            parameters.put("solutions", "");
-            parameters.put("keywords", "");
-            parameters.put("ratings", "");
-            parameters.put("pricerange", "");
-            parameters.put("eventdate", "");
-            parameters.put("certification", "");
-            parameters.put("duration", "");
-            parameters.put("instructors", "");
-            parameters.put("iswishlistcontent", "0");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String parameterString = parameters.toString();
-
-        vollyService.getStringResponseFromPostMethod(parameterString, "CATALOGDATA", urlStr);
-    }
-
-    public MyLearningModel generateMylearningModel(JSONObject jsonObject) throws
-            JSONException {
-
-        JSONArray jsonTableAry = jsonObject.getJSONArray("table2");
-        // for deleting records in table for respective table
-
-        for (int i = 0; i < jsonTableAry.length(); i++) {
-            JSONObject jsonMyLearningColumnObj = jsonTableAry.getJSONObject(i);
-//            Log.d(TAG, "injectMyLearningData: " + jsonMyLearningColumnObj);
-
-            MyLearningModel myLearningModel = new MyLearningModel();
-
-
-            //sitename
-            if (jsonMyLearningColumnObj.has("sitename")) {
-
-                myLearningModel.setSiteName(jsonMyLearningColumnObj.get("sitename").toString());
-            }
-            // siteurl
-            if (jsonMyLearningColumnObj.has("siteurl")) {
-
-                myLearningModel.setSiteURL(jsonMyLearningColumnObj.get("siteurl").toString());
-
-            }
-            // siteid
-            if (jsonMyLearningColumnObj.has("orgunitid")) {
-
-                myLearningModel.setSiteID(jsonMyLearningColumnObj.get("orgunitid").toString());
-
-            }
-            // userid
-            if (jsonMyLearningColumnObj.has("userid")) {
-
-                myLearningModel.setUserID(jsonMyLearningColumnObj.get("userid").toString());
-
-            }
-            // coursename
-
-
-            if (jsonMyLearningColumnObj.has("name")) {
-
-                myLearningModel.setCourseName(jsonMyLearningColumnObj.get("name").toString());
-
-            }
-
-
-            String authorName = "";
-            if (jsonMyLearningColumnObj.has("contentauthordisplayname")) {
-                authorName = jsonMyLearningColumnObj.getString("contentauthordisplayname");
-
-            }
-
-            if (isValidString(authorName)) {
-                myLearningModel.setAuthor(authorName);
-            } else {
-                // author
-                if (jsonMyLearningColumnObj.has("author")) {
-
-                    myLearningModel.setAuthor(jsonMyLearningColumnObj.get("author").toString());
-
-                }
-            }
-
-
-            // contentID
-            if (jsonMyLearningColumnObj.has("contentid")) {
-
-                myLearningModel.setContentID(jsonMyLearningColumnObj.get("contentid").toString());
-
-            }
-            // createddate
-            if (jsonMyLearningColumnObj.has("createddate")) {
-
-                myLearningModel.setCreatedDate(jsonMyLearningColumnObj.get("createddate").toString());
-
-            }
-
-            // durationEndDate
-            if (jsonMyLearningColumnObj.has("durationenddate")) {
-
-                myLearningModel.setDurationEndDate(jsonMyLearningColumnObj.get("durationenddate").toString());
-
-            }
-            // objectID
-            if (jsonMyLearningColumnObj.has("objectid")) {
-
-                myLearningModel.setObjectId(jsonMyLearningColumnObj.get("objectid").toString());
-
-            }
-            // thumbnailimagepath
-            if (jsonMyLearningColumnObj.has("thumbnailimagepath")) {
-
-                String imageurl = jsonMyLearningColumnObj.getString("thumbnailimagepath");
-
-
-                if (isValidString(imageurl)) {
-
-                    myLearningModel.setThumbnailImagePath(imageurl);
-                    String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + myLearningModel.getContentID() + "/" + imageurl;
-                    myLearningModel.setImageData(imagePathSet);
-
-
-                } else {
-                    if (jsonMyLearningColumnObj.has("contenttypethumbnail")) {
-                        String imageurlContentType = jsonMyLearningColumnObj.getString("contenttypethumbnail");
-                        if (isValidString(imageurlContentType)) {
-                            String imagePathSet = myLearningModel.getSiteURL() + "/content/sitefiles/Images/" + imageurlContentType;
-                            myLearningModel.setImageData(imagePathSet);
-
-                        }
-                    }
-
-
-                }
-
-                // relatedcontentcount
-                if (jsonMyLearningColumnObj.has("relatedconentcount")) {
-
-                    myLearningModel.setRelatedContentCount(jsonMyLearningColumnObj.get("relatedconentcount").toString());
-
-                }
-                // isDownloaded
-                if (jsonMyLearningColumnObj.has("isdownloaded")) {
-
-                    myLearningModel.setIsDownloaded(jsonMyLearningColumnObj.get("isdownloaded").toString());
-
-                }
-                // courseattempts
-                if (jsonMyLearningColumnObj.has("courseattempts")) {
-
-                    myLearningModel.setCourseAttempts(jsonMyLearningColumnObj.get("courseattempts").toString());
-
-                }
-                // objecttypeid
-                if (jsonMyLearningColumnObj.has("objecttypeid")) {
-
-                    myLearningModel.setObjecttypeId(jsonMyLearningColumnObj.get("objecttypeid").toString());
-
-                }
-                // scoid
-                if (jsonMyLearningColumnObj.has("scoid")) {
-
-                    myLearningModel.setScoId(jsonMyLearningColumnObj.get("scoid").toString());
-
-                }
-                // startpage
-                if (jsonMyLearningColumnObj.has("startpage")) {
-
-                    myLearningModel.setStartPage(jsonMyLearningColumnObj.get("startpage").toString());
-
-                }
-                // status
-                if (jsonMyLearningColumnObj.has("corelessonstatus")) {
-
-                    myLearningModel.setStatusActual(jsonMyLearningColumnObj.get("corelessonstatus").toString());
-
-                }
-
-                // shortdes
-                if (jsonMyLearningColumnObj.has("shortdescription")) {
-
-
-                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("shortdescription").toString());
-
-                    myLearningModel.setShortDes(result.toString());
-
-                }
-
-                // longdes
-                if (jsonMyLearningColumnObj.has("longdescription")) {
-
-                    Spanned result = fromHtml(jsonMyLearningColumnObj.get("longdescription").toString());
-
-//                    myLearningModel.setShortDes(result.toString());
-                    myLearningModel.setLongDes(result.toString());
-
-                }
-                // typeofevent
-                if (jsonMyLearningColumnObj.has("typeofevent")) {
-
-                    int typeoFEvent = Integer.parseInt(jsonMyLearningColumnObj.get("typeofevent").toString());
-
-                    myLearningModel.setTypeofevent(typeoFEvent);
-
-                }
-
-                // medianame
-                if (jsonMyLearningColumnObj.has("medianame")) {
-                    String medianame = "";
-
-                    if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-                        if (jsonMyLearningColumnObj.getString("medianame").equalsIgnoreCase("test")) {
-                            medianame = "Assessment(Test)";
-
-                        } else {
-                            medianame = jsonMyLearningColumnObj.get("medianame").toString();
-                        }
-                    } else {
-                        if (myLearningModel.getTypeofevent() == 2) {
-                            medianame = "Event (Online)";
-
-
-                        } else if (myLearningModel.getTypeofevent() == 1) {
-                            medianame = "Event (Face to Face)";
-
-                        }
-                    }
-
-                    myLearningModel.setMediaName(medianame);
-
-                }       // ratingid
-                if (jsonMyLearningColumnObj.has("ratingid")) {
-
-                    myLearningModel.setRatingId(jsonMyLearningColumnObj.get("ratingid").toString());
-
-                }
-                // publishedDate
-                if (jsonMyLearningColumnObj.has("publisheddate")) {
-
-                    myLearningModel.setPublishedDate(jsonMyLearningColumnObj.get("publisheddate").toString());
-
-                }
-                // eventstarttime
-                if (jsonMyLearningColumnObj.has("eventstartdatetime")) {
-
-                    myLearningModel.setEventstartTime(jsonMyLearningColumnObj.get("eventstartdatetime").toString());
-
-                }
-                // eventendtime
-                if (jsonMyLearningColumnObj.has("eventenddatetime")) {
-
-                    myLearningModel.setEventendTime(jsonMyLearningColumnObj.get("eventenddatetime").toString());
-
-                }
-
-                // mediatypeid
-                if (jsonMyLearningColumnObj.has("mediatypeid")) {
-
-                    myLearningModel.setMediatypeId(jsonMyLearningColumnObj.get("mediatypeid").toString());
-
-                }
-                // dateassigned
-                if (jsonMyLearningColumnObj.has("dateassigned")) {
-
-                    myLearningModel.setDateAssigned(jsonMyLearningColumnObj.get("dateassigned").toString());
-
-                }
-                // keywords
-                if (jsonMyLearningColumnObj.has("seokeywords")) {
-
-                    myLearningModel.setKeywords(jsonMyLearningColumnObj.get("seokeywords").toString());
-
-                }
-                // eventcontentid
-                if (jsonMyLearningColumnObj.has("eventcontentid")) {
-
-                    myLearningModel.setEventContentid(jsonMyLearningColumnObj.get("eventcontentid").toString());
-
-                }
-                // eventAddedToCalender
-                myLearningModel.setEventAddedToCalender(false);
-
-
-                // isExpiry
-                myLearningModel.setIsExpiry("false");
-
-                // locationname
-                if (jsonMyLearningColumnObj.has("locationname")) {
-
-                    myLearningModel.setLocationName(jsonMyLearningColumnObj.get("locationname").toString());
-
-                }
-                // timezone
-                if (jsonMyLearningColumnObj.has("timezone")) {
-
-                    myLearningModel.setTimeZone(jsonMyLearningColumnObj.get("timezone").toString());
-
-                }
-                // participanturl
-                if (jsonMyLearningColumnObj.has("participanturl")) {
-
-                    myLearningModel.setParticipantUrl(jsonMyLearningColumnObj.get("participanturl").toString());
-
-                }
-                // display
-                myLearningModel.setDisplayName(appUserModel.getDisplayName());
-                // userName
-                myLearningModel.setUserName(appUserModel.getUserName());
-                // password
-                myLearningModel.setPassword(appUserModel.getPassword());
-
-                // isListView
-                if (jsonMyLearningColumnObj.has("bit5")) {
-
-                    myLearningModel.setIsListView(jsonMyLearningColumnObj.get("bit5").toString());
-
-                }
-
-                // joinurl
-                if (jsonMyLearningColumnObj.has("joinurl")) {
-
-                    myLearningModel.setJoinurl(jsonMyLearningColumnObj.get("joinurl").toString());
-
-                }
-
-                // offlinepath
-                if (jsonMyLearningColumnObj.has("objecttypeid") && jsonMyLearningColumnObj.has("startpage")) {
-                    String objtId = jsonMyLearningColumnObj.get("objecttypeid").toString();
-                    String startPage = jsonMyLearningColumnObj.get("startpage").toString();
-                    String contentid = jsonMyLearningColumnObj.get("contentid").toString();
-                    String downloadDestFolderPath = this.getExternalFilesDir(null)
-                            + "/.Mydownloads/Contentdownloads" + "/" + contentid;
-
-                    String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
-
-                    myLearningModel.setOfflinepath(finalDownloadedFilePath);
-                }
-//
-
-                // wresult
-                if (jsonMyLearningColumnObj.has("wresult")) {
-
-                    myLearningModel.setWresult(jsonMyLearningColumnObj.get("wresult").toString());
-
-                }
-                // wmessage
-                if (jsonMyLearningColumnObj.has("wmessage")) {
-
-                    myLearningModel.setWmessage(jsonMyLearningColumnObj.get("wmessage").toString());
-
-                }
-
-                // presenter
-                if (jsonMyLearningColumnObj.has("presenter")) {
-
-                    myLearningModel.setPresenter(jsonMyLearningColumnObj.get("presenter").toString());
-
-                }
-
-                //sitename
-                if (jsonMyLearningColumnObj.has("saleprice")) {
-
-                    myLearningModel.setPrice(jsonMyLearningColumnObj.get("saleprice").toString());
-
-                }
-
-                //googleproductid
-                if (jsonMyLearningColumnObj.has("googleproductid")) {
-
-                    myLearningModel.setGoogleProductID(jsonMyLearningColumnObj.get("googleproductid").toString());
-
-                }
-
-                //componentid
-                if (jsonMyLearningColumnObj.has("componentid")) {
-
-                    myLearningModel.setComponentId(jsonMyLearningColumnObj.get("componentid").toString());
-
-                }
-
-                //currency
-                if (jsonMyLearningColumnObj.has("currency")) {
-
-                    myLearningModel.setCurrency(jsonMyLearningColumnObj.get("currency").toString());
-
-                }
-
-                //viewtype
-                if (jsonMyLearningColumnObj.has("viewtype")) {
-
-                    myLearningModel.setViewType(jsonMyLearningColumnObj.get("viewtype").toString());
-
-                }
-                //isaddedtomylearning
-                if (jsonMyLearningColumnObj.has("isaddedtomylearning")) {
-
-                    myLearningModel.setAddedToMylearning(Integer.parseInt(jsonMyLearningColumnObj.get("isaddedtomylearning").toString()));
-
-                }
-
-
-                //membershipname
-                if (jsonMyLearningColumnObj.has("membershipname")) {
-
-                    myLearningModel.setMembershipname(jsonMyLearningColumnObj.get("membershipname").toString());
-
-                }
-                //membershiplevel
-                if (jsonMyLearningColumnObj.has("membershiplevel")) {
-
-                    String memberShip = jsonMyLearningColumnObj.getString("membershiplevel");
-                    int memberInt = 1;
-                    if (isValidString(memberShip)) {
-                        memberInt = Integer.parseInt(memberShip);
-                    } else {
-                        memberInt = 1;
-                    }
-                    myLearningModel.setMemberShipLevel(memberInt);
-
-                }
-
-                //folderpath
-                if (jsonMyLearningColumnObj.has("folderpath")) {
-
-                    myLearningModel.setFolderPath(jsonMyLearningColumnObj.get("folderpath").toString());
-
-                }
-
-                myLearningModel.setContentTypeImagePath(jsonMyLearningColumnObj.optString("iconpath", ""));
-
-                //jwvideokey
-                if (jsonMyLearningColumnObj.has("jwvideokey")) {
-
-                    String jwKey = jsonMyLearningColumnObj.getString("jwvideokey");
-
-                    if (isValidString(jwKey)) {
-                        myLearningModel.setJwvideokey(jwKey);
-                    } else {
-                        myLearningModel.setJwvideokey("");
-                    }
-
-                }
-
-                //cloudmediaplayerkey
-                if (jsonMyLearningColumnObj.has("cloudmediaplayerkey")) {
-
-                    myLearningModel.setCloudmediaplayerkey(jsonMyLearningColumnObj.optString("cloudmediaplayerkey"));
-
-                    String jwKey = jsonMyLearningColumnObj.getString("cloudmediaplayerkey");
-
-                    if (isValidString(jwKey)) {
-                        myLearningModel.setCloudmediaplayerkey(jwKey);
-                    } else {
-                        myLearningModel.setCloudmediaplayerkey("");
-                    }
-                }
-            }
-
-        }
-
-        return myLearningModel;
-    }
-
     public void GetContentDetails(String eventInstanceIdOrEventContentID, MyLearningModel tempModel) {
         svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
 
@@ -1507,10 +1168,7 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
         JSONObject parameters = new JSONObject();
 
         try {
-
             parameters.put("ContentID", eventInstanceIdOrEventContentID);
-
-
             parameters.put("metadata", "1");
             parameters.put("Locale", preferencesManager.getLocalizationStringValue(getResources().getString(R.string.locale_name)));
             parameters.put("intUserID", appUserModel.getUserIDValue());
@@ -1535,86 +1193,134 @@ public class PrerequisiteContentActivity extends AppCompatActivity implements Vi
 
     }
 
-//    public static MyLearningModel getDetailMylearningModel(String response, AppUserModel appUserModel, MyLearningModel tempModel) {
-//
-//        JSONObject jsonObject = null;
-//        try {
-//            jsonObject = new JSONObject(response);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        MyLearningModel myLearningModel = new MyLearningModel();
-//        myLearningModel.setUserID(appUserModel.getUserIDValue());
-//        myLearningModel.setUserName(appUserModel.getUserName());
-//        myLearningModel.setSiteID(appUserModel.getSiteIDValue());
-//        myLearningModel.setSiteURL(appUserModel.getSiteURL());
-//
-//        myLearningModel.setSiteName(appUserModel.getSiteName());
-//        myLearningModel.setContentID(tempModel.getContentID());
-//        myLearningModel.setObjectId(jsonObject.optString("", ""));
-//        myLearningModel.setCourseName(jsonObject.optString("", ""));
-//        myLearningModel.setAuthor(jsonObject.optString("", ""));
-//        myLearningModel.setPresenter(jsonObject.optString("", ""));
-//        myLearningModel.setShortDes(jsonObject.optString("", ""));
-//        myLearningModel.setLongDes(jsonObject.optString("", ""));
-//        myLearningModel.setImageData(jsonObject.optString("", ""));
-//        myLearningModel.setMediaName(jsonObject.optString("", ""));
-//        myLearningModel.setCreatedDate(jsonObject.optString("", ""));
-//        myLearningModel.setStartPage(jsonObject.optString("", ""));
-//        myLearningModel.setAviliableSeats(jsonObject.optString("", ""));
-//        myLearningModel.setObjecttypeId(jsonObject.optString("", ""));
-//        myLearningModel.setLocationName(jsonObject.optString("", ""));
-//        myLearningModel.setScoId(jsonObject.optString("", ""));
-//        myLearningModel.setParticipantUrl(jsonObject.optString("", ""));
-//        myLearningModel.setStatusActual(jsonObject.optString("", ""));
-//        myLearningModel.setPassword(appUserModel.getPassword());
-//        myLearningModel.setDisplayName(jsonObject.optString("", ""));
-//        myLearningModel.setIsListView("false");
-//        myLearningModel.setIsDownloaded("false");
-//        myLearningModel.setCourseAttempts("0");
-//        myLearningModel.setAddedToMylearning(jsonObject.optString("", ""));
-//        myLearningModel.setEventContentid(jsonObject.optString("", ""));
-//        myLearningModel.setRelatedContentCount(jsonObject.optString("", ""));
-//        myLearningModel.setDurationEndDate(jsonObject.optString("", ""));
-//        myLearningModel.setRatingId(jsonObject.optString("", ""));
-//        myLearningModel.setIsExpiry("false");
-//        myLearningModel.setMediatypeId(jsonObject.optString("", ""));
-//        myLearningModel.setDateAssigned(jsonObject.optString("", ""));
-//        myLearningModel.setKeywords(jsonObject.optString("", ""));
-//        myLearningModel.setDownloadURL(jsonObject.optString("", ""));
-//        myLearningModel.setOfflinepath("");
-//        myLearningModel.setPresenter(jsonObject.optString("", ""));
-//        myLearningModel.setEventAddedToCalender(false);
-//        myLearningModel.setTimeZone(jsonObject.optString("", ""));
-//        myLearningModel.setJoinurl("");
-//        myLearningModel.setTypeofevent(jsonObject.optString("", ""));
-//        myLearningModel.setViewType("" + jsonObject.optString("", ""));
-//        myLearningModel.setProgress("inprogress");
-//
-//        myLearningModel.setMemberShipLevel(jsonObject.optString("", ""));
-//
-//        myLearningModel.setMembershipname(jsonObject.optString("", ""));
-//
-//        myLearningModel.setFolderPath(jsonObject.optString("", ""));
-//
-//        myLearningModel.setJwvideokey(jsonObject.optString("", "");
-//
-//        myLearningModel.setCloudmediaplayerkey(jsonObject.optString("", ""));
-//
-//        myLearningModel.setPublishedDate(formatDate(globalSearchResultModelNew.publisheddate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
-//
-//
-//        myLearningModel.setEventstartTime(jsonObject.optString("", ""));
-//        myLearningModel.setEventendTime(jsonObject.optString("", ""));
-//
-//        myLearningModel.setEventstartUtcTime(jsonObject.optString("", ""));
-//
-//        myLearningModel.setEventendUtcTime(jsonObject.optString("", ""));
-//
-//        myLearningModel.setBadCancellationEnabled(jsonObject.optString("", ""));
-//
-//        return myLearningModel;
-//    }
+    public MyLearningModel getDetailMylearningModel(JSONObject jsonObject, MyLearningModel tempModel) {
 
+        MyLearningModel myLearningModel = new MyLearningModel();
+        myLearningModel.setUserID(appUserModel.getUserIDValue());
+        myLearningModel.setUserName(appUserModel.getUserName());
+        myLearningModel.setSiteID(appUserModel.getSiteIDValue());
+        myLearningModel.setSiteURL(appUserModel.getSiteURL());
+        myLearningModel.setSiteName(appUserModel.getSiteName());
+        myLearningModel.setContentID(tempModel.getContentID());
+        myLearningModel.setObjectId(jsonObject.optString("ContentID", ""));
+        myLearningModel.setCourseName(tempModel.getCourseName());
+        myLearningModel.setAuthor(jsonObject.optString("AuthorName", ""));
+        myLearningModel.setPresenter(jsonObject.optString("Presentername", ""));
+        myLearningModel.setShortDes(jsonObject.optString("ShortDescription", ""));
+        myLearningModel.setLongDes(jsonObject.optString("LongDescription", ""));
+        myLearningModel.setImageData(tempModel.getImageData());
+        myLearningModel.setMediaName(tempModel.getMediaName());
+        myLearningModel.setAviliableSeats(jsonObject.optString("AvailableSeats", ""));
+        myLearningModel.setCreatedDate(jsonObject.optString("CreatedOn", ""));
+        myLearningModel.setPercentCompleted(jsonObject.optString("percentagecompleted", ""));
+        myLearningModel.setLocationName(jsonObject.optString("LocationName", ""));
+
+        String relatedCount = jsonObject.optString("RelatedContentLink", "");
+        if (isValidString(relatedCount) && relatedCount.length() > 0) {
+            myLearningModel.setRelatedContentCount("2");
+        } else {
+            myLearningModel.setRelatedContentCount("0");
+        }
+        myLearningModel.setObjecttypeId(jsonObject.optString("ContentTypeId", ""));
+        myLearningModel.setScoId(tempModel.getScoId());
+        myLearningModel.setParticipantUrl(jsonObject.optString("", ""));
+        myLearningModel.setStatusActual(tempModel.getStatusActual());
+        myLearningModel.setPassword(appUserModel.getPassword());
+        myLearningModel.setDisplayName(tempModel.getDisplayName());
+        myLearningModel.setIsListView("false");
+        myLearningModel.setIsDownloaded("false");
+        myLearningModel.setCourseAttempts("0");
+        myLearningModel.setAddedToMylearning(tempModel.getAddedToMylearning());
+        myLearningModel.setEventContentid(jsonObject.optString("ContentID", ""));
+        myLearningModel.setDurationEndDate(jsonObject.optString("DurationEndDate", ""));
+        myLearningModel.setRatingId(jsonObject.optString("RatingID", ""));
+        myLearningModel.setIsExpiry("false");
+        myLearningModel.setDateAssigned(jsonObject.optString("", ""));
+        myLearningModel.setKeywords(jsonObject.optString("", ""));
+        myLearningModel.setDownloadURL(jsonObject.optString("", ""));
+        myLearningModel.setPresenter(jsonObject.optString("Presentername", ""));
+        myLearningModel.setEventAddedToCalender(false);
+        myLearningModel.setTimeZone(jsonObject.optString("TimeZone", ""));
+        myLearningModel.setJoinurl(jsonObject.optString("JoinURL", ""));
+        myLearningModel.setProgress(jsonObject.optString("ActualStatus", ""));
+        myLearningModel.setStartPage(jsonObject.optString("startpage", ""));
+        myLearningModel.setViewType(jsonObject.optString("ViewType", ""));
+        myLearningModel.setContentTypeImagePath(tempModel.getContentTypeImagePath());
+        String eventSchedule = jsonObject.optString("EventScheduleType", "-1");
+        try {
+            int eventTyInt = Integer.parseInt(eventSchedule);
+            myLearningModel.setEventScheduleType(eventTyInt);
+
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+
+        String typeEvent = jsonObject.optString("EventScheduleType", "-1");
+
+        try {
+            int eventTyInt = Integer.parseInt(typeEvent);
+            myLearningModel.setTypeofevent(eventTyInt);
+
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        }
+
+        myLearningModel.setFolderPath(jsonObject.optString("FolderPath", ""));
+
+//      String badCancel = jsonObject.optString("isBadCancellationEnabled", "-1");
+//      myLearningModel.setBadCancellationEnabled("");
+
+        myLearningModel.setMediatypeId(jsonObject.optString("MediaTypeID", ""));
+
+        myLearningModel.setMembershipname(jsonObject.optString("", ""));
+
+//        myLearningModel.setJwvideokey(jsonObject.optString("jwstartpage", ""));
+//
+//        myLearningModel.setCloudmediaplayerkey(jsonObject.optString("JWVideoKey", ""));
+
+//        myLearningModel.setPublishedDate(formatDate(globalSearchResultModelNew.publisheddate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
+
+        myLearningModel.setEventstartTime(jsonObject.optString("EventStartDateTime", ""));
+        myLearningModel.setEventendTime(jsonObject.optString("EventEndDateTime", ""));
+
+        myLearningModel.setEventstartUtcTime(jsonObject.optString("EventStartDateTime", ""));
+
+        myLearningModel.setEventendUtcTime(jsonObject.optString("EventEndDateTime", ""));
+
+        myLearningModel.setQrCodeImagePath(jsonObject.optString("ActionViewQRcode", ""));
+
+        myLearningModel.isFromPrereq = true;
+
+        return myLearningModel;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK && data != null) {
+
+            MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
+
+            boolean refresh = data.getBooleanExtra("rescheduleenroll", false);
+            if (refresh) {
+                String EventInstanceId = data.getStringExtra("EventInstanceId");
+                String EventInstanceSelectedStartDate = data.getStringExtra("EventInstanceSelectedStartDate");
+                String EventInstanceSelectedEndDate = data.getStringExtra("EventInstanceSelectedEndDate");
+                Log.d(TAG, "onActivityResult: " + EventInstanceId);
+
+                PrerequisiteModel prerequisiteModel = new PrerequisiteModel();
+
+                prerequisiteModel.EventStartDateTime = EventInstanceSelectedStartDate;
+
+                prerequisiteModel.EventEndDateTime = EventInstanceSelectedEndDate;
+
+                prerequisiteModel.itIsInstanceID = EventInstanceId;
+
+                updateSelectedScheduleEvent(prerequisiteModel, myLearningModel.getContentID());
+
+            }
+
+        }
+    }
 }

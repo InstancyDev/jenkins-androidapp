@@ -128,6 +128,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      */
     public static final String TBL_CONTENTVIEW = "CONTENTVIEW";
     /**
+     *To store the  session view metadata details
+     */
+    public static final String TBL_SESSIONVIEW = "SESSIONVIEW";
+    /**
      * To store the user session details which tracked in offline course viewing
      */
     public static final String TBL_USERSESSION = "USERSESSION";
@@ -433,7 +437,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT,isContentEnrolled TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT,isContentEnrolled TEXT,instanceparentcontentid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_USERSESSION
@@ -472,7 +476,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN,iswishlisted BOOLEAN)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN,iswishlisted BOOLEAN,instanceparentcontentid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_LRSDATA
@@ -720,6 +724,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TBL_CONTENTVIEW
                 + "(id INTEGER PRIMARY KEY AUTOINCREMENT, coursename TEXT, authorname TEXT, contenttype TEXT, shortdesc TEXT, thumbnailimage TEXT, thumbnailicon TEXT, scoid TEXT, siteid TEXT, userid TEXT,medianame TEXT,parentscoid TEXT)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_SESSIONVIEW
+                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, eventname TEXT, startdate TEXT, enddate TEXT, timezone TEXT, thumbnailimage TEXT, thumbnailicon TEXT, instructors TEXT, location TEXT, contentid TEXT, userid TEXT, siteid TEXT,parentscoid TEXT, authorname TEXT, contenttype TEXT, shortdesc TEXT)");
+
+
         Log.d(TAG, "onCreate:  TABLES CREATED");
     }
 
@@ -767,17 +776,21 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_EVENTCONTENTDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN,iswishlisted BOOLEAN)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT, displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,eventstarttime TEXT,eventendtime TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT,eventcontentid TEXT,price TEXT,islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT, itemtype TEXT, categorycompid TEXT, presenter TEXT, relatedcontentcount INTEGER, availableseats INTEGER, isaddedtomylearning INTEGER, joinurl TEXT,folderpath TEXT,typeofevent TEXT,eventTabValue TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,waitlistenrolls INTEGER,waitlistlimit INTEGER,cancelevent INTEGER,enrollmentlimit INTEGER, noofusersenrolled INTEGER,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,groupName TEXT,cancelEventEnabled BOOLEAN,actionwaitlist TEXT,isBadCancellationEnabled BOOLEAN,iswishlisted BOOLEAN,instanceparentcontentid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CATALOGDATA
-                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT,isContentEnrolled TEXT)");
+                + "(ID INTEGER PRIMARY KEY AUTOINCREMENT,siteid TEXT,siteurl TEXT,sitename TEXT,displayname TEXT, username TEXT, password TEXT, userid TEXT, contentid TEXT,coursename TEXT,author TEXT,shortdes TEXT,longdes TEXT,imagedata TEXT,medianame TEXT,createddate TEXT,startpage TEXT,objecttypeid TEXT,locationname TEXT,timezone TEXT,scoid TEXT,participanturl TEXT,viewtype TEXT, price TEXT, islistview TEXT, ratingid TEXT,publisheddate TEXT, mediatypeid TEXT, keywords TEXT, googleproductid TEXT, currency TEXT,itemtype TEXT,categorycompid TEXT, downloadurl TEXT, offlinepath TEXT, isaddedtomylearning INTEGER, membershiplevel INTEGER, membershipname TEXT,folderpath TEXT,jwvideokey TEXT, cloudmediaplayerkey TEXT,presenter  TEXT,eventstarttime TEXT,eventendtime TEXT,relatedconentcount TEXT,eventstartUtctime TEXT,eventendUtctime TEXT,iswishlisted BOOLEAN,contentTypeImagePath TEXT,EventScheduleType INTEGER,LearningObjectives TEXT,TableofContent TEXT,LongDescription TEXT,totalratings INTEGER,groupName TEXT,activityid TEXT,cancelEventEnabled BOOLEAN,viewprerequisitecontentstatus TEXT,credits TEXT,decimal2 TEXT,duration TEXT,isContentEnrolled TEXT,instanceparentcontentid TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TBL_DETAILS_SCHEDULE + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, EventID TEXT, ContentID TEXT, Name TEXT, Duration TEXT, EventStartDateTime TEXT,EventEndDateTime TEXT,Location TEXT,TimeZone TEXT, PresenterID TEXT, Email TEXT, AccountType TEXT, Picture TEXT, DisplayName TEXT, About TEXT, Bit4 TEXT, AuthorName TEXT, EnrollmentLimit TEXT, AvailableSeats TEXT, TotalEnrolls TEXT, WaitListEnrolls TEXT, LocationImage TEXT,alreadyexist TEXT,showenroll TEXT,showwaitlis TEXT,WaitListLimit TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS "
                 + TBL_CONTENTVIEW
                 + "(id INTEGER PRIMARY KEY AUTOINCREMENT, coursename TEXT, authorname TEXT, contenttype TEXT, shortdesc TEXT, thumbnailimage TEXT, thumbnailicon TEXT, scoid TEXT, siteid TEXT, userid TEXT,medianame TEXT,parentscoid TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS "
+                + TBL_SESSIONVIEW
+                + "(id INTEGER PRIMARY KEY AUTOINCREMENT, eventname TEXT, startdate TEXT, enddate TEXT, timezone TEXT, thumbnailimage TEXT, thumbnailicon TEXT, instructors TEXT, location TEXT, contentid TEXT, userid TEXT, siteid TEXT,parentscoid TEXT, authorname TEXT, contenttype TEXT, shortdesc TEXT)");
 
     }
 
@@ -3071,7 +3084,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String startPage = jsonMyLearningColumnObj.get("startpage").toString();
                 String contentid = jsonMyLearningColumnObj.get("contentid").toString();
                 String downloadDestFolderPath = dbctx.getExternalFilesDir(null)
-                        + "/Mydownloads/Contentdownloads" + "/" + contentid;
+                        + "/.Mydownloads/Contentdownloads" + "/" + contentid;
 
                 String finalDownloadedFilePath = downloadDestFolderPath + "/" + startPage;
 
@@ -4248,6 +4261,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setDuration(jsonMyLearningColumnObj.optString("duration", ""));
 
+                myLearningModel.setInstanceparentcontentid(jsonMyLearningColumnObj.optString("instanceparentcontentid", ""));
+
                 if (isCotentExists(myLearningModel, TBL_CATALOGDATA)) {
                     continue;
                 }
@@ -4354,6 +4369,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("decimal2", myLearningModel.getDecimal2());
 
             contentValues.put("duration", myLearningModel.getDuration());
+            contentValues.put("instanceparentcontentid", myLearningModel.getInstanceparentcontentid());
 
             db.insert(TBL_CATALOGDATA, null, contentValues);
         } catch (SQLiteException exception) {
@@ -4596,6 +4612,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                     myLearningModel.setCancelEventEnabled(cursor.getInt(cursor
                             .getColumnIndex("cancelEventEnabled")) > 1);
+
+                    myLearningModel.setInstanceparentcontentid(cursor.getString(cursor
+                            .getColumnIndex("instanceparentcontentid")));
 
                     myLearningModelList.add(myLearningModel);
                 } while (cursor.moveToNext());
@@ -5159,6 +5178,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
                 myLearningModel.setBadCancellationEnabled(jsonMyLearningColumnObj.optBoolean("isbadcancellationenabled", false));
 
+                myLearningModel.setInstanceparentcontentid(jsonMyLearningColumnObj.optString("instanceparentcontentid", ""));
+
+
+
                 if (isCotentExists(myLearningModel, TBL_EVENTCONTENTDATA)) {
                     continue;
                 }
@@ -5246,6 +5269,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             contentValues.put("cancelEventEnabled", myLearningModel.isCancelEventEnabled());
             contentValues.put("actionwaitlist", myLearningModel.getActionWaitlist());
             contentValues.put("isBadCancellationEnabled", myLearningModel.isBadCancellationEnabled());
+            contentValues.put("instanceparentcontentid", myLearningModel.getInstanceparentcontentid());
 
             contentValues.put("iswishlisted", myLearningModel.isArchived());
 
@@ -5507,6 +5531,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     myLearningModel.setArchived(cursor.getInt(cursor
                             .getColumnIndex("iswishlisted")) > 0);
 
+                    myLearningModel.setInstanceparentcontentid(cursor.getString(cursor
+                            .getColumnIndex("instanceparentcontentid")));
 
                     Log.d(TAG, "fetchEventCatalogModel: is event added " + myLearningModel.getAddedToMylearning() + "  with getCourseName  " + myLearningModel.getCourseName());
 

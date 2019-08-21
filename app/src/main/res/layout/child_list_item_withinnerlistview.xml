@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="4dp"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="4dp">
+
+    <LinearLayout
+        android:id="@+id/sessionLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!--<android.support.v7.widget.AppCompatTextView-->
+            <!--android:id="@+id/schedule_sessionname"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="6dp"-->
+            <!--android:gravity="center"-->
+            <!--android:text="asdasdasdasdasasd"-->
+            <!--android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"-->
+            <!--android:textColor="@color/colorBlack" />-->
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/profile_image"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                app:civ_border_color="@color/colorWhite"
+                app:civ_border_width="0dp" />
+
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/schedule_user_name_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="asdasdasdasdasasd"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+                android:textColor="@color/colorBlack" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:paddingBottom="5dp">
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/schedule_event_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="2dp"
+                android:drawablePadding="3dp"
+                android:padding="2dp"
+                android:text="asdasdasdas"
+                android:textAlignment="textEnd"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+                android:textColor="@color/colorBlack" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:id="@+id/schedule_event_few"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginBottom="2dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="2dp"
+                android:padding="4dp"
+                android:text="Few seats left"
+                android:textAlignment="textEnd"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+                android:textColor="@color/colorBlack"
+                android:visibility="gone" />
+
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/schedule_enroll"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="20dp"
+                android:background="@color/colorInGreen"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Enroll"
+                android:textAllCaps="false" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/schedule_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:drawablePadding="10dp"
+        android:text="asdasdasdasdasdas"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+        android:textColor="@color/colorBlack" />
+
+</LinearLayout>

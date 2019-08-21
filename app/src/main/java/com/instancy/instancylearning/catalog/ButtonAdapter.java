@@ -1,10 +1,8 @@
 package com.instancy.instancylearning.catalog;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +16,6 @@ import com.instancy.instancylearning.interfaces.RecyclerViewClickListener;
 import com.instancy.instancylearning.models.AppUserModel;
 import com.instancy.instancylearning.models.CatalogCategoryButtonModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
-import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 

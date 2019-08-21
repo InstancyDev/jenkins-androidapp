@@ -440,6 +440,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
     @Override
     public void onBackPressed() {
+        executeWorkflowRuleOnExit(myLearningModel);
         boolean isCompleted = false;
         if (trackListModelList != null) {
             isCompleted = onTrackListClose(myLearningModel, trackListModelList);
@@ -505,6 +506,7 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
             case android.R.id.home:
                 // app icon in action bar clicked; go home
                 Log.d("DEBUG", "onOptionsItemSelected: ");
+                executeWorkflowRuleOnExit(myLearningModel);
                 boolean isCompleted = false;
                 if (trackListModelList != null) {
                     isCompleted = onTrackListClose(myLearningModel, trackListModelList);
@@ -2950,5 +2952,16 @@ public class EventTrackList_Activity extends AppCompatActivity implements SwipeR
 
         return "" + sumValue;
     }
+
+    public void executeWorkflowRuleOnExit(MyLearningModel learningModel) {
+
+        String paramsString = "parentcontentID=" + learningModel.getContentID() + "&siteID=" + learningModel.getSiteID() + "&userID=" + appUserModel.getUserIDValue() + "&localeID=es-es&compID=3&compInsID=3134&objecttypeId=10&Trackscoid=" + learningModel.getScoId() + "&wLaunchType=onexit";
+
+        if (isNetworkConnectionAvailable(this, -1)) {
+            vollyService.getStringResponseVolley("COURSETRACKING", appUserModel.getWebAPIUrl() + "TrackListView/GetTrackListViewData?" + paramsString, appUserModel.getAuthHeaders());
+        }
+
+    }
+
 }
 

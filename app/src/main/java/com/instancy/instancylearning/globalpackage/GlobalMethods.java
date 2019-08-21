@@ -1047,7 +1047,7 @@ public class GlobalMethods {
                     case R.id.ctx_view:
                         if (isValidString(myLearningDetalData.getViewprerequisitecontentstatus())) {
                             String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6, v.getContext());
-                            alertMessage = alertMessage  +"  "+ myLearningDetalData.getViewprerequisitecontentstatus();
+                            alertMessage = alertMessage + "  " + myLearningDetalData.getViewprerequisitecontentstatus();
                             final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                             builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert, v.getContext()))
                                     .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton, v.getContext()), new DialogInterface.OnClickListener() {
@@ -1078,7 +1078,23 @@ public class GlobalMethods {
                         }
                         break;
                     case R.id.ctx_relatedcontent:
-                        relatedContentView(myLearningDetalData, v.getContext(), isIconEnabled);
+                        if (isValidString(myLearningDetalData.getViewprerequisitecontentstatus())) {
+                            String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6, v.getContext());
+                            alertMessage = alertMessage + "  " + myLearningDetalData.getViewprerequisitecontentstatus();
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                            builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert, v.getContext()))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton, v.getContext()), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            relatedContentView(myLearningDetalData, v.getContext(), isIconEnabled);
+                        }
                         break;
                     case R.id.ctx_delete:
                         if (isNetworkConnectionAvailable(v.getContext(), -1)) {
@@ -1562,6 +1578,7 @@ public class GlobalMethods {
         }
     }
 
+
     public static void launchCourseForGlobalSearch(MyLearningModel myLearningModel, Context context) {
 
         databaseH = new DatabaseHandler(context);
@@ -1580,311 +1597,355 @@ public class GlobalMethods {
         } else
 
         {
-            if (isNetworkConnectionAvailable(context, -1)) {
-                String urlForView = "";
+            boolean isAngularLaunch = true;
 
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && myLearningModel.getIsListView().equalsIgnoreCase("true")) {
+                Intent intentDetail = new Intent(context, EventTrackList_Activity.class);
+                intentDetail.putExtra("myLearningDetalData", myLearningModel);
+                intentDetail.putExtra("ISICONENABLED", false);
+                intentDetail.putExtra("ISTRACKLIST", true);
+                ((Activity) context).startActivityForResult(intentDetail, COURSE_CLOSE_CODE);
+            } else {
+                if (isNetworkConnectionAvailable(context, -1)) {
+                    String urlForView = "";
 
-
-                    if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") || myLearningModel.getStatusActual().equalsIgnoreCase("")) {
-
-                        CMIModel model = new CMIModel();
-                        model.set_datecompleted("");
-                        model.set_siteId(myLearningModel.getSiteID());
-                        model.set_userId(Integer.parseInt(myLearningModel.getUserID()));
-                        model.set_startdate(GetCurrentDateTime());
-                        model.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
-                        model.set_isupdate("false");
-                        model.set_status("incomplete");
-                        model.setPercentageCompleted("50");
-                        model.set_seqNum("0");
-                        model.set_timespent("");
-                        model.set_objecttypeid(myLearningModel.getObjecttypeId());
-                        model.set_contentId(myLearningModel.getContentID());
-                        model.set_sitrurl(myLearningModel.getSiteURL());
-                        databaseH = new DatabaseHandler(context);
-                        databaseH.injectIntoCMITable(model, "false");
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
 
 
-                        int attempts = databaseH.getLatestAttempt(myLearningModel);
-                        LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
-                        learnerSessionModel.setSiteID(myLearningModel.getSiteID());
-                        learnerSessionModel.setUserID(myLearningModel.getUserID());
-                        learnerSessionModel.setScoID(myLearningModel.getScoId());
-                        learnerSessionModel.setAttemptNumber("" + (attempts + 1));
-                        learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
-                        databaseH.insertUserSession(learnerSessionModel);
-                    }
-                }
-                databaseH = new DatabaseHandler(context);
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject = databaseH.gettTinCanConfigurationValues(myLearningModel.getSiteID());
-                    Log.d(TAG, "TIN CAN OPTIONS: " + jsonObject);
+                        if (myLearningModel.getStatusActual().equalsIgnoreCase("Not Started") || myLearningModel.getStatusActual().equalsIgnoreCase("")) {
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                            CMIModel model = new CMIModel();
+                            model.set_datecompleted("");
+                            model.set_siteId(myLearningModel.getSiteID());
+                            model.set_userId(Integer.parseInt(myLearningModel.getUserID()));
+                            model.set_startdate(GetCurrentDateTime());
+                            model.set_scoId(Integer.parseInt(myLearningModel.getScoId()));
+                            model.set_isupdate("false");
+                            model.set_status("incomplete");
+                            model.set_seqNum("0");
+                            model.setPercentageCompleted("50");
+                            model.set_timespent("");
+                            model.set_objecttypeid(myLearningModel.getObjecttypeId());
+                            model.set_contentId(myLearningModel.getContentID());
+                            model.set_sitrurl(myLearningModel.getSiteURL());
+                            databaseH = new DatabaseHandler(context);
+                            databaseH.injectIntoCMITable(model, "false");
 
-                String lrsEndPoint = "";
-//                String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
-                String lrsActor = "{\"name\":[\"" + userName + "\"],\"account\":[{\"accountServiceHomePage\":\"" + myLearningModel.getSiteURL() + "\",\"accountName\":\"" + myLearningModel.getPassword() + "|" + userLoginId + "\"}],\"objectType\":\"Agent\"}&activity_id=" + myLearningModel.getActivityId() +
-                        "&grouping=" + myLearningModel.getActivityId();
-                String lrsAuthorizationKey = "";
-                String enabletincanSupportforco = "";
-                String enabletincanSupportforao = "";
-                String enabletincanSupportforlt = "";
-                String isTinCan = "";
-                String autKey = "";
-                try {
+                            int attempts = databaseH.getLatestAttempt(myLearningModel);
 
-                    if (jsonObject.length() != 0) {
-                        lrsEndPoint = jsonObject.getString("lrsendpoint");
-                        autKey = jsonObject.getString("base64lrsAuthKey");
-                        enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
-                        enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
-                        enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
-                        isTinCan = jsonObject.getString("istincan");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                            LearnerSessionModel learnerSessionModel = new LearnerSessionModel();
 
-                byte[] encrpt = new byte[0];
-                try {
-                    encrpt = autKey.getBytes("UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-                String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
-                lrsAuthorizationKey = "Basic " + base64;
-//                      String basicNewKey=base64.replace("\n","");
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
-
-                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
-
-                    if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
-
-                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
-
-                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
-
-                        } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
-                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
-
-                        } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
-                            urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
-
+                            learnerSessionModel.setSiteID(myLearningModel.getSiteID());
+                            learnerSessionModel.setUserID(myLearningModel.getUserID());
+                            learnerSessionModel.setScoID(myLearningModel.getScoId());
+                            learnerSessionModel.setAttemptNumber("" + (attempts + 1));
+                            learnerSessionModel.setSessionDateTime(GetCurrentDateTime());
+                            databaseH.insertUserSession(learnerSessionModel);
                         }
                     }
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
-                {
+                    databaseH = new DatabaseHandler(context);
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject = databaseH.gettTinCanConfigurationValues(myLearningModel.getSiteID());
+                        Log.d(TAG, "TIN CAN OPTIONS: " + jsonObject);
 
-                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && isValidString(myLearningModel.getJwvideokey())) {
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String lrsEndPoint = "";
+//                    String lrsActor = "{ \"mbox\":[\"mailto:" + userLoginId + "\"], \"name\":[\"" + userName + "\"] }";
+                    String lrsActor = "{\"name\":[\"" + userName + "\"],\"account\":[{\"accountServiceHomePage\":\"" + myLearningModel.getSiteURL() + "\",\"accountName\":\"" + myLearningModel.getPassword() + "|" + userLoginId + "\"}],\"objectType\":\"Agent\"}&activity_id=" + myLearningModel.getActivityId() +
+                            "&grouping=" + myLearningModel.getActivityId();
+                    String lrsAuthorizationKey = "";
+                    String enabletincanSupportforco = "";
+                    String enabletincanSupportforao = "";
+                    String enabletincanSupportforlt = "";
+                    String isTinCan = "";
+                    String autKey = "";
+                    try {
+
+                        if (jsonObject.length() != 0) {
+                            if (isAngularLaunch) {
+                                String lrsString = jsonObject.getString("lrsendpoint");
+                                if (!myLearningModel.getObjecttypeId().equalsIgnoreCase("102"))
+                                    lrsEndPoint = lrsString.replace("/", "~");
+                                else
+                                    lrsEndPoint = lrsString;
+                            } else {
+                                lrsEndPoint = jsonObject.getString("lrsendpoint");
+                            }
+
+                            autKey = jsonObject.getString("base64lrsAuthKey");
+                            enabletincanSupportforco = jsonObject.getString("enabletincansupportforco");
+                            enabletincanSupportforao = jsonObject.getString("enabletincansupportforao");
+                            enabletincanSupportforlt = jsonObject.getString("enabletincansupportforlt");
+                            isTinCan = jsonObject.getString("istincan");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    byte[] encrpt = new byte[0];
+                    try {
+                        encrpt = autKey.getBytes("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    String base64 = Base64.encodeToString(encrpt, Base64.NO_WRAP);
+                    lrsAuthorizationKey = "Basic " + base64;
+//                      String basicNewKey=base64.replace("\n","");
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") || myLearningModel.getObjecttypeId().equalsIgnoreCase("9") || myLearningModel.getObjecttypeId().equalsIgnoreCase("10")) {
+
+
+                        if (isAngularLaunch) {
+
+                            urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + myLearningModel.getStartPage() + "?nativeappURL=true";
+
+                        } else { // normal Launch
+
+                            urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?URL=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?nativeappURL=true" + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&trackinguserid=" + myLearningModel.getUserID();
+                        }
+
+                        if (isTinCan.toLowerCase().equalsIgnoreCase("true")) {
+
+                            if (myLearningModel.getObjecttypeId().equalsIgnoreCase("8") && enabletincanSupportforco.toLowerCase().equalsIgnoreCase("true")) {
+
+                                urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+
+                            } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("9") && enabletincanSupportforao.toLowerCase().equalsIgnoreCase("true")) {
+                                urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+
+                            } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("10") && enabletincanSupportforlt.toLowerCase().equalsIgnoreCase("true")) {
+                                urlForView = urlForView + "&endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + lrsActor;
+
+                            }
+                        }
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") || myLearningModel.getObjecttypeId().equalsIgnoreCase("14") || myLearningModel.getObjecttypeId().equalsIgnoreCase("21") || myLearningModel.getObjecttypeId().equalsIgnoreCase("36")) //14 21 36
+                    {
+
+                        if (myLearningModel.getObjecttypeId().equalsIgnoreCase("11") && isValidString(myLearningModel.getJwvideokey())) {
 
 //                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
 
-                        urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html"; // commented on 20th June 2019
+//                            urlForView = "http://content.jwplatform.com/players/" + myLearningModel.getJwvideokey() + "-" + myLearningModel.getCloudmediaplayerkey() + ".html"; // commented on 20th June 2019
 
+                            String jwstartpage = myLearningModel.getStartPage();
+                            jwstartpage = jwstartpage.replaceAll("/", "~");
 
-//                        jwstartpage = jwstartpage.replacingOccurrences(of: "/", with: "~")
+                            urlForView = myLearningModel.getSiteURL() + "ajaxcourse/ContentName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/ContentID/" + myLearningModel.getContentID() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + jwstartpage + "?nativeappURL=true/JWVideoParentID/" + myLearningModel.getTrackOrRelatedContentID();
+
+                            //                        jwstartpage = jwstartpage.replacingOccurrences(of: "/", with: "~")
 //
 //                        urlForView = "\(objectData.siteURL)ajaxcourse/ContentName/" + "\(objectData.courseName)" + "/ScoID/" + "\(objectData.scoid)" + "/ContentTypeId/"  + "\(objectData.objectTypeID)" + "/ContentID/" + "\(objectData.contentID)" + "/AllowCourseTracking/true/trackuserid/" + "\(objectData.userID)" + "/ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + "\(objectData.folderpath)" + "~" + "\(jwstartpage)" + "?nativeappURL=true" + "/JWVideoParentID/" + "\(objectData.parentContentID)"
 
+                        } else {
+                            urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+                        }
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+
+                        urlForView = myLearningModel.getStartPage();
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) { // scorm content
+
+                        if (isAngularLaunch) {
+
+                            String startPage = myLearningModel.getStartPage().replace("/", "~");
+
+                            urlForView = myLearningModel.getSiteURL() + "ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ScoID/" + myLearningModel.getScoId() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//ismobilecontentview/true/ContentPath/~Content~PublishFiles~" + myLearningModel.getFolderPath() + "~" + startPage + "?nativeappurl=true";
+
+                        } else {// normal launch
+                            urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+                        }
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
+                        if (isAngularLaunch) {
+                            urlForView = myLearningModel.getSiteURL() + "/ajaxcourse/CourseName/" + myLearningModel.getCourseName() + "/ContentID/" + myLearningModel.getContentID() + "/ContentTypeId/" + myLearningModel.getObjecttypeId() + "/AllowCourseTracking/true/trackuserid/" + myLearningModel.getUserID() + "/eventkey//eventtype//ismobilecontentview/true/ContentPath/~" + myLearningModel.getStartPage() + "?nativeappurl=true";
+
+                        } else {// normal launch
+                            urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
+
+                        }
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
+                        String encodedString = "";
+//                        try {
+//////                            encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
+//                            encodedString = lrsActor.replace(" ", "%20");
+//                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
+////
+//                        } catch (UnsupportedEncodingException e) {
+//                            e.printStackTrace();
+//                        }
+
+                        encodedString = lrsActor.replace(" ", "%20");
+                        urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + /*&registration=*/ "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
+                        String cerName = myLearningModel.getContentID() + "_Certificate";
+                        urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getSiteID() + "/UserCertificates/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("20")) {
+
+                        urlForView = myLearningModel.getSiteURL() + "/content/PublishFiles/" + myLearningModel.getFolderPath() + "/glossary_english.html";
 
                     } else {
-                        urlForView = myLearningModel.getSiteURL() + "/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage();
+
+
+                    }
+                    String encodedStr = "";
+                    if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
+                        encodedStr = replace(urlForView);
+                    } else {
+//                        encodedStr = replace(urlForView.toLowerCase());// commented for digimedica
+                        encodedStr = replace(urlForView);
                     }
 
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
-
-                    urlForView = myLearningModel.getStartPage();
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("26")) {
-
-                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?path=/Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=Yes&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
-
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("27")) {
-                    urlForView = myLearningModel.getSiteURL() + "/remote/AJAXLaunchPage.aspx?Path=" + myLearningModel.getStartPage() + "&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&CanTrack=Yes" + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&SCOID=" + myLearningModel.getScoId() + "&eventkey=&eventtype=" + "&trackinguserid=" + myLearningModel.getUserID();
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102")) {
-                    String encodedString = lrsActor;
-
-//                    try {
-//                        encodedString = URLEncoder.encode(lrsActor, "utf-8").replace("+", "%20").replace("%3A", ":");
-////                            encodedString = URLEncoder.encode(lrsActor, "UTF-8");
-//
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-                    urlForView = myLearningModel.getSiteURL() + "Content/PublishFiles/" + myLearningModel.getFolderPath() + "/" + myLearningModel.getStartPage() + "?endpoint=" + lrsEndPoint + "&auth=" + lrsAuthorizationKey + "&actor=" + encodedString + "&registration=&CourseName=" + myLearningModel.getCourseName() + "&ContentID=" + myLearningModel.getContentID() + "&ObjectTypeID=" + myLearningModel.getObjecttypeId() + "&CanTrack=YES" + "&nativeappURL=true";
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("52")) {
-                    String cerName = myLearningModel.getContentID() + "_Certificate";
-                    urlForView = myLearningModel.getSiteURL() + "/content/sitefiles/" + myLearningModel.getSiteID() + "/UserCertificates/" + myLearningModel.getUserID() + "/" + cerName + ".pdf";
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
-
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("20")) {
-
-                    urlForView = myLearningModel.getSiteURL() + "/content/PublishFiles/" + myLearningModel.getFolderPath() + "/glossary_english.html";
-
-                } else {
-
-
-                }
-                String encodedStr = "";
-                if (myLearningModel.getObjecttypeId().equalsIgnoreCase("102") || myLearningModel.getObjecttypeId().equalsIgnoreCase("28")) {
-                    encodedStr = replace(urlForView);
-                } else {
-                    encodedStr = replace(urlForView.toLowerCase());
-                }
-
-
-                Log.d("DBG", "launchCourseView: " + encodedStr);
-                if (encodedStr.endsWith(".pdf")) {
-                    Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
-                    pdfIntent.putExtra("PDF_URL", encodedStr);
-                    pdfIntent.putExtra("ISONLINE", "YES");
-                    pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
-                    pdfIntent.putExtra("myLearningDetalData", myLearningModel);
+                    Log.d("DBG", "launchCourseView: " + encodedStr);
+                    if (encodedStr.endsWith(".pdf")) {
+                        Intent pdfIntent = new Intent(context, PdfViewer_Activity.class);
+                        pdfIntent.putExtra("PDF_URL", encodedStr);
+                        pdfIntent.putExtra("ISONLINE", "YES");
+                        pdfIntent.putExtra("PDF_FILENAME", myLearningModel.getCourseName());
+                        pdfIntent.putExtra("myLearningDetalData", myLearningModel);
 //                        context.startActivity(pdfIntent);
-                    ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
+                        ((Activity) context).startActivityForResult(pdfIntent, COURSE_CLOSE_CODE);
 
-                } else if (encodedStr.toLowerCase().contains(".ppt") || encodedStr.toLowerCase().contains(".pptx")) {
+                    } else if (encodedStr.toLowerCase().contains(".ppt")
+                            || encodedStr.toLowerCase().contains(".pptx")) {
 
-                    encodedStr = encodedStr.replace("file://", "");
+                        encodedStr = encodedStr.replace("file://", "");
 
-                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
-                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-                    iWeb.putExtra("COURSE_URL", src);
-                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                        String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+                        Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                        iWeb.putExtra("COURSE_URL", src);
+                        iWeb.putExtra("myLearningDetalData", myLearningModel);
+                        ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
 
-                } else if (encodedStr.toLowerCase().contains(".doc") || encodedStr.toLowerCase().contains(".docx")) {
+                    } else if (encodedStr.toLowerCase().contains(".doc")
+                            || encodedStr.toLowerCase().contains(".docx")) {
 
-                    encodedStr = encodedStr.replace("file://", "");
+                        encodedStr = encodedStr.replace("file://", "");
 
-//                        String doc = "<iframe src='http://docs.google.com/viewer?url=" + encodedStr + "'" +
-//                                "width = '100%' height = '100%'" +
-//                                "style = 'border: none;' ></iframe > ";
 
 //                        String  src="http://docs.google.com/gview?embedded=true&url=http://ccidahra.com/wp-content/uploads/2016/03/sample.ppt";
 
-                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
-                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-                    iWeb.putExtra("COURSE_URL", src);
-                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                        String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+                        Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                        iWeb.putExtra("COURSE_URL", src);
+                        iWeb.putExtra("myLearningDetalData", myLearningModel);
+                        ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
 
 
-                } else if (encodedStr.toLowerCase().contains(".xlsx")
-                        || encodedStr.toLowerCase().contains(".xls")) {
-                    encodedStr = encodedStr.replace("file://", "");
+                    } else if (encodedStr.toLowerCase().contains(".xlsx")
+                            || encodedStr.toLowerCase().contains(".xls")) {
+                        encodedStr = encodedStr.replace("file://", "");
 
-                    String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
-                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-                    iWeb.putExtra("COURSE_URL", src);
-                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
-                } else if (offlinePath.toLowerCase().contains(".mpp")) {
-                    offlinePath = offlinePath.replace("file://", "");
-                    try {
-                        offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+
+                        String src = "http://docs.google.com/gview?embedded=true&url=" + encodedStr;
+                        Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                        iWeb.putExtra("COURSE_URL", src);
+                        iWeb.putExtra("myLearningDetalData", myLearningModel);
+                        ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                    } else if (offlinePath.toLowerCase().contains(".mpp")) {
+                        offlinePath = offlinePath.replace("file://", "");
+                        try {
+                            offlinePath = URLDecoder.decode(offlinePath, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(offlinePath);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
+
+                        try {
+                            context.startActivity(intent4);
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_mpp),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+                        }
+
+                    } else if (encodedStr.toLowerCase().contains(".visio")
+                            || encodedStr.toLowerCase().contains(".vsd")) {
+                        encodedStr = encodedStr.replace("file://", "");
+
+                        try {
+                            encodedStr = URLDecoder.decode(offlinePath, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(encodedStr);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(
+                                Uri.fromFile(file),
+                                "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
+
+                        try {
+                            context.startActivity(intent4);
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_mpp),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+
+
+                        }
+
+                    } else if (encodedStr.toLowerCase().contains(".txt")) {
+
+                        try {
+
+                            encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        File file = new File(encodedStr);
+                        Intent intent4 = new Intent();
+                        intent4.setAction(android.content.Intent.ACTION_VIEW);
+                        intent4.setDataAndType(Uri.fromFile(file), "text/plain");
+                        try {
+                            context.startActivity(intent4);
+
+                        } catch (ActivityNotFoundException e) {
+
+                            Toast toast = Toast.makeText(context,
+                                    context.getString(R.string.toast_no_application_txt),
+                                    Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                        }
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+
+                        relatedContentView(myLearningModel, context, false);
+
+                    } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
+
+
+                    } else {
+
+                        Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
+                        iWeb.putExtra("COURSE_URL", encodedStr);
+                        iWeb.putExtra("myLearningDetalData", myLearningModel);
+                        ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
                     }
-                    File file = new File(offlinePath);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/vnd.ms-project, application/msproj, application/msproject, application/x-msproject, application/x-ms-project, application/x-dos_ms_project, application/mpp, zz-application/zz-winassoc-mpp");
-
-                    try {
-                        context.startActivity(intent4);
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_mpp),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-                    }
-
-                } else if (encodedStr.toLowerCase().contains(".visio")
-                        || encodedStr.toLowerCase().contains(".vsd")) {
-                    encodedStr = encodedStr.replace("file://", "");
-
-                    try {
-                        encodedStr = URLDecoder.decode(offlinePath, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(encodedStr);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(
-                            Uri.fromFile(file),
-                            "application/visio, application/x-visio, application/vnd.visio, application/visio.drawing, application/vsd, application/x-vsd, image/x-vsd, zz-application/zz-winassoc-vsd");
-
-                    try {
-                        context.startActivity(intent4);
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_mpp),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-
-
-                    }
-
-                } else if (encodedStr.toLowerCase().contains(".txt")) {
-
-                    try {
-
-                        encodedStr = URLDecoder.decode(encodedStr, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    File file = new File(encodedStr);
-                    Intent intent4 = new Intent();
-                    intent4.setAction(android.content.Intent.ACTION_VIEW);
-                    intent4.setDataAndType(Uri.fromFile(file), "text/plain");
-                    try {
-                        context.startActivity(intent4);
-
-                    } catch (ActivityNotFoundException e) {
-
-                        Toast toast = Toast.makeText(context,
-                                context.getString(R.string.toast_no_application_txt),
-                                Toast.LENGTH_LONG);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
-
-                    relatedContentView(myLearningModel, context, false);
-
-                } else if (myLearningModel.getObjecttypeId().equalsIgnoreCase("688")) {
-
-
                 } else {
 
-                    Intent iWeb = new Intent(context, AdvancedWebCourseLaunch.class);
-                    iWeb.putExtra("COURSE_URL", encodedStr);
-                    iWeb.putExtra("myLearningDetalData", myLearningModel);
-                    ((Activity) context).startActivityForResult(iWeb, COURSE_CLOSE_CODE);
+                    showToast(context, "The content has not been downloaded for offline View. Please download it when you are in online");
                 }
-            } else {
-
-                showToast(context, "The content has not been downloaded for offline View. Please download it when you are in online");
             }
         }
     }
@@ -1893,10 +1954,8 @@ public class GlobalMethods {
     public static MyLearningModel convertGlobalModelToMylearningModel(GlobalSearchResultModelNew globalSearchResultModelNew, AppUserModel appUserModel) {
         MyLearningModel myLearningModel = new MyLearningModel();
 
-
         if (globalSearchResultModelNew == null)
             return null;
-
 
         myLearningModel.setUserID(globalSearchResultModelNew.userID);
         myLearningModel.setUserName(globalSearchResultModelNew.userID);
@@ -1910,7 +1969,7 @@ public class GlobalMethods {
         myLearningModel.setPresenter(globalSearchResultModelNew.presenter);
         myLearningModel.setShortDes(globalSearchResultModelNew.shortdescription);
         myLearningModel.setLongDes(globalSearchResultModelNew.longdescription);
-        myLearningModel.setImageData(globalSearchResultModelNew.contenttypethumbnail);
+
         myLearningModel.setMediaName(globalSearchResultModelNew.medianame);
         myLearningModel.setCreatedDate(globalSearchResultModelNew.createddate);
         myLearningModel.setStartPage(globalSearchResultModelNew.startpage);
@@ -1928,7 +1987,11 @@ public class GlobalMethods {
         myLearningModel.setAddedToMylearning(globalSearchResultModelNew.isaddedtomylearning);
         myLearningModel.setEventContentid(globalSearchResultModelNew.contentid);
         myLearningModel.setRelatedContentCount("" + globalSearchResultModelNew.relatedconentcount);
-        myLearningModel.setDurationEndDate(globalSearchResultModelNew.duration);
+        if (globalSearchResultModelNew.duration.equalsIgnoreCase("0")) {
+            myLearningModel.setDurationEndDate("");
+        } else {
+            myLearningModel.setDurationEndDate(globalSearchResultModelNew.duration);
+        }
         myLearningModel.setRatingId("" + globalSearchResultModelNew.ratingid);
         myLearningModel.setIsExpiry("false");
         myLearningModel.setMediatypeId(globalSearchResultModelNew.mediatypeid);
@@ -1956,7 +2019,6 @@ public class GlobalMethods {
 
         myLearningModel.setPublishedDate(formatDate(globalSearchResultModelNew.publisheddate, "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss"));
 
-
         myLearningModel.setEventstartTime(globalSearchResultModelNew.eventstartdatedisplay);
         myLearningModel.setEventendTime(globalSearchResultModelNew.eventenddatedisplay);
 
@@ -1966,9 +2028,14 @@ public class GlobalMethods {
 
         myLearningModel.setBadCancellationEnabled(globalSearchResultModelNew.isBadCancellationEnabled);
 
+        myLearningModel.setImageData(globalSearchResultModelNew.siteurl + globalSearchResultModelNew.thumbnailimagepath);
+
+        myLearningModel.setViewprerequisitecontentstatus(globalSearchResultModelNew.viewprerequisitecontentstatus);
+
+        myLearningModel.setContentTypeImagePath(globalSearchResultModelNew.iconpath);
+
         return myLearningModel;
     }
-
 
     public static SideMenusModel convertGlobalModelToSideMenuModel(GlobalSearchResultModelNew globalSearchResultModelNew) {
         SideMenusModel sideMenusModel = new SideMenusModel();

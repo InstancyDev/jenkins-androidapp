@@ -94,6 +94,7 @@ import com.instancy.instancylearning.models.MyLearningModel;
 import com.instancy.instancylearning.models.SideMenusModel;
 import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningDetailActivity1;
+import com.instancy.instancylearning.sidemenumodule.SideMenu;
 import com.instancy.instancylearning.utils.EndlessScrollListener;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 import com.instancy.instancylearning.utils.PreferencesManager;
@@ -128,6 +129,7 @@ import static com.instancy.instancylearning.utils.StaticValues.FILTER_CLOSE_CODE
 import static com.instancy.instancylearning.utils.StaticValues.GLOBAL_SEARCH;
 import static com.instancy.instancylearning.utils.StaticValues.IAP_LAUNCH_FLOW_CODE;
 import static com.instancy.instancylearning.utils.StaticValues.MYLEARNING_FRAGMENT_OPENED_FIRSTTIME;
+import static com.instancy.instancylearning.utils.StaticValues.PREREQ_CLOSE;
 import static com.instancy.instancylearning.utils.Utilities.ConvertToDate;
 import static com.instancy.instancylearning.utils.Utilities.GetZeroTimeDate;
 import static com.instancy.instancylearning.utils.Utilities.formatDate;
@@ -1586,7 +1588,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
             menu.getItem(1).setVisible(true);//enroll
         }
 
-        if (myLearningDetalData.getAddedToMylearning() == 0) {
+        if (myLearningDetalData.getAddedToMylearning() == 0 || myLearningDetalData.getAddedToMylearning() == 2) {
             if (myLearningDetalData.isArchived()) {
                 menu.getItem(6).setVisible(true);//removeWishListed
             } else {
@@ -1637,7 +1639,6 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
 //
 //                    menu.getItem(1).setVisible(true);//enroll
 //
-//
 //                } else if (myLearningDetalData.getWaitlistlimit() != -1 && myLearningDetalData.getWaitlistlimit() != myLearningDetalData.getWaitlistenrolls()) {
 //
 //                    int waitlistSeatsLeftout = myLearningDetalData.getWaitlistlimit() - myLearningDetalData.getWaitlistenrolls();
@@ -1669,7 +1670,23 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
 
                 if (item.getItemId() == R.id.ctx_view) {
 //                    GlobalMethods.launchCourseViewFromGlobalClass(myLearningDetalData, v.getContext());
-                    GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(), isIconEnabled);
+                    if (isValidString(myLearningDetalData.getViewprerequisitecontentstatus())) {
+                        String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6);
+                        alertMessage = alertMessage + "  " + myLearningDetalData.getViewprerequisitecontentstatus();
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert))
+                                .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
+
+                    } else {
+                        GlobalMethods.relatedContentView(myLearningDetalData, v.getContext(), isIconEnabled);
+                    }
                 }
 
                 if (item.getItemId() == R.id.ctx_cancelenrollment) {
@@ -1707,7 +1724,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                             Intent intent = new Intent(context, PrerequisiteContentActivity.class);
                             intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                             intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
-                            startActivity(intent);
+                            startActivityForResult(intent, PREREQ_CLOSE);
 
                         } else {
 
@@ -1909,7 +1926,7 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                 Intent intent = new Intent(context, PrerequisiteContentActivity.class);
                 intent.putExtra("sideMenusModel", (Serializable) sideMenusModel);
                 intent.putExtra("myLearningDetalData", (Serializable) myLearningDetalData);
-                startActivity(intent);
+                startActivityForResult(intent, PREREQ_CLOSE);
             } else {
 
 
@@ -2536,6 +2553,17 @@ public class Event_fragment_DynamicBottomButtons extends Fragment implements Swi
                     }
 
                 }
+            }
+        }
+
+        if (requestCode == PREREQ_CLOSE && resultCode == RESULT_OK && data != null) {
+
+            boolean refresh = data.getBooleanExtra("REFRESH", false);
+
+            if (refresh) {
+
+                ((SideMenu) getActivity()).homeControllClicked(true, 1, "", false, "");
+
             }
         }
 

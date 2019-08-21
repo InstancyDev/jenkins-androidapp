@@ -24,7 +24,7 @@
             android:padding="6dp">
 
             <ImageView
-                android:id="@+id/imageThumb"
+                android:id="@+id/imagethumb"
                 android:layout_width="fill_parent"
                 android:layout_height="200dp"
                 android:adjustViewBounds="true"
@@ -32,6 +32,22 @@
                 android:clickable="true"
                 android:padding="2dp"
                 android:src="@drawable/cellimage" />
+
+            <TextView
+                android:id="@+id/lbRequired"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="5dp"
+                android:background="@color/colorRed"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:padding="2dp"
+                android:text="Required"
+                android:visibility="gone"
+                android:textColor="@color/colorWhite"
+                android:textSize="18sp"
+                android:typeface="sans" />
 
 
             <android.support.design.widget.FloatingActionButton
@@ -57,34 +73,136 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/imgLayout"
             android:orientation="horizontal"
-            android:padding="5dp"
-            android:weightSum="3">
+            android:padding="5dp">
 
             <RelativeLayout
                 android:id="@+id/relattitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2.7">
+                android:layout_weight="2">
 
                 <TextView
                     android:id="@+id/txtCourseName"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:gravity="center_vertical|fill_horizontal"
-                    android:maxLines="2"
+                    android:maxLines="4"
                     android:padding="2dp"
-                    android:text="Ergonomics in Office "
+                    android:text="Ergonomics in Office  Ergonomics in Office  Ergonomics in Office "
                     android:textColor="@color/colorBlack"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:typeface="sans" />
+
+
+                <LinearLayout
+                    android:id="@+id/startTimeLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtCourseName"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lbStartDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="2dp"
+                        android:text="Start Date: "
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtStartDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="2dp"
+                        android:text="SEAC"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/endTimeLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/startTimeLayout"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lbEndDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="2dp"
+                        android:text="End Date: "
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtEndDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="2dp"
+                        android:text="SEAC"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/timeZoneLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/endTimeLayout"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lbTimeZone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="2dp"
+                        android:text="Time Zone:"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtTimeZone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:gravity="left"
+                        android:maxLines="1"
+                        android:padding="2dp"
+                        android:text=""
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
 
 
                 <LinearLayout
                     android:id="@+id/authorLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/txtCourseName"
+                    android:layout_below="@+id/timeZoneLayout"
                     android:orientation="horizontal">
 
                     <TextView
@@ -115,133 +233,73 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/createdOnLayout"
+                    android:id="@+id/locationLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/authorLayout"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/lbCreatedOn"
+                        android:id="@+id/lblocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="2dp"
-                        android:text="Created on: "
+                        android:text="Location:"
                         android:textColor="@color/colorBlack"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/txtCreatedOn"
+                        android:id="@+id/txtlocation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="2dp"
-                        android:text="04/18/2019"
+                        android:text=""
                         android:textColor="@color/colorBlack"
                         android:textSize="14sp" />
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/contentTypeLayout"
+                    android:id="@+id/statusLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/createdOnLayout"
+                    android:layout_below="@+id/locationLayout"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/lbContentType"
+                        android:id="@+id/lbstatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="2dp"
-                        android:text="Content Type:"
+                        android:text="Status:"
                         android:textColor="@color/colorBlack"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/txtContentType"
+                        android:id="@+id/txtStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:gravity="left"
                         android:maxLines="1"
                         android:padding="2dp"
-                        android:text="Image"
+                        android:text=""
                         android:textColor="@color/colorBlack"
                         android:textSize="14sp" />
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/txtShortDesc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/contentTypeLayout"
-                    android:ellipsize="end"
-                    android:gravity="left"
-                    android:padding="2dp"
-                    android:text="here short description here short description here short description here short description here short description here short description "
-                    android:textColor="@color/colorBlack"
-                    android:textSize="14sp" />
-
-
-                <TextView
-                    android:id="@+id/lbAddedtoMylearning"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/txtShortDesc"
-                    android:ellipsize="end"
-                    android:gravity="left"
-                    android:maxLines="1"
-                    android:padding="2dp"
-                    android:text="Added to Mylearning"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="14sp" />
-
-                <LinearLayout
-                    android:id="@+id/selectedDateLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/lbAddedtoMylearning"
-                    android:visibility="gone"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/lbSelectedDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:gravity="left"
-                        android:maxLines="1"
-                        android:padding="2dp"
-                        android:text="@string/prerequis_label_selectedtimelabel"
-                        android:textColor="@color/colorBlack"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtSelectedDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:gravity="left"
-                        android:maxLines="3"
-                        android:padding="2dp"
-                        android:text="22-12-2019 22-12-2019 22-12-2019 22-12-2019 22-12-2019"
-                        android:textColor="@color/colorBlack"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
 
             </RelativeLayout>
 
@@ -249,7 +307,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight=".3"
-                android:padding="4dp">
+                android:padding="4dp"
+                android:visibility="gone">
 
                 <ImageButton
                     android:id="@+id/btn_contextmenu"
@@ -260,24 +319,6 @@
                     android:layout_gravity="center"
                     android:background="@drawable/ic_more_vert_black_24dp" />
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentEnd="true">
-
-                    <CheckBox
-                        android:id="@+id/chxBoxPreq"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:background="@android:color/transparent"
-                        android:clickable="true"
-                        android:gravity="center"
-                        android:text="@string/fa_icon_cloud_download"
-                        android:textColor="@color/text_color"
-                        android:textSize="24sp" />
-                </RelativeLayout>
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>

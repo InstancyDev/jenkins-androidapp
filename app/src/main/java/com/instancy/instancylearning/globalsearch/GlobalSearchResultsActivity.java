@@ -275,8 +275,6 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
             MyLearningModel myLearningDetalData = convertGlobalModelToMylearningModel(globalSearchResultModel, appUserModel);
 
-//            checkUserLogin(myLearningDetalData, false, true, globalSearchResultModel);
-
             try {
                 checkUserLoginPost(myLearningDetalData, false, true, globalSearchResultModel, sideMenusModel);
             } catch (JSONException e) {
@@ -544,6 +542,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                             menu.getItem(1).setVisible(true);//buy
                         }
                     }
+                } else if (globalSearchResultModel.isaddedtomylearning == 2) {
+                    menu.getItem(4).setVisible(true);// add
                 } else {
                     menu.getItem(0).setVisible(true);//view
                 }
@@ -585,6 +585,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                             menu.getItem(12).setVisible(true);
                         }
                     }
+                } else if (globalSearchResultModel.isaddedtomylearning == 2) {
+                    menu.getItem(5).setVisible(true);// add
                 }
                 menu.getItem(6).setVisible(true);//Detail
                 break;
@@ -627,7 +629,23 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         addToMyLearningCheckUser(myLearningDetalData, false, globalSearchResultModel, sideMenusModel);
                         break;
                     case R.id.ctx_view:
-                        launchCourseForGlobalSearch(myLearningDetalData, GlobalSearchResultsActivity.this);
+                        if (myLearningDetalData != null && isValidString(myLearningDetalData.getViewprerequisitecontentstatus())) {
+                            String alertMessage = getLocalizationValue(JsonLocalekeys.prerequistesalerttitle6_alerttitle6);
+                            alertMessage = alertMessage + "  " + myLearningDetalData.getViewprerequisitecontentstatus();
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(GlobalSearchResultsActivity.this);
+                            builder.setMessage(alertMessage).setTitle(getLocalizationValue(JsonLocalekeys.details_alerttitle_stringalert))
+                                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.events_alertbutton_okbutton), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
+
+                        } else {
+                            launchCourseForGlobalSearch(myLearningDetalData, GlobalSearchResultsActivity.this);
+                        }
                         break;
                     case R.id.ctx_join:
                         // Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
@@ -645,7 +663,7 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                         cancelEnrollment(myLearningDetalData);
                         break;
                     case R.id.ctx_detail:
-                        gotoDetailView(globalSearchResultModel);
+                        gotoDetailView(globalSearchResultModel, sideMenusModel);
                         break;
                     case R.id.ctx_addtomy:
                         // Toast.makeText(v.getContext(), "Clicked here", Toast.LENGTH_SHORT).show();
@@ -704,7 +722,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
-    public void getQuestionDetails(GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
+    public void getQuestionDetails(GlobalSearchResultModelNew
+                                           globalSearchResultModelNew, SideMenusModel sideMenusModel) {
 
         //      public AskTheExpertDTO GetUserQuestionDetails(int intUserId, int intSiteID, int intQuestionID, int ComponentInsID, int ComponentID)
 
@@ -715,7 +734,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public void gotoQuestionDetail(AskExpertQuestionModelDg askExpertQuestionModel, boolean nextLevel, SideMenusModel sideMenusModel) {
+    public void gotoQuestionDetail(AskExpertQuestionModelDg askExpertQuestionModel,
+                                   boolean nextLevel, SideMenusModel sideMenusModel) {
 
 
         Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, AskExpertsAnswersActivity.class);
@@ -741,7 +761,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         //
     }
 
-    public void gotoDiscForum(boolean nextLevel, DiscussionForumModelDg discussionForumModel, String topicID) {
+    public void gotoDiscForum(boolean nextLevel, DiscussionForumModelDg
+            discussionForumModel, String topicID) {
 // http://stmciapi.instancysoft.com/api//MobileLMS/GetForumTopics?ForumID=155
 
 
@@ -755,7 +776,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         startActivity(intentDetail);
     }
 
-    public PeopleListingModel convertGlobalToPeopleListing(GlobalSearchResultModelNew resultModel) {
+    public PeopleListingModel convertGlobalToPeopleListing(GlobalSearchResultModelNew
+                                                                   resultModel) {
         PeopleListingModel peopleListingModel = new PeopleListingModel();
 
         if (resultModel == null) {
@@ -799,7 +821,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public AskExpertQuestionModelDg convertGlobalToQuestionModel(GlobalSearchResultModelNew resultModel) {
+    public AskExpertQuestionModelDg convertGlobalToQuestionModel(GlobalSearchResultModelNew
+                                                                         resultModel) {
         AskExpertQuestionModelDg askExpertQuestionModel = new AskExpertQuestionModelDg();
 
         if (resultModel == null) {
@@ -830,7 +853,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         return askExpertQuestionModel;
     }
 
-    public DiscussionForumModelDg convertGlobalToDiscussionForum(GlobalSearchResultModelNew resultModel) {
+    public DiscussionForumModelDg convertGlobalToDiscussionForum(GlobalSearchResultModelNew
+                                                                         resultModel) {
         DiscussionForumModelDg discussionForumModel = new DiscussionForumModelDg();
 
         if (resultModel == null) {
@@ -886,7 +910,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public DiscussionTopicModelDg convertGlobalToDiscussionTopicModel(GlobalSearchResultModelNew resultModel) {
+    public DiscussionTopicModelDg convertGlobalToDiscussionTopicModel
+            (GlobalSearchResultModelNew resultModel) {
         DiscussionTopicModelDg discussionTopicModel = new DiscussionTopicModelDg();
 
         if (resultModel == null) {
@@ -1091,7 +1116,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
     }
 
-    public void enrollEventCall(MyLearningModel learningModel, GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
+    public void enrollEventCall(MyLearningModel learningModel, GlobalSearchResultModelNew
+            globalSearchResultModelNew, SideMenusModel sideMenusModel) {
 
         if (uiSettingsModel.isAllowExpiredEventsSubscription() && returnEventCompleted(learningModel.getEventstartUtcTime())) {
 
@@ -1108,7 +1134,9 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
-    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData, boolean isInApp, GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
+    public void addToMyLearningCheckUser(MyLearningModel myLearningDetalData,
+                                         boolean isInApp, GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel
+                                                 sideMenusModel) {
 
         if (isNetworkConnectionAvailable(this, -1)) {
 
@@ -1244,7 +1272,9 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 //        VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
 //    }
 
-    public void checkUserLoginPost(final MyLearningModel learningModel, final boolean isInApp, final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew, final SideMenusModel sideMenusModel) throws JSONException {
+    public void checkUserLoginPost(final MyLearningModel learningModel, final boolean isInApp,
+                                   final boolean seeAll, final GlobalSearchResultModelNew globalSearchResultModelNew,
+                                   final SideMenusModel sideMenusModel) throws JSONException {
 
         String urlString = appUserModel.getWebAPIUrl() + "/MobileLMS/PostLoginDetails";
 
@@ -1505,18 +1535,20 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
-    public void gotoDetailView(GlobalSearchResultModelNew globalSearchResultModelNew) {
+    public void gotoDetailView(GlobalSearchResultModelNew globalSearchResultModelNew, SideMenusModel sideMenusModel) {
         MyLearningModel myLearningDetalData = convertGlobalModelToMylearningModel(globalSearchResultModelNew, appUserModel);
 
         Intent intentDetail = new Intent(GlobalSearchResultsActivity.this, MyLearningDetailActivity1.class);
         intentDetail.putExtra("IFROMCATALOG", false);
         intentDetail.putExtra("myLearningDetalData", myLearningDetalData);
         intentDetail.putExtra("IFROMCATALOG", true);
+        intentDetail.putExtra("sideMenusModel", (Serializable) sideMenusModel);
         startActivityForResult(intentDetail, DETAIL_CLOSE_CODE);
 
     }
 
-    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel, final boolean isJoinedCommunity) {
+    public void getMobileGetMobileContentMetaData(final MyLearningModel learningModel,
+                                                  final boolean isJoinedCommunity) {
 
         String urlStr = appUserModel.getWebAPIUrl() + "MobileLMS/MobileGetMobileContentMetaData?SiteURL="
                 + learningModel.getSiteURL() + "&ContentID=" + learningModel.getContentID() + "&userid="
@@ -1577,7 +1609,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         VolleySingleton.getInstance(this).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void addToMyLearning(final MyLearningModel myLearningDetalData, final boolean isAutoAdd, final boolean isJoinedCommunity, SideMenusModel sideMenusModel) {
+    public void addToMyLearning(final MyLearningModel myLearningDetalData,
+                                final boolean isAutoAdd, final boolean isJoinedCommunity, SideMenusModel sideMenusModel) {
 
         if (isNetworkConnectionAvailable(GlobalSearchResultsActivity.this, -1)) {
 //            boolean isSubscribed = db.isSubscribedContent(myLearningDetalData);
@@ -1766,7 +1799,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
         return askExpertsQuestionModel;
     }
 
-    public void getUserQuestionDetails(GlobalSearchResultModelNew globalSearchResultModelNew, final SideMenusModel sideMenusModel, final boolean newxtLevel) {
+    public void getUserQuestionDetails(GlobalSearchResultModelNew globalSearchResultModelNew,
+                                       final SideMenusModel sideMenusModel, final boolean newxtLevel) {
         //      public AskTheExpertDTO GetUserQuestionDetails(int intUserId, int intSiteID, int intQuestionID, int ComponentInsID, int ComponentID)
 
         String parmStringUrl = appUserModel.getWebAPIUrl() + "MobileLMS/GetUserQuestionDetails?intUserId=" + appUserModel.getUserIDValue() + "&intSiteID=" + appUserModel.getSiteIDValue() + "&intQuestionID=" + globalSearchResultModelNew.folderid + "&ComponentInsID=" + sideMenusModel.getRepositoryId() + "&ComponentID=" + sideMenusModel.getComponentId();
@@ -1821,7 +1855,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public void getForumList(SideMenusModel sideMenusModel, GlobalSearchResultModelNew globalSearchResultModelNew, boolean nextLevel) {
+    public void getForumList(SideMenusModel sideMenusModel, GlobalSearchResultModelNew
+            globalSearchResultModelNew, boolean nextLevel) {
 
         //    http://digimedicaapi.instancysoft.com/api/DiscussionForums/GetCourseDiscussionContentID?strContentID=&intForumID=7&intUserID=1&intSiteID=374&strLocale=en-us
 
@@ -1857,7 +1892,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
     }
 
 
-    public void getStringResponseFromPostMethod(final String postData, String apiURL, final GlobalSearchResultModelNew globalSearchResultModelNew, final boolean nextLevel) {
+    public void getStringResponseFromPostMethod(final String postData, String apiURL,
+                                                final GlobalSearchResultModelNew globalSearchResultModelNew, final boolean nextLevel) {
 
         byte[] encrpt = new byte[0];
         try {
@@ -1930,7 +1966,8 @@ public class GlobalSearchResultsActivity extends AppCompatActivity implements Vi
 
     }
 
-    public DiscussionForumModelDg getForumModel(String responseStr, int forumId) throws JSONException {
+    public DiscussionForumModelDg getForumModel(String responseStr, int forumId) throws
+            JSONException {
 
         JSONObject jsonObject = new JSONObject(responseStr);
 

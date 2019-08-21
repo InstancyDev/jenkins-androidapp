@@ -104,10 +104,12 @@ public class SignUp_Activity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
-
+                Log.d(TAG, "shouldOverrideUrlLoading: " + url);
                 if (url.toLowerCase().contains("home")) {
                     view.loadUrl(appDefaultUrl + "nativemobile/Sign-Up/nativesignup/true");
-                } else if (url.toLowerCase().contains("autosignupnativeapp.aspx")) {
+//                } else if (url.toLowerCase().contains("autosignupnativeapp.aspx")) {
+                } else if (url.toLowerCase().contains("autosignupnativeapp.html")) {
+
                     if (url.contains("?")) {
 //                        Toast.makeText(SignUp_Activity.this, "Sign up success..!!", Toast.LENGTH_SHORT).show();
                         String query = url.substring(url.lastIndexOf("?") + 1);

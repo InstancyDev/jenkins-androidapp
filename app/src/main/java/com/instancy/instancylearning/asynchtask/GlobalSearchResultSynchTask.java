@@ -272,6 +272,9 @@ public class GlobalSearchResultSynchTask extends AsyncTask<String, Integer, JSON
 
                         globalSearchResultModel.isBadCancellationEnabled = resultList.optBoolean("isbadcancellationenabled", false);
 
+                        globalSearchResultModel.viewprerequisitecontentstatus = resultList.optString("viewprerequisitecontentstatus", "");
+
+
                         globalSearchResultModel.componentName = selectedModel.componentName;
                         globalSearchResultModel.componentid = selectedModel.componentID;
                         globalSearchResultModel.componentInstanceID = selectedModel.componentInstancID;

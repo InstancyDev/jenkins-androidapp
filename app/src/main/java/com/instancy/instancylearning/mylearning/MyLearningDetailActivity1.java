@@ -75,6 +75,7 @@ import com.instancy.instancylearning.asynchtask.SetCourseCompleteSynchTask;
 import com.instancy.instancylearning.catalog.ContentViewActivity;
 import com.instancy.instancylearning.databaseutils.DatabaseHandler;
 import com.instancy.instancylearning.events.PrerequisiteContentActivity;
+import com.instancy.instancylearning.events.PrerequisiteModel;
 import com.instancy.instancylearning.globalpackage.AppController;
 import com.instancy.instancylearning.globalpackage.GlobalMethods;
 import com.instancy.instancylearning.helper.FontManager;
@@ -117,7 +118,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -309,6 +312,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
     boolean isEventSheduledDone = false;
 
+    boolean isFromPreqDetailAction;
+
 
     private String getLocalizationValue(String key) {
         return JsonLocalization.getInstance().getStringForKey(key, MyLearningDetailActivity1.this);
@@ -341,6 +346,9 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             isAutoLaunch = bundle.getBoolean(ISAUTOLAUNCH_KEY, false);
 
             sideMenusModel = (SideMenusModel) getIntent().getExtras().getSerializable("sideMenusModel");
+
+            isFromPreqDetailAction = getIntent().getBooleanExtra("rescheduleenroll", false);
+
         }
         String apiKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxZKOgrgA0BACsUqzZ49Xqj1SEWSx/VNSQ7e/WkUdbn7Bm2uVDYagESPHd7xD6cIUZz9GDKczG/fkoShHZdMCzWKiq07BzWnxdSaWa4rRMr+uylYAYYvV5I/R3dSIAOCbbcQ1EKUp5D7c2ltUpGZmHStDcOMhyiQgxcxZKTec6YiJ17X64Ci4adb9X/ensgOSduwQwkgyTiHjklCbwyxYSblZ4oD8WE/Ko9003VrD/FRNTAnKd5ahh2TbaISmEkwed/TK4ehosqYP8pZNZkx/bMsZ2tMYJF0lBUl5i9NS+gjVbPX4r013Pjrnz9vFq2HUvt7p26pxpjkBTtkwVgnkXQIDAQAB";
 
@@ -1032,7 +1040,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
                         Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
                         iconFirst.setBackground(viewIcon);
-                        buttonFirst.setText(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewoption));
+                        buttonFirst.setText(getLocalizationValue(JsonLocalekeys.events_actionsheet_relatedcontentoption));
                         buttonFirst.setTag(1);
                         txtPrice.setVisibility(View.GONE);
                         txtPrice.setText("");
@@ -1062,43 +1070,6 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
                         if (isValidString(myLearningModel.getEventstartUtcTime()) && !returnEventCompleted(myLearningModel.getEventstartUtcTime())) {
                             iconFirst.setBackground(calendarImg);
-//                            if (isValidString(myLearningModel.getAviliableSeats())) {
-//                                int avaliableSeats = 0;
-//                                try {
-//                                    avaliableSeats = Integer.parseInt(myLearningModel.getAviliableSeats());
-//                                } catch (NumberFormatException nf) {
-//                                    avaliableSeats = 0;
-//                                    nf.printStackTrace();
-//                                }
-//                                if (avaliableSeats > 0) {
-//
-//                                    buttonFirst.setText(getLocalizationValue(JsonLocalekeys.details_button_enrollbutton));
-//                                    buttonFirst.setTag(6);
-//
-//                                } else if (isValidString(myLearningModel.getActionWaitlist()) && myLearningModel.getActionWaitlist().equalsIgnoreCase("true")) {
-//                                    buttonFirst.setText(getLocalizationValue(JsonLocalekeys.events_actionsheet_waitlistoption));
-//                                    buttonFirst.setTag(6);
-//
-//                                }
-////                                else if (avaliableSeats <= 0 && myLearningModel.getWaitlistlimit() != 0 && myLearningModel.getWaitlistlimit() != myLearningModel.getWaitlistenrolls()) {
-//                                    buttonFirst.setText(getLocalizationValue(JsonLocalekeys.details_button_enrollbutton));
-//                                    buttonFirst.setTag(6);
-////
-////                                }
-//                                else {
-//                                //    btnsLayout.setVisibility(View.GONE);
-//                                    if (myLearningModel.getAddedToMylearning()!=2){
-//                                        btnsLayout.setVisibility(View.GONE);
-//                                    } else if(myLearningModel.getAddedToMylearning()==2){
-//                                        buttonFirst.setText(getLocalizationValue(JsonLocalekeys.events_actionsheet_waitlistoption));
-//                                        buttonFirst.setTag(6);
-//                                    }else {
-//
-//                                    }
-//
-//                                }
-//                            } else {
-
 
                             if (isValidString(myLearningModel.getActionWaitlist()) && myLearningModel.getActionWaitlist().equalsIgnoreCase("true")) {
                                 buttonFirst.setText(getLocalizationValue(JsonLocalekeys.events_actionsheet_waitlistoption));
@@ -1163,6 +1134,14 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 //                        buttonFirst.setTag(3);
 
                     }
+                }
+
+                if (myLearningModel.getEventType().equalsIgnoreCase("2") && myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                    relativeSecond.setVisibility(View.VISIBLE);
+                    Drawable relatedContent = getButtonDrawable(R.string.fa_icon_list_alt, this, uiSettingsModel.getAppButtonTextColor());
+                    buttonSecond.setText(getLocalizationValue(JsonLocalekeys.details_label_sessionstitlelable));
+                    iconSecond.setBackground(relatedContent);
+                    buttonSecond.setTag(13);
                 }
 
             } else {
@@ -1258,7 +1237,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                     }
                     Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
                     iconFirst.setBackground(viewIcon);
-                    buttonFirst.setText(getLocalizationValue(JsonLocalekeys.details_button_viewbutton));
+                    buttonFirst.setText(getLocalizationValue(JsonLocalekeys.events_actionsheet_relatedcontentoption));
                     buttonFirst.setTag(1);
                     txtPrice.setVisibility(View.GONE);
                     txtPrice.setText("");
@@ -1286,6 +1265,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                         Intent intent = new Intent(MyLearningDetailActivity1.this, MyLearningSchedulelActivity.class);
                         intent.putExtra("myLearningDetalData", myLearningModel);
                         intent.putExtra("sideMenusModel", sideMenusModel);
+
                         startActivityForResult(intent, DETAIL_CLOSE_CODE);
                     }
                 } else if (myLearningModel.getEventScheduleType() == 2 && isValidString(myLearningModel.getReSheduleEvent())) {
@@ -1382,7 +1362,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         if (myLearningModel.getIsListView().equalsIgnoreCase("true") && !myLearningModel.getRelatedContentCount().equalsIgnoreCase("0")) {
             Drawable viewIcon = getButtonDrawable(R.string.fa_icon_eye, this, uiSettingsModel.getAppButtonTextColor());
             iconFirst.setBackground(viewIcon);
-            buttonFirst.setText(getLocalizationValue(JsonLocalekeys.details_button_viewbutton));
+            buttonFirst.setText(getLocalizationValue(JsonLocalekeys.events_actionsheet_relatedcontentoption));
             buttonFirst.setTag(1);
             txtPrice.setVisibility(View.GONE);
             txtPrice.setText("");
@@ -1686,6 +1666,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                                 myLearningModel.setStatusActual(jsonObject.getString("ContentStatus"));
                             }
 
+                            myLearningModel.setEventType(jsonObject.optString("EventType", ""));
+
                             myLearningModel.setContentEnrolled(jsonObject.optString("isContentEnrolled", "false"));
 
                             if (isFromCatalog) {
@@ -1769,24 +1751,12 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 //                                new UtilMoreText(txtWhatYouLearnText, "" + Html.fromHtml(myLearningModel.getLearningObjectives() + "  "), "            Read More", "         Read Less").setSpanTextColor(Color.parseColor(uiSettingsModel.getAppButtonBgColor())).createString();
 
                             }
+
+                            if (myLearningModel.getEventType().equalsIgnoreCase("2") && myLearningModel.getObjecttypeId().equalsIgnoreCase("70")) {
+                                typeLayout(isFromCatalog, uiSettingsModel, true); // BetaCommented
+                            }
+
                             if (myLearningModel.getEventScheduleType() == 1) {
-                                if (uiSettingsModel.isEnableMultipleInstancesforEvent()) {
-//                                    if (!TextUtils.isEmpty(myLearningModel.getLongDes())) {
-//                                        findViewById(R.id.txtDescription).setVisibility(View.VISIBLE);
-//                                        txtWhatYouLearnText.setVisibility(View.VISIBLE);
-//                                        txtLongDesc.setText(Html.fromHtml(myLearningModel.getLongDes()));
-//                                    }
-//                                    if (!TextUtils.isEmpty(myLearningModel.getTableofContent())) {
-//                                        findViewById(R.id.txtTableofContentTitle).setVisibility(View.VISIBLE);
-//                                        txtWhatYouLearnText.setVisibility(View.VISIBLE);
-//                                        txtTableofContentText.setText(Html.fromHtml(myLearningModel.getTableofContent()));
-//                                    }
-//                                    if (!TextUtils.isEmpty(myLearningModel.getLearningObjectives())) {
-//                                        findViewById(R.id.txtWhatYouLearnTitle).setVisibility(View.VISIBLE);
-//                                        txtWhatYouLearnText.setVisibility(View.VISIBLE);
-//                                        txtWhatYouLearnText.setText(Html.fromHtml(myLearningModel.getLearningObjectives()));
-//                                    }
-                                }
                                 typeLayout(isFromCatalog, uiSettingsModel, true); // BetaCommented
                             }
 
@@ -1810,6 +1780,17 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
                     }
                 }
+
+                if (requestType.equalsIgnoreCase("COURSETRACKING")) {
+
+                    if (isValidString(response)) {
+
+
+                        Log.d(TAG, "notifySuccess: detail" + response);
+                        refreshCatalogContent = true;
+                    }
+                }
+
 
                 svProgressHUD.dismiss();
             }
@@ -2013,6 +1994,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                             Intent intent = new Intent(MyLearningDetailActivity1.this, MyLearningSchedulelActivity.class);
                             intent.putExtra("myLearningDetalData", myLearningModel);
                             intent.putExtra("sideMenusModel", sideMenusModel);
+                            intent.putExtra("rescheduleenroll", isFromPreqDetailAction);
                             startActivityForResult(intent, DETAIL_CLOSE_CODE);
 
                         }
@@ -2020,6 +2002,7 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                         Intent intent = new Intent(MyLearningDetailActivity1.this, MyLearningSchedulelActivity.class);
                         intent.putExtra("myLearningDetalData", myLearningModel);
                         intent.putExtra("sideMenusModel", sideMenusModel);
+                        intent.putExtra("rescheduleenroll", isFromPreqDetailAction);
                         startActivityForResult(intent, DETAIL_CLOSE_CODE);
 
                     }
@@ -2063,6 +2046,11 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
 
                 } else if ((Integer) buttonSecond.getTag() == 11) {
                     Intent intent = new Intent(MyLearningDetailActivity1.this, ContentViewActivity.class);
+                    intent.putExtra("myLearningDetalData", myLearningModel);
+                    startActivityForResult(intent, DETAIL_CLOSE_CODE);
+
+                } else if ((Integer) buttonSecond.getTag() == 13) {
+                    Intent intent = new Intent(MyLearningDetailActivity1.this, SessionViewActivity.class);
                     intent.putExtra("myLearningDetalData", myLearningModel);
                     startActivityForResult(intent, DETAIL_CLOSE_CODE);
 
@@ -2266,6 +2254,8 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             }
             refreshReview = true;
             refreshCatalogContent = true;
+
+            executeSiteWorkflowrulesOnTracking(myLearningModel);
         }
 
         if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
@@ -2320,6 +2310,9 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             if (data != null) {
                 MyLearningModel myLearningModel = (MyLearningModel) data.getSerializableExtra("myLearningDetalData");
                 boolean refresh = data.getBooleanExtra("SHEDULED", false);
+
+                boolean isFromreSchedule = data.getBooleanExtra("rescheduleenroll", false);
+
                 if (refresh) {
                     refreshReview = true;
                     isEventSheduled = true;
@@ -2330,11 +2323,64 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
                         GetContentDetails(false, eventInstanceId);
                     }
                 }
+                if (isFromreSchedule) {
+                    String EventInstanceId = data.getStringExtra("EventInstanceId");
+                    String EventInstanceSelectedStartDate = data.getStringExtra("EventInstanceSelectedStartDate");
+                    String EventInstanceSelectedEndDate = data.getStringExtra("EventInstanceSelectedEndDate");
+                    Log.d(TAG, "onActivityResult: " + EventInstanceId);
+
+//                    try {
+//                        java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("EEE, MMM dd yyyy, hh:mm a");
+//                        Date startdate = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(EventInstanceSelectedStartDate);
+//                        Date endDate = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(EventInstanceSelectedEndDate);
+//
+//                        PrerequisiteModel prerequisiteModel = new PrerequisiteModel();
+//
+//                        prerequisiteModel.EventStartDateTime = format.format(startdate);
+//
+//                        prerequisiteModel.EventEndDateTime = format.format(endDate);
+//
+//                        prerequisiteModel.ContentID = EventInstanceId;
+//
+//                        finishTheActivityForPrerequsite(prerequisiteModel, myLearningModel);
+//                        // updateSelectedScheduleEvent(prerequisiteModel, myLearningModel.getContentID());
+//
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    }
+
+                    PrerequisiteModel prerequisiteModel = new PrerequisiteModel();
+
+                    prerequisiteModel.EventStartDateTime = EventInstanceSelectedStartDate;
+
+                    prerequisiteModel.EventEndDateTime = EventInstanceSelectedEndDate;
+
+                    prerequisiteModel.ContentID = EventInstanceId;
+
+                    finishTheActivityForPrerequsite(prerequisiteModel, myLearningModel);
+
+                }
             }
             refreshCatalogContent = true;
         }
 
     }
+
+    public void finishTheActivityForPrerequsite(PrerequisiteModel prerequisiteModel, MyLearningModel myLearningModel) {
+
+        if (myLearningModel != null) {
+            Intent intent = getIntent();
+            intent.putExtra("rescheduleenroll", true);
+            intent.putExtra("myLearningDetalData", (Serializable) myLearningModel);
+            intent.putExtra("EventInstanceId", prerequisiteModel.ContentID);
+            intent.putExtra("EventInstanceSelectedStartDate", prerequisiteModel.EventStartDateTime);
+            intent.putExtra("EventInstanceSelectedEndDate", prerequisiteModel.EventEndDateTime);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+
+    }
+
 
     public void getStatusFromServer(final MyLearningModel myLearningModel) {
 //        svProgressHUD.showWithMaskType(SVProgressHUD.SVProgressHUDMaskType.BlackCancel);
@@ -3184,10 +3230,6 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
         vollyService.getStringResponseVolley("INAPP", urlStr, appUserModel.getAuthHeaders());
 
         return status;
-    }
-
-    public void openRelatedContent() {
-        GlobalMethods.launchCourseViewFromGlobalClass(myLearningModel, MyLearningDetailActivity1.this, isIconEnabled);
     }
 
     public void openReportsActivity() {
@@ -4384,6 +4426,21 @@ public class MyLearningDetailActivity1 extends AppCompatActivity implements Bill
             jwVideosDownloadAsynch = new JwVideosDownloadAsynch(this, jwFileURLArray, jwFileLocalPathsArray);
             jwVideosDownloadAsynch.execute();
         }
+    }
+
+    public void executeSiteWorkflowrulesOnTracking(MyLearningModel learningModel) {
+
+        String paramsString = "strContentID=" + learningModel.getContentID() +
+                "&UserID=" + appUserModel.getUserIDValue()
+                + "&SiteID="
+                + appUserModel.getSiteIDValue()
+                + "&SCOID=" + learningModel.getScoId();
+
+        if (isNetworkConnectionAvailable(MyLearningDetailActivity1.this, -1)) {
+
+            vollyService.getStringResponseVolley("COURSETRACKING", appUserModel.getWebAPIUrl() + "CourseTracking/executeSiteWorkflowrulesOnTracking?" + paramsString, appUserModel.getAuthHeaders());
+        }
+
     }
 
 }

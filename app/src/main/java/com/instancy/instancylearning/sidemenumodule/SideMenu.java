@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.sidemenumodule;
 
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -30,6 +31,7 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -219,6 +221,8 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
     //    private SignalRService mService
     private boolean mBound = false;
 
+    Dialog dialog;
+
     private String getLocalizationValue(String key) {
         return JsonLocalization.getInstance().getStringForKey(key, SideMenu.this);
     }
@@ -313,6 +317,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
 
         if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_medmentor))) {
             sendMessageLayout.setVisibility(View.GONE);
+//            settingsLayout.setVisibility(View.GONE);
         }
 
         Log.d(TAG, "onCreate: appname " + getResources().getString(R.string.app_name));
@@ -423,7 +428,7 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                     nmEx.printStackTrace();
                     homeIndex = 0;
                 }
-                    lastClicked = 0;
+                lastClicked = 0;
 
             }
             navDrawerExpandableView.setAdapter(menuDynamicAdapter);
@@ -848,29 +853,30 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
                 return;
             }
 
+            exitDialog();
 //            if (!doubleBackToExitPressedOnce) {
 //                this.doubleBackToExitPressedOnce = true;
 //                Toast.makeText(this, "      Please click BACK again to exit.      ", Toast.LENGTH_SHORT).show();
 
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(getLocalizationValue(JsonLocalekeys.exitapplication))
-                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.exitapplication_negative), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int i) {
-                    dialog.dismiss();
-                }
-            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.exitapplication_positive), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    //do things
-                    dialog.dismiss();
-                    finish();
-
-                }
-            });
-            AlertDialog alert = builder.create();
-////                TextView textView = (TextView) alert.findViewById(android.R.id.title);
-////                textView.setTextSize(20);
-            alert.show();
+//            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setMessage(getLocalizationValue(JsonLocalekeys.exitapplication))
+//                    .setCancelable(false).setNegativeButton(getLocalizationValue(JsonLocalekeys.exitapplication_negative), new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int i) {
+//                    dialog.dismiss();
+//                }
+//            }).setPositiveButton(getLocalizationValue(JsonLocalekeys.exitapplication_positive), new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    //do things
+//                    dialog.dismiss();
+//                    finish();
+//
+//                }
+//            });
+//            AlertDialog alert = builder.create();
+//////                TextView textView = (TextView) alert.findViewById(android.R.id.title);
+//////                textView.setTextSize(20);
+//            alert.show();
 //                new Handler().postDelayed(new Runnable() {
 //
 //                    @Override
@@ -1365,5 +1371,46 @@ public class SideMenu extends AppCompatActivity implements View.OnClickListener,
         }
         return responMap;
     }
+
+    public void exitDialog() {
+
+
+        dialog = new Dialog(SideMenu.this);
+
+        dialog.setContentView(R.layout.exitdialog);
+        dialog.show();
+        TextView titleView = (TextView) dialog.findViewById(R.id.titleView);
+        titleView.setText(getLocalizationValue(JsonLocalekeys.exitapplication));
+        Button dialogYes = (Button) dialog.findViewById(R.id.dialogYes);
+        Button dialogNo = (Button) dialog.findViewById(R.id.dialogNo);
+
+        dialogNo.setText(getLocalizationValue(JsonLocalekeys.exitapplication_negative));
+
+        dialogYes.setText(getLocalizationValue(JsonLocalekeys.exitapplication_positive));
+
+        dialogNo.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        dialogNo.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+
+        dialogYes.setBackgroundColor(Color.parseColor(uiSettingsModel.getAppHeaderColor()));
+        dialogYes.setTextColor(Color.parseColor(uiSettingsModel.getAppHeaderTextColor()));
+
+        dialogYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+
+        dialogNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package com.instancy.instancylearning.webpage;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,8 +15,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.instancy.instancylearning.R;
@@ -165,6 +169,65 @@ public class Webpage_fragment extends Fragment {
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         webView.setBackgroundColor(getResources().getColor(R.color.colorFaceBookSilver));
         webSettings.setMediaPlaybackRequiresUserGesture(false);
+        webView.setWebViewClient(new WebViewClient() {
+
+                                       @Override
+                                       public void onLoadResource(WebView view, String url) {
+
+
+
+                                       }
+
+                                       @Override
+                                       public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                           Log.d(TAG, "shouldOverrideUrlLoading: " + url);
+                                           url = url.toLowerCase();
+
+                                           return false;
+                                       }
+
+                                       @Override
+                                       public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                                           super.onPageStarted(view, url, favicon);
+                                           Log.d(TAG, "onPageStarted: from normal web " + url);
+                                       }
+
+                                       @Override
+                                       public void onPageFinished(WebView view, String url) {
+                                           super.onPageFinished(view, url);
+                                           Log.d(TAG, "onPageFinished: from normal web " + url);
+
+                                       }
+
+                                       @Override
+                                       public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                                           super.onReceivedError(view, errorCode, description, failingUrl);
+
+
+                                       }
+
+                                   }
+        );
+
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                super.onProgressChanged(view, newProgress);
+
+            }
+
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                return super.onJsAlert(view, url, message, result);
+
+            }
+
+            @Override
+            public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+                return super.onJsConfirm(view, url, message, result);
+
+            }
+        });
 
 //        webView.loadUrl("https://www.flipkart.com/");
     }

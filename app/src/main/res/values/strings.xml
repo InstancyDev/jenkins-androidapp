@@ -15,9 +15,9 @@
 
     <!--<string name="app_name"> Development </string>-->
 
-    <string name="app_name"> MedMentor Education </string>
+    <!--<string name="app_name"> MedMentor Education </string>-->
 
-    <!--<string name="app_name"> AEI para Ti </string>-->
+    <string name="app_name"> AEI para Ti </string>
 
     <!--<string name="app_name">HealthHelp IE</string>-->
 

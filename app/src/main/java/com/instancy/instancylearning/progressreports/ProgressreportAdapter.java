@@ -226,6 +226,11 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         if (isValidString(listTitle.credits)) {
 
             txtCredits.setText(listTitle.credits);
+
+        }
+        if (context.getResources().getString(R.string.app_name).equalsIgnoreCase(context.getResources().getString(R.string.app_esperanza))) {
+            txtCredits.setVisibility(View.GONE);
+            lblCredits.setVisibility(View.GONE);
         }
 
         txtContentTitle.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -352,6 +357,11 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
             txtCredits.setText(progressReportModel.credits);
         }
 
+        if (context.getResources().getString(R.string.app_name).equalsIgnoreCase(context.getResources().getString(R.string.app_esperanza))) {
+            txtCredits.setVisibility(View.GONE);
+            lblCredits.setVisibility(View.GONE);
+        }
+
         FontManager.markAsIconContainer(convertView.findViewById(R.id.txt_contextmenu), iconFon);
 
         final View finalConvertView = convertView;
@@ -415,6 +425,9 @@ public class ProgressReportAdapter extends BaseExpandableListAdapter {
         popup.getMenuInflater().inflate(R.menu.progressreport_menu, popup.getMenu());
         //registering popup with OnMenuItemClickListene
         Menu menu = popup.getMenu();
+
+        menu.getItem(1).setTitle(getLocalizationValue(JsonLocalekeys.mylearning_actionsheet_viewcertificateoption));
+
         String certificationAction = "";
         String objectID = "";
         if (isFromChild) {

@@ -75,7 +75,6 @@
     <!--<string name="app_default_url">http://staging.instancysoft.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-
     <!--<string name="app_default_url">http://learntoflyair.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
@@ -92,9 +91,9 @@
     <!--<string name="app_default_url">http://medmind.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
 
-    <!--<string name="app_default_url">http://esperanza.instancy.com/</string>-->
-    <!--<string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>-->
-    <!--<string name="app_default_auth_url">http://masterapi.instancy.com/api/</string>-->
+    <string name="app_default_url">http://esperanza.instancy.com/</string>
+    <string name="app_default_webapi_url">https://qanapi.enlightus.com/api/</string>
+    <string name="app_default_auth_url">http://masterapi.instancy.com/api/</string>
 
     <!--<string name="app_default_url">http://stagingesperanza.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
@@ -132,13 +131,14 @@
     <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
     <!--<string name="app_default_auth_url">http://angularbasicapi.instancysoft.com/api/</string>-->
 
-     <!--<string name="app_default_url">http://stagingmedmind.instancy.com/</string>-->
-     <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
-     <!--<string name="app_default_auth_url">http://masterapi.instancy.com/api/</string>-->
+    <!--<string name="app_default_url">http://stagingmedmind.instancy.com/</string>-->
+    <!--<string name="app_default_webapi_url">http://angular6api.instancysoft.com/api/</string>-->
+    <!--<string name="app_default_auth_url">http://masterapi.instancy.com/api/</string>-->
 
-    <string name="app_default_url">https://www.medmentor.com/</string>
-    <string name="app_default_webapi_url">https://www.medmentor.com/webapi/api/</string>
-    <string name="app_default_auth_url">http://masterapi.instancy.com/api/</string>
+
+    <!--<string name="app_default_url">https://www.medmentor.com/</string>-->
+    <!--<string name="app_default_webapi_url">https://www.medmentor.com/webapi/api/</string>-->
+    <!--<string name="app_default_auth_url">http://masterapi.instancy.com/api/</string>-->
 
     <!--<string name="app_default_url">http://mci4.instancy.com/</string>-->
     <!--<string name="app_default_webapi_url">http://qaDemwebapi.instancy.net/api/</string>-->

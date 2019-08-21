@@ -64,10 +64,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.instancy.instancylearning.utils.StaticValues.AUTOLAUNCHCONTENTID_KEY;
 import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_PASSWORD;
 import static com.instancy.instancylearning.utils.StaticValues.BUNDLE_USERNAME;
 import static com.instancy.instancylearning.utils.Utilities.isNetworkConnectionAvailable;
 import static com.instancy.instancylearning.utils.Utilities.isValidEmail;
+import static com.instancy.instancylearning.utils.Utilities.isValidString;
 
 /**
  * Created by Upendranath on 7/18/2017 Working on InstancyLearning.
@@ -654,16 +656,22 @@ public class NativeSignupActivity extends AppCompatActivity {
                 Toast.makeText(context, "" + userObj.optString("message"), Toast.LENGTH_LONG).show();
                 Intent loginIntent = new Intent(NativeSignupActivity.this, Login_activity.class);
 
-                if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
-
-                    String userNames = userObj.getString("login");
-
-                }
+//                if (getResources().getString(R.string.app_name).equalsIgnoreCase(getResources().getString(R.string.app_esperanza))) {
+//
+//                    String userNames = userObj.getString("login");
+//
+//                }
 
                 if (userObj.getString("action").equalsIgnoreCase("selfregistration")) {
                     String userNames = userObj.getString("login");
                     String pwsdValue = userObj.getString("pwd");
+                    String autoLaunchId = userObj.optString("autolaunchcontentid");
                     Bundle bundle = new Bundle();
+
+                    if (isValidString(autoLaunchId)) {
+
+                        bundle.putString(AUTOLAUNCHCONTENTID_KEY, autoLaunchId);
+                    }
                     bundle.putString(BUNDLE_USERNAME, userNames);
                     bundle.putString(BUNDLE_PASSWORD, pwsdValue);
                     loginIntent.putExtras(bundle);

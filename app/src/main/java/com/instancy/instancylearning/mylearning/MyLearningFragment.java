@@ -402,6 +402,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 
                 }
 
+
                 svProgressHUD.dismiss();
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -446,6 +447,22 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 }
+
+                if (requestType.equalsIgnoreCase("COURSETRACKING")) {
+
+                    if (isValidString(response)) {
+
+                        pageIndex = 1;
+                        if (isDigimedica) {
+                            getMobileMyCatalogObjectsNew(true);
+                        } else {
+                            refreshMyLearning(true);
+                        }
+
+                        Log.d(TAG, "notifySuccess: " + response);
+                    }
+                }
+
 
                 swipeRefreshLayout.setRefreshing(false);
                 svProgressHUD.dismiss();
@@ -1426,11 +1443,11 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
         if (extensionStr.contains(".zip")) {
 
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID();
 
         } else {
             downloadDestFolderPath = view.getContext().getExternalFilesDir(null)
-                    + "/Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
+                    + "/.Mydownloads/Contentdownloads" + "/" + learningModel.getContentID() + localizationFolder;
         }
 
         boolean success = (new File(downloadDestFolderPath)).mkdirs();
@@ -2295,7 +2312,6 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                         } else {
                             injectFromDbtoModel();
                         }
-
                     }
                 } else {
 
@@ -2336,6 +2352,7 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
 //                    cmiSynchTask.synchCompleted = this;
                     cmiSynchTask.execute();
                 }
+                executeSiteWorkflowrulesOnTracking(myLearningModel);
             }
         }
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == RESULT_OK)
@@ -2357,6 +2374,8 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
                     }
                 }
             }
+
+
         }
         if (requestCode == DETAIL_CLOSE_CODE && resultCode == 0)
 
@@ -2594,7 +2613,20 @@ public class MyLearningFragment extends Fragment implements SwipeRefreshLayout.O
             jwVideosDownloadAsynch = new JwVideosDownloadAsynch(context, jwFileURLArray, jwFileLocalPathsArray);
             jwVideosDownloadAsynch.execute();
         }
+    }
 
+    public void executeSiteWorkflowrulesOnTracking(MyLearningModel learningModel) {
+
+        String paramsString = "strContentID=" + learningModel.getContentID() +
+                "&UserID=" + appUserModel.getUserIDValue()
+                + "&SiteID="
+                + appUserModel.getSiteIDValue()
+                + "&SCOID=" + learningModel.getScoId();
+
+        if (isNetworkConnectionAvailable(getContext(), -1)) {
+
+            vollyService.getStringResponseVolley("COURSETRACKING", appUserModel.getWebAPIUrl() + "CourseTracking/executeSiteWorkflowrulesOnTracking?" + paramsString, appUserModel.getAuthHeaders());
+        }
 
     }
 

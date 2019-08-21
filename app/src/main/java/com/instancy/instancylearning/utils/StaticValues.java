@@ -12,9 +12,14 @@ public class StaticValues {
      * Version of Database.
      */
 
-//    public static final int DATABASE_VERSION = 2; // Esperanza DB Version
+    public static final int DATABASE_VERSION = 4;
 
-    public static final int DATABASE_VERSION = 2; // Regular DB Version
+//        Esperanza DB Version for updated on July 29 2019
+//        applicationId "com.instancy.esperanza"
+//        versionCode 24
+//        versionName "3.1" db version 4
+
+//    public static final int DATABASE_VERSION = 2; // Regular DB Version
 
     public static final int DEFAULTSITEID = -1;
     public static final int DEFAULTUSERID = -1;
@@ -143,6 +148,7 @@ public class StaticValues {
 
     public static final int EXPERIENCE_ACT = 10101;
 
+    public static final int PREREQ_CLOSE = 5454;
 
     public static final int GLOBAL_SEARCH = 1001;
 

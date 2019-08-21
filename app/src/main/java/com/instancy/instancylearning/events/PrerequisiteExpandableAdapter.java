@@ -22,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -33,6 +34,9 @@ import com.instancy.instancylearning.models.UiSettingsModel;
 import com.instancy.instancylearning.mylearning.MyLearningScheduleChildModel;
 import com.instancy.instancylearning.utils.JsonLocalekeys;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -131,8 +135,7 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded,
-                             View convertView, ViewGroup parent) {
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         String groupName = getKey(groupPosition);
 
         PrerequisiteModel prerequisiteModel = (PrerequisiteModel) getChild(groupPosition, 0);
@@ -152,18 +155,21 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(groupName);
 
-        txtDescription.setText(prerequisiteModel.prereqGrouplabel);
+        if (isValidString(prerequisiteModel.prereqGrouplabel)) {
+            txtDescription.setText(prerequisiteModel.prereqGrouplabel);
+            txtDescription.setVisibility(View.VISIBLE);
+        } else {
+            txtDescription.setVisibility(View.GONE);
+        }
 
         return convertView;
     }
 
     @Override
-    public View getChildView(final int groupPosition, final int childPosition,
-                             boolean isLastChild, View convertView, final ViewGroup parent) {
+    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, final ViewGroup parent) {
         final PrerequisiteModel prerequisiteModel = (PrerequisiteModel) getChild(groupPosition, childPosition);
 
         final ViewHolder holder;
-
 
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
@@ -183,17 +189,6 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
         holder.parent = parent;
         holder.view = convertView;
 
-//        AppCompatTextView txtCourseName = convertView.findViewById(R.id.txtCourseName);
-//        AppCompatTextView txtCreatedOn = convertView.findViewById(R.id.txtCreatedOn);
-//        AppCompatTextView txtAuthor = convertView.findViewById(R.id.txtAuthor);
-//        AppCompatTextView lbAddedtoMylearning = convertView.findViewById(R.id.lbAddedtoMylearning);
-//        AppCompatTextView txtContentType = convertView.findViewById(R.id.txtContentType);
-//        CheckBox chxBoxPreq = (CheckBox) convertView.findViewById(R.id.chxBoxPreq);
-//        ImageView imageThumb = convertView.findViewById(R.id.imageThumb);
-//        FloatingActionButton fabbtnthumb = convertView.findViewById(R.id.fabbtnthumb);
-//        ImageButton contextMenu = convertView.findViewById(R.id.btn_contextmenu);
-
-
         holder.txtCourseName.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtCreatedOn.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtAuthor.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
@@ -201,12 +196,33 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
         holder.txtContentType.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
         holder.txtShortDesc.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
+        holder.txtSelectedDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
+//        holder.lbSelectedDate.setTextColor(Color.parseColor(uiSettingsModel.getAppTextColor()));
 
         holder.txtCourseName.setText(prerequisiteModel.Title);
         holder.txtCreatedOn.setText(prerequisiteModel.CreatedOn);
         holder.txtAuthor.setText(prerequisiteModel.AuthorDisplayName);
         holder.lbAddedtoMylearning.setText("");
         holder.txtContentType.setText(prerequisiteModel.ContentType);
+
+        if (prerequisiteModel.Prerequisites.equalsIgnoreCase("1") || prerequisiteModel.Prerequisites.equalsIgnoreCase("2") || prerequisiteModel.Prerequisites.equalsIgnoreCase("3")) {
+            if (prerequisiteModel.ContentTypeId.equalsIgnoreCase("70") && prerequisiteModel.EventScheduleType.equalsIgnoreCase("1")) {
+
+                if (isValidString(prerequisiteModel.EventStartDateTime) && isValidString(prerequisiteModel.EventEndDateTime)) {
+                    holder.selectedDateLayout.setVisibility(View.VISIBLE);
+                    holder.txtSelectedDate.setText(prerequisiteModel.EventStartDateTime + " - " + prerequisiteModel.EventEndDateTime);
+                    holder.lbSelectedDate.setText(getLocalizationValue(JsonLocalekeys.prerequis_label_selectedtimelabel));
+                }else {
+                    holder.selectedDateLayout.setVisibility(View.GONE);
+                }
+
+            }else {
+                holder.selectedDateLayout.setVisibility(View.GONE);
+            }
+
+        }else {
+            holder.selectedDateLayout.setVisibility(View.GONE);
+        }
 
 //        if (isValidString(prerequisiteModel.ShortDescription)) {
 //            holder.txtShortDesc.setVisibility(View.VISIBLE);
@@ -222,7 +238,7 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
 //
 //
 //        } else {
-            holder.txtShortDesc.setVisibility(View.GONE);
+        holder.txtShortDesc.setVisibility(View.GONE);
 //        }
 
         String imgUrl = "";
@@ -241,13 +257,14 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
 
         holder.fabbtnthumb.setBackgroundTintList(ColorStateList.valueOf(convertView.getResources().getColor(R.color.colorWhite)));
 
-
         holder.chxBoxPreq.setOnCheckedChangeListener(null);
         if (prerequisiteModel.Ischecked && prerequisiteModel.IsLearnerContent && groupPosition > 0) {
             holder.chxBoxPreq.setChecked(true);
             holder.chxBoxPreq.setEnabled(false);
             holder.lbAddedtoMylearning.setText(getLocalizationValue(JsonLocalekeys.prerequistesalerttitle2_alerttitle2));
+            holder.lbAddedtoMylearning.setVisibility(View.VISIBLE);
         } else {
+            holder.lbAddedtoMylearning.setVisibility(View.GONE);
             holder.chxBoxPreq.setChecked(prerequisiteModel.isItemChecked);
             holder.chxBoxPreq.setEnabled(true);
         }
@@ -303,6 +320,18 @@ public class PrerequisiteExpandableAdapter extends BaseExpandableListAdapter {
         @Nullable
         @BindView(R.id.txtContentType)
         TextView txtContentType;
+
+        @Nullable
+        @BindView(R.id.lbSelectedDate)
+        TextView lbSelectedDate;
+
+        @Nullable
+        @BindView(R.id.txtSelectedDate)
+        TextView txtSelectedDate;
+
+        @Nullable
+        @BindView(R.id.selectedDateLayout)
+        LinearLayout selectedDateLayout;
 
         @Nullable
         @BindView(R.id.txtShortDesc)
