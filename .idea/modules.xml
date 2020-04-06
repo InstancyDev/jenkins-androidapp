@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Instancy App.iml" filepath="$PROJECT_DIR$/Instancy App.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Instancy-Playground-Android.iml" filepath="$PROJECT_DIR$/Instancy-Playground-Android.iml" group="Instancy-Playground-Android" />
+      <module fileurl="file://$PROJECT_DIR$/app/Instancy-Playground-Android-app.iml" filepath="$PROJECT_DIR$/app/Instancy-Playground-Android-app.iml" group="Instancy-Playground-Android/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
