@@ -118,9 +118,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
-        lintOptions {
+        android {
+		lintOptions {
             checkReleaseBuilds false
             abortOnError false
+			}
         }
     }
 
